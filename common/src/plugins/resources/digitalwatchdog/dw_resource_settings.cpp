@@ -7,19 +7,41 @@
 DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_httpClient(host, port, timeout, auth)
 {
+    CLHttpStatus status = m_httpClient.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
+    if (status == CL_HTTP_SUCCESS) 
+    {
+        QByteArray body;
+        m_httpClient.readAll(body);
+        QList<QByteArray> lines = body.split(',');
+        for (int i = 0; i < lines.size(); ++i) 
+        {
+            QString str = QString::fromLatin1(lines[i]);
+            /*if (lines[i].toLower().contains("onvif_stream_number")) 
+            {
+                QList<QByteArray> params = lines[i].split(':');
+                if (params.size() >= 2) 
+                {
+                    int streams = params[1].trimmed().toInt();
 
+                    return streams >= 2;
+                }
+            }*/
+        }
+    }
+
+    //ToDo: log warning
 }
 
 bool DWCameraProxy::getFromCamera(const QString& name, QString& val)
 {
     //ToDo: implement
-    return true;
+    return false;
 }
 
 bool DWCameraProxy::setToCamera(const QString& name, const QString& value, const QString& query)
 {
     //ToDo: implement
-    return true;
+    return false;
 }
 
 //
@@ -62,7 +84,7 @@ bool DWCameraSetting::setToCamera(DWCameraProxy& proxy)
 const QString& DWCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
 const QString& DWCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
 
-DWCameraSettingReader::DWCameraSettingReader(CameraSettings& settings, const QString& filepath):
+DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& filepath):
     CameraSettingReader(filepath, QString::fromLatin1("DIGITALWATCHDOG")),
     m_settings(settings)
 {

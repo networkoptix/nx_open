@@ -61,12 +61,7 @@ bool QnPlWatchDogResource::initInternal()
     }
     else 
     {
-        bool res = QnPlOnvifResource::initInternal();
-        if (res) {
-            m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-        }
-
-        return res;
+        return QnPlOnvifResource::initInternal();
     }
 }
 
@@ -93,29 +88,26 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
-    if (!m_cameraProxy) {
-        //ToDo: log warning
-        return;
-    }
-
     QnPlOnvifResource::fetchAndSetCameraSettings();
+
+    if (!m_cameraProxy) {
+        m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    }    
 }
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    if (!m_cameraProxy) {
-        //ToDo: log warning
-        return false;
-    }
+    if (m_cameraProxy)
+    {
+        DWCameraSettings::Iterator it = m_settings.find(param.name());
+        if (it != m_settings.end()) {
+            if (it.value().getFromCamera(*m_cameraProxy)){
+                val.setValue(it.value().serializeToStr());
+                return true;
+            }
 
-    CameraSettings::ConstIterator it = m_settings.find(param.name());
-    if (it != m_settings.end()) {
-        if (it.value().getFromCamera(*m_cameraProxy)){
-            val.setValue(static_cast<QString>(it.value().getCurrent()));
-            return true;
+            return false;
         }
-
-        return false;
     }
 
     return QnPlOnvifResource::getParamPhysical(param, val);
@@ -123,16 +115,24 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    if (!m_cameraProxy) {
-        //ToDo: log warning
-        return false;
+    if (m_cameraProxy)
+    {
+        CameraSetting tmp;
+        tmp.deserializeFromStr(val.toString());
+
+        DWCameraSettings::Iterator it = m_settings.find(param.name());
+        if (it != m_settings.end()) {
+            CameraSettingValue oldVal = it.value().getCurrent();
+            it.value().setCurrent(tmp.getCurrent());
+
+            if (!it.value().setToCamera(*m_cameraProxy)) {
+                it.value().setCurrent(oldVal);
+                return false;
+            }
+
+            return true;
+        }
     }
 
-    CameraSettings::ConstIterator it = m_settings.find(param.name());
-    if (it != m_settings.end()) {
-        it.value().setCurrent(val.toString());
-        return it.value().setToCamera(*m_cameraProxy));
-    }
-
-    return QnPlOnvifResource::setParamPhysical();
+    return QnPlOnvifResource::setParamPhysical(param, val);
 }

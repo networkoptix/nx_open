@@ -1441,15 +1441,14 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
     QMutexLocker lock(&m_mutex);
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::ConstIterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param.name());
 
     if (it == settings.end()) {
         return false;
     }
 
-    OnvifCameraSetting tmp = it.value();
-    if (tmp.getFromCamera(*m_onvifAdditionalSettings)) {
-        val.setValue(tmp.serializeToStr());
+    if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {
+        val.setValue(it.value().serializeToStr());
         return true;
     }
 
@@ -1464,7 +1463,7 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
     tmp.deserializeFromStr(val.toString());
 
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
-    CameraSettings::ConstIterator it = settings.find(param.name());
+    CameraSettings::Iterator it = settings.find(param.name());
 
     if (it == settings.end())
     {
@@ -1473,19 +1472,26 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
         }
 
         //For Button only operation object is required
-        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it =
+        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator opIt =
             OnvifCameraSettingOperationAbstract::operations.find(param.name());
 
-        if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
+        if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
             return false;
         }
 
-        return it.value()->set(tmp, *m_onvifAdditionalSettings);
+        return opIt.value()->set(tmp, *m_onvifAdditionalSettings);
     }
 
-    OnvifCameraSetting tmpOnvif = it.value();
-    tmpOnvif.setCurrent(tmp.getCurrent());
-    return tmpOnvif.setToCamera(*m_onvifAdditionalSettings);
+    CameraSettingValue oldVal = it.value().getCurrent();
+    it.value().setCurrent(tmp.getCurrent());
+
+
+    if (!it.value().setToCamera(*m_onvifAdditionalSettings)) {
+        it.value().setCurrent(oldVal);
+        return false;
+    }
+
+    return true;
 }
 
 void QnPlOnvifResource::fetchAndSetCameraSettings()

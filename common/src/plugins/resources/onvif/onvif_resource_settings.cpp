@@ -82,6 +82,7 @@ bool OnvifCameraSettingsResp::makeSetRequest()
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
     request.ImagingSettings = m_valsResponse->ImagingSettings;
+    request.VideoSourceToken = m_videoSrcToken;
 
     int soapRes = soapWrapper.setImagingSettings(request, response);
     if (soapRes != SOAP_OK) {
@@ -210,7 +211,9 @@ bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraS
 
     output.setMin(rangesResp.ImagingOptions->WhiteBalance->YbGain->Min);
     output.setMax(rangesResp.ImagingOptions->WhiteBalance->YbGain->Max);
+
     output.setStep(1.0);
+
     output.setCurrent(*(valsResp.ImagingSettings->WhiteBalance->CbGain));
 
     return true;

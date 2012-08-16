@@ -47,7 +47,7 @@ public:
     bool setToCamera(DWCameraProxy& proxy);
 };
 
-typedef QHash<QString, DWCameraSetting> CameraSettings;
+typedef QHash<QString, DWCameraSetting> DWCameraSettings;
 
 //
 // class DWCameraSettingReader
@@ -58,10 +58,10 @@ class DWCameraSettingReader: public CameraSettingReader
     static const QString& IMAGING_GROUP_NAME;
     static const QString& MAINTENANCE_GROUP_NAME;
 
-    CameraSettings& m_settings;
+    DWCameraSettings& m_settings;
 
 public:
-    DWCameraSettingReader(CameraSettings& settings, const QString& filepath);
+    DWCameraSettingReader(DWCameraSettings& settings, const QString& filepath);
     virtual ~DWCameraSettingReader();
 
 protected:

@@ -154,6 +154,13 @@
     <group name = "Imaging"
            description ="">
 
+      <group name = "White Balance"
+           description ="">
+        
+        
+        
+      </group>
+
       <param name = "WB mode"
              description = ""
              widget_type = "Enumeration"

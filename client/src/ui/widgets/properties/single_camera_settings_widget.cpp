@@ -1,6 +1,7 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-#include "core/resource/video_server.h"
+//#include "core/resource/video_server.h"
+#include <core/resource/video_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>

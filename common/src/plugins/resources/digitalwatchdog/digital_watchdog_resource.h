@@ -12,6 +12,7 @@ class QnPlWatchDogResource : public QnPlOnvifResource
 {
 public:
     QnPlWatchDogResource();
+    ~QnPlWatchDogResource();
 
     virtual int suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const override;
 
@@ -26,7 +27,7 @@ private:
 
 private:
     DWCameraProxy* m_cameraProxy;
-    CameraSettings m_settings;
+    DWCameraSettings m_settings;
 };
 
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
