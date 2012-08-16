@@ -451,7 +451,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
 
-    if (QnScreenRecorder::isSupported){
+    if (QnScreenRecorder::isSupported()){
         factory(Qn::ScreenRecordingAction).
             flags(Qn::Main).
             text(tr("Start Screen Recording")).
