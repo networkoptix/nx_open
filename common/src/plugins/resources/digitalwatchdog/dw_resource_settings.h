@@ -26,6 +26,9 @@ public:
 
 class DWCameraSetting: public CameraSetting
 {
+    typedef QHash<QString, int> EnumStrToInt;
+    EnumStrToInt m_enumStrToInt;
+
 public:
 
     DWCameraSetting(): CameraSetting() {};
@@ -45,6 +48,7 @@ public:
 
     bool getFromCamera(DWCameraProxy& proxy);
     bool setToCamera(DWCameraProxy& proxy);
+    int getCurrentAsInt() const;
 };
 
 typedef QHash<QString, DWCameraSetting> DWCameraSettings;

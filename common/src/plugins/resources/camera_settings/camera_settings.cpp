@@ -359,17 +359,15 @@ bool CameraSettingReader::proceed()
 
     QDomNode node = root.firstChild();
 
-    while (!node.isNull())
+    for (; !node.isNull(); node = node.nextSibling())
     {
         if (node.toElement().tagName() == QLatin1String("camera"))
         {
-            if (node.attributes().namedItem(ATTR_NAME).nodeValue() != QLatin1String("ONVIF")) {
+            if (node.attributes().namedItem(ATTR_NAME).nodeValue() != m_cameraId) {
                 continue;
             }
             return parseCameraXml(node.toElement());
         }
-
-        node = node.nextSibling();
     }
 
     qWarning() << "File '" << m_filepath << "'. Can't find camera: " << m_cameraId;

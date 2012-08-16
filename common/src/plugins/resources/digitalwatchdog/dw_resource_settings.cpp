@@ -98,14 +98,8 @@ DWCameraSettingReader::~DWCameraSettingReader()
 
 bool DWCameraSettingReader::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
 {
-    if (m_settings.isEmpty() && id == IMAGING_GROUP_NAME)
-    {
-        //Group is enabled by default, to disable we should make a record, which equals empty object
-        m_settings.insert(id, DWCameraSetting());
-
-        return false;
-    }
-
+    //ToDo: check for the duplicated id
+    m_settings.insert(id, DWCameraSetting());
     return true;
 }
 

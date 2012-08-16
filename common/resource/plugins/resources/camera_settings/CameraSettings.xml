@@ -249,7 +249,7 @@
              max = "10"
              query = "dnbwlevel1"/>
 
-        <param name = "Switching from Color to B/W"
+        <param name = "Switching from B/W to Color"
              description = ""
              widget_type = "MinMaxStep"
              min = "0"

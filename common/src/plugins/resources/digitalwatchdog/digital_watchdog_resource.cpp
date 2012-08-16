@@ -94,8 +94,8 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
         m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
     }
 
-    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    //QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     DWCameraSettingReader reader(m_settings, filepath);
     reader.read() && reader.proceed();
 }
