@@ -2,6 +2,7 @@
 #include "ffmpeg_transcoder.h"
 #include "ffmpeg_video_transcoder.h"
 #include "quick_sync_transcoder.h"
+#include "core/resource/media_resource.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -73,10 +74,27 @@ QnTranscoder::~QnTranscoder()
 
 }
 
+int QnTranscoder::suggestBitrate(QSize resolution) const
+{
+    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+
+    int hiEnd = 1024*2;
+
+    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240
+
+    int result = hiEnd * resolutionFactor;
+
+    return qMax(128,result)*1024;
+}
+
 int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
-    if (bitrate == -1)
-        bitrate = resolution.width() * resolution.height() * 5;
+    if (bitrate == -1) {
+        //bitrate = resolution.width() * resolution.height() * 5;
+        bitrate = suggestBitrate(resolution);
+    }
 
     m_videoCodec = codec;
     switch (method)

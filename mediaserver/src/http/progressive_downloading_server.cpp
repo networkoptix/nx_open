@@ -149,17 +149,6 @@ void QnProgressiveDownloadingConsumer::run()
         return;
     }
 
-    if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
-    //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
-    {
-        QByteArray msg;
-        msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
-        qWarning() << msg;
-        d->responseBody = msg;
-        sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
-        return;
-    }
-
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
     d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
@@ -178,6 +167,32 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
+
+        QSize videoSize(640,480);
+        QList<QByteArray> resolution = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().split('x');
+        if (resolution.size() == 2)
+        {
+            videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
+            if (videoSize.width() < 16 || videoSize.height() < 16)
+            {
+                qWarning() << "Invalid resolution specified for web streaming. Defaulting to 640x480";
+                videoSize = QSize(640,480);
+            }
+        }
+
+
+        if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize) != 0)
+            //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)
+        {
+            QByteArray msg;
+            msg = QByteArray("Transcoding error. Can not setup video codec:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
+            qWarning() << msg;
+            d->responseBody = msg;
+            sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
+            return;
+        }
+
+
 
         QnResourcePtr resource = qnResPool->getResourceByUniqId(fi.baseName());
         if (resource == 0)
