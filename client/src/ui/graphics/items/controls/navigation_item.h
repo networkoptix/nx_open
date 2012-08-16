@@ -63,11 +63,12 @@ private:
     QnImageButtonWidget *m_playButton;
     QnImageButtonWidget *m_stepForwardButton;
     QnImageButtonWidget *m_jumpForwardButton;
-    QnImageButtonWidget *m_liveButton;
-    QnImageButtonWidget *m_mrsButton;
-    QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_muteButton;
+
+    QnImageButtonWidget *m_liveButton;
+    QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_thumbnailsButton;
+    QnImageButtonWidget *m_calendarButton;
 
     GraphicsLabel *m_timeLabel;
 

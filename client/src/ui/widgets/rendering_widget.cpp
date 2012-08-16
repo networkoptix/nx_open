@@ -55,9 +55,10 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
     }
     
     if(resource) {
-        m_channelScreenSize = QSize();
         m_display = new QnResourceDisplay(resource, this);
         m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
+        updateChannelScreenSize();
+
         m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */
         m_display->start();
 
@@ -66,6 +67,19 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
         m_display->camDisplay()->setMTDecoding(true);
     }
 }
+
+void QnRenderingWidget::updateChannelScreenSize() {
+    if(!m_renderer) {
+        m_channelScreenSize = QSize();
+    } else {
+        QSize channelScreenSize = QSizeF(width() / m_display->videoLayout()->width(), height() / m_display->videoLayout()->height()).toSize();
+        if(channelScreenSize != m_channelScreenSize) {
+            m_channelScreenSize = channelScreenSize;
+            m_renderer->setChannelScreenSize(m_channelScreenSize);
+        }
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -90,12 +104,7 @@ void QnRenderingWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (m_renderer) {
-        /* Update screen size of a single channel. */
-        QSize channelScreenSize = QSizeF(width() / m_display->videoLayout()->width(), height() / m_display->videoLayout()->height()).toSize();
-        if(channelScreenSize != m_channelScreenSize) {
-            m_channelScreenSize = channelScreenSize;
-            m_renderer->setChannelScreenSize(m_channelScreenSize);
-        }
+        updateChannelScreenSize();
 
         /* Paint frame. */
         QSize sourceSize = m_renderer->sourceSize();

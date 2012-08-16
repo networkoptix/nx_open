@@ -539,6 +539,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         m_calendarShowButton->setTransform(transform);
     }
     m_calendarShowButton->setFocusProxy(m_calendarItem);
+    m_calendarShowButton->setVisible(false);
 
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
@@ -555,9 +556,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
-
-    /*m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());*/
 
     connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
@@ -1049,7 +1047,10 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
     if (QnCalendarWidget* c = dynamic_cast<QnCalendarWidget *>(m_calendarItem->widget()))
         calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
 
-    bool calendarVisible = !calendarEmpty && m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: does this belong here?
+
+    bool calendarVisible = calendarEnabled && m_sliderVisible && m_sliderOpened;
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
