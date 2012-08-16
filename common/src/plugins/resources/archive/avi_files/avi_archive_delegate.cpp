@@ -9,6 +9,7 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "utils/media/nalUnits.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -182,8 +183,13 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
-
         stream= m_formatContext->streams[packet.stream_index];
+        if (stream->codec->codec_id == CODEC_ID_H264 && packet.size == 6)
+        {
+            // may be H264 delimiter as separate packet. remove it
+            if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nuDelimiter)
+                continue; // skip delimiter
+        }
 
         if (m_indexToChannel.isEmpty())
             initLayoutStreams();

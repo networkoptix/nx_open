@@ -409,7 +409,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (sleep && m_lastFrameDisplayed != QnVideoStreamDisplay::Status_Buffered)
     {
-        qint64 realSleepTime = 0;
+        qint64 realSleepTime = AV_NOPTS_VALUE;
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
@@ -470,9 +470,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
         }
-
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
-        hurryUpCheck(vd, speed, needToSleep, realSleepTime);
+        if (realSleepTime != AV_NOPTS_VALUE)
+            hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
     int channel = vd->channelNumber;
