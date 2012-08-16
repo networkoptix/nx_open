@@ -11,6 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/screen_recording/screen_recorder.h>
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
@@ -449,15 +450,18 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    factory(Qn::ScreenRecordingAction).
-        flags(Qn::Main).
-        text(tr("Start Screen Recording")).
-        toggledText(tr("Stop Screen Recording")).
-        shortcut(tr("Alt+R")).
-        shortcut(Qt::Key_MediaRecord).
-        shortcutContext(Qt::ApplicationShortcut).
-        icon(qnSkin->icon("decorations/recording.png")).
-        autoRepeat(false);
+
+    if (QnScreenRecorder::isSupported){
+        factory(Qn::ScreenRecordingAction).
+            flags(Qn::Main).
+            text(tr("Start Screen Recording")).
+            toggledText(tr("Stop Screen Recording")).
+            shortcut(tr("Alt+R")).
+            shortcut(Qt::Key_MediaRecord).
+            shortcutContext(Qt::ApplicationShortcut).
+            icon(qnSkin->icon("decorations/recording.png")).
+            autoRepeat(false);
+    }
 
     factory(Qn::FullscreenAction).
         flags(Qn::Main).

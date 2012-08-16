@@ -25,7 +25,13 @@ public:
     /**
      * \returns                         Whether screen recording is supported. 
      */
-    bool isSupported() const;
+    static bool isSupported(){
+        #ifdef Q_OS_WIN
+            return true;
+        #else
+            return false;
+        #endif
+        }
 
     /**
      * \returns                         Whether recording is in progress.
