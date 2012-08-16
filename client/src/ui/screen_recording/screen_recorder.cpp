@@ -95,6 +95,14 @@ QnScreenRecorder::~QnScreenRecorder() {
     stopRecording();
 }
 
+bool QnScreenRecorder::isSupported() {
+#ifdef Q_OS_WIN
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool QnScreenRecorder::isRecording() const {
     return m_recording;
 }
