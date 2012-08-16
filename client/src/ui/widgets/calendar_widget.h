@@ -34,19 +34,9 @@ signals:
     /**
     * Signal is emitted when cell was clicked (even if it is already selected date)
     */
-    void dateUpdate(const QDate &date); // TODO: signals that are part of public interface are named as 'somethingHappened', in this case - 'dateClicked'
-
+    void dateClicked(const QDate &date);
 protected:
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
-
-protected slots:
-    // TODO: slots are named either as 'doSomething' or as 'at_somewhere_somethingHappened', where 'somewhere' is a name of an object,
-    // and 'somethingHappened' is a name of a signal of this object that this slot handles. In this case a better name is 'at_tableView_changeDate'
-    // 
-    // OR even better, just connect tableView's signal directly to 'dateClicked' signal of this object.
-
-    void dateChanged(const QDate &date); 
-
 private:
     QnTimePeriodStorage m_currentTimeStorage;
     QnTimePeriodStorage m_syncedTimeStorage;

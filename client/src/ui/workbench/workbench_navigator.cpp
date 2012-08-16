@@ -191,7 +191,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeScrollBar,                    SIGNAL(sliderReleased()),                           this,   SLOT(at_timeScrollBar_sliderReleased()));
     m_timeScrollBar->installEventFilter(this);
 
-    connect(m_calendar,                         SIGNAL(dateUpdate(const QDate&)),                   this,   SLOT(at_calendar_dateChanged(const QDate&)));
+    connect(m_calendar,                         SIGNAL(dateClicked(const QDate&)),                  this,   SLOT(at_calendar_dateChanged(const QDate&)));
 
     updateLines();
     updateScrollBarFromSlider();
