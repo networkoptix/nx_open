@@ -23,6 +23,9 @@ public:
     void setResource(const QnMediaResourcePtr &resource);
 
 protected:
+    void updateChannelScreenSize();
+
+protected:
     virtual void initializeGL() override;
     virtual void paintGL() override;
     virtual void resizeGL(int width, int height) override;
