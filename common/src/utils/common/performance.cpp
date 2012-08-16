@@ -455,7 +455,7 @@ namespace{
             output->clear();
             for( map<pair<int, int>, DiskStatContext>::const_iterator
                  it = m_devNameToStat.begin();
-                 it != m_devNameToStat.begin();
+                 it != m_devNameToStat.end();
                  ++it )
             {
                 output->append( it->second.prevStat.diskUtilizationPercent );
@@ -863,5 +863,4 @@ int QnPerformance::cpuCoreCount() {
 bool QnPerformance::currentHddUsage(QList<int> *output){
     return refresherInstance()->hddUsage(output);
 }
-
 

@@ -8,6 +8,7 @@
 #include "recorder/storage_manager.h"
 #include "utils/common/performance.h"
 
+
 int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray)
 {
     Q_UNUSED(params)
@@ -19,26 +20,14 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
 
     result.append("<storages>\n");
 
-#if defined(Q_OS_WIN)
-    QList<int> *hddUsage = new QList<int>();
-    QnPerformance::currentHddUsage(hddUsage);
-    for (int i = 0; i < hddUsage->count(); i++){
+    QList<int> hddUsage;
+    QnPerformance::currentHddUsage(&hddUsage);
+    for (int i = 0; i < hddUsage.count(); i++){
         result.append("<storage>\n");
         result.append(QString("<url>HDD%1</url>\n").arg(i));
-        result.append(QString("<usage>%1</usage>\n").arg(hddUsage->at(i)));
+        result.append(QString("<usage>%1</usage>\n").arg(hddUsage.at(i)));
         result.append("</storage>\n");
     }
-    delete hddUsage;
-#else
-    // old way calculating
-    foreach(QnStorageResourcePtr storage, storages)
-    {
-        result.append("<storage>\n");
-        result.append(QString("<url>%1</url>\n").arg(storage->getUrl()));
-        result.append(QString("<usage>%1</usage>\n").arg(int(storage->getAvarageWritingUsage() * 100 + 0.5)));
-        result.append("</storage>\n");
-    }
-#endif
     result.append("</storages>\n");
 
     result.append("<cpuinfo>\n");
