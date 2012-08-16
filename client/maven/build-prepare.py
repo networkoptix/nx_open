@@ -14,67 +14,69 @@ def platform():
     elif sys.platform == 'linux2':
         return 'linux'
 
-def genskin():
+def genqrc(qrcname, qrcprefix, path, extensions, additions=''):
   os.path = posixpath
 
-  skin_qrc = open('build/skin.qrc', 'w')
+  qrcfile = open(qrcname, 'w')
 
-  print >> skin_qrc, """
-  <!DOCTYPE RCC>
-  <RCC version="1.0">
-  <qresource prefix="/skin">
-  """
+  print >> qrcfile, '<!DOCTYPE RCC>'
+  print >> qrcfile, '<RCC version="1.0">'
+  print >> qrcfile, '<qresource prefix="%s">' % (qrcprefix)
 
-  skin_dir = '${basedir}/resource/${custom.skin}/skin'
-  for root, dirs, files in os.walk(skin_dir):
-    parent = root[len(skin_dir) + 1:]
-
-    for f in files:
-      if f.endswith('.png'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
-      if f.endswith('.mkv'):
-        print >> skin_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
-  
-  print >> skin_qrc, '<file alias="globals.ini">${project.build.directory}/globals.ini</file>'
-  print >> skin_qrc, """
-  </qresource>
-  </RCC>
-  """  
-  
-  skin_qrc.close()		
-
-def gentranslations():
-  os.path = posixpath
-
-  translations_qrc = open('build/client_translations.qrc', 'w')
-
-  print >> translations_qrc, """
-  <!DOCTYPE RCC>
-  <RCC version="1.0">
-  <qresource prefix="/translations">
-  """
-
-  translations_project_dir = '${project.build.sourceDirectory}/translations'
-  for root, dirs, files in os.walk(translations_project_dir):
-    parent = root[len(translations_project_dir) + 1:]
+  for root, dirs, files in os.walk(path):
+    parent = root[len(path) + 1:]
     if '.svn' in dirs:
       dirs.remove('.svn')  # don't visit SVN directories
 
     for f in files:
-      if f.endswith('.qm'):
-        print >> translations_qrc, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
-
-  print >> translations_qrc, """
-  </qresource>
-  </RCC>
-  """  
+      for extension in extensions:
+        if f.endswith(extension):
+          print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
   
-  translations_qrc.close()		  
+  print >> qrcfile, additions
+  print >> qrcfile, '</qresource>'
+  print >> qrcfile, '</RCC>'
+  
+  qrcfile.close()		
+
 
 if __name__ == '__main__':
   os.system('mkdir build')
-  genskin()
+  genqrc('build/skin.qrc', '/skin', '${basedir}/resource/${custom.skin}/skin', ['.png', '.mkv'], '<file alias="globals.ini">${project.build.directory}/globals.ini</file>')
+  genqrc('build/client.qrc', '/', '${basedir}/resource/common', ['.conf'])
+  
   os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
-  gentranslations()
+  genqrc('build/client_translations.qrc', '/translations', '${project.build.sourceDirectory}/translations', ['.qm'])
+  
   if platform() == 'linux':
     os.system('unzip -a -u *.zip')
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
