@@ -158,10 +158,17 @@ namespace Qn {
     Q_DECLARE_FLAGS(Permissions, Permission)
 
     enum UserRight{
-        CreateLayoutRight           = 0x00000001,
-        CreateUserRight             = 0x00000002,
-        SuperUserRight              = 0x00000004,
-        EditUserRight               = 0x00000008
+        EditLayoutRight             = 0x00000001,
+        ProtectedRight              = 0x00000002,
+        EditProtectedUserRight      = 0x00000004,
+        EditUserRight               = 0x00000008,
+        EditCameraRight             = 0x00000010,
+        EditServerRight             = 0x00000020,
+
+        /* Combined rights */
+        AdminRight                  = EditLayoutRight | EditUserRight | ProtectedRight | EditCameraRight | EditServerRight,
+        SuperUserRight              = AdminRight | EditProtectedUserRight
+
     };
     Q_DECLARE_FLAGS(UserRights, UserRight)
 

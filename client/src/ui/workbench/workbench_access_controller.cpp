@@ -80,39 +80,31 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
 
-    Qn::Permission result = 0;
+    Qn::Permissions result = 0;
     quint64 rights = m_user->getRights();
-    quint64 other_rights = user->getRights();
 
     if (user == m_user)
         result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;    // everyone can edit own data
     else
-        if (rights && Qn::CreateUserRight)
+        if (rights && Qn::EditUserRight)
             result |= Qn::CreateUserPermission;                                 // no one can create themselve
 
-    if (rights && Qn::CreateLayoutRight)                                        // layout-admin can create layouts
+    if (rights && Qn::EditLayoutRight)                                          // layout-admin can create layouts
         result |= Qn::CreateLayoutPermission;
 
-    if (rights && Qn::SuperUserRight){                                          // super-user can edit every user
-        result |= Qn::ReadWriteSavePermission;
-        if (user != m_user)
-            result |= Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+    if (user != m_user && rights && Qn::EditUserRight){
+        result |= Qn::ReadPermission;
+        // protected users (admins?) can only be edited by super-user
+        if ((rights && Qn::EditProtectedUserRight) ||  !(user->getRights() && Qn::ProtectedRight))
+            result |= Qn::ReadWriteSavePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
-
-    if (rights && Qn::EditUserRight){
-        if (user != m_user){
-            if (other_rights && Qn::EditUserRight)
-                result |= Qn::ReadPermission;                                   // user-admin cannot edit other admins
-            else                                                                // user-admin can edit other users
-                result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
-        }
-    }
+    return result;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
     if(isFileLayout(layout)) {
         return Qn::ReadPermission;
-    } else if(isAdmin() || isOwner()) {
+    } else if(m_user->getRights() && Qn::EditLayoutRight) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
@@ -128,7 +120,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &) {
-    if(isAdmin() || isOwner()) {
+    if(m_user->getRights() && Qn::EditCameraRight) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return Qn::ReadPermission;
@@ -140,7 +132,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstra
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {
-    if(isAdmin() || isOwner()) {
+    if(m_user->getRights() && Qn::EditServerRight) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return 0;
