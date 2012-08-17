@@ -36,7 +36,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez;
 }
 
-QnFileStorageResource::QnFileStorageResource()
+QnFileStorageResource::QnFileStorageResource():
+    m_storageBitrateCoeff(1.0)
 {
 
 };
@@ -166,4 +167,15 @@ float QnFileStorageResource::getAvarageWritingUsage() const
 {
     QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getUrl());
     return writer ? writer->getAvarageUsage() : 0;
+}
+
+float QnFileStorageResource::bitrate() const
+{
+    return QnStorageResource::bitrate() * m_storageBitrateCoeff;
+}
+
+void QnFileStorageResource::setStorageBitrateCoeff(float value)
+{
+    qDebug() << "QnFileStorageResource " << getUrl() << "coeff " << value;
+    m_storageBitrateCoeff = value;
 }

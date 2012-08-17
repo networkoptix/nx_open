@@ -201,10 +201,11 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    qnLogMsgHandler(type, msg);
+    qnLogMsgHandler( type, msg );
 }
 
 #ifndef API_TEST_MAIN
+
 int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
@@ -327,7 +328,7 @@ int main(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);

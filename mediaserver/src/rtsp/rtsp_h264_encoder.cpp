@@ -123,6 +123,7 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
             Q_ASSERT(m_currentData < m_nalEnd);
         }
     }
+    return true;
 }
 
 void QnRtspH264Encoder::init()

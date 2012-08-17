@@ -13,6 +13,7 @@
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/screen_recording/screen_recorder.h"
 
 #include <ui/widgets/settings/connections_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
@@ -45,8 +46,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
     ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
 
-    m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-    ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+    if (QnScreenRecorder::isSupported()){
+        m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
+        ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+    }
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
@@ -123,12 +126,7 @@ void QnPreferencesDialog::accept() {
     submitToSettings();
     if (oldLanguage != m_settings->language())
         QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
-
-    if (m_recordingSettingsWidget && m_recordingSettingsWidget->decoderQuality() == Qn::BestQuality && m_recordingSettingsWidget->resolution() == Qn::NativeResolution)
-        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
-
     //m_youTubeSettingsWidget->accept();
-
     base_type::accept();
 }
 

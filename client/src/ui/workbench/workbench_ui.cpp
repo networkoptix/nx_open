@@ -526,6 +526,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     /* Calendar. */
     QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     navigator()->setCalendar(calendarWidget);
+    connect(calendarWidget, SIGNAL(emptyChanged()), this, SLOT(updateCalendarVisibility()));
 
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
@@ -538,6 +539,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         m_calendarShowButton->setTransform(transform);
     }
     m_calendarShowButton->setFocusProxy(m_calendarItem);
+    m_calendarShowButton->setVisible(false);
 
     m_calendarOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
@@ -554,9 +556,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarItem));
     m_calendarOpacityAnimatorGroup->addAnimator(opacityAnimator(m_calendarShowButton)); /* Speed of 1.0 is OK here. */
-
-    /*m_calendarItem->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
-    m_calendarShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());*/
 
     connect(m_calendarShowButton,       SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_calendarShowButton_toggled(bool)));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateCalendarOpacity()));
@@ -647,7 +646,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setHelpVisible(true, false);
     setCalendarOpened(false, false);
     setCalendarVisible(false);
-
+    updateControlsVisibility(false);
 
     /* Tree is pinned by default. */
     m_treePinButton->setChecked(true);
@@ -1044,7 +1043,14 @@ void QnWorkbenchUi::updateCalendarOpacity(bool animate) {
 }
 
 void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
-    bool calendarVisible = m_sliderVisible && m_sliderOpened && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    bool calendarEmpty = true;
+    if (QnCalendarWidget* c = dynamic_cast<QnCalendarWidget *>(m_calendarItem->widget()))
+        calendarEmpty = c->isEmpty(); /* Small hack. We have a signal that updates visibility if a calendar receive new data */
+
+    bool calendarEnabled = !calendarEmpty && (navigator()->currentWidget() && navigator()->currentWidget()->resource()->flags() & QnResource::utc);
+    action(Qn::ToggleCalendarAction)->setEnabled(calendarEnabled); // TODO: does this belong here?
+
+    bool calendarVisible = calendarEnabled && m_sliderVisible && m_sliderOpened;
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
@@ -1062,12 +1068,14 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
-        setHelpVisible(hovered, animate);
+        //setHelpVisible(hovered, animate);
+        setHelpVisible(false, false);
     } else {
         setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
-        setHelpVisible(true, animate);
+        //setHelpVisible(true, animate);
+        setHelpVisible(false, false);
     }
 
     updateCalendarVisibility(animate);

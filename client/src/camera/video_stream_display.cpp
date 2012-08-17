@@ -174,7 +174,7 @@ void QnVideoStreamDisplay::reorderPrevFrames()
 void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
 {
     if (m_maxReverseQueueSize == -1) {
-        int bytesPerPic = avpicture_get_size(dec->getFormat(), dec->getWidth(), dec->getHeight());
+        int bytesPerPic = avpicture_get_size(dec->GetPixelFormat(), dec->getWidth(), dec->getHeight());
         m_maxReverseQueueSize = MAX_REVERSE_QUEUE_SIZE / bytesPerPic;
     }
     
@@ -295,7 +295,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     }
 
     if (tmpFrame->width == 0) {
-        dec->getLastDecodedFrame(tmpFrame.data());
+        getLastDecodedFrame( dec, tmpFrame.data() );
     }
 
     m_mtx.unlock();
@@ -767,4 +767,40 @@ void QnVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
 QSize QnVideoStreamDisplay::getImageSize() const
 {
     return m_imageSize;
+}
+
+bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame )
+{
+    const AVFrame* lastFrame = dec->lastFrame();
+    if( !lastFrame || dec->GetPixelFormat() == -1 || dec->getWidth() == 0 )
+        return false;
+
+    outFrame->setUseExternalData( false );
+    outFrame->reallocate( dec->getWidth(), dec->getHeight(), dec->GetPixelFormat(), lastFrame->linesize[0] );
+
+    if( lastFrame->interlaced_frame && dec->isMultiThreadedDecoding() )
+    {
+        avpicture_deinterlace( (AVPicture*) outFrame, (AVPicture*) lastFrame, dec->GetPixelFormat(), dec->getWidth(), dec->getHeight() );
+        outFrame->pkt_dts = lastFrame->pkt_dts;
+    }
+    else
+    {
+        if( outFrame->format == PIX_FMT_YUV420P )
+        {
+            // optimization
+            for (int i = 0; i < 3; ++ i) 
+            {
+                int h = lastFrame->height >> (i > 0 ? 1 : 0);
+                memcpy( outFrame->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );
+            }
+        }
+        else
+        {
+            av_picture_copy( (AVPicture*)outFrame, (AVPicture*)(lastFrame), dec->GetPixelFormat(), dec->getWidth(), dec->getHeight() );
+        }
+        outFrame->pkt_dts = lastFrame->pkt_dts;
+    }
+
+    outFrame->format = dec->GetPixelFormat();
+    return true;
 }

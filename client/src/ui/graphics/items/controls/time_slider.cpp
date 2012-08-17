@@ -233,7 +233,16 @@ namespace {
         return result;
     }
 
-    void drawCroppedPixmap(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const QPixmap &pixmap, const QRectF &source, QRectF *drawnTarget = NULL) {
+    void drawData(QPainter *painter, const QRectF &targetRect, const QPixmap &data, const QRectF &sourceRect) {
+        painter->drawPixmap(targetRect, data, sourceRect);
+    }
+
+    void drawData(QPainter *painter, const QRectF &targetRect, const QImage &data, const QRectF &sourceRect) {
+        painter->drawImage(targetRect, data, sourceRect);
+    }
+
+    template<class Data>
+    void drawCroppedData(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const Data &data, const QRectF &source, QRectF *drawnTarget = NULL) {
         MarginsF targetMargins(
             qMax(0.0, cropTarget.left() - target.left()),
             qMax(0.0, cropTarget.top() - target.top()),
@@ -255,11 +264,19 @@ namespace {
             MarginsF sourceMargins = QnGeometry::cwiseMul(QnGeometry::cwiseDiv(targetMargins, target.size()), source.size());
             QRectF erodedSource = QnGeometry::eroded(source, sourceMargins);
 
-            painter->drawPixmap(erodedTarget, pixmap, erodedSource);
+            drawData(painter, erodedTarget, data, erodedSource);
         }
 
         if(drawnTarget)
             *drawnTarget = erodedTarget;
+    }
+
+    void drawCroppedPixmap(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const QPixmap &pixmap, const QRectF &source, QRectF *drawnTarget = NULL) {
+        drawCroppedData(painter, target, cropTarget, pixmap, source, drawnTarget);
+    }
+
+    void drawCroppedImage(QPainter *painter, const QRectF &target, const QRectF &cropTarget, const QImage &image, const QRectF &source, QRectF *drawnTarget = NULL) {
+        drawCroppedData(painter, target, cropTarget, image, source, drawnTarget);
     }
 
 } // anonymous namespace
@@ -1637,13 +1654,16 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
 }
 
 void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect) {
-    const QPixmap &pixmap = data.thumbnail.pixmap();
+    const QImage &image = data.thumbnail.pixmap();
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * data.opacity);
 
     QRectF rect;
-    drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect(), &rect);
+    drawCroppedImage(painter, targetRect, boundingRect, image, image.rect(), &rect);
+
+    //QPixmap pixmap = QPixmap::fromImage(image);
+    //drawCroppedPixmap(painter, targetRect, boundingRect, pixmap, pixmap.rect(), &rect);
 
     if(!rect.isEmpty()) {
         qreal a = data.selection;

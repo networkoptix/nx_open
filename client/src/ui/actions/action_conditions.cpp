@@ -107,7 +107,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image);
+        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server);
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -237,7 +237,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & QnResource::still_image)
+    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->currentRenderStatus();

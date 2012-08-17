@@ -1,8 +1,4 @@
-#ifdef WIN32
 #include "openssl/evp.h"
-#else
-#include "evp.h"
-#endif
 
 #include "soap_wrapper.h"
 #include "onvif/Onvif.nsmap"

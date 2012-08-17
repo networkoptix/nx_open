@@ -95,7 +95,7 @@ QnScreenRecorder::~QnScreenRecorder() {
     stopRecording();
 }
 
-bool QnScreenRecorder::isSupported() const {
+bool QnScreenRecorder::isSupported() {
 #ifdef Q_OS_WIN
     return true;
 #else
@@ -163,6 +163,8 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
 
     m_recording = true;
     emit recordingStarted();
+#else
+    Q_UNUSED(appWidget)
 #endif
 }
 

@@ -493,9 +493,7 @@ void QnResourceWidget::setChannelOverlay(int channel, Overlay overlay) {
     state.overlay = overlay;
 }
 
-QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel) const {
-    QnResource::Status resourceStatus = m_resource->getStatus();
-
+QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel, int resourceStatus) const {
     if (resourceStatus == QnResource::Offline) {
         return OfflineOverlay;
     } else if (resourceStatus == QnResource::Unauthorized) {
@@ -510,6 +508,10 @@ QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel)
             return EmptyOverlay;
         }
     }
+}
+
+QnResourceWidget::Overlay QnResourceWidget::calculateChannelOverlay(int channel) const {
+    return calculateChannelOverlay(channel, m_resource->getStatus());
 }
 
 void QnResourceWidget::updateChannelOverlay(int channel) {

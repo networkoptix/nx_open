@@ -6,6 +6,7 @@
 #include "server_stream_recorder.h"
 #include "recording_manager.h"
 #include "serverutil.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 
@@ -16,7 +17,8 @@ Q_GLOBAL_STATIC(QnStorageManager, inst)
 
 QnStorageManager::QnStorageManager():
     m_mutex(QMutex::Recursive),
-    m_storageFileReaded(false)
+    m_storageFileReaded(false),
+    m_storagesStatisticsReady(false)
 {
 }
 
@@ -112,6 +114,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 {
     storage->setIndex(detectStorageIndex(storage->getUrl()));
     QMutexLocker lock(&m_mutex);
+    m_storagesStatisticsReady = false;
     
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
 
@@ -127,6 +130,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 QnStorageResourcePtr QnStorageManager::removeStorage(QnStorageResourcePtr storage)
 {
     QMutexLocker lock(&m_mutex);
+    m_storagesStatisticsReady = false;
 
     // remove existing storage record if exists
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
@@ -292,6 +296,7 @@ void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newE
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
 
+/*
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
     Q_UNUSED(provider)
@@ -349,6 +354,83 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             }
         }
     }
+
+    if (result)
+        qWarning() << "Selected storage for new file: " << result->getUrl() << ". strategy:" << (balanceByBitrate ? " bitrate balance" : "free space balance");
+
+
+    return result;
+}
+*/
+
+void QnStorageManager::updateStorageStatistics()
+{
+    double totalSpace = 0;
+    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
+            continue; // do not use offline storages for writting
+
+        qint64 storageSpace = fileStorage->getFreeSpace() + fileStorage->getWritedSpace();
+        totalSpace += storageSpace;
+    }
+
+    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
+        if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
+            continue; // do not use offline storages for writting
+
+        qint64 storageSpace = fileStorage->getFreeSpace() + fileStorage->getWritedSpace();
+        // write to large HDD more often then small HDD
+        fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
+    }
+}
+
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
+{
+    QMutexLocker lock(&m_mutex);
+    QnStorageResourcePtr result;
+    float minBitrate = INT_MAX;
+
+    if (!m_storagesStatisticsReady) {
+        updateStorageStatistics();
+        m_storagesStatisticsReady = true;
+    }
+
+    QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
+    QVector<QnStorageResourcePtr> candidates;
+
+    // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
+
+    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    {
+        if (itr.value()->getStatus() != QnResource::Offline) {
+            float bitrate = itr.value()->bitrate();
+            qDebug() << "QnFileStorageResource " << itr.value()->getUrl() << "current bitrate=" << itr.value()->bitrate();
+            minBitrate = qMin(minBitrate, bitrate);
+            bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, itr.value());
+        }
+    }
+    for (int i = 0; i < bitrateInfo.size(); ++i)
+    {
+        if (bitrateInfo[i].first <= minBitrate*1.1f)
+            candidates << bitrateInfo[i].second;
+    }
+
+    // select storage with maximum free space
+    qint64 maxFreeSpace = -INT_MAX;
+    for (int i = 0; i < candidates.size(); ++i)
+    {   
+        qint64 freeSpace = candidates[i]->getFreeSpace();
+        if (freeSpace > maxFreeSpace)
+        {
+            maxFreeSpace = freeSpace;
+            result = candidates[i];
+        }
+    }
+    qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
 
     return result;
 }

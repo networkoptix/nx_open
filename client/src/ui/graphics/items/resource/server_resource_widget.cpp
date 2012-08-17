@@ -35,7 +35,7 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(QList<int> *values, qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step) {
+    QPainterPath createChartPath(const QList<int> &values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
         QPainterPath path;
         int max_value = -1;
         int prev_value = 0;
@@ -51,7 +51,7 @@ namespace {
 
         bool first(true);
 
-        QListIterator<int> iter(*values);
+        QListIterator<int> iter(values);
         bool last = !iter.hasNext();
         while (!last){
             int i_value = iter.next();
@@ -70,7 +70,14 @@ namespace {
 
             qreal y2 = i_value * scale * 0.01;
 
-            /** Drawing only second part of the arc, cut at the beginning */
+            /* Note that we're using 89 degrees for arc length for a reason.
+             * When using full 90 degrees, arcs are connected, but Qt still
+             * inserts an empty line segment to join consecutive arcs. 
+             * Path triangulator then chokes when trying to calculate a normal
+             * for this line segment, producing NaNs in its output.
+             * These NaNs are then fed to GPU, resulting in artifacts. */
+
+            /* Drawing only second part of the arc, cut at the beginning */
             if (x1 + x_step2 < 0.0) {
                 if (y2 > y1) {
                     path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
@@ -83,46 +90,46 @@ namespace {
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc, cut at the beginning */
+            /* Drawing both parts of the arc, cut at the beginning */
             else if (x1 < 0.0) {
                 if (y2 > y1) {
                     path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
                 } else if (y2 < y1) {
                     path.arcMoveTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle);
                     path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle, angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
                 } else { // y2 == y1
                     path.moveTo(0.0, y1);
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc as usual */
+            /* Drawing both parts of the arc as usual */
             else if (!last) { 
                 if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
                 } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
                 } else { // y2 == y1
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc, cut at the end */
+            /* Drawing both parts of the arc, cut at the end */
             else if (elapsed_step >= 0.5) {
                 if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
                     path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
                 } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
                     path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
                 } else { // y2 == y1
                     path.lineTo(x1 + x_step * elapsed_step, y2);
                 }
             } 
-            /** Drawing only first part of the arc, cut at the end */
+            /* Drawing only first part of the arc, cut at the end */
             else {
                 if (y2 > y1) {
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90 + angle);
@@ -136,7 +143,7 @@ namespace {
             y1 = y2;
         }
         /** value that will be shown */
-        current_value = ((last_value - prev_value)*elapsed_step + prev_value);
+        *current_value = ((last_value - prev_value)*elapsed_step + prev_value);
         return path;
     }
 
@@ -243,12 +250,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 
     const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
-    qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
+
+    qreal elapsed_step = (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
     {
         QPen grid;
-        QVector<QPoint> pointPairs;
         grid.setColor(qnGlobals->systemHealthColorGrid());
         grid.setWidthF(pen_width);
 
@@ -274,12 +281,11 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QPen graphPen;
         graphPen.setWidthF(pen_width * 2);
-        graphPen.setJoinStyle(Qt::RoundJoin);
-        graphPen.setCapStyle(Qt::RoundCap);
+        graphPen.setCapStyle(Qt::FlatCap);
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].history), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(m_history[i].history, x_step, -1.0 * oh, elapsed_step, &current_value);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
@@ -290,12 +296,11 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     /** Draw frame and legend */
     {
         QnScopedPainterPenRollback penRollback(painter);
-        QPen main_pen;{
-            main_pen.setColor(getColorById(0));
-            main_pen.setWidthF(pen_width * 2);
-            main_pen.setJoinStyle(Qt::RoundJoin);
-            main_pen.setCapStyle(Qt::RoundCap);
-        }
+        QPen main_pen;
+        main_pen.setColor(getColorById(0));
+        main_pen.setWidthF(pen_width * 2);
+        main_pen.setJoinStyle(Qt::MiterJoin);
+
         painter->setPen(main_pen);
         painter->drawRect(inner);
 

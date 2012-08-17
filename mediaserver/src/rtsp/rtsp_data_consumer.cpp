@@ -55,6 +55,18 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
+    foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+    {
+        if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+        {
+            if (consumer->m_liveQuality == MEDIA_Quality_Low) {
+                m_liveQuality = MEDIA_Quality_Low;
+                m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
+                break;
+            }
+        }
+    }
+
     m_allConsumers << this;
 }
 
@@ -192,23 +204,10 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         if (m_newLiveQuality == MEDIA_Quality_None)
         {
             //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()/2 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
+            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
                 m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
             else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
                 m_newLiveQuality = MEDIA_Quality_High;
-        }
-        
-        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
-        {
-            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_High;
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
         }
     }
 
@@ -474,7 +473,21 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (metadata == 0)
     {
-        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
+        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
+        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        {
+            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_High;
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+        }
+
+        if (m_liveQuality == MEDIA_Quality_High && isSecondaryProvider)
             return true; // data for other live quality stream
         else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
             return true; // data for other live quality stream

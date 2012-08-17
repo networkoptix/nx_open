@@ -321,8 +321,8 @@ bool NameHelper::isSupported(const QString& cameraName) const
         return false;
     }
 
-    qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
-             << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
+    //qDebug() << "NameHelper::isSupported: camera name: " << cameraName << ", normalized: "
+    //         << cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString());
 
     QSet<QString>::ConstIterator it = camerasNames.constFind(cameraName.toLower().replace(UNNEEDED_CHARACTERS, QString()));
     if (it == camerasNames.constEnd()) {

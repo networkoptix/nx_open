@@ -163,6 +163,24 @@ AVIOContext* QnStorageResource::createFfmpegIOContext(const QString& url, QIODev
     return ffmpegIOContext;
 }
 
+AVIOContext* QnStorageResource::createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE)
+{
+    quint8* ioBuffer;
+    AVIOContext* ffmpegIOContext;
+
+    ioBuffer = (quint8*) av_malloc(IO_BLOCK_SIZE);
+    ffmpegIOContext = avio_alloc_context(
+        ioBuffer,
+        IO_BLOCK_SIZE,
+        (ioDevice->openMode() & QIODevice::WriteOnly) ? 1 : 0,
+        ioDevice,
+        &ffmpegReadPacket,
+        &ffmpegWritePacket,
+        &ffmpegSeek);
+
+    return ffmpegIOContext;
+}
+
 qint64 QnStorageResource::getFileSizeByIOContext(AVIOContext* ioContext)
 {
     if (ioContext)

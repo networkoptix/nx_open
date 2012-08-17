@@ -1,4 +1,4 @@
-QT = core gui network xml opengl webkit
+QT = core gui network xml opengl
 CONFIG += console precompile_header
 CONFIG -= flat app_bundle
 

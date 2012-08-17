@@ -1463,6 +1463,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     if(widgets.size() != 1)
         return;
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: check
+    if (!widget) //e.g. server item
+        return;
+
     QnResourceDisplay *display = widget->display();
     const QnVideoResourceLayout *layout = display->videoLayout();
 
