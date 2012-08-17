@@ -201,9 +201,6 @@ protected:
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
 
-    qint64 m_timeOffsetUsec;
-    qint64 m_minTimeUsec;
-    qint64 m_maxTimeUsec;
     int m_fczFrames;
     bool m_useMTRealTimeDecode;
 };

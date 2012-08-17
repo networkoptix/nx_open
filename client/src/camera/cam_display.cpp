@@ -124,10 +124,7 @@ QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal):
     m_lastLiveIsLowQuality(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
-    m_timeMutex(QMutex::Recursive),
-    m_timeOffsetUsec(0),
-    m_minTimeUsec(0),
-    m_maxTimeUsec(0)
+    m_timeMutex(QMutex::Recursive)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
