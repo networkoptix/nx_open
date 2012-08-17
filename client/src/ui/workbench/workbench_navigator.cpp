@@ -1116,10 +1116,11 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
     if(widget->resource()->flags() & QnResource::utc)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
             addSyncedWidget(mediaWidget);
+            connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
+        }
 
-    connect(widget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
     connect(widget, SIGNAL(displayFlagsChanged()), this, SLOT(at_widget_displayFlagsChanged()));
     connect(widget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 }
