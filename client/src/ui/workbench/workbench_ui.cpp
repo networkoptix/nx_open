@@ -646,7 +646,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     setHelpVisible(true, false);
     setCalendarOpened(false, false);
     setCalendarVisible(false);
-
+    updateControlsVisibility(false);
 
     /* Tree is pinned by default. */
     m_treePinButton->setChecked(true);
@@ -1068,12 +1068,14 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setSliderVisible(sliderVisible && hovered, animate);
         setTreeVisible(hovered, animate);
         setTitleVisible(hovered, animate);
-        setHelpVisible(hovered, animate);
+        //setHelpVisible(hovered, animate);
+        setHelpVisible(false, false);
     } else {
         setSliderVisible(sliderVisible, animate);
         setTreeVisible(true, animate);
         setTitleVisible(true, animate);
-        setHelpVisible(true, animate);
+        //setHelpVisible(true, animate);
+        setHelpVisible(false, false);
     }
 
     updateCalendarVisibility(animate);
