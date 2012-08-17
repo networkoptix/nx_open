@@ -61,17 +61,17 @@ public:
 
     virtual PixelFormat GetPixelFormat() const;
 
-    //!Implemenattion of QnAbstractVideoDecoder::decode
+    //!Implementation of QnAbstractVideoDecoder::decode
     virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
     //!Not implemented yet
     virtual void setLightCpuMode( DecodeMode val );
-    //!Implemenattion of QnAbstractVideoDecoder::getWidth
+    //!Implementation of QnAbstractVideoDecoder::getWidth
     virtual int getWidth() const;
-    //!Implemenattion of QnAbstractVideoDecoder::getHeight
+    //!Implementation of QnAbstractVideoDecoder::getHeight
     virtual int getHeight() const;
-    //!Implemenattion of QnAbstractVideoDecoder::getSampleAspectRatio
+    //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const;
-    //!Implemenattion of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only untile next \a decode call
+    //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only untile next \a decode call
     virtual const AVFrame* lastFrame() const;
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
@@ -81,11 +81,19 @@ public:
     */
     virtual void setOutPictureSize( const QSize& outSize );
 
-    //!intriduced for test purposes
+    //!introduced for test purposes
     bool decode( mfxU32 codecID, mfxBitstream* inputStream, CLVideoDecoderOutput* outFrame );
 
 private:
+    enum ProcessingState
+    {
+        decoding,
+        processing,
+        done
+    };
+
     MFXVideoSession m_mfxSession;
+    ProcessingState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
     std::auto_ptr<MFXVideoVPP> m_processor;
     mfxVideoParam m_srcStreamParam;

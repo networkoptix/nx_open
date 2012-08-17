@@ -170,6 +170,7 @@ static const PixelFormat pixelFormat = PIX_FMT_NV12;
 
 QuickSyncVideoDecoder::QuickSyncVideoDecoder()
 :
+    m_state( decoding ),
     m_syncPoint( NULL ),
     m_initialized( false ),
     m_mfxSessionEstablished( false ),
@@ -226,7 +227,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
     //if( data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
     //{
     //    std::basic_string<mfxU8> seqHeader;
-    //    //TODO/IMPL sps & pps is in the extradata parsing it...
+    //    //TODO/IMPL sps & pps is in the extradata, parsing it...
     //    // prefix is unit len
     //    int reqUnitSize = (data->context->ctx()->extradata[4] & 0x03) + 1;
 
@@ -268,13 +269,6 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
 
 bool QuickSyncVideoDecoder::decode( mfxU32 codecID, mfxBitstream* inputStream, CLVideoDecoderOutput* outFrame )
 {
-    enum ProcessingState
-    {
-        decoding,
-        vpp,
-        done
-    } state = decoding;
-
     if( !m_initialized && !init( codecID, inputStream ) )
         return false;
 
@@ -286,66 +280,6 @@ bool QuickSyncVideoDecoder::decode( mfxU32 codecID, mfxBitstream* inputStream, C
         decodingTry < MAX_ENCODE_ASYNC_CALL_TRIES;
          )
     {
-        mfxStatus opStatus = MFX_ERR_NONE;
-        state = decoding;
-        while( (state != done) && (opStatus >= MFX_ERR_NONE) )
-        {
-            switch( state )
-            {
-                case decoding:
-                {
-                    mfxFrameSurface1* workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
-                    if( workingSurface )
-                        opStatus = m_decoder->DecodeFrameAsync( inputStream, workingSurface, &decodedFrame, &m_syncPoint );
-                    else
-                        opStatus = m_decoder->DecodeFrameAsync( NULL, NULL, &decodedFrame, &m_syncPoint );
-                    break;
-                }
-
-                case vpp:
-                {
-                    mfxFrameSurface1* in = decodedFrame;
-                    decodedFrame = findUnlockedSurface( &m_processingSurfacePool );
-                    opStatus = m_processor->RunFrameVPPAsync( in, decodedFrame, NULL, &m_syncPoint );
-                    state = done;
-                    break;
-                }
-            }
-
-            qDebug()<<"Op start status "<<opStatus;
-
-            if( opStatus >= MFX_ERR_NONE && m_syncPoint )
-            {
-                opStatus = MFXVideoCORE_SyncOperation( m_mfxSession, m_syncPoint, INFINITE );
-                qDebug()<<"Op sync status  "<<opStatus;
-            }
-            else if( opStatus > MFX_ERR_NONE )  //DecodeFrameAsync returned warning
-            {
-                if( opStatus == MFX_WRN_VIDEO_PARAM_CHANGED )
-                {
-                    //читаем новые параметры видео-потока
-                    m_decoder->GetVideoParam( &m_srcStreamParam );
-                }
-                opStatus = MFX_ERR_NONE;
-                continue;
-            }
-
-            if( opStatus > MFX_ERR_NONE )
-                opStatus = MFX_ERR_NONE;   //ignoring warnings
-
-            //moving stte
-            switch( state )
-            {
-                case decoding:
-                    state = m_processor.get() ? vpp : done;
-                    break;
-
-                case vpp:
-                    state = done;
-                    break;
-            }
-        }
-
         //mfxFrameSurface1* workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
         //if( workingSurface )
         //{
@@ -390,6 +324,63 @@ bool QuickSyncVideoDecoder::decode( mfxU32 codecID, mfxBitstream* inputStream, C
         //    if( opStatus > MFX_ERR_NONE )
         //        opStatus = MFX_ERR_NONE;   //ignoring warnings
         //}
+
+        mfxStatus opStatus = MFX_ERR_NONE;
+        m_state = decoding;
+        while( (m_state != done) && (opStatus >= MFX_ERR_NONE) )
+        {
+            switch( m_state )
+            {
+                case decoding:
+                {
+                    mfxFrameSurface1* workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
+                    opStatus = m_decoder->DecodeFrameAsync( workingSurface ? inputStream : NULL, workingSurface, &decodedFrame, &m_syncPoint );
+                    break;
+                }
+
+                case processing:
+                {
+                    mfxFrameSurface1* in = decodedFrame;
+                    decodedFrame = findUnlockedSurface( &m_processingSurfacePool );
+                    opStatus = m_processor->RunFrameVPPAsync( in, decodedFrame, NULL, &m_syncPoint );
+                    m_state = done;
+                    break;
+                }
+            }
+
+            qDebug()<<"Op start status "<<opStatus;
+
+            if( opStatus >= MFX_ERR_NONE && m_syncPoint )
+            {
+                opStatus = MFXVideoCORE_SyncOperation( m_mfxSession, m_syncPoint, INFINITE );
+                qDebug()<<"Op sync status  "<<opStatus;
+            }
+            else if( opStatus > MFX_ERR_NONE )  //DecodeFrameAsync returned warning
+            {
+                if( opStatus == MFX_WRN_VIDEO_PARAM_CHANGED )
+                {
+                    //читаем новые параметры видео-потока
+                    m_decoder->GetVideoParam( &m_srcStreamParam );
+                }
+                opStatus = MFX_ERR_NONE;
+                continue;
+            }
+
+            if( opStatus > MFX_ERR_NONE )
+                opStatus = MFX_ERR_NONE;   //ignoring warnings
+
+            //moving stte
+            switch( m_state )
+            {
+                case decoding:
+                    m_state = m_processor.get() ? processing : done;
+                    break;
+
+                case processing:
+                    m_state = done;
+                    break;
+            }
+        }
 
         //TODO/IMPL perhaps it is reasonable to do SyncOperation before DecodeFrameAsync (to sync previous operation) to parallel decoding and everything but not this method
 
@@ -489,19 +480,19 @@ void QuickSyncVideoDecoder::setLightCpuMode( DecodeMode /*val*/ )
     //TODO/IMPL
 }
 
-//!Implemenattion of QnAbstractVideoDecoder::getWidth
+//!Implementation of QnAbstractVideoDecoder::getWidth
 int QuickSyncVideoDecoder::getWidth() const
 {
     return m_srcStreamParam.mfx.FrameInfo.Width;
 }
 
-//!Implemenattion of QnAbstractVideoDecoder::getHeight
+//!Implementation of QnAbstractVideoDecoder::getHeight
 int QuickSyncVideoDecoder::getHeight() const
 {
     return m_srcStreamParam.mfx.FrameInfo.Height;
 }
 
-//!Implemenattion of QnAbstractVideoDecoder::getSampleAspectRatio
+//!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
 double QuickSyncVideoDecoder::getSampleAspectRatio() const
 {
     return m_srcStreamParam.mfx.FrameInfo.AspectRatioH > 0 

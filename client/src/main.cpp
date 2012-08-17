@@ -201,12 +201,55 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    qnLogMsgHandler(type, msg);
+    qnLogMsgHandler( type, msg );
 }
 
 #ifndef API_TEST_MAIN
+
+#include <fstream>
+#include "../../common/src/decoders/video/quicksyncvideodecoder.h"
+
+int testQuickSyncDecoder()
+{
+    //static const char* TEST_FILE_NAME = "c:/content/test.mpv";
+    static const char* TEST_FILE_NAME = "c:/content/test.264";
+
+    std::auto_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder() );
+    std::ifstream inputFile( TEST_FILE_NAME, std::ios::binary );
+
+    static const int BUF_SIZE = 64*1024;
+    char buf[BUF_SIZE];
+    mfxBitstream inputStream;
+    memset( &inputStream, 0, sizeof(inputStream) );
+    inputStream.TimeStamp = MFX_TIMESTAMP_UNKNOWN;
+    inputStream.Data = (mfxU8*)buf;
+    inputStream.DataLength = 0;
+    inputStream.MaxLength = BUF_SIZE;
+    //for( int i = 0; !inputFile.eof() && i < 20; ++i )
+    while( !inputFile.eof() )
+    {
+        inputFile.read( (char*)(inputStream.Data + inputStream.DataOffset), inputStream.MaxLength - inputStream.DataOffset );
+        inputStream.DataLength += inputFile.gcount();
+        inputStream.DataOffset = 0;
+        decoder->decode( MFX_CODEC_AVC, &inputStream, NULL );
+        if( inputStream.DataLength > 0 )
+        {
+            memmove( inputStream.Data, inputStream.Data + inputStream.DataOffset, inputStream.DataLength );
+            inputStream.DataOffset = inputStream.DataLength;
+        }
+        else
+        {
+            inputStream.DataOffset = 0;
+        }
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[])
 {
+    //return testQuickSyncDecoder();
+
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -324,7 +367,11 @@ int main(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
+//#ifdef _WIN32
+//    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::INTEL_QUICK_SYNC );
+//#else
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
+//#endif
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
