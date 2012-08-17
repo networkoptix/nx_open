@@ -38,7 +38,9 @@ namespace {
 
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
-    QnResourceWidget(context, item, parent)
+    QnResourceWidget(context, item, parent),
+    m_motionSensitivityValid(false),
+    m_binaryMotionMaskValid(false)
 {
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 

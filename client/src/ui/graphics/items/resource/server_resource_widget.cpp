@@ -35,7 +35,7 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(QList<int> *values, qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step) {
+    QPainterPath createChartPath(const QList<int> &values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
         QPainterPath path;
         int max_value = -1;
         int prev_value = 0;
@@ -51,7 +51,7 @@ namespace {
 
         bool first(true);
 
-        QListIterator<int> iter(*values);
+        QListIterator<int> iter(values);
         bool last = !iter.hasNext();
         while (!last){
             int i_value = iter.next();
@@ -136,7 +136,7 @@ namespace {
             y1 = y2;
         }
         /** value that will be shown */
-        current_value = ((last_value - prev_value)*elapsed_step + prev_value);
+        *current_value = ((last_value - prev_value)*elapsed_step + prev_value);
         return path;
     }
 
@@ -279,7 +279,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].history), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(m_history[i].history, x_step, -1.0 * oh, elapsed_step, &current_value);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
