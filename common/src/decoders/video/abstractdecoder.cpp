@@ -1,12 +1,14 @@
+
 #include "abstractdecoder.h"
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
 
+
+
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
 
-QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding)
+QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding )
 {
-
     // h264 
     switch(m_codecManufacture)
     {
@@ -15,10 +17,10 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(const QnCompressedV
         return new IPPH264Decoder();
         break;
 #endif
+
     case FFMPEG:
     default:
         return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
-        break;
     }
 
     return 0;
@@ -30,11 +32,13 @@ void QnAbstractVideoDecoder::setTryHardwareAcceleration(bool tryHardwareAccelera
 }
 
 QnAbstractVideoDecoder::QnAbstractVideoDecoder()
-    : m_tryHardwareAcceleration(false),
-      m_hardwareAccelerationEnabled(false),
-      m_mtDecoding(false),
-      m_needRecreate(false)
-{}
+:
+    m_tryHardwareAcceleration(false),
+    m_hardwareAccelerationEnabled(false),
+    m_mtDecoding(false),
+    m_needRecreate(false)
+{
+}
 
 bool QnAbstractVideoDecoder::isHardwareAccelerationEnabled() const 
 {

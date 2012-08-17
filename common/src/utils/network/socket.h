@@ -16,6 +16,7 @@
 #endif
 
 #include "nettools.h"
+#include "utils/common/bytearray.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -183,6 +184,9 @@ public:
      *   @exception SocketException thrown if unable to send data
      */
     int send(const void *buffer, int bufferLen) ;
+    int send(const QnByteArray& data);
+    int send(const QByteArray& data);
+
 
     /**
      *   Read into the given buffer up to bufferLen bytes data from this

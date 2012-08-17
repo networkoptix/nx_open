@@ -1,10 +1,13 @@
 #ifndef clabstractdecoder_h_2155
 #define clabstractdecoder_h_2155
 
-
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/frame_info.h"
 
+
+/*!
+    Implementation of this class does not have to be thread-safe
+*/
 class QnAbstractVideoDecoder
 {
 public:
@@ -20,42 +23,47 @@ public:
 
     virtual ~QnAbstractVideoDecoder(){};
 
-    virtual PixelFormat GetPixelFormat() { return PIX_FMT_NONE; }
+    virtual PixelFormat GetPixelFormat() const { return PIX_FMT_NONE; }
 
     /**
       * Decode video frame.
       * Set hardwareAccelerationEnabled flag if hardware acceleration was used
+      * \return true If \a outFrame is filled, false if no output frame
+      * \note No error information is returned!
       */
-    virtual bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame) = 0;
+    virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame ) = 0;
 
-    virtual void showMotion(bool show ) = 0;
+    virtual void setLightCpuMode( DecodeMode val ) = 0;
 
-    virtual void setLightCpuMode(DecodeMode val) = 0;
-
-    virtual void setMTDecoding(bool value)
+    //!Use ulti-threaded decoding (if supported by implementation)
+    virtual void setMTDecoding( bool value )
     {
         if (m_mtDecoding != value)
             m_needRecreate = true;
 
         m_mtDecoding = value;
     }
-
-    virtual bool getLastDecodedFrame(CLVideoDecoderOutput *outFrame)
-    {
-        Q_UNUSED(outFrame);
-
-        return false;
-    }
+    //!Returns true if decoder uses multiple threads
+    bool isMultiThreadedDecoding() const { return m_mtDecoding; }
 
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
+    //!Returns true if hardware acceleration enabled
     bool isHardwareAccelerationEnabled() const;
     virtual int getWidth() const  { return 0; }
     virtual int getHeight() const { return 0; }
     virtual double getSampleAspectRatio() const { return 1; };
-    virtual PixelFormat getFormat() const { return PIX_FMT_YUV420P; }
-    virtual void flush() {}
-    virtual const AVFrame* lastFrame() { return 0; }
-    virtual void resetDecoder(QnCompressedVideoDataPtr data) { Q_UNUSED(data); }
+    virtual const AVFrame* lastFrame() const { return 0; }
+    //!Reset decoder state (e.g. to reposition source stream)
+    /*!
+        \param data First encoded frame of new stream. It is recommended that this frame be IDR and contain sequence header
+    */
+    virtual void resetDecoder( QnCompressedVideoDataPtr data ) = 0;
+    //!Establish picture resize during decoding
+    /*!
+        \param outSize Out picture size. If (0, 0) no resizing will be done
+        \note This method is only a hint to a decoder. Decoder can totally ignore supplied value or can resize to a different size
+    */
+    virtual void setOutPictureSize( const QSize& outSize ) = 0;
 
 private:
     QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}
@@ -72,12 +80,18 @@ protected:
 class CLVideoDecoderFactory
 {
 public:
-    enum CLCodecManufacture{FFMPEG, INTELIPP};
-    static QnAbstractVideoDecoder* createDecoder(const QnCompressedVideoDataPtr data, bool mtDecoding);
-    static void setCodecManufacture(CLCodecManufacture codecman)
+    enum CLCodecManufacture
+    {
+        FFMPEG,
+        INTELIPP
+    };
+
+    static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding );
+    static void setCodecManufacture( CLCodecManufacture codecman )
     {
         m_codecManufacture = codecman;
     }
+
 private:
     static CLCodecManufacture m_codecManufacture;
 };

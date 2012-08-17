@@ -63,7 +63,6 @@ public:
     bool isNoData() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
-
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -199,6 +198,7 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
+
     int m_fczFrames;
     bool m_useMTRealTimeDecode;
 };

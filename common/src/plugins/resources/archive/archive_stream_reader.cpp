@@ -405,8 +405,15 @@ begin_label:
     {
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == qint64(AV_NOPTS_VALUE))
-            displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
+        if (currentTimeHint == qint64(AV_NOPTS_VALUE)) 
+        {
+            if (jumpTime != qint64(AV_NOPTS_VALUE))
+                displayTime = jumpTime;
+            else
+                displayTime = determineDisplayTime(reverseMode);
+
+            //displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
+        }
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;

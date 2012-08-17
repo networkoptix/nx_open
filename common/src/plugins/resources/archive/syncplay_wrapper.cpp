@@ -20,7 +20,10 @@ struct ReaderInfo
         enabled(true),
         buffering(false),
         isEOF(false),
-        paused(false)
+        paused(false),
+        timeOffsetUsec(0),
+        minTimeUsec(0),
+        maxTimeUsec(0)
     {
     }
     QnAbstractArchiveReader* reader;
@@ -30,6 +33,9 @@ struct ReaderInfo
     bool buffering;
     bool isEOF;
     bool paused;
+    qint64 timeOffsetUsec;
+    qint64 minTimeUsec;
+    qint64 maxTimeUsec;
 };
 
 
