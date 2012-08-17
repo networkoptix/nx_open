@@ -4,44 +4,64 @@
 // class DWCameraProxy
 //
 
+QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},]"));
+
+
 DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_httpClient(host, port, timeout, auth)
+{
+    getFromCameraImpl();
+}
+
+bool DWCameraProxy::getFromCameraImpl()
 {
     CLHttpStatus status = m_httpClient.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
     if (status == CL_HTTP_SUCCESS) 
     {
+        m_bufferedValues.clear();
+
         QByteArray body;
         m_httpClient.readAll(body);
         QList<QByteArray> lines = body.split(',');
         for (int i = 0; i < lines.size(); ++i) 
         {
             QString str = QString::fromLatin1(lines[i]);
-            /*if (lines[i].toLower().contains("onvif_stream_number")) 
-            {
-                QList<QByteArray> params = lines[i].split(':');
-                if (params.size() >= 2) 
-                {
-                    int streams = params[1].trimmed().toInt();
-
-                    return streams >= 2;
-                }
-            }*/
+            str.replace(DW_RES_SETTINGS_FILTER, QString());
+            QStringList pairStrs = str.split(QString::fromLatin1(":"));
+            if (pairStrs.size() == 2) {
+                m_bufferedValues.insert(pairStrs[0].trimmed(), pairStrs[1].trimmed());
+            }
         }
+
+        return true;
     }
 
     //ToDo: log warning
-}
-
-bool DWCameraProxy::getFromCamera(const QString& name, QString& val)
-{
-    //ToDo: implement
     return false;
 }
 
-bool DWCameraProxy::setToCamera(const QString& name, const QString& value, const QString& query)
+bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
-    //ToDo: implement
-    return false;
+    QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
+    if (it == m_bufferedValues.end()) {
+        return false;
+    }
+
+    src.setCurrent(src.getIntStrAsCurrent(it.value()));
+    return true;
+}
+
+bool DWCameraProxy::setToCamera(DWCameraSetting& src)
+{
+    QString desiredVal = src.getCurrentAsIntStr();
+
+    QByteArray query((QString::fromLatin1("/cgi-bin/camerasetup.cgi&") + src.getQuery() + QString::fromLatin1("=") + desiredVal).toLatin1());
+
+    bool res = m_httpClient.doGET(query) == CL_HTTP_SUCCESS;
+    res = getFromCameraImpl() && res;
+    res = getFromCamera(src) && res;    
+
+    return res && desiredVal == src.getCurrentAsIntStr();
 }
 
 //
@@ -52,29 +72,84 @@ DWCameraSetting::DWCameraSetting(const QString& id, const QString& name, WIDGET_
         const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
     CameraSetting(id, name, type, query, min, max, step, current)
 {
-
+    initAdditionalValues();
 }
 
 DWCameraSetting& DWCameraSetting::operator=(const DWCameraSetting& rhs)
 {
     CameraSetting::operator=(rhs);
 
+    m_enumStrToInt = rhs.m_enumStrToInt;
+
     return *this;
 }
 
 bool DWCameraSetting::getFromCamera(DWCameraProxy& proxy)
 {
-    QString tmp;
-    bool res = proxy.getFromCamera(getId(), tmp);
-    if (res) {
-        setCurrent(tmp);
-    }
-    return res;
+    return proxy.getFromCamera(*this);
 }
 
 bool DWCameraSetting::setToCamera(DWCameraProxy& proxy)
 {
-    return proxy.setToCamera(getId(), static_cast<QString>(getCurrent()), getQuery());
+    return proxy.setToCamera(*this);
+}
+
+void DWCameraSetting::initAdditionalValues()
+{
+    if (getType() != CameraSetting::Enumeration && getType() != CameraSetting::OnOff ||
+        !m_enumStrToInt.isEmpty())
+    {
+        return;
+    }
+
+    if (getType() == CameraSetting::Enumeration)
+    {
+        QStringList m_enumStrToInt = static_cast<QString>(getMin()).split(QLatin1String(","));
+        return;
+    }
+
+    if (getType() == CameraSetting::OnOff)
+    {
+        m_enumStrToInt.push_back(QString::fromLatin1("Off"));
+        m_enumStrToInt.push_back(QString::fromLatin1("On"));
+        return;
+    }
+}
+
+QString DWCameraSetting::getCurrentAsIntStr() const
+{
+    if (getType() != CameraSetting::Enumeration && getType() != CameraSetting::OnOff)
+    {
+        return static_cast<QString>(getCurrent());
+    }
+
+    QString curr = static_cast<QString>(getCurrent());
+    for (int i = 0; i < m_enumStrToInt.size(); ++i) {
+        if (curr == m_enumStrToInt.at(i)) {
+            QString numStr;
+            numStr.setNum(i);
+            return numStr;
+        }
+    }
+
+    //Log warning
+    return QString();
+}
+
+QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
+{
+    if (getType() != CameraSetting::Enumeration && getType() != CameraSetting::OnOff)
+    {
+        return numStr;
+    }
+
+    int i = numStr.toInt();
+    if (i < 0 || i > m_enumStrToInt.size()) {
+        //Log warning
+        return QString();
+    }
+
+    return m_enumStrToInt.at(i);
 }
 
 //

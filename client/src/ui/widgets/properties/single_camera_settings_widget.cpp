@@ -94,8 +94,8 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     layout->addWidget(advancedTreeWidget);
     layout->addWidget(advancedWidget);
 
-    //QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-    QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     m_widgetsRecreator = new CameraSettingsWidgetsCreator(filepath, *advancedTreeWidget, *advancedLayout, this);
 }
 
@@ -445,7 +445,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
             << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;
     }
-    if (httpStatusCode != 0 && httpStatusCode != 200) {
+    if (httpStatusCode != 0) {
         qWarning() << "QnSingleCameraSettingsWidget::at_advancedSettingsLoaded: http status code is not OK: " << httpStatusCode
             << ". Camera id: " << (m_camera == 0? QString::fromLatin1("unknown"): m_camera->getUniqueId());
         return;

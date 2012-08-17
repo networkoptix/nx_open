@@ -4,6 +4,8 @@
 #include "../camera_settings/camera_settings.h"
 #include "utils/network/simple_http_client.h"
 
+class DWCameraSetting;
+
 //
 // class DWCameraProxy
 //
@@ -11,13 +13,18 @@
 class DWCameraProxy
 {
     CLSimpleHTTPClient m_httpClient;
+    QHash<QString,QString> m_bufferedValues;
 
 public:
 
     DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
-    bool getFromCamera(const QString& name, QString& val);
-    bool setToCamera(const QString& name, const QString& value, const QString& query);
+    bool getFromCamera(DWCameraSetting& src);
+    bool setToCamera(DWCameraSetting& src);
+
+private:
+
+    bool getFromCameraImpl();
 };
 
 //
@@ -26,8 +33,7 @@ public:
 
 class DWCameraSetting: public CameraSetting
 {
-    typedef QHash<QString, int> EnumStrToInt;
-    EnumStrToInt m_enumStrToInt;
+    QStringList m_enumStrToInt;
 
 public:
 
@@ -48,7 +54,12 @@ public:
 
     bool getFromCamera(DWCameraProxy& proxy);
     bool setToCamera(DWCameraProxy& proxy);
-    int getCurrentAsInt() const;
+    QString getCurrentAsIntStr() const;
+    QString getIntStrAsCurrent(const QString& numStr) const;
+
+private:
+    
+    void initAdditionalValues();
 };
 
 typedef QHash<QString, DWCameraSetting> DWCameraSettings;

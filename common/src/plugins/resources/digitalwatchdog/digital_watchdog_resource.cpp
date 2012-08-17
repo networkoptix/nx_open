@@ -90,18 +90,22 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
+    QMutexLocker lock(&m_mutex);
+
     if (!m_cameraProxy) {
         m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
     }
 
-    //QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     DWCameraSettingReader reader(m_settings, filepath);
     reader.read() && reader.proceed();
 }
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
+    QMutexLocker lock(&m_mutex);
+
     if (m_cameraProxy)
     {
         DWCameraSettings::Iterator it = m_settings.find(param.name());
@@ -120,6 +124,8 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
+    QMutexLocker lock(&m_mutex);
+
     if (m_cameraProxy)
     {
         CameraSetting tmp;
