@@ -250,12 +250,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 
     const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
-    qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
+
+    qreal elapsed_step = (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
     {
         QPen grid;
-        QVector<QPoint> pointPairs;
         grid.setColor(qnGlobals->systemHealthColorGrid());
         grid.setWidthF(pen_width);
 
