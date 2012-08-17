@@ -175,6 +175,25 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.unlock();
 }
 
+QnTimePeriod QnLayoutResource::timeBounds() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_timeBounds;
+}
+
+void QnLayoutResource::setTimeBounds(const QnTimePeriod &timeBounds) {
+    {
+        QMutexLocker locker(&m_mutex);
+
+        if(m_timeBounds == timeBounds)
+            return;
+
+        m_timeBounds = timeBounds;
+    }
+
+    emit timeBoundsChanged();
+}
+
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 {
     QnLayoutResourcePtr layout;

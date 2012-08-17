@@ -33,6 +33,7 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
+
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
     qint64 seekInternal(qint64 time, bool findIFrame, bool recursive);
@@ -40,6 +41,7 @@ private:
     bool setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive);
 
     DeviceFileCatalog::Chunk findChunk(DeviceFileCatalogPtr catalog, qint64 time, DeviceFileCatalog::FindMethod findMethod);
+
 private:
     bool m_opened;
     QnResourcePtr m_resource;
@@ -71,7 +73,6 @@ private:
     QnAbstractMediaDataPtr m_newQualityTmpData;
     QnAviResourcePtr m_newQualityFileRes;
     QnAviArchiveDelegatePtr m_newQualityAviDelegate;
-    
 
     bool m_sendMotion;
     bool m_eof;

@@ -65,17 +65,17 @@ private:
     QSet<QGraphicsItem *> items;
     QList<Instrument *> instruments;
 
-    QSet<QGraphicsItem *> delayedItems;
-    bool pendingDelayedItemProcessing;
+    InstrumentEventDispatcher<QGraphicsScene> *sceneDispatcher;
+    InstrumentEventDispatcher<QGraphicsView> *viewDispatcher;
+    InstrumentEventDispatcher<QWidget> *viewportDispatcher;
+    InstrumentEventDispatcher<QGraphicsItem> *itemDispatcher;
 
     InstrumentPaintSyncer *paintSyncer;
     qint64 totalTickTime;
     QList<QWidget *> syncedViewports;
 
-    InstrumentEventDispatcher<QGraphicsScene> *sceneDispatcher;
-    InstrumentEventDispatcher<QGraphicsView> *viewDispatcher;
-    InstrumentEventDispatcher<QWidget> *viewportDispatcher;
-    InstrumentEventDispatcher<QGraphicsItem> *itemDispatcher;
+    QSet<QGraphicsItem *> delayedItems;
+    bool pendingDelayedItemProcessing;
 
 private:
     Q_DECLARE_PUBLIC(InstrumentManager);

@@ -9,7 +9,7 @@
 
 #include "client_message_processor.h"
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(QnClientMessageProcessor, qn_eventManager_instance, {
+Q_GLOBAL_STATIC_WITH_INITIALIZER(QnClientMessageProcessor, qn_clientMessageProcessor_instance, {
     QThread *thread = new QThread(); // TODO: leaking thread here.
     thread->start();
 
@@ -18,7 +18,7 @@ Q_GLOBAL_STATIC_WITH_INITIALIZER(QnClientMessageProcessor, qn_eventManager_insta
 
 QnClientMessageProcessor* QnClientMessageProcessor::instance()
 {
-    return qn_eventManager_instance();
+    return qn_clientMessageProcessor_instance();
 }
 
 void QnClientMessageProcessor::init()

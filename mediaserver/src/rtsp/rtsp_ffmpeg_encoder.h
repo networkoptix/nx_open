@@ -20,6 +20,9 @@ public:
     virtual quint32 getFrequency() override;
     virtual quint8 getPayloadtype() override;
     virtual QString getName() override;
+
+    void setLiveMarker(int value);
+    void setAdditionFlags(quint16 value);
 private:
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:
@@ -29,6 +32,11 @@ private:
     QnAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
+    int m_liveMarker;
+    quint16 m_additionFlags;
+    bool m_eofReached;
 };
+
+typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
 
 #endif // __RTSP_FFMPEG_ENCODER_H__

@@ -73,6 +73,10 @@ bool QnMaskedProxyWidget::eventFilter(QObject *object, QEvent *event) {
     return base_type::eventFilter(object, event);
 }
 
+QRectF QnMaskedProxyWidget::paintRect() const {
+    return m_paintRect.isNull() ? rect() : m_paintRect;
+}
+
 void QnMaskedProxyWidget::setPaintRect(const QRectF &paintRect) {
     if(qFuzzyCompare(m_paintRect, paintRect))
         return;
@@ -83,9 +87,17 @@ void QnMaskedProxyWidget::setPaintRect(const QRectF &paintRect) {
     emit paintRectChanged();
 }
 
+QSizeF QnMaskedProxyWidget::paintSize() const {
+    return m_paintRect.isNull() ? size() : m_paintRect.size();
+}
+
+void QnMaskedProxyWidget::setPaintSize(const QSizeF &paintSize) {
+    setPaintRect(QRectF(m_paintRect.topLeft(), paintSize));
+}
+
 QRectF QnMaskedProxyWidget::paintGeometry() const {
     if(m_paintRect.isNull())
-        return QRectF();
+        return geometry();
 
     return QRectF(
         pos() + m_paintRect.topLeft(),

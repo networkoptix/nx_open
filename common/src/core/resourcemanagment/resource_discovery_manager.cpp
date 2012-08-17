@@ -255,7 +255,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 
             if (newNetRes)
             {
-                if (!newNetRes->checkFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
+                if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
                     quint32 ips = newNetRes->getHostAddress().toIPv4Address();
                     if (ipsList.contains(ips))
@@ -341,7 +341,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     // in pool could not be 2 resources with same ip
     foreach (const QnResourcePtr &res, resources)
     {
-        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
@@ -586,7 +586,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
         if (!netRes)
             continue;
 
-        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
+        if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
         if (res->isDisabled()) // if this is camera from other mediaserver 
@@ -690,7 +690,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 
     foreach (const QnResourcePtr &res, justfoundList)
     {
-        if (res->checkFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
+        if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver
             continue;
 
         QnNetworkResourcePtr nr = res.dynamicCast<QnNetworkResource>();

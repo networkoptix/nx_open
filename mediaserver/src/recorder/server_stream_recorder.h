@@ -54,6 +54,9 @@ private:
     QnResource::ConnectionRole m_role;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
+    QnVideoServerResourcePtr m_videoServer;
+    QnScheduleTask m_panicSchedileRecord;
+    bool m_usedPanicMode;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

@@ -102,6 +102,28 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 // QnPlOnvifResource
 //
 
+QnPlOnvifResource::QnPlOnvifResource() :
+    m_iframeDistance(-1),
+    m_minQuality(0),
+    m_maxQuality(0),
+    m_codec(H264),
+    m_audioCodec(AUDIO_NONE),
+    m_primaryResolution(EMPTY_RESOLUTION_PAIR),
+    m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
+    m_primaryH264Profile(-1),
+    m_secondaryH264Profile(-1),
+    m_audioBitrate(0),
+    m_audioSamplerate(0),
+    m_needUpdateOnvifUrl(false),
+    m_forceCodecFromPrimaryEncoder(false)
+{
+}
+
+QnPlOnvifResource::~QnPlOnvifResource() {
+    return;
+}
+
+
 const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     const QString& senderIpAddress)
 {
@@ -177,23 +199,6 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
 
 const QString QnPlOnvifResource::createOnvifEndpointUrl(const QString& ipAddress) {
     return QLatin1String(ONVIF_PROTOCOL_PREFIX) + ipAddress + QLatin1String(ONVIF_URL_SUFFIX);
-}
-
-QnPlOnvifResource::QnPlOnvifResource() :
-    m_iframeDistance(-1),
-    m_minQuality(0),
-    m_maxQuality(0),
-    m_codec(H264),
-    m_audioCodec(AUDIO_NONE),
-    m_primaryResolution(EMPTY_RESOLUTION_PAIR),
-    m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
-    m_primaryH264Profile(-1),
-    m_secondaryH264Profile(-1),
-    m_audioBitrate(0),
-    m_audioSamplerate(0),
-    m_needUpdateOnvifUrl(false),
-    m_forceCodecFromPrimaryEncoder(false)
-{
 }
 
 bool QnPlOnvifResource::isResourceAccessible()
@@ -455,7 +460,7 @@ int QnPlOnvifResource::getMaxFps()
     QVariant mediaVariant;
     QnSecurityCamResource* this_casted = const_cast<QnPlOnvifResource*>(this);
 
-    if (!hasSuchParam(MAX_FPS_PARAM_NAME))
+    if (!hasParam(MAX_FPS_PARAM_NAME))
     {
         return QnPhysicalCameraResource::getMaxFps();
     }

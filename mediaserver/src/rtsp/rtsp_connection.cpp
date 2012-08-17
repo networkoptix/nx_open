@@ -773,6 +773,7 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     addResponseRangeHeader();
+    d->dataProcessor->setUseUTCTime(d->useProprietaryFormat);
     d->dataProcessor->start();
 
     

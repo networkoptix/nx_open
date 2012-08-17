@@ -10,16 +10,16 @@ static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
+    m_opened(false),
+    m_lastPacketTime(0),
+    m_skipFramesToTime(0),
     m_reverseMode(false),
     m_selectedAudioChannel(0),
-    m_opened(false),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High),
-    m_skipFramesToTime(0),
-    m_lastPacketTime(0)
+    m_quality(MEDIA_Quality_High)
 {
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
@@ -219,7 +219,8 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     //int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
-    if (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
+    int chunkSwitchCnt = 0;
+    while (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
@@ -243,8 +244,13 @@ begin_label:
         }
 
         data = m_aviDelegate->getNextData();
-        if (data) 
+        if (data) {
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+        }
+        else {
+            if (++chunkSwitchCnt > 10)
+                break;
+        }
     }
 
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 

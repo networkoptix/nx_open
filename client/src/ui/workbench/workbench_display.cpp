@@ -50,7 +50,6 @@
 #include <ui/style/globals.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
-#include "extensions/workbench_render_watcher.h"
 #include "workbench_layout.h"
 #include "workbench_item.h"
 #include "workbench_grid_mapper.h"
@@ -239,8 +238,7 @@ void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 curren
         return;
 
     if(!m_streamSynchronizer) {
-        QnWorkbenchRenderWatcher *renderWatcher = new QnWorkbenchRenderWatcher(this, this);
-        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this, renderWatcher, this);
+        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this);
 
         connect(m_streamSynchronizer, SIGNAL(effectiveChanged()), this, SIGNAL(streamsSynchronizationEffectiveChanged()));
         if(m_streamSynchronizer->isEffective())
@@ -731,13 +729,13 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         return false;
     }
 
-    if (!resource->checkFlags(QnResource::media) && !resource->checkFlags(QnResource::server)) { // TODO: unsupported for now
+    if (!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }
 
     QnResourceWidget *widget;
-    if (resource->checkFlags(QnResource::server))
+    if (resource->hasFlags(QnResource::server))
         widget = new QnServerResourceWidget(context(), item);
     else
         widget = new QnMediaResourceWidget(context(), item);

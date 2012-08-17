@@ -26,7 +26,6 @@ private:
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
     int m_videoBitrate;
-    qint64 m_startDateTime;
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
    

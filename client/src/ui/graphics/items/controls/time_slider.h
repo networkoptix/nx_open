@@ -154,6 +154,9 @@ public:
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
 
+    const QVector<qint64> &indicators() const;
+    void setIndicators(const QVector<qint64> &indicators);
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -225,7 +228,7 @@ private:
 
     struct ThumbnailData {
         ThumbnailData(): pos(0.0), opacity(0.0), selection(0.0), hiding(false), selecting(false) {}
-        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), selection(0.0), hiding(false), selecting(false) {}
 
         QnThumbnail thumbnail;
         qreal pos;
@@ -337,6 +340,8 @@ private:
     qreal m_prefferedHeight;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
+
+    QVector<qint64> m_indicators;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

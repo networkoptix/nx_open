@@ -6,8 +6,8 @@
 
 class QnRecordedChunkListHandler: public QnRestRequestHandler
 {
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
     virtual QString description(TCPSocket* tcpSocket) const;
 private:
     qint64 parseDateTime(const QString& dateTime);
@@ -16,8 +16,8 @@ private:
 
 class QnXsdHelperHandler: public QnRestRequestHandler
 {
-    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result);
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result);
+    virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
 };
 
 #endif // __RECORD_CHUNKS_H__

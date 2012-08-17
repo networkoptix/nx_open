@@ -71,6 +71,8 @@ public:
     int getFps() const { return m_data.m_fps; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
+    void setFps(int value) { m_data.m_fps = value; }
+
     /*
     * Duration at ms
     */

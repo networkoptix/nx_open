@@ -66,7 +66,7 @@ const QnVirtualCameraResourceList &QnCameraSettingsWidget::cameras() const {
 
 void QnCameraSettingsWidget::setResources(const QnResourceList &resources) {
     m_resources = resources.toSet().toList();
-    m_cameras = QnResourceCriterion::filter<QnVirtualCameraResource>(m_resources);
+    m_cameras = m_resources.filtered<QnVirtualCameraResource>();
 
     if(m_cameras.size() != m_resources.size() && m_cameras.size() != 0) {
         setMode(InvalidMode);

@@ -656,7 +656,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
-    bool selectionEditable = !(snapshotManager()->flags(workbench()->currentLayout()->resource()) & Qn::LayoutIsFile);
+    bool selectionEditable = workbench()->currentLayout()->resource() && (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
     if(!selectionEditable)
         m_timeSlider->setSelectionValid(false);
@@ -675,15 +675,26 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
-    qint64 endTimeUSec = reader->endTime();
-    qint64 endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
+    bool isQuickSearch = workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty();
 
-    qint64 startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
-    qint64 startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
+    qint64 startTimeUSec, endTimeUSec;
+    qint64 endTimeMSec, startTimeMSec;
+    if(isQuickSearch) {
+        endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
+        endTimeUSec = endTimeMSec * 1000;
+        startTimeMSec = workbench()->currentLayout()->resource()->timeBounds().startTimeMs;
+        startTimeUSec = startTimeMSec * 1000;
+    } else {
+        endTimeUSec = reader->endTime();
+        endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
+
+        startTimeUSec = reader->startTime();                       /* vvvvv  If nothing is recorded, set minimum to end - 10s. */
+        startTimeMSec = startTimeUSec == DATETIME_NOW ? endTimeMSec - 10000 : (startTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->minimum() : startTimeUSec / 1000); 
+    }
 
     m_timeSlider->setRange(startTimeMSec, endTimeMSec);
-    m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(),
-        QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
+    if(m_calendar)
+        m_calendar->setDateRange(QDateTime::fromMSecsSinceEpoch(startTimeMSec).date(), QDateTime::fromMSecsSinceEpoch(endTimeMSec).date());
 
     if(!m_pausedOverride) {
         qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -692,7 +703,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if (timeUSec != DATETIME_NOW && timeUSec != AV_NOPTS_VALUE){
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec){
-                timeMSec += (now - m_lastUpdateSlider) * this->speed();
+                timeMSec += (now - m_lastUpdateSlider) * speed();
             } else {
                 m_lastCameraTime = timeMSec;
                 m_lastUpdateSlider = now;
@@ -703,6 +714,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
+
+        if(isQuickSearch) {
+            QVector<qint64> indicators;
+            foreach(QnResourceWidget *widget, display()->widgets())
+                if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                    indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
+            m_timeSlider->setIndicators(indicators);
+        } else {
+            m_timeSlider->setIndicators(QVector<qint64>());
+        }
     }
 
     if(!m_currentWidgetLoaded && (startTimeUSec != AV_NOPTS_VALUE && endTimeUSec != AV_NOPTS_VALUE)) {
@@ -750,7 +771,8 @@ void QnWorkbenchNavigator::updateCurrentPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(CurrentLine, type, periods);
-    m_calendar->setCurrentTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setCurrentTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateSyncedPeriods() {
@@ -779,7 +801,8 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     }
 
     m_timeSlider->setTimePeriods(SyncedLine, type, periods);
-    m_calendar->setSyncedTimePeriods(type, periods);
+    if(m_calendar)
+        m_calendar->setSyncedTimePeriods(type, periods);
 }
 
 void QnWorkbenchNavigator::updateLines() {
@@ -1175,6 +1198,6 @@ void QnWorkbenchNavigator::at_calendar_selectionChanged(){
     m_timeSlider->finishAnimations();
     m_timeSlider->setWindow(startMSec, endMSec);
     // do not update value to avoid window scrolling if no data is recorded
-//  m_timeSlider->setValue(startMSec);
+    //  m_timeSlider->setValue(startMSec);
 }
 

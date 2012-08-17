@@ -14,7 +14,7 @@
 #include <utils/common/counter.h>
 
 #include <core/resource/storage_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 
@@ -137,6 +137,15 @@ void QnServerSettingsDialog::updateFromResources() {
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
     ui->apiPortLineEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
     ui->rtspPortLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+
+    bool panicMode = m_server->isPanicMode();
+    ui->recordingModeLabel->setText(panicMode ? tr("Panic") : tr("Normal"));
+    {
+        QPalette palette = this->palette();
+        if(panicMode)
+            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
+        ui->recordingModeLabel->setPalette(palette);
+    }
 
     setTableStorages(m_server->getStorages());
 

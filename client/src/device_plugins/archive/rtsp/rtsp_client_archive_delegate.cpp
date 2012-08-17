@@ -9,7 +9,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "core/resource/camera_history.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 

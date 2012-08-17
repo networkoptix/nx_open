@@ -2,11 +2,11 @@
 #include <QDebug>
 
 extern QMutex global_ffmpeg_mutex;
-static const int IO_BLOCK_SIZE = 1024*32;
+static const int IO_BLOCK_SIZE = 1024*16;
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
-    Q_ASSERT_X(true, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
 
@@ -18,7 +18,7 @@ static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 {
-    Q_ASSERT_X(true, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
+    Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
 
@@ -36,7 +36,7 @@ AVIOContext* QnFfmpegTranscoder::createFfmpegIOContext()
         &ffmpegReadPacket,
         &ffmpegWritePacket,
         &ffmpegSeek);
-
+    ffmpegIOContext->seekable = 0;
     return ffmpegIOContext;
 }
 
@@ -45,7 +45,6 @@ QnTranscoder(),
 m_videoEncoderCodecCtx(0),
 m_audioEncoderCodecCtx(0),
 m_videoBitrate(0),
-m_startDateTime(0),
 m_formatCtx(0),
 m_ioContext(0)
 {
@@ -123,6 +122,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
                 m_videoEncoderCodecCtx->height = m_vTranscoder->getResolution().height();
             }
+            m_videoEncoderCodecCtx->bit_rate = m_vTranscoder->getBitrate();
         }
         else 
         {
@@ -139,9 +139,9 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
                 m_videoEncoderCodecCtx->width = video->width;
                 m_videoEncoderCodecCtx->height = video->height;
             }
+            m_videoEncoderCodecCtx->bit_rate = video->width * video->height; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
         }
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-        m_videoEncoderCodecCtx->bit_rate = video->width * video->height*5; // auto fill bitrate. 10Mbit for full HD
         m_videoEncoderCodecCtx->time_base.num = 1;
         m_videoEncoderCodecCtx->time_base.den = 60;
         m_videoEncoderCodecCtx->gop_size = 30;
@@ -154,7 +154,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
     if (m_audioCodec != CODEC_ID_NONE)
     {
-        Q_ASSERT_X(true, Q_FUNC_INFO, "Not implemented! Under construction!!!");
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
@@ -186,8 +186,6 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     av_init_packet(&packet);
     packet.data = 0;
     packet.size = 0;
-    packet.pts = av_rescale_q(media->timestamp-m_startDateTime, srcRate, stream->time_base);
-    packet.dts = packet.pts;
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     QnAbstractMediaDataPtr transcodedData;
@@ -203,12 +201,14 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
             if (transcodedData) {
                 packet.data = (quint8*) transcodedData->data.data();
                 packet.size = transcodedData->data.size();
+                packet.pts = av_rescale_q(transcodedData->timestamp, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
             }
         }
         else {
             // direct stream copy
+            packet.pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
             packet.data = (quint8*) media->data.data();
             packet.size = media->data.size();
             if(media->flags & AV_PKT_FLAG_KEY)
@@ -218,9 +218,12 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     else {
         Q_ASSERT_X(true, Q_FUNC_INFO, "Not implemented! Under cunstruction!!!");
     }
+    packet.dts = packet.pts;
     
     if (packet.size > 0)
     {
+        qDebug() << "packet.pts=" << packet.pts;
+
         if (av_write_frame(m_formatCtx, &packet) < 0) {
             qWarning() << QLatin1String("Transcoder error: can't write AV packet");
             //return -1; // ignore error and continue

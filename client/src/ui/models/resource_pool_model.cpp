@@ -728,7 +728,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(resources);
+        QnMediaResourceList medias = resources.filtered<QnMediaResource>();
 
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutParameter, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
@@ -751,7 +751,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
-            QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
+            QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
             if(!cameras.empty())
                 menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::ServerParameter, server));
         }

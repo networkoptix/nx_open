@@ -3,6 +3,7 @@
 
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/video_server_resource.h>
 #include <licensing/license.h>
 
 #include <ui/style/globals.h>
@@ -127,6 +128,17 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
         ui->enableRecordingCheckBox->setCheckState(Qt::PartiallyChecked);
     } else {
         ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
+    }
+
+    ui->recordingModeLabel->setText(tr("Normal"));
+    if(enabledCount > 0) {
+        QnVideoServerResourcePtr server = qnResPool->getResourceById(m_cameras[0]->getParentId()).dynamicCast<QnVideoServerResource>();
+        if(server && server->isPanicMode()) {
+            QPalette palette = this->palette();
+            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
+            ui->recordingModeLabel->setPalette(palette);
+            ui->recordingModeLabel->setText(tr("Panic"));
+        }
     }
 
     updateMotionButtons();
