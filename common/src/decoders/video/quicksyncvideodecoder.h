@@ -3,6 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0   //disabled till: external decoder plugin, DX surface, async mode (if needed)
+
 #ifndef QUICKSYNCVIDEODECODER_H
 #define QUICKSYNCVIDEODECODER_H
 
@@ -124,3 +126,5 @@ private:
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H
+
+#endif

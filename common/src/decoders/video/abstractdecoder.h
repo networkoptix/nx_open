@@ -84,10 +84,6 @@ public:
     {
         FFMPEG,
         INTELIPP
-#ifdef _WIN32
-        //!Use Intel media SDK (if available on target platform). Supported only under Microsoft Windows OS
-        , INTEL_QUICK_SYNC
-#endif
     };
 
     static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding );

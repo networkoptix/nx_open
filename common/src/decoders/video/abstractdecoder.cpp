@@ -1,11 +1,7 @@
 
 #include "abstractdecoder.h"
 #include "ffmpeg.h"
-#include "quicksyncvideodecoder.h"
 #include "ipp_h264_decoder.h"
-#ifdef Q_OS_WIN
-#include "quicksyncvideodecoder.h"
-#endif
 
 
 
@@ -20,22 +16,11 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
     case INTELIPP:
         return new IPPH264Decoder();
         break;
-
-    case INTEL_QUICK_SYNC:
-    {
-        QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder();
-        decoder->decode( data, NULL );
-        return decoder;
-    }
 #endif
 
     case FFMPEG:
     default:
-#if defined(_WIN32) && defined(_DEBUG)
-        return new QuickSyncVideoDecoder();
-#else
-        //return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
-#endif
+        return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
     }
 
     return 0;

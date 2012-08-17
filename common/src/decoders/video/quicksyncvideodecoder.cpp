@@ -3,14 +3,11 @@
 * a.kolesnikov
 ***********************************************************/
 
+#if 0
+
 #include "quicksyncvideodecoder.h"
 
-//#include <Windows.h>
-
 #include <iostream>
-
-#ifdef _WIN32
-#endif
 
 
 //////////////////////////////////////////////////////////
@@ -815,3 +812,5 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, mfxFr
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_BFF || 
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_REPEATED;
 }
+
+#endif
