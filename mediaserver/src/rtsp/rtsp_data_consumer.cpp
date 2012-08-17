@@ -55,6 +55,18 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
+    foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+    {
+        if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+        {
+            if (consumer->m_liveQuality == MEDIA_Quality_Low) {
+                m_liveQuality = MEDIA_Quality_Low;
+                m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
+                break;
+            }
+        }
+    }
+
     m_allConsumers << this;
 }
 
