@@ -540,6 +540,9 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
 
     sws_scale(m_scaleContext, outFrame.data, outFrame.linesize, 0, outFrame.height, dstBuffer, dstLineSize);
 
+    /* We need to do copy the image since it doesn't own its data buffer. */
+    image = image.copy();
+
     qint64 actualTime = outFrame.pkt_dts / 1000;
     return QnThumbnail(image, image.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
 }
