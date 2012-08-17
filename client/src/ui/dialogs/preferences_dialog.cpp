@@ -13,6 +13,7 @@
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/screen_recording/screen_recorder.h"
 
 #include <ui/widgets/settings/connections_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
@@ -45,8 +46,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
     ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
 
-    m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-    ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+    if (QnScreenRecorder::isSupported()){
+        m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
+        ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+    }
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
