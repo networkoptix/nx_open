@@ -1403,10 +1403,3 @@ bool QnCamDisplay::isNoData() const
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
     */
 }
-
-void QnCamDisplay::setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec)
-{
-    m_timeOffsetUsec = timeOffsetUsec;
-    m_minTimeUsec = minTimeUsec;
-    m_maxTimeUsec = maxTimeUsec;
-}

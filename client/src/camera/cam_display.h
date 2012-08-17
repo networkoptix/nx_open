@@ -63,8 +63,6 @@ public:
     bool isNoData() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
-
-    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) override;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
