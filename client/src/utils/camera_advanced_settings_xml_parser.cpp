@@ -8,8 +8,9 @@ const QString CASXP_MAINTENANCE_GROUP_NAME(QLatin1String("%%Maintenance"));
 // class CameraSettingsLister
 //
 
-CameraSettingsLister::CameraSettingsLister(const QString& filepath):
-    CameraSettingReader(filepath, QString::fromLatin1("ONVIF"))
+CameraSettingsLister::CameraSettingsLister(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj):
+    CameraSettingReader(filepath, id),
+    m_obj(obj)
 {
 
 }
@@ -19,12 +20,16 @@ CameraSettingsLister::~CameraSettingsLister()
 
 }
 
-QStringList CameraSettingsLister::fetchParams()
+bool CameraSettingsLister::proceed(QStringList& out)
 {
-    read();
-    proceed();
+    bool res = read() && CameraSettingReader::proceed();
 
-    return m_params;
+    if (res) {
+        out.append(m_params);
+        return true;
+    }
+
+    return false;
 }
 
 bool CameraSettingsLister::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
@@ -53,12 +58,19 @@ void CameraSettingsLister::cleanDataOnFail()
     m_params.clear();
 }
 
+void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
+{
+    m_obj.parentOfRootElemFound(parentId);
+}
+
 //
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
-    CameraSettingReader(filepath, QString::fromLatin1("ONVIF")),
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj,
+        QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
+    CameraSettingReader(filepath, id),
+    m_obj(obj),
     m_settings(0),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
@@ -73,23 +85,10 @@ CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 
 }
 
-bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
+bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
-    if (!settings) {
-        return false;
-    }
+    m_settings = &settings;
 
-    m_settings = settings;
-
-    //WidgetsById::Iterator it = m_widgetsById.begin();
-    //for (; it != m_widgetsById.end(); ++it)
-    //{
-    //    //Deleting root element (automaticaly all children will be deleted)
-    //    if (it.key().count(QString::fromLatin1("%%")) == 1)
-    //    {
-    //        delete it.value();
-    //    }
-    //}
     m_widgetsById.clear();
     m_rootWidget.clear();
 
@@ -107,7 +106,7 @@ bool CameraSettingsWidgetsCreator::recreateWidgets(CameraSettings* settings)
     //Default - show empty widget
     m_rootLayout.addWidget(new QWidget(m_owner));
 
-    return read() && proceed();
+    return read() && CameraSettingReader::proceed();
 }
 
 bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name)
@@ -137,17 +136,6 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
             Q_ASSERT(false);
         }
         it.value()->addChild(item);
-        //QVBoxLayout *layout = dynamic_cast<QVBoxLayout *>(it.value()->layout());
-        //if(!layout) {
-        //    delete it.value()->layout();
-        //    it.value()->setLayout(layout = new QVBoxLayout());
-        //}
-
-        //tabWidget = new QGroupBox(name);
-        //layout->addWidget(tabWidget);
-
-        //tabWidget->setFixedWidth(300);
-        //tabWidget->setFixedHeight(300);
     }
 
     //item->setObjectName(id);
@@ -211,8 +199,6 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
     QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(value.getName()));
     item->setData(0, Qt::UserRole, ind);
     parentIt.value()->addChild(item);
-
-    //m_widgetsById.insert(value.getId(), tabWidget);
 }
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()
@@ -226,11 +212,143 @@ void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, 
         return;
     }
 
-    unsigned int ind = item->data(0, Qt::UserRole).toUInt();
-    if (ind > m_rootLayout.count() - 1) {
+    int ind = item->data(0, Qt::UserRole).toInt();
+    if (ind + 1 > m_rootLayout.count()) {
         qDebug() << "CameraSettingsWidgetsCreator::treeWidgetItemPressed: index out of range! Ind = " << ind << ", Count = " << m_rootLayout.count();
         return;
     }
 
     m_rootLayout.setCurrentIndex(ind);
+}
+
+void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId)
+{
+    m_obj.parentOfRootElemFound(parentId);
+}
+
+//
+// class CameraSettingTreeReader
+//
+
+template <class T, class E>
+CameraSettingTreeReader<T, E>::CameraSettingTreeReader(const QString& id):
+    m_initialId(id),
+    m_currParentId(),
+    m_firstTime(true)
+{
+    parentOfRootElemFound(id);
+}
+
+template <class T, class E>
+CameraSettingTreeReader<T, E>::~CameraSettingTreeReader()
+{
+    clean();
+}
+
+template <class T, class E>
+void CameraSettingTreeReader<T, E>::parentOfRootElemFound(const QString& parentId)
+{
+    if (parentId.isEmpty()) {
+        return;
+    }
+
+    m_currParentId = parentId;
+
+    if (m_firstTime) {
+        m_objList.push_back(createElement(parentId));
+    }
+}
+
+template <class T, class E>
+bool CameraSettingTreeReader<T, E>::proceed()
+{
+    QString currentId;
+    m_currParentId = m_initialId;
+    int i = 0;
+
+    do
+    {
+        currentId = m_currParentId;
+
+        T* nextElem = m_firstTime? m_objList.back(): m_objList.at(i++);
+        //ToDo: check impossible situation i > size - 1
+        if (!nextElem->proceed(getCallback())) {
+            clean();
+            return false;
+        }
+    }
+    while (currentId != m_currParentId);
+
+    m_firstTime = false;
+    return true;
+}
+
+template <class T, class E>
+void CameraSettingTreeReader<T, E>::clean()
+{
+    foreach (T* obj, m_objList) {
+        delete obj;
+    }
+    m_objList.clear();
+}
+
+//
+// class CameraSettingsTreeLister
+//
+
+CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& filepath, const QString& id):
+    CameraSettingTreeReader<CameraSettingsLister, QStringList>(id),
+    m_filepath(filepath)
+{
+    
+}
+
+CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
+{
+    return new CameraSettingsLister(m_filepath, id, *this);
+}
+
+QStringList& CameraSettingsTreeLister::getCallback()
+{
+    return m_params;
+}
+
+QStringList CameraSettingsTreeLister::proceed()
+{
+    m_params.clear();
+    CameraSettingTreeReader<CameraSettingsLister, QStringList>::proceed();
+    return m_params;
+}
+
+//
+// class CameraSettingsWidgetsTreeCreator
+//
+
+CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& filepath, const QString& id, QTreeWidget& rootWidget,
+        QStackedLayout& rootLayout, QObject* handler):
+    CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
+    m_filepath(filepath),
+    m_rootWidget(rootWidget),
+    m_rootLayout(rootLayout),
+    m_handler(handler),
+    m_settings(0)
+{
+
+}
+
+CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
+{
+    return new CameraSettingsWidgetsCreator(m_filepath, id, *this, m_rootWidget, m_rootLayout, m_handler);
+}
+
+CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()
+{
+    //ToDo: check pointer
+    return *m_settings;
+}
+
+void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
+{
+    m_settings = settings;
+    CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }

@@ -1529,6 +1529,6 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     CameraSettings::ConstIterator it = onvifSettings.begin();
 
     for (; it != onvifSettings.end(); ++it) {
-        setParam(it.key(), it.value().serializeToStr(), QnDomain::QnDomainPhysical);
+        setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
     }
 }

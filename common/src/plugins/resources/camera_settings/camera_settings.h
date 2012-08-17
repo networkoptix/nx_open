@@ -107,6 +107,7 @@ public:
     static const QString& ID_SEPARATOR;
     static const QString& TAG_GROUP;
     static const QString& TAG_PARAM;
+    static const QString& ATTR_PARENT;
     static const QString& ATTR_ID;
     static const QString& ATTR_NAME;
     static const QString& ATTR_WIDGET_TYPE;
@@ -130,6 +131,7 @@ protected:
     virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;
     virtual void paramFound(const CameraSetting& value, const QString& parentId) = 0;
     virtual void cleanDataOnFail() = 0;
+    virtual void parentOfRootElemFound(const QString& parentId) = 0;
 
 private:
 

@@ -79,44 +79,48 @@ QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
 
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
-    QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
-    if(!layout) {
-        delete ui->tabAdvanced->layout();
-        ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+    QVariant id;
+    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    {
+        QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
+        if(!layout) {
+            delete ui->tabAdvanced->layout();
+            ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+        }
+
+        QTreeWidget* advancedTreeWidget = new QTreeWidget();
+        advancedTreeWidget->setColumnCount(1);
+        advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
+
+        QWidget* advancedWidget = new QWidget();
+        QStackedLayout* advancedLayout = new QStackedLayout(advancedWidget);
+        layout->addWidget(advancedTreeWidget);
+        layout->addWidget(advancedWidget);
+
+        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+        //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(filepath, id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
-
-    QTreeWidget* advancedTreeWidget = new QTreeWidget();
-    advancedTreeWidget->setColumnCount(1);
-    advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
-
-    QWidget* advancedWidget = new QWidget();
-    QStackedLayout* advancedLayout = new QStackedLayout(advancedWidget);
-    layout->addWidget(advancedTreeWidget);
-    layout->addWidget(advancedWidget);
-
-    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    m_widgetsRecreator = new CameraSettingsWidgetsCreator(filepath, *advancedTreeWidget, *advancedLayout, this);
 }
 
 void QnSingleCameraSettingsWidget::loadAdvancedSettings()
 {
-    if (!m_camera) {
-        return;
+    QVariant id;
+    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    {
+        QnVideoServerConnectionPtr serverConnection = getServerConnection();
+        if (serverConnection.isNull()) {
+            return;
+        }
+
+        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+        //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+        CameraSettingsTreeLister lister(filepath, id.toString());
+        QStringList settings = lister.proceed();
+
+        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
+        serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
     }
-
-    QnVideoServerConnectionPtr serverConnection = getServerConnection();
-    if (serverConnection.isNull()) {
-        return;
-    }
-
-    QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    CameraSettingsLister lister(filepath);
-    QStringList settings = lister.fetchParams();
-
-    qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
-    serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
 }
 
 const QnVirtualCameraResourcePtr &QnSingleCameraSettingsWidget::camera() const {
@@ -482,7 +486,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         }
     }
 
-    m_widgetsRecreator->recreateWidgets(&m_cameraSettings);
+    m_widgetsRecreator->proceed(&m_cameraSettings);
 
     //at_dbDataChanged();
 }

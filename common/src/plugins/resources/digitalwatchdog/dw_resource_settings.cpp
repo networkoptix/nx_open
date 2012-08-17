@@ -193,3 +193,8 @@ void DWCameraSettingReader::cleanDataOnFail()
 {
     m_settings.clear();
 }
+
+void DWCameraSettingReader::parentOfRootElemFound(const QString& /*parentId*/)
+{
+
+}

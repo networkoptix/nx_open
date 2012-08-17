@@ -1207,3 +1207,8 @@ void OnvifCameraSettingReader::cleanDataOnFail()
 {
     m_settings.getCameraSettings().clear();
 }
+
+void OnvifCameraSettingReader::parentOfRootElemFound(const QString& /*parentId*/)
+{
+
+}

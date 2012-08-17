@@ -85,6 +85,7 @@ protected:
     virtual bool isParamEnabled(const QString& id, const QString& parentId);
     virtual void paramFound(const CameraSetting& value, const QString& parentId);
     virtual void cleanDataOnFail();
+    virtual void parentOfRootElemFound(const QString& parentId);
 
 private:
 

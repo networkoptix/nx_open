@@ -298,6 +298,7 @@ bool CameraSetting::isDisabled() const
 const QString& CameraSettingReader::ID_SEPARATOR = *(new QString(QLatin1String("%%")));
 const QString& CameraSettingReader::TAG_GROUP = *(new QString(QLatin1String("group")));
 const QString& CameraSettingReader::TAG_PARAM = *(new QString(QLatin1String("param")));
+const QString& CameraSettingReader::ATTR_PARENT = *(new QString(QLatin1String("parent")));
 const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id")));
 const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
 const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
@@ -366,6 +367,12 @@ bool CameraSettingReader::proceed()
             if (node.attributes().namedItem(ATTR_NAME).nodeValue() != m_cameraId) {
                 continue;
             }
+
+            QString parentId = node.attributes().namedItem(ATTR_PARENT).nodeValue();
+            if (parentId.isEmpty()) {
+                parentOfRootElemFound(parentId);
+            }
+
             return parseCameraXml(node.toElement());
         }
     }

@@ -114,7 +114,7 @@ private:
     bool m_inUpdateMaxFps;
 
     CameraSettings m_cameraSettings;
-    CameraSettingsWidgetsCreator* m_widgetsRecreator;
+    CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
     mutable QnVideoServerConnectionPtr m_serverConnection;
