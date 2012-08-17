@@ -65,7 +65,8 @@ QnGlobals::QnGlobals(QObject *parent):
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
-    Q_INIT_RESOURCE(skin);
+    Q_INIT_RESOURCE(client_generated);
+    Q_INIT_RESOURCE(client_custom);
 
     init();
 
