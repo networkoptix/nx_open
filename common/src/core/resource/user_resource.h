@@ -18,15 +18,15 @@ public:
     QString getPassword() const;    
     void setPassword(const QString &password);
 
-    bool isAdmin() const;    
-    void setAdmin(bool admin = true);
+    quint64 getRights() const;
+    void setRights(quint64 rights);
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QString m_password;
-    bool m_isAdmin;
+    bool m_rights;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr);

@@ -3,7 +3,7 @@
 
 QnUserResource::QnUserResource()
     : base_type(),
-      m_isAdmin(false)
+      m_rights(0)
 {
     setStatus(Online, true);
     addFlags(QnResource::user | QnResource::remote);
@@ -28,14 +28,14 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
-bool QnUserResource::isAdmin() const
+quint64 QnUserResource::getRights() const
 {
-    return m_isAdmin;
+    return m_rights;
 }
 
-void QnUserResource::setAdmin(bool admin)
+void QnUserResource::setRights(quint64 rights)
 {
-    m_isAdmin = admin;
+    m_rights = rights;
 }
 
 void QnUserResource::updateInner(QnResourcePtr other) {
@@ -45,6 +45,6 @@ void QnUserResource::updateInner(QnResourcePtr other) {
     if(localOther) {
         setPassword(localOther->getPassword());
 
-        setAdmin(localOther->isAdmin());
+        setRights(localOther->getRights());
     }
 }

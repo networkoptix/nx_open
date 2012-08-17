@@ -53,18 +53,6 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     return data.notifier;
 }
 
-bool QnWorkbenchAccessController::isOwner() const {
-    return m_user && m_user->isAdmin() && m_user->getName() == QLatin1String("admin");
-}
-
-bool QnWorkbenchAccessController::isAdmin() const {
-    return m_user && m_user->isAdmin() && m_user->getName() != QLatin1String("admin");
-}
-
-bool QnWorkbenchAccessController::isViewer() const {
-    return !m_user || !m_user->isAdmin();
-}
-
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
     if(!resource)
         return 0;
@@ -91,25 +79,32 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
-    if(isOwner()) {
-        if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission | Qn::CreateUserPermission;
-        } else {
-            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
-        }
-    } else if(isAdmin()) {
-        if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission | Qn::CreateLayoutPermission | Qn::CreateUserPermission;
-        } else if(user->isAdmin()) {
-            return Qn::ReadPermission | Qn::CreateLayoutPermission;
-        } else {
-            return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::CreateLayoutPermission;
-        }
-    } else {
-        if(user == m_user) {
-            return Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;
-        } else {
-            return 0;
+
+    Qn::Permission result = 0;
+    quint64 rights = m_user->getRights();
+    quint64 other_rights = user->getRights();
+
+    if (user == m_user)
+        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;    // everyone can edit own data
+    else
+        if (rights && Qn::CreateUserRight)
+            result |= Qn::CreateUserPermission;                                 // no one can create themselve
+
+    if (rights && Qn::CreateLayoutRight)                                        // layout-admin can create layouts
+        result |= Qn::CreateLayoutPermission;
+
+    if (rights && Qn::SuperUserRight){                                          // super-user can edit every user
+        result |= Qn::ReadWriteSavePermission;
+        if (user != m_user)
+            result |= Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
+    }
+
+    if (rights && Qn::EditUserRight){
+        if (user != m_user){
+            if (other_rights && Qn::EditUserRight)
+                result |= Qn::ReadPermission;                                   // user-admin cannot edit other admins
+            else                                                                // user-admin can edit other users
+                result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission;
         }
     }
 }

@@ -45,10 +45,6 @@ public:
 
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
-    bool isOwner() const;
-    bool isAdmin() const;
-    bool isViewer() const;
-
 signals:
     /**
      * \param resource                  Resource for which permissions have changed. 

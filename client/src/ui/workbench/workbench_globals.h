@@ -155,7 +155,15 @@ namespace Qn {
 
         AllPermissions              = 0xFFFFFFFF
     };
-    Q_DECLARE_FLAGS(Permissions, Permission);
+    Q_DECLARE_FLAGS(Permissions, Permission)
+
+    enum UserRight{
+        CreateLayoutRight           = 0x00000001,
+        CreateUserRight             = 0x00000002,
+        SuperUserRight              = 0x00000004,
+        EditUserRight               = 0x00000008
+    };
+    Q_DECLARE_FLAGS(UserRights, UserRight)
 
 
 } // namespace Qn
