@@ -8,6 +8,7 @@
 
 #include <ui/widgets/dwm.h>
 #include <ui/style/skin.h>
+#include <ui/style/globals.h>
 
 #ifdef Q_OS_WIN32
 #   include "device_plugins/desktop/win_audio_helper.h"
@@ -89,6 +90,14 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
             screen
         );
     }
+
+    {
+        QPalette palette = ui->recordingWarningLabel->palette();
+        palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+        ui->recordingWarningLabel->setPalette(palette);
+    }
+    connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+    connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
 }
 
 QnRecordingSettingsWidget::~QnRecordingSettingsWidget() {
@@ -302,4 +311,9 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 #endif
 }
 
-
+void QnRecordingSettingsWidget::updateRecordingWarning(){
+    if (decoderQuality() == Qn::BestQuality && (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ))
+        ui->recordingWarningLabel->setText(tr("Very powerful machine is required for Best quality and high resolution."));
+    else
+        ui->recordingWarningLabel->setText(QString());
+}

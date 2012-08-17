@@ -123,12 +123,7 @@ void QnPreferencesDialog::accept() {
     submitToSettings();
     if (oldLanguage != m_settings->language())
         QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
-
-    if (m_recordingSettingsWidget && m_recordingSettingsWidget->decoderQuality() == Qn::BestQuality && m_recordingSettingsWidget->resolution() == Qn::NativeResolution)
-        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
-
     //m_youTubeSettingsWidget->accept();
-
     base_type::accept();
 }
 
