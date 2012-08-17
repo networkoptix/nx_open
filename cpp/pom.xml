@@ -81,7 +81,7 @@
 						<configuration>
 							<executable>python</executable>
 							<arguments>
-								<argument>build-prepare.py</argument>
+								<argument>gen-resources.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>		
 						</configuration>
@@ -207,7 +207,7 @@
 								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo> -->
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>
 
 								<fileset id="qrc_path" dir="${project.build.directory}" erroronmissingdir="false">
 									<include name="**/*.qrc" />
@@ -215,15 +215,15 @@
 								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
 									<map from="" to="RESOURCES += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo> -->
 
-								<!-- <fileset id="lang_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+								<fileset id="lang_path" dir="${basedir}/resources" erroronmissingdir="false">
 									<include name="**/*.ts" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="lang" refid="lang_path">
 									<map from="" to="TRANSLATIONS += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo> -->
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${lang}</echo>
 
 								<fileset id="forms_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.ui" />
