@@ -1,7 +1,7 @@
 #include "transcoder.h"
 #include "ffmpeg_transcoder.h"
-#include "ffmpeg_video_transcoder.h"
-#include "quick_sync_transcoder.h"
+#include "ffmpeg_transcoder.h"
+#include "quicksyncvideotranscoder.h"
 #include "core/resource/media_resource.h"
 
 // ---------------------------- QnCodecTranscoder ------------------

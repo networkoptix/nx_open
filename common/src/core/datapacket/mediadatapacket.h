@@ -81,6 +81,19 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
     virtual QnAbstractMediaData* clone();
 
+    //!Create media packet using existing data \a data of size \a dataSize. This buffer will not be deleted!
+    QnAbstractMediaData(char* data, unsigned int dataSize): 
+        data(data, dataSize),
+        dataType(EMPTY_DATA),
+        compressionType(CODEC_ID_NONE),
+        flags(MediaFlags_None),
+        channelNumber(0),
+        subChannelNumber(0),
+        context(0),
+        opaque(0)
+    {
+    }
+
     virtual ~QnAbstractMediaData()
     {
     }
@@ -96,7 +109,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 protected:
     void assign(QnAbstractMediaData* other);
 private:
-    QnAbstractMediaData(): data(0, 1) {};
+    QnAbstractMediaData(): data(0U, 1) {};
 };
 typedef QSharedPointer<QnAbstractMediaData> QnAbstractMediaDataPtr;
 

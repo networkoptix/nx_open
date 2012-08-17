@@ -11,10 +11,22 @@ QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity):
     m_capacity(0),
     m_size(0),
     m_data(NULL),
-    m_ignore(0)
+    m_ignore(0),
+    m_ownBuffer( true )
 {
     if (capacity > 0)
         reallocate(capacity);
+}
+
+QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
+:
+    m_alignment( 1 ),
+    m_capacity( dataSize ),
+    m_size( dataSize ),
+    m_data( buf ),
+    m_ignore( 0 ),
+    m_ownBuffer( false )
+{
 }
 
 QnByteArray::~QnByteArray()
@@ -35,6 +47,9 @@ const char *QnByteArray::constData() const
 
 char *QnByteArray::data()
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     return m_data + m_ignore;
 }
 
@@ -58,8 +73,11 @@ unsigned int QnByteArray::capacity() const
     return m_capacity;
 }
 
-unsigned int QnByteArray::write(const char *data, unsigned int size)
+unsigned int QnByteArray::write( const char *data, unsigned int size )
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     reserve(m_size + size);
 
     qMemCopy(m_data + m_size, data, size);
@@ -71,6 +89,9 @@ unsigned int QnByteArray::write(const char *data, unsigned int size)
 
 unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     reserve(pos + size);
 
     qMemCopy(m_data + pos, data, size);
@@ -83,6 +104,9 @@ unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 
 void QnByteArray::writeFiller(quint8 filler, int size)
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     reserve(m_size + size);
 
     memset(m_data + m_size, filler, size);
@@ -91,6 +115,9 @@ void QnByteArray::writeFiller(quint8 filler, int size)
 
 char *QnByteArray::startWriting(unsigned int size)
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     reserve(m_size + size);
 
     return m_data + m_size;
@@ -134,7 +161,7 @@ bool QnByteArray::reallocate(unsigned int capacity)
         return false;
     }
 
-    if (capacity <= m_capacity)
+    if (capacity < m_capacity)
         return true;
 
     char *data = (char *) qMallocAligned(capacity + QN_BYTE_ARRAY_PADDING, m_alignment);
@@ -142,9 +169,11 @@ bool QnByteArray::reallocate(unsigned int capacity)
         return false;
 
     qMemCopy(data, m_data, m_size);
-    qFreeAligned(m_data);
+    if( m_ownBuffer )
+        qFreeAligned(m_data);
     m_capacity = capacity;
     m_data = data;
+    m_ownBuffer = true;
 
     return true;
 }
