@@ -7,4 +7,4 @@ echo customization=%INPUT%
 if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 
 @echo on
-mvn compile -P!convert-clean-windows,!convert-clean,!installer %CUSTOMIZATION%
+mvn compile -U -P!convert-clean-windows,!convert-clean,!installer %CUSTOMIZATION%

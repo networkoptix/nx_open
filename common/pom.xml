@@ -77,6 +77,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
+		<dependency>
+			<groupId>com.intel</groupId>
+			<artifactId>mfx</artifactId>
+			<version>2012-R2-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>
 	</dependencies>
 
 	<build>

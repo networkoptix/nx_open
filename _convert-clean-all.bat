@@ -7,4 +7,4 @@ echo customization=%INPUT%
 if not [%1] == [] set CUSTOMIZATION=-Dcustomization=%INPUT%
 
 @echo on
-mvn clean compile -P!installer %CUSTOMIZATION%
+mvn clean compile -U -P!installer %CUSTOMIZATION%
