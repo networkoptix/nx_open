@@ -19,8 +19,6 @@ public:
     virtual ~QnArchiveSyncPlayWrapper();
     void addArchiveReader(QnAbstractArchiveReader* reader, QnlTimeSource* cam);
     
-    void setTimeParams(QnAbstractArchiveReader* reader, qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec);
-
     void removeArchiveReader(QnAbstractArchiveReader* reader);
 
     virtual qint64 getCurrentTime() const;

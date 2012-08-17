@@ -70,7 +70,6 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
-    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) override;
 protected:
     virtual bool init();
 
@@ -153,10 +152,6 @@ private:
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
-
-    qint64 m_timeOffsetUsec;
-    qint64 m_minTimeUsec;
-    qint64 m_maxTimeUsec;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

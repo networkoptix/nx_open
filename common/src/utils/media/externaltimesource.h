@@ -39,13 +39,6 @@ public:
 
     virtual void reinitTime(qint64 newTime) { Q_UNUSED(newTime); }
     
-    /*
-    * Set time modificators for time source
-    * @param timeOffsetUsec relative time offset of the time source at usec
-    * @param minTimeUsec additional time range bounds
-    * @param maxTimeUsec additional time range bounds
-    */
-    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) { Q_UNUSED(timeOffsetUsec); Q_UNUSED(minTimeUsec); Q_UNUSED(maxTimeUsec) }
 };
 
 #endif //QnExternalTimeSource_h_1919

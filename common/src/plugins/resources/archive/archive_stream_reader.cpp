@@ -57,11 +57,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQuality(MEDIA_Quality_High),
     m_oldQualityFastSwitch(true),
     m_isStillImage(false),
-    m_speed(1.0),
-
-    m_timeOffsetUsec(0),
-    m_minTimeUsec(0),
-    m_maxTimeUsec(0)
+    m_speed(1.0)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -215,7 +211,7 @@ bool QnArchiveStreamReader::init()
                 if (m_requiredJumpTime == requiredJumpTime) {
                     m_requiredJumpTime = AV_NOPTS_VALUE;
                     m_jumpMtx.unlock();
-                    emit jumpOccured(requiredJumpTime+m_timeOffsetUsec);
+                    emit jumpOccured(requiredJumpTime);
                 }
                 else {
                     requiredJumpTime = m_requiredJumpTime;
@@ -371,8 +367,8 @@ begin_label:
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
-                internalJumpTo(displayTime-m_timeOffsetUsec);
-                setSkipFramesToTime(displayTime-m_timeOffsetUsec, false);
+                internalJumpTo(displayTime);
+                setSkipFramesToTime(displayTime, false);
 
                 emit jumpOccured(displayTime);
                 m_BOF = true;
@@ -399,7 +395,7 @@ begin_label:
         if (!exactJumpToSpecifiedFrame && channelCount > 1)
             setNeedKeyData();
         internalJumpTo(jumpTime);
-        emit jumpOccured(jumpTime+m_timeOffsetUsec);
+        emit jumpOccured(jumpTime);
         m_BOF = true;
     }
 
@@ -414,15 +410,12 @@ begin_label:
             if (jumpTime != qint64(AV_NOPTS_VALUE))
                 displayTime = jumpTime;
             else
-                displayTime = determineDisplayTime(reverseMode) - m_timeOffsetUsec;
+                displayTime = determineDisplayTime(reverseMode);
 
             //displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
         }
-        else {
-            displayTime -= m_timeOffsetUsec;
-        }
 
-        m_delegate->onReverseMode(displayTime+m_timeOffsetUsec, reverseMode);
+        m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
         if (!delegateForNegativeSpeed) {
             if (!exactJumpToSpecifiedFrame && channelCount > 1)
@@ -439,7 +432,7 @@ begin_label:
         m_BOF = true;
         m_afterBOFCounter = 0;
         if (jumpTime != qint64(AV_NOPTS_VALUE))
-            emit jumpOccured(displayTime+m_timeOffsetUsec);
+            emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
 
@@ -724,8 +717,6 @@ begin_label:
     if (jumpTime != DATETIME_NOW)
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
-    if (m_currentData)
-        m_currentData->timestamp += m_timeOffsetUsec;
     return m_currentData;
 }
 
@@ -883,7 +874,7 @@ void QnArchiveStreamReader::channeljumpToUnsync(qint64 mksec, int /*channel*/, q
     m_singleQuantProcessed=false;
     //if (m_requiredJumpTime != AV_NOPTS_VALUE)
     //    emit jumpCanceled(m_requiredJumpTime);
-    m_requiredJumpTime = mksec - m_timeOffsetUsec;
+    m_requiredJumpTime = mksec;
     m_tmpSkipFramesToTime = skipTime;
     m_singleShowWaitCond.wakeAll();
 }
@@ -963,9 +954,9 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
 void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
     if (m_requiredJumpTime != qint64(AV_NOPTS_VALUE))
-        emit jumpCanceled(m_requiredJumpTime+m_timeOffsetUsec);
+        emit jumpCanceled(m_requiredJumpTime);
     emit beforeJump(mksec);
-    m_delegate->beforeSeek(mksec-m_timeOffsetUsec);
+    m_delegate->beforeSeek(mksec);
 }
 
 bool QnArchiveStreamReader::setSendMotion(bool value)
@@ -1076,11 +1067,4 @@ double QnArchiveStreamReader::getSpeed() const
 QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 {
     return m_codecContext;
-}
-
-void QnArchiveStreamReader::setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec)
-{
-    m_timeOffsetUsec = timeOffsetUsec;
-    m_minTimeUsec = minTimeUsec;
-    m_maxTimeUsec = maxTimeUsec;
 }

@@ -1,8 +1,7 @@
 #include "transcoder.h"
 #include "ffmpeg_transcoder.h"
-#include "ffmpeg_transcoder.h"
-#include "quicksyncvideotranscoder.h"
 #include "core/resource/media_resource.h"
+#include "ffmpeg_video_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -105,8 +104,10 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
         case TM_FfmpegTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnFfmpegVideoTranscoder(codec));
             break;
+            /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
+            */
             break;
         case TM_OpenCLTranscode:
             m_lastErrMessage = "OpenCLTranscode is not implemented";
