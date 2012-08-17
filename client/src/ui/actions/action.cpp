@@ -6,6 +6,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -124,6 +125,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 resources.push_back(context()->workbench()->currentLayout()->resource());
             } else if(key == Qn::CurrentUserParameter) {
                 resources.push_back(context()->user());
+            } else if(key == Qn::AllVideoServersParameter) {
+                resources = context()->resourcePool()->getResources().filtered<QnVideoServerResource>();
             }
 
             if((accessController()->permissions(resources) & required) != required)

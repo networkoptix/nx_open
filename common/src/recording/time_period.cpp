@@ -1,5 +1,9 @@
 #include "time_period.h"
-#include "utils/common/util.h"
+
+#include <QtCore/QDebug>
+
+#include <utils/common/util.h>
+
 #include "time_period_list.h"
 
 
@@ -253,4 +257,9 @@ bool QnTimePeriod::decode(QByteArray &stream, QnTimePeriodList &periods)
 bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 {
     return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
+}
+
+QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
+    dbg.nospace() << "QnTimePeriod(" << period.startTimeMs << ',' << period.durationMs << ')';
+    return dbg.space();
 }

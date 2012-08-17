@@ -155,10 +155,13 @@ protected:
     QnByteArray m_internalBuffer;
     qint64 m_firstTime;
 private:
+    int suggestBitrate(QSize resolution) const;
+private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnCompressedAudioDataPtr> m_delayedAudioQueue;
     bool m_initialized;
+    int m_eofCounter;
 };
 
 #endif  // __TRANSCODER_H

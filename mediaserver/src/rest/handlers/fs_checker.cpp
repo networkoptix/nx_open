@@ -13,7 +13,7 @@ QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
 
 }
 
-int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
+int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     QString pathStr;
@@ -84,10 +84,10 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
     return CODE_OK;
 }
 
-int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
+int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const

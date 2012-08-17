@@ -186,6 +186,7 @@ namespace {
     
     const QColor tickmarkColor(255, 255, 255, 255);
     const QColor positionMarkerColor(255, 255, 255, 196);
+    const QColor indicatorColor(128, 160, 192, 128);
 
     const QColor selectionColor = qnGlobals->selectionColor();
     const QColor selectionMarkerColor = selectionColor.lighter();
@@ -268,25 +269,25 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     base_type(parent),
     m_windowStart(0),
     m_windowEnd(0),
-    m_options(0),
-    m_oldMinimum(0),
-    m_oldMaximum(0),
-    m_animationUpdateMSecsPerPixel(1.0),
-    m_msecsPerPixel(1.0),
     m_minimalWindow(0),
     m_selectionValid(false),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_oldMinimum(0),
+    m_oldMaximum(0),
+    m_options(0),
     m_unzooming(false),
+    m_dragMarker(NoMarker),
     m_dragIsClick(false),
     m_selecting(false),
-    m_dragMarker(NoMarker),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-    m_rulerHeight(0.0),
-    m_prefferedHeight(0.0),
+    m_msecsPerPixel(1.0),
+    m_animationUpdateMSecsPerPixel(1.0),
     m_lastThumbnailsUpdateTime(0),
     m_lastHoverThumbnail(-1),
-    m_thumbnailsVisible(false)
+    m_thumbnailsVisible(false),
+    m_rulerHeight(0.0),
+    m_prefferedHeight(0.0),
+    m_pixmapCache(QnTimeSliderPixmapCache::instance())
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -483,7 +484,7 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodRole type, const QnTim
     if(!checkLinePeriod(line, type))
         return;
 
-    m_lineData[line].timeStorage.updatePeriods(type, timePeriods);
+    m_lineData[line].timeStorage.setPeriods(type, timePeriods);
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -870,6 +871,13 @@ void QnTimeSlider::freezeThumbnails() {
     }
 }
 
+const QVector<qint64> &QnTimeSlider::indicators() const {
+    return m_indicators;
+}
+
+void QnTimeSlider::setIndicators(const QVector<qint64> &indicators) {
+    m_indicators = indicators;
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -1295,6 +1303,10 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), positionMarkerColor);
+
+    /* Draw indicators. */
+    foreach(qint64 position, m_indicators)
+        drawMarker(painter, position, indicatorColor);
 }
 
 void QnTimeSlider::drawSeparator(QPainter *painter, const QRectF &rect) {
@@ -1354,9 +1366,11 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
      * different motion periods several times over the same location. 
      * It makes transparent time slider look better. */
 
-    QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
-    QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
-    QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
+    /* Note that constness of period lists is important here as requesting
+     * iterators from a non-const object will result in detach. */
+    const QnTimePeriodList periods[Qn::TimePeriodRoleCount] = {recorded, motion};
+    const QColor pastColor[Qn::TimePeriodRoleCount + 1] = {pastRecordingColor, pastMotionColor, pastBackgroundColor};
+    const QColor futureColor[Qn::TimePeriodRoleCount + 1] = {futureRecordingColor, futureMotionColor, futureBackgroundColor};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodRoleCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodRoleCount];

@@ -9,7 +9,7 @@ class QnServerCameraProcessor : public QObject, public QnResourceProcessor
 public:
     void processResources(const QnResourceList &resources);
 private slots:
-    void at_serverIfFound(QString);
+    void at_serverIfFound(const QString &);
 };
 
 class QnServerCamera: public QnVirtualCameraResource

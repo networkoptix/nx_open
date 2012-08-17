@@ -2,7 +2,7 @@
 #define MAIN_H
 
 #include "utils/common/longrunnable.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "http/progressive_downloading_server.h"
 
 class QnAppserverResourceProcessor;

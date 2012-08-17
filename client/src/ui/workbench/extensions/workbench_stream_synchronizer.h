@@ -7,12 +7,12 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 class QnCounter;
-class QnWorkbenchDisplay;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
-class QnWorkbenchRenderWatcher;
 
 class QnAbstractRenderer;
 
@@ -20,10 +20,10 @@ class QnAbstractRenderer;
  * This class manages the necessary machinery for synchronized playback of
  * cameras on the scene.
  */
-class QnWorkbenchStreamSynchronizer: public QObject {
+class QnWorkbenchStreamSynchronizer: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    QnWorkbenchStreamSynchronizer(QnWorkbenchDisplay *display, QnWorkbenchRenderWatcher *renderWatcher, QObject *parent = NULL);
+    QnWorkbenchStreamSynchronizer(QObject *parent = NULL);
 
     /**
      * Disable this stream synchronizer. 
@@ -57,7 +57,7 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_renderWatcher_displayingStateChanged(QnAbstractRenderer *renderer, bool displaying);
+    void at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying);
 
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
@@ -72,9 +72,6 @@ private:
 
     /** Syncplay instance that performs the actual stream synchronization. */
     QnArchiveSyncPlayWrapper *m_syncPlay;
-
-    /** Workbench display that this stream synchronizer was created for. */
-    QWeakPointer<QnWorkbenchDisplay> m_display;
 
     QSet<QnMediaResourceWidget *> m_queuedWidgets;
 };

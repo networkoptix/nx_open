@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 #include <api/video_server_connection.h>
 
 #include <ui/style/globals.h>
@@ -16,9 +16,8 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 
-/** How many points are shown on the screen simultaneously */
-// TODO: #GDM use more informative names please =). What kind of limit?
-#define LIMIT 60
+/** How many points of the chart are shown on the screen simultaneously */
+#define CHART_POINTS_LIMIT 60
 
 /** Data update period. For the best result should be equal to server's */
 #define REQUEST_TIME 2000
@@ -153,25 +152,25 @@ namespace {
 
 } // anonymous namespace
 
-QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description):
-    Id(id),
-    Description(description)
+QnServerResourceWidget::QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description)
 {
-    for (int i = 0; i < LIMIT; i++)
-        History.append(0);
+    this->id = id;
+    this->description = description;
+    for (int i = 0; i < CHART_POINTS_LIMIT; i++)
+        history.append(0);
 }
 
-void QnStatisticsHistoryData::append(int value) {
-    History.append(value);
-    if (History.count() > LIMIT)
-        History.pop_front();
+void QnServerResourceWidget::QnStatisticsHistoryData::append(int value) {
+    history.append(value);
+    if (history.count() > CHART_POINTS_LIMIT)
+        history.pop_front();
 }
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
-    m_alreadyUpdating(false),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered)
+    m_renderStatus(Qn::NothingRendered),
+    m_alreadyUpdating(false)
 {
     m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
     if(!m_resource) 
@@ -180,6 +179,9 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
     timer->start(REQUEST_TIME);
+
+    /* Run handlers. */
+    updateButtonsVisibility();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
@@ -240,7 +242,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
     painter->endNativePainting();
 
-    const qreal x_step = (qreal)ow*1.0/(LIMIT - 2);
+    const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
     qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
@@ -277,7 +279,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         for (int i = 0; i < m_history.length(); i++){
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].History), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(&(m_history[i].history), x_step, -1.0 * oh, current_value, elapsed_step);
             values.append(current_value);
 
             graphPen.setColor(getColorById(i));
@@ -299,17 +301,18 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QnScopedPainterFontRollback fontRollback(painter);
         QFont font(this->font());
+
+#ifndef Q_WS_X11
         font.setPointSizeF(offset * 0.3);
         painter->setFont(font);
-
         /** Draw text values */
         {
-            int x = offset*1.1 + ow;
+            qreal x = offset*1.1 + ow;
             for (int i = 0; i < values.length(); i++){
                 qreal inter_value = values[i];
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
-                int y = offset + oh * (1.0 - inter_value * 0.01);
+                qreal y = offset + oh * (1.0 - inter_value * 0.01);
                 painter->drawText(x, y, QString::number(qRound(inter_value))+QLatin1Char('%'));
             }
         }
@@ -317,6 +320,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         /** Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
+            Q_UNUSED(transformRollback) //ugly hack to prevent warning
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
 
@@ -328,11 +332,53 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, m_history[i].Id);
+                painter->drawText(offset*0.1, offset*0.1, m_history[i].id);
                 legendTransform.translate(offset * 2, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
+#else //Q_WS_X11
+        font.setPixelSize(20);
+        painter->setFont(font);
+        /** Draw text values */
+        {
+            qreal c = offset*0.02;
+            painter->scale(c, c);
+            c = 1/c;
+            qreal x = offset*1.1 + ow;
+            for (int i = 0; i < values.length(); i++){
+                qreal inter_value = values[i];
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                qreal y = offset + oh * (1.0 - inter_value * 0.01);
+                painter->drawText(x*c, y*c, QString::number(qRound(inter_value))+QLatin1Char('%'));
+            }
+            painter->scale(c, c);
+        }
+
+        /** Draw legend */
+        {
+            QnScopedPainterTransformRollback transformRollback(painter);
+
+            painter->translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
+            qreal c = offset*0.02;
+            painter->scale(c, c);
+            c = 1/c;
+
+            QPainterPath legend;
+            legend.addRect(0.0, 0.0, -offset*0.2*c, -offset*0.2*c);
+            main_pen.setWidthF(pen_width * 2 * c);
+
+            for (int i = 0; i < m_history.length(); i++){
+                main_pen.setColor(getColorById(i));
+                painter->setPen(main_pen);
+                painter->strokePath(legend, main_pen);
+                painter->drawText(offset*0.1*c, offset*0.1*c, m_history[i].id);
+                painter->translate(offset * 2*c, 0.0);
+            }
+            painter->scale(c, c);
+        }
+    #endif //Q_WS_X11
     }
 }
 

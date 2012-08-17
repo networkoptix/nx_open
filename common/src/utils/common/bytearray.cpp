@@ -43,6 +43,11 @@ void QnByteArray::ignore_first_bytes(int bytes_to_ignore)
     m_ignore = bytes_to_ignore;
 }
 
+int QnByteArray::getAlignment() const
+{
+    return m_alignment;
+}
+
 unsigned int QnByteArray::size() const
 {
     return m_size - m_ignore;

@@ -119,6 +119,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
     if (m_forceSliceDecoding == -1 && data && data->data.data() && m_context->codec_id == CODEC_ID_H264) 
     {
         m_forceSliceDecoding = 0;
+        int nextSliceCnt = 0;
         const quint8* curNal = (const quint8*) data->data.data();
         if (curNal[0] == 0) 
         {
@@ -132,15 +133,16 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnCompressedVideoDat
                     try {
                         int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
                         if (first_mb_in_slice > 0) {
-                            m_forceSliceDecoding = 1; // multislice frame
-                            break;
+                            nextSliceCnt++;
+                            //break;
                         }
                     } catch(...) {
                         break;
                     }
                 }
-
             }
+            if (nextSliceCnt >= 3)
+                m_forceSliceDecoding = 1; // multislice frame. Use multislice decoding if slice count 4 or above
         }
     }
     m_context->thread_type = m_mtDecoding && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
@@ -558,7 +560,7 @@ void CLFFmpegVideoDecoder::showMotion(bool show)
 
 void CLFFmpegVideoDecoder::setMTDecoding(bool value)
 {
-    if (m_mtDecoding != value && m_forceSliceDecoding != 1)
+    if (m_mtDecoding != value)
         m_needRecreate = true;
     m_mtDecoding = value;
 }

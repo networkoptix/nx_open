@@ -24,8 +24,11 @@ public:
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();
+    int getVideoStreamResolution() const;
 protected:
     virtual void run() override;
+private:
+    static QByteArray getMimeType(QByteArray streamingFormat);
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnProgressiveDownloadingConsumer);
 };

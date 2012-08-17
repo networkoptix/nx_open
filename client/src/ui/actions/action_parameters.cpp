@@ -27,19 +27,6 @@ QnActionParameters::QnActionParameters(const QVariant &items, const QVariantMap 
     setItems(items);
 }
 
-QnActionParameters::QnActionParameters(const QnResourcePtr &resource, const QVariantMap &arguments) {
-    setArguments(arguments);
-
-    QnResourceList resources;
-    resources.push_back(resource);
-    setItems(QVariant::fromValue<QnResourceList>(resources));
-}
-
-QnActionParameters::QnActionParameters(const QnResourceList &resources, const QVariantMap &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceList>(resources));
-}
-
 QnActionParameters::QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments) {
     setArguments(arguments);
     setItems(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)));

@@ -10,7 +10,7 @@ namespace pb {
     class Message;
 }
 
-namespace Qn{
+namespace Qn {
     enum Message_Type {
         Message_Type_Initial = 0,
         Message_Type_Ping = 1,
@@ -33,7 +33,6 @@ struct QnMessage
 
     // These fields are temporary and caused by
     // heavy-weightness of QnResource
-    // TODO: Ivan. Replace resource with lightweight transfer object here
     QnId resourceId;
     QString resourceGuid;
     bool resourceDisabled;

@@ -135,6 +135,8 @@ public:
     // TODO: this function breaks data alignment.
     void ignore_first_bytes(int bytes_to_ignore);
 
+    int getAlignment() const;
+
 protected:
     bool reallocate(unsigned int capacity);
 

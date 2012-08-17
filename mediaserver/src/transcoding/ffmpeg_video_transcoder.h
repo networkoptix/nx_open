@@ -21,7 +21,9 @@ private:
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
     SwsContext* scaleContext;
-
+    qint64 m_firstEncodedPts;
+    int m_lastSrcWidth;
+    int m_lastSrcHeight;
 };
 
 #endif // __FFMPEG_VIDEO_TRANSCODER_H__

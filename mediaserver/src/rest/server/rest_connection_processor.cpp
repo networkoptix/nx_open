@@ -52,14 +52,14 @@ void QnRestConnectionProcessor::run()
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == "GET") {
-                        rez = handler->executeGet(url.path(), params, d->responseBody);
+                        rez = handler->executeGet(url.path(), params, d->responseBody, encoding);
                     }
                     else if (d->requestHeaders.method().toUpper() == "POST") {
-                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody);
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, encoding);
                     }
                     else {
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
-                        encoding = "plain/text";
+                        encoding = "text/plain";
                         d->responseBody = "Invalid HTTP method";
                         rez = CODE_NOT_FOUND;
                     }

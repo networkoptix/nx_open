@@ -11,15 +11,6 @@
 
 class QnRadialGradientPainter;
 
-struct QnStatisticsHistoryData {
-    QString Id; // TODO: #GDM classes start with Uppercase, fields with lowercase.
-    QString Description;
-    QList<int> History;
-
-    QnStatisticsHistoryData(QString id, QString description);
-    void append(int value);
-};
-
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT;
 
@@ -57,6 +48,15 @@ private:
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
 private:
+    struct QnStatisticsHistoryData {
+        QString id;
+        QString description;
+        QList<int> history;
+
+        QnStatisticsHistoryData(QString id, QString description);
+        void append(int value);
+    };
+
     /** Video server resource. */
     QnVideoServerResourcePtr m_resource;
 

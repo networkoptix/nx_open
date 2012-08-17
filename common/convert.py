@@ -11,10 +11,10 @@ from filetypes import all_filetypes, video_filetypes, image_filetypes
 
 # os.path = posixpath
 
-FFMPEG_VERSION = '2012-04-10'
+FFMPEG_VERSION = '2012-08-06-webm'
 
 EXCLUDE_DIRS = ('.svn', 'dxva')
-EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx')
+EXCLUDE_FILES = ('dxva', 'moc_', 'qrc_', 'StdAfx', 'dw_dvr')
 
 # Should be 'staticlib' or '' for DLL
 BUILDLIB = 'staticlib'

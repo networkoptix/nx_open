@@ -14,6 +14,8 @@
 #include <utils/common/request_param.h>
 #include <api/video_server_statistics.h>
 
+#include "api_fwd.h"
+
 class VideoServerSessionManager;
 
 namespace detail {
@@ -182,9 +184,8 @@ private:
     static int m_proxyPort;
 };
 
-typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;
 
-
+// TODO: what is the purpose of this class?
 class TestReceiver
 :
     public QObject
