@@ -57,4 +57,5 @@ public:
     QnTcpListener* owner;
     QnByteArray sendBuffer;
     int socketTimeout;
+    bool chunkedMode;
 };

@@ -398,6 +398,16 @@ void CommunicatingSocket::setWriteTimeOut( unsigned int ms )
     }
 }
 
+int CommunicatingSocket::send(const QnByteArray& data)
+{
+    return send(data.data(), data.size());
+}
+
+int CommunicatingSocket::send(const QByteArray& data)
+{
+    return send(data.data(), data.size());
+}
+
 int CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);

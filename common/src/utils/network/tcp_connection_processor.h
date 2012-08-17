@@ -2,6 +2,7 @@
 #define __TCP_CONNECTION_PROCESSOR_H__
 
 #include <QMutex>
+#include <QUrl>
 
 #include "utils/common/longrunnable.h"
 #include "utils/network/socket.h"
@@ -24,6 +25,7 @@ public:
 
     int getSocketTimeout();
 
+    bool sendChunk(const QnByteArray& chunk);
 protected:
     virtual void pleaseStop();
     virtual void parseRequest();
@@ -39,6 +41,9 @@ protected:
 
     void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType);
     QString codeToMessage(int code);
+
+    bool readRequest();
+    QUrl getDecodedUrl() const;
 
     QN_DECLARE_PRIVATE(QnTCPConnectionProcessor);
     QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, TCPSocket* socket, QnTcpListener* owner);

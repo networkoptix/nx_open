@@ -46,4 +46,14 @@ bool IPPH264Decoder::decode(const QnCompressedVideoDataPtr data, CLVideoDecoderO
     return m_decoder && ptr_decode(m_decoder, data.data(), outFrame);
 }
 
+void IPPH264Decoder::resetDecoder( QnCompressedVideoDataPtr /*data*/ )
+{
+    //TODO/IMPL
+}
+
+void IPPH264Decoder::setOutPictureSize( const QSize& /*outSize*/ )
+{
+    //TODO/IMPL
+}
+
 #endif

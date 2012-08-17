@@ -63,6 +63,47 @@ bool QnMediaContext::equalTo(QnMediaContext *other) const
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
 }
 
+
+void QnAbstractMediaData::assign(QnAbstractMediaData* other)
+{
+    dataProvider = other->dataProvider;
+    timestamp = other->timestamp;
+
+    data.write(other->data.data(), other->data.size());
+    dataType = other->dataType;
+    compressionType = other->compressionType;
+    flags = other->flags;
+    channelNumber = other->channelNumber;
+    subChannelNumber = other->subChannelNumber;
+    context = other->context;
+    opaque = other->opaque;
+}
+
+// ----------------------------------- QnAbstractMediaData -----------------------------------------
+
+QnAbstractMediaData* QnAbstractMediaData::clone()
+{
+    QnAbstractMediaData* rez = new QnAbstractMediaData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
+}
+
+// ----------------------------------- QnCompressedVideoData -----------------------------------------
+void QnCompressedVideoData::assign(QnCompressedVideoData* other)
+{
+    QnAbstractMediaData::assign(other);
+    width = other->width;
+    height = other->height;
+    motion = other->motion;
+}
+
+QnCompressedVideoData* QnCompressedVideoData::clone()
+{
+    QnCompressedVideoData* rez = new QnCompressedVideoData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
+}
+
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
 
 QnMetaDataV1::QnMetaDataV1(int initialValue):
@@ -81,6 +122,21 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
         data.writeFiller(0xff, data.capacity());
     else
         data.writeFiller(0, data.capacity());
+}
+
+void QnMetaDataV1::assign(QnMetaDataV1* other)
+{
+    QnAbstractMediaData::assign(other);
+    i_mask = other->i_mask;
+    m_input = other->m_input;
+    m_duration = other->m_duration;
+}
+
+QnMetaDataV1* QnMetaDataV1::clone()
+{
+    QnMetaDataV1* rez = new QnMetaDataV1();
+    rez->assign(this);
+    return rez;
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
@@ -253,3 +309,17 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
 
 }
 
+// ----------------------------------- QnCompressedAudioData -----------------------------------------
+
+void QnCompressedAudioData::assign(QnCompressedAudioData* other)
+{
+    QnAbstractMediaData::assign(other);
+    duration = other->duration;
+}
+
+QnCompressedAudioData* QnCompressedAudioData::clone()
+{
+    QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
+}

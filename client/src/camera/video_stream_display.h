@@ -116,6 +116,7 @@ private:
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
+    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame );
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H

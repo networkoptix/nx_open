@@ -19,30 +19,30 @@ static const unsigned long MAX_WAIT_TIMEOUT_MS = 5000;
 
 namespace HttpStatusCode
 {
-	enum Value
-	{
-		ok = 200,
-		badRequest = 400,
-		notFound = 404
-	};
+    enum Value
+    {
+        ok = 200,
+        badRequest = 400,
+        notFound = 404
+    };
 }
 
 QnCameraSettingsHandler::QnCameraSettingsHandler()
 {
 }
 
-int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody )
+int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& responseMessageBody, QByteArray& contentType )
 {
-	enum CmdType
-	{
-		ctSetParam,
-		ctGetParam
-	} cmdType;
-	//LTRACE( 6, http, "QnCameraSettingsHandler. Received request "<<path );
+    enum CmdType
+    {
+        ctSetParam,
+        ctGetParam
+    } cmdType;
+    //LTRACE( 6, http, "QnCameraSettingsHandler. Received request "<<path );
 
-	//TODO it would be nice to fill reasonPhrase too
-	if( params.empty() )
-		return HttpStatusCode::badRequest;
+    //TODO it would be nice to fill reasonPhrase too
+    if( params.empty() )
+        return HttpStatusCode::badRequest;
 
     QnRequestParamList::const_iterator camIDIter = params.begin();
     for( ;
@@ -52,48 +52,48 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
         if( camIDIter->first == "res_id" )
             break;
     }
-	if( camIDIter == params.end() )
-	{
-		//LTRACE( 4, http, "QnCameraSettingsHandler. No res_id params in request "<<path<<". Ignoring..." );
-		return HttpStatusCode::badRequest;
-	}
-	const QString& camID = camIDIter->second;
+    if( camIDIter == params.end() )
+    {
+        //LTRACE( 4, http, "QnCameraSettingsHandler. No res_id params in request "<<path<<". Ignoring..." );
+        return HttpStatusCode::badRequest;
+    }
+    const QString& camID = camIDIter->second;
 
-	if( params.size() == 1 )
-	{
-		//LTRACE( 4, http, "QnCameraSettingsHandler. No param names in request "<<path );
-		return HttpStatusCode::badRequest;
-	}
+    if( params.size() == 1 )
+    {
+        //LTRACE( 4, http, "QnCameraSettingsHandler. No param names in request "<<path );
+        return HttpStatusCode::badRequest;
+    }
 
     QStringList pathItems = path.split( '/' );
-	if( pathItems.empty() )
-		return HttpStatusCode::notFound;
+    if( pathItems.empty() )
+        return HttpStatusCode::notFound;
     if( pathItems.back().isEmpty() )
     {
         pathItems.pop_back();
-	    if( pathItems.empty() )
-		    return HttpStatusCode::notFound;
+        if( pathItems.empty() )
+            return HttpStatusCode::notFound;
     }
-	const QString& cmdName = pathItems.back();
-	if( cmdName == "getCameraParam" )
-	{
-		cmdType = ctGetParam;
-	}
-	else if( cmdName == "setCameraParam" )
-	{
-		cmdType = ctSetParam;
-	}
-	else
-	{
-		//LTRACE( 4, http, "QnCameraSettingsHandler. Unknown command "<<cmdName<<" in request "<<path<<". Ignoring..." );
-		return HttpStatusCode::notFound;
-	}
+    const QString& cmdName = pathItems.back();
+    if( cmdName == "getCameraParam" )
+    {
+        cmdType = ctGetParam;
+    }
+    else if( cmdName == "setCameraParam" )
+    {
+        cmdType = ctSetParam;
+    }
+    else
+    {
+        //LTRACE( 4, http, "QnCameraSettingsHandler. Unknown command "<<cmdName<<" in request "<<path<<". Ignoring..." );
+        return HttpStatusCode::notFound;
+    }
 
-	AwaitedParameters awaitedParams;
-	const QnResourcePtr& res = QnResourcePool::instance()->getNetResourceByPhysicalId( camID );
+    AwaitedParameters awaitedParams;
+    const QnResourcePtr& res = QnResourcePool::instance()->getNetResourceByPhysicalId( camID );
     if( !res.data() )
     {
-		//LTRACE( 4, http, "QnCameraSettingsHandler. Unknown camera "<<camID<<" in request "<<path<<". Ignoring..." );
+        //LTRACE( 4, http, "QnCameraSettingsHandler. Unknown camera "<<camID<<" in request "<<path<<". Ignoring..." );
         return HttpStatusCode::notFound;
     }
 
@@ -111,27 +111,27 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
             this,
             SLOT(asyncParamSetComplete(const QString&, const QVariant&, bool)),
             Qt::DirectConnection );
-	for( QnRequestParamList::const_iterator
-		it = params.begin();
-		it != params.end();
-		++it )
-	{
+    for( QnRequestParamList::const_iterator
+        it = params.begin();
+        it != params.end();
+        ++it )
+    {
         if( it == camIDIter )
             continue;
-		if( cmdType == ctSetParam )
-			res->setParamAsync( it->first, it->second, QnDomainPhysical );
-		else if( cmdType == ctGetParam )
-			res->getParamAsync( it->first, QnDomainPhysical );
-		awaitedParams.paramsToWaitFor.insert( it->first );
-	}
+        if( cmdType == ctSetParam )
+            res->setParamAsync( it->first, it->second, QnDomainPhysical );
+        else if( cmdType == ctGetParam )
+            res->getParamAsync( it->first, QnDomainPhysical );
+        awaitedParams.paramsToWaitFor.insert( it->first );
+    }
 
-	{
-		QMutexLocker lk( &m_mutex );
-		std::set<AwaitedParameters*>::iterator awaitedParamsIter = m_awaitedParamsSets.insert( &awaitedParams ).first;
+    {
+        QMutexLocker lk( &m_mutex );
+        std::set<AwaitedParameters*>::iterator awaitedParamsIter = m_awaitedParamsSets.insert( &awaitedParams ).first;
         QElapsedTimer asyncOpCompletionTimer;
         asyncOpCompletionTimer.start();
-		for( ;; )
-		{
+        for( ;; )
+        {
             const qint64 curClock = asyncOpCompletionTimer.elapsed();
             if( curClock >= MAX_WAIT_TIMEOUT_MS )
             {
@@ -147,11 +147,11 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
                 break;
             }
             m_cond.wait( &m_mutex, MAX_WAIT_TIMEOUT_MS - curClock );
-			if( awaitedParams.paramsToWaitFor.empty() )
-				break;
-		}
-		m_awaitedParamsSets.erase( awaitedParamsIter );
-	}
+            if( awaitedParams.paramsToWaitFor.empty() )
+                break;
+        }
+        m_awaitedParamsSets.erase( awaitedParamsIter );
+    }
 
     if( cmdType == ctGetParam )
         disconnect(
@@ -166,83 +166,83 @@ int QnCameraSettingsHandler::executeGet( const QString& path, const QnRequestPar
             this,
             SLOT(asyncParamSetComplete(const QString&, const QVariant&, bool)) );
 
-	{
-		//serializing answer
-		for( std::map<QString, std::pair<QVariant, bool> >::const_iterator
-			it = awaitedParams.paramValues.begin();
-			it != awaitedParams.paramValues.end();
-			++it )
-		{
-			if( cmdType == ctGetParam )
-				responseMessageBody += it->first + "=" + it->second.first.toString() + "\n";
-			else if( cmdType == ctSetParam )
-				responseMessageBody += (it->second.second ? "ok:" : "failure:") + it->first + "\n";
-		}
-	}
+    {
+        //serializing answer
+        for( std::map<QString, std::pair<QVariant, bool> >::const_iterator
+            it = awaitedParams.paramValues.begin();
+            it != awaitedParams.paramValues.end();
+            ++it )
+        {
+            if( cmdType == ctGetParam )
+                responseMessageBody += it->first + "=" + it->second.first.toString() + "\n";
+            else if( cmdType == ctSetParam )
+                responseMessageBody += (it->second.second ? "ok:" : "failure:") + it->first + "\n";
+        }
+    }
 
-	//LTRACE( 6, http, "QnCameraSettingsHandler. request "<<path<<" processed successfully" );
+    //LTRACE( 6, http, "QnCameraSettingsHandler. request "<<path<<" processed successfully" );
 
-	return HttpStatusCode::ok;
+    return HttpStatusCode::ok;
 }
 
-int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/ )
+int QnCameraSettingsHandler::executePost( const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/, QByteArray& /*responseMessageBody*/, QByteArray& /*contentType*/ )
 {
-	//TODO/IMPL
-	return 0;
+    //TODO/IMPL
+    return 0;
 }
 
 //QString QnCameraSettingsHandler::description( TCPSocket* /*tcpSocket*/ ) const
 //{
-//	return 
-//		"Allows to get/set camera parameters<BR>\n"
-//		"To get: <BR>\n"
-//		"c->s: GET /api/getCameraParam?res_id=camera_mac&param1&param2&param3 HTTP/1.0 <BR>\n"
-//		"s->c: HTTP/1.0 200 OK<BR>\n"
-//		"      Content-Type: application/text<BR>\n"
-//		"      Content-Length: 39<BR>\n"
-//		"      <BR>\n"
-//		"      param1=value1<BR>\n"
-//		"      param2=value2<BR>\n"
-//		"      param3=value3<BR>\n"
-//		"<BR>\n"
-//		"To set: <BR>\n"
-//		"c->s: GET /api/setCameraParam?res_id=camera_mac&param1=value1&param2=value2&param3=value3 HTTP/1.0 <BR>\n"
-//		"s->c: HTTP/1.0 500 Internal Server Error<BR>\n"
-//	    "      Content-Type: application/text<BR>\n"
-//	    "      Content-Length: 38<BR>\n"
+//  return 
+//      "Allows to get/set camera parameters<BR>\n"
+//      "To get: <BR>\n"
+//      "c->s: GET /api/getCameraParam?res_id=camera_mac&param1&param2&param3 HTTP/1.0 <BR>\n"
+//      "s->c: HTTP/1.0 200 OK<BR>\n"
+//      "      Content-Type: application/text<BR>\n"
+//      "      Content-Length: 39<BR>\n"
+//      "      <BR>\n"
+//      "      param1=value1<BR>\n"
+//      "      param2=value2<BR>\n"
+//      "      param3=value3<BR>\n"
+//      "<BR>\n"
+//      "To set: <BR>\n"
+//      "c->s: GET /api/setCameraParam?res_id=camera_mac&param1=value1&param2=value2&param3=value3 HTTP/1.0 <BR>\n"
+//      "s->c: HTTP/1.0 500 Internal Server Error<BR>\n"
+//      "      Content-Type: application/text<BR>\n"
+//      "      Content-Length: 38<BR>\n"
 //        "      <BR>\n"
-//		"      ok: param1<BR>\n"
-//	    "      failure: param2<BR>\n"
-//	    "      ok: param3<BR>\n";
+//      "      ok: param1<BR>\n"
+//      "      failure: param2<BR>\n"
+//      "      ok: param3<BR>\n";
 //
 //}
 
 void QnCameraSettingsHandler::asyncParamGetComplete( const QString& paramName, const QVariant& paramValue, bool result )
 {
-	QMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_mutex );
 
-	//LTRACE( 6, http, "QnCameraSettingsHandler::asyncParamGetComplete. paramName "<<paramName<<", paramValue "<<paramValue );
+    //LTRACE( 6, http, "QnCameraSettingsHandler::asyncParamGetComplete. paramName "<<paramName<<", paramValue "<<paramValue );
 
-	for( std::set<AwaitedParameters*>::const_iterator
-		it = m_awaitedParamsSets.begin();
-		it != m_awaitedParamsSets.end();
-		++it )
-	{
-		std::set<QString>::iterator paramIter = (*it)->paramsToWaitFor.find( paramName );
-		if( paramIter == (*it)->paramsToWaitFor.end() )
-			continue;
-		//context *it is waiting for this parameter, giving it to him...
+    for( std::set<AwaitedParameters*>::const_iterator
+        it = m_awaitedParamsSets.begin();
+        it != m_awaitedParamsSets.end();
+        ++it )
+    {
+        std::set<QString>::iterator paramIter = (*it)->paramsToWaitFor.find( paramName );
+        if( paramIter == (*it)->paramsToWaitFor.end() )
+            continue;
+        //context *it is waiting for this parameter, giving it to him...
         (*it)->paramValues.insert( std::make_pair( paramName, std::make_pair( paramValue, result ) ) );
-		(*it)->paramsToWaitFor.erase( paramIter );
-	}
+        (*it)->paramsToWaitFor.erase( paramIter );
+    }
 
-	m_cond.wakeAll();
+    m_cond.wakeAll();
 }
 
 void QnCameraSettingsHandler::asyncParamSetComplete( const QString& paramName, const QVariant& paramValue, bool result )
 {
-	//processing is identical to the previous method
-	asyncParamGetComplete( paramName, paramValue, result );
+    //processing is identical to the previous method
+    asyncParamGetComplete( paramName, paramValue, result );
 }
 
 QString QnSetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
