@@ -168,8 +168,8 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->passwordEdit->clear();
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
-        ui->accessRightsComboBox->setCurrentIndex(m_user->isAdmin() ? 1 : 0); // TODO: evil magic numbers
 
+        updateAccessRights2(m_user->getRights());
         updatePassword();
     }
 
@@ -183,7 +183,7 @@ void QnUserSettingsDialog::submitToResource() {
     m_user->setName(ui->loginEdit->text());
     if(!ui->passwordEdit->text().isEmpty())
         m_user->setPassword(ui->passwordEdit->text());
-    m_user->setAdmin(ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool());
+ //   m_user->setAdmin(ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toBool());
 
     setHasChanges(false);
 }
@@ -289,9 +289,14 @@ void QnUserSettingsDialog::updateElement(Element element) {
     setHint(element, hint);
 }
 
+void QnUserSettingsDialog::updateAccessRights2(quint64 rights){
+
+}
+
 void QnUserSettingsDialog::updateAll() {
     updateElement(AccessRights);
     updateElement(Password);
     updateElement(CurrentPassword);
     updateElement(Login);
 }
+

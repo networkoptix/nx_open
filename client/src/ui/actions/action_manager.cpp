@@ -134,6 +134,12 @@ public:
         return *this;
     }
 
+    QnActionBuilder requiredRights(Qn::UserRights rights){
+        m_action->setRequiredRights(rights);
+
+        return *this;
+    }
+
     QnActionBuilder separator(bool isSeparator = true) {
         m_action->setSeparator(isSeparator);
         m_action->setFlags(m_action->flags() | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::WidgetTarget | Qn::ResourceTarget | Qn::LayoutItemTarget);
@@ -400,7 +406,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentUserParameter, Qn::CreateUserPermission).
+            requiredRights(Qn::EditUserRight).
             text(tr("User...")).
             pulledText(tr("New User..."));
     } factory.leaveSubMenu();

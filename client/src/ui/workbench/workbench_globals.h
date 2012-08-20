@@ -28,7 +28,7 @@ namespace Qn {
                                              * Center of item's combined geometry defines desired position. 
                                              * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
-    Q_DECLARE_FLAGS(ItemFlags, ItemFlag);
+    Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
     /**
      * Layout-specific flags.
@@ -56,7 +56,7 @@ namespace Qn {
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
+        UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
     };
 
 
@@ -71,7 +71,7 @@ namespace Qn {
         BottomBorder = 0x8,
         AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
     };
-    Q_DECLARE_FLAGS(Borders, Border);
+    Q_DECLARE_FLAGS(Borders, Border)
 
 
     /**
@@ -82,9 +82,9 @@ namespace Qn {
         MarginsAffectSize = 0x1,        
 
         /** Viewport margins affect how viewport position is bounded. */
-        MarginsAffectPosition = 0x2,
+        MarginsAffectPosition = 0x2
     };
-    Q_DECLARE_FLAGS(MarginFlags, MarginFlag);
+    Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
 
 
     /**
@@ -99,13 +99,13 @@ namespace Qn {
         ResourceIsBeingSaved = 0x2,
 
         /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x4,
+        ResourceIsChanged = 0x4
     };
-    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag);
+    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
 
 
     /**
-     * Flags describing the actions permitted for the user. 
+     * Flags describing the actions permitted for the user to do with the selected resource.
      */
     enum Permission {
         /* Generic permissions. */
@@ -146,21 +146,20 @@ namespace Qn {
         /** Permission to create layouts for the user. */
         CreateLayoutPermission      = 0x00000800,
 
-
-        /* Current user-specific permissions. Are meaningful for a resource representing current user only. */
-
-        /** Permission to create users. */
-        CreateUserPermission        = 0x10000000,
-
-
         AllPermissions              = 0xFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 
+
+    /**
+     * Flags describing the actions permitted for the current user.
+     */
     enum UserRight{
         EditLayoutRight             = 0x00000001,
+
         ProtectedRight              = 0x00000002,
         EditProtectedUserRight      = 0x00000004,
+
         EditUserRight               = 0x00000008,
         EditCameraRight             = 0x00000010,
         EditServerRight             = 0x00000020,
@@ -176,11 +175,12 @@ namespace Qn {
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::UserRights)
 
 
 #endif // QN_WORKBENCH_GLOBALS_H

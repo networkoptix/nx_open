@@ -61,6 +61,7 @@ protected slots:
     void updateCurrentPassword() { updateElement(CurrentPassword); }
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
+    void updateAccessRights2(quint64 rights);
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);
