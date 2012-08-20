@@ -26,7 +26,7 @@ protected:
 
 private:
     QString m_password;
-    bool m_rights;
+    quint64 m_rights;
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr);

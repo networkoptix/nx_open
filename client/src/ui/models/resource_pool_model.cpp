@@ -583,7 +583,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         return m_rootNode;
 
     if(node->resourceFlags() & QnResource::user) {
-        if(accessController()->hasRights(Qn::EditUserRight)) {
+        if(!accessController()->hasRights(Qn::EditUserRight)) {
             return m_rootNode;
         } else {
             return m_usersNode;
