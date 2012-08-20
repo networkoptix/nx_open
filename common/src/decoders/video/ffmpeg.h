@@ -35,18 +35,19 @@ public:
     }
 
     AVCodecContext* getContext() const;
-    bool getLastDecodedFrame(CLVideoDecoderOutput* outFrame);
 
-    PixelFormat GetPixelFormat();
+    PixelFormat GetPixelFormat() const;
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
     double getSampleAspectRatio() const;
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
-    virtual const AVFrame* lastFrame() { return m_frame; }
+    virtual const AVFrame* lastFrame() const { return m_frame; }
     void determineOptimalThreadType(const QnCompressedVideoDataPtr data);
     virtual void setMTDecoding(bool value);
     virtual void resetDecoder(QnCompressedVideoDataPtr data);
+    virtual void setOutPictureSize( const QSize& outSize );
+
 private:
     static AVCodec* findCodec(CodecID codecId);
 

@@ -17,6 +17,9 @@ void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
 void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod) const
 {
     catalog = (m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow);
+    if (catalog == 0)
+        return; // no data in archive
+
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
 
     qint64 timeDistance = chunk.distanceToTime(time);

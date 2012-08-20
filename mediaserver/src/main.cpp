@@ -424,7 +424,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_argv(argv),
     m_processor(0),
     m_rtspListener(0),
-    m_restServer(0)
+    m_restServer(0),
+    m_progressiveDownloadingServer(0)
 {
     serviceMainInstance = this;
 }
@@ -442,6 +443,11 @@ void QnMain::stopObjects()
     {
         delete m_restServer;
         m_restServer = 0;
+    }
+
+    if (m_progressiveDownloadingServer) {
+        delete m_progressiveDownloadingServer;
+        m_progressiveDownloadingServer = 0;
     }
 
     if (m_rtspListener)
@@ -623,6 +629,8 @@ void QnMain::run()
     m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
     m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, 8890);
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {
