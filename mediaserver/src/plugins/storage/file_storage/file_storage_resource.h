@@ -35,8 +35,16 @@ public:
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
     virtual qint64 getFreeSpace() override;
+
+    virtual float bitrate() const override;
+
+    void setStorageBitrateCoeff(float value);
 private:
     QString removeProtocolPrefix(const QString& url);
+private:
+    // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
+    float m_storageBitrateCoeff;
 };
+typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 
 #endif // _FILE_STORAGE_PROTOCOL_H__
