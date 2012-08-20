@@ -81,6 +81,8 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    void setUserData(QnResourceWidget *widget, const QnTimePeriod &window, const QnTimePeriod &selection, bool selectionValid);
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();

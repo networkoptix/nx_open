@@ -308,6 +308,15 @@ QString QnResourceWidget::titleText() const {
 }
 
 void QnResourceWidget::setTitleText(const QString &titleText) {
+    if(m_titleText == titleText)
+        return;
+
+    m_titleText = titleText;
+
+    updateTitleText();
+}
+
+void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
     m_headerLabel->setText(titleText);
 }
 
@@ -316,7 +325,16 @@ QString QnResourceWidget::calculateTitleText() const {
 }
 
 void QnResourceWidget::updateTitleText() {
-    setTitleText(calculateTitleText());
+    setTitleTextInternal(m_titleText.isNull() ? calculateTitleText() : m_titleText);
+}
+
+void QnResourceWidget::setInfoText(const QString &infoText) {
+    if(m_infoText == infoText)
+        return;
+
+    m_infoText = infoText;
+
+    updateInfoText();
 }
 
 QString QnResourceWidget::infoText() {
@@ -326,7 +344,7 @@ QString QnResourceWidget::infoText() {
     return rightText.isEmpty() ? leftText : (leftText + QLatin1Char('\t') + rightText);
 }
 
-void QnResourceWidget::setInfoText(const QString &infoText) {
+void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
     QString leftText = infoText;
     QString rightText;
 
@@ -345,7 +363,7 @@ QString QnResourceWidget::calculateInfoText() const {
 }
 
 void QnResourceWidget::updateInfoText() {
-    setInfoText(calculateInfoText());
+    setInfoTextInternal(m_infoText.isNull() ? calculateInfoText() : m_infoText);
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
@@ -411,6 +429,9 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
     } else {
         m_footerWidget->setOpacity(opacity);
     }
+
+    if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
+        infoButton->setChecked(visible);
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
