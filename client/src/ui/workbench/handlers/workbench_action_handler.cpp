@@ -1123,7 +1123,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 16; // TODO: take it from config?
+    const qint64 maxItems = 12; // TODO: take it from config?
 
     /* Find best time step. */
     qint64 step = 0;
@@ -1186,7 +1186,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
         /* TODO: this code does not belong here. */
         widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        widget->display()->archiveReader()->pauseMedia();
+        //widget->display()->archiveReader()->pauseMedia();
         widget->display()->camDisplay()->playAudio(false);
         widget->display()->archiveReader()->setSingleShotMode(true);
 
