@@ -147,6 +147,7 @@ private:
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
+    void updateSecondaryResolutionList(const VideoOptionsResp& response);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
@@ -165,13 +166,14 @@ private:
     
     int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
-    float getResolutionAspectRatio(const ResolutionPair& resolution) const;
+    static ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare, const QList<ResolutionPair>& resolutionList);
+    static float getResolutionAspectRatio(const ResolutionPair& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int getH264StreamProfile(const VideoOptionsResp& response);
 
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
+    QList<ResolutionPair> m_secondaryResolutionList;
 
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;

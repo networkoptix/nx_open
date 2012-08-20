@@ -104,6 +104,12 @@ public:
         return *this;
     }
 
+    QnActionBuilder toolTip(const QString &toolTip) {
+        m_action->setToolTip(toolTip);
+
+        return *this;
+    }
+
     QnActionBuilder flags(Qn::ActionFlags flags) {
         m_action->setFlags(m_action->flags() | flags);
 
@@ -393,6 +399,7 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::TabBar | Qn::SingleTarget | Qn::NoTarget).
             text(tr("Tab")).
             pulledText(tr("New Tab")).
+            toolTip(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
             autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
             icon(qnSkin->icon("decorations/new_layout.png"));
