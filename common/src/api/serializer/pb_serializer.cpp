@@ -766,6 +766,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
     pb_userResource.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
     pb_user.set_rights(userPtr->getRights());
+    pb_user.set_isadmin(false);
     pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
 
     std::string str;

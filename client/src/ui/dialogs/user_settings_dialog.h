@@ -13,7 +13,7 @@ namespace Ui {
 }
 
 class QnUserSettingsDialog: public QDialog {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     enum Element {
         Login,
