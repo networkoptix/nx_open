@@ -155,14 +155,13 @@ namespace Qn {
      * Flags describing the actions permitted for the current user.
      */
     enum UserRight{
-        EditLayoutRight             = 0x00000001,
+        EditProtectedUserRight      = 0x00000001,       // super-admin, can edit even admins
+        ProtectedRight              = 0x00000002,       // admin, cannot be edited by other admins
 
-        ProtectedRight              = 0x00000002,
-        EditProtectedUserRight      = 0x00000004,
-
-        EditUserRight               = 0x00000008,
-        EditCameraRight             = 0x00000010,
-        EditServerRight             = 0x00000020,
+        EditLayoutRight             = 0x00000004,       // can create and edit layouts
+        EditUserRight               = 0x00000008,       // can create and edit users
+        EditCameraRight             = 0x00000010,       // can edit cameras
+        EditServerRight             = 0x00000020,       // can view servers list and edit servers
 
         /* Combined rights */
         AdminRight                  = EditLayoutRight | EditUserRight | ProtectedRight | EditCameraRight | EditServerRight,
