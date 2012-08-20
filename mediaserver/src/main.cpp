@@ -440,6 +440,13 @@ QnMain::~QnMain()
 void QnMain::stopObjects()
 {
     if (m_restServer)
+        m_restServer->pleaseStop();
+    if (m_progressiveDownloadingServer)
+        m_progressiveDownloadingServer->pleaseStop();
+    if (m_rtspListener)
+        m_rtspListener->pleaseStop();
+
+    if (m_restServer)
     {
         delete m_restServer;
         m_restServer = 0;
@@ -760,6 +767,17 @@ private:
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
+
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+    QnRecordingManager::instance()->stop();
+    QnVideoCameraPool::instance()->stop();
+    if (serviceMainInstance)
+    {
+        serviceMainInstance->stopObjects();
+        serviceMainInstance = 0;
+    }
+
     qApp->quit();
 }
 
@@ -771,18 +789,6 @@ int main(int argc, char* argv[])
     QnVideoService service(argc, argv);
 
     int result = service.exec();
-
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
-    QnRecordingManager::instance()->stop();
-
-    QnVideoCameraPool::instance()->stop();
-
-    if (serviceMainInstance)
-    {
-        serviceMainInstance->stopObjects();
-        serviceMainInstance = 0;
-    }
 
     return result;
 }

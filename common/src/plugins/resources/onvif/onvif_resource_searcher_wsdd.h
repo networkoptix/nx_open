@@ -33,6 +33,7 @@ public:
 
     void findResources(QnResourceList& result) const;
 
+    void pleaseStop();
 private:
 
     //void updateInterfacesListenSockets() const;
@@ -49,6 +50,8 @@ private:
     template <class T> void printProbeMatches(const T* source, const SOAP_ENV__Header* header) const;
     template <class T> void addEndpointToHash(EndpointInfoHash& hash, const T* probeMatches,
         const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const;
+private:
+    bool m_shouldStop;
 };
 
 #endif // onvif_resource_searcher_wsdd_h

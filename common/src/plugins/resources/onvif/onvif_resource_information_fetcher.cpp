@@ -9,7 +9,8 @@ const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     /*passwordsData(PasswordHelper::instance()),*/
-    camersNamesData(NameHelper::instance())
+    camersNamesData(NameHelper::instance()),
+    m_shouldStop(false)
 {
     QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_RT)));
     if (!typePtr.isNull()) {
@@ -29,7 +30,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
-    while(iter != endpointInfo.end()) {
+    while(iter != endpointInfo.end() && !m_shouldStop) {
         findResources(iter.key(), iter.value(), result);
 
         ++iter;
@@ -212,4 +213,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
     return resource;
+}
+
+void OnvifResourceInformationFetcher::pleaseStop()
+{
+    m_shouldStop = true;
 }

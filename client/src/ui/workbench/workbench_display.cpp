@@ -35,6 +35,7 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
+#include <ui/graphics/instruments/tool_tip_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
@@ -172,6 +173,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
+    m_instrumentManager->installInstrument(new ToolTipInstrument(this));
 
     m_curtainActivityInstrument->recursiveDisable();
 

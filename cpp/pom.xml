@@ -290,7 +290,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>qmake</executable>
+									<executable>${environment.dir}/qt/bin/qmake</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-tp</commandlineArgs>

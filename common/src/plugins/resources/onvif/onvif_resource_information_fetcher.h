@@ -37,6 +37,7 @@ public:
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacture (const QString& manufacture);
 
+    void pleaseStop();
 private:
     OnvifResourceInformationFetcher();
 
@@ -57,6 +58,7 @@ private:
     QnId onvifTypeId;
     //PasswordHelper& passwordsData;
     NameHelper &camersNamesData;
+    bool m_shouldStop;
 };
 
 #endif // onvif_resource_information_fetcher_h
