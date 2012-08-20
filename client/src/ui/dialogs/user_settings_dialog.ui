@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>510</height>
+    <height>364</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -122,50 +122,7 @@
              <property name="title">
               <string>Access rights</string>
              </property>
-             <layout class="QVBoxLayout" name="verticalLayout_3">
-              <item>
-               <widget class="QCheckBox" name="superUserCheckBox">
-                <property name="text">
-                 <string>Super-Administrator</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="adminCheckBox">
-                <property name="text">
-                 <string>Administrator</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="editLayoutCheckBox">
-                <property name="text">
-                 <string>Layout Editor</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="editUserCheckBox">
-                <property name="text">
-                 <string>User Editor</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="editCameraCheckBox">
-                <property name="text">
-                 <string>Camera Editor</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QCheckBox" name="editServerCheckBox">
-                <property name="text">
-                 <string>Server Editor</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
+             <layout class="QVBoxLayout" name="verticalLayout_3"/>
             </widget>
            </item>
            <item row="5" column="1">

@@ -2,6 +2,7 @@
 #include "ui_user_settings_dialog.h"
 
 #include <QtGui/QPushButton>
+#include <QtGui/QCheckBox>
 #include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>
@@ -38,8 +39,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
 
     ui->accessRightsGroupbox->hide();
 
-    loadAccessRightsPresets();
-
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateLogin()));
     connect(ui->currentPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(updateCurrentPassword()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updatePassword()));
@@ -54,13 +53,6 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(setHasChanges()));
 
     connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
-
-    connect(ui->superUserCheckBox,      SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
-    connect(ui->adminCheckBox,          SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
-    connect(ui->editLayoutCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
-    connect(ui->editUserCheckBox,       SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
-    connect(ui->editCameraCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
-    connect(ui->editServerCheckBox,     SIGNAL(clicked()),                      this,   SLOT(at_accessRights_changed()));
 
     {
         QPalette palette = ui->hintLabel->palette();
@@ -123,8 +115,9 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
         ui->accessRightsLabel->setVisible(visible);
         ui->accessRightsComboBox->setVisible(visible);
         ui->advancedButton->setVisible(visible);
-        ui->accessRightsGroupbox->setEnabled(editable);
+//        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
+        setReadOnly(ui->accessRightsGroupbox, !editable);
         break;
     default:
         break;
@@ -200,21 +193,8 @@ void QnUserSettingsDialog::submitToResource() {
         m_user->setPassword(ui->passwordEdit->text());
 
     quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-    if (rights == CUSTOM_RIGHTS){
-        rights = 0; //TODO: load from checkboxes
-        if (ui->superUserCheckBox->isChecked())
-            rights |= Qn::SuperUserRight;
-        if (ui->adminCheckBox->isChecked())
-            rights |= Qn::ProtectedRight;
-        if (ui->editLayoutCheckBox->isChecked())
-            rights |= Qn::EditLayoutRight;
-        if (ui->editUserCheckBox->isChecked())
-            rights |= Qn::EditUserRight;
-        if (ui->editCameraCheckBox->isChecked())
-            rights |= Qn::EditCameraRight;
-        if (ui->editServerCheckBox->isChecked())
-            rights |= Qn::EditServerRight;
-    }
+    if (rights == CUSTOM_RIGHTS)
+        rights = readAccessRightsAdvanced();
     m_user->setRights(rights);
 
     setHasChanges(false);
@@ -308,9 +288,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
             valid = false;
         } else {
             quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
-            if (rights != CUSTOM_RIGHTS)
-                loadAccessRightsToUi(rights);
-            else
+            if (rights == CUSTOM_RIGHTS)
                 ui->advancedButton->setChecked(true);
         }
         break;
@@ -328,32 +306,11 @@ void QnUserSettingsDialog::updateElement(Element element) {
 }
 
 void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights){
-    bool custom = true;
-    for (int i = 0; i < ui->accessRightsComboBox->count(); i++){
-        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights){
-            ui->accessRightsComboBox->setCurrentIndex(i);
-            custom = false;
-            break;
-        }
-    }
+    createAccessRightsPresets(rights);
+    createAccessRightsAdvanced(rights);
 
-    ui->superUserCheckBox->setChecked(rights & Qn::EditProtectedUserRight);
-    ui->adminCheckBox->setChecked(rights & Qn::ProtectedRight);
-    ui->editLayoutCheckBox->setChecked(rights & Qn::EditLayoutRight);
-    ui->editUserCheckBox->setChecked(rights & Qn::EditUserRight);
-    ui->editCameraCheckBox->setChecked(rights & Qn::EditCameraRight);
-    ui->editServerCheckBox->setChecked(rights & Qn::EditServerRight);
-    if (custom){
-        ui->advancedButton->setChecked(true);
-        ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
-    }
-}
-
-void QnUserSettingsDialog::loadAccessRightsPresets(){
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)0);
-    ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::AdminRight);
-    ui->accessRightsComboBox->addItem(tr("Super-Administrator"), (quint64)Qn::SuperUserRight);
-    ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
+    selectAccessRightsPreset(rights);
+    fillAccessRightsAdvanced(rights);
 }
 
 void QnUserSettingsDialog::updateAll() {
@@ -365,6 +322,78 @@ void QnUserSettingsDialog::updateAll() {
 
 void QnUserSettingsDialog::at_accessRights_changed(){
     setHasChanges(true);
-    ui->advancedButton->setChecked(true);
-    ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
+    selectAccessRightsPreset(readAccessRightsAdvanced());
+}
+
+
+void QnUserSettingsDialog::createAccessRightsPresets(quint64 rights){
+    if (rights & Qn::EditProtectedUserRight){
+        ui->accessRightsComboBox->addItem(tr("Super-Administrator"), (quint64)Qn::SuperUserRight);
+        return;
+    }
+
+    if (rights & Qn::ProtectedRight){
+        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::AdminRight);
+        return;
+    }
+
+    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)0);
+    ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
+}
+
+void QnUserSettingsDialog::createAccessRightsAdvanced(quint64 rights){
+    if (rights & Qn::EditProtectedUserRight)
+        createAccessRightCheckBox(tr("Super-Administrator"), Qn::EditProtectedUserRight);
+    if (rights & Qn::ProtectedRight)
+        createAccessRightCheckBox(tr("Administrator"), Qn::ProtectedRight);
+    createAccessRightCheckBox(tr("Can create and edit users"), Qn::EditUserRight);
+    createAccessRightCheckBox(tr("Can create and edit layouts"), Qn::EditLayoutRight);
+    createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::EditCameraRight);
+    createAccessRightCheckBox(tr("Can edit server settings"), Qn::EditServerRight);
+}
+
+void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right){
+    QCheckBox *checkBox = new QCheckBox(text, this);
+    ui->accessRightsGroupbox->layout()->addWidget(checkBox);
+    m_advancedRights.insert(right, checkBox);
+
+    if (isReadOnly(ui->accessRightsGroupbox))
+        setReadOnly(checkBox, true);
+    else
+        connect(checkBox, SIGNAL(clicked()), this, SLOT(at_accessRights_changed()));
+}
+
+void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights){
+    bool custom = true;
+    for (int i = 0; i < ui->accessRightsComboBox->count(); i++){
+        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights){
+            ui->accessRightsComboBox->setCurrentIndex(i);
+            custom = false;
+            break;
+        }
+    }
+
+    if (custom){
+        ui->advancedButton->setChecked(true);
+        ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
+    }
+}
+
+void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights){
+    QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
+    while (i.hasNext()) {
+        i.next();
+        i.value()->setChecked(i.key() & rights);
+    }
+}
+
+quint64 QnUserSettingsDialog::readAccessRightsAdvanced(){
+    quint64 rights = 0;
+    QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()->isChecked())
+            rights |= i.key();
+    }
+    return rights;
 }

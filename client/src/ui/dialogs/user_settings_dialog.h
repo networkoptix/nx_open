@@ -7,6 +7,7 @@
 #include <core/resource/resource_fwd.h>
 
 class QnWorkbenchContext;
+class QCheckBox;
 
 namespace Ui {
     class UserSettingsDialog;
@@ -62,12 +63,18 @@ protected slots:
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
     void loadAccessRightsToUi(quint64 rights);
-    void loadAccessRightsPresets();
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);
     void at_accessRights_changed();
 private:
+    void createAccessRightsPresets(quint64 rights);
+    void createAccessRightsAdvanced(quint64 rights);
+    void createAccessRightCheckBox(QString text, quint64 right);
+    void selectAccessRightsPreset(quint64 rights);
+    void fillAccessRightsAdvanced(quint64 rights);
+    quint64 readAccessRightsAdvanced();
+
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QWeakPointer<QnWorkbenchContext> m_context;
     QString m_currentPassword;
@@ -77,6 +84,7 @@ private:
     QString m_hints[ElementCount];
     ElementFlags m_flags[ElementCount];
     bool m_hasChanges;
+    QHash<quint64, QCheckBox*> m_advancedRights;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)
