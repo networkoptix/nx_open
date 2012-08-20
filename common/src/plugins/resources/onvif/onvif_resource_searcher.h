@@ -18,6 +18,7 @@ protected:
 
     virtual ~OnvifResourceSearcher();
 
+    virtual void pleaseStop() override;
 public:
 
     static OnvifResourceSearcher& instance();
