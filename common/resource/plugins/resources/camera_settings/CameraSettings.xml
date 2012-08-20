@@ -176,6 +176,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
+             step = "1"
              query = "wbred1"/>
 
         <param name = "Blue"
@@ -183,6 +184,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
+             step = "1"
              query = "wbblue1"/>
 
       </group>
@@ -195,6 +197,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
+             step = "1"
              query = "brightness1"/>
 
         <param name = "Shutter Mode"
@@ -223,6 +226,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
+             step = "1"
              query = "gain1"/>
 
         <param name = "BLC Mode"
@@ -247,6 +251,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
+             step = "1"
              query = "dnbwlevel1"/>
 
         <param name = "Switching from B/W to Color"
@@ -254,6 +259,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
+             step = "1"
              query = "dncolorlevel1"/>
 
       </group>
@@ -273,6 +279,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
+             step = "1"
              query = "chroma1"/>
 
         <param name = "Sharpness"
@@ -280,6 +287,7 @@
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
+             step = "1"
              query = "sharpness1"/>
 
         <param name = "Mirror"

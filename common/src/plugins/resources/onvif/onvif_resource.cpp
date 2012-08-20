@@ -1444,7 +1444,8 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     CameraSettings::Iterator it = settings.find(param.name());
 
     if (it == settings.end()) {
-        return false;
+        //return false;
+        return true;
     }
 
     if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {
@@ -1452,7 +1453,8 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
         return true;
     }
 
-    return false;
+    //return false;
+    return true;
 }
 
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
@@ -1503,14 +1505,14 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     }
 
     QAuthenticator auth(getAuth());
-    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(imagingUrl.toLatin1().data(), auth.user().toStdString(),
-        auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
+    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
+        auth.user().toStdString(), auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
 
     if (!imagingUrl.isEmpty()) {
         settings->makeGetRequest();
     }
 
-    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
+    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
     OnvifCameraSettingReader reader(*settings, filepath);
 

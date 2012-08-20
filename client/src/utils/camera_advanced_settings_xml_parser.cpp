@@ -20,12 +20,12 @@ CameraSettingsLister::~CameraSettingsLister()
 
 }
 
-bool CameraSettingsLister::proceed(QStringList& out)
+bool CameraSettingsLister::proceed(QSet<QString>& out)
 {
     bool res = read() && CameraSettingReader::proceed();
 
     if (res) {
-        out.append(m_params);
+        out.unite(m_params);
         return true;
     }
 
@@ -34,14 +34,14 @@ bool CameraSettingsLister::proceed(QStringList& out)
 
 bool CameraSettingsLister::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
 {
-    m_params.push_back(id);
+    m_params.insert(id);
 
     return true;
 }
 
 bool CameraSettingsLister::isParamEnabled(const QString& id, const QString& /*parentId*/)
 {
-    m_params.push_back(id);
+    m_params.insert(id);
 
     //We don't need creation of the object, so returning false
     return false;
@@ -236,7 +236,7 @@ CameraSettingTreeReader<T, E>::CameraSettingTreeReader(const QString& id):
     m_currParentId(),
     m_firstTime(true)
 {
-    parentOfRootElemFound(id);
+    
 }
 
 template <class T, class E>
@@ -262,6 +262,10 @@ void CameraSettingTreeReader<T, E>::parentOfRootElemFound(const QString& parentI
 template <class T, class E>
 bool CameraSettingTreeReader<T, E>::proceed()
 {
+    if (m_firstTime) {
+        parentOfRootElemFound(m_initialId);
+    }
+
     QString currentId;
     m_currParentId = m_initialId;
     int i = 0;
@@ -297,7 +301,7 @@ void CameraSettingTreeReader<T, E>::clean()
 //
 
 CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& filepath, const QString& id):
-    CameraSettingTreeReader<CameraSettingsLister, QStringList>(id),
+    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id),
     m_filepath(filepath)
 {
     
@@ -308,7 +312,7 @@ CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
     return new CameraSettingsLister(m_filepath, id, *this);
 }
 
-QStringList& CameraSettingsTreeLister::getCallback()
+QSet<QString>& CameraSettingsTreeLister::getCallback()
 {
     return m_params;
 }
@@ -316,8 +320,8 @@ QStringList& CameraSettingsTreeLister::getCallback()
 QStringList CameraSettingsTreeLister::proceed()
 {
     m_params.clear();
-    CameraSettingTreeReader<CameraSettingsLister, QStringList>::proceed();
-    return m_params;
+    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >::proceed();
+    return m_params.toList();
 }
 
 //

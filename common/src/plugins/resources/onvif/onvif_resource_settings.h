@@ -13,6 +13,7 @@ typedef QHash<QString, OnvifCameraSetting> CameraSettings;
 
 class OnvifCameraSettingsResp
 {
+    DeviceSoapWrapper* m_deviceSoapWrapper;
     ImagingSoapWrapper* m_rangesSoapWrapper;
     ImagingSoapWrapper* m_valsSoapWrapper;
     ImagingOptionsResp* m_rangesResponse;
@@ -23,8 +24,8 @@ class OnvifCameraSettingsResp
 
 public:
 
-    OnvifCameraSettingsResp(const std::string& endpoint, const std::string& login, const std::string& passwd,
-        const std::string& videoSrcToken, const QString& uniqId);
+    OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const std::string& login,
+        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId);
 
     ~OnvifCameraSettingsResp();
 
@@ -33,11 +34,12 @@ public:
     bool makeSetRequest();
     const ImagingOptionsResp& getRangesResponse() const;
     const ImagingSettingsResp& getValsResponse() const;
-    QString getEndpointUrl() const;
+    QString getImagingUrl() const;
     QString getLogin() const;
     QString getPassword() const;
     QString getUniqueId() const;
     CameraSettings& getCameraSettings() { return m_cameraSettings; }
+    DeviceSoapWrapper* getDeviceSoapWrapper();
 
 private:
 

@@ -104,7 +104,7 @@ void DWCameraSetting::initAdditionalValues()
 
     if (getType() == CameraSetting::Enumeration)
     {
-        QStringList m_enumStrToInt = static_cast<QString>(getMin()).split(QLatin1String(","));
+        m_enumStrToInt = static_cast<QString>(getMin()).split(QLatin1String(","));
         return;
     }
 
@@ -144,8 +144,9 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
     }
 
     int i = numStr.toInt();
-    if (i < 0 || i > m_enumStrToInt.size()) {
-        //Log warning
+    if (i < 0 || i >= m_enumStrToInt.size()) {
+        //Log warning, currently let's be assert
+        Q_ASSERT(false);
         return QString();
     }
 

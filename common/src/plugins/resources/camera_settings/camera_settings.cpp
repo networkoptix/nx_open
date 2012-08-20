@@ -369,7 +369,7 @@ bool CameraSettingReader::proceed()
             }
 
             QString parentId = node.attributes().namedItem(ATTR_PARENT).nodeValue();
-            if (parentId.isEmpty()) {
+            if (!parentId.isEmpty()) {
                 parentOfRootElemFound(parentId);
             }
 
@@ -485,7 +485,7 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     switch(widgetType)
     {
     case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
-        paramFound(CameraSetting(id, name, widgetType, min, max, step), parentId);
+        paramFound(CameraSetting(id, name, widgetType, query, min, max, step), parentId);
         return true;
 
     default:

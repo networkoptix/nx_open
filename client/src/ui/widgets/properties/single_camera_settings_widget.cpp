@@ -54,8 +54,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
 
-    initAdvancedTab();
-
     updateFromResource();
 }
 
@@ -80,7 +78,7 @@ QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+    if (!m_widgetsRecreator && m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
         QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
         if(!layout) {
@@ -97,7 +95,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
         layout->addWidget(advancedTreeWidget);
         layout->addWidget(advancedWidget);
 
-        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
         //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(filepath, id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
@@ -105,6 +103,8 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
 void QnSingleCameraSettingsWidget::loadAdvancedSettings()
 {
+    initAdvancedTab();
+
     QVariant id;
     if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
@@ -113,7 +113,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
             return;
         }
 
-        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms33\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
+        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
         //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
         CameraSettingsTreeLister lister(filepath, id.toString());
         QStringList settings = lister.proceed();
@@ -459,6 +459,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
 
     for (; it != params.end(); ++it)
     {
+        QString key = it->first;
         QString val = it->second.toString();
 
         if (!val.isEmpty())

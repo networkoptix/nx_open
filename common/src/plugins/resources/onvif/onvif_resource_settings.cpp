@@ -7,10 +7,11 @@ enum onvifXsd__WideDynamicMode;
 // class OnvifCameraSettingsResp
 //
 
-OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& endpoint, const std::string& login,
-        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId):
-    m_rangesSoapWrapper(endpoint.empty()? 0: new ImagingSoapWrapper(endpoint, login, passwd)),
-    m_valsSoapWrapper(endpoint.empty()? 0: new ImagingSoapWrapper(endpoint, login, passwd)),
+OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl,
+        const std::string& login, const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId):
+    m_deviceSoapWrapper(deviceUrl.empty()? 0: new DeviceSoapWrapper(deviceUrl, login, passwd)),
+    m_rangesSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd)),
+    m_valsSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd)),
     m_rangesResponse(new ImagingOptionsResp()),
     m_valsResponse(new ImagingSettingsResp()),
     m_videoSrcToken(videoSrcToken),
@@ -70,7 +71,7 @@ bool OnvifCameraSettingsResp::makeSetRequest()
         return false;
     }
 
-    QString endpoint = getEndpointUrl();
+    QString endpoint = getImagingUrl();
     if (endpoint.isEmpty()) {
         return false;
     }
@@ -109,7 +110,7 @@ const ImagingSettingsResp& OnvifCameraSettingsResp::getValsResponse() const
   return *m_valsResponse;
 }
 
-QString OnvifCameraSettingsResp::getEndpointUrl() const
+QString OnvifCameraSettingsResp::getImagingUrl() const
 {
     return m_rangesSoapWrapper? m_rangesSoapWrapper->getEndpointUrl(): QString();
 }
@@ -127,6 +128,11 @@ QString OnvifCameraSettingsResp::getPassword() const
 QString OnvifCameraSettingsResp::getUniqueId() const
 {
     return m_uniqId;
+}
+
+DeviceSoapWrapper* OnvifCameraSettingsResp::getDeviceSoapWrapper()
+{
+    return m_deviceSoapWrapper;
 }
 
 //
@@ -1044,17 +1050,19 @@ bool MaintenanceSystemRebootOperation::get(CameraSetting& /*output*/, OnvifCamer
 
 bool MaintenanceSystemRebootOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
-    QString endpoint = src.getEndpointUrl();
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
+    DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
+    if (!soapWrapper) {
+        return false;
+    }
 
     RebootReq request;
     RebootResp response;
 
-    int soapRes = soapWrapper.systemReboot(request, response);
+    int soapRes = soapWrapper->systemReboot(request, response);
     if (soapRes != SOAP_OK) {
         qWarning() << "MaintenanceSystemRebootOperation::set: can't perform reboot on camera. UniqId: " << src.getUniqueId()
-            << ". Reason: SOAP to endpoint " << soapWrapper.getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << soapWrapper.getLastError();
+            << ". Reason: SOAP to endpoint " << soapWrapper->getEndpointUrl() << " failed. GSoap error code: "
+            << soapRes << ". " << soapWrapper->getLastError();
         return false;
     }
 
@@ -1068,17 +1076,19 @@ bool MaintenanceSoftSystemFactoryDefaultOperation::get(CameraSetting& /*output*/
 
 bool MaintenanceSoftSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
-    QString endpoint = src.getEndpointUrl();
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
+    DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
+    if (!soapWrapper) {
+        return false;
+    }
 
     FactoryDefaultReq request;
     FactoryDefaultResp response;
 
-    int soapRes = soapWrapper.systemFactoryDefaultSoft(request, response);
+    int soapRes = soapWrapper->systemFactoryDefaultSoft(request, response);
     if (soapRes != SOAP_OK) {
         qWarning() << "MaintenanceSoftSystemFactoryDefaultOperation::set: can't perform soft factory default on camera. UniqId: "
-            << src.getUniqueId() << ". Reason: SOAP to endpoint " << soapWrapper.getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << soapWrapper.getLastError();
+            << src.getUniqueId() << ". Reason: SOAP to endpoint " << soapWrapper->getEndpointUrl() << " failed. GSoap error code: "
+            << soapRes << ". " << soapWrapper->getLastError();
         return false;
     }
 
@@ -1092,17 +1102,19 @@ bool MaintenanceHardSystemFactoryDefaultOperation::get(CameraSetting& /*output*/
 
 bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*input*/, OnvifCameraSettingsResp& src, bool /*reinit*/) const
 {
-    QString endpoint = src.getEndpointUrl();
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), src.getLogin().toStdString(), src.getPassword().toStdString());
+    DeviceSoapWrapper* soapWrapper = src.getDeviceSoapWrapper();
+    if (!soapWrapper) {
+        return false;
+    }
 
     FactoryDefaultReq request;
     FactoryDefaultResp response;
 
-    int soapRes = soapWrapper.systemFactoryDefaultHard(request, response);
+    int soapRes = soapWrapper->systemFactoryDefaultHard(request, response);
     if (soapRes != SOAP_OK) {
         qWarning() << "MaintenanceSoftSystemFactoryDefaultOperation::set: can't perform hard factory default on camera. UniqId: "
-            << src.getUniqueId() << ". Reason: SOAP to endpoint " << soapWrapper.getEndpointUrl() << " failed. GSoap error code: "
-            << soapRes << ". " << soapWrapper.getLastError();
+            << src.getUniqueId() << ". Reason: SOAP to endpoint " << soapWrapper->getEndpointUrl() << " failed. GSoap error code: "
+            << soapRes << ". " << soapWrapper->getLastError();
         return false;
     }
 

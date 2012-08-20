@@ -25,14 +25,14 @@ public:
 
 class CameraSettingsLister: public CameraSettingReader
 {
-    QStringList m_params;
+    QSet<QString> m_params;
     ParentOfRootElemFoundAware& m_obj;
 
 public:
     CameraSettingsLister(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj);
     virtual ~CameraSettingsLister();
 
-    bool proceed(QStringList& out);
+    bool proceed(QSet<QString>& out);
 
 protected:
 
@@ -121,13 +121,13 @@ public:
 // class CameraSettingsTreeLister
 //
 
-class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLister, QStringList>
+class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >
 {
     const QString& m_filepath;
-    QStringList m_params;
+    QSet<QString> m_params;
 
 protected:
-    virtual QStringList& getCallback() override;
+    virtual QSet<QString>& getCallback() override;
 
 public:
 
@@ -144,7 +144,7 @@ public:
 
 class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
-    const QString& m_filepath;
+    const QString m_filepath;
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     QObject* m_handler;
