@@ -1,6 +1,19 @@
 #include "core/resource/camera_resource.h"
 #include "iqinvision_resource_searcher.h"
 #include "iqinvision_resource.h"
+#include "utils/common/sleep.h"
+
+static quint16 NATIVE_DISCOVERY_REQUEST_PORT = 43282;
+static quint16 NATIVE_DISCOVERY_RESPONSE_PORT = 43283;
+
+static const int REQUEST_SIZE = 8;
+static const char* requests[] =
+{
+    "\x01\x01\x00\x00\x00\x3f\x00\x00",
+    "\x01\x01\x00\x00\x00\x40\x7f\x00",
+    "\x01\x01\x00\x00\x00\x80\xbf\x00",
+    "\x01\x01\x00\x00\x00\x80\xc0\xff"
+};
 
 
 QnPlIqResourceSearcher::QnPlIqResourceSearcher()
@@ -143,3 +156,102 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
 
     return local_results;
 }
+
+void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)
+{
+    /*
+    QFile gggFile("c:/123");
+    gggFile.open(QFile::ReadOnly);
+    responseData = gggFile.readAll();
+    */
+
+    if (responseData.at(0) != 0x01 || responseData.at(1) != 0x04 || responseData.at(2) != 0x00 || 
+        responseData.at(3) != 0x00 || responseData.at(4) != 0x00 || responseData.at(5) != 0x00)
+    {
+        return;
+    }
+
+    QnMacAddress macAddr;
+    for (int i = 0; i < 6; i++)
+        macAddr.setByte(i, responseData.at(i+6));
+
+    int iqpos = responseData.indexOf("IQ"); // name
+    iqpos = responseData.indexOf("IQ", iqpos+2); // vendor
+    iqpos = responseData.indexOf("IQ", iqpos+2); // type
+    if (iqpos < 0)
+        return;
+
+    QByteArray name(responseData.data() + iqpos); // construct from null terminated char*
+
+    foreach(QnResourcePtr res, result)
+    {
+        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+
+        if (net_res->getMAC() == macAddr)
+        {
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+                net_res->setDiscoveryAddr(discoveryAddress);
+            return; // already found;
+        }
+    }
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return;
+
+    QnNetworkResourcePtr resource ( new QnPlIqResource() );
+    in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
+    QHostAddress peerAddress(inet_ntoa(*peer_addr));
+    resource->setTypeId(rt);
+    resource->setName(name);
+    resource->setMAC(macAddr);
+    resource->setHostAddress(peerAddress, QnDomainMemory);
+    resource->setDiscoveryAddr(discoveryAddress);
+
+    result.push_back(resource);
+}
+
+
+QnResourceList QnPlIqResourceSearcher::findResources()
+{
+    QnResourceList result = QnMdnsResourceSearcher::findResources();
+
+    foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
+    {
+        QUdpSocket sendSock, receiveSock;
+        if (!bindToInterface(sendSock, iface, NATIVE_DISCOVERY_REQUEST_PORT)) 
+            continue;
+        if (!bindToInterface(receiveSock, iface, NATIVE_DISCOVERY_RESPONSE_PORT))
+            continue;
+
+        for (int i = 0; i < sizeof(requests)/sizeof(char*); ++i)
+        {
+            // sending broadcast
+            QByteArray datagram(requests[i], REQUEST_SIZE);
+            sendSock.writeDatagram(datagram.data(), datagram.size(),QHostAddress::Broadcast, NATIVE_DISCOVERY_REQUEST_PORT);
+        }
+
+        QTime time;
+        time.start();
+        QnSleep::msleep(150);
+
+        while (receiveSock.hasPendingDatagrams())
+        {
+            QByteArray datagram;
+            datagram.resize(receiveSock.pendingDatagramSize());
+
+            QHostAddress sender;
+            quint16 senderPort;
+
+            receiveSock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+
+            if (senderPort == NATIVE_DISCOVERY_RESPONSE_PORT && datagram.size() > 128) // minimum response size
+                processNativePacket(result, datagram, iface.address);
+        }
+        //processNativePacket(result, QByteArray(), iface.address);
+    }
+
+    return result;
+
+}
+
