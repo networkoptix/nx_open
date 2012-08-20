@@ -440,6 +440,13 @@ QnMain::~QnMain()
 void QnMain::stopObjects()
 {
     if (m_restServer)
+        m_restServer->pleaseStop();
+    if (m_progressiveDownloadingServer)
+        m_progressiveDownloadingServer->pleaseStop();
+    if (m_rtspListener)
+        m_rtspListener->pleaseStop();
+
+    if (m_restServer)
     {
         delete m_restServer;
         m_restServer = 0;

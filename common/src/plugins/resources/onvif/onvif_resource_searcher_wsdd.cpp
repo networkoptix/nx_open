@@ -46,7 +46,10 @@ const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
-    m_onvifFetcher(OnvifResourceInformationFetcher::instance())/*,
+    m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
+    m_shouldStop(false)
+    /*,
+    m_s
     m_recvSocketList(),
     m_mutex()*/
 {
@@ -57,6 +60,12 @@ OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
 {
     static OnvifResourceSearcherWsdd inst;
     return inst;
+}
+
+void OnvifResourceSearcherWsdd::pleaseStop()
+{
+    m_shouldStop = true;
+    m_onvifFetcher.pleaseStop();
 }
 
 //To avoid recreating of gsoap socket, these 2 functions must be assigned
@@ -240,6 +249,10 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
     foreach(QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+
+        if (m_shouldStop)
+            return;
+
         QString host(iface.address.toString());
 
         qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
@@ -294,6 +307,9 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
         while (true) 
         {
+            if (m_shouldStop)
+                return;
+
             __wsdd__ProbeMatches wsddProbeMatches;
             wsddProbeMatches.wsdd__ProbeMatches = NULL;
 

@@ -245,6 +245,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     it = resources.begin();
     while (it != resources.end())
     {
+        if (needToStop())
+            return QnResourceList();
+
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 

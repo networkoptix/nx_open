@@ -519,8 +519,8 @@ TCPSocket *TCPServerSocket::accept()  {
     struct timeval timeout;
     FD_ZERO(&read_set);
     FD_SET(sockDesc, &read_set);
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 250 * 1000;
 
     if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
         return 0;
