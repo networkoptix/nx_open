@@ -195,15 +195,16 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
         }
     }
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QString nameStr = QString::fromLatin1(name);
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
     if (!rt.isValid())
         return;
 
     QnNetworkResourcePtr resource ( new QnPlIqResource() );
     in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
-    QHostAddress peerAddress(inet_ntoa(*peer_addr));
+    QHostAddress peerAddress(QLatin1String(inet_ntoa(*peer_addr)));
     resource->setTypeId(rt);
-    resource->setName(name);
+    resource->setName(nameStr);
     resource->setMAC(macAddr);
     resource->setHostAddress(peerAddress, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryAddress);
