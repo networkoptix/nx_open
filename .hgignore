@@ -130,8 +130,8 @@ traytool/src/traytool.vcproj
 traytool/x86
 traytool/x64
 
-client/contrib/bespin/x86
-client/contrib/bespin/x64
+client/contrib/bespin/x86*
+client/contrib/bespin/x64*
 
 debsetup/mediaserver/package
 debsetup/mediaserver/x86
