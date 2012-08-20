@@ -210,7 +210,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
-    connect(action(Qn::QuickSearchAction),                      SIGNAL(triggered()),    this,   SLOT(at_quickSearchAction_triggered()));
+    connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -1099,7 +1099,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
+void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource = parameters.resource();
