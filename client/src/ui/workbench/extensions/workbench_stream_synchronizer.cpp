@@ -40,8 +40,8 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(m_counter,                  SIGNAL(reachedZero()),  m_syncPlay,     SLOT(deleteLater()));
     connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
 
-    /* Prepare render watcher. */
-    QnWorkbenchRenderWatcher *renderWatcher = context()->watcher<QnWorkbenchRenderWatcher>();
+    /* Prepare render instance. */
+    QnWorkbenchRenderWatcher *renderWatcher = context()->instance<QnWorkbenchRenderWatcher>();
     connect(renderWatcher, SIGNAL(displayingChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
 
     /* Run handlers for all widgets already on display. */

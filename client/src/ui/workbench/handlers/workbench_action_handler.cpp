@@ -219,7 +219,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
-    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1991,7 +1991,7 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
-    action(Qn::TogglePanicModeAction)->setChecked(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode());
+    action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
