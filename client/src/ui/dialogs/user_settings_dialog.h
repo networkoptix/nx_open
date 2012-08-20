@@ -61,11 +61,12 @@ protected slots:
     void updateCurrentPassword() { updateElement(CurrentPassword); }
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
-    void updateAccessRights2(quint64 rights);
+    void loadAccessRightsToUi(quint64 rights);
+    void loadAccessRightsPresets();
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);
-
+    void at_accessRights_changed();
 private:
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QWeakPointer<QnWorkbenchContext> m_context;
@@ -78,6 +79,6 @@ private:
     bool m_hasChanges;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)
 
 #endif // QN_NEW_USER_DIALOG_H
