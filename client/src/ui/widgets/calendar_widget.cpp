@@ -116,10 +116,6 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     /* Draw background. */
     {
         QBrush brush = painter->brush();
-        QRect backgroundRect = rect;
-
-        /*if(isCurrent)
-            backgroundRect = backgroundRect.adjusted(3, 3, -3, -3);*/
 
         if (m_currentTimeStorage.periods(Qn::MotionRole).intersects(current)) {
             brush.setColor(motionColor);
@@ -131,7 +127,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
             brush.setColor(backgroundColor);
             brush.setStyle(Qt::SolidPattern);
         }
-        painter->fillRect(backgroundRect, brush);
+        painter->fillRect(rect, brush);
 
         if (m_syncedTimeStorage.periods(Qn::MotionRole).intersects(current)) {
             brush.setColor(motionColor);
@@ -140,7 +136,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
             brush.setColor(recordingColor);
             brush.setStyle(Qt::BDiagPattern);
         }
-        painter->fillRect(backgroundRect, brush);
+        painter->fillRect(rect, brush);
     }
 
     QnScopedPainterPenRollback penRollback(painter);
