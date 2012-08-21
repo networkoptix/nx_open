@@ -25,7 +25,7 @@ QnGradientBackgroundPainter::QnGradientBackgroundPainter(qreal cycleIntervalSecs
     m_cycleIntervalSecs(cycleIntervalSecs)
 {
     connect(qnSettings->notifier(QnSettings::BACKGROUND_COLOR), SIGNAL(valueChanged(int)),  this,   SLOT(updateBackgroundColor()));
-    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
+    connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this,   SLOT(updateBackgroundColor()));
 
     updateBackgroundColor(false);
 
@@ -91,7 +91,7 @@ void QnGradientBackgroundPainter::setBackgroundColor(const QColor &backgroundCol
 void QnGradientBackgroundPainter::updateBackgroundColor(bool animate) {
     QColor backgroundColor;
 
-    if(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode()) {
+    if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()) {
         backgroundColor = QColor(255, 0, 0, 255);
     } else if(m_settings) {
         backgroundColor = m_settings.data()->backgroundColor();

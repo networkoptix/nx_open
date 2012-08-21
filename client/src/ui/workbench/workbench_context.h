@@ -70,18 +70,13 @@ public:
 
     void setUserName(const QString &userName);
 
-    template<class Watcher>
-    Watcher *watcher() {
-        QByteArray key(typeid(Watcher).name());
+    template<class T>
+    T *instance() {
+        QByteArray key(typeid(T).name());
         QObject *&result = m_instanceByTypeName[key];
         if(!result)
-            result = new Watcher(this);
-        return static_cast<Watcher *>(result);
-    }
-
-    template<class Handler>
-    Handler *handler() {
-        return watcher<Handler>();
+            result = new T(this);
+        return static_cast<T *>(result);
     }
 
 signals:

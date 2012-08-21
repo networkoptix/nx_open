@@ -39,7 +39,7 @@ public:
      * Search for resources may take time. This function can be used to
      * stop resource search prematurely. 
      */
-    void pleaseStop();
+    virtual void pleaseStop();
 
     bool isLocal() const;
 

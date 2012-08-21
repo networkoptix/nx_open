@@ -510,7 +510,7 @@ namespace Qn {
          * 
          * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
          */
-        QuickSearchAction,
+        ThumbnailsSearchAction,
 
         /**
          * Shows/hides calendar.

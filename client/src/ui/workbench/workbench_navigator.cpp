@@ -391,6 +391,18 @@ QnWorkbenchNavigator::WidgetFlags QnWorkbenchNavigator::currentWidgetFlags() con
     return m_currentWidgetFlags;
 }
 
+void QnWorkbenchNavigator::setUserData(QnResourceWidget *widget, const QnTimePeriod &window, const QnTimePeriod &selection, bool selectionValid) {
+    SliderUserData data;
+    data.window = window;
+    data.selection = selection;
+    data.selectionValid = selectionValid;
+
+    m_localDataByWidget[widget] = data;
+
+    if(widget == m_currentWidget)
+        setCurrentSliderData(data, false);
+}
+
 QnWorkbenchNavigator::SliderUserData QnWorkbenchNavigator::currentSliderData() const {
     SliderUserData result;
 
