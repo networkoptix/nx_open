@@ -233,7 +233,7 @@ QVariant QnWorkbenchItem::data(int role) const {
     case Qn::ResourceUidRole:
         return m_resourceUid;
     case Qn::ItemUuidRole:
-        return m_uuid;
+        return QVariant::fromValue<QUuid>(m_uuid);
     case Qn::ItemGeometryRole:
         return m_geometry;
     case Qn::ItemGeometryDeltaRole:
