@@ -4,8 +4,7 @@
 #include <core/resource/resource.h>
 
 #include <ui/style/resource_icon_cache.h>
-
-#include "item_data_role.h"
+#include <ui/workbench/workbench_globals.h>
 
 QnResourceListModel::QnResourceListModel(QObject *parent): 
     QAbstractListModel(parent),
@@ -118,9 +117,9 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const {
         return QVariant::fromValue<QnResourcePtr>(resource);
     case Qn::ResourceFlagsRole:
         return static_cast<int>(resource->flags());
-    case Qn::SearchStringRole: 
+    case Qn::ResourceSearchStringRole: 
         return resource->toSearchString();
-    case Qn::StatusRole: 
+    case Qn::ResourceStatusRole: 
         return static_cast<int>(resource->getStatus());
     default:
         break;

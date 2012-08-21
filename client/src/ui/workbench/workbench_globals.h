@@ -4,6 +4,50 @@
 #include <QtCore/QtGlobal>
 
 namespace Qn {
+
+    /** 
+     * Type of a node in resource tree displayed to the user.
+     */
+    enum NodeType {
+        RootNode,
+        LocalNode,
+        ServersNode,
+        UsersNode,
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode,       /**< Node that represents a layout item. */
+    };
+
+
+    /**
+     * Generic enumeration holding different data roles used in Qn classes.
+     */
+    enum ItemDataRole {
+        /* Tree-based. */
+        NodeTypeRole                = Qt::UserRole + 1,     /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+
+        /* Resource-based. */
+        ResourceRole                = Qt::UserRole + 2,     /**< Role for QnResourcePtr. */
+        ResourceFlagsRole           = Qt::UserRole + 3,     /**< Role for resource flags. */
+        ResourceSearchStringRole    = Qt::UserRole + 4,     /**< Role for resource search string. */
+        ResourceStatusRole          = Qt::UserRole + 5,     /**< Role for resource status. */
+        ResourceUidRole             = Qt::UserRole + 6,     /**< Role for resource unique id. */
+
+        /* Layout item-based. */
+        ItemUuidRole                = Qt::UserRole + 7,     /**< Role for layout item's UUID. */
+        ItemGeometryRole            = Qt::UserRole + 8,     /**< Role for item's integer geometry. */
+        ItemGeometryDeltaRole       = Qt::UserRole + 9,     /**< Role for item's floating point geometry delta. */
+        ItemCombinedGeometryRole    = Qt::UserRole + 10,    /**< Role for item's floating point combined geometry. */
+        ItemFlagsRole               = Qt::UserRole + 11,    /**< Role for item's flags. */
+        ItemRotationRole            = Qt::UserRole + 12,    /**< Role for item's rotation. */
+
+        ItemTimeRole                = Qt::UserRole + 13,    /**< Role for item's playback position. */
+        ItemPausedRole              = Qt::UserRole + 14,    /**< Role for item's paused state. */
+        ItemSpeedRole               = Qt::UserRole + 15,    /**< Role for item's playback speed. */
+        ItemSliderWindowRole        = Qt::UserRole + 15,    /**< Role for slider selection that is displayed when the items is active. */
+        ItemSliderSelectionRole     = Qt::UserRole + 16,    /**< Role for slider window that is displayed when the item is active. */
+    };
+
+
     /**
      * Role of an item on the scene. 
      * 
@@ -29,14 +73,6 @@ namespace Qn {
                                              * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
     Q_DECLARE_FLAGS(ItemFlags, ItemFlag);
-
-    /**
-     * Layout-specific flags.
-     */
-    //enum LayoutFlags {
-    //    LayoutIsFile = 0x1,                 /**< Layout was opened from a MultiStream file. */
-    //    LayoutIsQuickSearch = 0x2,          /**< Layout is a QuickSearch view of some resource. */
-    //};
 
 
     /**
