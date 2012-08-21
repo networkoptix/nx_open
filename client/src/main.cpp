@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
 
     /* Support old straight build scripts. */
 #ifndef NO_TRANSLATIONS
-    Q_INIT_RESOURCE(common_translations);
+    Q_INIT_RESOURCE(common_common);
 #endif
 
     QString language = qnSettings->language();

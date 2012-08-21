@@ -1184,11 +1184,13 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         if(!widget)
             continue;
 
+        // TODO: don't start reader!
+
         /* TODO: this code does not belong here. */
         widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
         //widget->display()->archiveReader()->pauseMedia();
-        widget->display()->camDisplay()->playAudio(false);
-        widget->display()->archiveReader()->setSingleShotMode(true);
+        //widget->display()->camDisplay()->playAudio(false);
+        //widget->display()->archiveReader()->setSingleShotMode(true);
 
         widget->setDecorationsVisible(true, false);
         widget->setInfoVisible(true, false);
