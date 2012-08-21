@@ -34,7 +34,8 @@ namespace {
 
 QnCalendarWidget::QnCalendarWidget():
     QCalendarWidget(),
-    m_tableView(0)
+    m_tableView(0),
+    m_empty(true)
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
@@ -60,23 +61,14 @@ QnCalendarWidget::QnCalendarWidget():
 
 void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods)
 {
-    bool oldEmpty = isEmpty();
     m_currentTimeStorage.setPeriods(type, periods);
-    bool newEmpty = isEmpty();
-    if (newEmpty != oldEmpty)
-        emit emptyChanged();
-
+    updateEmpty();
     update();
 }
 
 void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods) {
-    // TODO: #GDM Copypasta. Move to separate function (updateEmpty()) and add m_empty field.
-    bool oldEmpty = isEmpty();
     m_syncedTimeStorage.setPeriods(type, periods);
-    bool newEmpty = isEmpty();
-    if (newEmpty != oldEmpty)
-        emit emptyChanged();
-
+    updateEmpty();
     update();
 }
 
@@ -96,12 +88,7 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
 }
 
 bool QnCalendarWidget::isEmpty() {
-    for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
-        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
-                ||
-            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
-            return false;
-    return true;
+    return m_empty;
 }
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
@@ -175,4 +162,21 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         painter->setFont(font);
         painter->drawText(rect, Qt::AlignCenter, text);
     }
+}
+
+void QnCalendarWidget::updateEmpty(){
+    bool value = true;
+    for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
+        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
+                ||
+            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
+        {
+            value = false;
+            break;
+        }
+    if (m_empty == value)
+        return;
+
+    m_empty = value;
+    emit emptyChanged();
 }

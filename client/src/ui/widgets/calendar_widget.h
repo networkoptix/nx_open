@@ -38,10 +38,13 @@ signals:
 protected:
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
 private:
+    void updateEmpty();
+
     QnTimePeriodStorage m_currentTimeStorage;
     QnTimePeriodStorage m_syncedTimeStorage;
     QTableView* m_tableView;
     QnTimePeriod m_window;
+    bool m_empty;
 };
 
 
