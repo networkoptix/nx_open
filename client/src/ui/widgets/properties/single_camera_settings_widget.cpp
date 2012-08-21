@@ -351,6 +351,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
 
+    if(!m_camera)
+        return; // TODO: investigate why we get here with null camera
+
     m_inUpdateMaxFps = true;
     if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
         || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
