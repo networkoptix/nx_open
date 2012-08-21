@@ -7,7 +7,8 @@ CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
-RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-skin.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-icons.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 
 !contains(BUILDLIB, staticlib) {
