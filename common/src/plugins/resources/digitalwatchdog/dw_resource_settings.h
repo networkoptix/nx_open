@@ -76,7 +76,7 @@ class DWCameraSettingReader: public CameraSettingReader
     DWCameraSettings& m_settings;
 
 public:
-    DWCameraSettingReader(DWCameraSettings& settings, const QString& filepath);
+    DWCameraSettingReader(DWCameraSettings& settings);
     virtual ~DWCameraSettingReader();
 
 protected:

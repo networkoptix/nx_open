@@ -160,8 +160,8 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 const QString& DWCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
 const QString& DWCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
 
-DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& filepath):
-    CameraSettingReader(filepath, QString::fromLatin1("DIGITALWATCHDOG")),
+DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings):
+    CameraSettingReader(QString::fromLatin1("DIGITALWATCHDOG")),
     m_settings(settings)
 {
 

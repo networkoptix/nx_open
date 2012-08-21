@@ -119,7 +119,7 @@ public:
     static QString createId(const QString& parentId, const QString& name);
     static bool isEnabled(const CameraSetting& val);
 
-    CameraSettingReader(const QString& filepath, const QString& cameraId);
+    CameraSettingReader(const QString& cameraId);
     virtual ~CameraSettingReader();
 
     bool read();

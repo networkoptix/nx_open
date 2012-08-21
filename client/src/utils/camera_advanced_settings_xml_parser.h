@@ -29,7 +29,7 @@ class CameraSettingsLister: public CameraSettingReader
     ParentOfRootElemFoundAware& m_obj;
 
 public:
-    CameraSettingsLister(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj);
+    CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj);
     virtual ~CameraSettingsLister();
 
     bool proceed(QSet<QString>& out);
@@ -80,7 +80,7 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
-    CameraSettingsWidgetsCreator(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj,
+    CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
         QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner);
 
     virtual ~CameraSettingsWidgetsCreator();
@@ -149,7 +149,6 @@ public:
 
 class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >
 {
-    const QString& m_filepath;
     QSet<QString> m_params;
 
 protected:
@@ -157,7 +156,7 @@ protected:
 
 public:
 
-    CameraSettingsTreeLister(const QString& filepath, const QString& id);
+    CameraSettingsTreeLister(const QString& id);
 
     CameraSettingsLister* createElement(const QString& id) override;
 
@@ -171,7 +170,6 @@ public:
 class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
     typedef CameraSettingsWidgetsCreator::WidgetsById WidgetsById;
-    const QString m_filepath;
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     WidgetsById m_widgetsById;
@@ -184,7 +182,7 @@ protected:
 
 public:
 
-    CameraSettingsWidgetsTreeCreator(const QString& filepath, const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
+    CameraSettingsWidgetsTreeCreator(const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
 
     CameraSettingsWidgetsCreator* createElement(const QString& id) override;
 

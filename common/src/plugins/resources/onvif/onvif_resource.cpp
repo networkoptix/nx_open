@@ -1533,9 +1533,7 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
         settings->makeGetRequest();
     }
 
-    QString filepath = QString::fromLatin1("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-    OnvifCameraSettingReader reader(*settings, filepath);
+    OnvifCameraSettingReader reader(*settings);
 
     reader.read() && reader.proceed();
     {

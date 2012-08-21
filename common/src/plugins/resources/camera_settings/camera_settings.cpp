@@ -306,6 +306,7 @@ const QString& CameraSettingReader::ATTR_QUERY = *(new QString(QLatin1String("qu
 const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
 const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
 const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("step")));
+const QString CSR_CAMERA_SETTINGS_FILEPATH(QLatin1String(":/camera_settings/camera_settings.xml"));
 
 QString CameraSettingReader::createId(const QString& parentId, const QString& name)
 {
@@ -318,9 +319,9 @@ bool CameraSettingReader::isEnabled(const CameraSetting& val)
         (val.getType() == CameraSetting::Enumeration || val.getMin() != val.getMax());
 }
 
-CameraSettingReader::CameraSettingReader(const QString& filepath, const QString& cameraId) :
-    m_filepath(filepath),
-    m_cameraId(cameraId)
+CameraSettingReader::CameraSettingReader(const QString& cameraId) :
+    m_cameraId(cameraId),
+    m_filepath(CSR_CAMERA_SETTINGS_FILEPATH)
 {
 }
 

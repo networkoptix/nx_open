@@ -349,7 +349,7 @@ class OnvifCameraSettingReader: public CameraSettingReader
     OnvifCameraSettingsResp& m_settings;
 
 public:
-    OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath);
+    OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings);
     virtual ~OnvifCameraSettingReader();
 
 protected:

@@ -8,8 +8,8 @@ const QString CASXP_MAINTENANCE_GROUP_NAME(QLatin1String("%%Maintenance"));
 // class CameraSettingsLister
 //
 
-CameraSettingsLister::CameraSettingsLister(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj):
-    CameraSettingReader(filepath, id),
+CameraSettingsLister::CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj):
+    CameraSettingReader(id),
     m_obj(obj)
 {
 
@@ -67,9 +67,9 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj,
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
         QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner):
-    CameraSettingReader(filepath, id),
+    CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
     m_rootWidget(rootWidget),
@@ -380,16 +380,15 @@ void CameraSettingTreeReader<T, E>::clean()
 // class CameraSettingsTreeLister
 //
 
-CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& filepath, const QString& id):
-    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id),
-    m_filepath(filepath)
+CameraSettingsTreeLister::CameraSettingsTreeLister(const QString& id):
+    CameraSettingTreeReader<CameraSettingsLister, QSet<QString> >(id)
 {
     
 }
 
 CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
 {
-    return new CameraSettingsLister(m_filepath, id, *this);
+    return new CameraSettingsLister(id, *this);
 }
 
 QSet<QString>& CameraSettingsTreeLister::getCallback()
@@ -408,10 +407,9 @@ QStringList CameraSettingsTreeLister::proceed()
 // class CameraSettingsWidgetsTreeCreator
 //
 
-CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& filepath, const QString& id, QTreeWidget& rootWidget,
+CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& id, QTreeWidget& rootWidget,
         QStackedLayout& rootLayout, QObject* handler):
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
-    m_filepath(filepath),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
     m_widgetsById(),
@@ -424,7 +422,7 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(m_filepath, id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_handler, m_owner);
+    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_handler, m_owner);
 }
 
 CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()

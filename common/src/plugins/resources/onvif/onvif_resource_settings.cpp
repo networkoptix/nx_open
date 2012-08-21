@@ -1150,8 +1150,8 @@ OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs)
 const QString& OnvifCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
 const QString& OnvifCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
 
-OnvifCameraSettingReader::OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings, const QString& filepath):
-    CameraSettingReader(filepath, QString::fromLatin1("ONVIF")),
+OnvifCameraSettingReader::OnvifCameraSettingReader(OnvifCameraSettingsResp& onvifSettings):
+    CameraSettingReader(QString::fromLatin1("ONVIF")),
     m_settings(onvifSettings)
 {
 

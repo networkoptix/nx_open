@@ -95,9 +95,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
         layout->addWidget(advancedTreeWidget);
         layout->addWidget(advancedWidget);
 
-        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-        //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(filepath, id.toString(), *advancedTreeWidget, *advancedLayout, this);
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
 }
 
@@ -113,9 +111,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
             return;
         }
 
-        QString filepath(QLatin1String("C:\\projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml"));
-        //QString filepath = QString::fromLatin1("C:\\Data\\Projects\\networkoptix\\netoptix_vms\\common\\resource\\plugins\\resources\\camera_settings\\CameraSettings.xml");
-        CameraSettingsTreeLister lister(filepath, id.toString());
+        CameraSettingsTreeLister lister(id.toString());
         QStringList settings = lister.proceed();
 
         qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
