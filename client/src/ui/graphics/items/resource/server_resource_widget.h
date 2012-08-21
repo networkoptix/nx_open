@@ -5,14 +5,14 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>
 
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
 
 class QnServerResourceWidget: public QnResourceWidget {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnResourceWidget base_type;
 
@@ -63,8 +63,11 @@ private:
     /** History of last usage responses. */
     QList<QnStatisticsHistoryData> m_history;
 
-    /** Total number of responses received. */ 
-    uint m_counter;
+    /** Id of the last received response. */
+    uint m_lastHistoryId;
+
+    /** Timestamp of the last received response in msecs since epoch */
+    qint64 m_lastTimeStamp;
 
     /** Status of the frame history. */
     Qn::RenderStatus m_renderStatus;

@@ -9,7 +9,7 @@
 #include "session_manager.h"
 
 #include <api/serializer/serializer.h>
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>
 
 #include "utils/common/rand.h"
 

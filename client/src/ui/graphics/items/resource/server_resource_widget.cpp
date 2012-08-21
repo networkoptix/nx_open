@@ -6,7 +6,9 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/video_server_resource.h>
+
 #include <api/video_server_connection.h>
+#include <api/video_server_statistics_manager.h>
 
 #include <ui/style/globals.h>
 
@@ -155,7 +157,7 @@ namespace {
     };
 
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
-    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
+    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
 } // anonymous namespace
 
@@ -402,6 +404,10 @@ void QnServerResourceWidget::at_timer_timeout() {
     }
 
     m_alreadyUpdating = true;
+
+    QnVideoServerStatisticsManager *manager = videoServerStatisticsManager();
+    manager->getHistory(m_resource->getUniqueId(), m_lastHistoryId);
+    //m_resource->getUniqueId()
     m_resource->apiConnection()->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataVector &)));
 }
 

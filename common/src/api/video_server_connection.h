@@ -12,7 +12,7 @@
 #include "recording/time_period_list.h"
 
 #include <utils/common/request_param.h>
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>.h>
 
 #include "api_fwd.h"
 

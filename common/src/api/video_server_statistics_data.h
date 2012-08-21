@@ -4,8 +4,6 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
-// TODO: rename this header
-
 struct QnStatisticsData {
     enum DeviceType {
         CPU,
