@@ -689,15 +689,15 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
-    bool isQuickSearch = workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty();
+    bool isQuickSearch = false; //workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty();
 
     qint64 startTimeUSec, endTimeUSec;
     qint64 endTimeMSec, startTimeMSec;
     if(isQuickSearch) {
-        endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
+        /*endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
         endTimeUSec = endTimeMSec * 1000;
         startTimeMSec = workbench()->currentLayout()->resource()->timeBounds().startTimeMs;
-        startTimeUSec = startTimeMSec * 1000;
+        startTimeUSec = startTimeMSec * 1000;*/
     } else {
         endTimeUSec = reader->endTime();
         endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);

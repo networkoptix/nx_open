@@ -1158,7 +1158,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
     layout->setParentId(context()->user()->getId());
-    layout->setTimeBounds(period);
+    //layout->setTimeBounds(period);
 
     QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {

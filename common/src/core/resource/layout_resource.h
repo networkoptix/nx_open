@@ -50,9 +50,9 @@ public:
      */
     static QnLayoutResourcePtr fromFile(const QString& xfile);
 
-    QnTimePeriod timeBounds() const;
+    void setData(const QHash<int, QVariant> &dataByRole);
 
-    void setTimeBounds(const QnTimePeriod &timeBounds);
+    QHash<int, QVariant> data() const;
 
 signals:
     void itemAdded(const QnLayoutItemData &item);
@@ -60,7 +60,6 @@ signals:
     void itemChanged(const QnLayoutItemData &item);
     void cellAspectRatioChanged();
     void cellSpacingChanged();
-    void timeBoundsChanged();
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;
@@ -72,9 +71,9 @@ private:
 
 private:
     QnLayoutItemDataMap m_itemByUuid;
-    QnTimePeriod m_timeBounds;
     qreal m_cellAspectRatio;
     QSizeF m_cellSpacing;
+    QHash<int, QVariant> m_dataByRole;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);
