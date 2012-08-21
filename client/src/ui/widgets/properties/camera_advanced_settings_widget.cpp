@@ -4,9 +4,24 @@
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
 
-//#include "device/device.h"
-//#include "base/log.h"
-//#include "settings.h"
+
+QnSettingsGroupBox::QnSettingsGroupBox(const QString& title, QWidget& parent):
+    QGroupBox(title, &parent),
+    alreadyShowed(false)
+{
+    setLayout(new QVBoxLayout());
+}
+
+void QnSettingsGroupBox::showEvent(QShowEvent* event)
+{
+    if (!alreadyShowed) {
+        alreadyShowed = true;
+        static_cast<QVBoxLayout*>(layout())->addStretch(1);
+    }
+
+    QGroupBox::showEvent(event);
+}
+//==============================================
 
 QnSettingsSlider::QnSettingsSlider(Qt::Orientation orientation, QWidget *parent)
 : QSlider(orientation, parent)
@@ -22,14 +37,14 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 }
 //==============================================
 
-QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QWidget& parent)
-    : QWidget(),
+QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox &parent)
+    : QWidget(&parent),
       mHandler(handler),
       mParam(obj),
       mWidget(0),
       mlayout(new QHBoxLayout())
 {
-    setParent(&parent);
+    dynamic_cast<QVBoxLayout*>(parent.layout())->addWidget(this);
     setLayout(mlayout);
 
     QObject::connect(this, SIGNAL( setAdvancedParam(const CameraSetting&) ),
@@ -58,7 +73,7 @@ void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
 }
 
 //==============================================
-QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QWidget& parent):
+QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
     QnAbstractSettingsWidget(handler, obj, parent)
 {
     m_checkBox = new QCheckBox(mParam.getName());
@@ -101,7 +116,7 @@ void QnSettingsOnOffWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QWidget& parent):
+QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
     QnAbstractSettingsWidget(handler, obj, parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -158,7 +173,7 @@ void QnSettingsMinMaxStepWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QWidget& parent):
+QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
     QnAbstractSettingsWidget(handler, obj, parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -230,7 +245,7 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 }
 
 //==================================================
-QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QWidget& parent):
+QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsGroupBox& parent):
     QnAbstractSettingsWidget(handler, dummyVal, parent),
     dummyVal(obj)
 {
@@ -239,7 +254,7 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
     mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     mlayout->addWidget(btn);
     mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    mlayout->addWidget(new QWidget());
+    mlayout->addWidget(new QWidget()); // TODO: hueta
 
     QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
 

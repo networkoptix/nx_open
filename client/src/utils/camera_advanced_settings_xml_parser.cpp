@@ -77,7 +77,8 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_widgetsById(widgetsById),
     m_handler(handler),
     m_owner(owner),
-    m_emptyGroupsById()
+    m_emptyGroupsById(),
+    m_layoutIndById()
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
 }
@@ -100,6 +101,7 @@ void CameraSettingsWidgetsCreator::removeEmptyWidgetGroups()
 bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
     removeEmptyWidgetGroups();
+    m_layoutIndById.clear();
 
     m_settings = &settings;
 
@@ -190,37 +192,44 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         return;
     }
 
+    QnSettingsGroupBox* rootWidget = 0;
+    LayoutIndById::ConstIterator lIndIt = m_layoutIndById.find(parentId);
+    if (lIndIt != m_layoutIndById.end()) {
+        int ind = lIndIt.value();
+        rootWidget = dynamic_cast<QnSettingsGroupBox*>(m_rootLayout.widget(ind));
+        Q_ASSERT(rootWidget != 0);
+    } else {
+        rootWidget = new QnSettingsGroupBox(parentId, *m_owner);
+        int ind = m_rootLayout.addWidget(rootWidget);
+        m_layoutIndById.insert(parentId, ind);
+
+        QTreeWidgetItem* parentItem = findParentForParam(parentId);
+        parentItem->setData(0, Qt::UserRole, ind);
+    }
+
     QWidget* tabWidget = 0;
     switch(value.getType())
     {
         case CameraSetting::OnOff:
-            tabWidget = new QnSettingsOnOffWidget(m_handler, *(currIt.value()), *m_owner);
+            tabWidget = new QnSettingsOnOffWidget(m_handler, *(currIt.value()), *rootWidget);
             break;
 
         case CameraSetting::MinMaxStep:
-            tabWidget = new QnSettingsMinMaxStepWidget(m_handler, *(currIt.value()), *m_owner);
+            tabWidget = new QnSettingsMinMaxStepWidget(m_handler, *(currIt.value()), *rootWidget);
             break;
 
         case CameraSetting::Enumeration:
-            tabWidget = new QnSettingsEnumerationWidget(m_handler, *(currIt.value()), *m_owner);
+            tabWidget = new QnSettingsEnumerationWidget(m_handler, *(currIt.value()), *rootWidget);
             break;
 
         case CameraSetting::Button:
-            tabWidget = new QnSettingsButtonWidget(m_handler, value, *m_owner);
+            tabWidget = new QnSettingsButtonWidget(m_handler, value, *rootWidget);
             break;
 
         default:
             //Unknown widget type!
             Q_ASSERT(false);
     }
-
-    int ind = m_rootLayout.addWidget(tabWidget);
-
-    QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(value.getName()));
-    item->setData(0, Qt::UserRole, ind);
-
-    QTreeWidgetItem* parentItem = findParentForParam(parentId);
-    parentItem->addChild(item);
 }
 
 QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString& parentId)

@@ -77,6 +77,8 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 
     typedef QHash<QString, WidgetAndParent*> WidgetsAndParentsById;
 
+    typedef QHash<QString, int> LayoutIndById;
+
 public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
@@ -113,6 +115,7 @@ private:
     QObject* m_handler;
     QWidget* m_owner;
     WidgetsAndParentsById m_emptyGroupsById;
+    LayoutIndById m_layoutIndById;
 };
 
 //
