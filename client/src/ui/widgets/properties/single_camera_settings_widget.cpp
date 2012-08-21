@@ -259,6 +259,10 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
+    setReadOnly(ui->resetMotionRegionsButton, readOnly);
+    setReadOnly(ui->sensitivitySlider, readOnly);
+    setReadOnly(ui->softwareMotionButton, readOnly);
+    setReadOnly(ui->cameraMotionButton, readOnly);
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
     m_readOnly = readOnly;
@@ -399,6 +403,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
+    //m_motionWidget->setReadOnly(m_readOnly);
     
     m_motionLayout->addWidget(m_motionWidget);
 

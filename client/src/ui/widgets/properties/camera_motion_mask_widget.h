@@ -19,8 +19,8 @@ class QnMediaResourceWidget;
 
 class QnCameraMotionMaskWidget: public QWidget
 {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
         
 public:
     QnCameraMotionMaskWidget(QWidget *parent = 0);
