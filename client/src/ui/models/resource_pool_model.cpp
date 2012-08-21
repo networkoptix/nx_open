@@ -19,6 +19,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_globals.h>
 
 #include "file_processor.h"
 
@@ -352,13 +353,13 @@ public:
             if(m_resource)
                 return static_cast<int>(m_flags);
             break;
-        case Qn::UuidRole:
+        case Qn::ItemUuidRole:
             if(m_type == Qn::ItemNode)
                 return QVariant::fromValue<QUuid>(m_uuid);
             break;
-        case Qn::SearchStringRole: 
+        case Qn::ResourceSearchStringRole: 
             return m_searchString;
-        case Qn::StatusRole: 
+        case Qn::ResourceStatusRole: 
             return static_cast<int>(m_status);
         case Qn::NodeTypeRole:
             return static_cast<int>(m_type);
@@ -493,9 +494,9 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
     QHash<int, QByteArray> roles = roleNames();
     roles.insert(Qn::ResourceRole,      "resource");
     roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::UuidRole,          "uuid");
-    roles.insert(Qn::SearchStringRole,  "searchString");
-    roles.insert(Qn::StatusRole,        "status");
+    roles.insert(Qn::ItemUuidRole,          "uuid");
+    roles.insert(Qn::ResourceSearchStringRole,  "searchString");
+    roles.insert(Qn::ResourceStatusRole,        "status");
     roles.insert(Qn::NodeTypeRole,      "nodeType");
     setRoleNames(roles);
 

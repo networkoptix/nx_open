@@ -362,7 +362,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(Qn::ItemFlag flag, bool 
 
     QnScopedValueRollback<bool> guard(&m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
-    if(item->checkFlag(flag) != value)
+    if(item->hasFlag(flag) != value)
         return; /* Somebody has already changed it back. */
 
     m_pendingItems.insert(item->uuid());
