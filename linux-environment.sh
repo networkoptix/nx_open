@@ -1,25 +1,18 @@
-# sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev python-dev  libasound2 libxrender-dev libfreetype6-dev libfontconfig1-dev libxrandr-dev libxinerama-dev libxcursor-dev
+sudo apt-get install -y openjdk-6-jre-headless protobuf-compiler build-essential unzip zip libqt4-dev libz-dev python-dev  libasound2 libxrender-dev libfreetype6-dev libfontconfig1-dev libxrandr-dev libxinerama-dev libxcursor-dev libopenal-dev
 
-#mkdir -p ~/environment
-#cd ~/environment
+mkdir -p ~/environment
+hg clone ssh://hg@noptix.enk.me/buildenv ~/environment
+cd ~/environment
+chmod 755 ./get_buildenv.sh
+./get_buildenv.sh
 
-#hg clone ssh://hg@noptix.enk.me/buildenv ~/environment
-#chmod 755 ~/environment/get_buildenv.sh
-#~/environment/get_buildenv.sh
-
-#mkdir maven
-#cd ./maven
-#wget --no-check-certificate https://boris:pizdohuj@noptix.enk.me/jenkins/maven.zip
-#unzip ./maven.zip
-#chmod 755 ~/environment/maven/bin/mvn
-
-echo 'export environment=/drives/data2/QtSDK/projects/networkoptix/environment' >> ~/.profile
-echo 'export PATH=/drives/data2/QtSDK/projects/networkoptix/environment/maven/bin:'$PATH >> ~/.profile
+echo 'export environment=~/environment' >> ~/.profile
+echo 'export PATH=$environment/maven/bin:'$PATH >> ~/.profile
 #echo 'export JAVA_HOME=/usr' >> ~/.profile
 
-#cd ~/environment
-#wget http://sourceforge.net/projects/cx-freeze/files/4.2.3/cx_Freeze-4.2.3.tar.gz/download?use_mirror=dfn
-#mv ./download\?use_mirror\=dfn cx_freeze.tar.gz
+cd ~/environment
+wget http://sourceforge.net/projects/cx-freeze/files/4.2.3/cx_Freeze-4.2.3.tar.gz/download?use_mirror=dfn
+mv ./download\?use_mirror\=dfn cx_freeze.tar.gz
 #tar xvf ./cx_freeze.tar.gz
 #cd ./cx_Freeze*
 #python setup.py build

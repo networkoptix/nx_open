@@ -12,4 +12,4 @@ if not [%2] == [] set ARCH=-Darch=%INPUT_ARCH%
 echo ARCH=%INPUT_ARCH%
 
 @echo on
-mvn clean install %CUSTOMIZATION% %ARCH% -Dmaven.test.skip=true
+mvn clean install %CUSTOMIZATION% %ARCH% -Dskiptest=true
