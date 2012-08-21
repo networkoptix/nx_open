@@ -236,6 +236,10 @@ public:
      */
     bool setData(int role, const QVariant &value);
 
+    QHash<int, QVariant> data() const {
+        return m_dataByRole;
+    }
+
 public slots:
     /**
      * Adds the given item to this layout. This layout takes ownership of the

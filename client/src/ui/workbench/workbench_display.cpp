@@ -62,6 +62,8 @@
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
+Q_DECLARE_METATYPE(QUuid) // TODO: move out
+
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
         bool operator()(QGraphicsItem *l, QGraphicsItem *r) const {
@@ -375,6 +377,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
     connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+    connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
 
     /* Connect to grid mapper. */
@@ -1309,8 +1312,23 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
     at_workbench_itemChanged(role, workbench()->item(role));
 }
 
+void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
+    if(!isStreamsSynchronized()) {
+        workbench()->currentLayout()->setData(Qn::LayoutSyncItemUuidRole, QVariant::fromValue<QUuid>(QUuid()));
+    } else {
+        foreach(QnResourceWidget *widget, m_widgetByItem) {
+            if(widget->resource()->flags() & QnResource::utc) {
+                workbench()->currentLayout()->setData(Qn::LayoutSyncItemUuidRole, QVariant::fromValue<QUuid>(widget->item()->uuid()));
+                break;
+            }
+        }
+    }
+}
+
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     fitInView(false);
+
+    setStreamsSynchronized(widget(workbench()->currentLayout()->item(workbench()->currentLayout()->data(Qn::LayoutSyncItemUuidRole).value<QUuid>())));
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

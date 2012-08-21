@@ -334,6 +334,7 @@ protected slots:
 
     void at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
@@ -459,6 +460,11 @@ private:
 
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
+
+
+    
+
+
 };
 
 #endif // QN_WORKBENCH_MANAGER_H
