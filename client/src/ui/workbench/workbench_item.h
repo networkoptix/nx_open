@@ -229,8 +229,9 @@ public:
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
+     * \returns                         Whether data was successfully set.
      */
-    void setData(int role, const QVariant &value);
+    bool setData(int role, const QVariant &value);
 
 signals:
     void geometryChanged();

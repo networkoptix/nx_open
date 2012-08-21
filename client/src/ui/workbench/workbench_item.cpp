@@ -5,6 +5,8 @@
 #include "workbench_layout.h"
 #include "core/resourcemanagment/resource_pool.h"
 
+Q_DECLARE_METATYPE(QUuid); // TODO: move to global metatype initializer in core
+
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),
     m_layout(NULL),
@@ -224,4 +226,90 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
 
     /* Set geometry adjustment flag. */
     setFlag(Qn::PendingGeometryAdjustment, true);
+}
+
+QVariant QnWorkbenchItem::data(int role) const {
+    switch(role) {
+    case Qn::ResourceUidRole:
+        return m_resourceUid;
+    case Qn::ItemUuidRole:
+        return m_uuid;
+    case Qn::ItemGeometryRole:
+        return m_geometry;
+    case Qn::ItemGeometryDeltaRole:
+        return m_geometryDelta;
+    case Qn::ItemCombinedGeometryRole:
+        return combinedGeometry();
+    case Qn::ItemFlagsRole:
+        return static_cast<int>(m_flags);
+    case Qn::ItemRotationRole:
+        return m_rotation;
+    default:
+        return m_dataByRole.value(role);
+    }
+}
+
+bool QnWorkbenchItem::setData(int role, const QVariant &value) {
+    switch(role) {
+    case Qn::ResourceUidRole:
+        if(value.toString() == m_resourceUid) {
+            return true;
+        } else {
+            qnWarning("Changing resource unique id of a workbench item is not supported.");
+            return false;
+        }
+    case Qn::ItemUuidRole:
+        if(value.value<QUuid>() == m_uuid) {
+            return true;
+        } else {
+            qnWarning("Changing UUID of a workbench item is not supported.");
+            return false;
+        }
+        break;
+    case Qn::ItemGeometryRole:
+        if(value.canConvert<QRect>()) {
+            return setGeometry(value.toRect());
+        } else {
+            qnWarning("Provided geometry value '%1' is not convertible to QRect.", value);
+            return false;
+        }
+    case Qn::ItemGeometryDeltaRole:
+        if(value.canConvert<QRectF>()) {
+            return setGeometryDelta(value.toRectF());
+        } else {
+            qnWarning("Provided geometry delta value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    case Qn::ItemCombinedGeometryRole:
+        if(value.canConvert<QRectF>()) {
+            return setCombinedGeometry(value.toRectF());
+        } else {
+            qnWarning("Provided combined geometry value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    case Qn::ItemFlagsRole: {
+        bool ok;
+        int flags = value.toInt(&ok);
+        if(ok) {
+            return setFlags(static_cast<Qn::ItemFlags>(flags));
+        } else {
+            qnWarning("Provided flags value '%1' is not convertible to int.", value);
+            return false;
+        }
+    }
+    case Qn::ItemRotationRole: {
+        bool ok;
+        qreal rotation = value.toReal(&ok);
+        if(ok) {
+            setRotation(rotation);
+            return true;
+        } else {
+            qnWarning("Provided rotation value '%1' must be convertible to qreal.", value);
+            return false;
+        }
+    }
+    default:
+        m_dataByRole[role] = value;
+        return true;
+    }
 }
