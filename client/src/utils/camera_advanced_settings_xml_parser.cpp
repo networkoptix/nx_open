@@ -76,19 +76,33 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepa
     m_rootLayout(rootLayout),
     m_widgetsById(widgetsById),
     m_handler(handler),
-    m_owner(owner)
+    m_owner(owner),
+    m_emptyGroupsById()
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 {
+    removeEmptyWidgetGroups();
+}
 
+void CameraSettingsWidgetsCreator::removeEmptyWidgetGroups()
+{
+    WidgetsAndParentsById::Iterator it = m_emptyGroupsById.begin();
+    for (; it != m_emptyGroupsById.end(); ++it)
+    {
+        delete it.value();
+    }
+    m_emptyGroupsById.clear();
 }
 
 bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
+    removeEmptyWidgetGroups();
+
     m_settings = &settings;
+
     return read() && CameraSettingReader::proceed();
 }
 
@@ -106,9 +120,28 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     }
 
     //QTreeWidgetItem* tabWidget = 0;
+    /*QTreeWidgetItem* parentItem = 0;
+    if (!parentId.isEmpty()) {
+        WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
+        if (it == m_widgetsById.end())
+        {
+            parentItem = it.value();
+        }
+        else
+        {
+            //This should mean that parent is empty group
+            WidgetsAndParentsById::ConstIterator eGroupsIt = m_emptyGroupsById.find(parentId);
+            if (eGroupsIt == m_emptyGroupsById.end()) {
+                //Parent must be already created!
+                Q_ASSERT(false);
+            }
+            parentItem = eGroupsIt.value()->get();
+        } 
+    }*/
+
     QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
 
-    if (parentId.isEmpty())
+    /**if (parentId.isEmpty())
     {
         m_rootWidget.addTopLevelItem(item);
 
@@ -123,11 +156,12 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
             Q_ASSERT(false);
         }
         it.value()->addChild(item);
-    }
+    }**/
 
     //item->setObjectName(id);
     item->setData(0, Qt::UserRole, 0);
-    m_widgetsById.insert(id, item);
+    /**m_widgetsById.insert(id, item);**/
+    m_emptyGroupsById.insert(id, new WidgetAndParent(item, parentId));
 
     return true;
 }
@@ -150,12 +184,6 @@ bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QStri
 
 void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const QString& parentId)
 {
-    WidgetsById::ConstIterator parentIt = m_widgetsById.find(parentId);
-    if (parentIt == m_widgetsById.end()) {
-        //Parent must be already created!
-        Q_ASSERT(false);
-    }
-
     CameraSettings::Iterator currIt = m_settings->find(value.getId());
     if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
         //ToDo: uncomment and explore: qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
@@ -190,7 +218,67 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 
     QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(value.getName()));
     item->setData(0, Qt::UserRole, ind);
-    parentIt.value()->addChild(item);
+
+    QTreeWidgetItem* parentItem = findParentForParam(parentId);
+    parentItem->addChild(item);
+}
+
+QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString& parentId)
+{
+    WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
+    if (it != m_widgetsById.end()) {
+        return it.value();
+    }
+
+    QList<QPair<QString, WidgetAndParent*> > parentsHierarchy;
+
+    QString grandParentId = parentId;
+    while (true)
+    {
+        WidgetsAndParentsById::Iterator eGroupsIt = m_emptyGroupsById.find(grandParentId);
+        if (eGroupsIt == m_emptyGroupsById.end()) {
+            break;
+        }
+
+        parentsHierarchy.push_front(QPair<QString, WidgetAndParent*>(grandParentId, eGroupsIt.value()));
+        grandParentId = eGroupsIt.value()->getParentId();
+        m_emptyGroupsById.erase(eGroupsIt);
+    }
+
+
+    if (grandParentId.isEmpty())
+    {
+        if (parentsHierarchy.isEmpty()) {
+            //Param can't be attached directly to m_rootWidget
+            Q_ASSERT(false);
+        }
+
+        QPair<QString, WidgetAndParent*> data = parentsHierarchy.takeFirst();
+        m_rootWidget.addTopLevelItem(data.second->get());
+        it = m_widgetsById.insert(data.first, data.second->take());
+
+        delete data.second;
+    }
+    else
+    {
+        it = m_widgetsById.find(grandParentId);
+    }
+
+    if (it == m_widgetsById.end()) {
+        //Grand parent must exist!
+        Q_ASSERT(false);
+    }
+
+    while (!parentsHierarchy.isEmpty())
+    {
+        QPair<QString, WidgetAndParent*> data = parentsHierarchy.takeFirst();
+        it.value()->addChild(data.second->get());
+        it = m_widgetsById.insert(data.first, data.second->take());
+
+        delete data.second;
+    }
+
+    return it.value();
 }
 
 void CameraSettingsWidgetsCreator::cleanDataOnFail()

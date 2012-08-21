@@ -55,6 +55,28 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 {
     Q_OBJECT
 
+    class WidgetAndParent
+    {
+        QTreeWidgetItem* m_widget;
+        const QString m_parentId;
+
+
+        WidgetAndParent();
+        WidgetAndParent& operator= (const WidgetAndParent&);
+        WidgetAndParent(const WidgetAndParent&);
+
+    public:
+
+        WidgetAndParent(QTreeWidgetItem* widget, const QString& parentId): m_widget(widget), m_parentId(parentId) {}
+        ~WidgetAndParent() { delete m_widget; }
+
+        QTreeWidgetItem* get() { return m_widget; }
+        QTreeWidgetItem* take() { QTreeWidgetItem* tmp = m_widget; m_widget = 0; return tmp; }
+        QString getParentId() { return m_parentId; }
+    };
+
+    typedef QHash<QString, WidgetAndParent*> WidgetsAndParentsById;
+
 public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
@@ -80,6 +102,9 @@ private:
 
     CameraSettingsWidgetsCreator();
 
+    void removeEmptyWidgetGroups();
+    QTreeWidgetItem* findParentForParam(const QString& parentId);
+
     ParentOfRootElemFoundAware& m_obj;
     CameraSettings* m_settings;
     QTreeWidget& m_rootWidget;
@@ -87,6 +112,7 @@ private:
     WidgetsById& m_widgetsById;
     QObject* m_handler;
     QWidget* m_owner;
+    WidgetsAndParentsById m_emptyGroupsById;
 };
 
 //
