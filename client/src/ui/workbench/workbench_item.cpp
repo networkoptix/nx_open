@@ -36,6 +36,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
+
+    m_dataByRole = data.dataByRole; // TODO
 }
 
 QnWorkbenchItem::~QnWorkbenchItem() {
@@ -54,6 +56,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 
     return data;
 }
@@ -77,6 +80,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     setRotation(data.rotation);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
+    m_dataByRole = data.dataByRole; // TODO
+
     return result;
 }
 
@@ -93,6 +98,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {

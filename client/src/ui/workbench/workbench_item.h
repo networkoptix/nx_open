@@ -12,7 +12,7 @@ class QnWorkbenchLayout;
 class QnLayoutItemData;
 
 /**
- * Layout item. Video, image, folder, or anything else.
+ * Layout item. Video, image, server, or anything else.
  */
 class QnWorkbenchItem : public QObject {
     Q_OBJECT;

@@ -1196,7 +1196,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         widget->setInfoVisible(true, false);
         widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
 
-        navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
+        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
 
         time += step;
     }
