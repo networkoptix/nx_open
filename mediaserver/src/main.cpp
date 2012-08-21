@@ -785,6 +785,10 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+    /* Init common resources. */
+    Q_INIT_RESOURCE(common_common);
+    Q_INIT_RESOURCE(common_custom);
+    Q_INIT_RESOURCE(common_generated);
 
     QnVideoService service(argc, argv);
 
