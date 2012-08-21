@@ -55,19 +55,11 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 {
     Q_OBJECT
 
+public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
-    ParentOfRootElemFoundAware& m_obj;
-    CameraSettings* m_settings;
-    QTreeWidget& m_rootWidget;
-    QStackedLayout& m_rootLayout;
-    WidgetsById m_widgetsById;
-    QObject* m_handler;
-    QWidget* m_owner;
-
-public:
     CameraSettingsWidgetsCreator(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj,
-        QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
+        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner);
 
     virtual ~CameraSettingsWidgetsCreator();
 
@@ -87,6 +79,14 @@ protected slots:
 private:
 
     CameraSettingsWidgetsCreator();
+
+    ParentOfRootElemFoundAware& m_obj;
+    CameraSettings* m_settings;
+    QTreeWidget& m_rootWidget;
+    QStackedLayout& m_rootLayout;
+    WidgetsById& m_widgetsById;
+    QObject* m_handler;
+    QWidget* m_owner;
 };
 
 //
@@ -144,10 +144,13 @@ public:
 
 class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
+    typedef CameraSettingsWidgetsCreator::WidgetsById WidgetsById;
     const QString m_filepath;
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
+    WidgetsById m_widgetsById;
     QObject* m_handler;
+    QWidget* m_owner;
     CameraSettings* m_settings;
 
 protected:

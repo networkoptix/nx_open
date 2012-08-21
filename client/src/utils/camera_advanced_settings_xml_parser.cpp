@@ -68,14 +68,15 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 //
 
 CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& filepath, const QString& id, ParentOfRootElemFoundAware& obj,
-        QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
+        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner):
     CameraSettingReader(filepath, id),
     m_obj(obj),
     m_settings(0),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
+    m_widgetsById(widgetsById),
     m_handler(handler),
-    m_owner(0)
+    m_owner(owner)
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
 }
@@ -88,29 +89,15 @@ CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
     m_settings = &settings;
-
-    m_widgetsById.clear();
-    m_rootWidget.clear();
-
-    if (m_owner)
-    {
-        QObjectList children = m_owner->children();
-        for (int i = 0; i < children.count(); ++i)
-        {
-            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
-        }
-        delete m_owner;
-    }
-    m_owner = new QWidget();
-
-    //Default - show empty widget
-    m_rootLayout.addWidget(new QWidget(m_owner));
-
     return read() && CameraSettingReader::proceed();
 }
 
 bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name)
 {
+    if (m_widgetsById.find(id) != m_widgetsById.end()) {
+        return true;
+    }
+
     if (m_settings->find(id) != m_settings->end()) {
         //By default, group is enabled. It can be disabled by mediaserver
         //Disabled - means empty value. Group can have only empty value, so 
@@ -147,6 +134,11 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
 
 bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& /*parentId*/)
 {
+    if (m_widgetsById.find(id) != m_widgetsById.end()) {
+        //Widget already created - so returning false
+        return false;
+    }
+
     CameraSettings::ConstIterator it = m_settings->find(id);
     if (it == m_settings->end()) {
         //It means enabled, but have no value
@@ -334,15 +326,17 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_filepath(filepath),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
+    m_widgetsById(),
     m_handler(handler),
-    m_settings(0)
+    m_settings(0),
+    m_owner(0)
 {
 
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(m_filepath, id, *this, m_rootWidget, m_rootLayout, m_handler);
+    return new CameraSettingsWidgetsCreator(m_filepath, id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_handler, m_owner);
 }
 
 CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()
@@ -354,5 +348,23 @@ CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()
 void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 {
     m_settings = settings;
+
+    m_widgetsById.clear();
+    m_rootWidget.clear();
+
+    if (m_owner)
+    {
+        QObjectList children = m_owner->children();
+        for (int i = 0; i < children.count(); ++i)
+        {
+            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
+        }
+        delete m_owner;
+    }
+    m_owner = new QWidget();
+
+    //Default - show empty widget
+    m_rootLayout.addWidget(new QWidget(m_owner));
+
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }
