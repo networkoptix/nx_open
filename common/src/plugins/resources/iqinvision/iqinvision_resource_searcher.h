@@ -20,7 +20,10 @@ public:
     virtual QnResourcePtr checkHostAddr(QHostAddress addr);
 
 protected:
-    virtual QnNetworkResourcePtr processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) override;
+    virtual QnResourceList findResources() override;
+private:
+    void  processNativePacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress);
 };
 
 #endif //iq_device_server_h_1825

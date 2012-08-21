@@ -29,13 +29,15 @@ QnResourceList QnMdnsResourceSearcher::findResources()
         QString localAddress = data[i].localAddress;
         QString removeAddress = data[i].removeAddress;
 
-        QnNetworkResourcePtr nresource = processPacket(result, data[i].response, QHostAddress(localAddress));
-        if (nresource) 
+        QList<QnNetworkResourcePtr> nresourceLst = processPacket(result, data[i].response, QHostAddress(localAddress));
+
+        foreach(QnNetworkResourcePtr nresource, nresourceLst)
         {
             nresource->setHostAddress(QHostAddress(removeAddress), QnDomainMemory);
             nresource->setDiscoveryAddr(QHostAddress(localAddress));
             result.push_back(nresource);
         }
+
     }
 
     return result;
