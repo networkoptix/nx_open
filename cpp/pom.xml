@@ -73,7 +73,7 @@
 				<executions>
 					<execution>
 						<id>auto-clean</id>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
