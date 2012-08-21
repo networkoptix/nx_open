@@ -7,6 +7,7 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/synctime.h>
 
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
@@ -33,8 +34,9 @@ namespace {
 
 
 QnCalendarWidget::QnCalendarWidget():
-    QCalendarWidget(),
-    m_tableView(0)
+    m_tableView(0),
+    m_empty(true),
+    m_currentTime(0)
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
@@ -47,12 +49,14 @@ QnCalendarWidget::QnCalendarWidget():
     yearEdit->installEventFilter(contextMenuEater);
 
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
-    setVerticalHeaderFormat(QnCalendarWidget::NoVerticalHeader);
+    setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
     m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     Q_ASSERT(m_tableView);
     m_tableView->horizontalHeader()->setMinimumSectionSize(18);
     QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
+
+    m_tableView->viewport()->installEventFilter(this);
 
     QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     navBarBackground->setBackgroundRole(QPalette::Window);
@@ -60,23 +64,14 @@ QnCalendarWidget::QnCalendarWidget():
 
 void QnCalendarWidget::setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods)
 {
-    bool oldEmpty = isEmpty();
     m_currentTimeStorage.setPeriods(type, periods);
-    bool newEmpty = isEmpty();
-    if (newEmpty != oldEmpty)
-        emit emptyChanged();
-
+    updateEmpty();
     update();
 }
 
 void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods) {
-    // TODO: #GDM Copypasta. Move to separate function (updateEmpty()) and add m_empty field.
-    bool oldEmpty = isEmpty();
     m_syncedTimeStorage.setPeriods(type, periods);
-    bool newEmpty = isEmpty();
-    if (newEmpty != oldEmpty)
-        emit emptyChanged();
-
+    updateEmpty();
     update();
 }
 
@@ -96,17 +91,24 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
 }
 
 bool QnCalendarWidget::isEmpty() {
-    for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
-        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
-                ||
-            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
-            return false;
-    return true;
+    return m_empty;
+}
+
+bool QnCalendarWidget::eventFilter(QObject *watched, QEvent *event){
+    if (event->type() == QEvent::Paint && watched == m_tableView->viewport())
+        m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    return base_type::eventFilter(watched, event);
 }
 
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
     QDateTime dt(date);
-    QnTimePeriod current(dt.toMSecsSinceEpoch(), DAY);
+
+    qint64 dtMSecs = dt.toMSecsSinceEpoch();
+    QnTimePeriod current;
+    if (dtMSecs < m_currentTime){
+        current.startTimeMs = dtMSecs;
+        current.durationMs = DAY;
+    }
 
     QnScopedPainterBrushRollback brushRollback(painter);
     Q_UNUSED(brushRollback);
@@ -175,4 +177,21 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         painter->setFont(font);
         painter->drawText(rect, Qt::AlignCenter, text);
     }
+}
+
+void QnCalendarWidget::updateEmpty(){
+    bool value = true;
+    for(int type = 0; type < Qn::TimePeriodRoleCount; type++)
+        if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty()
+                ||
+            !m_syncedTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty())
+        {
+            value = false;
+            break;
+        }
+    if (m_empty == value)
+        return;
+
+    m_empty = value;
+    emit emptyChanged();
 }

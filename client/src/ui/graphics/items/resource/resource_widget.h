@@ -193,6 +193,8 @@ public:
      */
     QString titleText() const;
 
+    // TODO: write sane comments for these functions.
+
     /**
      * \param titleText                 New title text for this window.
      */
@@ -210,7 +212,7 @@ public:
      *                                  and these parts will be aligned to the sides of the footer.
      */
     void setInfoText(const QString &infoText);
-
+    
     bool isDecorationsVisible() const;
     Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
 
@@ -290,6 +292,9 @@ protected:
     void ensureAboutToBeDestroyedEmitted();
 
 private:
+    void setTitleTextInternal(const QString &titleText);
+    void setInfoTextInternal(const QString &infoText);
+
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
@@ -342,6 +347,8 @@ private:
 
     /** Frame width. */
     qreal m_frameWidth;
+
+    QString m_titleText, m_infoText;
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;

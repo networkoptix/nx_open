@@ -152,7 +152,7 @@ QRectF QnWorkbenchItem::combinedGeometry() const {
 }
 
 bool QnWorkbenchItem::setFlag(Qn::ItemFlag flag, bool value) {
-    if(checkFlag(flag) == value)
+    if(hasFlag(flag) == value)
         return true;
 
     if(m_layout != NULL) {
@@ -182,7 +182,7 @@ bool QnWorkbenchItem::setFlags(Qn::ItemFlags flags) {
 }
 
 void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
-    if(checkFlag(flag) == value)
+    if(hasFlag(flag) == value)
         return;
 
     if(flag == Qn::Pinned && value)

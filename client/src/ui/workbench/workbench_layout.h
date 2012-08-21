@@ -334,8 +334,6 @@ private:
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;
-
-    /**  */
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);

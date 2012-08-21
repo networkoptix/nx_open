@@ -344,6 +344,10 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
+    setReadOnly(ui->resetMotionRegionsButton, readOnly);
+    setReadOnly(ui->sensitivitySlider, readOnly);
+    setReadOnly(ui->softwareMotionButton, readOnly);
+    setReadOnly(ui->cameraMotionButton, readOnly);
     if(m_motionWidget)
         setReadOnly(m_motionWidget, readOnly);
     m_readOnly = readOnly;
@@ -496,6 +500,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
 
+    if(!m_camera)
+        return; // TODO: investigate why we get here with null camera
+
     m_inUpdateMaxFps = true;
     if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
         || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
@@ -541,6 +548,7 @@ void QnSingleCameraSettingsWidget::at_tabWidget_currentChanged() {
     
     using ::setReadOnly;
     setReadOnly(m_motionWidget, m_readOnly);
+    //m_motionWidget->setReadOnly(m_readOnly);
     
     m_motionLayout->addWidget(m_motionWidget);
 

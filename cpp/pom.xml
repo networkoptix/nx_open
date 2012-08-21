@@ -20,7 +20,7 @@
 		<ffmpeg.version>git-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
-        <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
+		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
@@ -42,7 +42,7 @@
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>
 	</dependencies>		
-	
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -68,10 +68,95 @@
 			</plugin>
 
 			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<filesets>
+								<fileset>
+									<directory>${project.build.directory}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<excludes>
+										<exclude>**/*.user</exclude>
+									</excludes>
+								</fileset>
+								<fileset>
+									<directory>${project.build.sourceDirectory}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<includes>
+										<include>**/version.h</include>
+										<include>**/filetypes.h</include>
+										<include>**/compatibility.cpp</include>
+									</includes>
+								</fileset>								
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>prepare-qt-project</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+							<resources>          
+								<resource>
+									<targetPath>${project.build.directory}</targetPath>
+									<directory>${basedir}/../cpp/shared-resources</directory>
+									<filtering>true</filtering>
+									<excludes>
+										<exclude>icons/**</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<targetPath>${project.build.directory}</targetPath>
+									<directory>${basedir}/../cpp/shared-resources/icons/${custom.skin}</directory>
+									<filtering>false</filtering>
+								</resource>												
+							</resources>              
+							<encoding>UTF-8</encoding>
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>			
+
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.1.1</version>
 				<executions>
+					<execution>
+						<id>gen-qrc</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<arguments>
+								<argument>gen-resources.py</argument>
+							</arguments>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
 					<execution>
 						<id>additional-build-steps</id>
 						<phase>process-sources</phase>
@@ -102,10 +187,10 @@
 							<failOnError>false</failOnError>
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
-								
+
 								<!-- This ugly hack prevents creating symlinks instead of text files (this is known unzip issue).
 								First everything except *.h is unpacked then *.h only -->
-								
+
 								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
 									<arg line="-a -u *.zip -x **/include/** *.a"/>
 								</exec>
@@ -115,7 +200,7 @@
 								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
 									<arg line="-a -u *.zip *.a"/>
 								</exec>                             
-								
+
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
 								</concat>	
@@ -188,7 +273,7 @@
 									<map from="" to="HEADERS += "/>
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${libs_headers}</echo>		-->						
-								
+
 								<fileset id="sources_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
@@ -207,7 +292,7 @@
 								<pathconvert pathsep="${line.separator}" property="add_sources" refid="add_sources_path">
 									<map from="" to="SOURCES += "/>
 								</pathconvert>
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo> -->
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${add_sources}</echo>
 
 								<fileset id="qrc_path" dir="${project.build.directory}" erroronmissingdir="false">
 									<include name="**/*.qrc" />
@@ -215,9 +300,9 @@
 								<pathconvert pathsep="${line.separator}" property="qrc" refid="qrc_path">
 									<map from="" to="RESOURCES += "/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${qrc}</echo> 
 
-								<!-- <fileset id="lang_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
+								<fileset id="lang_path" dir="${basedir}/resource" erroronmissingdir="false">
 									<include name="**/*.ts" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="lang" refid="lang_path">
@@ -271,8 +356,18 @@
 					<family>Windows</family>
 				</os>
 			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.ffmpeg</groupId>
+					<artifactId>ffmpeg-misc-headers-win32</artifactId>
+					<version>dev</version>
+					<type>zip</type>
+					<classifier>${platform}</classifier>	
+				</dependency>		
+			</dependencies>			
 			<properties>
-                <compiler>msvc2008</compiler>
+				<qtlib9>multimedia</qtlib9>
+				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -340,7 +435,84 @@
 								</configuration>								
 							</execution>
 						</executions>
-					</plugin>						
+					</plugin>
+
+					<!--<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.4</version>
+						<executions>
+							<execution>
+								<id>unpack-platform-libs</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>unpack-dependencies</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin> -->
+					<plugin>
+						<groupId>com.goldin.plugins</groupId>
+						<artifactId>maven-copy-plugin</artifactId>
+						<version>0.2.3.8-beta-9</version>
+						<executions>
+							<execution>
+								<id>copy-qt-libraries</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<runIf>{{ buildLib != "staticlib" }}</runIf>
+									<failIfNotFound>false</failIfNotFound>
+									<resources>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/bin/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>**/qt${qtlib1}4.*</include>
+												<include>**/qt${qtlib2}4.*</include>
+												<include>**/qt${qtlib3}4.*</include>
+												<include>**/qt${qtlib4}4.*</include>
+												<include>**/qt${qtlib5}4.*</include>
+												<include>**/qt${qtlib6}4.*</include>
+												<include>**/qt${qtlib7}4.*</include>
+												<include>**/qt${qtlib8}4.*</include>
+												<include>**/qt${qtlib9}4.*</include>
+												<include>**/qt${qtlib1}d4.*</include>
+												<include>**/qt${qtlib2}d4.*</include>
+												<include>**/qt${qtlib3}d4.*</include>
+												<include>**/qt${qtlib4}d4.*</include>
+												<include>**/qt${qtlib5}d4.*</include>
+												<include>**/qt${qtlib6}d4.*</include>
+												<include>**/qt${qtlib7}d4.*</include>
+												<include>**/qt${qtlib8}d4.*</include>
+												<include>**/qt${qtlib9}d4.*</include>												
+											</includes>
+											<excludes>
+												<exclude>**/*.lib</exclude>
+											</excludes>
+										</resource>
+										<resource>
+											<targetPath>${project.build.directory}/bin</targetPath>
+											<directory>${environment.dir}/qt/plugins/${arch}</directory>
+											<preservePath>true</preservePath>
+											<includes>
+												<include>*/${qtplugin1}/**</include>
+												<include>*/${qtplugin2}/**</include>
+												<include>*/${qtplugin3}/**</include>
+											</includes>										
+										</resource>	
+									</resources>								
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>					
+
 					<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.2</version>
@@ -373,7 +545,7 @@
 				</os>		
 			</activation>
 			<properties>
-                <compiler>gcc</compiler>
+				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<build>	
@@ -467,151 +639,5 @@
 				</plugins>	
 			</build>			
 		</profile>	
-
-		<profile>
-			<id>convert-clean-windows</id>
-			<activation>
-				<os>
-					<family>Windows</family>
-				</os>
-			</activation>	
-			<properties>
-				<qtlib9>multimedia</qtlib9>
-			</properties>				
-			<dependencies>
-				<dependency>
-					<groupId>org.ffmpeg</groupId>
-					<artifactId>ffmpeg-misc-headers-win32</artifactId>
-					<version>dev</version>
-					<type>zip</type>
-					<classifier>${platform}</classifier>	
-				</dependency>		
-			</dependencies>				
-			<build>
-				<plugins>
-					<!--<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-platform-libs</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>unpack-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin> -->
-					<plugin>
-						<groupId>com.goldin.plugins</groupId>
-						<artifactId>maven-copy-plugin</artifactId>
-						<version>0.2.3.8-beta-9</version>
-						<executions>
-							<execution>
-								<id>copy-qt-libraries</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<runIf>{{ buildLib != "staticlib" }}</runIf>
-									<failIfNotFound>false</failIfNotFound>
-									<resources>
-										<resource>
-											<targetPath>${project.build.directory}/bin</targetPath>
-											<directory>${environment.dir}/qt/bin/${arch}</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>**/qt${qtlib1}4.*</include>
-												<include>**/qt${qtlib2}4.*</include>
-												<include>**/qt${qtlib3}4.*</include>
-												<include>**/qt${qtlib4}4.*</include>
-												<include>**/qt${qtlib5}4.*</include>
-												<include>**/qt${qtlib6}4.*</include>
-												<include>**/qt${qtlib7}4.*</include>
-												<include>**/qt${qtlib8}4.*</include>
-												<include>**/qt${qtlib9}4.*</include>
-												<include>**/qt${qtlib1}d4.*</include>
-												<include>**/qt${qtlib2}d4.*</include>
-												<include>**/qt${qtlib3}d4.*</include>
-												<include>**/qt${qtlib4}d4.*</include>
-												<include>**/qt${qtlib5}d4.*</include>
-												<include>**/qt${qtlib6}d4.*</include>
-												<include>**/qt${qtlib7}d4.*</include>
-												<include>**/qt${qtlib8}d4.*</include>
-												<include>**/qt${qtlib9}d4.*</include>												
-											</includes>
-											<excludes>
-												<exclude>**/*.lib</exclude>
-											</excludes>
-										</resource>
-										<resource>
-											<targetPath>${project.build.directory}/bin</targetPath>
-											<directory>${environment.dir}/qt/plugins/${arch}</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>*/${qtplugin1}/**</include>
-												<include>*/${qtplugin2}/**</include>
-												<include>*/${qtplugin3}/**</include>
-											</includes>										
-										</resource>	
-									</resources>								
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
-				</plugins>
-			</build>
-		</profile> 
-
-		<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file> 
-			</activation>			
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>2.5</version>
-						<executions>
-							<execution>
-								<id>prepare-qt-project</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-									<resources>          
-										<resource>
-											<targetPath>${project.build.directory}</targetPath>
-											<directory>${basedir}/../cpp/shared-resources</directory>
-											<filtering>true</filtering>
-											<excludes>
-												<exclude>icons/**</exclude>
-											</excludes>
-										</resource>
-										<resource>
-											<targetPath>${project.build.directory}</targetPath>
-											<directory>${basedir}/../cpp/shared-resources/icons/${custom.skin}</directory>
-											<filtering>false</filtering>
-										</resource>												
-									</resources>              
-									<encoding>UTF-8</encoding>
-								</configuration>            
-							</execution>
-						</executions>
-					</plugin>			
-				</plugins>
-			</build>
-		</profile>
 	</profiles>	
 </project>

@@ -657,7 +657,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     dropInstrument->setSurface(m_titleBackgroundItem);
 
     /* Set up help context processing. */
-    m_motionDisplayWatcher = context()->watcher<QnWorkbenchMotionDisplayWatcher>();
+    m_motionDisplayWatcher = context()->instance<QnWorkbenchMotionDisplayWatcher>();
     connect(display()->focusListenerInstrument(), SIGNAL(focusItemChanged()),                                                       this,                           SLOT(updateHelpContext()));
     connect(m_treeWidget,               SIGNAL(currentTabChanged()),                                                                this,                           SLOT(updateHelpContext()));
     connect(m_motionDisplayWatcher,     SIGNAL(motionGridShown()),                                                                  this,                           SLOT(updateHelpContext()));
