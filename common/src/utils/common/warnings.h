@@ -92,6 +92,10 @@ namespace detail {
             return debug_operator_lshift(s, arg);
         }
 
+        inline QString operator<<(const QString &s, const QVariant &arg) {
+            return debug_operator_lshift(s, arg);
+        }
+
         inline void invokeInternal(const WarningHandler &handler, const char *functionName, const QString &s) {
             handler(functionName, s);
         }

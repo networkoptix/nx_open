@@ -11,6 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/settings.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
@@ -39,34 +40,34 @@ namespace {
         return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
     }
 
-    void glDrawTexturedRect(const QRectF &rect) {
+    void glDrawTexturedRect(const QRectF &rect, bool flipped) {
         /* For reasons unknown, default code path produces upside-down quads on X11,
          * so we work this around by supplying mirrored texture coordinates. */
         glBegin(GL_QUADS);
-#ifdef Q_WS_X11
-        glTexCoord(0.0, 0.0);
-        glVertex(rect.topLeft());
-        glTexCoord(1.0, 0.0);
-        glVertex(rect.topRight());
-        glTexCoord(1.0, 1.0);
-        glVertex(rect.bottomRight());
-        glTexCoord(0.0, 1.0);
-        glVertex(rect.bottomLeft());
-#else
-        glTexCoord(0.0, 1.0);
-        glVertex(rect.topLeft());
-        glTexCoord(1.0, 1.0);
-        glVertex(rect.topRight());
-        glTexCoord(1.0, 0.0);
-        glVertex(rect.bottomRight());
-        glTexCoord(0.0, 0.0);
-        glVertex(rect.bottomLeft());
-#endif //Q_WS_X11
+        if (flipped){
+            glTexCoord(0.0, 0.0);
+            glVertex(rect.topLeft());
+            glTexCoord(1.0, 0.0);
+            glVertex(rect.topRight());
+            glTexCoord(1.0, 1.0);
+            glVertex(rect.bottomRight());
+            glTexCoord(0.0, 1.0);
+            glVertex(rect.bottomLeft());
+        } else {
+            glTexCoord(0.0, 1.0);
+            glVertex(rect.topLeft());
+            glTexCoord(1.0, 1.0);
+            glVertex(rect.topRight());
+            glTexCoord(1.0, 0.0);
+            glVertex(rect.bottomRight());
+            glTexCoord(0.0, 0.0);
+            glVertex(rect.bottomLeft());
+        }
         glEnd();
     }
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
-    Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage);
+    Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage)
 
 } // anonymous namespace
 
@@ -112,6 +113,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
 
     QEvent styleChange(QEvent::StyleChange);
     event(&styleChange);
+
+    m_flipped = QnSettings::instance()->isIconsFlipped();
 }
 
 QnImageButtonWidget::~QnImageButtonWidget() {
@@ -266,7 +269,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
             widget->bindTexture(pixmap(startState));
         }
 
-        glDrawTexturedRect(rect);
+        glDrawTexturedRect(rect, m_flipped);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
         widget->bindTexture(pixmap(endState));
@@ -277,7 +280,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         m_shader->setTexture0(0);
         m_shader->setTexture1(1);
 
-        glDrawTexturedRect(rect);
+        glDrawTexturedRect(rect, m_flipped);
 
         m_shader->release();
     }

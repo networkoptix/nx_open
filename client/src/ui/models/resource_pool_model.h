@@ -1,13 +1,14 @@
 #ifndef QN_RESOURCE_POOL_MODEL_H
 #define QN_RESOURCE_POOL_MODEL_H
 
-#include <QAbstractItemModel>
-#include <QScopedPointer>
-#include <QUuid>
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QUuid>
+
 #include <utils/common/qnid.h>
+#include <core/resource/resource_fwd.h>
+
 #include <ui/workbench/workbench_context_aware.h>
-#include "item_data_role.h"
 
 class QnResourceModelPrivate;
 class QnResourcePool;
@@ -17,7 +18,6 @@ class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
     Q_OBJECT;
-    Q_ENUMS(ItemDataRole);
 
 public:
     explicit QnResourcePoolModel(QObject *parent = 0);
