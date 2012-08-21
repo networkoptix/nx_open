@@ -95,7 +95,7 @@
 									<includes>
 										<include>**/version.h</include>
 										<include>**/filetypes.h</include>
-										<include>**/compatibility.cpp</include>
+										<include>**/compatibility_info.cpp</include>
 									</includes>
 								</fileset>								
 							</filesets>
