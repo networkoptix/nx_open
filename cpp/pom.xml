@@ -143,6 +143,7 @@
 							<executable>python</executable>
 							<arguments>
 								<argument>gen-resources.py</argument>
+								<argument>build-prepare.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>		
 						</configuration>
