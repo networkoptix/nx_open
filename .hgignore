@@ -16,6 +16,7 @@ syntax: glob
 *.vcxproj.filters
 *.xcodeproj
 *.qm
+compatibility_info.cpp
 
 .DS_Store
 .idea
