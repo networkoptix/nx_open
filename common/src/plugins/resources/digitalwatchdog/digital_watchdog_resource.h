@@ -16,7 +16,8 @@ public:
 protected:
     bool initInternal() override;
 private:
-    bool isDualStreamingEnabled();
+    bool isDualStreamingEnabled(bool& unauth);
+    void enableOnvifSecondStream();
 };
 
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
