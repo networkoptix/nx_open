@@ -223,6 +223,19 @@ public:
      */
     QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric = NULL) const;
 
+    /**
+     * \param role                      Role to get data for.
+     * \returns                         Data for the given role.
+     */
+    QVariant data(int role) const;
+
+    /**
+     * \param role                      Role to set data for.
+     * \param value                     New value for the given data role.
+     * \returns                         Whether the data was successfully set.
+     */
+    bool setData(int role, const QVariant &value);
+
 public slots:
     /**
      * Adds the given item to this layout. This layout takes ownership of the
@@ -295,6 +308,13 @@ signals:
      */
     void cellSpacingChanged();
 
+    /**
+     * This signal is emitted whenever data associated with the provided role is changed.
+     * 
+     * \param role                      Role of the changed data.
+     */
+    void dataChanged(int role);
+
 private:
     template<bool returnEarly>
     bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
@@ -334,6 +354,9 @@ private:
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;
+
+    /** User data by role. */
+    QHash<int, QVariant> m_dataByRole;
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);

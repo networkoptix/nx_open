@@ -12,7 +12,7 @@ class QnWorkbenchLayout;
 class QnLayoutItemData;
 
 /**
- * Layout item. Video, image, folder, or anything else.
+ * Layout item. Video, image, server, or anything else.
  */
 class QnWorkbenchItem : public QObject {
     Q_OBJECT;
@@ -229,7 +229,7 @@ public:
     /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
-     * \returns                         Whether data was successfully set.
+     * \returns                         Whether the data was successfully set.
      */
     bool setData(int role, const QVariant &value);
 
@@ -238,6 +238,7 @@ signals:
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void rotationChanged();
+    void dataChanged(int role);
 
 protected:
     void setGeometryInternal(const QRect &geometry);

@@ -89,7 +89,7 @@ protected slots:
     void at_layout_cellSpacingChanged();
     void at_layout_aboutToBeDestroyed();
 
-    void at_item_changed();
+    void at_item_dataChanged(int role);
     void at_item_flagChanged(Qn::ItemFlag flag, bool value);
 
 private:
@@ -113,7 +113,7 @@ private:
     bool m_autoDeleting;
 
     /** Whether queued submit is in progress. */
-    bool m_submitting;
+    bool m_submitPending;
 
     /** Queue of item UUIDs that are to be submitted in deferred mode. 
      *

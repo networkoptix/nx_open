@@ -1158,7 +1158,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
     layout->setParentId(context()->user()->getId());
-    layout->setTimeBounds(period);
+    //layout->setTimeBounds(period);
 
     QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
@@ -1196,7 +1196,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         widget->setInfoVisible(true, false);
         widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
 
-        navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
+        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
 
         time += step;
     }
