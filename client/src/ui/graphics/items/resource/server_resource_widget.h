@@ -41,6 +41,7 @@ protected:
 
 private slots:
     void at_timer_timeout();
+    void at_statistics_received();
 
 private:
     /** Main painting function. */
@@ -62,11 +63,12 @@ private:
     /** Timestamp of the last received response in msecs since epoch */
     qint64 m_lastTimeStamp;
 
+    int m_statisticsId;
+
+    int m_counter;
+
     /** Status of the frame history. */
     Qn::RenderStatus m_renderStatus;
-
-    /** Status of the update request. */
-    bool m_alreadyUpdating;
 
     /** Elapsed timer for smooth scroll. */
     QElapsedTimer m_elapsedTimer;

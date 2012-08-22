@@ -167,12 +167,14 @@ namespace {
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
     m_lastHistoryId(-1),
-    m_renderStatus(Qn::NothingRendered),
-    m_alreadyUpdating(false)
+    m_counter(0),
+    m_renderStatus(Qn::NothingRendered)
 {
     m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
+
+    m_statisticsId = videoServerStatisticsManager()->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     QTimer *timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
@@ -183,6 +185,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
+    videoServerStatisticsManager()->unRegisterServerWidget(m_resource, m_statisticsId, this);
     ensureAboutToBeDestroyedEmitted();
 }
 
@@ -245,6 +248,8 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
             (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
+    qDebug() << "elapsed step" << elapsed_step;
+
     /** Draw grid */
     {
         QPen grid;
@@ -252,7 +257,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         grid.setWidthF(pen_width);
 
         QPainterPath grid_path;
-        for (qreal i = offset - (x_step * (elapsed_step + m_lastHistoryId%4 - 4)); i < ow + offset; i += x_step*4){
+        for (qreal i = offset - (x_step * (elapsed_step + m_counter%4 - 4)); i < ow + offset; i += x_step*4){
             grid_path.moveTo(i, offset);
             grid_path.lineTo(i, oh + offset);
         }
@@ -406,7 +411,11 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_timer_timeout() {
-    m_elapsedTimer.restart();
+    videoServerStatisticsManager()->notifyTimer(m_resource, m_statisticsId);
+}
+
+void QnServerResourceWidget::at_statistics_received(){
+    qDebug() << "widget" << m_statisticsId << "received statistics";
 
     QnStatisticsHistory *history_update = new QnStatisticsHistory();
     qint64 id = videoServerStatisticsManager()->getHistory(m_resource, m_lastHistoryId, history_update);
@@ -439,8 +448,10 @@ void QnServerResourceWidget::at_timer_timeout() {
 
     m_lastHistoryId = id;
     m_renderStatus = Qn::NewFrameRendered;
-}
 
+    m_elapsedTimer.restart();
+    m_counter++;
+}
 
 void QnServerResourceWidget::updateValues(QString key, QnStatisticsData *newValues, qint64 newId){
     QnStatisticsData *oldValues;
