@@ -77,12 +77,14 @@ public:
 	void write_byte_align_bits(BitStreamWriter& writer);
 
     int calc_rbsp_trailing_bits_cnt(uint8_t val);
+
 protected:
 	//GetBitContext getBitContext;
 	BitStreamReader bitReader;
 	inline int extractUEGolombCode();
 	inline int extractSEGolombCode();
 	void updateBits(int bitOffset, int bitLen, int value);
+    void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
 };
 
 class NALDelimiter: public NALUnit {
@@ -127,8 +129,9 @@ public:
 	int slice_group_change_rate;
 	int num_slice_groups_minus1;
 	int slice_group_map_type;
+    int second_chroma_qp_index_offset;
 
-    PPSUnit(): NALUnit(), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0), m_ready(false) {}
+    PPSUnit(): NALUnit(), transform_8x8_mode_flag(0), pic_scaling_matrix_present_flag(0), second_chroma_qp_index_offset(0), m_ready(false) {}
 	virtual ~PPSUnit() {}
 	bool isReady() {return m_ready;}
 	int deserialize();
@@ -290,7 +293,6 @@ private:
 	void deserializeVuiParameters();
 	int getCropY();
 	int getCropX();
-	void scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag);
 	void serializeHDRParameters(BitStreamWriter& writer);
 };
 

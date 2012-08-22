@@ -275,6 +275,22 @@ int NALUnit::serialize(quint8* dstBuffer)
 	return 4;
 }
 
+void NALUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag)
+{
+    int lastScale = 8;
+    int nextScale = 8;
+    for(int j = 0; j < sizeOfScalingList; j++ )
+    {
+        if( nextScale != 0 ) {
+            int delta_scale = extractSEGolombCode();
+            nextScale = ( lastScale + delta_scale + 256 ) % 256;
+            useDefaultScalingMatrixFlag = ( j  ==  0 && nextScale  ==  0 );
+        }
+        scalingList[j] = ( nextScale  ==  0 ) ? lastScale : nextScale;
+        lastScale = scalingList[ j ];
+    }
+}
+
 
 int ceil_log2(double val)
 {
@@ -401,7 +417,30 @@ int PPSUnit::deserialize()
         {
             transform_8x8_mode_flag = bitReader.getBit();
             pic_scaling_matrix_present_flag = bitReader.getBit();
+
+            if( pic_scaling_matrix_present_flag )
+                for( int i = 0; i < 6 + 2* transform_8x8_mode_flag; ++i )
+                {
+                    int pic_scaling_list_present_flag_i = bitReader.getBit();
+                    if( pic_scaling_list_present_flag_i )
+                    {
+                        if( i < 6 )
+                        {
+                            int scalingList4x4_i[16];
+                            bool useDefaultScalingMatrix4x4Flag_i;
+                            scaling_list( scalingList4x4_i, 16, useDefaultScalingMatrix4x4Flag_i );
+                        }
+                        else
+                        {
+                            int scalingList8x8_i[64];
+                            bool useDefaultScalingMatrix8x8Flag_i;
+                            scaling_list( scalingList8x8_i, 64, useDefaultScalingMatrix8x8Flag_i );
+                        }
+                    }
+                }
+            second_chroma_qp_index_offset = extractSEGolombCode();
         }
+
 		m_ready = true;
 		return 0;
 	} catch (BitStreamException) {
@@ -441,22 +480,6 @@ void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
 		bitWriter.putBits(8 - bitWriter.getBitsCount() % 8, 0);
 	m_nalBufferLen = bitWriter.getBitsCount() / 8 + 1;
 	assert(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
-}
-
-void SPSUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag) 
-{
-	int lastScale = 8;
-	int nextScale = 8;
-	for(int j = 0; j < sizeOfScalingList; j++ ) 
-	{
-		if( nextScale != 0 ) {
-			int delta_scale = extractSEGolombCode();
-			nextScale = ( lastScale + delta_scale + 256 ) % 256;
-			useDefaultScalingMatrixFlag = ( j  ==  0 && nextScale  ==  0 );
-		}
-		scalingList[j] = ( nextScale  ==  0 ) ? lastScale : nextScale;
-		lastScale = scalingList[ j ];
-	}
 }
 
 
@@ -1032,7 +1055,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
 		m_frameNumBits = sps->log2_max_frame_num;
 		frame_num = bitReader.getBits( m_frameNumBits);
 		bottom_field_flag = 0;
-		m_field_pic_flag = 0;
+        m_field_pic_flag = 0;
 		if( sps->frame_mbs_only_flag == 0) {
 			m_field_pic_flag = bitReader.getBits( 1);
 			if( m_field_pic_flag )
