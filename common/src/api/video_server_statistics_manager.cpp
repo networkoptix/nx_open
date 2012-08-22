@@ -1,5 +1,7 @@
 #include "video_server_statistics_manager.h"
 
+#include <QtCore/QTimer>
+
 #include <api/api_fwd.h>
 
 #include <api/video_server_statistics_data.h>
@@ -8,45 +10,42 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/video_server_resource.h>
 
+/** Data update period. For the best result should be equal to server's */
+#define REQUEST_TIME 2000
+
 QnVideoServerStatisticsManager::QnVideoServerStatisticsManager(QObject *parent):
     QObject(parent)
-{}
+{
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
+    timer->start(REQUEST_TIME);
+}
+
+void QnVideoServerStatisticsManager::registerServerWidget(QnVideoServerResourcePtr resource, QObject *target, const char *slot){
+    QString id = resource->getUniqueId();
+    if (!m_statistics.contains(id))
+        m_statistics[id] = new QnStatisticsStorage(this, resource->apiConnection());
+    m_statistics[id]->registerServerWidget(target, slot);
+}
+
+void QnVideoServerStatisticsManager::unRegisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
+    QString id = resource->getUniqueId();
+    if (!m_statistics.contains(id))
+        return;
+    m_statistics[id]->unRegisterServerWidget(target);
+}
 
 qint64 QnVideoServerStatisticsManager::getHistory(QnVideoServerResourcePtr resource, qint64 lastId, QnStatisticsHistory *history){
-    qDebug() << "history seek";
-    QString id = resource->getUniqueId();
-
-    if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(this);
-
-    QnStatisticsStorage *storage = m_statistics[id];
-    return storage->getHistory(lastId, history);
-}
-
-int QnVideoServerStatisticsManager::registerServerWidget(QnVideoServerResourcePtr resource, QObject *target, const char *slot){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(this);
-
-    QnStatisticsStorage *storage = m_statistics[id];
-    return storage->registerServerWidget(target, slot);
+        return -1;
+    return m_statistics[id]->getHistory(lastId, history);
 }
 
-void QnVideoServerStatisticsManager::unRegisterServerWidget(QnVideoServerResourcePtr resource, int widgetId, QObject *target){
-    QString id = resource->getUniqueId();
-    if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(this);
-
-    QnStatisticsStorage *storage = m_statistics[id];
-    storage->unRegisterServerWidget(widgetId, target);
+void QnVideoServerStatisticsManager::at_timer_timeout(){
+    QHashIterator<QString, QnStatisticsStorage *> iter(m_statistics);
+    while (iter.hasNext()){
+        iter.next();
+        iter.value()->update();
+    }
 }
-
-void QnVideoServerStatisticsManager::notifyTimer(QnVideoServerResourcePtr resource, int widgetId){
-    QString id = resource->getUniqueId();
-    if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(this);
-    QnStatisticsStorage *storage = m_statistics[id];
-    storage->notifyTimer(resource->apiConnection(), widgetId);
-}
-
-

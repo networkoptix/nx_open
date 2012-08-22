@@ -10,19 +10,27 @@
 
 #define STORAGE_LIMIT 60
 
-QnStatisticsStorage::QnStatisticsStorage(QObject *parent):
+QnStatisticsStorage::QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
     m_timeStamp(0),
-    m_activeWidget(-1),
-    m_lastWidget(-1)
+    m_listeners(0),
+    m_apiConnection(apiConnection)
 {
 }
 
-qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *history){
-    qDebug() << "requested history from" << lastId << "to" << m_lastId;
+void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot){
+    connect(this, SIGNAL(at_statistics_processed()), target, slot);
+    m_listeners++;
+}
 
+void QnStatisticsStorage::unRegisterServerWidget(QObject *target){
+    disconnect(this, 0, target, 0);
+    m_listeners--;
+}
+
+qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *history){
     if (m_history.isEmpty())
         return -1;
 
@@ -44,14 +52,17 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
     return m_lastId;
 }
 
-void QnStatisticsStorage::update(QnVideoServerConnectionPtr apiConnection){
-    qDebug() << "trying to update";
-    apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
+void QnStatisticsStorage::update(){
+    if (m_alreadyUpdating)
+        return;
+    if (!m_listeners)
+        return;
+
+    m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
     m_alreadyUpdating = true;
 }
 
 void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data){
-    qDebug() << "statistics received";
     int cpuCounter = 0;
     int hddCounter = 0;
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
@@ -78,35 +89,4 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
     emit at_statistics_processed();
 }
 
-int QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot){
-    connect(this, SIGNAL(at_statistics_processed()), target, slot);
 
-    m_lastWidget++;
-
-    qDebug() << "widget" << m_lastWidget << "registered";
-    return m_lastWidget;
-}
-
-void QnStatisticsStorage::unRegisterServerWidget(int widgetId, QObject *target){
-    qDebug() << "widget" << widgetId << "unregistered";
-
-    if (m_activeWidget == widgetId){
-        m_activeWidget = -1;
-        qDebug() << "active widget cleared";
-    }
-    disconnect(this, 0, target, 0);
-}
-
-void QnStatisticsStorage::notifyTimer(QnVideoServerConnectionPtr apiConnection, int widgetId){
-    qDebug() << "notify timer " << widgetId;
-    if (m_activeWidget < 0){
-        m_activeWidget = widgetId;
-        qDebug() << "widget" << widgetId << "set as active";
-    }
-
-    if (m_activeWidget != widgetId)
-        return;
-
-    qDebug() << "widget" << widgetId << "initiated update";
-    update(apiConnection);
-}

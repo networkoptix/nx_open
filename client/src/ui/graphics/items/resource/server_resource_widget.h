@@ -40,13 +40,19 @@ protected:
     virtual Buttons calculateButtonsVisibility() const override;
 
 private slots:
-    void at_timer_timeout();
     void at_statistics_received();
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
+    /**
+     * Util function that add new values to the statistics storage and mantain its number.
+     *
+     * \param key                       Id of the corresponding history item.
+     * \param newValues                 Updated values.
+     * \param newId                     Id of the last provided value.
+     */
     void updateValues(QString key, QnStatisticsData *newValues, qint64 newId);
 
 private:
@@ -60,14 +66,17 @@ private:
     /** Id of the last received response. */
     qint64 m_lastHistoryId;
 
-    /** Timestamp of the last received response in msecs since epoch */
-    qint64 m_lastTimeStamp;
+    // TODO: #GDM uncomment when will implement time labels
+    // /** Timestamp of the last received response in msecs since epoch */
+    //qint64 m_lastTimeStamp;
 
+    /** Id of the our widget in the statistics manager. */
     int m_statisticsId;
 
+    /** Number of successfull responces received, required to smooth scroll. */
     int m_counter;
 
-    /** Status of the frame history. */
+    /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
 
     /** Elapsed timer for smooth scroll. */

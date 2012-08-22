@@ -24,7 +24,7 @@
 /** How many points of the chart are shown on the screen simultaneously */
 #define CHART_POINTS_LIMIT 60
 
-/** Data update period. For the best result should be equal to server's */
+/** Data update period. For the best result should be equal to videoServerStatisticsManager's */
 #define REQUEST_TIME 2000
 
 namespace {
@@ -174,18 +174,14 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    m_statisticsId = videoServerStatisticsManager()->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
-
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
-    timer->start(REQUEST_TIME);
+    videoServerStatisticsManager()->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     /* Run handlers. */
     updateButtonsVisibility();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
-    videoServerStatisticsManager()->unRegisterServerWidget(m_resource, m_statisticsId, this);
+    videoServerStatisticsManager()->unRegisterServerWidget(m_resource, this);
     ensureAboutToBeDestroyedEmitted();
 }
 
@@ -247,8 +243,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
     qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
             (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
-
-    qDebug() << "elapsed step" << elapsed_step;
 
     /** Draw grid */
     {
@@ -410,13 +404,7 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
 
-void QnServerResourceWidget::at_timer_timeout() {
-    videoServerStatisticsManager()->notifyTimer(m_resource, m_statisticsId);
-}
-
 void QnServerResourceWidget::at_statistics_received(){
-    qDebug() << "widget" << m_statisticsId << "received statistics";
-
     QnStatisticsHistory *history_update = new QnStatisticsHistory();
     qint64 id = videoServerStatisticsManager()->getHistory(m_resource, m_lastHistoryId, history_update);
     if (id < 0){
