@@ -40,7 +40,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
     m_videoServerStatisticsManager.reset(new QnVideoServerStatisticsManager(this));
-    qDebug() << "workbench context created";
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {

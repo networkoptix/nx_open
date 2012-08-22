@@ -40,31 +40,24 @@ protected:
     virtual Buttons calculateButtonsVisibility() const override;
 
 private slots:
-    void at_statisticsReceived(const QnStatisticsDataVector &data);
     void at_timer_timeout();
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-private:
-    struct QnStatisticsHistoryData {
-        QString id;
-        QString description;
-        QList<int> history;
+    void updateValues(QString key, QnStatisticsData *newValues, qint64 newId);
 
-        QnStatisticsHistoryData(QString id, QString description);
-        void append(int value);
-    };
+private:
 
     /** Video server resource. */
     QnVideoServerResourcePtr m_resource;
 
     /** History of last usage responses. */
-    QList<QnStatisticsHistoryData> m_history;
+    QnStatisticsHistory m_history;
 
     /** Id of the last received response. */
-    uint m_lastHistoryId;
+    qint64 m_lastHistoryId;
 
     /** Timestamp of the last received response in msecs since epoch */
     qint64 m_lastTimeStamp;

@@ -3,8 +3,13 @@
 
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
+#include <QtCore/QHash>
+#include <QtCore/QHashIterator>
+#include <QtCore/QMutableHashIterator>
+#include <QtCore/QLinkedList>
+#include <QtCore/QLinkedListIterator>
 
-struct QnStatisticsData {
+struct QnStatisticsDataItem {
     enum DeviceType {
         CPU,
         HDD
@@ -14,13 +19,19 @@ struct QnStatisticsData {
     int value;
     DeviceType device;
 
-    QnStatisticsData(){}
+    QnStatisticsDataItem(){}
 
-    QnStatisticsData(QString description, int value, DeviceType device): description(description), value(value), device(device) {}
+    QnStatisticsDataItem(QString description, int value, DeviceType device): description(description), value(value), device(device) {}
 };
 
-typedef QVector<QnStatisticsData> QnStatisticsDataVector;
+typedef QList<QnStatisticsDataItem> QnStatisticsDataList;//todo
 
-Q_DECLARE_METATYPE(QnStatisticsDataVector)
+typedef QLinkedList<int> QnStatisticsData;
+typedef QLinkedListIterator<int> QnStatisticsDataIterator;
+typedef QHash<QString, QnStatisticsData*> QnStatisticsHistory;
+typedef QHashIterator<QString, QnStatisticsData*> QnStatisticsIterator;
+typedef QMutableHashIterator<QString, QnStatisticsData*> QnStatisticsCleaner;
+
+Q_DECLARE_METATYPE(QnStatisticsDataList)
 
 #endif // QN_STATISTICS_DATA
