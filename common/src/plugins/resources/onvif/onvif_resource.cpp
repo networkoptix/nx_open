@@ -1460,6 +1460,10 @@ bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
+    if (!m_onvifAdditionalSettings) {
+        return false;
+    }
+
     QMutexLocker lock(&m_mutex);
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::Iterator it = settings.find(param.name());
@@ -1480,6 +1484,10 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
+    if (!m_onvifAdditionalSettings) {
+        return false;
+    }
+
     QMutexLocker lock(&m_mutex);
 
     CameraSetting tmp;
