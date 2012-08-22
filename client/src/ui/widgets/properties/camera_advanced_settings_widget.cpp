@@ -78,11 +78,11 @@ QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& ob
 {
     m_checkBox = new QCheckBox(mParam.getName());
 
-    mlayout->addWidget(new QWidget());
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     mlayout->addWidget(m_checkBox);
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
 
     if (mParam.getCurrent() == mParam.getMax())
         m_checkBox->setCheckState(Qt::Checked);
@@ -120,11 +120,11 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     QnAbstractSettingsWidget(handler, obj, parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
-    mlayout->addWidget(new QWidget());
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     mlayout->addLayout(vlayout);
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
 
     groupBox = new QGroupBox();
     vlayout->addWidget(new QWidget());
@@ -177,11 +177,11 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     QnAbstractSettingsWidget(handler, obj, parent)
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
-    mlayout->addWidget(new QWidget());
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     mlayout->addLayout(vlayout);
-    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    mlayout->addWidget(new QWidget());
+    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    //mlayout->addWidget(new QWidget());
 
     QGroupBox* groupBox = new QGroupBox();
     vlayout->addWidget(new QWidget());
