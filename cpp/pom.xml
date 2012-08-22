@@ -20,7 +20,7 @@
 		<ffmpeg.version>git-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
-        <dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
+		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<buildLib/>
 		<qtlib1/>
 		<qtlib2/>
@@ -30,7 +30,9 @@
 		<qtlib6/>
 		<qtlib7/>
 		<qtlib8/>
-		<qtlib9/>	
+		<qtlib9/>
+        <!--Additional C++ Flags that passed to Qmake-->
+        <QMAKE-FLAGS/>
 	</properties>
 
 	<dependencies>
@@ -42,7 +44,7 @@
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>
 	</dependencies>		
-	
+
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
@@ -102,10 +104,10 @@
 							<failOnError>false</failOnError>
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
-								
+
 								<!-- This ugly hack prevents creating symlinks instead of text files (this is known unzip issue).
 								First everything except *.h is unpacked then *.h only -->
-								
+
 								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
 									<arg line="-a -u *.zip -x **/include/** *.a"/>
 								</exec>
@@ -115,7 +117,7 @@
 								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
 									<arg line="-a -u *.zip *.a"/>
 								</exec>                             
-								
+
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
 								</concat>	
@@ -175,6 +177,7 @@
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
 									<exclude name="**/version.h" />
+									<exclude name="coreutils-8.13/**" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="headers" refid="headers_path">
 									<map from="" to="HEADERS += "/>
@@ -188,11 +191,12 @@
 									<map from="" to="HEADERS += "/>
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${libs_headers}</echo>		-->						
-								
+
 								<fileset id="sources_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
+									<exclude name="coreutils-8.13/**" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="sources" refid="sources_path">
 									<map from="" to="SOURCES += "/>
@@ -272,7 +276,7 @@
 				</os>
 			</activation>
 			<properties>
-                <compiler>msvc2008</compiler>
+				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -373,7 +377,7 @@
 				</os>		
 			</activation>
 			<properties>
-                <compiler>gcc</compiler>
+				<compiler>gcc</compiler>
 				<rename-skip>false</rename-skip>
 			</properties>
 			<build>	
@@ -467,6 +471,40 @@
 				</plugins>	
 			</build>			
 		</profile>	
+
+<!--		<profile>
+			<id>linux-release-pg</id>
+			<build>	
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>generate-makefile</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>qmake</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+									<arguments>
+										<commandlineArgs>-spec</commandlineArgs>
+										<commandlineArgs>linux-g++</commandlineArgs>
+										<commandlineArgs>CONFIG+=${build.configuration}</commandlineArgs>
+										<commandlineArgs>-o</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/Makefile.${build.configuration}</commandlineArgs>
+										<commandlineArgs>${project.build.directory}/${project.artifactId}.pro</commandlineArgs>
+									</arguments>
+								</configuration>
+							</execution>	
+						</executions>	
+					</plugin>						
+				</plugins>
+			</build>			
+		</profile>			-->
 
 		<profile>
 			<id>convert-clean-windows</id>
