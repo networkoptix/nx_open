@@ -20,7 +20,7 @@ DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${project.build.directory}/build/include ${project.build.directory}/build/pri
+INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${project.build.directory}/build/pri ${environment.dir}/qt/custom/QtCore
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
@@ -29,27 +29,43 @@ OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
 
+isEmpty(BUILDLIB) {
+  LIBS += -lcommon
+}
+
 CONFIG(debug, debug|release) {
-  DESTDIR = ${project.build.directory}/bin/debug
+  isEmpty(BUILDLIB) {
+	DESTDIR = ${libdir}/bin/debug
+	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+	} else {
+    DESTDIR = ${libdir}/build/bin/debug
+  }  
   OBJECTS_DIR  = ${project.build.directory}/build/debug
   MOC_DIR = ${project.build.directory}/build/debug/generated
   UI_DIR = ${project.build.directory}/build/debug/generated
   RCC_DIR = ${project.build.directory}/build/debug/generated
-  LIBS = -L${project.build.directory}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug -L${basedir}/../common/${arch}/bin/debug $$LIBS
+  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
 }
 
 CONFIG(release, debug|release) {
-  DESTDIR = ${project.build.directory}/bin/release
+  isEmpty(BUILDLIB) {
+	DESTDIR = ${libdir}/bin/release
+	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+  } else {
+    DESTDIR = ${libdir}/build/bin/release
+  }  
   OBJECTS_DIR  = ${project.build.directory}/build/release
   MOC_DIR = ${project.build.directory}/build/release/generated
   UI_DIR = ${project.build.directory}/build/release/generated
   RCC_DIR = ${project.build.directory}/build/release/generated
-  LIBS = -L${project.build.directory}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release -L${basedir}/../common/${arch}/bin/release $$LIBS
+  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
 win* {
+  INCLUDEPATH += ${environment.dir}/qt/custom/QtCore
   !contains(BUILDLIB, staticlib) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
+	ICON = ${project.build.directory}/hdw_logo.ico	
   }
   
   CONFIG += ${arch}

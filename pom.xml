@@ -13,12 +13,29 @@
 	</scm>	
 
 	<properties>
+		<libdir>${basedir}/../build-environment/${arch}</libdir>
+		<main.basedir>${project.basedir}</main.basedir>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
 		<environment.dir>${env.ENVIRONMENT}</environment.dir>
 		<customization>default</customization>
+		<!--QT libs used--> 
+		<qtlib1>core</qtlib1>
+		<qtlib2>gui</qtlib2>
+		<qtlib3>network</qtlib3>
+		<qtlib4>opengl</qtlib4>
+		<qtlib5>xml</qtlib5>
+		<qtlib6>multimedia</qtlib6>
+		<qtlib7/>
+		<qtlib8/>
+		<qtlib9/>
+		<!--QT plugins used-->      
+		<qtplugin1>imageformats</qtplugin1>
+		<qtplugin2>enter its name here...</qtplugin2>
+		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>
+		<module>build-environment</module>
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
@@ -29,6 +46,39 @@
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>released-version</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>released-version</goal>
+							<goal>parse-version</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>hgchangeset</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>update</doUpdate>
+				</configuration>
+			</plugin>		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -137,53 +187,6 @@
 				<qt.dir>/usr/lib/i386-linux-gnu</qt.dir>			
 				<arch>x86</arch>
 			</properties>
-		</profile>
-
-		<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<activeByDefault>true</activeByDefault>
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file> 
-			</activation>				
-			<build>
-				<plugins>    
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>released-version</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>released-version</goal>
-									<goal>parse-version</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>buildnumber-maven-plugin</artifactId>
-						<version>1.0-beta-4</version>
-						<executions>
-							<execution>
-								<phase>validate</phase>
-								<goals>
-									<goal>hgchangeset</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<doCheck>false</doCheck>
-							<doUpdate>update</doUpdate>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>	
 	</profiles>	
 </project>

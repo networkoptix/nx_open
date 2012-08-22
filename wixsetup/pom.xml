@@ -22,6 +22,7 @@
 
 	<properties>
 		<arch>x86</arch>
+		<skiptest>true</skiptest>
 	</properties>
 
 	<build>
@@ -58,81 +59,6 @@
 			</activation>			
 			<build>
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-artifacts</id>
-								<phase>initialize</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>appserver</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-exec</classifier>
-											<overWrite>false</overWrite>
-											<excludes>ecs.exe,db/ecs.db</excludes>
-											<outputDirectory>${project.build.directory}/appserver</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>appserver</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-exec</classifier>
-											<overWrite>false</overWrite>
-											<includes>ecs.exe</includes>
-											<outputDirectory>${project.build.directory}/files</outputDirectory>
-										</artifactItem>								
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>client</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/client</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>mediaserver</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/mediaserver</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>traytool</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/traytool</outputDirectory>
-										</artifactItem>								
-										<artifactItem>
-											<groupId>com.networkoptix.hdwitness</groupId>
-											<artifactId>mediaproxy</artifactId>
-											<version>${project.version}</version>
-											<type>zip</type>
-											<classifier>${platform}-${arch}-${build.configuration}-${customization}-exec</classifier>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}/mediaproxy</outputDirectory>
-										</artifactItem>											
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>

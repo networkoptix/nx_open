@@ -23,10 +23,7 @@ compatibility_info.cpp
 Debug
 Release
 
-contrib/maven-artifacts-deploy/include
-contrib/maven-artifacts-deploy/linux
-contrib/maven-artifacts-deploy/target
-contrib/maven-artifacts-deploy/windows
+build-environment/x86
 
 appserver/gen
 appserver/db/ecs.db
