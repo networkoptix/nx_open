@@ -23,6 +23,8 @@ public:
     QRectF combinedGeometry;
     qreal rotation;
 
+    QHash<int, QVariant> dataByRole;
+
     friend bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r) {
         if (l.uuid != r.uuid || l.flags != r.flags || !qFuzzyCompare(l.combinedGeometry, r.combinedGeometry) || !qFuzzyCompare(l.rotation, r.rotation))
             return false;

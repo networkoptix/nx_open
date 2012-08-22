@@ -36,6 +36,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
+
+    m_dataByRole = data.dataByRole; // TODO
 }
 
 QnWorkbenchItem::~QnWorkbenchItem() {
@@ -54,6 +56,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 
     return data;
 }
@@ -77,6 +80,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     setRotation(data.rotation);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
+    m_dataByRole = data.dataByRole; // TODO
+
     return result;
 }
 
@@ -93,6 +98,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
@@ -110,6 +116,8 @@ void QnWorkbenchItem::setGeometryInternal(const QRect &geometry) {
     m_geometry = geometry;
 
     emit geometryChanged();
+    emit dataChanged(Qn::ItemGeometryRole);
+    emit dataChanged(Qn::ItemCombinedGeometryRole);
 }
 
 bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
@@ -122,6 +130,8 @@ bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     m_geometryDelta = geometryDelta;
 
     emit geometryDeltaChanged();
+    emit dataChanged(Qn::ItemGeometryDeltaRole);
+    emit dataChanged(Qn::ItemCombinedGeometryRole);
     return true;
 }
 
@@ -179,7 +189,6 @@ bool QnWorkbenchItem::setFlags(Qn::ItemFlags flags) {
     if((m_flags ^ flags) & Qn::PendingGeometryAdjustment)
         result &= setFlag(Qn::PendingGeometryAdjustment, flags & Qn::PendingGeometryAdjustment);
 
-
     return result;
 }
 
@@ -193,6 +202,7 @@ void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
 
     emit flagChanged(flag, value);
+    emit dataChanged(Qn::ItemFlagsRole);
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {
@@ -202,6 +212,7 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
     m_rotation = rotation;
 
     emit rotationChanged();
+    emit dataChanged(Qn::ItemRotationRole);
 }
 
 void QnWorkbenchItem::adjustGeometry() {
@@ -233,7 +244,7 @@ QVariant QnWorkbenchItem::data(int role) const {
     case Qn::ResourceUidRole:
         return m_resourceUid;
     case Qn::ItemUuidRole:
-        return m_uuid;
+        return QVariant::fromValue<QUuid>(m_uuid);
     case Qn::ItemGeometryRole:
         return m_geometry;
     case Qn::ItemGeometryDeltaRole:
@@ -309,7 +320,11 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
         }
     }
     default:
-        m_dataByRole[role] = value;
+        QVariant &localValue = m_dataByRole[role];
+        if(localValue != value) {
+            localValue = value;
+            emit dataChanged(role);
+        }
         return true;
     }
 }

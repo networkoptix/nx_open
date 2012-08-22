@@ -22,29 +22,38 @@ namespace Qn {
      * Generic enumeration holding different data roles used in Qn classes.
      */
     enum ItemDataRole {
+        FirstItemDataRole   = Qt::UserRole,
+
         /* Tree-based. */
-        NodeTypeRole                = Qt::UserRole + 1,     /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
 
         /* Resource-based. */
-        ResourceRole                = Qt::UserRole + 2,     /**< Role for QnResourcePtr. */
-        ResourceFlagsRole           = Qt::UserRole + 3,     /**< Role for resource flags. */
-        ResourceSearchStringRole    = Qt::UserRole + 4,     /**< Role for resource search string. */
-        ResourceStatusRole          = Qt::UserRole + 5,     /**< Role for resource status. */
-        ResourceUidRole             = Qt::UserRole + 6,     /**< Role for resource unique id. */
+        ResourceRole,                               /**< Role for QnResourcePtr. */
+        ResourceNameRole,                           /**< Role for resource name. */
+        ResourceFlagsRole,                          /**< Role for resource flags. */
+        ResourceSearchStringRole,                   /**< Role for resource search string. */
+        ResourceStatusRole,                         /**< Role for resource status. */
+        ResourceUidRole,                            /**< Role for resource unique id. */
 
-        /* Layout item-based. */
-        ItemUuidRole                = Qt::UserRole + 7,     /**< Role for layout item's UUID. */
-        ItemGeometryRole            = Qt::UserRole + 8,     /**< Role for item's integer geometry. */
-        ItemGeometryDeltaRole       = Qt::UserRole + 9,     /**< Role for item's floating point geometry delta. */
-        ItemCombinedGeometryRole    = Qt::UserRole + 10,    /**< Role for item's floating point combined geometry. */
-        ItemFlagsRole               = Qt::UserRole + 11,    /**< Role for item's flags. */
-        ItemRotationRole            = Qt::UserRole + 12,    /**< Role for item's rotation. */
+        /* Layout-based. */
+        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. */
+        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. */
+        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. */
+        LayoutSyncItemUuidRole,                     /**< Role for UUID of layout's item that is a target of stream synchronization. */
 
-        ItemTimeRole                = Qt::UserRole + 13,    /**< Role for item's playback position. */
-        ItemPausedRole              = Qt::UserRole + 14,    /**< Role for item's paused state. */
-        ItemSpeedRole               = Qt::UserRole + 15,    /**< Role for item's playback speed. */
-        ItemSliderWindowRole        = Qt::UserRole + 15,    /**< Role for slider selection that is displayed when the items is active. */
-        ItemSliderSelectionRole     = Qt::UserRole + 16,    /**< Role for slider window that is displayed when the item is active. */
+        /* Item-based. */
+        ItemUuidRole,                               /**< Role for item's UUID. */
+        ItemGeometryRole,                           /**< Role for item's integer geometry. */
+        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. */
+        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. */
+        ItemFlagsRole,                              /**< Role for item's flags. */
+        ItemRotationRole,                           /**< Role for item's rotation. */
+
+        ItemTimeRole,                               /**< Role for item's playback position. */
+        ItemPausedRole,                             /**< Role for item's paused state. */
+        ItemSpeedRole,                              /**< Role for item's playback speed. */
+        ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. */
+        ItemSliderSelectionRole,                    /**< Role for slider window that is displayed when the item is active. */
     };
 
 
