@@ -61,7 +61,7 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
-    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType);
+    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
     bool canSwitchToHiQuality();
@@ -80,8 +80,8 @@ private:
     QByteArray m_codecCtxData;
     //QMap<int, QList<int> > m_ctxSended;
     QTime m_timer;
-    quint16 m_sequence[MAX_RTP_CHANNELS];
-    qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
+    //quint16 m_sequence[MAX_RTP_CHANNELS];
+    //qint64 m_firstRtpTime[MAX_RTP_CHANNELS];
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)

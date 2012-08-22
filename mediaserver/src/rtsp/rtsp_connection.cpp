@@ -35,30 +35,6 @@
 class QnTcpListener;
 
 // ------------- ServerTrackInfo --------------------
-//QMap<int, QPair<int,int> > trackPorts; // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
-struct ServerTrackInfo
-{
-    ServerTrackInfo(): clientPort(0), clientRtcpPort(0), mediaSocket(0), rtcpSocket(0) {}
-
-    bool openServerSocket(const QString& peerAddress)
-    {
-        if (mediaSocket.setLocalPort(0) && rtcpSocket.setLocalPort(0))
-        {
-            mediaSocket.connect(peerAddress, clientPort);
-            rtcpSocket.connect(peerAddress, clientRtcpPort);
-            return true;
-        }
-        return false;
-    }
-
-    int clientPort;
-    int clientRtcpPort;
-    UDPSocket mediaSocket;
-    UDPSocket rtcpSocket;
-    QnRtspEncoderPtr encoder;
-};
-typedef QSharedPointer<ServerTrackInfo> ServerTrackInfoPtr;
-typedef QMap<int, ServerTrackInfoPtr> ServerTrackInfoMap;
 
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
@@ -305,6 +281,17 @@ int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
         return -1;
 }
 
+RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
+    if (itr != d->trackInfo.end())
+        return itr.value();
+    else
+        return RtspServerTrackInfoPtr();
+}
+
+/*
 QnRtspEncoderPtr QnRtspConnectionProcessor::getCodecEncoder(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
@@ -327,6 +314,7 @@ UDPSocket* QnRtspConnectionProcessor::getMediaSocket(int trackNum) const
     else 
         return 0;
 }
+*/
 
 int QnRtspConnectionProcessor::numOfVideoChannels()
 {
@@ -483,7 +471,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         if (encoder == 0)
             return CODE_NOT_FOUND;
 
-        ServerTrackInfoPtr trackInfo(new ServerTrackInfo());
+        RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         trackInfo->encoder = encoder;
         d->trackInfo.insert(i, trackInfo);
         //d->encoders.insert(i, encoder);
@@ -570,7 +558,7 @@ int QnRtspConnectionProcessor::composeSetup()
                 ServerTrackInfoMap::iterator itr = d->trackInfo.find(trackId);
                 if (itr != d->trackInfo.end())
                 {
-                    ServerTrackInfoPtr trackInfo = itr.value();
+                    RtspServerTrackInfoPtr trackInfo = itr.value();
                     QList<QByteArray> ports = data.split('=').last().split('-');
                     trackInfo->clientPort = ports[0].toInt();
                     trackInfo->clientRtcpPort = ports[1].toInt();
@@ -897,7 +885,6 @@ int QnRtspConnectionProcessor::composeTeardown()
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
 
-    d->trackInfo.clear();
     //d->encoders.clear();
 
     return CODE_OK;
@@ -1017,6 +1004,21 @@ void QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->resumeNetwork();
 }
 
+void QnRtspConnectionProcessor::processBinaryRequest()
+{
+
+}
+
+int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
+{
+    if (data.size() < 4)
+        return 0;
+    int msgLen = (data.at(2) << 8) + data.at(3) + 4;
+    if (data.size() < msgLen)
+        return 0;
+    return msgLen;
+}
+
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -1027,13 +1029,27 @@ void QnRtspConnectionProcessor::run()
         int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) {
             d->receiveBuffer.append((const char*) d->tcpReadBuffer, readed);
-            int msgLen = isFullMessage(d->receiveBuffer);
-            if (msgLen)
+            if (d->receiveBuffer[0] == '$')
             {
-                d->clientRequest = d->receiveBuffer.left(msgLen);
-                d->receiveBuffer.remove(0, msgLen);
-                parseRequest();
-                processRequest();
+                // binary request
+                int msgLen = isFullBinaryMessage(d->receiveBuffer);
+                if (msgLen)
+                {
+                    d->clientRequest = d->receiveBuffer.left(msgLen);
+                    d->receiveBuffer.remove(0, msgLen);
+                    processBinaryRequest();
+                }
+            }
+            else {
+                // text request
+                int msgLen = isFullMessage(d->receiveBuffer);
+                if (msgLen)
+                {
+                    d->clientRequest = d->receiveBuffer.left(msgLen);
+                    d->receiveBuffer.remove(0, msgLen);
+                    parseRequest();
+                    processRequest();
+                }
             }
         }
         else if (t.elapsed() < 2)
@@ -1045,6 +1061,7 @@ void QnRtspConnectionProcessor::run()
 
     d->deleteDP();
     d->socket->close();
+    d->trackInfo.clear();
     m_runing = false;
     //deleteLater(); // does not works for this thread
 }
@@ -1055,4 +1072,20 @@ void QnRtspConnectionProcessor::switchToLive()
     QMutexLocker lock(&d->mutex);
     d->liveMode = Mode_Live;
     composePlay();
+}
+
+void QnRtspConnectionProcessor::resetTrackTiming()
+{
+    Q_D(QnRtspConnectionProcessor);
+    for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
+    {
+        itr.value()->sequence = 0;
+        itr.value()->firstRtpTime = -1;
+    }
+}
+
+bool QnRtspConnectionProcessor::isTcpMode() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->tcpMode;
 }
