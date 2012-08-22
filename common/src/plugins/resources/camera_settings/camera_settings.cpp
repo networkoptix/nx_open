@@ -107,6 +107,8 @@ QString& CAMERA_SETTING_TYPE_BOOL   = *(new QString(QLatin1String("Boolean")));
 QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep")));
 QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
 QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
+QString& CAMERA_SETTING_VAL_ON = *(new QString(QLatin1String("On")));
+QString& CAMERA_SETTING_VAL_OFF = *(new QString(QLatin1String("Off")));
 
 QString& CameraSetting::SEPARATOR = *(new QString(QLatin1String(";;")));
 
@@ -158,7 +160,12 @@ CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE
     m_max(max),
     m_step(step),
     m_current(current)
-{}
+{
+    if (m_type == OnOff) {
+        m_min = CAMERA_SETTING_VAL_OFF;
+        m_max = CAMERA_SETTING_VAL_ON;
+    }
+}
 
 void CameraSetting::setId(const QString& id) {
     m_id = id;

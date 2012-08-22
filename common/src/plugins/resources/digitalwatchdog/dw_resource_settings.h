@@ -12,7 +12,10 @@ class DWCameraSetting;
 
 class DWCameraProxy
 {
-    CLSimpleHTTPClient m_httpClient;
+    const QHostAddress m_host;
+    int m_port;
+    unsigned int m_timeout;
+    const QAuthenticator m_auth;
     QHash<QString,QString> m_bufferedValues;
 
 public:

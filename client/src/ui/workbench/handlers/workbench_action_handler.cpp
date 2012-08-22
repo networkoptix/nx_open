@@ -514,9 +514,30 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
-        //
-        // ToDo: Add record to log + message to user
-        //
+        QString error = QString::fromLatin1("Currently parameters can't be saved. Connection refused.");
+
+        QString failedParams;
+        QList< QPair< QString, QVariant> >::ConstIterator it =
+            cameraSettingsDialog()->widget()->getModifiedAdvancedParams().begin();
+        for (; it != cameraSettingsDialog()->widget()->getModifiedAdvancedParams().end(); ++it)
+        {
+            QString formattedParam(it->first.right(it->first.length() - 2));
+            failedParams += QString::fromLatin1("\n");
+            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+        }
+
+        if (!failedParams.isEmpty()) {
+            QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(),
+                tr("Error"),
+                tr(error.toLatin1()),
+                tr("Failed to save the following parameters:\n%1").arg(failedParams),
+                QDialogButtonBox::Ok
+                );
+
+            cameraSettingsDialog()->widget()->updateFromResources();
+        }
 
         return;
     }
@@ -1835,18 +1856,32 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
 {
-    //ToDo: implement this method like "at_resources_saved"
-    if (httpStatusCode != 0) {
-        int i = 0;
-    }
+    QString error = QString::fromLatin1("Currently parameters can't be saved. ");
+    error += httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now."):
+        QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
 
+    QString failedParams;
     QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
     for (; it != operationResult.end(); ++it)
     {
-        if (it->second) {
-            QString key = it->first;
-            int i = 0;
+        if (!it->second) {
+            QString formattedParam(QString::fromLatin1("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += QString::fromLatin1("\n");
+            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
         }
+    }
+
+    if (!failedParams.isEmpty()) {
+        QnResourceListDialog::exec(
+            widget(),
+            QnResourceList(),
+            tr("Error"),
+            tr(error.toLatin1()),
+            tr("Failed to save the following parameters:\n%1").arg(failedParams),
+            QDialogButtonBox::Ok
+            );
+
+        //ToDo: restore old values by invoking smth like updateFromResource();
     }
 }
 

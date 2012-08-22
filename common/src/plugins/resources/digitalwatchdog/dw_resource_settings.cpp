@@ -8,20 +8,25 @@ QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},]"));
 
 
 DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
-    m_httpClient(host, port, timeout, auth)
+    m_host(host),
+    m_port(port),
+    m_timeout(timeout),
+    m_auth(auth)
 {
     getFromCameraImpl();
 }
 
 bool DWCameraProxy::getFromCameraImpl()
 {
-    CLHttpStatus status = m_httpClient.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=color"));
+    CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
+
+    CLHttpStatus status = httpClient.doGET(QByteArray("cgi-bin/getconfig.cgi?action=color"));
     if (status == CL_HTTP_SUCCESS) 
     {
         m_bufferedValues.clear();
 
         QByteArray body;
-        m_httpClient.readAll(body);
+        httpClient.readAll(body);
         QList<QByteArray> lines = body.split(',');
         for (int i = 0; i < lines.size(); ++i) 
         {
@@ -55,9 +60,10 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 {
     QString desiredVal = src.getCurrentAsIntStr();
 
-    QByteArray query((QString::fromLatin1("/cgi-bin/camerasetup.cgi&") + src.getQuery() + QString::fromLatin1("=") + desiredVal).toLatin1());
+    CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
+    QByteArray query((QString::fromLatin1("cgi-bin/camerasetup.cgi?") + src.getQuery() + QString::fromLatin1("=") + desiredVal).toLatin1());
 
-    bool res = m_httpClient.doGET(query) == CL_HTTP_SUCCESS;
+    bool res = httpClient.doGET(query) == CL_HTTP_SUCCESS;
     res = getFromCameraImpl() && res;
     res = getFromCamera(src) && res;    
 
@@ -110,8 +116,8 @@ void DWCameraSetting::initAdditionalValues()
 
     if (getType() == CameraSetting::OnOff)
     {
-        m_enumStrToInt.push_back(QString::fromLatin1("Off"));
-        m_enumStrToInt.push_back(QString::fromLatin1("On"));
+        m_enumStrToInt.push_back(getMin());
+        m_enumStrToInt.push_back(getMax());
         return;
     }
 }
@@ -145,7 +151,7 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 
     int i = numStr.toInt();
     if (i < 0 || i >= m_enumStrToInt.size()) {
-        //Log warning, currently let's be assert
+        //ToDo: Log warning, currently let's be assert
         Q_ASSERT(false);
         return QString();
     }
