@@ -7,6 +7,7 @@
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/synctime.h>
 
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
@@ -33,9 +34,9 @@ namespace {
 
 
 QnCalendarWidget::QnCalendarWidget():
-    QCalendarWidget(),
     m_tableView(0),
-    m_empty(true)
+    m_empty(true),
+    m_currentTime(0)
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
@@ -48,12 +49,14 @@ QnCalendarWidget::QnCalendarWidget():
     yearEdit->installEventFilter(contextMenuEater);
 
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
-    setVerticalHeaderFormat(QnCalendarWidget::NoVerticalHeader);
+    setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
     m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
     Q_ASSERT(m_tableView);
     m_tableView->horizontalHeader()->setMinimumSectionSize(18);
     QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
+
+    m_tableView->viewport()->installEventFilter(this);
 
     QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     navBarBackground->setBackgroundRole(QPalette::Window);
@@ -91,9 +94,21 @@ bool QnCalendarWidget::isEmpty() {
     return m_empty;
 }
 
+bool QnCalendarWidget::eventFilter(QObject *watched, QEvent *event){
+    if (event->type() == QEvent::Paint && watched == m_tableView->viewport())
+        m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    return base_type::eventFilter(watched, event);
+}
+
 void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
     QDateTime dt(date);
-    QnTimePeriod current(dt.toMSecsSinceEpoch(), DAY);
+
+    qint64 dtMSecs = dt.toMSecsSinceEpoch();
+    QnTimePeriod current;
+    if (dtMSecs < m_currentTime){
+        current.startTimeMs = dtMSecs;
+        current.durationMs = DAY;
+    }
 
     QnScopedPainterBrushRollback brushRollback(painter);
     Q_UNUSED(brushRollback);

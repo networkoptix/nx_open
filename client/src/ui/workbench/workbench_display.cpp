@@ -785,7 +785,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    if(item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(item->hasFlag(Qn::PendingGeometryAdjustment))
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
@@ -1207,7 +1207,7 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
 }
 
 void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate) {
-    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(!item->hasFlag(Qn::PendingGeometryAdjustment))
         return;
 
     QnResourceWidget *widget = this->widget(item);
@@ -1221,7 +1221,7 @@ void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate
 }
 
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
-    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(!item->hasFlag(Qn::PendingGeometryAdjustment))
         return;
 
     QnResourceWidget *widget = this->widget(item);

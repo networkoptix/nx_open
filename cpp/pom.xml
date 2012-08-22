@@ -73,7 +73,7 @@
 				<executions>
 					<execution>
 						<id>auto-clean</id>
-						<phase>initialize</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
@@ -88,6 +88,16 @@
 										<exclude>**/*.user</exclude>
 									</excludes>
 								</fileset>
+								<fileset>
+									<directory>${project.build.sourceDirectory}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<includes>
+										<include>**/version.h</include>
+										<include>**/filetypes.h</include>
+										<include>**/compatibility_info.cpp</include>
+									</includes>
+								</fileset>								
 							</filesets>
 						</configuration>
 					</execution>
@@ -134,7 +144,7 @@
 				<version>1.1.1</version>
 				<executions>
 					<execution>
-						<id>additional-build-steps</id>
+						<id>gen-qrc</id>
 						<phase>process-sources</phase>
 						<goals>
 							<goal>exec</goal>
@@ -143,6 +153,20 @@
 							<executable>python</executable>
 							<arguments>
 								<argument>gen-resources.py</argument>
+							</arguments>
+							<workingDirectory>${project.build.directory}</workingDirectory>		
+						</configuration>
+					</execution>
+					<execution>
+						<id>additional-build-steps</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>python</executable>
+							<arguments>
+								<argument>build-prepare.py</argument>
 							</arguments>
 							<workingDirectory>${project.build.directory}</workingDirectory>		
 						</configuration>

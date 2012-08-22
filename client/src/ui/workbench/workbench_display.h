@@ -53,7 +53,6 @@ class QnCamDisplay;
 class QnWorkbenchDisplay: public QObject, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations {
     Q_OBJECT;
     Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity);
-    Q_ENUMS(Qn::ItemLayer);
 
 public:
     /**

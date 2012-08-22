@@ -76,7 +76,7 @@ protected:
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
         QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
 
         /* Bold items of current layout in tree. */
         if(!resource.isNull() && !currentLayoutResource.isNull()) {
@@ -309,7 +309,7 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
         result->setFilterKeyColumn(0);
-        result->setFilterRole(Qn::SearchStringRole);
+        result->setFilterRole(Qn::ResourceSearchStringRole);
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
@@ -401,7 +401,7 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
         if(uuid.isNull())
             continue;
 
@@ -425,7 +425,7 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
-    if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
     } else {
         return QVariant::fromValue(selectedResources());

@@ -14,6 +14,9 @@
  */
 class QnCalendarWidget: public QCalendarWidget {
     Q_OBJECT
+
+    typedef QCalendarWidget base_type;
+
 public: 
     QnCalendarWidget();
     void setCurrentTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods);
@@ -36,6 +39,7 @@ signals:
     */
     void dateClicked(const QDate &date);
 protected:
+    bool eventFilter(QObject *watched, QEvent *event);
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
 private:
     void updateEmpty();
@@ -45,6 +49,9 @@ private:
     QTableView* m_tableView;
     QnTimePeriod m_window;
     bool m_empty;
+
+    /** Current server time in msecs since epoch */
+    qint64 m_currentTime;
 };
 
 

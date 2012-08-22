@@ -1,9 +1,10 @@
 #ifndef QN_RESOURCE_SEARCH_SYNCHRONIZER_H
 #define QN_RESOURCE_SEARCH_SYNCHRONIZER_H
 
-#include <QObject>
-#include <QHash>
-#include <QModelIndex>
+#include <QtCore/QObject>
+#include <QtCore/QHash>
+#include <QtCore/QModelIndex>
+
 #include <core/resource/resource_fwd.h>
 
 class QnWorkbenchItem;

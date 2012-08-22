@@ -7,8 +7,8 @@
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(traytool);
-
+	Q_INIT_RESOURCE(traytool);
+	
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(0, QObject::tr("Systray"),
             QObject::tr("I couldn't detect any system tray "

@@ -9,7 +9,7 @@
 #include "session_manager.h"
 
 #include <api/serializer/serializer.h>
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>
 
 #include "utils/common/rand.h"
 
@@ -369,7 +369,7 @@ int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *tar
 
 int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slot){
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(const QnStatisticsDataVector &/* data */)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(const QnStatisticsDataList &/* data */)), target, slot, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("statistics"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
@@ -494,8 +494,8 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         int usage =  usageStr.toShort();
         QByteArray modelStr = extractXmlBody(reply, "model");
 
-        QnStatisticsDataVector data;
-        data.append(QnStatisticsData(QLatin1String(modelStr), usage, QnStatisticsData::CPU));
+        QnStatisticsDataList data;
+        data.append(QnStatisticsDataItem(QLatin1String(modelStr), usage, QnStatisticsDataItem::CPU));
 
         QByteArray storages = extractXmlBody(reply, "storages");
         QByteArray storage;
@@ -507,7 +507,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
                 break;
             QString url = QLatin1String(extractXmlBody(storage, "url"));
             usage = extractXmlBody(storage, "usage").toShort();
-            data.append(QnStatisticsData(url, usage, QnStatisticsData::HDD));
+            data.append(QnStatisticsDataItem(url, usage, QnStatisticsDataItem::HDD));
         } while (storage.length() > 0);
         emit finished(data); 
     }
