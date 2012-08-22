@@ -81,6 +81,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_layoutIndById()
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
+    connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -199,11 +200,10 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         rootWidget = dynamic_cast<QnSettingsGroupBox*>(m_rootLayout.widget(ind));
         Q_ASSERT(rootWidget != 0);
     } else {
-        rootWidget = new QnSettingsGroupBox(parentId, *m_owner);
+        QTreeWidgetItem* parentItem = findParentForParam(parentId);
+        rootWidget = new QnSettingsGroupBox(parentItem->text(0), m_owner);
         int ind = m_rootLayout.addWidget(rootWidget);
         m_layoutIndById.insert(parentId, ind);
-
-        QTreeWidgetItem* parentItem = findParentForParam(parentId);
         parentItem->setData(0, Qt::UserRole, ind);
     }
 
@@ -308,6 +308,13 @@ void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, 
     }
 
     m_rootLayout.setCurrentIndex(ind);
+}
+
+void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
+{
+    if (m_rootLayout.count() > 0) {
+        m_rootLayout.setCurrentIndex(0);
+    }
 }
 
 void CameraSettingsWidgetsCreator::parentOfRootElemFound(const QString& parentId)

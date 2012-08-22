@@ -5,8 +5,8 @@
 #include <QtGui/QStyleFactory>
 
 
-QnSettingsGroupBox::QnSettingsGroupBox(const QString& title, QWidget& parent):
-    QGroupBox(title, &parent),
+QnSettingsGroupBox::QnSettingsGroupBox(const QString& title, QWidget* parent):
+    QGroupBox(title, parent),
     alreadyShowed(false)
 {
     setLayout(new QVBoxLayout());

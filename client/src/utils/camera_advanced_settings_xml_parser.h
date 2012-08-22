@@ -99,6 +99,7 @@ protected:
 
 protected slots:
     void treeWidgetItemPressed(QTreeWidgetItem * item, int column);
+    void treeWidgetItemSelectionChanged();
 
 private:
 

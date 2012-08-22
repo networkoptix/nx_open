@@ -13,7 +13,7 @@ class QnSettingsGroupBox : public QGroupBox
 
 public:
 
-    QnSettingsGroupBox(const QString& title, QWidget& parent);
+    QnSettingsGroupBox(const QString& title, QWidget* parent);
 
 protected:
 
