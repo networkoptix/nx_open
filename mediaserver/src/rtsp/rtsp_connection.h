@@ -32,6 +32,7 @@ public:
     int getMetadataTcpChannel() const;
     int getAVTcpChannel(int trackNum) const;
     QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
+    UDPSocket* getMediaSocket(int trackNum) const;
 protected:
     virtual void run();
     void addResponseRangeHeader();

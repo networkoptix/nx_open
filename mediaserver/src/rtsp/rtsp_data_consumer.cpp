@@ -47,7 +47,9 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_useUTCTime(true),
   m_fastChannelZappingSize(0),
   m_firstLiveTime(AV_NOPTS_VALUE),
-  m_lastLiveTime(AV_NOPTS_VALUE)
+  m_lastLiveTime(AV_NOPTS_VALUE),
+  m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
+  m_allowAdaptiveStreaming(true)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
@@ -201,7 +203,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 
-        if (m_newLiveQuality == MEDIA_Quality_None)
+        if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None)
         {
             //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
             if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
@@ -498,6 +500,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (rtpTcpChannel == -1) 
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = m_owner->getCodecEncoder(media->channelNumber);
+    UDPSocket* mediaSocket = m_owner->getMediaSocket(media->channelNumber);
     if (codecEncoder == 0)
         return true; // skip data (for example audio is disabled)
 
@@ -520,11 +523,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             m_lastSendTime = media->timestamp;
         m_lastMediaTime = media->timestamp;
     }
-    if (m_realtimeMode)
-        doRealtimeDelay(media);
-
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (m_realtimeMode || !isLive)
+        doRealtimeDelay(media);
+
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
     {
         QMutexLocker lock(&m_liveTimingControlMtx);
@@ -558,27 +561,32 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         timeDiff -= m_firstRtpTime[media->channelNumber]; // enumerate RTP time from 0 after seek
     qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
 
-
     while(dataExists && !m_needStop) 
     {
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
 
-        m_owner->clearBuffer();
+        m_sendBuffer.clear();
 
         buildRtspTcpHeader(rtpTcpChannel, codecEncoder->getSSRC(), 0, codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype()); 
-        m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-        dataExists = codecEncoder->getNextPacket(m_owner->getSendBuffer());
+        m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        dataExists = codecEncoder->getNextPacket(m_sendBuffer);
         if (dataExists) 
         {
-            Q_ASSERT(m_owner->getSendBuffer().size() > 16);
-            quint16* lenPtr = (quint16*) (m_owner->getSendBuffer().data() + 2);
-            *lenPtr = htons(m_owner->getSendBuffer().size() - 4);
-            m_owner->sendBuffer();
+            Q_ASSERT(m_sendBuffer.size() > 16);
+            if (mediaSocket == 0) {
+                quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
+                *lenPtr = htons(m_sendBuffer.size() - 4);
+                m_owner->sendBuffer(m_sendBuffer);
+            }
+            else {
+                Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+                mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            }
             m_sequence[rtpTcpChannel]++;
         }
     }
-    m_owner->clearBuffer();
+    m_sendBuffer.clear();
 
 
     //m_owner->sendCurrentRangeIfUpdated();
@@ -589,11 +597,18 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         int metadataTcpChannel = m_owner->getMetadataTcpChannel();
         if (metadataTcpChannel >= 0) {
             buildRtspTcpHeader(metadataTcpChannel, METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE);
-            m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-            m_owner->bufferData(newRange);
-            m_owner->sendBuffer();
+            m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+            m_sendBuffer.write(newRange);
+
+            if (mediaSocket == 0)
+                m_owner->sendBuffer(m_sendBuffer);
+            else  {
+                Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+                mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            }
+
             m_sequence[metadataTcpChannel]++;
-            m_owner->clearBuffer();
+            m_sendBuffer.clear();
         }
     }
 
@@ -675,4 +690,9 @@ void QnRtspDataConsumer::clearUnprocessedData()
 void QnRtspDataConsumer::setUseUTCTime(bool value)
 {
     m_useUTCTime = value;
+}
+
+void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
+{
+    m_allowAdaptiveStreaming = value;
 }
