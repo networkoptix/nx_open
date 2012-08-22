@@ -40,7 +40,7 @@
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm -lcommon</windows.oslibs>
-        <linux.oslibs>-lcrypto -lz</linux.oslibs>
+        <linux.oslibs>-lcrypto -lz -lopenal</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -86,13 +86,6 @@
             <type>zip</type>
             <classifier>${platform}-${arch}-${compiler}</classifier>
         </dependency>                               
-        <dependency>
-            <groupId>com.creativelabs</groupId>
-            <artifactId>openal</artifactId>
-            <version>1.1-SNAPSHOT</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
 		<dependency>
 			<groupId>com.nokia.qt</groupId>
 			<artifactId>qtcore</artifactId>
@@ -120,20 +113,27 @@
 				</os>
 			</activation>	
 			<dependencies>
-                <dependency>
-                    <groupId>com.microsoft.directx</groupId>
-                    <artifactId>d3d9</artifactId>
-                    <version>JUN2010</version>
-                    <type>zip</type>
-                    <classifier>${platform}-${arch}</classifier>
-                </dependency>   
-                <dependency>
-                    <groupId>com.microsoft.directx</groupId>
-                    <artifactId>d3dx9</artifactId>
-                    <version>JUN2010</version>
-                    <type>zip</type>
-                    <classifier>${platform}-${arch}</classifier>
-                </dependency>   
+			        <dependency>
+		    		    <groupId>com.creativelabs</groupId>
+			            <artifactId>openal</artifactId>
+			            <version>1.1-SNAPSHOT</version>
+			            <type>zip</type>
+			            <classifier>${platform}-${arch}</classifier>
+			        </dependency>
+		                <dependency>
+		                    <groupId>com.microsoft.directx</groupId>
+		                    <artifactId>d3d9</artifactId>
+		                    <version>JUN2010</version>
+		                    <type>zip</type>
+		                    <classifier>${platform}-${arch}</classifier>
+		                </dependency>   
+		                <dependency>
+		                    <groupId>com.microsoft.directx</groupId>
+		                    <artifactId>d3dx9</artifactId>
+		                    <version>JUN2010</version>
+		                    <type>zip</type>
+		                    <classifier>${platform}-${arch}</classifier>
+		                </dependency>   
 			</dependencies>				
 		</profile> 
 	</profiles>		

@@ -846,9 +846,9 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Export Selection as Multi-Stream...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
-    factory(Qn::QuickSearchAction).
+    factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Quick Search...")).
+        text(tr("Thumbnails Search...")).
         condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, this));
 
     factory().

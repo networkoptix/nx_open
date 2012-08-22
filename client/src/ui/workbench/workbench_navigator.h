@@ -98,14 +98,6 @@ protected:
         SliderLineCount
     };
 
-    struct SliderUserData {
-        SliderUserData(): window(0, -1), selection(0, 0), selectionValid(false) {}
-
-        QnTimePeriod window;
-        QnTimePeriod selection;
-        bool selectionValid;
-    };
-
     void initialize();
     void deinitialize();
     bool isValid();
@@ -113,8 +105,8 @@ protected:
     void addSyncedWidget(QnMediaResourceWidget *widget);
     void removeSyncedWidget(QnMediaResourceWidget *widget);
     
-    SliderUserData currentSliderData() const;
-    void setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow = false);
+    void updateItemDataFromSlider(QnResourceWidget *widget) const;
+    void updateSliderFromItemData(QnResourceWidget *widget, bool preferToPreserveWindow = false);
 
     void setPlayingTemporary(bool playing);
 
@@ -220,9 +212,6 @@ private:
     qint64 m_lastCameraTime;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
-
-    /** Widget to per-widget slider data mapping. */
-    QHash<QnResourceWidget *, SliderUserData> m_localDataByWidget;
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     

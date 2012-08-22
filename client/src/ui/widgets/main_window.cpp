@@ -142,7 +142,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up handlers. */
-    QnWorkbenchActionHandler *actionHandler = context->handler<QnWorkbenchActionHandler>();
+    QnWorkbenchActionHandler *actionHandler = context->instance<QnWorkbenchActionHandler>();
     actionHandler->setWidget(this);
 
 

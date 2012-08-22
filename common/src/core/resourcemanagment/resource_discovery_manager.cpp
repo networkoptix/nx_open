@@ -95,6 +95,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 
 void QnResourceDiscoveryManager::pleaseStop()
 {
+    if (m_runing)
     {
         QMutexLocker locker(&m_searchersListMutex);
         foreach (QnAbstractResourceSearcher *searcher, m_searchersList)
@@ -245,6 +246,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     it = resources.begin();
     while (it != resources.end())
     {
+        if (needToStop())
+            return QnResourceList();
+
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 

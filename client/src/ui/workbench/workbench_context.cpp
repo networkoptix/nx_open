@@ -27,7 +27,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_resourcePool = resourcePool;
     m_workbench.reset(new QnWorkbench(this));
     
-    m_userWatcher = watcher<QnWorkbenchUserWatcher>();
+    m_userWatcher = instance<QnWorkbenchUserWatcher>();
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,    SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 

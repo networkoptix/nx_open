@@ -51,8 +51,8 @@ QnSystrayWindow::QnSystrayWindow():
 {
     ui->setupUi(this);
 
-    m_iconOK = QIcon(":/images/traytool.png");
-    m_iconBad = QIcon(":/images/traytool.png");
+    m_iconOK = QIcon(":/traytool.png");
+    m_iconBad = QIcon(":/traytool.png");
 
     m_mediaServerHandle = 0;
     m_appServerHandle = 0;

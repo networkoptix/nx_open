@@ -34,12 +34,12 @@ struct QnConnectionData {
 
 typedef QList<QnConnectionData> QnConnectionDataList;
 
-Q_DECLARE_METATYPE(QnConnectionData);
-Q_DECLARE_METATYPE(QnConnectionDataList);
+Q_DECLARE_METATYPE(QnConnectionData)
+Q_DECLARE_METATYPE(QnConnectionDataList)
 
 
 class QnSettings: public QnPropertyStorage {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnPropertyStorage base_type;
 
@@ -61,6 +61,7 @@ public:
         DEBUG_COUNTER,
 
         LANGUAGE,
+        FLIP_ICONS,
 
         VARIABLE_COUNT
     };
@@ -82,21 +83,27 @@ protected:
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
-    QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
-        QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24);
-        QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false);
-        QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString());
-        QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList());
-        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true);
-        QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor());
-        QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false);
-        QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false);
-        QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData());
-        QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
-        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList());
-        QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
-        QN_DECLARE_RW_PROPERTY(QString,                 language,               setLanguage,                LANGUAGE,                   QLatin1String("en"));
-    QN_END_PROPERTY_STORAGE();
+    QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
+        QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
+        QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
+        QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
+        QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
+        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
+        QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
+        QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
+        QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
+        QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
+        QN_DECLARE_RW_PROPERTY(QString,                 language,               setLanguage,                LANGUAGE,                   QLatin1String("en"))
+
+#ifdef Q_WS_X11
+        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 true)
+#else
+        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 false)
+#endif
+    QN_END_PROPERTY_STORAGE()
 
 private:
     QSettings *m_settings;

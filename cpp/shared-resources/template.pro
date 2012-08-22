@@ -6,7 +6,10 @@ QMAKE_INFO_PLIST = Info.plist
 CONFIG += precompile_header $$BUILDLIB
 CONFIG -= flat app_bundle
 DEFINES += __STDC_CONSTANT_MACROS
-QMAKE_CXXFLAGS += ${QMAKE-FLAGS}
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 
 !contains(BUILDLIB, staticlib) {
   ICON = ${project.build.directory}/hdw_logo.ico

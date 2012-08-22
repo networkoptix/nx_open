@@ -1,8 +1,8 @@
 TEMPLATE = app
 DEFINES += CL_FORCE_LOGO
 DEFINES += QT_QTCOLORPICKER_IMPORT
-TRANSLATIONS += ${project.build.sourceDirectory}/translations/client_en.ts \
-				${project.build.sourceDirectory}/translations/client_ru.ts
+TRANSLATIONS += ${basedir}/resource/common/translations/client_en.ts \
+				${basedir}/resource/common/translations/client_ru.ts
 
 CONFIG(debug, debug|release) {
   CONFIG += console
