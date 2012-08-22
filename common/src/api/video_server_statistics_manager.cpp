@@ -2,12 +2,9 @@
 
 #include <QtCore/QTimer>
 
-#include <api/api_fwd.h>
-
 #include <api/video_server_statistics_data.h>
 #include <api/video_server_statistics_storage.h>
 
-#include <core/resource/resource_fwd.h>
 #include <core/resource/video_server_resource.h>
 
 /** Data update period. For the best result should be equal to server's */
