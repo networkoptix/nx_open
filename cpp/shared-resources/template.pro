@@ -11,8 +11,6 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 
-DEPENDPATH *= $${INCLUDEPATH}
-
 !contains(BUILDLIB, staticlib) {
   ICON = ${project.build.directory}/hdw_logo.ico
 }
@@ -54,6 +52,7 @@ QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qt
 
 include(${environment.dir}/qt/custom/QtCore/private/qtcore.pri) 
 INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore 
+DEPENDPATH *= $${INCLUDEPATH}
 
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
