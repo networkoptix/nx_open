@@ -115,6 +115,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
         if (m_vTranscoder)
         {
+            m_vTranscoder->open(video);
+
             if (m_vTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, m_vTranscoder->getCodecContext());
             }

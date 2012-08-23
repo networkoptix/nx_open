@@ -55,6 +55,20 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
+void QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
+{
+    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+    CLVideoDecoderOutput decodedVideoFrame;
+    decoder.decode(video, &decodedVideoFrame);
+    if (m_resolution.width() == 0 && m_resolution.height() == 0)
+        m_resolution = QSize(decodedVideoFrame.width, decodedVideoFrame.height);
+    else if (m_resolution.width() == 0)
+    {
+        float ar = decodedVideoFrame.width / (float) decodedVideoFrame.height;
+        m_resolution.setWidth(m_resolution.height() * ar);
+    }
+}
+
 // ---------------------- QnTranscoder -------------------------
 
 QnTranscoder::QnTranscoder():
@@ -77,6 +91,9 @@ int QnTranscoder::suggestBitrate(QSize resolution) const
 {
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+
+    if (resolution.width() == 0)
+        resolution.setWidth(resolution.height()*4/3);
 
     int hiEnd = 1024*2;
 
