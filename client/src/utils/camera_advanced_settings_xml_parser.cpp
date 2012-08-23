@@ -68,7 +68,7 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 //
 
 CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
-        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner):
+        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler):
     CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
@@ -76,7 +76,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_rootLayout(rootLayout),
     m_widgetsById(widgetsById),
     m_handler(handler),
-    m_owner(owner),
+    m_owner(0),
     m_emptyGroupsById(),
     m_layoutIndById()
 {
@@ -103,6 +103,17 @@ bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
     removeEmptyWidgetGroups();
     m_layoutIndById.clear();
+
+    if (m_owner)
+    {
+        QObjectList children = m_owner->children();
+        for (int i = 0; i < children.count(); ++i)
+        {
+            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
+        }
+        delete m_owner;
+    }
+    m_owner = new QWidget();
 
     m_settings = &settings;
 
@@ -430,15 +441,15 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_rootLayout(rootLayout),
     m_widgetsById(),
     m_handler(handler),
-    m_settings(0),
-    m_owner(0)
+    m_settings(0)
 {
-
+    //Default - show empty widget
+    m_rootLayout.addWidget(new QWidget());
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_handler, m_owner);
+    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_handler);
 }
 
 CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()
@@ -453,20 +464,6 @@ void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 
     m_widgetsById.clear();
     m_rootWidget.clear();
-
-    if (m_owner)
-    {
-        QObjectList children = m_owner->children();
-        for (int i = 0; i < children.count(); ++i)
-        {
-            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
-        }
-        delete m_owner;
-    }
-    m_owner = new QWidget();
-
-    //Default - show empty widget
-    m_rootLayout.addWidget(new QWidget(m_owner));
 
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }

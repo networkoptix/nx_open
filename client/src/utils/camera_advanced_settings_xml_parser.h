@@ -83,7 +83,7 @@ public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
 
     CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
-        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler, QWidget* owner);
+        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler);
 
     virtual ~CameraSettingsWidgetsCreator();
 
@@ -178,7 +178,6 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     QStackedLayout& m_rootLayout;
     WidgetsById m_widgetsById;
     QObject* m_handler;
-    QWidget* m_owner;
     CameraSettings* m_settings;
 
 protected:

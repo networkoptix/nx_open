@@ -197,7 +197,6 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     QVBoxLayout *layout = new QVBoxLayout(groupBox);
 
     QStringList values = static_cast<QString>(mParam.getMin()).split(QLatin1Char(','));
-    mParam.setCurrent(values[0].trimmed());//ToDo remove this line
     for (int i = 0; i < values.length(); ++i)
     {
         QString val = values[i].trimmed();

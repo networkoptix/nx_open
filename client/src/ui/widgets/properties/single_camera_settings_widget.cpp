@@ -455,6 +455,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         return;
     }
 
+    bool changesFound = false;
     QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
 
     for (; it != params.end(); ++it)
@@ -469,17 +470,23 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
 
             CameraSettings::Iterator sIt = m_cameraSettings.find(tmp->getId());
             if (sIt == m_cameraSettings.end()) {
+                changesFound = true;
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;
             }
 
             CameraSetting& savedVal = *(sIt.value());
             if (CameraSettingReader::isEnabled(savedVal)) {
-                sIt.value()->setCurrent(tmp->getCurrent());
+                CameraSettingValue newVal = tmp->getCurrent();
+                if (savedVal.getCurrent() != newVal) {
+                    changesFound = true;
+                    savedVal.setCurrent(newVal);
+                }
                 continue;
             }
 
             if (CameraSettingReader::isEnabled(*tmp)) {
+                changesFound = true;
                 m_cameraSettings.erase(sIt);
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;
@@ -487,9 +494,9 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         }
     }
 
-    m_widgetsRecreator->proceed(&m_cameraSettings);
-
-    //at_dbDataChanged();
+    if (changesFound) {
+        m_widgetsRecreator->proceed(&m_cameraSettings);
+    }
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
