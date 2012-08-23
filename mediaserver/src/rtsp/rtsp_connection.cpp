@@ -34,6 +34,8 @@
 
 class QnTcpListener;
 
+// ------------- ServerTrackInfo --------------------
+
 // ----------------------------- QnRtspConnectionProcessorPrivate ----------------------------
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
@@ -58,7 +60,8 @@ public:
         prevEndTime(AV_NOPTS_VALUE),
         metadataChannelNum(7),
         audioEnabled(false),
-        useProprietaryFormat(false)
+        useProprietaryFormat(false),
+        tcpMode(true)
     {
     }
 
@@ -114,8 +117,9 @@ public:
 
     QString sessionId;
     QnMediaResourcePtr mediaRes;
-    QMap<int, QPair<int,int> > trackPorts; // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
-    QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
+    //QMap<int, QPair<int,int> > trackPorts; // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
+    //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
+    ServerTrackInfoMap trackInfo;
     bool useProprietaryFormat;
     qint64 startTime; // time from last range header
     qint64 endTime;   // time from last range header
@@ -128,6 +132,7 @@ public:
     qint64 prevEndTime;
     int metadataChannelNum;
     bool audioEnabled;
+    bool tcpMode;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -149,15 +154,6 @@ void QnRtspConnectionProcessor::parseRequest()
 
     if (!d->requestHeaders.value("Scale").isNull())
         d->rtspScale = d->requestHeaders.value("Scale").toDouble();
-    processRangeHeader();
-
-    if (!d->requestHeaders.value("x-media-step").isEmpty())
-        d->liveMode = Mode_ThumbNails;
-    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
-        d->liveMode = Mode_Live;
-    else
-        d->liveMode = Mode_Archive;
-
 
     if (d->mediaRes == 0)
     {
@@ -170,6 +166,19 @@ void QnRtspConnectionProcessor::parseRequest()
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
+
+    if (d->requestHeaders.value("user-agent").toLower().contains("network optix"))
+        d->useProprietaryFormat = true;
+    processRangeHeader();
+
+    if (!d->requestHeaders.value("x-media-step").isEmpty())
+        d->liveMode = Mode_ThumbNails;
+    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+        d->liveMode = Mode_Live;
+    else
+        d->liveMode = Mode_Archive;
+
+
     if (d->requestHeaders.value("x-media-quality") == QString("low"))
         d->quality = MEDIA_Quality_Low;
     else
@@ -265,17 +274,47 @@ int QnRtspConnectionProcessor::getMetadataTcpChannel() const
 int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
-    if (d->trackPorts.contains(trackNum))
-        return d->trackPorts.value(trackNum).first;
+    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
+    if (itr != d->trackInfo.end())
+        return itr.value()->clientPort;
     else
         return -1;
 }
 
+RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
+    if (itr != d->trackInfo.end())
+        return itr.value();
+    else
+        return RtspServerTrackInfoPtr();
+}
+
+/*
 QnRtspEncoderPtr QnRtspConnectionProcessor::getCodecEncoder(int trackNum) const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return d->encoders.value(trackNum);
+    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
+    if (itr != d->trackInfo.end())
+        return itr.value()->encoder;
+    else
+        return QnRtspEncoderPtr();
 }
+
+UDPSocket* QnRtspConnectionProcessor::getMediaSocket(int trackNum) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    if (d->tcpMode)
+        return 0;
+    
+    ServerTrackInfoMap::const_iterator itr = d->trackInfo.find(trackNum);
+    if (itr != d->trackInfo.end())
+        return &(itr.value()->mediaSocket);
+    else 
+        return 0;
+}
+*/
 
 int QnRtspConnectionProcessor::numOfVideoChannels()
 {
@@ -413,7 +452,6 @@ int QnRtspConnectionProcessor::composeDescribe()
     addResponseRangeHeader();
 
     int i = 0;
-    d->useProprietaryFormat = d->requestHeaders.value("user-agent").toLower().contains("network optix");
     for (; i < numVideo + numAudio; ++i)
     {
         QnRtspEncoderPtr encoder;
@@ -433,7 +471,10 @@ int QnRtspConnectionProcessor::composeDescribe()
         if (encoder == 0)
             return CODE_NOT_FOUND;
 
-        d->encoders.insert(i, encoder);
+        RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
+        trackInfo->encoder = encoder;
+        d->trackInfo.insert(i, trackInfo);
+        //d->encoders.insert(i, encoder);
 
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
@@ -474,9 +515,21 @@ int QnRtspConnectionProcessor::composeSetup()
     if (!d->mediaRes)
         return CODE_NOT_FOUND;
 
-    QString transport = d->requestHeaders.value("Transport");
-    if (transport.indexOf("TCP") == -1)
-        return CODE_NOT_IMPLEMETED;
+    QByteArray transport = d->requestHeaders.value("Transport").toUtf8();
+    //if (transport.indexOf("TCP") == -1)
+    //    return CODE_NOT_IMPLEMETED;
+    //QByteArray lowLevelTransport = transport.split(';').first().split('/').last().toLower();
+    //if (lowLevelTransport != "tcp" && lowLevelTransport != "udp")
+    //    return CODE_NOT_IMPLEMETED;
+    QByteArray lowLevelTransport = "udp";
+    if (transport.toLower().contains("tcp")) {
+        lowLevelTransport = "tcp";
+        d->tcpMode = true;
+    }
+    else {
+        d->tcpMode = false;
+    }
+
     int trackId = extractTrackId(d->requestHeaders.path());
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
@@ -490,16 +543,37 @@ int QnRtspConnectionProcessor::composeSetup()
 
     if (trackId >= 0)
     {
-        QStringList transportInfo = transport.split(';');
-        foreach(const QString& data, transportInfo)
+        QList<QByteArray> transportInfo = transport.split(';');
+        foreach(const QByteArray& data, transportInfo)
         {
+            /*
             if (data.startsWith("interleaved="))
             {
-                QStringList ports = data.mid(QString("interleaved=").length()).split("-");
+                QList<QByteArray> ports = data.mid(QString("interleaved=").length()).split('-');
                 d->trackPorts.insert(trackId, QPair<int,int>(ports[0].toInt(), ports.size() > 1 ? ports[1].toInt() : 0));
+            }
+            */
+            if (data.startsWith("interleaved=") || data.startsWith("client_port="))
+            {
+                ServerTrackInfoMap::iterator itr = d->trackInfo.find(trackId);
+                if (itr != d->trackInfo.end())
+                {
+                    RtspServerTrackInfoPtr trackInfo = itr.value();
+                    QList<QByteArray> ports = data.split('=').last().split('-');
+                    trackInfo->clientPort = ports[0].toInt();
+                    trackInfo->clientRtcpPort = ports[1].toInt();
+                    if (!d->tcpMode) {
+                        if (trackInfo->openServerSocket(d->socket->getPeerAddress())) {
+                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket.getLocalPort()));
+                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket.getLocalPort()));
+                        }
+                    }
+                }
+                //d->trackPorts.insert(trackId, QPair<int,int>(ports[0].toInt(), ports.size() > 1 ? ports[1].toInt() : 0));
             }
         }
     }
+    d->responseHeaders.setValue("Transport", transport);
     return CODE_OK;
 }
 
@@ -552,9 +626,17 @@ void QnRtspConnectionProcessor::processRangeHeader()
 {
     Q_D(QnRtspConnectionProcessor);
     QString rangeStr = d->requestHeaders.value("Range");
-    if (rangeStr.isNull())
+    QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
+    if (rangeStr.isNull()) {
+        if (cameraResource)
+            d->startTime = DATETIME_NOW;
+        else
+            d->startTime = 0;
         return;
+    }
     parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
+    if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
+        d->startTime = DATETIME_NOW;
 }
 
 void QnRtspConnectionProcessor::parseRangeHeader(const QString& rangeStr, qint64* startTime, qint64* endTime)
@@ -803,8 +885,7 @@ int QnRtspConnectionProcessor::composeTeardown()
     d->rtspScale = 1.0;
     d->startTime = d->endTime = 0;
 
-    d->trackPorts.clear();
-    d->encoders.clear();
+    //d->encoders.clear();
 
     return CODE_OK;
 }
@@ -923,6 +1004,21 @@ void QnRtspConnectionProcessor::processRequest()
         d->dataProcessor->resumeNetwork();
 }
 
+void QnRtspConnectionProcessor::processBinaryRequest()
+{
+
+}
+
+int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
+{
+    if (data.size() < 4)
+        return 0;
+    int msgLen = (data.at(2) << 8) + data.at(3) + 4;
+    if (data.size() < msgLen)
+        return 0;
+    return msgLen;
+}
+
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -933,13 +1029,27 @@ void QnRtspConnectionProcessor::run()
         int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) {
             d->receiveBuffer.append((const char*) d->tcpReadBuffer, readed);
-            int msgLen = isFullMessage(d->receiveBuffer);
-            if (msgLen)
+            if (d->receiveBuffer[0] == '$')
             {
-                d->clientRequest = d->receiveBuffer.left(msgLen);
-                d->receiveBuffer.remove(0, msgLen);
-                parseRequest();
-                processRequest();
+                // binary request
+                int msgLen = isFullBinaryMessage(d->receiveBuffer);
+                if (msgLen)
+                {
+                    d->clientRequest = d->receiveBuffer.left(msgLen);
+                    d->receiveBuffer.remove(0, msgLen);
+                    processBinaryRequest();
+                }
+            }
+            else {
+                // text request
+                int msgLen = isFullMessage(d->receiveBuffer);
+                if (msgLen)
+                {
+                    d->clientRequest = d->receiveBuffer.left(msgLen);
+                    d->receiveBuffer.remove(0, msgLen);
+                    parseRequest();
+                    processRequest();
+                }
             }
         }
         else if (t.elapsed() < 2)
@@ -951,6 +1061,7 @@ void QnRtspConnectionProcessor::run()
 
     d->deleteDP();
     d->socket->close();
+    d->trackInfo.clear();
     m_runing = false;
     //deleteLater(); // does not works for this thread
 }
@@ -961,4 +1072,20 @@ void QnRtspConnectionProcessor::switchToLive()
     QMutexLocker lock(&d->mutex);
     d->liveMode = Mode_Live;
     composePlay();
+}
+
+void QnRtspConnectionProcessor::resetTrackTiming()
+{
+    Q_D(QnRtspConnectionProcessor);
+    for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
+    {
+        itr.value()->sequence = 0;
+        itr.value()->firstRtpTime = -1;
+    }
+}
+
+bool QnRtspConnectionProcessor::isTcpMode() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->tcpMode;
 }

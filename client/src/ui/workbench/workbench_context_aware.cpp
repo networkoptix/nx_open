@@ -75,4 +75,7 @@ QnWorkbenchNavigator *QnWorkbenchContextAware::navigator() const {
     return context()->navigator();
 }
 
+QnVideoServerStatisticsManager *QnWorkbenchContextAware::videoServerStatisticsManager() const{
+    return context()->videoServerStatisticsManager();
+}
 
