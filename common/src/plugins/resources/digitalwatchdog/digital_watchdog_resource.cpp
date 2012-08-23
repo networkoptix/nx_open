@@ -5,7 +5,7 @@ QnPlWatchDogResource::QnPlWatchDogResource()
 
 }
 
-bool QnPlWatchDogResource::isDualStreamingEnabled()
+bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
     CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
@@ -30,6 +30,7 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
     }
     else if (status == CL_HTTP_AUTH_REQUIRED) 
     {
+        unauth = true;
         setStatus(Unauthorized);
     }
 
@@ -38,17 +39,12 @@ bool QnPlWatchDogResource::isDualStreamingEnabled()
 
 bool QnPlWatchDogResource::initInternal() 
 {
-    if (!isDualStreamingEnabled() && getStatus() != QnResource::Unauthorized) 
+    bool unauth = false;
+
+    if (!isDualStreamingEnabled(unauth) && unauth==false) 
     {
         // The camera most likely is going to reset after enabling dual streaming
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-        QByteArray request;
-        request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
-        request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
-        CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
-        Q_UNUSED(status);
-
-        setStatus(Offline);
+        enableOnvifSecondStream();
         return false;
     }
     else 
@@ -57,6 +53,20 @@ bool QnPlWatchDogResource::initInternal()
     }
 }
 
+
+void QnPlWatchDogResource::enableOnvifSecondStream()
+{
+    // The camera most likely is going to reset after enabling dual streaming
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    QByteArray request;
+    request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
+    request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
+    CLHttpStatus status = http.doPOST(QByteArray("/cgi-bin/onvifsetup.cgi"), QLatin1String(request));
+    Q_UNUSED(status);
+
+    setStatus(Offline);
+    // camera rebooting ....
+}
 
 int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution, int fps) const
 {

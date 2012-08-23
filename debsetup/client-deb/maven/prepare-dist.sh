@@ -1,6 +1,6 @@
-unzip -a -o -u 'client*.zip'
-rm ./client*.zip
-unzip -a -o -u '*.zip' -x '**/include/**' '*.a'
+#unzip -a -o -u 'client*.zip'
+#rm ./client*.zip
+#unzip -a -o -u '*.zip' -x '**/include/**' '*.a'
 
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done

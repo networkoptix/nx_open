@@ -76,7 +76,14 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
         foreach(QnRtspDataConsumer* consumer, m_allConsumers)
         {
             if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
-                consumer->resetQualityStatistics();
+            {
+                if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                {
+                    consumer->resetQualityStatistics();
+                    if (m_liveQuality == MEDIA_Quality_Low)
+                        break;
+                }
+            }
         }
     }
     stop();
@@ -176,6 +183,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     Q_ASSERT(m_firstLiveTime != AV_NOPTS_VALUE);
     qint64 elapsed = m_liveTimer.elapsed()*1000;
     bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
+
     return rez;
 }
 
@@ -213,6 +221,9 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
     {
         m_dataQueue.lock();
+
+        m_newLiveQuality = MEDIA_Quality_Low;
+
         QnAbstractMediaDataPtr dataLow;
         QnAbstractMediaDataPtr dataHi;
         for (int i = m_dataQueue.size()-1; i >=0; --i)

@@ -20,23 +20,6 @@
 	<packaging>pom</packaging>
 	<name>Enterprise Controller Deb Package</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.networkoptix.hdwitness</groupId>
-			<artifactId>mediaproxy</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.networkoptix.hdwitness</groupId>
-			<artifactId>appserver</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-exec</classifier>
-		</dependency>		
-	</dependencies>		
-
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
