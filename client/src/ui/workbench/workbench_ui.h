@@ -171,6 +171,7 @@ protected:
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
+    void updatePanicButtonGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);

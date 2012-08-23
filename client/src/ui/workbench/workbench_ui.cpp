@@ -626,8 +626,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_panicButton->setCheckable(true);
     m_panicButton->setIcon(qnSkin->icon("play.png", "pause.png"));
     m_panicButton->setPreferredSize(60, 30);
-    m_panicButton->setPos(titleLayout->geometry().width() - 60, titleLayout->geometry().height());
-    connect(m_panicButton, SIGNAL(toggled(bool)), action(Qn::TogglePanicModeAction), SLOT(toggle()));
+    connect(action(Qn::TogglePanicModeAction), SIGNAL(toggled(bool)), m_panicButton, SLOT(setChecked(bool)));
+    connect(m_panicButton, SIGNAL(clicked()), action(Qn::TogglePanicModeAction), SLOT(toggle()));
 
 
     /* Connect to display. */
@@ -1251,7 +1251,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
 void QnWorkbenchUi::updateFpsGeometry() {
     QPointF pos = QPointF(
         m_controlsWidgetRect.right() - m_fpsItem->size().width(),
-        m_titleUsed ? m_titleItem->geometry().bottom() : 0.0
+        m_panicButton->geometry().bottom()
     );
 
     if(qFuzzyCompare(pos, m_fpsItem->pos()))
@@ -1284,6 +1284,19 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
         m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
     }
+}
+
+void QnWorkbenchUi::updatePanicButtonGeometry(){
+    QPointF pos = QPointF(
+            m_controlsWidgetRect.right() - m_panicButton->size().width(),
+            m_titleUsed ? m_titleItem->geometry().bottom() : 0.0
+    );
+
+    if(qFuzzyCompare(pos, m_panicButton->pos()))
+        return;
+
+    m_panicButton->setPos(pos);
+    updateFpsGeometry();
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
@@ -1552,7 +1565,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
 
     updateTreeGeometry();
     updateHelpGeometry();
-    updateFpsGeometry();
+    updatePanicButtonGeometry();
 }
 
 void QnWorkbenchUi::at_sliderShowButton_toggled(bool checked) {
@@ -1694,9 +1707,9 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     if(!m_titleUsed)
         return;
 
-    updateFpsGeometry();
     updateTreeGeometry();
     updateHelpGeometry();
+    updatePanicButtonGeometry();
 
     QRectF geometry = m_titleItem->geometry();
 
