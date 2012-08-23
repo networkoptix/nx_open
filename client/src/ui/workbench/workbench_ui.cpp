@@ -622,6 +622,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
     connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
 
+    m_panicButton = new QnImageButtonWidget(m_controlsWidget);
+    m_panicButton->setCheckable(true);
+    m_panicButton->setIcon(qnSkin->icon("play.png", "pause.png"));
+    m_panicButton->setPreferredSize(60, 30);
+    m_panicButton->setPos(titleLayout->geometry().width() - 60, titleLayout->geometry().height());
+    connect(m_panicButton, SIGNAL(toggled(bool)), action(Qn::TogglePanicModeAction), SLOT(toggle()));
+
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
