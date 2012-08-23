@@ -103,6 +103,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 //
 
 QnPlOnvifResource::QnPlOnvifResource() :
+    m_physicalParamsMutex(QMutex::Recursive),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -1460,11 +1461,12 @@ bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
+    QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_onvifAdditionalSettings) {
         return false;
     }
 
-    QMutexLocker lock(&m_mutex);
+    m_onvifAdditionalSettings->makeGetRequest();
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::Iterator it = settings.find(param.name());
 
@@ -1484,11 +1486,10 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
+    QMutexLocker lock(&m_physicalParamsMutex);
     if (!m_onvifAdditionalSettings) {
         return false;
     }
-
-    QMutexLocker lock(&m_mutex);
 
     CameraSetting tmp;
     tmp.deserializeFromStr(val.toString());
@@ -1544,20 +1545,19 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
     OnvifCameraSettingReader reader(*settings);
 
     reader.read() && reader.proceed();
-    {
-        QMutexLocker lock(&m_mutex);
 
-        if (m_onvifAdditionalSettings) {
-            delete m_onvifAdditionalSettings;
-        }
-
-        m_onvifAdditionalSettings = settings;
-    }
-
-    CameraSettings& onvifSettings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings& onvifSettings = settings->getCameraSettings();
     CameraSettings::ConstIterator it = onvifSettings.begin();
 
     for (; it != onvifSettings.end(); ++it) {
         setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
     }
+
+    QMutexLocker lock(&m_physicalParamsMutex);
+
+    if (m_onvifAdditionalSettings) {
+        delete m_onvifAdditionalSettings;
+    }
+
+    m_onvifAdditionalSettings = settings;    
 }

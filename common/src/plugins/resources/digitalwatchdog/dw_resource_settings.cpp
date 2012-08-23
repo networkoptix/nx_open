@@ -47,6 +47,10 @@ bool DWCameraProxy::getFromCameraImpl()
 
 bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
+    if (!getFromCameraImpl()) {
+        return false;
+    }
+
     QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
     if (it == m_bufferedValues.end()) {
         return false;

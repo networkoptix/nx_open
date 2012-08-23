@@ -25,11 +25,13 @@ public:
 
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
+    void advancedSettingChanged();
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
     void at_settingsWidget_hasChangesChanged();
     void at_settingsWidget_modeChanged();
+    void at_advancedSettingChanged();
 
 private:
     QWeakPointer<QnWorkbenchContext> m_context;

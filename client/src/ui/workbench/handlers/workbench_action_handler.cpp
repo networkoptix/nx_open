@@ -1268,6 +1268,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
@@ -1310,6 +1311,24 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
     cameraSettingsDialog()->widget()->updateFromResources();
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsAdvanced_changed() {
+    if(!cameraSettingsDialog())
+        return;
+
+    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
+
+    if (!hasCameraChanges) {
+        return;
+    }
+
+    QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
+    if(cameras.empty())
+        return;
+
+    cameraSettingsDialog()->widget()->submitToResources();
+    saveAdvancedCameraSettingsAsync(cameras);
 }
 
 void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {

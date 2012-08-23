@@ -102,7 +102,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_physicalParamsMutex);
 
     if (m_cameraProxy)
     {
@@ -123,7 +123,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
 bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_physicalParamsMutex);
 
     if (m_cameraProxy)
     {

@@ -187,6 +187,8 @@ protected:
     QList<ResolutionPair> m_secondaryResolutionList;
     OnvifCameraSettingsResp* m_onvifAdditionalSettings;
 
+    mutable QMutex m_physicalParamsMutex;
+
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;

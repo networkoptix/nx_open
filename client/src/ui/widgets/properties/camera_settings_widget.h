@@ -57,9 +57,11 @@ signals:
     void hasChangesChanged();
     void modeChanged();
     void moreLicensesRequested();
+    void advancedSettingChanged();
 
 protected slots:
     void at_moreLicensesRequested();
+    void at_advancedSettingChanged();
 
 private:
     void setMode(Mode mode);

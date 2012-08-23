@@ -33,6 +33,7 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
 
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
+    connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);
@@ -244,6 +245,10 @@ void QnCameraSettingsWidget::setMode(Mode mode) {
 
 void QnCameraSettingsWidget::at_moreLicensesRequested() {
     menu()->trigger(Qn::GetMoreLicensesAction);
+}
+
+void QnCameraSettingsWidget::at_advancedSettingChanged() {
+    emit advancedSettingChanged();
 }
 
 bool QnCameraSettingsWidget::isValidMotionRegion(){

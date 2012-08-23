@@ -576,5 +576,6 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
 {
     m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
-    at_cameraDataChanged();
+    m_hasCameraChanges = true;//ToDo: at_cameraDataChanged();
+    emit advancedSettingChanged();
 }

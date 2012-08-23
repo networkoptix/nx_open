@@ -63,6 +63,7 @@ public slots:
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
+    void advancedSettingChanged();
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
