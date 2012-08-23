@@ -190,7 +190,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>get_buildenv.bat</executable>
+									<executable>${environment.dir}/get_buildenv.bat</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
 								</configuration>
 							</execution>

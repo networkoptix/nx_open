@@ -44,6 +44,7 @@
 							<files>
 								<file>../build-${customization}.properties</file>
 								<file>../build-environment/${arch}/libdir.properties</file>
+								<file>../appserver/setup/build/appserver.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -113,7 +114,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>
 									<arguments>
 										<argument>dir</argument>
-										<argument>appserver</argument>
+										<argument>${AppServerDir}</argument>
 										<argument>-wixvar</argument>
 										<argument>-nologo</argument>
 										<argument>-sfrag</argument> 
@@ -162,7 +163,7 @@
 									<executable>candle</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>
 									<arguments>
-										<argument>-dAppServerSourceDir="appserver"</argument>
+										<argument>-dAppServerSourceDir="${AppServerDir}"</argument>
 										<argument>-out</argument>
 										<argument>obj\${build.configuration}\</argument>
 										<argument>-ext</argument> 

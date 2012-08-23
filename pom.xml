@@ -16,7 +16,6 @@
 		<main.basedir>${project.basedir}</main.basedir>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
-		<environment.dir>${env.environment}</environment.dir>
 		<customization>default</customization>
 		<!--QT libs used--> 
 		<qtlib1>core</qtlib1>
@@ -133,6 +132,7 @@
 				<module>wixsetup</module>
 			</modules>
 			<properties>
+				<environment.dir>${env.ENVIRONMENT}</environment.dir>
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
@@ -172,6 +172,7 @@
 				<module>debsetup/appserver-deb</module>
 			</modules>
 			<properties>
+				<environment.dir>${env.environment}</environment.dir>
 				<platform>linux</platform>
 				<compiler>gcc</compiler>
 			</properties>
