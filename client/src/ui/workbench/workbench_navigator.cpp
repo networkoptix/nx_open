@@ -245,7 +245,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     if(!isLiveSupported())
         return false;
 
-    if(live) {
+    if (live){
         m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
         m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
@@ -1058,14 +1058,15 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update reader position. */
     if(m_currentMediaWidget && !m_updatingSliderFromReader) {
-        QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
-        if (value == DATETIME_NOW) {
-            reader->jumpToPreviousFrame(DATETIME_NOW);
-        } else {
-            if (m_timeSlider->isSliderDown()) {
-                reader->jumpTo(value * 1000, 0);
+        if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()){
+            if (value == DATETIME_NOW) {
+                reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                if (m_timeSlider->isSliderDown()) {
+                    reader->jumpTo(value * 1000, 0);
+                } else {
+                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                }
             }
         }
 
