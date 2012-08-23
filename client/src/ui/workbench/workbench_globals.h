@@ -14,7 +14,7 @@ namespace Qn {
         ServersNode,
         UsersNode,
         ResourceNode,   /**< Node that represents a resource. */
-        ItemNode,       /**< Node that represents a layout item. */
+        ItemNode        /**< Node that represents a layout item. */
     };
 
 

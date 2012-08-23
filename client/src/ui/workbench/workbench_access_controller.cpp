@@ -43,6 +43,12 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
+quint64 QnWorkbenchAccessController::rights() const{
+    if (!m_user)
+        return 0;
+    return m_user->getRights();
+}
+
 bool QnWorkbenchAccessController::hasRights(Qn::UserRights requiredRights) const {
     return m_user && ((m_user->getRights() & requiredRights) == requiredRights);
 }

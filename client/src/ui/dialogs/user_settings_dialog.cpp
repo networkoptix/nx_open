@@ -22,7 +22,9 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     QDialog(parent),
     ui(new Ui::UserSettingsDialog()),
     m_context(context),
-    m_hasChanges(false)
+    m_user(0),
+    m_hasChanges(false),
+    m_editorRights(0)
 {
     if(context == NULL) 
         qnNullWarning(context);
@@ -118,12 +120,21 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
 //        ui->accessRightsGroupbox->setEnabled(editable);
         setReadOnly(ui->accessRightsComboBox, !editable);
         setReadOnly(ui->accessRightsGroupbox, !editable);
+        // TODO: #gdm if readonly then do not save anyway
         break;
     default:
         break;
     }
 
     updateElement(element);
+}
+
+void QnUserSettingsDialog::setEditorRights(quint64 rights){
+    m_editorRights = rights;
+    if (m_user){
+        createAccessRightsPresets();
+        createAccessRightsAdvanced();
+    }
 }
 
 QnUserSettingsDialog::ElementFlags QnUserSettingsDialog::elementFlags(Element element) const {
@@ -144,6 +155,10 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
         return;
 
     m_user = user;
+    if (m_editorRights){
+        createAccessRightsPresets();
+        createAccessRightsAdvanced();
+    }
 
     updateFromResource();
 }
@@ -180,7 +195,6 @@ void QnUserSettingsDialog::updateFromResource() {
         loadAccessRightsToUi(m_user->getRights());
         updatePassword();
     }
-
     setHasChanges(false);
 }
 
@@ -195,6 +209,7 @@ void QnUserSettingsDialog::submitToResource() {
     quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
     if (rights == CUSTOM_RIGHTS)
         rights = readAccessRightsAdvanced();
+
     m_user->setRights(rights);
 
     setHasChanges(false);
@@ -290,6 +305,8 @@ void QnUserSettingsDialog::updateElement(Element element) {
             quint64 rights = ui->accessRightsComboBox->itemData(ui->accessRightsComboBox->currentIndex()).toULongLong();
             if (rights == CUSTOM_RIGHTS)
                 ui->advancedButton->setChecked(true);
+            else
+                fillAccessRightsAdvanced(rights);
         }
         break;
     default:
@@ -306,9 +323,6 @@ void QnUserSettingsDialog::updateElement(Element element) {
 }
 
 void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights){
-    createAccessRightsPresets(rights);
-    createAccessRightsAdvanced(rights);
-
     selectAccessRightsPreset(rights);
     fillAccessRightsAdvanced(rights);
 }
@@ -326,25 +340,35 @@ void QnUserSettingsDialog::at_accessRights_changed(){
 }
 
 
-void QnUserSettingsDialog::createAccessRightsPresets(quint64 rights){
-    if (rights & Qn::EditProtectedUserRight){
-        ui->accessRightsComboBox->addItem(tr("Super-Administrator"), (quint64)Qn::SuperUserRight);
+void QnUserSettingsDialog::createAccessRightsPresets(){
+    if (!m_user)
         return;
+
+    quint64 rights = m_user->getRights();
+
+    // show only for view of owner
+    if (rights & Qn::EditProtectedUserRight){
+        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::SuperUserRight);
     }
 
-    if (rights & Qn::ProtectedRight){
+    // view of an admin or anyone opened by owner
+    if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight)){
         ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::AdminRight);
-        return;
     }
 
     ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)0);
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }
 
-void QnUserSettingsDialog::createAccessRightsAdvanced(quint64 rights){
+void QnUserSettingsDialog::createAccessRightsAdvanced(){
+    if (!m_user)
+        return;
+
+    quint64 rights = m_user->getRights();
+
     if (rights & Qn::EditProtectedUserRight)
-        createAccessRightCheckBox(tr("Super-Administrator"), Qn::EditProtectedUserRight);
-    if (rights & Qn::ProtectedRight)
+        createAccessRightCheckBox(tr("Owner"), Qn::EditProtectedUserRight);
+    if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight))
         createAccessRightCheckBox(tr("Administrator"), Qn::ProtectedRight);
     createAccessRightCheckBox(tr("Can create and edit users"), Qn::EditUserRight);
     createAccessRightCheckBox(tr("Can create and edit layouts"), Qn::EditLayoutRight);

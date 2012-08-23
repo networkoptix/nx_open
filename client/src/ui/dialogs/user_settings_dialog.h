@@ -42,6 +42,8 @@ public:
     void setElementFlags(Element element, ElementFlags flags);
     ElementFlags elementFlags(Element element) const;
 
+    void setEditorRights(quint64 rights);
+
     bool hasChanges() const {
         return m_hasChanges;
     }
@@ -68,8 +70,8 @@ protected slots:
     void setHasChanges(bool hasChanges = true);
     void at_accessRights_changed();
 private:
-    void createAccessRightsPresets(quint64 rights);
-    void createAccessRightsAdvanced(quint64 rights);
+    void createAccessRightsPresets();
+    void createAccessRightsAdvanced();
     void createAccessRightCheckBox(QString text, quint64 right);
     void selectAccessRightsPreset(quint64 rights);
     void fillAccessRightsAdvanced(quint64 rights);
@@ -85,6 +87,7 @@ private:
     ElementFlags m_flags[ElementCount];
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
+    quint64 m_editorRights;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)

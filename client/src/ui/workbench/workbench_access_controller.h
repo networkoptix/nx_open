@@ -32,6 +32,7 @@ public:
     virtual ~QnWorkbenchAccessController();
 
     Qn::Permissions permissions(const QnResourcePtr &resource) const;
+    quint64 rights() const;
 
     bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
     bool hasRights(Qn::UserRights requiredRights) const;

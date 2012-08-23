@@ -714,8 +714,6 @@ void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
     arguments << QLatin1String("--delayed-drop");
     arguments << QLatin1String(serializedData.toBase64().data());
 
-    qDebug() << "args";
-    qDebug() << arguments[1];
     openNewWindow(arguments);
 }
 
@@ -1428,13 +1426,10 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setEditorRights(accessController()->rights());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    if(accessController()->hasRights(Qn::EditProtectedUserRight)) {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible | QnUserSettingsDialog::Editable);
-    } else {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    }
+
 
     if(!dialog->exec())
         return;
@@ -1586,6 +1581,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setEditorRights(accessController()->rights());
     
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);

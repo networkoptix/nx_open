@@ -6,7 +6,7 @@
 
 class QnUserResource : public QnResource
 {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnResource base_type;
 
@@ -21,15 +21,18 @@ public:
     quint64 getRights() const;
     void setRights(quint64 rights);
 
+    bool isAdmin() const;
+    void setAdmin(bool isAdmin);
 protected:
     virtual void updateInner(QnResourcePtr other) override;
 
 private:
     QString m_password;
     quint64 m_rights;
+    bool m_isAdmin;
 };
 
-Q_DECLARE_METATYPE(QnUserResourcePtr);
-Q_DECLARE_METATYPE(QnUserResourceList);
+Q_DECLARE_METATYPE(QnUserResourcePtr)
+Q_DECLARE_METATYPE(QnUserResourceList)
 
 #endif // QN_USER_RESOURCE_H
