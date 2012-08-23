@@ -11,16 +11,50 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 
+DEPENDPATH *= $${INCLUDEPATH}
+
 !contains(BUILDLIB, staticlib) {
   ICON = ${project.build.directory}/hdw_logo.ico
 }
+
+CONFIG(debug, debug|release) {
+  isEmpty(BUILDLIB) {
+	DESTDIR = ${libdir}/bin/debug
+#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+	} else {
+    DESTDIR = ${libdir}/build/bin/debug
+  }  
+  OBJECTS_DIR  = ${project.build.directory}/build/debug
+  MOC_DIR = ${project.build.directory}/build/debug/generated
+  UI_DIR = ${project.build.directory}/build/debug/generated
+  RCC_DIR = ${project.build.directory}/build/debug/generated
+  LIBS = -L${libdir}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug
+}
+
+CONFIG(release, debug|release) {
+  isEmpty(BUILDLIB) {
+	DESTDIR = ${libdir}/bin/release
+#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+  } else {
+    DESTDIR = ${libdir}/build/bin/release
+  }  
+  OBJECTS_DIR  = ${project.build.directory}/build/release
+  MOC_DIR = ${project.build.directory}/build/release/generated
+  UI_DIR = ${project.build.directory}/build/release/generated
+  RCC_DIR = ${project.build.directory}/build/release/generated
+  LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
+}
+
+LIBS += -lcommon	
 
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${project.build.directory}/build/include ${project.build.directory}/build/pri
+include(${environment.dir}/qt/custom/QtCore/private/qtcore.pri) 
+INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore 
+
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
@@ -29,27 +63,10 @@ OVERRIDE_DEFINITION = "override="
 win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
 
-CONFIG(debug, debug|release) {
-  DESTDIR = ${project.build.directory}/bin/debug
-  OBJECTS_DIR  = ${project.build.directory}/build/debug
-  MOC_DIR = ${project.build.directory}/build/debug/generated
-  UI_DIR = ${project.build.directory}/build/debug/generated
-  RCC_DIR = ${project.build.directory}/build/debug/generated
-  LIBS = -L${project.build.directory}/build/bin/debug -L${environment.dir}/qt/bin/${arch}/debug -L${basedir}/../common/${arch}/bin/debug $$LIBS
-}
-
-CONFIG(release, debug|release) {
-  DESTDIR = ${project.build.directory}/bin/release
-  OBJECTS_DIR  = ${project.build.directory}/build/release
-  MOC_DIR = ${project.build.directory}/build/release/generated
-  UI_DIR = ${project.build.directory}/build/release/generated
-  RCC_DIR = ${project.build.directory}/build/release/generated
-  LIBS = -L${project.build.directory}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release -L${basedir}/../common/${arch}/bin/release $$LIBS
-}
-
 win* {
   !contains(BUILDLIB, staticlib) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
+	ICON = ${project.build.directory}/hdw_logo.ico	
   }
   
   CONFIG += ${arch}

@@ -17,9 +17,9 @@ STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${buil
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
-CLIENT_BIN_PATH=${project.build.directory}/bin
-CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/${build.configuration}/styles
-CLIENT_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
+CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
+CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
+CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
 	
 . $CLIENT_BIN_PATH/env.sh
 
@@ -40,7 +40,7 @@ cp -P -Rf usr $STAGE
 
 # Copy libraries
 cp -P $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -P $CLIENT_STYLES_PATH/libbespin.so* $BINSTAGE/styles
+cp -P $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
 
 # Must use system libraries due to compatibility issues
 # cp -P ${qt.dir}/libaudio.so* $LIBSTAGE

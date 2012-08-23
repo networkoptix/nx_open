@@ -20,22 +20,10 @@
 	<packaging>pom</packaging>
 	<name>Media Server Deb Package</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>com.networkoptix.hdwitness</groupId>
-			<artifactId>client</artifactId>
-			<version>${project.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
-		</dependency>
-	</dependencies>		
-
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
 		<sourceDirectory>${basedir}/src</sourceDirectory> 	
-		<plugins>
-
-		</plugins>		
+		<plugins></plugins>		
 	</build>
 </project>
