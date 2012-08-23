@@ -19,7 +19,8 @@ QnResourceConsumer(res),
 m_videoParser(0),
 m_audioParser(0),
 m_videoIO(0),
-m_audioIO(0)
+m_audioIO(0),
+m_pleaseStop(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -105,7 +106,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     QTime dataTimer;
     dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int readed = m_RtpSession.readBinaryResponce(rtpBuffer, sizeof(rtpBuffer));
         m_RtpSession.sendKeepAliveIfNeeded();
@@ -160,8 +161,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         return result;
     }
-
-    qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+    if (m_RtpSession.isOpened() && !m_pleaseStop)
+        qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
     return result;
 }
 
@@ -183,7 +184,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     QTime dataTimer;
     dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int nfds = 0;
         FD_ZERO(&read_set);
@@ -385,4 +386,9 @@ const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
         return m_audioParser->getAudioLayout();
     else
         return 0;
+}
+
+void QnMulticodecRtpReader::pleaseStop()
+{
+    m_pleaseStop = true;
 }
