@@ -56,8 +56,24 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 
 QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
 {
-    if (durationMs == -1 || other.startTimeMs == -1)
+    if (durationMs == -1 && other.durationMs == -1)
         return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);
+
+    if (durationMs == -1){
+        if (startTimeMs > other.startTimeMs + other.durationMs)
+            return QnTimePeriod();
+        if (startTimeMs < other.startTimeMs)
+            return QnTimePeriod(other.startTimeMs, other.durationMs);
+        return QnTimePeriod(startTimeMs, other.durationMs - (startTimeMs - other.startTimeMs));
+    }
+
+    if (other.durationMs == -1){
+        if (other.startTimeMs > startTimeMs + durationMs)
+            return QnTimePeriod();
+        if (other.startTimeMs < startTimeMs)
+            return QnTimePeriod(startTimeMs, durationMs);
+        return QnTimePeriod(other.startTimeMs, durationMs - (other.startTimeMs - startTimeMs));
+    }
 
     if (other.startTimeMs > startTimeMs + durationMs || startTimeMs > other.startTimeMs + other.durationMs)
         return QnTimePeriod();
