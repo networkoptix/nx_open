@@ -11,6 +11,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/screen_recording/screen_recorder.h>
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
@@ -357,6 +358,15 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("connected.png"));
 
+    factory(Qn::TogglePanicModeAction).
+        flags(Qn::Main).
+        text(tr("Start Panic Recording")).
+        toggledText(tr("Stop Panic Recording")).
+        autoRepeat(false).
+        shortcut(tr("Ctrl+P")).
+        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        condition(new QnPanicActionCondition(this));
+
     factory().
         flags(Qn::Main | Qn::Tree).
         separator();
@@ -440,15 +450,18 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    factory(Qn::ScreenRecordingAction).
-        flags(Qn::Main).
-        text(tr("Start Screen Recording")).
-        toggledText(tr("Stop Screen Recording")).
-        shortcut(tr("Alt+R")).
-        shortcut(Qt::Key_MediaRecord).
-        shortcutContext(Qt::ApplicationShortcut).
-        icon(qnSkin->icon("decorations/recording.png")).
-        autoRepeat(false);
+
+    if (QnScreenRecorder::isSupported()){
+        factory(Qn::ScreenRecordingAction).
+            flags(Qn::Main).
+            text(tr("Start Screen Recording")).
+            toggledText(tr("Stop Screen Recording")).
+            shortcut(tr("Alt+R")).
+            shortcut(Qt::Key_MediaRecord).
+            shortcutContext(Qt::ApplicationShortcut).
+            icon(qnSkin->icon("decorations/recording.png")).
+            autoRepeat(false);
+    }
 
     factory(Qn::FullscreenAction).
         flags(Qn::Main).
@@ -477,7 +490,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
-        shortcut(tr("Ctrl+P")).
+        //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
         autoRepeat(false).
         icon(qnSkin->icon("decorations/settings.png"));
@@ -838,14 +851,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ToggleThumbnailsAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Show Thumbnails")).
-        toggledText(tr("Hide Thumbnails")).
-        icon(qnSkin->icon("thumbnails.png"));
+        toggledText(tr("Hide Thumbnails"));
 
     factory(Qn::ToggleCalendarAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Show Calendar")).
-        toggledText(tr("Hide Calendar")).
-        icon(qnSkin->icon("thumbnails.png"));
+        toggledText(tr("Hide Calendar"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
@@ -920,7 +931,10 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
     dst->setChecked(src->isChecked());
     dst->setFont(src->font());
     dst->setIconText(src->iconText());
+    
     dst->setProperty(sourceActionPropertyName, QVariant::fromValue<QnAction *>(src));
+    foreach(const QByteArray &name, src->dynamicPropertyNames())
+        dst->setProperty(name.data(), src->property(name.data()));
     
     if(forwardSignals) {
         connect(dst, SIGNAL(triggered()),   src, SLOT(trigger()));

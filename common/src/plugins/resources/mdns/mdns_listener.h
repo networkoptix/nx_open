@@ -14,12 +14,12 @@ public:
 
     struct ConsumerData
     {
-        ConsumerData(const QByteArray& _response, const QString& _localAddress, const QString& _removeAddress):
-                response(_response), localAddress(_localAddress), removeAddress(_removeAddress) {}
+        ConsumerData(const QByteArray& response, const QString& localAddress, const QString& remoteAddress):
+                response(response), localAddress(localAddress), remoteAddress(remoteAddress) {}
 
         QByteArray response;
-        QString removeAddress;
         QString localAddress;
+        QString remoteAddress;
     };
 
     typedef QList<ConsumerData> ConsumerDataList;
@@ -37,8 +37,9 @@ private:
     void updateSocketList();
     void readDataFromSocket();
     void deleteSocketList();
-    QString getBestLocalAddress(const QString& removeAddress);
+    QString getBestLocalAddress(const QString& remoteAddress);
     void readSocketInternal(UDPSocket* socket, QString localAddress);
+
 private:
     QList<UDPSocket*> m_socketList;
     UDPSocket* m_receiveSocket;

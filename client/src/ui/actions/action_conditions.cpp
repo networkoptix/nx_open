@@ -2,6 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
+#include <core/resourcemanagment/resource_pool.h>
 #include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -106,7 +107,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image);
+        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server);
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -175,13 +176,13 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::layout))
+        if(resource->hasFlags(QnResource::layout))
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::user))
+        if(resource->hasFlags(QnResource::user))
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::remote_server) || resource->checkFlags(QnResource::live_cam)) // TODO: move this to permissions.
+        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: move this to permissions.
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
@@ -236,7 +237,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & QnResource::still_image)
+    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->currentRenderStatus();
@@ -275,3 +276,11 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
+    foreach(const QnVirtualCameraResourcePtr &camera, resourcePool()->getResources().filtered<QnVirtualCameraResource>())
+        if(!camera->isScheduleDisabled())
+            return Qn::EnabledAction;
+    return Qn::DisabledAction;
+}
+

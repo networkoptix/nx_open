@@ -24,6 +24,7 @@ public:
     virtual ~QnProgressiveDownloadingConsumer();
 
     QnFfmpegTranscoder* getTranscoder();
+    int getVideoStreamResolution() const;
 protected:
     virtual void run() override;
 private:

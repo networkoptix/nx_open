@@ -516,10 +516,11 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
 
 void TestReceiver::getParamsCompleted( int status, const QList< QPair< QString, QVariant> >& params )
 {
-    int x = 0;
+    Q_UNUSED(status)
+    Q_UNUSED(params)
 }
 
 void TestReceiver::setParamCompleted( int status )
 {
-    int x = 0;
+    Q_UNUSED(status)
 }

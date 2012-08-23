@@ -172,7 +172,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager(display()->instrumentManager()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_cursorPos(invalidCursorPos())
+    m_cursorPos(invalidCursorPos()),
+    m_screenRecorder(0)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -357,7 +358,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
-    window->addAction(action(Qn::ScreenRecordingAction));
+    if (QnScreenRecorder::isSupported())
+        window->addAction(action(Qn::ScreenRecordingAction));
     window->addAction(action(Qn::ToggleSmartSearchAction));
 
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
@@ -368,12 +370,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
-    connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
+    if (QnScreenRecorder::isSupported())
+        connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
 
     /* Init screen recorder. */
-    m_screenRecorder = new QnScreenRecorder(this);
-    if (m_screenRecorder->isSupported()) {
+    if (QnScreenRecorder::isSupported()){
+        m_screenRecorder = new QnScreenRecorder(this);
         connect(m_screenRecorder,       SIGNAL(recordingStarted()),                                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
         connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
@@ -384,8 +387,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
-    disconnect(m_screenRecorder, NULL, this, NULL);
-    m_screenRecorder->stopRecording();
+    if (m_screenRecorder){
+        disconnect(m_screenRecorder, NULL, this, NULL);
+        m_screenRecorder->stopRecording();
+    }
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -403,7 +408,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                 widget->setSelected(true);
             }
 
-            menu()->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
+            menu()->trigger(Qn::RemoveLayoutItemAction, widget);
             event->ignore();
             return true;
         }
@@ -525,8 +530,7 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::startRecording()
 {
-    if (!m_screenRecorder->isSupported()) {
-        stopRecording();
+    if (!m_screenRecorder) {
         return;
     }
 
@@ -573,10 +577,10 @@ void QnWorkbenchController::startRecording()
 
 void QnWorkbenchController::stopRecording()
 {
-    action(Qn::ScreenRecordingAction)->setChecked(false);
-
-    if (!m_screenRecorder->isSupported())
+    if (!m_screenRecorder)
         return;
+
+    action(Qn::ScreenRecordingAction)->setChecked(false);
 
     if (!m_screenRecorder->isRecording()) {
         m_countdownCanceled = true;
@@ -591,7 +595,8 @@ void QnWorkbenchController::at_recordingAnimation_finished()
     m_recordingLabel->hide();
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            m_screenRecorder->startRecording(widget);
+            if (m_screenRecorder) // just in case =)
+                m_screenRecorder->startRecording(widget);
     }
     m_countdownCanceled = false;
 }
@@ -627,7 +632,8 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    action(Qn::ScreenRecordingAction)->setChecked(false);
+    if (QnScreenRecorder::isSupported())
+        action(Qn::ScreenRecordingAction)->setChecked(false);
 
     QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to the following error: %1").arg(errorMessage));
 }
@@ -1080,10 +1086,7 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 
-        if(
-            (viewportGeometry.width() < zoomedItemGeometry.width() && !qFuzzyCompare(viewportGeometry.width(), zoomedItemGeometry.width())) ||
-            (viewportGeometry.height() < zoomedItemGeometry.height() && !qFuzzyCompare(viewportGeometry.height(), zoomedItemGeometry.height()))
-        ) {
+        if(viewportGeometry.width() < zoomedItemGeometry.width() * 0.975 || viewportGeometry.height() < zoomedItemGeometry.height() * 0.975) {
             workbench()->setItem(Qn::ZoomedRole, NULL);
             workbench()->setItem(Qn::ZoomedRole, workbenchItem);
         } else {
@@ -1140,8 +1143,9 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     m_widgetByRole[role] = newWidget;
 
-    if(newWidget)
-        newWidget->setFocus();
+    QGraphicsItem *focusItem = display()->scene()->focusItem();
+    if(newWidget && (!focusItem || dynamic_cast<QnResourceWidget *>(focusItem)))
+        newWidget->setFocus(); /* Move focus only if it's not already grabbed by some control element. */
 
     switch(role) {
     case Qn::ZoomedRole:

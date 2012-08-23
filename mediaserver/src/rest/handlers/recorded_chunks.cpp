@@ -31,7 +31,7 @@ QRect QnRecordedChunkListHandler::deserializeMotionRect(const QString& rectStr)
         return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
 }
 
-int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
+int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -41,6 +41,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     bool urlFound = false;
     bool useBinary = false;
     QList<QRegion> motionRegions;
+    QString callback;
 
     for (int i = 0; i < params.size(); ++i)
     {
@@ -69,6 +70,8 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
             detailLevel = params[i].second.toLongLong();
         else if (params[i].first == "format")
             useBinary = params[i].second == "bin";
+        else if (params[i].first == "callback")
+            callback = params[i].second;
     }
     if (!urlFound)
         errStr += "Parameter physicalId must be provided. \n";
@@ -100,19 +103,39 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         QnTimePeriod::encode(result,periods);
     }
     else {
+#if 0 // Roma asked to not remove this wonderful piece of code
         result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
         foreach(QnTimePeriod period, periods)
             result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
         result.append("</recordedTimePeriods>\n");
+#else
+        contentType = "application/json";
+
+        result.append(callback);
+        result.append("([");
+        int nSize = periods.size();
+        for (int n = 0; n < nSize; ++n)
+        {
+            if (n)
+                result.append(", ");
+
+            const QnTimePeriod& period = periods[n];
+            result.append("[")
+                .append(QByteArray::number(period.startTimeMs)).append(", ").append(QByteArray::number(period.durationMs))
+                .append("]");
+        }
+            
+        result.append("]);");
+#endif
     }
 
     return CODE_OK;
 }
 
-int QnRecordedChunkListHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
+int QnRecordedChunkListHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result);
+    return executeGet(path, params, result, contentType);
 }
 
 QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
@@ -131,7 +154,7 @@ QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
     return rez;
 }
 
-int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result)
+int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(params)
     //QString method = path.mid(path.lastIndexOf('/')+1);
@@ -151,8 +174,8 @@ int QnXsdHelperHandler::executeGet(const QString& path, const QnRequestParamList
     }
 }
 
-int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result)
+int QnXsdHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
-    return executeGet(path, params, result);
+    return executeGet(path, params, result, contentType);
 }

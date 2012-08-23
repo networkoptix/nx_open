@@ -1,7 +1,7 @@
 #include "transcoder.h"
 #include "ffmpeg_transcoder.h"
+#include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
-#include "quick_sync_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -62,7 +62,8 @@ QnTranscoder::QnTranscoder():
     m_videoCodec(CODEC_ID_NONE),
     m_audioCodec(CODEC_ID_NONE),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
-    m_firstTime(AV_NOPTS_VALUE)
+    m_firstTime(AV_NOPTS_VALUE),
+    m_eofCounter(0)
 {
 
 }
@@ -72,10 +73,27 @@ QnTranscoder::~QnTranscoder()
 
 }
 
+int QnTranscoder::suggestBitrate(QSize resolution) const
+{
+    // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
+    // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
+
+    int hiEnd = 1024*2;
+
+    float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
+    resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240
+
+    int result = hiEnd * resolutionFactor;
+
+    return qMax(128,result)*1024;
+}
+
 int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
-    if (bitrate == -1)
-        bitrate = resolution.width() * resolution.height() * 5;
+    if (bitrate == -1) {
+        //bitrate = resolution.width() * resolution.height() * 5;
+        bitrate = suggestBitrate(resolution);
+    }
 
     m_videoCodec = codec;
     switch (method)
@@ -86,8 +104,10 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
         case TM_FfmpegTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnFfmpegVideoTranscoder(codec));
             break;
+            /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
+            */
             break;
         case TM_OpenCLTranscode:
             m_lastErrMessage = "OpenCLTranscode is not implemented";
@@ -112,8 +132,17 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
     m_internalBuffer.clear();
-    if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
+    if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+    {
+        if (++m_eofCounter >= 3)
+            return -8; // EOF reached
+        else
+            return 0;
+    }
+    else if (media->dataType != QnAbstractMediaData::VIDEO && media->dataType != QnAbstractMediaData::AUDIO)
         return 0; // transcode only audio and video, skip packet
+
+    m_eofCounter = 0;
 
     if (m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;

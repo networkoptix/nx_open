@@ -86,22 +86,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
     m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setPreferredSize(96, 24);
+    m_thumbnailsButton->setIcon(qnSkin->icon("thumbnails.png"));
+    m_thumbnailsButton->setPreferredSize(48, 24);
 
-
-    /* Time label. */
-#if 0
-    m_timeLabel = new GraphicsLabel(this);
-    m_timeLabel->setObjectName("TimeLabel");
-    m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
-    m_timeLabel->setText(QLatin1String(" ")); /* So that it takes some space right away. */
-    {
-        QPalette pal = m_timeLabel->palette();
-        pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
-        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
-        m_timeLabel->setPalette(pal);
-    }
-#endif
+    m_calendarButton = new QnImageButtonWidget(this);
+    m_calendarButton->setDefaultAction(action(Qn::ToggleCalendarAction));
+    m_calendarButton->setIcon(qnSkin->icon("calendar.png"));
+    m_calendarButton->setPreferredSize(48, 24);
 
 
     /* Create sliders. */
@@ -118,15 +109,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
-    m_calendar = new QGraphicsProxyWidget(parent);
-    QnCalendarWidget *calendar = new QnCalendarWidget();
-    m_calendar->setWidget(calendar);
-    m_calendar->setVisible(false);
-
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
-    navigator()->setCalendar(calendar);
 
     /* Put it all into layouts. */
     QGraphicsLinearLayout *buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -153,28 +138,29 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);
     rightLayoutHU->setSpacing(3);
-    rightLayoutHU->addItem(m_liveButton);
-    rightLayoutHU->addItem(m_syncButton);
+    rightLayoutHU->addItem(m_muteButton);
+    rightLayoutHU->addItem(m_volumeSlider);
+
+    QGraphicsLinearLayout *rightLayoutHM = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutHM->setContentsMargins(0, 0, 0, 0);
+    rightLayoutHM->setSpacing(3);
+    rightLayoutHM->addItem(m_liveButton);
+    rightLayoutHM->addItem(m_syncButton);
 
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_muteButton);
-    rightLayoutHL->addItem(m_volumeSlider);
+    rightLayoutHL->addItem(m_thumbnailsButton);
+    rightLayoutHL->addItem(m_calendarButton);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     rightLayoutV->setContentsMargins(0, 3, 0, 3);
     rightLayoutV->setSpacing(0);
     rightLayoutV->setMinimumHeight(87.0);
-    rightLayoutV->addItem(rightLayoutHL);
     rightLayoutV->addItem(rightLayoutHU);
-    rightLayoutV->addItem(m_thumbnailsButton);
-    rightLayoutV->setAlignment(m_thumbnailsButton, Qt::AlignCenter);
-    rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
-#if 0
-    rightLayoutV->addItem(m_timeLabel);
-#endif
+    rightLayoutV->addItem(rightLayoutHM);
+    rightLayoutV->addItem(rightLayoutHL);
 
     QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
     sliderLayout->setContentsMargins(0, 0, 0, 0);

@@ -1,6 +1,6 @@
 #include "multi_camera_time_period_loader.h"
 #include "utils/common/warnings.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/camera_history.h"
 

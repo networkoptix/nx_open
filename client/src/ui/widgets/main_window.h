@@ -14,7 +14,6 @@ class QSpacerItem;
 class QToolButton;
 
 class QnActionManager;
-class QnResourcePoolUserWatcher;
 class QnGradientBackgroundPainter;
 class QnLayoutTabBar;
 class QnGraphicsView;
@@ -26,7 +25,6 @@ class QnWorkbenchUi;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
-class QnWorkbenchActionHandler;
 
 class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -95,7 +93,6 @@ private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
     QnWorkbenchUi *m_ui;
-    QnWorkbenchActionHandler *m_actionHandler;
 
     QnGraphicsView *m_view;
     QnLayoutTabBar *m_tabBar;

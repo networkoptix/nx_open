@@ -16,12 +16,12 @@ inline QString replaceCharacters(const QString &string, const char *symbols, con
     bool mask[256];
     memset(mask, 0, sizeof(mask));
     while(*symbols)
-        mask[*symbols++] = true;
+        mask[static_cast<int>(*symbols++)] = true; /* Static cast is here to silence GCC's -Wchar-subscripts. */
 
     QString result = string;
     for(int i = 0; i < result.size(); i++) {
         ushort c = result[i].unicode();
-        if(c < 0 || c >= 256 || !mask[c])
+        if(c >= 256 || !mask[c])
             continue;
 
         result[i] = replacement;

@@ -23,19 +23,19 @@ private:
     SPSUnit m_sps;
     int m_frequency;
     int m_rtpChannel;
+    int m_prevSequenceNum;
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
     bool m_keyDataExists;
+    bool m_frameExists;
     quint64 m_timeCycles;
     quint64 m_timeCycleValue;
     quint64 m_lastTimeStamp;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
-    int m_prevSequenceNum;
 
     QnCompressedVideoDataPtr m_videoData;
     QnByteArray m_videoBuffer;
-    bool m_frameExists;
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);

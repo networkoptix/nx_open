@@ -38,7 +38,6 @@ class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
 class QnGridItem;
-class QnWorkbenchRenderWatcher;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;

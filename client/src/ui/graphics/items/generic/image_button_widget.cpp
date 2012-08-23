@@ -40,7 +40,19 @@ namespace {
     }
 
     void glDrawTexturedRect(const QRectF &rect) {
+        /* For reasons unknown, default code path produces upside-down quads on X11,
+         * so we work this around by supplying mirrored texture coordinates. */
         glBegin(GL_QUADS);
+#ifdef Q_WS_X11
+        glTexCoord(0.0, 0.0);
+        glVertex(rect.topLeft());
+        glTexCoord(1.0, 0.0);
+        glVertex(rect.topRight());
+        glTexCoord(1.0, 1.0);
+        glVertex(rect.bottomRight());
+        glTexCoord(0.0, 1.0);
+        glVertex(rect.bottomLeft());
+#else
         glTexCoord(0.0, 1.0);
         glVertex(rect.topLeft());
         glTexCoord(1.0, 1.0);
@@ -49,6 +61,7 @@ namespace {
         glVertex(rect.bottomRight());
         glTexCoord(0.0, 0.0);
         glVertex(rect.bottomLeft());
+#endif //Q_WS_X11
         glEnd();
     }
 
@@ -80,7 +93,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_skipNextHoverEvents(false),
     m_state(0),
     m_hoverProgress(0.0),
-    m_action(NULL)
+    m_action(NULL),
+    m_actionIconOverridden(false)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
@@ -137,6 +151,8 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
     setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
     setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::On));
+
+    m_actionIconOverridden = true;
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
@@ -234,7 +250,6 @@ void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsIte
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
     painter->beginNativePainting();
-    //glPushAttrib(GL_CURRENT_BIT | GL_COLOR_BUFFER_BIT); /* Push current color and blending-related options. */
     glEnable(GL_BLEND);
     glEnable(GL_TEXTURE_2D);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -406,7 +421,7 @@ bool QnImageButtonWidget::event(QEvent *event) {
         return event->isAccepted();
     case QEvent::ActionChanged:
         if (actionEvent->action() == m_action)
-            setDefaultAction(actionEvent->action()); /** Update button state. */
+            updateFromDefaultAction();
         break;
     case QEvent::ActionAdded:
         break;
@@ -560,12 +575,20 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
     if (!this->actions().contains(action))
         addAction(action); /* This way we will receive action-related events and thus will track changes in action state. */
 
-    setIcon(action->icon());
-    setToolTip(action->toolTip());
+    m_actionIconOverridden = false;
+    updateFromDefaultAction();
+}
 
-    setCheckable(action->isCheckable());
-    setChecked(action->isChecked());
-    setEnabled(action->isEnabled());
+void QnImageButtonWidget::updateFromDefaultAction() {
+    if(!m_actionIconOverridden) {
+        setIcon(m_action->icon());
+        m_actionIconOverridden = false;
+    }
+
+    setToolTip(m_action->toolTip());
+    setCheckable(m_action->isCheckable());
+    setChecked(m_action->isChecked());
+    setEnabled(m_action->isEnabled());
 }
 
 bool QnImageButtonWidget::isCached() const {

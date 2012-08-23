@@ -131,6 +131,7 @@ protected slots:
     void updateSliderOptions();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
+    void updateCalendarFromSlider();
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodRole type);
@@ -180,7 +181,7 @@ protected slots:
 
     void at_timeScrollBar_destroyed();
     void at_calendar_destroyed();
-    void at_calendar_selectionChanged();
+    void at_calendar_dateChanged(const QDate &date);
 
 private:
     QnTimeSlider *m_timeSlider;

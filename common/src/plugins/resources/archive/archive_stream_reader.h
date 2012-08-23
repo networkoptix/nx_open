@@ -69,6 +69,7 @@ public:
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) override;
 
     virtual QnMediaContextPtr getCodecContext() const override;
+
 protected:
     virtual bool init();
 

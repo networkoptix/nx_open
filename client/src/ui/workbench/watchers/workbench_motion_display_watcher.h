@@ -1,18 +1,22 @@
 #ifndef QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H
 #define QN_WORKBENCH_MOTION_DISPLAY_WATCHER_H
 
-#include <QObject>
-#include <QWeakPointer>
-#include <QSet>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QSet>
 
-class QnWorkbenchDisplay;
+#include <ui/workbench/workbench_context_aware.h>
+
 class QnResourceWidget;
 
-class QnWorkbenchMotionDisplayWatcher: public QObject {
+/**
+ * This class tracks whether there are any widgets on the scene with motion grid
+ * displayed, and provides the necessary getters and notifiers to access this state.
+ */
+class QnWorkbenchMotionDisplayWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    QnWorkbenchMotionDisplayWatcher(QnWorkbenchDisplay *display, QObject *parent = NULL);
-
+    QnWorkbenchMotionDisplayWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchMotionDisplayWatcher();
 
     /**
@@ -43,7 +47,6 @@ protected slots:
     void at_widget_displayFlagsChanged();
 
 private:
-    QWeakPointer<QnWorkbenchDisplay> m_display;
     QSet<QnResourceWidget *> m_widgets;
 };
 

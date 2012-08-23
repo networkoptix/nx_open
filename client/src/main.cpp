@@ -38,7 +38,7 @@
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
@@ -201,10 +201,11 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #endif
     }
 
-    qnLogMsgHandler(type, msg);
+    qnLogMsgHandler( type, msg );
 }
 
 #ifndef API_TEST_MAIN
+
 int main(int argc, char *argv[])
 {
     QTextStream out(stdout);
@@ -276,7 +277,10 @@ int main(int argc, char *argv[])
     /* Initialize application instance. */
     application->setStartDragDistance(20);
 
+    /* Support old straight build scripts. */
+#ifndef NO_TRANSLATIONS
     Q_INIT_RESOURCE(common_translations);
+#endif
 
     QString language = qnSettings->language();
     QTranslator appTranslator;
@@ -288,7 +292,7 @@ int main(int argc, char *argv[])
         application->installTranslator(&commonTranslator);
 
     QTranslator qtTranslator;
-    if (qtTranslator.load(QLatin1String(":/translations/qt_") + language + QLatin1String(".qm")))
+    if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
         application->installTranslator(&qtTranslator);
     
     QnToolTip::instance();
@@ -324,7 +328,7 @@ int main(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture(CLVideoDecoderFactory::FFMPEG);
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);

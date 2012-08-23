@@ -1,7 +1,7 @@
 #include "time_period_loader.h"
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);

@@ -8,7 +8,10 @@ QnVideoTranscoder(codecId),
 m_videoDecoder(0),
 scaleContext(0),
 m_encoderCtx(0),
-m_firstEncodedPts(AV_NOPTS_VALUE)
+m_firstEncodedPts(AV_NOPTS_VALUE),
+m_lastSrcWidth(-1),
+m_lastSrcHeight(-1)
+
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -27,6 +30,17 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
 {
+    if (m_decodedVideoFrame.width != m_lastSrcWidth ||  m_decodedVideoFrame.height != m_lastSrcHeight)
+    {
+        // src resolution is changed
+        m_lastSrcWidth = m_decodedVideoFrame.width;
+        m_lastSrcHeight = m_decodedVideoFrame.height;
+        if (scaleContext) {
+            sws_freeContext(scaleContext);
+            scaleContext = 0;
+        }
+    }
+
     if (scaleContext == 0)
     {
         scaleContext = sws_getContext(m_decodedVideoFrame.width, m_decodedVideoFrame.height, (PixelFormat) m_decodedVideoFrame.format, 
@@ -37,6 +51,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
         }
         m_scaledVideoFrame.reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
     }
+
     sws_scale(scaleContext,
         m_decodedVideoFrame.data, m_decodedVideoFrame.linesize, 
         0, m_decodedVideoFrame.height, 
@@ -67,6 +82,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         m_encoderCtx->height = m_resolution.height();
         m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
         m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+        m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
 
         m_encoderCtx->bit_rate = m_bitrate;
         m_encoderCtx->gop_size = 32;

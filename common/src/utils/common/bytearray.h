@@ -17,7 +17,9 @@ public:
      * \param alignment                 Alignment of array data.
      * \param capacity                  Initial array capacity.
      */
-    explicit QnByteArray(unsigned int alignment, unsigned int capacity);
+    explicit QnByteArray( unsigned int alignment, unsigned int capacity );
+    //!Takes external buffer \a data. This buffer is not deleted in destructor!
+    explicit QnByteArray( char* buf, unsigned int dataSize );
 
     /**
      * Destructor.
@@ -135,6 +137,8 @@ public:
     // TODO: this function breaks data alignment.
     void ignore_first_bytes(int bytes_to_ignore);
 
+    int getAlignment() const;
+
 protected:
     bool reallocate(unsigned int capacity);
 
@@ -147,6 +151,8 @@ private:
     unsigned int m_size;
     char *m_data;
     int m_ignore;
+    //!true, if we own memory pointed to by \a m_data
+    bool m_ownBuffer;
 };
 
 #endif // QN_BYTE_ARRAY_H

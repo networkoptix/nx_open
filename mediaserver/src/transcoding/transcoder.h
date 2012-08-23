@@ -63,6 +63,7 @@ public:
     //!Set picture size (in pixels) of output video stream
     /*!
         By default, output stream has the same picture size as input
+        \param value If (0,0) than input stream picture size is used
     */
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
@@ -155,10 +156,13 @@ protected:
     QnByteArray m_internalBuffer;
     qint64 m_firstTime;
 private:
+    int suggestBitrate(QSize resolution) const;
+private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnCompressedAudioDataPtr> m_delayedAudioQueue;
     bool m_initialized;
+    int m_eofCounter;
 };
 
 #endif  // __TRANSCODER_H

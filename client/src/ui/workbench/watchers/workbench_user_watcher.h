@@ -1,10 +1,11 @@
-#ifndef QN_RESOURCE_POOL_USER_WATCHER_H
-#define QN_RESOURCE_POOL_USER_WATCHER_H
+#ifndef QN_WORKBENCH_USER_WATCHER_H
+#define QN_WORKBENCH_USER_WATCHER_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 
-class QnResourcePool;
+#include <ui/workbench/workbench_context_aware.h>
 
 /**
  * This class can be used for watching the resource pool for a user resource 
@@ -14,12 +15,12 @@ class QnResourcePool;
  * is emitted. If its name changes, or if it is deleted from the pool, 
  * <tt>userChanged</tt> signal will be emitted again, passing a null resource.
  */
-class QN_EXPORT QnResourcePoolUserWatcher: public QObject {
+class QnWorkbenchUserWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    QnResourcePoolUserWatcher(QnResourcePool *resourcePool, QObject *parent = NULL);
+    QnWorkbenchUserWatcher(QObject *parent = NULL);
 
-    virtual ~QnResourcePoolUserWatcher();
+    virtual ~QnWorkbenchUserWatcher();
 
     void setUserName(const QString &name);
 
@@ -44,10 +45,9 @@ private:
     void setCurrentUser(const QnUserResourcePtr &currentUser);
 
 private:
-    QnResourcePool *m_resourcePool;
     QnUserResourceList m_users;
     QString m_userName;
     QnUserResourcePtr m_user;
 };
 
-#endif // QN_RESOURCE_POOL_USER_WATCHER_H
+#endif // QN_WORKBENCH_USER_WATCHER_H

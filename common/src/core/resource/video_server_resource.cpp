@@ -1,4 +1,4 @@
-#include "video_server.h"
+#include "video_server_resource.h"
 
 #include <QtCore/QUrl>
 #include "utils/common/delete_later.h"
@@ -22,8 +22,8 @@ QString QnLocalVideoServerResource::getUniqueId() const
 
 
 QnVideoServerResource::QnVideoServerResource():
-    QnResource()
-    //,m_rtspListener(0)
+    QnResource(),
+    m_panicMode(false)
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
@@ -104,12 +104,12 @@ void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &sto
 class QnEmptyDataProvider: public QnAbstractMediaStreamDataProvider{
 public:
     QnEmptyDataProvider(QnResourcePtr resource): QnAbstractMediaStreamDataProvider(resource){}
-protected:
-    virtual QnAbstractMediaDataPtr getNextData() override{
-        QnAbstractMediaDataPtr data(new QnAbstractMediaData(0, 1));
-        return data;}
-};
 
+protected:
+    virtual QnAbstractMediaDataPtr getNextData() override {
+        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1U));
+    }
+};
 
 QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
     return new QnEmptyDataProvider(toSharedPointer());
@@ -168,6 +168,19 @@ bool QnVideoServerResource::getReserve() const
     return m_reserve;
 }
 
+bool QnVideoServerResource::isPanicMode() const {
+    return m_panicMode;
+}
+
+void QnVideoServerResource::setPanicMode(bool panicMode) {
+    if(m_panicMode == panicMode)
+        return;
+
+    m_panicMode = panicMode;
+
+    emit panicModeChanged(::toSharedPointer(this)); // TODO: emit it AFTER mutex unlock.
+}
+
 void QnVideoServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
@@ -193,6 +206,9 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
 
     QnVideoServerResourcePtr localOther = other.dynamicCast<QnVideoServerResource>();
     if(localOther) {
+        setPanicMode(localOther->isPanicMode());
+
+        m_reserve = localOther->m_reserve;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
 

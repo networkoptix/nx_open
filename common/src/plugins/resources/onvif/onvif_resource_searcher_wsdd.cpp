@@ -1,8 +1,4 @@
-#ifdef WIN32
 #include "openssl/evp.h"
-#else
-#include "evp.h"
-#endif
 
 #include "onvif_resource_searcher_wsdd.h"
 #include "core/resource/camera_resource.h"
@@ -414,8 +410,8 @@ QString OnvifResourceSearcherWsdd::getAppropriateAddress(const T* source, const 
         }
     }
 
-    qDebug() << "OnvifResourceSearcherWsdd::getAppropriateAddress: address = " << appropriateAddr
-             << ". Interface: " << prefixes[0];
+    //qDebug() << "OnvifResourceSearcherWsdd::getAppropriateAddress: address = " << appropriateAddr
+    //         << ". Interface: " << prefixes[0];
 
     return appropriateAddr;
 }
@@ -555,6 +551,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
 template <class T>
 void OnvifResourceSearcherWsdd::printProbeMatches(const T* source, const SOAP_ENV__Header* header) const
 {
+    return;
     qDebug() << "OnvifResourceSearcherWsdd::printProbeMatches";
 
     qDebug() << "  Header: ";

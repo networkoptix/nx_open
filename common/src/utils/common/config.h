@@ -48,8 +48,15 @@
 
 /* Some windows-specific defines. */
 #ifdef _WIN32
-#   define __STDC_CONSTANT_MACROS
+#   undef NOMINMAX
 #   define NOMINMAX 
+#endif
+
+
+/* Some MSVC-specific defines. */
+#ifdef _MSC_VER
+#   undef __STDC_CONSTANT_MACROS
+#   define __STDC_CONSTANT_MACROS
 #endif
 
 

@@ -245,20 +245,6 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
     }
 }
 
-QnResourceList QnResourceCriterion::filter(const QnResourceList &resources) const {
-    QnResourceList result;
-    foreach(const QnResourcePtr &resource, resources) {
-        Operation operation = check(resource);
-        if(operation == Accept)
-            result.push_back(resource);
-    }
-    return result;
-}
-
-QnResourceList QnResourceCriterion::filter(const QnResourceList &resources, const QnResourceCriterion &criterion) {
-    return criterion.filter(resources);
-}
-
 bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r) {
     if(l.type() != r.type())
         return false;

@@ -50,9 +50,15 @@ public:
     void setReserve(bool reserve = true);
     bool getReserve() const;
 
+    bool isPanicMode() const;
+    void setPanicMode(bool panicMode);
+
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+
 signals:
-    void serverIFFound(QString);
+    void serverIFFound(const QString &);
+    void panicModeChanged(const QnVideoServerResourcePtr &resource);
+
 protected:
 
 private:
@@ -63,6 +69,7 @@ private:
     QnAbstractStorageResourceList m_storages;
     bool m_primaryIFSelected;
     bool m_reserve;
+    bool m_panicMode;
 };
 
 class QnVideoServerResourceFactory : public QnResourceFactory

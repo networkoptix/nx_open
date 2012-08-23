@@ -44,7 +44,10 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_hiQualityRetryCounter(0),
   m_realtimeMode(false),
   m_adaptiveSleep(MAX_FRAME_DURATION*1000),
-  m_useUTCTime(true)
+  m_useUTCTime(true),
+  m_fastChannelZappingSize(0),
+  m_firstLiveTime(AV_NOPTS_VALUE),
+  m_lastLiveTime(AV_NOPTS_VALUE)
 {
     memset(m_sequence, 0, sizeof(m_sequence));
     for (int i = 0; i < MAX_RTP_CHANNELS; ++i)
@@ -52,6 +55,18 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
+    foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+    {
+        if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+        {
+            if (consumer->m_liveQuality == MEDIA_Quality_Low) {
+                m_liveQuality = MEDIA_Quality_Low;
+                m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
+                break;
+            }
+        }
+    }
+
     m_allConsumers << this;
 }
 
@@ -72,6 +87,7 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
   void QnRtspDataConsumer::pauseNetwork()
 {
     m_pauseNetwork = true;
+    m_fastChannelZappingSize = 0;
 }
 void QnRtspDataConsumer::resumeNetwork()
 {
@@ -154,6 +170,17 @@ bool QnRtspDataConsumer::canSwitchToHiQuality()
     return true;
 }
 
+bool QnRtspDataConsumer::isMediaTimingsSlow() const
+{
+    QMutexLocker lock(&m_liveTimingControlMtx);
+    if (m_lastLiveTime == AV_NOPTS_VALUE)
+        return false;
+    Q_ASSERT(m_firstLiveTime != AV_NOPTS_VALUE);
+    qint64 elapsed = m_liveTimer.elapsed()*1000;
+    bool rez = m_lastLiveTime - m_firstLiveTime < m_liveTimer.elapsed()*1000;
+    return rez;
+}
+
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -173,25 +200,14 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         if (isSecondaryProvider)
             media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
+
         if (m_newLiveQuality == MEDIA_Quality_None)
         {
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
+            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
+            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
                 m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
             else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
                 m_newLiveQuality = MEDIA_Quality_High;
-        }
-        
-        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
-        {
-            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_High;
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
         }
     }
 
@@ -457,7 +473,21 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (metadata == 0)
     {
-        if (m_liveQuality == MEDIA_Quality_High && m_owner->isSecondaryLiveDP(media->dataProvider))
+        bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
+        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
+        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        {
+            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+            else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                m_liveQuality = MEDIA_Quality_High;
+                m_newLiveQuality = MEDIA_Quality_None;
+            }
+        }
+
+        if (m_liveQuality == MEDIA_Quality_High && isSecondaryProvider)
             return true; // data for other live quality stream
         else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
             return true; // data for other live quality stream
@@ -495,8 +525,27 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (isLive) 
-        media->opaque = m_liveMarker;
+    if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
+    {
+        QMutexLocker lock(&m_liveTimingControlMtx);
+        if (m_firstLiveTime == AV_NOPTS_VALUE) {
+            m_liveTimer.restart();
+            m_lastLiveTime = m_firstLiveTime = media->timestamp;
+        }
+    }
+
+    QnRtspFfmpegEncoderPtr ffmpegEncoder = qSharedPointerDynamicCast<QnRtspFfmpegEncoder>(codecEncoder);
+    if (ffmpegEncoder)
+    {
+        ffmpegEncoder->setAdditionFlags(0);
+        if (isLive) {
+            ffmpegEncoder->setLiveMarker(m_liveMarker);
+            if (m_fastChannelZappingSize > 0) {
+                ffmpegEncoder->setAdditionFlags(QnAbstractMediaData::MediaFlags_FCZ);
+                m_fastChannelZappingSize--;
+            }
+        }
+    }
 
     codecEncoder->setDataPacket(media);
     bool dataExists = true;
@@ -550,6 +599,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
+
+    QMutexLocker lock(&m_liveTimingControlMtx);
+    if (media->dataType == QnAbstractMediaData::VIDEO && m_lastLiveTime != AV_NOPTS_VALUE)
+        m_lastLiveTime = media->timestamp;
+
     return true;
 }
 
@@ -577,6 +631,12 @@ int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skip
     if (camera)
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue);
     m_dataQueue.setMaxSize(m_dataQueue.size()-prevSize + MAX_QUEUE_SIZE);
+    m_fastChannelZappingSize = copySize;
+
+    QMutexLocker lock(&m_liveTimingControlMtx);
+    m_firstLiveTime = AV_NOPTS_VALUE;
+    m_lastLiveTime = AV_NOPTS_VALUE;
+
     return copySize;
 }
 

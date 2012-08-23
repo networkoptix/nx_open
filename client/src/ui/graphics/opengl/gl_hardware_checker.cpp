@@ -117,7 +117,7 @@ QnGlHardwareChecker::~QnGlHardwareChecker() {
     qn_hardwareCheckerPrivate_instance()->check(m_context);
 }
 
-bool QnGlHardwareChecker::eventFilter(QObject *watched, QEvent *event) {
+bool QnGlHardwareChecker::eventFilter(QObject *, QEvent *event) {
     if (event->type() == QEvent::Paint || event->type() == QEvent::UpdateRequest)
         qnDeleteLater(this);
     return false;

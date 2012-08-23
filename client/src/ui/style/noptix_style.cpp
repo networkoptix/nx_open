@@ -182,6 +182,12 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
+    QFont font;
+    font.setPixelSize(12);
+    font.setStyle(QFont::StyleNormal);
+    font.setWeight(QFont::Normal);
+    application->setFont(font);
+
     QFont menuFont;
     menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
@@ -199,16 +205,6 @@ void QnNoptixStyle::polish(QWidget *widget) {
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
         itemView->setIconSize(QSize(18, 18));
-        
-        QFont font = itemView->font();
-        font.setPointSize(10);
-        itemView->setFont(font);
-    } else if(QTabBar *tabBar = qobject_cast<QTabBar *>(widget)) {
-        if(tabBar->inherits("QnLayoutTabBar")) {
-            QFont font = tabBar->font();
-            font.setPointSize(10);
-            tabBar->setFont(font);
-        }
     }
 }
 

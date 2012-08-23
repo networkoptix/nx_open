@@ -19,7 +19,6 @@
 #include <utils/common/string.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool_user_watcher.h>
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <api/session_manager.h>
@@ -56,20 +55,24 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_resource.h>
+#include <ui/workbench/workbench_access_controller.h>
+
+#include <ui/workbench/watchers/workbench_panic_watcher.h>
+
+
 #include <utils/settings.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
 
-#include "workbench.h"
-#include "workbench_display.h"
-#include "workbench_synchronizer.h"
-#include "workbench_layout.h"
-#include "workbench_item.h"
-#include "workbench_context.h"
-#include "workbench_layout_snapshot_manager.h"
-#include "workbench_resource.h"
-#include "workbench_access_controller.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -215,8 +218,12 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
+    connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
+    at_panicWatcher_panicModeChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -274,7 +281,7 @@ bool QnWorkbenchActionHandler::canAutoDelete(const QnResourcePtr &resource) cons
     if(!layoutResource)
         return false;
     
-    return snapshotManager()->flags(layoutResource) == Qn::LayoutIsLocal; /* Local, not changed and not being saved. */
+    return snapshotManager()->flags(layoutResource) == Qn::ResourceIsLocal; /* Local, not changed and not being saved. */
 }
 
 void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position) const {
@@ -331,9 +338,9 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     foreach(const QnLayoutResourcePtr &resource, resources) {
         bool changed, saveable, askable;
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        askable = flags == (Qn::LayoutIsChanged | Qn::LayoutIsLocal); /* Changed, local, not being saved. */
-        changed = flags & Qn::LayoutIsChanged;
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        askable = flags == (Qn::ResourceIsChanged | Qn::ResourceIsLocal); /* Changed, local, not being saved. */
+        changed = flags & Qn::ResourceIsChanged;
         saveable = accessController()->permissions(resource) & Qn::SavePermission;
 
         if(askable && saveable)
@@ -423,9 +430,10 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
             delete layout;
         }
 
-        Qn::LayoutFlags flags = snapshotManager()->flags(resource);
-        if((flags & (Qn::LayoutIsLocal | Qn::LayoutIsBeingSaved | Qn::LayoutIsFile)) == Qn::LayoutIsLocal) /* Local, not being saved and not a file. */
-            resourcePool()->removeResource(resource);
+        Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
+        if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
+            if((resource->flags() & QnResource::local_media) != QnResource::local_media) /* Not a file. */
+                resourcePool()->removeResource(resource);
     }
 }
 
@@ -524,7 +532,7 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
         data.toMimeData(&mimeData);
 
         QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(resources);
+        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()){
             workbench()->clear();
             menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
@@ -547,7 +555,7 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
 
     /* Open all user's layouts. */
     if(qnSettings->isLayoutsOpenedOnLogin()) {
-        QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(context()->resourcePool()->getResourcesWithParentId(user->getId()));
+        QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     }
     
@@ -628,7 +636,8 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered() {
         return;
     }
 
-    QnResourceList resources = QnResourceCriterion::filter<QnResource>(parameters.resources());
+    // TODO: server & media resources only!
+    QnResourceList resources = parameters.resources();
     if(!resources.isEmpty()) {
         addToLayout(layout, resources, !position.isNull(), position);
         return;
@@ -647,12 +656,13 @@ void QnWorkbenchActionHandler::at_openInNewLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnResource, QnResourceList>(menu()->currentParameters(sender()).resources());
-    if(medias.isEmpty()) 
+    // TODO: server & media resources only!
+    QnResourceList resources = menu()->currentParameters(sender()).resources();
+    if(resources.isEmpty()) 
         return;
     
     QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
     QnMimeData data(&mimeData);
     QByteArray serializedData;
     QDataStream stream(&serializedData, QIODevice::WriteOnly);
@@ -682,12 +692,15 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
-    QnResourceList medias = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(menu()->currentParameters(sender()).resources());
-    if(medias.isEmpty()) 
+    // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
+    // TODO: #GDM avoid copypasta.
+
+    QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
+    if(layouts.isEmpty()) 
         return;
 
     QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(medias, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnWorkbenchResource::serializeResources(layouts, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
     QnMimeData data(&mimeData);
     QByteArray serializedData;
     QDataStream stream(&serializedData, QIODevice::WriteOnly);
@@ -832,7 +845,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
-    QnVirtualCameraResourceList serverCameras = QnResourceCriterion::filter<QnVirtualCameraResource>(resourcePool()->getResourcesWithParentId(server->getId()));
+    QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
 
     QnVirtualCameraResourceList modifiedResources;
     QnResourceList errorResources;
@@ -899,7 +912,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
+    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
     if(!layouts.empty()) {
         menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
     } else {
@@ -911,7 +924,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
-    QnResourceList layouts = QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(parameters.resources());
+    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
     if(layouts.empty()) /* That's media drop, open new layout. */
         menu()->trigger(Qn::OpenNewTabAction);
 
@@ -959,7 +972,7 @@ void QnWorkbenchActionHandler::at_openLayoutAction_triggered() {
     dialog->setNameFilters(filters);
 
     if(dialog->exec())
-        menu()->trigger(Qn::DropResourcesAction, QnResourceCriterion::filter<QnLayoutResource, QnResourceList>(addToResourcePool(dialog->selectedFiles())));
+        menu()->trigger(Qn::DropResourcesAction, addToResourcePool(dialog->selectedFiles()).filtered<QnLayoutResource>());
 }
 
 void QnWorkbenchActionHandler::at_openFolderAction_triggered() {
@@ -1093,44 +1106,48 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
-    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-    if(periods.isEmpty()) {
-        periods.push_back(period);
-    } else {
-        periods = periods.intersected(period);
-    }
-
     const int matrixWidth = 3, matrixHeight = 3;
     const int itemCount = matrixWidth * matrixHeight;
 
     /* Construct and add a new layout first. */
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout();
-    QList<QnWorkbenchItem *> items;
+    QnLayoutResourcePtr layout(new QnLayoutResource());
+    layout->setGuid(QUuid::createUuid());
+    layout->setName(tr("Quick Search for %1").arg(resource->getName()));
+    layout->setParentId(context()->user()->getId());
+    layout->setTimeBounds(period);
+
+    QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid());
-        item->setFlag(Qn::Pinned, true);
-        item->setGeometry(QRect(i % matrixWidth, i / matrixWidth, 1, 1));
-        layout->addItem(item);
+        QnLayoutItemData item;
+        item.flags = Qn::Pinned;
+        item.uuid = QUuid::createUuid();
+        item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
+        item.resource.id = resource->getId();
+        item.resource.path = resource->getUniqueId();
+
         items.push_back(item);
+        layout->addItem(item);
     }
-    workbench()->setCurrentLayout(layout);
-    
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+
     /* Then navigate. */
     display()->setStreamsSynchronized(NULL);
-    qint64 d = periods.duration() / itemCount;
-    QnTimePeriodListTimeIterator pos = periods.timeBegin();
-    foreach(QnWorkbenchItem *item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(item));
+    qint64 t = period.startTimeMs;
+    qint64 d = period.durationMs / itemCount;
+    foreach(const QnLayoutItemData &item, items) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
         if(!widget)
             continue;
 
-        widget->display()->setCurrentTimeUSec(*pos * 1000);
-        pos += d;
+        widget->display()->setCurrentTimeUSec(t * 1000);
+        t += d;
     }
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
-    QnResourceList resources = QnResourceCriterion::filter<QnVirtualCameraResource, QnResourceList>(menu()->currentParameters(sender()).resources());
+    QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
 
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
@@ -1190,7 +1207,7 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnVideoServerResourceList resources = QnResourceCriterion::filter<QnVideoServerResource>(menu()->currentParameters(sender()).resources());
+    QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
     if(resources.size() != 1)
         return;
 
@@ -1400,7 +1417,7 @@ void QnWorkbenchActionHandler::at_exitAction_triggered() {
     if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
         menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
 
-    if(closeLayouts(QnResourceCriterion::filter<QnLayoutResource>(resourcePool()->getResources()), true))
+    if(closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), true))
         qApp->closeAllWindows();
 }
 
@@ -1409,6 +1426,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     if(widgets.size() != 1)
         return;
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]); // TODO: check
+    if (!widget) //e.g. server item
+        return;
+
     QnResourceDisplay *display = widget->display();
     const QnVideoResourceLayout *layout = display->videoLayout();
 
@@ -1908,7 +1928,7 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
     if(status == 0)
         return;
 
-    QnLayoutResourceList layoutResources = QnResourceCriterion::filter<QnLayoutResource>(resources);
+    QnLayoutResourceList layoutResources = resources.filtered<QnLayoutResource>();
     QnLayoutResourceList reopeningLayoutResources;
     foreach(const QnLayoutResourcePtr &layoutResource, layoutResources)
         if(snapshotManager()->isLocal(layoutResource) && !QnWorkbenchLayout::instance(layoutResource))
@@ -1968,5 +1988,20 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 
     for(int i = 0; i < resources.size(); i++)
         resources[i]->setDisabled(oldDisabledFlags[i]);
+}
+
+void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
+    action(Qn::TogglePanicModeAction)->setChecked(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode());
+}
+
+void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
+    QnVideoServerResourceList resources = resourcePool()->getResources().filtered<QnVideoServerResource>();
+
+    foreach(QnVideoServerResourcePtr resource, resources) {
+        if(resource->isPanicMode() != checked) {
+            resource->setPanicMode(checked);
+            connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        }
+    }
 }
 

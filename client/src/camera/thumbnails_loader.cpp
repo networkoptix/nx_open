@@ -5,7 +5,6 @@
 #include <limits>
 
 #include <QtCore/QTimer>
-#include <QtGui/QPixmap>
 #include <QtGui/QImage>
 
 #include <utils/common/math.h>
@@ -401,7 +400,7 @@ void QnThumbnailsLoader::process() {
         QQueue<qint64> timingsQueue;
         QQueue<int> frameFlags;
 
-        QnThumbnail thumbnail(QPixmap(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
+        QnThumbnail thumbnail(QImage(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
         if (frame) 
@@ -541,10 +540,11 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
 
     sws_scale(m_scaleContext, outFrame.data, outFrame.linesize, 0, outFrame.height, dstBuffer, dstLineSize);
 
-    QPixmap pixmap(QPixmap::fromImage(image));
-    qint64 actualTime = outFrame.pkt_dts / 1000;
+    /* We need to do copy the image since it doesn't own its data buffer. */
+    image = image.copy();
 
-    return QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
+    qint64 actualTime = outFrame.pkt_dts / 1000;
+    return QnThumbnail(image, image.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
 }
 
 qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {

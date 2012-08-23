@@ -19,14 +19,13 @@ protected:
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) override;
 private:
-    friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
+    //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
 private:
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
     int m_videoBitrate;
-    qint64 m_startDateTime;
     AVFormatContext* m_formatCtx;
     QString m_lastErrMessage;
    

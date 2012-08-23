@@ -325,7 +325,7 @@ QnParamList QnResource::getResourceParamList() const
     return m_resourceParamList;
 }
 
-bool QnResource::hasSuchParam(const QString &name) const
+bool QnResource::hasParam(const QString &name) const
 {
     return getResourceParamList().contains(name);
 }

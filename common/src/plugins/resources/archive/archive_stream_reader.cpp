@@ -61,7 +61,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
-    m_isStillImage = dev->checkFlags(QnResource::still_image);
+    m_isStillImage = dev->hasFlags(QnResource::still_image);
     // Should init packets here as some times destroy (av_free_packet) could be called before init
     //connect(dev.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(onStatusChanged(QnResource::Status, QnResource::Status)));
 
@@ -405,8 +405,15 @@ begin_label:
     {
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == qint64(AV_NOPTS_VALUE))
-            displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
+        if (currentTimeHint == qint64(AV_NOPTS_VALUE)) 
+        {
+            if (jumpTime != qint64(AV_NOPTS_VALUE))
+                displayTime = jumpTime;
+            else
+                displayTime = determineDisplayTime(reverseMode);
+
+            //displayTime = jumpTime != qint64(AV_NOPTS_VALUE) ? jumpTime : determineDisplayTime(reverseMode);
+        }
 
         m_delegate->onReverseMode(displayTime, reverseMode);
         m_prevReverseMode = reverseMode;
