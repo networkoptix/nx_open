@@ -3,6 +3,10 @@
 #include "iqinvision_resource.h"
 #include "utils/common/sleep.h"
 
+#ifndef Q_OS_WIN
+#include <arpa/inet.h>
+#endif
+
 static quint16 NATIVE_DISCOVERY_REQUEST_PORT = 43282;
 static quint16 NATIVE_DISCOVERY_RESPONSE_PORT = 43283;
 
