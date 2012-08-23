@@ -1430,7 +1430,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    if(accessController()->isOwner()) {
+    if(accessController()->hasRights(Qn::EditProtectedUserRight)) {
         dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible | QnUserSettingsDialog::Editable);
     } else {
         dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
