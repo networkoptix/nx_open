@@ -20,7 +20,9 @@ DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${project.build.directory}/build/pri ${environment.dir}/qt/custom/QtCore
+include(${env.environment}/qt/custom/QtCore/private/qtcore.pri) 
+INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore 
+
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
 PRECOMPILED_SOURCE = ${project.build.sourceDirectory}/StdAfx.cpp
 
@@ -36,7 +38,7 @@ isEmpty(BUILDLIB) {
 CONFIG(debug, debug|release) {
   isEmpty(BUILDLIB) {
 	DESTDIR = ${libdir}/bin/debug
-	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
 	} else {
     DESTDIR = ${libdir}/build/bin/debug
   }  
@@ -50,7 +52,7 @@ CONFIG(debug, debug|release) {
 CONFIG(release, debug|release) {
   isEmpty(BUILDLIB) {
 	DESTDIR = ${libdir}/bin/release
-	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
+#	PRE_TARGETDEPS += ${libdir}/build/bin/debug/common.lib
   } else {
     DESTDIR = ${libdir}/build/bin/release
   }  
@@ -62,7 +64,6 @@ CONFIG(release, debug|release) {
 }
 
 win* {
-  INCLUDEPATH += ${environment.dir}/qt/custom/QtCore
   !contains(BUILDLIB, staticlib) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
 	ICON = ${project.build.directory}/hdw_logo.ico	

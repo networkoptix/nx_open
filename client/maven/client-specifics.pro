@@ -5,7 +5,7 @@ TRANSLATIONS += ${basedir}/resource/common/translations/client_en.ts \
 				${basedir}/resource/common/translations/client_ru.ts
 
 include(${environment.dir}/qt/custom/qtsingleapplication/src/qtsingleapplication.pri)
-include(${environment.dir}/qt/custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
+#include(${environment.dir}/qt/custom/qtsingleapplication/src/qtsinglecoreapplication.pri)
 
 CONFIG(debug, debug|release) {
   CONFIG += console

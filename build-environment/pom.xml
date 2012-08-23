@@ -15,6 +15,7 @@
 	<name>Build Environment for QT projects</name>
 
 	<properties>
+		<libdir>${project.build.directory}</libdir>
 		<ffmpeg.version>git-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
@@ -283,7 +284,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>get_buildenv.sh</executable>
+									<executable>${environment.dir}/get_buildenv.sh</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
 								</configuration>
 							</execution>
@@ -303,9 +304,38 @@
 								<configuration>
 									<outputDirectory>${project.build.directory}</outputDirectory>
 								</configuration>
-							</execution>
+							</execution>							
 						</executions>
 					</plugin>
+
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>generate-qt-project</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<failOnError>false</failOnError>
+									<target>							
+										<chmod file="${project.build.directory}/*.sh" perm="755"/>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip -x **/include/** *.a"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip **/include/**"/>
+										</exec>
+										<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
+											<arg line="-a -u *.zip *.a"/>
+										</exec>
+									</target>										
+								</configuration>
+							</execution>				
+						</executions>
+					</plugin>					
 				</plugins>	
 			</build>			
 		</profile>	

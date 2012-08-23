@@ -37,6 +37,7 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
+								<file>../build-environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -194,19 +195,6 @@
 										<echo file="${libdir}/build/bin/release/common.lib" append="false"/>
 									</then>
 								</if> -->
-								
-								<!-- This ugly hack prevents creating symlinks instead of text files (this is known unzip issue).
-								First everything except *.h is unpacked then *.h only -->
-
-								<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip -x **/include/** *.a"/>
-								</exec>
-								<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip **/include/**"/>
-								</exec>
-								<exec dir="${libdir}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip *.a"/>
-								</exec>                             
 
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
@@ -227,7 +215,7 @@
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="debug_libs" refid="debug_libs_path">
-									<map from="C:\develop\projects\netoptix_vms\build-environment\x86\build\bin\debug\" to="     LIBS += -l"/>									
+									<map from="${libdir}/build/bin/debug/" to="     LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${debug_libs}${line.separator}}</echo>
@@ -237,7 +225,7 @@
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="release_libs" refid="release_libs_path">
-									<map from="C:\develop\projects\netoptix_vms\build-environment\x86\build\bin\release\" to="    LIBS += -l"/>									
+									<map from="${libdir}/build/bin/release/" to="    LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${release_libs}${line.separator}}</echo>
@@ -248,7 +236,7 @@
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="linux_debug_libs" refid="linux_debug_libs_path">
-									<map from="" to="     LIBS += -l"/>									
+									<map from="${libdir}/build/bin/debug/lib" to="    LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}}</echo>
@@ -259,7 +247,7 @@
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
-									<map from="" to="    LIBS += -l"/>									
+									<map from="${libdir}/build/bin/release/lib" to="    LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
@@ -487,7 +475,7 @@
 								</configuration>
 							</execution>
 
-							<execution>
+							<!--<execution>
 								<id>prepare-deb</id>
 								<phase>prepare-package</phase>
 								<goals>
@@ -498,11 +486,11 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<skip>${assembly-skip}</skip>
 								</configuration>
-							</execution>
+							</execution> -->
 						</executions>
 					</plugin>
 
-					<plugin>
+					<!--<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.2</version>
 						<executions>
@@ -519,7 +507,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin>-->
 				</plugins>	
 			</build>			
 		</profile>	

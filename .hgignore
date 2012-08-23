@@ -131,9 +131,11 @@ traytool/x64
 client/contrib/bespin/x86*
 client/contrib/bespin/x64*
 
-debsetup/mediaserver/package
-debsetup/mediaserver/x86
-debsetup/mediaserver/x64
+debsetup/mediaserver-deb/package
+debsetup/mediaserver-deb/x86
+debsetup/mediaserver-deb/x64
+debsetup/client-deb/x86
+debsetup/client-deb/x64
 debsetup/appserver/package
 debsetup/appserver/x86
 debsetup/appserver/x64

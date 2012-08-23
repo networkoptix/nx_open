@@ -13,11 +13,10 @@
 	</scm>	
 
 	<properties>
-		<libdir>${basedir}/../build-environment/${arch}</libdir>
 		<main.basedir>${project.basedir}</main.basedir>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
-		<environment.dir>${env.ENVIRONMENT}</environment.dir>
+		<environment.dir>${env.environment}</environment.dir>
 		<customization>default</customization>
 		<!--QT libs used--> 
 		<qtlib1>core</qtlib1>
@@ -46,6 +45,21 @@
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<plugins>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
