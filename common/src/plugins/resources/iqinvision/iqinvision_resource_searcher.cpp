@@ -10,9 +10,9 @@ static const int REQUEST_SIZE = 8;
 static const char* requests[] =
 {
     "\x01\x01\x00\x00\x00\x3f\x00\x00",
-    "\x01\x01\x00\x00\x00\x40\x7f\x00",
-    "\x01\x01\x00\x00\x00\x80\xbf\x00",
-    "\x01\x01\x00\x00\x00\x80\xc0\xff"
+    "\x01\x01\x00\x00\x40\x7f\x00\x00",
+    "\x01\x01\x00\x00\x80\xbf\x00\x00",
+    "\x01\x01\x00\x00\xc0\xff\x00\x00"
 };
 
 
@@ -196,8 +196,10 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
     }
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
-    if (!rt.isValid())
+    if (!rt.isValid()) {
+        qWarning() << "Unregistered IQvision camera type:" << name;
         return;
+    }
 
     QnNetworkResourcePtr resource ( new QnPlIqResource() );
     in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
@@ -233,7 +235,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
 
         QTime time;
         time.start();
-        QnSleep::msleep(150);
+        QnSleep::msleep(300);
 
         while (receiveSock.hasPendingDatagrams())
         {
