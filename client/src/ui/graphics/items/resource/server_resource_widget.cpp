@@ -333,7 +333,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
             legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
 
-            legendTransform.translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
+            legendTransform.translate(width * 0.5 - offset * m_history.size(), oh + offset * 1.5);
             painter->setTransform(legendTransform);
             int counter = 0;
             QnStatisticsIterator iter(m_history);
