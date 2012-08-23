@@ -38,11 +38,12 @@
 						<configuration>
 							<files>
 								<file>../../build-${customization}.properties</file>
+								<file>../../build-environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin>	
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -80,7 +81,7 @@
 				<executions>
 					<execution>
 						<id>prepare-clean</id>
-						<phase>pre-clean</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>run</goal>
 						</goals>
@@ -90,10 +91,10 @@
 									<arg line="rm -Rf ${project.build.directory}"/>
 								</exec>
 							</target>
-							<!--<target>
+							<target>
 								<chmod file="${basedir}/../pre-clean.sh" perm="755"/>	
-								<exec dir="${basedir}/../" executable="pre-clean.sh" failifexecutionfails="false" />
-							</target> -->
+								<exec dir="${basedir}/../" executable="${basedir}/../pre-clean.sh" failifexecutionfails="false" />
+							</target>
 						</configuration>
 					</execution>	
 					<execution>

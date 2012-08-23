@@ -20,7 +20,7 @@
 	<packaging>pom</packaging>
 	<name>Media Server Deb Package</name>
 
-<!--	<dependencies>
+	<!--	<dependencies>
 		<dependency>
 			<groupId>com.networkoptix.hdwitness</groupId>
 			<artifactId>mediaserver</artifactId>

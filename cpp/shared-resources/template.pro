@@ -11,6 +11,8 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 
+DEPENDPATH *= $${INCLUDEPATH}
+
 !contains(BUILDLIB, staticlib) {
   ICON = ${project.build.directory}/hdw_logo.ico
 }
