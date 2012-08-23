@@ -20,7 +20,7 @@
 	<packaging>pom</packaging>
 	<name>Media Server Deb Package</name>
 
-	<dependencies>
+	<!--	<dependencies>
 		<dependency>
 			<groupId>com.networkoptix.hdwitness</groupId>
 			<artifactId>mediaserver</artifactId>
@@ -28,7 +28,7 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${build.configuration}-exec</classifier>
 		</dependency>
-	</dependencies>		
+	</dependencies>		-->
 
 	<build>
 		<directory>${arch}</directory>
