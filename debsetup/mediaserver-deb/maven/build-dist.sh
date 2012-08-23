@@ -20,7 +20,7 @@ ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-SERVER_BIN_PATH=${project.build.directory}/bin
+SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
 	
 . $SERVER_BIN_PATH/env.sh
