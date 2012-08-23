@@ -53,7 +53,7 @@ namespace Qn {
         ItemPausedRole,                             /**< Role for item's paused state. */
         ItemSpeedRole,                              /**< Role for item's playback speed. */
         ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. */
-        ItemSliderSelectionRole,                    /**< Role for slider window that is displayed when the item is active. */
+        ItemSliderSelectionRole                     /**< Role for slider window that is displayed when the item is active. */
     };
 
 
@@ -195,27 +195,6 @@ namespace Qn {
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 
-
-    /**
-     * Flags describing the actions permitted for the current user.
-     */
-    enum UserRight{
-        EditProtectedUserRight      = 0x00000001,       // super-admin, can edit even admins
-        ProtectedRight              = 0x00000002,       // admin, cannot be edited by other admins
-
-        EditLayoutRight             = 0x00000004,       // can create and edit layouts
-        EditUserRight               = 0x00000008,       // can create and edit users
-        EditCameraRight             = 0x00000010,       // can edit cameras
-        EditServerRight             = 0x00000020,       // can view servers list and edit servers
-
-        /* Combined rights */
-        AdminRight                  = EditLayoutRight | EditUserRight | ProtectedRight | EditCameraRight | EditServerRight,
-        SuperUserRight              = AdminRight | EditProtectedUserRight
-
-    };
-    Q_DECLARE_FLAGS(UserRights, UserRight)
-
-
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
@@ -224,7 +203,5 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::UserRights)
-
 
 #endif // QN_WORKBENCH_GLOBALS_H

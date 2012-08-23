@@ -348,15 +348,18 @@ void QnUserSettingsDialog::createAccessRightsPresets(){
 
     // show only for view of owner
     if (rights & Qn::EditProtectedUserRight){
-        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::SuperUserRight);
+        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::OwnerRight);
     }
 
-    // view of an admin or anyone opened by owner
+    // show for an admin or for anyone opened by owner
     if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight)){
         ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::AdminRight);
     }
 
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)0);
+    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::AdvancedViewerRight);
+    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::ViewerRight);
+    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::LiveViewerRight);
+
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }
 
@@ -369,11 +372,9 @@ void QnUserSettingsDialog::createAccessRightsAdvanced(){
     if (rights & Qn::EditProtectedUserRight)
         createAccessRightCheckBox(tr("Owner"), Qn::EditProtectedUserRight);
     if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight))
-        createAccessRightCheckBox(tr("Administrator"), Qn::ProtectedRight);
-    createAccessRightCheckBox(tr("Can create and edit users"), Qn::EditUserRight);
-    createAccessRightCheckBox(tr("Can create and edit layouts"), Qn::EditLayoutRight);
+        createAccessRightCheckBox(tr("Administrator"), Qn::ProtectedRight | Qn::EditUserRight | Qn::EditLayoutRight | Qn::EditServerRight);
     createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::EditCameraRight);
-    createAccessRightCheckBox(tr("Can edit server settings"), Qn::EditServerRight);
+    createAccessRightCheckBox(tr("Can view video archives"), Qn::ViewArchiveRight);
 }
 
 void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right){

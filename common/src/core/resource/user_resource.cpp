@@ -32,8 +32,7 @@ void QnUserResource::setPassword(const QString& password)
 quint64 QnUserResource::getRights() const
 {
     if (m_isAdmin)
-      //  return Qn::SuperUserRight; //TODO: #gdm move constants to common-place
-        return 63;
+        return Qn::OwnerRight;
     return m_rights;
 }
 
