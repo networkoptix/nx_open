@@ -1,6 +1,7 @@
 #ifndef cl_ThreadQueue_h_2236
 #define cl_ThreadQueue_h_2236 
 
+#include <QVector>
 #include <QQueue>
 #include <QVariant>
 #include <QSemaphore>
@@ -20,8 +21,11 @@ class CLThreadQueue
 public:
     CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
         : m_maxSize( maxSize ),
-        m_cs(QMutex::Recursive)
+        m_cs(QMutex::Recursive),
+        m_bufferLen(0),
+        m_headIndex(0)
     {
+        reallocateBuffer(maxSize);
     }
     
     ~CLThreadQueue() {
@@ -32,10 +36,18 @@ public:
     { 
         QMutexLocker mutex(&m_cs);
 
+
+        if (m_bufferLen == m_buffer.size())
+            reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
+
+
         // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
         //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
 
-        m_queue.enqueue(val); 
+        //m_queue.enqueue(val); 
+        int index = (m_headIndex + m_bufferLen) % m_buffer.size();
+        m_buffer[index] = val;
+        m_bufferLen++;
 
         m_sem.release(); 
 
@@ -45,19 +57,21 @@ public:
     T front() const
     {
         QMutexLocker mutex(&m_cs);
-        return m_queue.front();  
+        return m_buffer[m_headIndex];
     }
 
     T at(int i) const
     {
         QMutexLocker mutex(&m_cs);
-        return m_queue[i];  
+        int index = m_headIndex + i;
+        return m_buffer[index % m_buffer.size()];
     }
 
     T last() const
     {
         QMutexLocker mutex(&m_cs);
-        return m_queue.last();
+        int index = m_headIndex + m_bufferLen - 1;
+        return m_buffer[index % m_buffer.size()];
     }
 
 
@@ -68,13 +82,31 @@ public:
 
         QMutexLocker mutex(&m_cs);
 
-        if (!m_queue.empty()) 
+        if (m_bufferLen > 0)
         {
-            val = m_queue.dequeue();  
+            val = m_buffer[m_headIndex]; //m_queue.dequeue();
+            m_buffer[m_headIndex] = T();
+            m_headIndex++;
+            if (m_headIndex >= m_buffer.size())
+                m_headIndex = 0;
+            m_bufferLen--;
             return true; 
         }
 
         return false;
+    }
+
+    void removeFirst(int count)
+    {
+        m_sem.tryAcquire(count);
+        QMutexLocker mutex(&m_cs);
+        for (int i = 0; i < count; ++i)
+        {
+            m_buffer[m_headIndex++] = T();
+            if (m_headIndex >= m_buffer.size())
+                m_headIndex = 0;
+        }
+        m_bufferLen -= count;
     }
 
     void lock()
@@ -87,6 +119,7 @@ public:
         m_cs.unlock();
     }
 
+    /*
     void removeAt(int index)
     {
         QMutexLocker mutex(&m_cs);
@@ -122,12 +155,27 @@ public:
             }
         }
     }
+    */
+
+    template <class ConditionFunc>
+    void detachDataByCondition(const ConditionFunc& cond, QVariant opaque)
+    {
+        QMutexLocker mutex(&m_cs);
+        int index = m_headIndex;
+        for (int i = 0; i < m_bufferLen; ++i)
+        {
+            if (cond(m_buffer[index], opaque))
+            {
+                m_sem.acquire(1);
+                m_buffer[index] = T();
+            }
+            index = (index + 1) % m_buffer.size();
+        }
+    }
 
     int size() const
     {
-        QMutexLocker mutex(&m_cs);
-
-        return m_queue.size();
+        return m_bufferLen;
     }
 
     int maxSize() const
@@ -138,19 +186,24 @@ public:
     void setMaxSize(int value) 
     {
         m_maxSize = value;
+        reallocateBuffer(qMax(m_maxSize, m_bufferLen));
     }
 
     void clear()
     {
         QMutexLocker mutex(&this->m_cs);
 
-        while (!this->m_queue.empty()) 
+        this->m_sem.tryAcquire(m_bufferLen);
+        int index = m_headIndex;
+        for (int i = 0; i < m_bufferLen; ++i)
         {
-            this->m_sem.tryAcquire();
-            this->m_queue.dequeue();
+            m_buffer[index] = T();
+            index = (index + 1) % m_buffer.size();
         }
+        m_bufferLen = 0;
     }
 
+    /*
     void clearDelete()
     {
         QMutexLocker mutex(&this->m_cs);
@@ -161,10 +214,38 @@ public:
             delete this->m_queue.dequeue();
         }
     }
+    */
+private:
+    // for grow only
+    void reallocateBuffer(int newSize)
+    {
+        QMutexLocker mutex(&m_cs);
+
+        int oldSize = m_buffer.size();
+        m_buffer.resize(newSize);
+
+        if (m_headIndex > 0)
+        {
+            int tailIndex = (m_headIndex + m_bufferLen) % oldSize;
+            int delta = newSize-oldSize;
+
+            for (int i = oldSize; i < newSize; ++i)            
+                m_buffer[i] = m_buffer[i - oldSize];
+            int i = 0;
+            for (;i < tailIndex - delta; ++i)
+                m_buffer[i] = m_buffer[i+delta];
+            for (;i < tailIndex; ++i)
+                m_buffer[i] = T();
+        }
+    }
 
 protected:
-    QQueue<T> m_queue;
-    quint32 m_maxSize;
+    //QQueue<T> m_queue;
+    QVector<T> m_buffer;
+    int m_headIndex;
+    int m_bufferLen;
+
+    int m_maxSize;
     mutable QMutex m_cs;
     QSemaphore m_sem;
 };
