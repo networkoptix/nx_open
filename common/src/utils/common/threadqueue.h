@@ -224,13 +224,13 @@ private:
         int oldSize = m_buffer.size();
         m_buffer.resize(newSize);
 
-        if (m_headIndex > 0)
+        if (m_headIndex > 0 && m_bufferLen > 0)
         {
             int tailIndex = (m_headIndex + m_bufferLen) % oldSize;
             int delta = newSize-oldSize;
 
-            for (int i = oldSize; i < newSize; ++i)            
-                m_buffer[i] = m_buffer[i - oldSize];
+            for (int i = 0; i < delta && i < tailIndex; ++i)
+                m_buffer[oldSize + i] = m_buffer[i];
             int i = 0;
             for (;i < tailIndex - delta; ++i)
                 m_buffer[i] = m_buffer[i+delta];
