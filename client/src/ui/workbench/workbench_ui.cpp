@@ -411,9 +411,15 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     }
     m_titleShowButton->setFocusProxy(m_titleItem);
 
+    m_panicButton = new QnImageButtonWidget(m_controlsWidget);
+    m_panicButton->setCheckable(true);
+    m_panicButton->setIcon(qnSkin->icon("panic.png"));
+    m_panicButton->setPreferredSize(127.25, 47.0);
+
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
     m_titleOpacityProcessor->addTargetItem(m_titleShowButton);
+    m_titleOpacityProcessor->addTargetItem(m_panicButton);
 
     m_titleYAnimator = new VariantAnimator(this);
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
@@ -427,6 +433,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleItem));
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleBackgroundItem)); /* Speed of 1.0 is OK here. */
     m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_titleShowButton));
+    m_titleOpacityAnimatorGroup->addAnimator(opacityAnimator(m_panicButton));
 
     connect(m_tabBarWidget,             SIGNAL(closeRequested(QnWorkbenchLayout *)),                                                this,                           SLOT(at_tabBar_closeRequested(QnWorkbenchLayout *)));
     connect(m_titleShowButton,          SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_titleShowButton_toggled(bool)));
@@ -436,8 +443,10 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(m_panicButton,              SIGNAL(clicked()),                                                                          action(Qn::TogglePanicModeAction), SLOT(toggle()));
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
     connect(action(Qn::MainMenuAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::TogglePanicModeAction), SIGNAL(toggled(bool)),                                                               m_panicButton,                  SLOT(setChecked(bool)));
 
 
     /* Help window. */
@@ -621,7 +630,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_sliderResizerItem,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderResizerItem_geometryChanged()));
     connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
     connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
-
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -943,12 +951,14 @@ void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpa
         opacityAnimator(m_titleItem)->setTargetValue(foregroundOpacity);
         opacityAnimator(m_titleBackgroundItem)->setTargetValue(backgroundOpacity);
         opacityAnimator(m_titleShowButton)->setTargetValue(backgroundOpacity);
+        opacityAnimator(m_panicButton)->setTargetValue(backgroundOpacity);
         m_titleOpacityAnimatorGroup->start();
     } else {
         m_titleOpacityAnimatorGroup->stop();
         m_titleItem->setOpacity(foregroundOpacity);
         m_titleBackgroundItem->setOpacity(backgroundOpacity);
         m_titleShowButton->setOpacity(backgroundOpacity);
+        m_panicButton->setOpacity(backgroundOpacity);
     }
 }
 
@@ -1244,7 +1254,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
 void QnWorkbenchUi::updateFpsGeometry() {
     QPointF pos = QPointF(
         m_controlsWidgetRect.right() - m_fpsItem->size().width(),
-        m_titleUsed ? m_titleItem->geometry().bottom() : 0.0
+        m_panicButton->geometry().bottom()
     );
 
     if(qFuzzyCompare(pos, m_fpsItem->pos()))
@@ -1277,6 +1287,19 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
         /* This one is needed here as we're in a handler and thus geometry change doesn't adjust position =(. */
         m_sliderResizerItem->setPos(sliderResizerGeometry.topLeft());  // TODO: remove this ugly hack.
     }
+}
+
+void QnWorkbenchUi::updatePanicButtonGeometry(){
+    QPointF pos = QPointF(
+            m_controlsWidgetRect.right() - m_panicButton->size().width(),
+            m_titleUsed ? m_titleItem->geometry().bottom() : 0.0
+    );
+
+    if(qFuzzyCompare(pos, m_panicButton->pos()))
+        return;
+
+    m_panicButton->setPos(pos);
+    updateFpsGeometry();
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
@@ -1545,7 +1568,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged() {
 
     updateTreeGeometry();
     updateHelpGeometry();
-    updateFpsGeometry();
+    updatePanicButtonGeometry();
 }
 
 void QnWorkbenchUi::at_sliderShowButton_toggled(bool checked) {
@@ -1687,9 +1710,9 @@ void QnWorkbenchUi::at_titleItem_geometryChanged() {
     if(!m_titleUsed)
         return;
 
-    updateFpsGeometry();
     updateTreeGeometry();
     updateHelpGeometry();
+    updatePanicButtonGeometry();
 
     QRectF geometry = m_titleItem->geometry();
 
