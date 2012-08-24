@@ -9,6 +9,7 @@
 
 class QnRtpStreamParser;
 class QnRtpAudioStreamParser;
+class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
 
 class QnMulticodecRtpReader : public QnResourceConsumer
@@ -41,12 +42,13 @@ private:
     RTPSession m_RtpSession;
     RTPIODevice* m_videoIO;
     RTPIODevice* m_audioIO;
-    QnRtpStreamParser* m_videoParser;
+    QnRtpVideoStreamParser* m_videoParser;
     QnRtpAudioStreamParser* m_audioParser;
 
     QString m_request;
 
-    QList<QnAbstractMediaDataPtr> m_lastVideoData;
+    //QList<QnAbstractMediaDataPtr> m_lastVideoData;
+    QnAbstractMediaDataPtr m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;
     QnRtspTimeHelper m_timeHelper;
