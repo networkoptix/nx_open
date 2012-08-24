@@ -624,8 +624,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_panicButton = new QnImageButtonWidget(m_controlsWidget);
     m_panicButton->setCheckable(true);
-    m_panicButton->setIcon(qnSkin->icon("play.png", "pause.png"));
-    m_panicButton->setPreferredSize(60, 30);
+    m_panicButton->setIcon(qnSkin->icon("panic.png"));
+    m_panicButton->setPreferredSize(127.25, 47.0);
     connect(action(Qn::TogglePanicModeAction), SIGNAL(toggled(bool)), m_panicButton, SLOT(setChecked(bool)));
     connect(m_panicButton, SIGNAL(clicked()), action(Qn::TogglePanicModeAction), SLOT(toggle()));
 
