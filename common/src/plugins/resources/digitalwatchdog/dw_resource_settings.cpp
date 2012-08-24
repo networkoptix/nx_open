@@ -78,9 +78,9 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 // class DWCameraSetting: public CameraSetting
 // 
 
-DWCameraSetting::DWCameraSetting(const QString& id, const QString& name, WIDGET_TYPE type, const QString& query, const CameraSettingValue min,
-        const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
-    CameraSetting(id, name, type, query, min, max, step, current)
+DWCameraSetting::DWCameraSetting(const QString& id, const QString& name, WIDGET_TYPE type, const QString& query, const QString& description,
+        const CameraSettingValue min, const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
+    CameraSetting(id, name, type, query, description, min, max, step, current)
 {
     initAdditionalValues();
 }
@@ -196,8 +196,8 @@ bool DWCameraSettingReader::isParamEnabled(const QString& /*id*/, const QString&
 
 void DWCameraSettingReader::paramFound(const CameraSetting& value, const QString& /*parentId*/)
 {
-    m_settings.insert(value.getId(), DWCameraSetting(
-        value.getId(), value.getName(), value.getType(), value.getQuery(), value.getMin(), value.getMax(), value.getStep()));
+    m_settings.insert(value.getId(), DWCameraSetting(value.getId(), value.getName(), value.getType(), value.getQuery(),
+        value.getDescription(), value.getMin(), value.getMax(), value.getStep()));
 }
 
 void DWCameraSettingReader::cleanDataOnFail()

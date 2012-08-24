@@ -45,6 +45,7 @@ public:
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
+        const QString& description,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),
         const CameraSettingValue step = CameraSettingValue(),
@@ -63,6 +64,9 @@ public:
 
     void setQuery(const QString& query);
     QString getQuery() const;
+
+    void setDescription(const QString& description);
+    QString getDescription() const;
 
     void setMin(const CameraSettingValue& min);
     CameraSettingValue getMin() const;
@@ -92,6 +96,7 @@ private:
     CameraSettingValue m_max;
     CameraSettingValue m_step;
     CameraSettingValue m_current;
+    QString m_description;
 };
 
 typedef QHash<QString, CameraSetting> CameraSettingsByIds;
@@ -112,6 +117,7 @@ public:
     static const QString& ATTR_NAME;
     static const QString& ATTR_WIDGET_TYPE;
     static const QString& ATTR_QUERY;
+    static const QString& ATTR_DESCRIPTION;
     static const QString& ATTR_MIN;
     static const QString& ATTR_MAX;
     static const QString& ATTR_STEP;

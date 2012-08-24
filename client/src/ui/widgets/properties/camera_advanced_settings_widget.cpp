@@ -37,12 +37,13 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 }
 //==============================================
 
-QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox &parent)
+QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox &parent, const QString& hint)
     : QWidget(&parent),
       mHandler(handler),
       mParam(obj),
       mWidget(0),
-      mlayout(new QHBoxLayout())
+      mlayout(new QHBoxLayout()),
+      m_hint(hint)
 {
     dynamic_cast<QVBoxLayout*>(parent.layout())->addWidget(this);
     setLayout(mlayout);
@@ -72,9 +73,27 @@ void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
     emit setAdvancedParam(mParam);
 }
 
+void QnAbstractSettingsWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    /*QPoint widgetPosition = mapFromGlobal(event->globalPos());
+    uint key = (widgetPosition.y()/squareSize)*columns + widgetPosition.x()/squareSize;
+
+    QString text = QString::fromLatin1("<p>Character: <span style=\"font-size: 24pt; font-family: %1\">").arg(displayFont.family())
+        + QChar(key)
+        + QString::fromLatin1("</span><p>Value: 0x")
+        + QString::number(key, 16);
+    QToolTip::showText(event->globalPos(), text, this);*/
+    QToolTip::showText(event->globalPos(), m_hint, this);
+}
+
+void QnAbstractSettingsWidget::enterEvent(QEvent *event)
+{
+    QToolTip::showText(this->pos(), m_hint, this);
+}
+
 //==============================================
 QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
-    QnAbstractSettingsWidget(handler, obj, parent)
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     m_checkBox = new QCheckBox(mParam.getName());
 
@@ -117,7 +136,7 @@ void QnSettingsOnOffWidget::updateParam(QString val)
 
 //==============================================
 QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
-    QnAbstractSettingsWidget(handler, obj, parent)
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
     //mlayout->addWidget(new QWidget());
@@ -174,7 +193,7 @@ void QnSettingsMinMaxStepWidget::updateParam(QString val)
 
 //==============================================
 QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
-    QnAbstractSettingsWidget(handler, obj, parent)
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
     //mlayout->addWidget(new QWidget());
@@ -245,7 +264,7 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 
 //==================================================
 QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsGroupBox& parent):
-    QnAbstractSettingsWidget(handler, dummyVal, parent),
+    QnAbstractSettingsWidget(handler, dummyVal, parent, obj.getDescription()),
     dummyVal(obj)
 {
     QPushButton* btn = new QPushButton(mParam.getName());

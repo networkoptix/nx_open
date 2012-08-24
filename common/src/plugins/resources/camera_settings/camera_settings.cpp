@@ -150,12 +150,13 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
 }
 
 CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
-        const QString& query, const CameraSettingValue min, const CameraSettingValue max,
+        const QString& query, const QString& description, const CameraSettingValue min, const CameraSettingValue max,
         const CameraSettingValue step, const CameraSettingValue current) :
     m_id(id),
     m_name(name),
     m_type(type),
     m_query(query),
+    m_description(description),
     m_min(min),
     m_max(max),
     m_step(step),
@@ -199,6 +200,16 @@ void CameraSetting::setQuery(const QString& query)
 QString CameraSetting::getQuery() const
 {
     return m_query;
+}
+
+void CameraSetting::setDescription(const QString& description)
+{
+    m_description = description;
+}
+
+QString CameraSetting::getDescription() const
+{
+    return m_description;
 }
 
 void CameraSetting::setMin(const CameraSettingValue& min) {
@@ -310,6 +321,7 @@ const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id"))
 const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
 const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
 const QString& CameraSettingReader::ATTR_QUERY = *(new QString(QLatin1String("query")));
+const QString& CameraSettingReader::ATTR_DESCRIPTION = *(new QString(QLatin1String("description")));
 const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
 const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
 const QString& CameraSettingReader::ATTR_STEP = *(new QString(QLatin1String("step")));
@@ -390,32 +402,6 @@ bool CameraSettingReader::proceed()
     return true;
 }
 
-/*void CameraSettingReader::groupFound(const CameraSetting& value)
-{
-    QString id = value.getId();
-    CameraSettingsByIds::ConstIterator it = m_settingsByIds.find(id);
-
-    if (it != m_settingsByIds.end()) {
-        //id must be unique
-        Q_ASSERT(false);
-    }
-
-    m_settingsByIds.insert(id, value);
-}
-
-void CameraSettingReader::paramFound(const CameraSetting& value)
-{
-    QString id = value.getId();
-    CameraSettingsByIds::ConstIterator it = m_settingsByIds.find(id);
-
-    if (it != m_settingsByIds.end()) {
-        //id must be unique
-        Q_ASSERT(false);
-    }
-
-    m_settingsByIds.insert(id, value);
-}*/
-
 bool CameraSettingReader::parseCameraXml(const QDomElement& cameraXml)
 {
     if (!parseGroupXml(cameraXml.firstChildElement(), QLatin1String(""))) {
@@ -486,6 +472,7 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
 
     QString query = elementXml.attribute(ATTR_QUERY);
+    QString description = elementXml.attribute(ATTR_DESCRIPTION);
     CameraSettingValue min = CameraSettingValue(elementXml.attribute(ATTR_MIN));
     CameraSettingValue max = CameraSettingValue(elementXml.attribute(ATTR_MAX));
     CameraSettingValue step = CameraSettingValue(elementXml.attribute(ATTR_STEP));

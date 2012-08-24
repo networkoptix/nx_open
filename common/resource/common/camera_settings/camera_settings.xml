@@ -7,40 +7,40 @@
            description ="">
 
       <param name = "Brightness"
-               description = ""
+               description = "Image brightness."
                widget_type = "MinMaxStep"
                query = ""/>
 
       <param name = "Color Saturation"
-               description = ""
+               description = "Color saturation of the image."
                widget_type = "MinMaxStep"
                query = ""/>
 
       <param name = "Contrast"
-               description = ""
+               description = "Contrast of the image."
                widget_type = "MinMaxStep"
                query = ""/>
 
-      <param name = "Ir Cut Filter Modes"
-               description = ""
+      <param name = "Ir Cut Filter Mode"
+               description = "Infrared Cutoff Filter settings."
                widget_type = "Enumeration"
                min = "ON,OFF,AUTO"
                max = "ON,OFF,AUTO"
                query = ""/>
 
       <param name = "Sharpness"
-               description = ""
+               description = "Sharpness of the Video image."
                widget_type = "MinMaxStep"
                query = ""/>
 
       <group name = "Backlight Compensation"
              description ="">
         <param name = "Mode"
-               description = ""
+               description = "Enabled/disabled BLC mode (on/off)."
                widget_type = "OnOff"
                query = ""/>
         <param name = "Level"
-               description = ""
+               description = "Level of BLC."
                widget_type = "MinMaxStep"
                query = ""/>
       </group>
@@ -48,11 +48,11 @@
       <group name = "Wide Dynamic Range"
              description ="">
         <param name = "Mode"
-               description = ""
+               description = "Wide dynamic range mode (on/off)."
                widget_type = "OnOff"
                query = ""/>
         <param name = "Level"
-               description = ""
+               description = "Level of wide dynamic range."
                widget_type = "MinMaxStep"
                query = ""/>
       </group>
@@ -60,17 +60,17 @@
       <group name = "White Balance"
              description ="">
         <param name = "Mode"
-               description = ""
+               description = "White Balance (auto/manual)."
                widget_type = "Enumeration"
                min = "AUTO,MANUAL"
                max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Yr Gain"
-               description = ""
+               description = "Rgain."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Yb Gain"
-               description = ""
+               description = "Bgain."
                widget_type = "MinMaxStep"
                query = ""/>
       </group>
@@ -78,53 +78,53 @@
       <group name = "Exposure"
              description ="">
         <param name = "Mode"
-               description = ""
+               description = "Exposure Mode. Auto – Enabled the exposure algorithm on the device. Manual – Disabled exposure algorithm on the device."
                widget_type = "Enumeration"
                min = "AUTO,MANUAL"
                max = "AUTO,MANUAL"
                query = ""/>
         <param name = "Priority"
-               description = ""
+               description = "The exposure priority mode (low noise/framerate)."
                widget_type = "Enumeration"
                min = "LowNoise,FrameRate"
                max = "LowNoise,FrameRate"
                query = ""/>
         <param name = "Min Exposure Time"
-               description = ""
+               description = "Minimum value of exposure time range allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Max Exposure Time"
-               description = ""
+               description = "Maximum value of exposure time range allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Min Gain"
-               description = ""
+               description = "Minimum value of the sensor gain range that is allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Max Gain"
-               description = ""
+               description = "Maximum value of the sensor gain range that is allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Min Iris"
-               description = ""
+               description = "Minimum value of the iris range allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Max Iris"
-               description = ""
+               description = "Maximum value of the iris range allowed to be used by the algorithm."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Exposure Time"
-               description = ""
+               description = "The fixed exposure time used by the image sensor (μs)."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Gain"
-               description = ""
+               description = "The fixed gain used by the image sensor (dB)."
                widget_type = "MinMaxStep"
                query = ""/>
         <param name = "Iris"
                description = ""
                widget_type = "MinMaxStep"
-               query = ""/>
+               query = "The fixed attenuation of input light affected by the iris (dB). 0dB maps to a fully opened iris."/>
       </group>
 
     </group>
@@ -132,15 +132,15 @@
     <group name = "Maintenance"
          description ="">
       <param name = "System Reboot"
-             description = ""
+             description = "This operation reboots the device."
              widget_type = "Button"
              query = ""/>
       <param name = "Soft System Factory Default"
-             description = ""
+             description = "This operation reloads all parameters on the device to their factory default values, except basic network settings like IP address, subnet and gateway or DHCP settings."
              widget_type = "Button"
              query = ""/>
       <param name = "Hard System Factory Default"
-             description = ""
+             description = "This operation reloads all parameters on the device to their factory default values."
              widget_type = "Button"
              query = ""/>
     </group>
@@ -148,7 +148,7 @@
   </camera>
 
   <camera name = "DIGITALWATCHDOG"
-          description =""
+          description = ""
           parent = "ONVIF">
 
     <group name = "Imaging"
@@ -158,21 +158,21 @@
            description ="">
 
         <param name = "Mode"
-             description = ""
+             description = "Also known as Color Balance. This gives the camera a reference to 'true white'."
              widget_type = "Enumeration"
              min = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              max = "AUTO,AUTO_H,AUTO_L,PRESET,MANUAL"
              query = "wbmode1"/>
 
         <param name = "Kelvin"
-             description = ""
+             description = "Determine the warmth of coolness of light."
              widget_type = "Enumeration"
              min = "LOW,MIDDLE,HIGH"
              max = "LOW,MIDDLE,HIGH"
              query = "wbkelvin1"/>
 
         <param name = "Red"
-             description = ""
+             description = "White Balance Red Offset"
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
@@ -180,7 +180,7 @@
              query = "wbred1"/>
 
         <param name = "Blue"
-             description = ""
+             description = "White Balance Red Offset"
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
@@ -193,7 +193,7 @@
            description ="">
 
         <param name = "Brightness"
-             description = ""
+             description = "Select from 0 (darkest) to 20 (brightest)."
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
@@ -201,28 +201,28 @@
              query = "brightness1"/>
 
         <param name = "Shutter Mode"
-             description = ""
+             description = "Set the amount of light allowed in the video manually or automatically."
              widget_type = "Enumeration"
              min = "AUTO,MANUAL"
              max = "AUTO,MANUAL"
              query = "dssmode1"/>
 
         <param name = "Shutter Speed"
-             description = ""
+             description = "Select the speed the camera’s shutter will operate—1/30, 1/60, or 1/120."
              widget_type = "Enumeration"
              min = "1/30,1/60,1/120"
              max = "1/30,1/60,1/120"
              query = "shutspeed1"/>
 
         <param name = "Digital Slow Shutter"
-             description = ""
+             description = "Recommended in low light conditions. Turn On or Off."
              widget_type = "Enumeration"
              min = "OFF,2x,3x,4x"
              max = "OFF,2x,3x,4x"
              query = "dsslimit1"/>
 
         <param name = "AGC Gain"
-             description = ""
+             description = "Maximum light gain settings in low light conditions. Select from 0 (least light) to 20 (most light)."
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
@@ -230,7 +230,7 @@
              query = "gain1"/>
 
         <param name = "BLC Mode"
-             description = ""
+             description = "Back Light Compensation Mode: This setup allows the camera to process an image that is harshly silhouette against a bright light source."
              widget_type = "OnOff"
              query = "blcmode1"/>
 
@@ -240,14 +240,14 @@
            description ="">
 
         <param name = "Mode"
-             description = ""
+             description = "Set the mode to Night, Day, or Auto. If set as Auto, set a desired Color to B/W Level and B/W to Color Level."
              widget_type = "Enumeration"
              min = "NIGHT(B/W),DAY(COLOR),AUTO"
              max = "NIGHT(B/W),DAY(COLOR),AUTO"
              query = "dnmode1"/>
 
         <param name = "Switching from Color to B/W"
-             description = ""
+             description = "The higher the number, the less darker the environment will have to be for the camera to switch from color to B/W."
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
@@ -255,7 +255,7 @@
              query = "dnbwlevel1"/>
 
         <param name = "Switching from B/W to Color"
-             description = ""
+             description = "This number should always be lower than the number set to color to B/W."
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
@@ -268,14 +268,14 @@
            description ="">
 
         <param name = "Lens Mode"
-             description = ""
+             description = "Set the camera to indoor/ outdoor lighting environment."
              widget_type = "Enumeration"
              min = "OUTDOOR,INDOOR"
              max = "OUTDOOR,INDOOR"
              query = "lensmode1"/>
 
         <param name = "Chroma"
-             description = ""
+             description = "Affect the quality of the color in the image. The higher the numbers, the video will have brighter colors."
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
@@ -283,7 +283,7 @@
              query = "chroma1"/>
 
         <param name = "Sharpness"
-             description = ""
+             description = "Select from the sharpness of the image."
              widget_type = "MinMaxStep"
              min = "0"
              max = "10"
@@ -291,17 +291,17 @@
              query = "sharpness1"/>
 
         <param name = "Mirror"
-             description = ""
+             description = "Mirror the image from left to right."
              widget_type = "OnOff"
              query = "mirrormode1"/>
 
         <param name = "Flip"
-             description = ""
+             description = "Flip the image upside down."
              widget_type = "OnOff"
              query = "flipmode1"/>
 
         <param name = "Digital Noise Reduction"
-             description = ""
+             description = "Control the level of noise in the image."
              widget_type = "Enumeration"
              min = "OFF,LOW,MIDDLE,HIGH"
              max = "OFF,LOW,MIDDLE,HIGH"
@@ -309,6 +309,14 @@
 
       </group>
 
+    </group>
+
+    <group name = "Maintenance"
+         description ="">
+      <param name = "Firmware Upgrade"
+             description = "Upgrade the device’s firmware"
+             widget_type = "Button"
+             query = ""/>
     </group>
 
   </camera>

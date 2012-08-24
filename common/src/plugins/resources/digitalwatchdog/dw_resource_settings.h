@@ -46,6 +46,7 @@ public:
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
+        const QString& description,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),
         const CameraSettingValue step = CameraSettingValue(),

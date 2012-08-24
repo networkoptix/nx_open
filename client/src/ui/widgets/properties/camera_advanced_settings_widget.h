@@ -41,7 +41,7 @@ class QnAbstractSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent);
+    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent, const QString& hint);
     virtual ~QnAbstractSettingsWidget();
 
     virtual QWidget* toWidget();
@@ -56,11 +56,14 @@ public slots:
 
 protected:
     virtual void setParam(const CameraSettingValue& val);
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void enterEvent(QEvent *event) override;
 protected:
     CameraSetting& mParam;
     QObject* mHandler;
     QWidget* mWidget;
     QHBoxLayout *mlayout;
+    QString m_hint;
 };
 //==============================================
 class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
