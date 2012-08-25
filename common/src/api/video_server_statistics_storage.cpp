@@ -35,6 +35,10 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
 
     QnStatisticsIterator iter(m_history);
     while (iter.hasNext()){
+        // TODO: #GDM if a function allocates memory that is to be freed by the caller,
+        // then this behavior should be documented. However, it is much better to
+        // avoid the need to document it altogether by working with classes that
+        // manage memory automatically. Discuss this with me before fixing.
         iter.next();
         QnStatisticsData* stats = new QnStatisticsData();
         history->insert(iter.key(), stats);
@@ -75,6 +79,7 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
            ? tr("CPU") + QString::number(cpuCounter++)
            : tr("HDD") + QString::number(hddCounter++);
 
+        // TODO: #GDM I see calls to operator new() here, but there are no calls to operator delete() in this file. Please re-check for memleaks.
         if (!m_history.contains(id))
             m_history[id] = new QnStatisticsData();
 

@@ -174,6 +174,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
+    // TODO: #Elric use type-based context storage request here, we don't want to create statistics manager for temporary contexts.
     videoServerStatisticsManager()->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     /* Run handlers. */
@@ -405,7 +406,10 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_statistics_received(){
-    QnStatisticsHistory *history_update = new QnStatisticsHistory();
+    // TODO: #GDM there is no need to allocate memory via new() here as it is freed 30 lines afterwards.
+    // QnStatisticsHistory can be allocated on the stack.
+
+    QnStatisticsHistory *history_update = new QnStatisticsHistory(); 
     qint64 id = videoServerStatisticsManager()->getHistory(m_resource, m_lastHistoryId, history_update);
     if (id < 0){
         m_renderStatus = Qn::CannotRender;
@@ -422,7 +426,7 @@ void QnServerResourceWidget::at_statistics_received(){
     while (cleaner.hasNext()) {
          cleaner.next();
          if (!(history_update->contains(cleaner.key())))
-            cleaner.remove();
+            cleaner.remove(); // TODO: #GDM Memleak!
     }
 
     // update existsing charts
@@ -432,7 +436,7 @@ void QnServerResourceWidget::at_statistics_received(){
          updateValues(updater.key(), updater.value(), id);
     }
 
-    delete history_update;
+    delete history_update; 
 
     m_lastHistoryId = id;
     m_renderStatus = Qn::NewFrameRendered;

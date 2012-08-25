@@ -15,7 +15,7 @@
 class QnStatisticsStorage: QObject{
     Q_OBJECT
 public:
-
+    // TODO: #GDM QObject *parent is usually the last parameter in a constructor. All Qt classes follow this rule.
     /**
      * Constructor
      *
@@ -24,6 +24,7 @@ public:
      */
     QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection);
 
+    // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
      *  Register the consumer object (usually widget).
      *
@@ -39,6 +40,9 @@ public:
      */
     void unRegisterServerWidget(QObject *target);
 
+    // TODO: #GDM #1.4 I think we can have a simpler API here, like 
+    // QnStatisticsHistory history() const;
+    // This way we'll avoid the need to store request ID at the caller's side.
     /**
      *  Get history data for the selected server resource.
      *
@@ -54,6 +58,9 @@ public:
     void update();
 
 signals:
+    // TODO: #GDM rename to statisticsUpdated? Or statisticsChanged?
+    // at_somewhere_somethingHappened() is a name template for signal handlers,
+    // somethingHappened() --- for signals.
 
     /**
      * Signal emitted when new data is received.
