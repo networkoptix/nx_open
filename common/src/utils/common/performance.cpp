@@ -28,7 +28,7 @@
 
 
 /** statistics usage update timer, in seconds. */
-#define STATISTICS_USAGE_REFRESH 1
+#define STATISTICS_USAGE_REFRESH 2
 
 using namespace std;
 

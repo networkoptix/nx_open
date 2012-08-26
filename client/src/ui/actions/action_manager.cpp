@@ -17,7 +17,7 @@
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
 
-Q_DECLARE_METATYPE(QnAction *);
+Q_DECLARE_METATYPE(QnAction *)
 
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
@@ -136,6 +136,12 @@ public:
 
     QnActionBuilder forbiddenPermissions(const QString &key, Qn::Permissions permissions) {
         m_action->setForbiddenPermissions(key, permissions);
+
+        return *this;
+    }
+
+    QnActionBuilder requiredRights(Qn::UserRights rights){
+        m_action->setRequiredRights(rights);
 
         return *this;
     }
@@ -370,8 +376,8 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-        requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
-        condition(new QnPanicActionCondition(this));
+        //requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elrik
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -407,7 +413,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree | Qn::NoTarget).
-            requiredPermissions(Qn::CurrentUserParameter, Qn::CreateUserPermission).
+            requiredRights(Qn::EditUserRight).
             text(tr("User...")).
             pulledText(tr("New User..."));
     } factory.leaveSubMenu();

@@ -255,7 +255,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 
         QString host(iface.address.toString());
 
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
+        //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
 
         QUdpSocket qSocket;
 
@@ -281,7 +281,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         fillWsddStructs(wsddProbe, replyTo);
 
         char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
+        //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
 
         //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
         //So const_cast should be safety
@@ -318,7 +318,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             {
                 if (soapRes == SOAP_EOF) 
                 {
-                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
+                    //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
                     soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
@@ -363,6 +363,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
 
     findEndpoints(endpoints);
 
+#if 0
     //ToDo: delete
     EndpointInfoHash::ConstIterator endpIter = endpoints.begin();
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
@@ -374,7 +375,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
                  << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
-
+#endif
     m_onvifFetcher.findResources(endpoints, result);
 }
 

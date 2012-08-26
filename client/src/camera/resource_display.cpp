@@ -15,7 +15,7 @@ detail::QnRendererGuard::~QnRendererGuard() {
     delete m_renderer;
 }
 
-QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
+QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent, bool liveOnly):
     QObject(parent),
     QnResourceConsumer(resource),
     m_dataProvider(NULL),
@@ -32,7 +32,8 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
 
     if(m_dataProvider != NULL) {
-        m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
+        if (!liveOnly)
+            m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
 
         if(m_mediaProvider != NULL) {

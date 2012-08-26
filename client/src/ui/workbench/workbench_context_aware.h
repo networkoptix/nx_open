@@ -61,7 +61,6 @@ protected:
     QnWorkbenchDisplay *display() const;
 
     QnWorkbenchNavigator *navigator() const;
-
 private:
     QnWorkbenchContext *m_context;
 };

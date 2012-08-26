@@ -1,18 +1,20 @@
-mkdir -p ${project.build.directory}/qtlibs/build/bin/debug
-mkdir -p ${project.build.directory}/qtlibs/build/bin/release
+if [ ${buildLib} != staticlib ]; then
 
-for i in ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9} 
-do
-  cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${project.build.directory}/qtlibs/build/bin/debug
-  cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${project.build.directory}/qtlibs/build/bin/release  
-done
+  mkdir -p ${libdir}/qtlibs/build/bin/debug
+  mkdir -p ${libdir}/qtlibs/build/bin/release
 
-cd ${project.build.directory}/qtlibs
+  for i in ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9} 
+  do
+    cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/debug
+    cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/release  
+  done
 
-zip -y -r ../qtlibs-${arch}.zip ./**
+#cd ${project.build.directory}/qtlibs
 
-cd ${project.build.directory}
+#zip -y -r ../qtlibs-${arch}.zip ./**
 
-mv ${project.build.directory}/bin/${build.configuration}/${project.artifactId} ${project.build.directory}/bin/${build.configuration}/${project.artifactId}-bin
+#cd ${project.build.directory}
 
-echo "export LD_LIBRARY_PATH=${project.build.directory}/build/bin/${build.configuration}:/usr/lib:${basedir}/../common/${arch}/bin/${build.configuration}" > ${project.build.directory}/bin/${build.configuration}/env.sh
+  echo "export LD_LIBRARY_PATH=${libdir}/build/bin/${build.configuration}:/usr/lib" > ${libdir}/bin/${build.configuration}/env.sh
+  mv ${libdir}/bin/${build.configuration}/${project.artifactId} ${libdir}/bin/${build.configuration}/${project.artifactId}-bin
+fi

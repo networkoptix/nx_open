@@ -1,11 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<!--
-    Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
-    A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
-    and have a parent pom to deletegate the build.
-  -->
+
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
@@ -21,19 +15,8 @@
 	<name>HD Witness Test Camera</name>	
 
 	<properties>
-		<product.title>${testcamera.name}</product.title>	
-		<!--QT libs used-->
-		<qtlib1>core</qtlib1>
-		<qtlib2>network</qtlib2>
-		<qtlib3>xml</qtlib3>
-		<qtlib4>gui</qtlib4>
-		<!--<qtlib5/>
-		<qtlib6/>
-		<qtlib7/>
-		<qtlib8/>
-		<qtlib9/>-->
 		<!--Global libs-->
-		<global.libs>-lcommon</global.libs>
+		<global.libs></global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
 		<linux.oslibs>-lz</linux.oslibs>
@@ -44,34 +27,5 @@
 		<windows.defines/>
 		<linux.defines/>
 		<mac.defines/>		
-	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.ffmpeg</groupId>
-			<artifactId>ffmpeg</artifactId>
-			<version>${ffmpeg.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>	
-		<dependency>
-			<groupId>com.google</groupId>
-			<artifactId>protobuf</artifactId>
-			<version>2.4.1</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}-${compiler}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.nokia.qt</groupId>
-			<artifactId>qtcore</artifactId>
-			<version>4.7.4</version>
-			<type>zip</type>
-		</dependency>			
-	</dependencies>		
-
-	<build>
-		<plugins>	
-
-		</plugins>
-	</build>    
+	</properties>  
 </project>
