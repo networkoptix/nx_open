@@ -25,11 +25,11 @@ void QnVideoServerStatisticsManager::registerServerWidget(QnVideoServerResourceP
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
-void QnVideoServerStatisticsManager::unRegisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
+void QnVideoServerStatisticsManager::unregisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return;
-    m_statistics[id]->unRegisterServerWidget(target);
+    m_statistics[id]->unregisterServerWidget(target);
 }
 
 qint64 QnVideoServerStatisticsManager::getHistory(QnVideoServerResourcePtr resource, qint64 lastId, QnStatisticsHistory *history){

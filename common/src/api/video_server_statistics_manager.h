@@ -13,7 +13,7 @@
   * Class that receives, parses and stores statistics data from all servers.
   * Also handles request sending through an inner timer.
   */
-class QnVideoServerStatisticsManager: QObject{
+class QnVideoServerStatisticsManager: public QObject {
     Q_OBJECT
 public:
     /**
@@ -38,7 +38,7 @@ public:
      * \param resource          Server resource whous history we do not want to receive anymore.
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unRegisterServerWidget(QnVideoServerResourcePtr resource, QObject *target);
+    void unregisterServerWidget(QnVideoServerResourcePtr resource, QObject *target);
 
     /**
      *  Get history data for the selected server resource.

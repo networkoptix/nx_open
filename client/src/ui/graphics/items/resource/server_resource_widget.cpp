@@ -19,6 +19,8 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 
+#include <ui/workbench/workbench_context.h>
+
 #include <QtCore/QHash>
 
 /** How many points of the chart are shown on the screen simultaneously */
@@ -166,6 +168,7 @@ namespace {
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
+    m_manager(context->instance<QnVideoServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered)
@@ -174,15 +177,15 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    // TODO: #Elric use type-based context storage request here, we don't want to create statistics manager for temporary contexts.
-    videoServerStatisticsManager()->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
+    m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     /* Run handlers. */
     updateButtonsVisibility();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
-    videoServerStatisticsManager()->unRegisterServerWidget(m_resource, this);
+    m_manager->unregisterServerWidget(m_resource, this);
+
     ensureAboutToBeDestroyedEmitted();
 }
 
@@ -393,7 +396,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             }
             painter->scale(c, c);
         }
-    #endif //Q_WS_X11
+#endif //Q_WS_X11
     }
 }
 
@@ -405,12 +408,12 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
 
-void QnServerResourceWidget::at_statistics_received(){
+void QnServerResourceWidget::at_statistics_received() {
     // TODO: #GDM there is no need to allocate memory via new() here as it is freed 30 lines afterwards.
     // QnStatisticsHistory can be allocated on the stack.
 
     QnStatisticsHistory *history_update = new QnStatisticsHistory(); 
-    qint64 id = videoServerStatisticsManager()->getHistory(m_resource, m_lastHistoryId, history_update);
+    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, history_update);
     if (id < 0){
         m_renderStatus = Qn::CannotRender;
         return;

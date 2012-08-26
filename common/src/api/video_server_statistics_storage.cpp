@@ -24,7 +24,7 @@ void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot
     m_listeners++;
 }
 
-void QnStatisticsStorage::unRegisterServerWidget(QObject *target){
+void QnStatisticsStorage::unregisterServerWidget(QObject *target){
     disconnect(this, 0, target, 0);
     m_listeners--;
 }

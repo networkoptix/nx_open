@@ -10,6 +10,7 @@
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
+class QnVideoServerStatisticsManager;
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -56,6 +57,7 @@ private:
     void updateValues(QString key, QnStatisticsData *newValues, qint64 newId);
 
 private:
+    QnVideoServerStatisticsManager *m_manager;
 
     /** Video server resource. */
     QnVideoServerResourcePtr m_resource;

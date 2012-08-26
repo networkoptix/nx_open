@@ -38,7 +38,7 @@ public:
      *
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unRegisterServerWidget(QObject *target);
+    void unregisterServerWidget(QObject *target);
 
     // TODO: #GDM #1.4 I think we can have a simpler API here, like 
     // QnStatisticsHistory history() const;
