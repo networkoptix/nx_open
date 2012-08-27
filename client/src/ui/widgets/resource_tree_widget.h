@@ -102,8 +102,8 @@ private slots:
     void at_workbench_currentLayoutChanged();
     
     void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_workbench_itemAdded(QnWorkbenchItem *item);
-    void at_workbench_itemRemoved(QnWorkbenchItem *item);
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
 
 private:
     QScopedPointer<Ui::ResourceTreeWidget> ui;

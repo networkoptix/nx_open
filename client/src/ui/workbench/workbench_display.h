@@ -68,18 +68,6 @@ public:
     virtual ~QnWorkbenchDisplay();
 
     /**
-     * \param widget              Whether camera streams on the scene should
-     *                                  be synchronized.
-     */
-    void setStreamsSynchronized(QnResourceWidget *widget);
-    void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
-
-
-    bool isStreamsSynchronized() const;
-
-    bool isStreamsSynchronizationEffective() const;
-
-    /**
      * \returns                         Instrument manager owned by this workbench display. 
      */
     InstrumentManager *instrumentManager() const {
@@ -283,9 +271,6 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
-    void streamsSynchronizedChanged();
-    void streamsSynchronizationEffectiveChanged();
-
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 
@@ -329,12 +314,13 @@ protected slots:
 
     void at_viewportAnimator_finished();
 
-    void at_workbench_itemAdded(QnWorkbenchItem *item);
-    void at_workbench_itemRemoved(QnWorkbenchItem *item);
-
     void at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
 
@@ -370,9 +356,6 @@ private:
 
     /** Current view. */
     QGraphicsView *m_view;
-
-    /** Stream synchronizer. */
-    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
@@ -459,6 +442,11 @@ private:
 
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
+
+
+    
+
+
 };
 
 #endif // QN_WORKBENCH_MANAGER_H

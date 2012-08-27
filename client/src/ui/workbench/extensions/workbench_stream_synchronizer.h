@@ -13,8 +13,18 @@ class QnCounter;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnArchiveSyncPlayWrapper;
-
 class QnAbstractRenderer;
+
+
+struct QnStreamSynchronizationState {
+    QnStreamSynchronizationState(): started(false), time(AV_NOPTS_VALUE), speed(0.0) {}
+    QnStreamSynchronizationState(bool started, qint64 time, float speed): started(started), time(time), speed(speed) {}
+
+    bool started;
+    qint64 time;
+    float speed;
+};
+
 
 /**
  * This class manages the necessary machinery for synchronized playback of
@@ -26,32 +36,40 @@ public:
     QnWorkbenchStreamSynchronizer(QObject *parent = NULL);
 
     /**
-     * Disable this stream synchronizer. 
-     * When disabled, video streams of cameras on the scene are not synchronized.
+     * Stops this stream synchronizer. 
+     * When stopped, UTC video streams on the scene are not synchronized.
      */
-    void disableSync();
+    void stop();
 
     /**
-     * Enable this stream synchronizer. 
-     * When disabled, video streams of cameras on the scene are not synchronized.
+     * Starts this stream synchronizer. 
      * 
-     * \param currentTime seek all streams to specified time
-     * \param speed change speed for all streams
+     * \param timeUSec                  Starting time for all synchronizable streams, in microseconds since epoch.
+     * \param speed                     Playback speed for all synchronizable streams.
      */
-    void enableSync(qint64 currentTime, float speed);
+    void start(qint64 timeUSec, float speed);
 
     /**
-     * \returns                         Whether this stream synchronizer is enabled.
+     * \returns                         Whether this stream synchronizer is running.
      */
-    bool isEnabled() const;
+    bool isRunning() const;
+
+
+    QnStreamSynchronizationState state() const;
+
+    void setState(const QnStreamSynchronizationState &state);
+
+    void setState(QnResourceWidget *widget);
+
 
     /**
      * \returns                         Whether enabling or disabling the synchronizer will have any effect.
      *                                  That is, whether there are any items to synchronize.
      */
     bool isEffective() const;
-    
+
 signals:
+    void runningChanged();
     void effectiveChanged();
 
 protected slots:
@@ -75,5 +93,7 @@ private:
 
     QSet<QnMediaResourceWidget *> m_queuedWidgets;
 };
+
+Q_DECLARE_METATYPE(QnStreamSynchronizationState);
 
 #endif // QN_WORKBENCH_STREAM_SYNCHRONIZER_H

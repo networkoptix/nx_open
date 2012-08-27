@@ -52,6 +52,8 @@ public:
 
     void setData(const QHash<int, QVariant> &dataByRole);
 
+    void setData(int role, const QVariant &value);
+
     QHash<int, QVariant> data() const;
 
 signals:

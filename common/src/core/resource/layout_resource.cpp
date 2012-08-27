@@ -234,6 +234,12 @@ void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
     m_dataByRole = dataByRole;
 }
 
+void QnLayoutResource::setData(int role, const QVariant &value) {
+    QMutexLocker locker(&m_mutex);
+
+    m_dataByRole[role] = value;
+}
+
 QHash<int, QVariant> QnLayoutResource::data() const {
     QMutexLocker locker(&m_mutex);
 
