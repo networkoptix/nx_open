@@ -259,8 +259,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 
     /* Run handlers. */
     updateFilter();
@@ -552,6 +550,8 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
 void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
+    disconnect(layout, NULL, this, NULL);
+
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
         synchronizer->disableUpdates();
@@ -577,6 +577,9 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     /* Bold state has changed. */
     currentItemView()->update();
+
+    connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
 }
 
 void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
@@ -584,12 +587,12 @@ void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     ui->resourceTreeView->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
