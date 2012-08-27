@@ -47,6 +47,7 @@ QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetti
 {
     dynamic_cast<QVBoxLayout*>(parent.layout())->addWidget(this);
     setLayout(mlayout);
+    setToolTip(m_hint);
 
     QObject::connect(this, SIGNAL( setAdvancedParam(const CameraSetting&) ),
         handler, SLOT( setAdvancedParam(const CameraSetting&) )  );
@@ -71,24 +72,6 @@ void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
 {
     mParam.setCurrent(val);
     emit setAdvancedParam(mParam);
-}
-
-void QnAbstractSettingsWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    /*QPoint widgetPosition = mapFromGlobal(event->globalPos());
-    uint key = (widgetPosition.y()/squareSize)*columns + widgetPosition.x()/squareSize;
-
-    QString text = QString::fromLatin1("<p>Character: <span style=\"font-size: 24pt; font-family: %1\">").arg(displayFont.family())
-        + QChar(key)
-        + QString::fromLatin1("</span><p>Value: 0x")
-        + QString::number(key, 16);
-    QToolTip::showText(event->globalPos(), text, this);*/
-    QToolTip::showText(event->globalPos(), m_hint, this);
-}
-
-void QnAbstractSettingsWidget::enterEvent(QEvent *event)
-{
-    QToolTip::showText(this->pos(), m_hint, this);
 }
 
 //==============================================
@@ -264,7 +247,7 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 
 //==================================================
 QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsGroupBox& parent):
-    QnAbstractSettingsWidget(handler, dummyVal, parent, obj.getDescription()),
+    QnAbstractSettingsWidget(handler, dummyVal, parent, obj.getDescription()), //ToDo: remove ugly hack: dummyVal potentially can be used before instantiation
     dummyVal(obj)
 {
     QPushButton* btn = new QPushButton(mParam.getName());

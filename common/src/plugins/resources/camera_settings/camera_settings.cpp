@@ -249,6 +249,8 @@ CameraSetting& CameraSetting::operator= (const CameraSetting& rhs)
     setId(rhs.getId());
     setName(rhs.getName());
     setType(rhs.getType());
+    setQuery(rhs.getQuery());
+    setDescription(rhs.getDescription());
     setMin(rhs.getMin());
     setMax(rhs.getMax());
     setStep(rhs.getStep());
@@ -480,7 +482,7 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     switch(widgetType)
     {
     case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
-        paramFound(CameraSetting(id, name, widgetType, query, min, max, step), parentId);
+        paramFound(CameraSetting(id, name, widgetType, query, description, min, max, step), parentId);
         return true;
 
     default:

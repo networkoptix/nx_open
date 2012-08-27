@@ -85,6 +85,8 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             delete ui->tabAdvanced->layout();
             ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
         }
+        QSplitter* advancedSplitter = new QSplitter();
+        layout->addWidget(advancedSplitter);
 
         QTreeWidget* advancedTreeWidget = new QTreeWidget();
         advancedTreeWidget->setColumnCount(1);
@@ -92,8 +94,8 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
         QWidget* advancedWidget = new QWidget();
         QStackedLayout* advancedLayout = new QStackedLayout(advancedWidget);
-        layout->addWidget(advancedTreeWidget);
-        layout->addWidget(advancedWidget);
+        advancedSplitter->addWidget(advancedTreeWidget);
+        advancedSplitter->addWidget(advancedWidget);
 
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }

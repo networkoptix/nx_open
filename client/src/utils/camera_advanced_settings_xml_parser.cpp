@@ -218,6 +218,10 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         parentItem->setData(0, Qt::UserRole, ind);
     }
 
+    //Description is not transported through http to avoid huge requests, so
+    //setting it from camera_settings.xml file.
+    if (currIt != m_settings->end()) currIt.value()->setDescription(value.getDescription());
+
     QWidget* tabWidget = 0;
     switch(value.getType())
     {

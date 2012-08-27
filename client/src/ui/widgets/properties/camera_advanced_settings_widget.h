@@ -56,8 +56,7 @@ public slots:
 
 protected:
     virtual void setParam(const CameraSettingValue& val);
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void enterEvent(QEvent *event) override;
+
 protected:
     CameraSetting& mParam;
     QObject* mHandler;
