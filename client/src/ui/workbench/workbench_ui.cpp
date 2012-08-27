@@ -415,6 +415,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_panicButton->setCheckable(true);
     m_panicButton->setIcon(qnSkin->icon("panic.png"));
     m_panicButton->setPreferredSize(127.25, 47.0);
+    m_panicButton->setToolTip(tr("Enable panic recording"));
 
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);

@@ -1,7 +1,21 @@
 #include "tool_tip_instrument.h"
 
 #include <QtGui/QHelpEvent>
+#include <QtGui/QGraphicsSimpleTextItem>
 
+
+class QnTooltipTextItem: public QGraphicsSimpleTextItem{
+
+public:
+    QnTooltipTextItem(const QString & text, QGraphicsItem * parent = 0):
+        QGraphicsSimpleTextItem(text, parent){
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override{
+        QGraphicsSimpleTextItem::paint(painter, option, widget);
+        qDebug() << "paaaaa!";
+    }
+};
 
 ToolTipInstrument::ToolTipInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::ToolTip), parent)
@@ -29,6 +43,22 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     }
 
     if(targetItem) {
+        qDebug() << "target item scene bounding" << targetItem->sceneBoundingRect();
+        QFont f;
+        f.setPointSizeF(20);
+        QnTooltipTextItem *text = new QnTooltipTextItem(targetItem->toolTip(), targetItem);
+      //  text->setFont(f);
+        text->setPen(QPen(Qt::white));
+
+        scene()->addItem(text);
+        text->setFlags(text->flags() | QGraphicsItem::ItemIgnoresTransformations);
+        text->setPos(0, 10);
+        text->setVisible(true);
+      //  scene()->update(text->sceneBoundingRect());
+        qDebug() << "scenePos" << scenePos;
+        qDebug() << "itempos" << text->sceneBoundingRect();
+
+
         // TODO: create tooltip item here.
     }
 
