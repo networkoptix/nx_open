@@ -199,7 +199,6 @@ namespace {
             m_rawHddUsageIdle.clear();
             for(int i = 0; i < hdds.count(); i++)
                 m_rawHddUsageIdle.append(hdds.at(i));
-            delete hdds;
 
             m_totalIdle = idle;
             m_processCpu = cpu;
