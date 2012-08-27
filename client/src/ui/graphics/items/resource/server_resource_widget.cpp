@@ -334,20 +334,24 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
-
             legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
 
-            legendTransform.translate(width * 0.5 - offset * m_history.size(), oh + offset * 1.5);
+            legendTransform.translate(width * 0.5, oh + offset * 1.5);
+
+            qreal legendOffset = 0.0;
+            int space = offset; // space for the square drawing and between legend elements
+            foreach(QString key, m_history.keys())
+                legendOffset += painter->fontMetrics().width(key) + space;
+            legendTransform.translate(-legendOffset * 0.5, 0.0);
             painter->setTransform(legendTransform);
+
             int counter = 0;
-            QnStatisticsIterator iter(m_history);
-            while (iter.hasNext()){
-                iter.next();
+            foreach(QString key, m_history.keys()){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, iter.key());
-                legendTransform.translate(offset * 2, 0.0);
+                painter->drawText(offset*0.1, offset*0.1, key);
+                legendTransform.translate(painter->fontMetrics().width(key) + space, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
@@ -374,25 +378,30 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
+            painter->translate(width * 0.5, oh + offset * 1.5);
 
-            painter->translate(width * 0.5 - offset * m_history.size(), oh + offset * 1.5);
             qreal c = offset*0.02;
             painter->scale(c, c);
-            c = 1/c;
+
+            qreal legendOffset = 0.0;
+            int space = 50; // space for the square drawing and between legend elements
+            foreach(QString key, m_history.keys())
+                legendOffset += painter->fontMetrics().width(key) + space;
+            painter->translate(-legendOffset * 0.5, 0.0);
+
+            c = 1/c; // 50 / offset
 
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset*0.2*c, -offset*0.2*c);
+            legend.addRect(0.0, 0.0, -10, -10);
             main_pen.setWidthF(pen_width * 2 * c);
 
             int counter = 0;
-            QnStatisticsIterator iter(m_history);
-            while (iter.hasNext()){
-                iter.next();
+            foreach(QString key, m_history.keys()){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1*c, offset*0.1*c, iter.key());
-                painter->translate(offset * 2*c, 0.0);
+                painter->drawText(5, 5, key);
+                painter->translate(painter->fontMetrics().width(key) + space, 0.0);
             }
             painter->scale(c, c);
         }

@@ -61,8 +61,6 @@ void QnStatisticsStorage::update(){
 }
 
 void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data){
-    int cpuCounter = 0;
-    int hddCounter = 0;
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
@@ -71,8 +69,8 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
         QnStatisticsDataItem next_data = iter.next();
 
         QString id = next_data.device == QnStatisticsDataItem::CPU
-           ? tr("CPU") + QString::number(cpuCounter++)
-           : tr("HDD") + QString::number(hddCounter++);
+           ? tr("CPU")
+           : next_data.description;
 
         QnStatisticsData &stats = m_history[id];
         stats.append(next_data.value);

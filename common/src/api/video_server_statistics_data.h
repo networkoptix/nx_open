@@ -24,7 +24,7 @@ struct QnStatisticsDataItem {
     QnStatisticsDataItem(QString description, int value, DeviceType device): description(description), value(value), device(device) {}
 };
 
-typedef QList<QnStatisticsDataItem> QnStatisticsDataList;//todo
+typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
 typedef QLinkedList<int> QnStatisticsData;
 typedef QLinkedListIterator<int> QnStatisticsDataIterator;
