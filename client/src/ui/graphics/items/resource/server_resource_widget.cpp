@@ -281,16 +281,16 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setWidthF(pen_width * 2);
         graphPen.setCapStyle(Qt::FlatCap);
 
-        QnStatisticsIterator iter(m_history);
         int counter = 0;
-        while (iter.hasNext()){
-            iter.next();
-            qreal current_value = 0;
-            QPainterPath path = createChartPath(iter.value(), x_step, -1.0 * oh, elapsed_step, &current_value);
-            values.append(current_value);
 
+        foreach(QString key, m_sortedKeys){
+            QnStatisticsData &stats = m_history[key];
+            qreal current_value = 0;
+            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &current_value);
+            values.append(current_value);
             graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);
+
         }
     }
 
@@ -340,13 +340,13 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
             qreal legendOffset = 0.0;
             int space = offset; // space for the square drawing and between legend elements
-            foreach(QString key, m_history.keys())
+            foreach(QString key, m_sortedKeys)
                 legendOffset += painter->fontMetrics().width(key) + space;
             legendTransform.translate(-legendOffset * 0.5, 0.0);
             painter->setTransform(legendTransform);
 
             int counter = 0;
-            foreach(QString key, m_history.keys()){
+            foreach(QString key, m_sortedKeys){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
@@ -385,7 +385,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
             qreal legendOffset = 0.0;
             int space = 50; // space for the square drawing and between legend elements
-            foreach(QString key, m_history.keys())
+            foreach(QString key, m_sortedKeys)
                 legendOffset += painter->fontMetrics().width(key) + space;
             painter->translate(-legendOffset * 0.5, 0.0);
 
@@ -396,7 +396,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             main_pen.setWidthF(pen_width * 2 * c);
 
             int counter = 0;
-            foreach(QString key, m_history.keys()){
+            foreach(QString key, m_sortedKeys){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
@@ -431,19 +431,31 @@ void QnServerResourceWidget::at_statistics_received() {
         return;
     }
 
+    bool reSort = false;
+
     // remove charts that are no exist anymore
     QnStatisticsCleaner cleaner(m_history);
     while (cleaner.hasNext()) {
          cleaner.next();
-         if (!(history_update.contains(cleaner.key())))
+         if (!(history_update.contains(cleaner.key()))){
             cleaner.remove();
+            reSort = true;
+         }
     }
 
     // update existsing charts
     QnStatisticsIterator updater(history_update);
     while (updater.hasNext()) {
          updater.next();
+         reSort = reSort | !m_history.contains(updater.key());
          updateValues(updater.key(), updater.value());
+    }
+
+    if (reSort){
+        m_sortedKeys.clear();
+        foreach(QString key, m_history.keys())
+            m_sortedKeys.append(key);
+        m_sortedKeys.sort();
     }
 
     m_lastHistoryId = id;
