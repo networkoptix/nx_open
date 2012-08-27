@@ -140,7 +140,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator(NULL),
     m_frontZ(0.0),
     m_dummyScene(new QGraphicsScene(this)),
-    m_streamSynchronizer(NULL),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
@@ -236,54 +235,6 @@ QnWorkbenchDisplay::~QnWorkbenchDisplay() {
     setScene(NULL);
 }
 
-void QnWorkbenchDisplay::setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed)
-{
-    if(synchronized == isStreamsSynchronized())
-        return;
-
-    if(!m_streamSynchronizer) {
-        m_streamSynchronizer = new QnWorkbenchStreamSynchronizer(this);
-
-        connect(m_streamSynchronizer, SIGNAL(effectiveChanged()), this, SIGNAL(streamsSynchronizationEffectiveChanged()));
-        if(m_streamSynchronizer->isEffective())
-            emit streamsSynchronizationEffectiveChanged();
-    }
-
-    if (synchronized)
-        m_streamSynchronizer->enableSync(currentTime, speed);
-    else
-        m_streamSynchronizer->disableSync();
-
-    emit streamsSynchronizedChanged();
-}
-
-void QnWorkbenchDisplay::setStreamsSynchronized(QnResourceWidget *widget) {
-    bool synchronized = widget != 0;
-    qint64 currentTime = AV_NOPTS_VALUE;
-    float speed = 1.0;
-    
-    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-        currentTime = mediaWidget->display()->currentTimeUSec();
-        speed = mediaWidget->display()->camDisplay()->getSpeed();
-    }
-
-    setStreamsSynchronized(synchronized, currentTime, speed);
-}
-
-bool QnWorkbenchDisplay::isStreamsSynchronized() const {
-    if(!m_streamSynchronizer)
-        return false;
-
-    return m_streamSynchronizer->isEnabled();
-}
-
-bool QnWorkbenchDisplay::isStreamsSynchronizationEffective() const {
-    if(!m_streamSynchronizer)
-        return false;
-
-    return m_streamSynchronizer->isEffective();
-}
-
 void QnWorkbenchDisplay::setScene(QGraphicsScene *scene) {
     if(m_scene == scene)
         return;
@@ -374,9 +325,6 @@ void QnWorkbenchDisplay::initSceneContext() {
 
     /* Connect to context. */
     connect(workbench(),            SIGNAL(itemChanged(Qn::ItemRole)),              this,                   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),            SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(workbench(),            SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
-    connect(workbench(),            SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
     connect(workbench(),            SIGNAL(currentLayoutAboutToBeChanged()),        this,                   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),            SIGNAL(currentLayoutChanged()),                 this,                   SLOT(at_workbench_currentLayoutChanged()));
 
@@ -1290,14 +1238,14 @@ void QnWorkbenchDisplay::at_viewportAnimator_finished() {
     synchronizeSceneBounds();
 }
 
-void QnWorkbenchDisplay::at_workbench_itemAdded(QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item) {
     if(addItemInternal(item, true)) {
         synchronizeSceneBounds();
         fitInView();
     }
 }
 
-void QnWorkbenchDisplay::at_workbench_itemRemoved(QnWorkbenchItem *item) {
+void QnWorkbenchDisplay::at_layout_itemRemoved(QnWorkbenchItem *item) {
     if(removeItemInternal(item, true, false)) {
         synchronizeSceneBounds();
         fitInView();
@@ -1313,22 +1261,31 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
-    if(!isStreamsSynchronized()) {
-        workbench()->currentLayout()->setData(Qn::LayoutSyncItemUuidRole, QVariant::fromValue<QUuid>(QUuid()));
-    } else {
-        foreach(QnResourceWidget *widget, m_widgetByItem) {
-            if(widget->resource()->flags() & QnResource::utc) {
-                workbench()->currentLayout()->setData(Qn::LayoutSyncItemUuidRole, QVariant::fromValue<QUuid>(widget->item()->uuid()));
-                break;
-            }
-        }
-    }
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
+
+    disconnect(layout, NULL, this, NULL);
+
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
+
+    foreach(QnWorkbenchItem *item, layout->items())
+        at_layout_itemRemoved(item);
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
-    fitInView(false);
+    QnWorkbenchLayout *layout = workbench()->currentLayout();
 
-    setStreamsSynchronized(widget(workbench()->currentLayout()->item(workbench()->currentLayout()->data(Qn::LayoutSyncItemUuidRole).value<QUuid>())));
+    foreach(QnWorkbenchItem *item, layout->items())
+        at_layout_itemAdded(item);
+
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
+
+    connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
+
+    fitInView(false);
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

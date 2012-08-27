@@ -11,6 +11,10 @@
 #include "workbench_layout_synchronizer.h"
 #include "workbench_utility.h"
 
+
+#include "extensions/workbench_stream_synchronizer.h"
+#include "utils/common/util.h"
+
 namespace {
     template<class PointContainer>
     void pointize(const QRect &region, PointContainer *points) {
@@ -27,6 +31,9 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
 {
+    // TODO: this does not belong here.
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
+
     initCellParameters();
 }
 
@@ -37,6 +44,9 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         qnNullWarning(resource);
         return;
     }
+
+    // TODO: this does not belong here.
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
 

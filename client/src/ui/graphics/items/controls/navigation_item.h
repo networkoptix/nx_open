@@ -19,7 +19,7 @@ class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAw
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit QnNavigationItem(QGraphicsItem *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnNavigationItem(QGraphicsItem *parent = NULL);
     ~QnNavigationItem();
 
     QnTimeSlider *timeSlider() const {

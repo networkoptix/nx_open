@@ -1175,7 +1175,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
     /* Navigate. */
-    display()->setStreamsSynchronized(NULL);
+    //display()->setStreamsSynchronized(NULL);
     qint64 time = period.startTimeMs;
     foreach(const QnLayoutItemData &item, items) {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
