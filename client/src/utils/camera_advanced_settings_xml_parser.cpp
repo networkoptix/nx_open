@@ -204,15 +204,15 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         return;
     }
 
-    QnSettingsGroupBox* rootWidget = 0;
+    QnSettingsScrollArea* rootWidget = 0;
     LayoutIndById::ConstIterator lIndIt = m_layoutIndById.find(parentId);
     if (lIndIt != m_layoutIndById.end()) {
         int ind = lIndIt.value();
-        rootWidget = dynamic_cast<QnSettingsGroupBox*>(m_rootLayout.widget(ind));
+        rootWidget = dynamic_cast<QnSettingsScrollArea*>(m_rootLayout.widget(ind));
         Q_ASSERT(rootWidget != 0);
     } else {
         QTreeWidgetItem* parentItem = findParentForParam(parentId);
-        rootWidget = new QnSettingsGroupBox(parentItem->text(0), m_owner);
+        rootWidget = new QnSettingsScrollArea(m_owner);
         int ind = m_rootLayout.addWidget(rootWidget);
         m_layoutIndById.insert(parentId, ind);
         parentItem->setData(0, Qt::UserRole, ind);

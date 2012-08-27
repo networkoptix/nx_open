@@ -5,22 +5,34 @@
 #include <QtGui/QStyleFactory>
 
 
-QnSettingsGroupBox::QnSettingsGroupBox(const QString& title, QWidget* parent):
-    QGroupBox(title, parent),
-    alreadyShowed(false)
+QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
+    QScrollArea(parent),
+    m_alreadyShowed(false)
 {
-    setLayout(new QVBoxLayout());
+    setLayout(new QHBoxLayout());
+    setWidget(new QWidget());
+    layout()->addWidget(widget());
+    widget()->setLayout(new QVBoxLayout());
+
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 }
 
-void QnSettingsGroupBox::showEvent(QShowEvent* event)
+void QnSettingsScrollArea::showEvent(QShowEvent* event)
 {
-    if (!alreadyShowed) {
-        alreadyShowed = true;
-        static_cast<QVBoxLayout*>(layout())->addStretch(1);
+    if (!m_alreadyShowed) {
+        m_alreadyShowed = true;
+        static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
     }
 
-    QGroupBox::showEvent(event);
+    QScrollArea::showEvent(event);
 }
+
+void QnSettingsScrollArea::addWidget(QWidget& widgetToAdd)
+{
+    dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(&widgetToAdd);
+}
+
 //==============================================
 
 QnSettingsSlider::QnSettingsSlider(Qt::Orientation orientation, QWidget *parent)
@@ -37,15 +49,15 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 }
 //==============================================
 
-QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox &parent, const QString& hint)
-    : QWidget(&parent),
+QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea &parent, const QString& hint)
+    : QWidget(0),
       mHandler(handler),
       mParam(obj),
       mWidget(0),
       mlayout(new QHBoxLayout()),
       m_hint(hint)
 {
-    dynamic_cast<QVBoxLayout*>(parent.layout())->addWidget(this);
+    parent.addWidget(*this);
     setLayout(mlayout);
     setToolTip(m_hint);
 
@@ -75,7 +87,7 @@ void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
 }
 
 //==============================================
-QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
+QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     m_checkBox = new QCheckBox(mParam.getName());
@@ -94,6 +106,7 @@ QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& ob
     //QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 
     mWidget = m_checkBox;
+    setMinimumSize(m_checkBox->sizeHint());
 }
 
 QnSettingsOnOffWidget::~QnSettingsOnOffWidget()
@@ -118,7 +131,7 @@ void QnSettingsOnOffWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
+QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -156,6 +169,7 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
 
     mWidget = groupBox;
+    setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsMinMaxStepWidget::onValChanged(int val)
@@ -175,7 +189,7 @@ void QnSettingsMinMaxStepWidget::updateParam(QString val)
 }
 
 //==============================================
-QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent):
+QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
@@ -218,6 +232,7 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     }
 
     mWidget = groupBox;
+    setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsEnumerationWidget::onClicked()
@@ -246,7 +261,7 @@ QRadioButton* QnSettingsEnumerationWidget::getBtnByname(const QString& name)
 }
 
 //==================================================
-QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsGroupBox& parent):
+QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsScrollArea& parent):
     QnAbstractSettingsWidget(handler, dummyVal, parent, obj.getDescription()), //ToDo: remove ugly hack: dummyVal potentially can be used before instantiation
     dummyVal(obj)
 {
@@ -262,6 +277,7 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
     btn->setFocusPolicy(Qt::NoFocus);
 
     mWidget = btn;
+    setMinimumSize(btn->sizeHint());
 }
 
 void QnSettingsButtonWidget::onClicked()

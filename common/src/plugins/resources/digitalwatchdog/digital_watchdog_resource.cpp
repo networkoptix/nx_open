@@ -106,9 +106,18 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     if (m_cameraProxy)
     {
+        QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+        if (currTime > m_advSettingsLastUpdated) {
+            if (!m_cameraProxy->getFromCameraIntoBuffer())
+            {
+                return false;
+            }
+            m_advSettingsLastUpdated = QDateTime::currentDateTime();
+        }
+
         DWCameraSettings::Iterator it = m_settings.find(param.name());
         if (it != m_settings.end()) {
-            if (it.value().getFromCamera(*m_cameraProxy)){
+            if (it.value().getFromBuffer(*m_cameraProxy)){
                 val.setValue(it.value().serializeToStr());
                 return true;
             }

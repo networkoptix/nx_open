@@ -25,6 +25,9 @@ public:
     bool getFromCamera(DWCameraSetting& src);
     bool setToCamera(DWCameraSetting& src);
 
+    bool getFromBuffer(DWCameraSetting& src);
+    bool getFromCameraIntoBuffer();
+
 private:
 
     bool getFromCameraImpl();
@@ -57,6 +60,7 @@ public:
     DWCameraSetting& DWCameraSetting::operator=(const DWCameraSetting& rhs);
 
     bool getFromCamera(DWCameraProxy& proxy);
+    bool getFromBuffer(DWCameraProxy& proxy);
     bool setToCamera(DWCameraProxy& proxy);
     QString getCurrentAsIntStr() const;
     QString getIntStrAsCurrent(const QString& numStr) const;

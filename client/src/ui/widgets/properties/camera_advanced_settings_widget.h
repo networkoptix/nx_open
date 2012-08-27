@@ -5,15 +5,16 @@
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 
-class QnSettingsGroupBox : public QGroupBox
+class QnSettingsScrollArea : public QScrollArea
 {
-    bool alreadyShowed;
+    bool m_alreadyShowed;
 
-    QnSettingsGroupBox();
+    QnSettingsScrollArea();
 
 public:
 
-    QnSettingsGroupBox(const QString& title, QWidget* parent);
+    QnSettingsScrollArea(QWidget* parent);
+    void addWidget(QWidget& widget);
 
 protected:
 
@@ -41,7 +42,7 @@ class QnAbstractSettingsWidget : public QWidget
 {
     Q_OBJECT
 public:
-    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent, const QString& hint);
+    QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent, const QString& hint);
     virtual ~QnAbstractSettingsWidget();
 
     virtual QWidget* toWidget();
@@ -69,7 +70,7 @@ class QnSettingsOnOffWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent);
+    QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
     ~QnSettingsOnOffWidget();
 
 public slots:
@@ -85,7 +86,7 @@ class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent);
+    QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
 
 public slots:
     void updateParam(QString val);
@@ -103,7 +104,7 @@ class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsGroupBox& parent);
+    QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
 
 public slots:
     void updateParam(QString val);
@@ -122,7 +123,7 @@ class QnSettingsButtonWidget : public QnAbstractSettingsWidget
 {
     Q_OBJECT
 public:
-    QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsGroupBox& parent);
+    QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsScrollArea& parent);
 
 public slots:
     void updateParam(QString val);

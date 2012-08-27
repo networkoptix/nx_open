@@ -28,6 +28,7 @@ const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
+const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 1; //1 second
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -104,6 +105,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 
 QnPlOnvifResource::QnPlOnvifResource() :
     m_physicalParamsMutex(QMutex::Recursive),
+    m_advSettingsLastUpdated(QDateTime::currentDateTime()),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -653,7 +655,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsResp& re
 
     QMutexLocker lock(&m_mutex);
     m_secondaryResolutionList.clear();
-    for (int i = 0; i < resolutions.size(); ++i)
+    for (unsigned int i = 0; i < resolutions.size(); ++i)
         m_secondaryResolutionList.append(ResolutionPair(resolutions[i]->Width, resolutions[i]->Height));
     qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
@@ -1466,13 +1468,20 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
         return false;
     }
 
-    m_onvifAdditionalSettings->makeGetRequest();
     CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
     CameraSettings::Iterator it = settings.find(param.name());
 
     if (it == settings.end()) {
         //return false;
         return true;
+    }
+
+    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    if (currTime > m_advSettingsLastUpdated) {
+        if (!m_onvifAdditionalSettings->makeGetRequest()) {
+            return false;
+        }
+        m_advSettingsLastUpdated = QDateTime::currentDateTime();
     }
 
     if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {

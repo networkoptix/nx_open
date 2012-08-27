@@ -74,6 +74,22 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
     return res && desiredVal == src.getCurrentAsIntStr();
 }
 
+bool DWCameraProxy::getFromBuffer(DWCameraSetting& src)
+{
+    QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
+    if (it == m_bufferedValues.end()) {
+        return false;
+    }
+
+    src.setCurrent(src.getIntStrAsCurrent(it.value()));
+    return true;
+}
+
+bool DWCameraProxy::getFromCameraIntoBuffer()
+{
+    return getFromCameraImpl();
+}
+
 //
 // class DWCameraSetting: public CameraSetting
 // 
@@ -97,6 +113,11 @@ DWCameraSetting& DWCameraSetting::operator=(const DWCameraSetting& rhs)
 bool DWCameraSetting::getFromCamera(DWCameraProxy& proxy)
 {
     return proxy.getFromCamera(*this);
+}
+
+bool DWCameraSetting::getFromBuffer(DWCameraProxy& proxy)
+{
+    return proxy.getFromBuffer(*this);
 }
 
 bool DWCameraSetting::setToCamera(DWCameraProxy& proxy)

@@ -1,6 +1,7 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#include <QDateTime>
 #include <QList>
 #include <QMap>
 #include <QPair>
@@ -74,6 +75,7 @@ public:
     static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
+    static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in seconds)
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
@@ -188,6 +190,7 @@ protected:
     OnvifCameraSettingsResp* m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
+    QDateTime m_advSettingsLastUpdated;
 
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
