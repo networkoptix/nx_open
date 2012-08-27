@@ -97,14 +97,16 @@ QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVa
 QnColorVector QnGlobals::initSystemHealthColors(){
     QnColorVector result;
     result.append(QColor(66, 140, 237));
-    result.append(QColor(237, 66, 138));
+    result.append(QColor(219, 59, 169));
+    result.append(QColor(237, 237, 237));
     result.append(QColor(237, 200, 66));
     result.append(QColor(103, 237, 66));
-    result.append(QColor(237, 237, 237));
-    result.append(QColor(59, 169, 219));
-    result.append(QColor(115, 219, 59));
-    result.append(QColor(219, 59, 169));
-    result.append(QColor(219, 163, 59));
+    result.append(QColor(255, 131, 48));
+    result.append(QColor(178, 0, 255));
+    result.append(QColor(0, 255, 255));
+    result.append(QColor(38, 127, 0));
+    result.append(QColor(255, 127, 127));
+    result.append(QColor(201, 0, 0));
     return result;
 }
 
