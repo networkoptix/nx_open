@@ -116,8 +116,11 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) {
 
     if(readOnly) {
         m_motionSelectionInstrument->disable();
+        m_clickInstrument->disable();
+
     } else {
         m_motionSelectionInstrument->enable();
+        m_clickInstrument->enable();
     }
 
     m_readOnly = readOnly;

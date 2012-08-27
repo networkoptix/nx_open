@@ -312,7 +312,7 @@
                     <Directory Id="INSTALLDIR" Name="${product.name}">
                         <Directory Id="VmsAppServerDir" Name="${appserver.name}">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
-                                <File Id="ecexe" Name="ecs.exe" Source="files/ecs.exe" KeyPath="yes">
+                                <File Id="ecexe" Name="ecs.exe" Source="${AppServerDir}/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="${company.name} ${appserver.name}" Scope="any" IgnoreFailure="yes" />
                                 </File>
                                 
@@ -367,7 +367,7 @@
                         
                         <Directory Id="VmsTrayToolDir" Name="TrayTool">
                             <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
-                                <File Id="traytool.exe" Name="traytool.exe" Source="traytool/traytool.exe" KeyPath="yes">
+                                <File Id="traytool.exe" Name="traytool.exe" Source="${libdir}/bin/${build.configuration}/traytool.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
@@ -380,19 +380,19 @@
                                 </File>
                             </Component>
                             <Component Id="TrayToolQTLibraries" Guid="b3bbeb5b-310a-4b10-b0bb-0e1193de80f5">
-                                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="traytool\QtCore$(var.suffix)4.dll"  />
-                                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="traytool\QtGui$(var.suffix)4.dll"  />
-                                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="traytool\QtNetwork$(var.suffix)4.dll"  />
+                                <File Id="TrayToolQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll"  />
+                                <File Id="TrayToolQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll"  />
+                                <File Id="TrayToolQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll"  />
                             </Component>
                             <Component Id="TrayToolOpenSSL" Guid="{9C379C95-1EDE-49b0-8C6C-7B55ADE60599}">
-                                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="traytool\libeay32.dll"/>
-                                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="traytool\ssleay32.dll"/>
+                                <File Id="TrayToollibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                                <File Id="TrayToolssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
                             </Component>							
                         </Directory>
                         
                         <Directory Id="VmsProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
-                                <File Id="ProxyExe" Name="mediaproxy.exe" Source="mediaproxy/mediaproxy.exe" KeyPath="yes">
+                                <File Id="ProxyExe" Name="mediaproxy.exe" Source="${libdir}/bin/${build.configuration}/mediaproxy.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
@@ -411,21 +411,21 @@
                             </Component>
                             
                             <Component Id="ProxyQTLibraries" Guid="{A49B87BB-ADD9-41CA-87C0-304A8A483427}">
-                                <File Id="ProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="mediaproxy\QtCore$(var.suffix)4.dll" />
-                                <File Id="ProxyQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="mediaproxy\QtGui$(var.suffix)4.dll" />
-                                <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="mediaproxy\QtMultimedia$(var.suffix)4.dll" />
-                                <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="mediaproxy\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaproxy\QtXml$(var.suffix)4.dll" />
+                                <File Id="ProxyQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                                <File Id="ProxyQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                                <File Id="ProxyQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ProxyQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ProxyQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
                             </Component>
                             <Component Id="ProxyOpenSSL" Guid="{B2CFCF46-4618-44a9-9BB5-7C832AA10652}">
-                                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="mediaproxy\libeay32.dll"/>
-                                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="mediaproxy\ssleay32.dll"/>
+                                <File Id="Proxylibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                                <File Id="Proxyssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
                             </Component>							
                         </Directory>
                         
                         <Directory Id="VmsMediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
-                                <File Id="ServerExe" Name="mediaserver.exe" Source="mediaserver/mediaserver.exe" KeyPath="yes">
+                                <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
@@ -471,32 +471,32 @@
                             </Component>
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
-                                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="mediaserver/avcodec-54.dll"/>
-                                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="mediaserver/avdevice-54.dll"/>
-                                <File Id="ServerAvfilterDll" Name="avfilter-3.dll" Source="mediaserver/avfilter-3.dll"/>
-                                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="mediaserver/avformat-54.dll"/>
-                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="mediaserver/avutil-51.dll"/>
-                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="mediaserver/swscale-2.dll"/>
-                                <!-- <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="mediaserver/libmp3lame-0.dll"/> -->
+                                <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+                                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="${libdir}/bin/${build.configuration}/avdevice-54.dll"/>
+                                <File Id="ServerAvfilterDll" Name="avfilter-3.dll" Source="${libdir}/bin/${build.configuration}/avfilter-3.dll"/>
+                                <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+                                <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+                                <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+                                <!-- <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/> -->
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
-                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="mediaserver\QtCore$(var.suffix)4.dll" />
-                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="mediaserver\QtGui$(var.suffix)4.dll" />
-                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="mediaserver\QtMultimedia$(var.suffix)4.dll" />
-                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="mediaserver\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="mediaserver\QtXml$(var.suffix)4.dll" />
+                                <File Id="ServerQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                                <File Id="ServerQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                                <File Id="ServerQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ServerQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ServerQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
-                                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="mediaserver\libeay32.dll"/>
-                                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="mediaserver\ssleay32.dll"/>
+                                <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                                <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
                             </Component>
                         </Directory>
                         
                         <Directory Id="VmsClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
-                                <File Id="client.exe" Name="${product.name}.exe" Source="client/client.exe" KeyPath="yes">
+                                <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
@@ -530,49 +530,49 @@
                            
                             <Directory Id="ImageFormats" Name="imageformats">
                                 <Component Id="ImageFormats" Guid="{74793EF7-61C1-4e9c-81D6-A120E85D984F}">
-                                    <File Id="qgif4.dll" Name="qgif4.dll" Source="client\imageformats\qgif$(var.suffix)4.dll" />
-                                    <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="client\imageformats\qjpeg$(var.suffix)4.dll" />
-                                    <File Id="qtiff4.dll" Name="qtiff4.dll" Source="client\imageformats\qtiff$(var.suffix)4.dll" />
+                                    <File Id="qgif4.dll" Name="qgif4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qgif$(var.suffix)4.dll" />
+                                    <File Id="qjpeg4.dll" Name="qjpeg4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qjpeg$(var.suffix)4.dll" />
+                                    <File Id="qtiff4.dll" Name="qtiff4.dll" Source="${libdir}/bin/${build.configuration}\imageformats\qtiff$(var.suffix)4.dll" />
                                 </Component>
                             </Directory>
                             
                             <Component Id="ClientFFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
-                                <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="client/avcodec-54.dll"/>
-                                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="client/avdevice-54.dll"/>
-                                <File Id="ClientAvfilterDll" Name="avfilter-3.dll" Source="client/avfilter-3.dll"/>
-                                <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="client/avformat-54.dll"/>
-                                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="client/avutil-51.dll"/>
-                                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="client/swscale-2.dll"/>
-                                <!-- <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="client/libmp3lame-0.dll"/> -->
-                                <File Id="ClientX264" Name="x264.exe" Source="client/x264.exe"/>                                
+                                <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
+                                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="${libdir}/bin/${build.configuration}/avdevice-54.dll"/>
+                                <File Id="ClientAvfilterDll" Name="avfilter-3.dll" Source="${libdir}/bin/${build.configuration}/avfilter-3.dll"/>
+                                <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
+                                <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
+                                <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
+                                <!-- <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/> -->
+                                <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
                             </Component>
                             
                             <Component Id="ClientQTLibraries" Guid="{6BDC7AB9-6230-4cf3-9C1C-634C636D90BC}">
-                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="client\QtCore$(var.suffix)4.dll" />
-                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="client\QtGui$(var.suffix)4.dll" />
-                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="client\QtMultimedia$(var.suffix)4.dll" />
-                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="client\QtNetwork$(var.suffix)4.dll" />
-                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="client\QtOpenGL$(var.suffix)4.dll" />
-                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="client\QtXml$(var.suffix)4.dll" />
+                                <File Id="ClientQtCore$(var.suffix)4.dll" Name="QtCore$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtCore$(var.suffix)4.dll" />
+                                <File Id="ClientQtGui$(var.suffix)4.dll" Name="QtGui$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtGui$(var.suffix)4.dll" />
+                                <File Id="ClientQtMultimedia$(var.suffix)4.dll" Name="QtMultimedia$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtMultimedia$(var.suffix)4.dll" />
+                                <File Id="ClientQtNetwork$(var.suffix)4.dll" Name="QtNetwork$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtNetwork$(var.suffix)4.dll" />
+                                <File Id="ClientQtOpenGL$(var.suffix)4.dll" Name="QtOpenGL$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtOpenGL$(var.suffix)4.dll" />
+                                <File Id="ClientQtXml$(var.suffix)4.dll" Name="QtXml$(var.suffix)4.dll" Source="${libdir}/bin/${build.configuration}\QtXml$(var.suffix)4.dll" />
                             </Component>
                             
                             <Component Id="ClientOpenAL" Guid="{FA1A8B92-3BEF-4779-90E9-2F76CC9D79D3}">
-                                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="client\OpenAL32.dll"/>
-                                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="client\wrap_oal.dll"/>
+                                <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="${libdir}/bin/${build.configuration}\OpenAL32.dll"/>
+                                <File Id="wrap_oal.dll" Name="wrap_oal.dll" Source="${libdir}/bin/${build.configuration}\wrap_oal.dll"/>
                             </Component>
                             
                             <Component Id="ClientOpenSSL" Guid="{D7E994B3-B437-4993-A04E-C15AF9DF8312}">
-                                <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="client\libeay32.dll"/>
-                                <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="client\ssleay32.dll"/>
+                                <File Id="Clientlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
+                                <File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
                             </Component>
                             
                             <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
-                                <File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="client\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                                <File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
                             </Component>
                             
                             <Directory Id="styles" Name="styles">
                                 <Component Id="bespin" Guid="{BF20F7AC-A34C-481a-84E3-731C80050D51}">
-                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="client\styles\bespin$(var.suffix).dll" />
+                                    <File Id="bespin$(var.suffix).dll" Name="bespin$(var.suffix).dll" Source="${libdir}/bin/${build.configuration}\styles\bespin$(var.suffix).dll" />
                                 </Component>
                             </Directory>
                         </Directory>

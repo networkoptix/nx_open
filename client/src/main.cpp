@@ -49,7 +49,6 @@
 #include "api/session_manager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
-#include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
@@ -279,7 +278,7 @@ int main(int argc, char *argv[])
 
     /* Support old straight build scripts. */
 #ifndef NO_TRANSLATIONS
-    Q_INIT_RESOURCE(common_translations);
+    Q_INIT_RESOURCE(common_common);
 #endif
 
     QString language = qnSettings->language();
@@ -295,8 +294,6 @@ int main(int argc, char *argv[])
     if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
         application->installTranslator(&qtTranslator);
     
-    QnToolTip::instance();
-
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();

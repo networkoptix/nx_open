@@ -65,11 +65,12 @@ QnGlobals::QnGlobals(QObject *parent):
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
-    Q_INIT_RESOURCE(skin);
+    Q_INIT_RESOURCE(client_generated);
+    Q_INIT_RESOURCE(client_custom);
 
     init();
 
-    QString path = QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
+    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
     QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
     settings->beginGroup(QLatin1String("globals"));
     updateFromSettings(settings.data());

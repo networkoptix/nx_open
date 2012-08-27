@@ -57,6 +57,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+
+        if (shouldStop())
+            return QnResourceList();
+
         QUdpSocket sock;
 
         if (!bindToInterface(sock, iface))

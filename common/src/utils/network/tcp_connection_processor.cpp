@@ -128,6 +128,7 @@ void QnTCPConnectionProcessor::parseRequest()
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 }
 
+/*
 void QnTCPConnectionProcessor::bufferData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -150,6 +151,12 @@ void QnTCPConnectionProcessor::clearBuffer()
 {
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.clear();
+}
+*/
+void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+{
+    Q_D(QnTCPConnectionProcessor);
+    sendData(sendBuffer.data(), sendBuffer.size());
 }
 
 void QnTCPConnectionProcessor::sendData(const char* data, int size)
@@ -193,8 +200,10 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
     if (!d->responseBody.isEmpty())
     {
-        d->responseHeaders.setContentLength(d->responseBody.length());
-        d->responseHeaders.setContentType(QLatin1String(contentType));
+        //d->responseHeaders.setContentLength(d->responseBody.length());
+        //d->responseHeaders.setContentType(QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
     }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();

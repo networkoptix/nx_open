@@ -38,6 +38,12 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr)
     return QnResourcePtr(0);
 }
 
+void OnvifResourceSearcher::pleaseStop()
+{
+    QnAbstractNetworkResourceSearcher::pleaseStop();
+    wsddSearcher.pleaseStop();
+}
+
 QnResourceList OnvifResourceSearcher::findResources()
 {
     QnResourceList result;

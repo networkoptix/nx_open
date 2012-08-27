@@ -169,17 +169,21 @@ void QnProgressiveDownloadingConsumer::run()
         }
 
         QSize videoSize(640,480);
-        QList<QByteArray> resolution = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().split('x');
+        QByteArray resolutionStr = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().toLower();
+        if (resolutionStr.endsWith('p'))
+            resolutionStr = resolutionStr.left(resolutionStr.length()-1);
+        QList<QByteArray> resolution = resolutionStr.split('x');
+        if (resolution.size() == 1)
+            resolution.insert(0,QByteArray("0"));
         if (resolution.size() == 2)
         {
             videoSize = QSize(resolution[0].trimmed().toInt(), resolution[1].trimmed().toInt());
-            if (videoSize.width() < 16 || videoSize.height() < 16)
+            if ((videoSize.width() < 16 && videoSize.width() != 0) || videoSize.height() < 16)
             {
-                qWarning() << "Invalid resolution specified for web streaming. Defaulting to 640x480";
-                videoSize = QSize(640,480);
+                qWarning() << "Invalid resolution specified for web streaming. Defaulting to 480p";
+                videoSize = QSize(0,480);
             }
         }
-
 
         if (d->transcoder.setVideoCodec(d->videoCodec, QnTranscoder::TM_FfmpegTranscode, videoSize) != 0)
             //if (d->transcoder.setVideoCodec(CODEC_ID_MPEG2VIDEO, QnTranscoder::TM_FfmpegTranscode, QSize(640,480)) != 0)

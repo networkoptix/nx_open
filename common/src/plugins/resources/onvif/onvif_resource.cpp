@@ -325,44 +325,43 @@ ResolutionPair QnPlOnvifResource::getMaxResolution() const
     return m_resolutionList.isEmpty()? EMPTY_RESOLUTION_PAIR: m_resolutionList.front();
 }
 
-float QnPlOnvifResource::getResolutionAspectRatio(const ResolutionPair& resolution) const
+float QnPlOnvifResource::getResolutionAspectRatio(const ResolutionPair& resolution)
 {
     return resolution.second == 0? 0: static_cast<double>(resolution.first) / resolution.second;
 }
 
 ResolutionPair QnPlOnvifResource::getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const
 {
-    return getNearestResolution(resolution, aspectRatio, MAX_SECONDARY_RESOLUTION_SQUARE);
+    QMutexLocker lock(&m_mutex);
+    return getNearestResolution(resolution, aspectRatio, MAX_SECONDARY_RESOLUTION_SQUARE, m_secondaryResolutionList);
 }
 
 ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& resolution, float aspectRatio,
-    double maxResolutionSquare) const
+    double maxResolutionSquare, const QList<ResolutionPair>& resolutionList)
 {
-    QMutexLocker lock(&m_mutex);
-
     double requestSquare = resolution.first * resolution.second;
     if (requestSquare < MAX_EPS || requestSquare > maxResolutionSquare) return EMPTY_RESOLUTION_PAIR;
 
     int bestIndex = -1;
     double bestMatchCoeff = maxResolutionSquare > MAX_EPS ? (maxResolutionSquare / requestSquare) : INT_MAX;
 
-    for (int i = 0; i < m_resolutionList.size(); ++i) {
+    for (int i = 0; i < resolutionList.size(); ++i) {
         ResolutionPair tmp;
 
-        tmp.first = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].first + 1), 8);
-        tmp.second = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].second - 1), 8);
+        tmp.first = qPower2Ceil(static_cast<unsigned int>(resolutionList[i].first + 1), 8);
+        tmp.second = qPower2Floor(static_cast<unsigned int>(resolutionList[i].second - 1), 8);
         float ar1 = getResolutionAspectRatio(tmp);
 
-        tmp.first = qPower2Floor(static_cast<unsigned int>(m_resolutionList[i].first - 1), 8);
-        tmp.second = qPower2Ceil(static_cast<unsigned int>(m_resolutionList[i].second + 1), 8);
+        tmp.first = qPower2Floor(static_cast<unsigned int>(resolutionList[i].first - 1), 8);
+        tmp.second = qPower2Ceil(static_cast<unsigned int>(resolutionList[i].second + 1), 8);
         float ar2 = getResolutionAspectRatio(tmp);
 
-        if (!qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
+        if (aspectRatio != 0 && !qBetween(aspectRatio, qMin(ar1,ar2), qMax(ar1,ar2)))
         {
             continue;
         }
 
-        double square = m_resolutionList[i].first * m_resolutionList[i].second;
+        double square = resolutionList[i].first * resolutionList[i].second;
         if (square < MAX_EPS) continue;
 
         double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
@@ -372,7 +371,7 @@ ResolutionPair QnPlOnvifResource::getNearestResolution(const ResolutionPair& res
         }
     }
 
-    return bestIndex >= 0 ? m_resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
+    return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
 void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
@@ -392,6 +391,8 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
         currentAspect = float(4.0 / 3.0);
     }
     m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, currentAspect);
+    if (m_secondaryResolution == EMPTY_RESOLUTION_PAIR)
+        m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0); // try to get resolution ignoring aspect ration
 
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
         Q_ASSERT(m_secondaryResolution.first <= SECONDARY_STREAM_MAX_RESOLUTION.first &&
@@ -626,6 +627,26 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
     fetchAndSetAudioSource(soapWrapper);
 
     return true;
+}
+
+void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsResp& response)
+{
+    if (!response.Options)
+        return;
+    const std::vector<onvifXsd__VideoResolution*>* resolutionsPtr = 0;
+    if (getCodec() == H264 && response.Options->H264)
+        resolutionsPtr = &response.Options->H264->ResolutionsAvailable;
+    else if (response.Options->JPEG)
+        resolutionsPtr = &response.Options->JPEG->ResolutionsAvailable;
+    if (!resolutionsPtr)
+        return;
+    const std::vector<onvifXsd__VideoResolution*>& resolutions = *resolutionsPtr;
+
+    QMutexLocker lock(&m_mutex);
+    m_secondaryResolutionList.clear();
+    for (int i = 0; i < resolutions.size(); ++i)
+        m_secondaryResolutionList.append(ResolutionPair(resolutions[i]->Width, resolutions[i]->Height));
+    qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
 
 void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response) {
@@ -1013,15 +1034,15 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     }
 
     setVideoEncoderOptions(optIt->optionsResp);
-
     {
         QMutexLocker lock(&m_mutex);
-
+        m_secondaryResolutionList = m_resolutionList;
         m_primaryVideoEncoderId = optIt->id;
 
         if (++optIt != optionsList.end()) {
             m_secondaryVideoEncoderId = optIt->id;
             m_secondaryH264Profile = getH264StreamProfile(optIt->optionsResp);
+            updateSecondaryResolutionList(optIt->optionsResp);
         }
     }
 

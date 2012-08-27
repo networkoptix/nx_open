@@ -5,6 +5,13 @@
 
 class QnPerformance {
 public:
+    struct QnHddData{
+        int usage;
+        QString name;
+
+        QnHddData(int u, QString n): usage(u), name(n){ }
+    };
+
     static qint64 currentThreadTimeMSecs();
 
     /**
@@ -48,7 +55,7 @@ public:
      *                                  are busy servicing read or write requests.
      * \param hddUsage                  Output list of hdd usage data.
      */
-    static bool currentHddUsage(QList<int> *output);
+    static bool currentHddUsage(QList<QnHddData> *output);
 };
 
 

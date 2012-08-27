@@ -35,6 +35,7 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
+#include <ui/graphics/instruments/tool_tip_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
@@ -172,6 +173,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_curtainActivityInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayHackInstrument);
+    m_instrumentManager->installInstrument(new ToolTipInstrument(this));
 
     m_curtainActivityInstrument->recursiveDisable();
 
@@ -783,7 +785,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
     synchronize(widget, false);
     bringToFront(widget);
 
-    if(item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(item->hasFlag(Qn::PendingGeometryAdjustment))
         adjustGeometryLater(item, animate); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
 
     connect(widget,                     SIGNAL(aboutToBeDestroyed()),   this,   SLOT(at_widget_aboutToBeDestroyed()));
@@ -1205,7 +1207,7 @@ void QnWorkbenchDisplay::synchronizeRaisedGeometry() {
 }
 
 void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate) {
-    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(!item->hasFlag(Qn::PendingGeometryAdjustment))
         return;
 
     QnResourceWidget *widget = this->widget(item);
@@ -1219,7 +1221,7 @@ void QnWorkbenchDisplay::adjustGeometryLater(QnWorkbenchItem *item, bool animate
 }
 
 void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
-    if(!item->checkFlag(Qn::PendingGeometryAdjustment))
+    if(!item->hasFlag(Qn::PendingGeometryAdjustment))
         return;
 
     QnResourceWidget *widget = this->widget(item);

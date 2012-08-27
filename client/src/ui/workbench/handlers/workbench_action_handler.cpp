@@ -64,6 +64,7 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
@@ -72,6 +73,9 @@
 
 #include "client_message_processor.h"
 #include "file_processor.h"
+
+// TODO: remove this include
+#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
 
 
@@ -206,7 +210,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ExitAction),                             SIGNAL(triggered()),    this,   SLOT(at_exitAction_triggered()));
     connect(action(Qn::ExportTimeSelectionAction),              SIGNAL(triggered()),    this,   SLOT(at_exportTimeSelectionAction_triggered()));
     connect(action(Qn::ExportLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_exportLayoutAction_triggered()));
-    connect(action(Qn::QuickSearchAction),                      SIGNAL(triggered()),    this,   SLOT(at_quickSearchAction_triggered()));
+    connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio4x3Action),   SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio4x3Action_triggered()));
     connect(action(Qn::SetCurrentLayoutAspectRatio16x9Action),  SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutAspectRatio16x9Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
@@ -219,7 +223,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
-    connect(context()->watcher<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -710,8 +714,6 @@ void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
     arguments << QLatin1String("--delayed-drop");
     arguments << QLatin1String(serializedData.toBase64().data());
 
-    qDebug() << "args";
-    qDebug() << arguments[1];
     openNewWindow(arguments);
 }
 
@@ -1095,7 +1097,7 @@ void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
+void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourcePtr resource = parameters.resource();
@@ -1106,15 +1108,55 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
-    const int matrixWidth = 3, matrixHeight = 3;
-    const int itemCount = matrixWidth * matrixHeight;
+    /* List of possible time steps, in milliseconds. */
+    const qint64 steps[] = {
+        1000ll * 10,                    /* 10 seconds. */
+        1000ll * 60,                    /* 1 minute. */
+        1000ll * 60 * 10,               /* 5 minutes. */
+        1000ll * 60 * 10,               /* 10 minutes. */
+        1000ll * 60 * 60,               /* 1 hour. */
+        1000ll * 60 * 60 * 6,           /* 6 hours. */
+        1000ll * 60 * 60 * 24,          /* 1 day. */
+        1000ll * 60 * 60 * 24 * 5,      /* 5 days. */
+        1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
+        0,
+    };
+    const qint64 maxItems = 12; // TODO: take it from config?
 
-    /* Construct and add a new layout first. */
+    /* Find best time step. */
+    qint64 step = 0;
+    for(int i = 0; steps[i] > 0; i++) {
+        if(period.durationMs < steps[i] * (maxItems - 2)) { /* -2 is here as we're going to snap period ends to closest step points. */
+            step = steps[i];
+            break;
+        }
+    }
+    
+    int itemCount = 0;
+    if(step == 0) { 
+        /* No luck? Calculate time step based on the maximal number of items. */
+        itemCount = maxItems;
+
+        step = period.durationMs / itemCount;
+    } else {
+        /* In this case we want to adjust the period. */
+        qint64 startTime = qFloor(period.startTimeMs, step);
+        qint64 endTime = qCeil(period.endTimeMs(), step);
+        period = QnTimePeriod(startTime, endTime - startTime);
+
+        itemCount = period.durationMs / step;
+    }
+
+    /* Calculate size of the resulting matrix. */
+    const qreal desiredAspectRatio = 4.0 / 3.0;
+    const int matrixWidth = qMax(1, qRound(std::sqrt(desiredAspectRatio * itemCount)));
+
+    /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(tr("Quick Search for %1").arg(resource->getName()));
+    layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
     layout->setParentId(context()->user()->getId());
-    layout->setTimeBounds(period);
+    //layout->setTimeBounds(period);
 
     QnLayoutItemDataList items;
     for(int i = 0; i < itemCount; i++) {
@@ -1132,17 +1174,29 @@ void QnWorkbenchActionHandler::at_quickSearchAction_triggered() {
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 
-    /* Then navigate. */
+    /* Navigate. */
     display()->setStreamsSynchronized(NULL);
-    qint64 t = period.startTimeMs;
-    qint64 d = period.durationMs / itemCount;
+    qint64 time = period.startTimeMs;
     foreach(const QnLayoutItemData &item, items) {
         QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
         if(!widget)
             continue;
 
-        widget->display()->setCurrentTimeUSec(t * 1000);
-        t += d;
+        // TODO: don't start reader!
+
+        /* TODO: this code does not belong here. */
+        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
+        //widget->display()->archiveReader()->pauseMedia();
+        //widget->display()->camDisplay()->playAudio(false);
+        //widget->display()->archiveReader()->setSingleShotMode(true);
+
+        widget->setDecorationsVisible(true, false);
+        widget->setInfoVisible(true, false);
+        widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
+
+        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
+
+        time += step;
     }
 }
 
@@ -1372,13 +1426,10 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setEditorRights(accessController()->rights());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    if(accessController()->isOwner()) {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible | QnUserSettingsDialog::Editable);
-    } else {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    }
+
 
     if(!dialog->exec())
         return;
@@ -1530,6 +1581,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setEditorRights(accessController()->rights());
     
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
@@ -1991,7 +2043,7 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 }
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
-    action(Qn::TogglePanicModeAction)->setChecked(context()->watcher<QnWorkbenchPanicWatcher>()->isPanicMode());
+    action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {

@@ -10,7 +10,7 @@
 #  ifdef CL_CUSTOMIZATION_PRESET
 #    define QN_SKIN_PATH QLatin1String(":/") + QLatin1String(CL_CUSTOMIZATION_PRESET)
 #  else
-#    define QN_SKIN_PATH QLatin1Char(':')
+#    define QN_SKIN_PATH QLatin1String(":")
 #  endif
 #endif
 

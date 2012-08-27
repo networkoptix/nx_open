@@ -46,7 +46,10 @@ const char WSDD_MULTICAST_ADDRESS[] = "239.255.255.250";
 
 
 OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
-    m_onvifFetcher(OnvifResourceInformationFetcher::instance())/*,
+    m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
+    m_shouldStop(false)
+    /*,
+    m_s
     m_recvSocketList(),
     m_mutex()*/
 {
@@ -57,6 +60,12 @@ OnvifResourceSearcherWsdd& OnvifResourceSearcherWsdd::instance()
 {
     static OnvifResourceSearcherWsdd inst;
     return inst;
+}
+
+void OnvifResourceSearcherWsdd::pleaseStop()
+{
+    m_shouldStop = true;
+    m_onvifFetcher.pleaseStop();
 }
 
 //To avoid recreating of gsoap socket, these 2 functions must be assigned
@@ -240,9 +249,13 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
 {
     foreach(QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+
+        if (m_shouldStop)
+            return;
+
         QString host(iface.address.toString());
 
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
+        //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints(): Binding to Interface: " << iface.address.toString();
 
         QUdpSocket qSocket;
 
@@ -268,7 +281,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         fillWsddStructs(wsddProbe, replyTo);
 
         char* messageID = const_cast<char*>(soap_wsa_rand_uuid(soapWsddProxy.soap));
-        qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
+        //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: MessageID: " << messageID << ". Interface: " << iface.address.toString();
 
         //String should not be changed (possibly, declaration of char* instead of const char*,- gsoap bug
         //So const_cast should be safety
@@ -294,6 +307,9 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
         //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
         while (true) 
         {
+            if (m_shouldStop)
+                return;
+
             __wsdd__ProbeMatches wsddProbeMatches;
             wsddProbeMatches.wsdd__ProbeMatches = NULL;
 
@@ -302,7 +318,7 @@ void OnvifResourceSearcherWsdd::findEndpoints(EndpointInfoHash& result) const
             {
                 if (soapRes == SOAP_EOF) 
                 {
-                    qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
+                    //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
                     soap_destroy(soapWsddProxy.soap);
                     soap_end(soapWsddProxy.soap);
                     break;
@@ -347,6 +363,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
 
     findEndpoints(endpoints);
 
+#if 0
     //ToDo: delete
     EndpointInfoHash::ConstIterator endpIter = endpoints.begin();
     qDebug() << "OnvifResourceSearcherWsdd::findResources: Endpoints in the list:"
@@ -358,7 +375,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result) const
                  << " - " << endpIter.value().name << ", discovered in " << endpIter.value().discoveryIp;
         ++endpIter;
     }
-
+#endif
     m_onvifFetcher.findResources(endpoints, result);
 }
 

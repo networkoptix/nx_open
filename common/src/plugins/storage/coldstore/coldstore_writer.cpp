@@ -32,7 +32,7 @@ int QnColdStoreWriter::queueSize() const
 
 bool QnColdStoreWriter::write(const QByteArray& ba, const QString& fn)
 {
-    QnCSFile* cf = new QnCSFile();
+    QnCSFilePtr cf = QnCSFilePtr(new QnCSFile());
     cf->data = ba;
     cf->fn = fn;
     
@@ -51,7 +51,7 @@ void QnColdStoreWriter::run()
         if (!isConnectedToTheResource())
             break;
 
-        QnCSFile* cf;
+        QnCSFilePtr cf;
         bool get = m_writeQueue.pop(cf, 20);
 
         if (!get)
@@ -62,11 +62,10 @@ void QnColdStoreWriter::run()
 
         storage()->onWrite(cf->data, cf->fn);
 
-        delete cf;
 
     }
 
-    m_writeQueue.clearDelete();
+    m_writeQueue.clear();
 }
 
 QnPlColdStoreStoragePtr QnColdStoreWriter::storage() const

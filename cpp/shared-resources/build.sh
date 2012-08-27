@@ -15,4 +15,4 @@ case `uname -s` in
         ;;
 esac
 
-make -f Makefile.${build.configuration} -j $[NPROCESSORS+1]
+colormake -f Makefile.${build.configuration} -j $[NPROCESSORS+1]
