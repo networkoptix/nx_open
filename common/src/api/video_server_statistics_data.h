@@ -28,9 +28,9 @@ typedef QList<QnStatisticsDataItem> QnStatisticsDataList;//todo
 
 typedef QLinkedList<int> QnStatisticsData;
 typedef QLinkedListIterator<int> QnStatisticsDataIterator;
-typedef QHash<QString, QnStatisticsData*> QnStatisticsHistory;
-typedef QHashIterator<QString, QnStatisticsData*> QnStatisticsIterator;
-typedef QMutableHashIterator<QString, QnStatisticsData*> QnStatisticsCleaner;
+typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
+typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
+typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 
 Q_DECLARE_METATYPE(QnStatisticsDataList)
 

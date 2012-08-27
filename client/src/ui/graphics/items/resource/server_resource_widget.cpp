@@ -42,7 +42,7 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(const QnStatisticsData *values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
+    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
         QPainterPath path;
         int max_value = -1;
         int prev_value = 0;
@@ -58,7 +58,7 @@ namespace {
 
         bool first(true);
 
-        QnStatisticsDataIterator iter(*values);
+        QnStatisticsDataIterator iter(values);
         bool last = !iter.hasNext();
         while (!last){
             int i_value = iter.next();
@@ -409,11 +409,9 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_statistics_received() {
-    // TODO: #GDM there is no need to allocate memory via new() here as it is freed 30 lines afterwards.
-    // QnStatisticsHistory can be allocated on the stack.
 
-    QnStatisticsHistory *history_update = new QnStatisticsHistory(); 
-    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, history_update);
+    QnStatisticsHistory history_update;
+    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
     if (id < 0){
         m_renderStatus = Qn::CannotRender;
         return;
@@ -428,18 +426,16 @@ void QnServerResourceWidget::at_statistics_received() {
     QnStatisticsCleaner cleaner(m_history);
     while (cleaner.hasNext()) {
          cleaner.next();
-         if (!(history_update->contains(cleaner.key())))
-            cleaner.remove(); // TODO: #GDM Memleak!
+         if (!(history_update.contains(cleaner.key())))
+            cleaner.remove();
     }
 
     // update existsing charts
-    QnStatisticsIterator updater(*history_update);
+    QnStatisticsIterator updater(history_update);
     while (updater.hasNext()) {
          updater.next();
-         updateValues(updater.key(), updater.value(), id);
+         updateValues(updater.key(), updater.value());
     }
-
-    delete history_update; 
 
     m_lastHistoryId = id;
     m_renderStatus = Qn::NewFrameRendered;
@@ -448,29 +444,13 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 }
 
-void QnServerResourceWidget::updateValues(QString key, QnStatisticsData *newValues, qint64 newId){
-    QnStatisticsData *oldValues;
+void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues){
+    QnStatisticsData &oldValues = m_history[key];
 
-    if (!m_history.contains(key)){
-        oldValues = new QnStatisticsData();
-        for (int i = 0; i < CHART_POINTS_LIMIT; i++)
-            oldValues->append(0);
-        m_history[key] = oldValues;
-    } else {
-        oldValues = m_history[key];
-    }
-
-    // minimal stored id
-    qint64 minId = qMin(newId - CHART_POINTS_LIMIT + 1, qint64(0));
-
-    if (m_lastHistoryId < minId){
-        oldValues->clear();
-    } else {
-        int size = oldValues->size();
-        for (int i = 1; i < size - (m_lastHistoryId - minId); i++)
-            oldValues->removeFirst();
-    }
-
-    while (!newValues->isEmpty())
-        oldValues->append(newValues->takeFirst());
+    while (!newValues.isEmpty())
+        oldValues.append(newValues.takeFirst());
+    while (oldValues.size() > CHART_POINTS_LIMIT)
+        oldValues.removeFirst();
+    while (oldValues.size() < CHART_POINTS_LIMIT)
+        oldValues.prepend(0);
 }
