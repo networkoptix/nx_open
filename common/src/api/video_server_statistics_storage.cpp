@@ -9,7 +9,7 @@
 
 #define STORAGE_LIMIT 60
 
-QnStatisticsStorage::QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection):
+QnStatisticsStorage::QnStatisticsStorage(QnVideoServerConnectionPtr apiConnection, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
@@ -24,7 +24,7 @@ void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot
     m_listeners++;
 }
 
-void QnStatisticsStorage::unRegisterServerWidget(QObject *target){
+void QnStatisticsStorage::unregisterServerWidget(QObject *target){
     disconnect(this, 0, target, 0);
     m_listeners--;
 }
@@ -36,16 +36,15 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
     QnStatisticsIterator iter(m_history);
     while (iter.hasNext()){
         iter.next();
-        QnStatisticsData* stats = new QnStatisticsData();
-        history->insert(iter.key(), stats);
-
+        QnStatisticsData stats;
         qint64 counter = m_lastId;
-        QnStatisticsDataIterator peeker(*iter.value());
+        QnStatisticsDataIterator peeker(iter.value());
         peeker.toBack();
         while (counter > lastId && peeker.hasPrevious()){
-            stats->prepend(peeker.previous());
+            stats.prepend(peeker.previous());
             counter--;
         }
+        history->insert(iter.key(), stats);
     }
 
     return m_lastId;
@@ -62,8 +61,6 @@ void QnStatisticsStorage::update(){
 }
 
 void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data){
-    int cpuCounter = 0;
-    int hddCounter = 0;
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
@@ -72,16 +69,13 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
         QnStatisticsDataItem next_data = iter.next();
 
         QString id = next_data.device == QnStatisticsDataItem::CPU
-           ? tr("CPU") + QString::number(cpuCounter++)
-           : tr("HDD") + QString::number(hddCounter++);
+           ? tr("CPU")
+           : next_data.description;
 
-        if (!m_history.contains(id))
-            m_history[id] = new QnStatisticsData();
-
-        QnStatisticsData *stats = m_history[id];
-        stats->append(next_data.value);
-        if (stats->size() > STORAGE_LIMIT)
-            stats->removeFirst();
+        QnStatisticsData &stats = m_history[id];
+        stats.append(next_data.value);
+        if (stats.size() > STORAGE_LIMIT)
+            stats.removeFirst();
     }
     m_alreadyUpdating = false;
 

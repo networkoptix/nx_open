@@ -223,6 +223,37 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         m_dataQueue.lock();
 
         m_newLiveQuality = MEDIA_Quality_Low;
+        bool somethingDeleted = false;
+        for (int i = m_dataQueue.size()-1; i >=0; --i)
+        {
+            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+            if (media->flags & (AV_PKT_FLAG_KEY | QnAbstractMediaData::MediaFlags_LowQuality)) {
+                m_dataQueue.removeFirst(i);
+                somethingDeleted = true;
+                break;
+            }
+        }
+        if (!somethingDeleted)
+        {
+            for (int i = m_dataQueue.size()-1; i >=0; --i)
+            {
+                QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+                if (media->flags & AV_PKT_FLAG_KEY)
+                {
+                    m_dataQueue.removeFirst(i);
+                    break;
+                }
+            }
+        }
+        m_dataQueue.unlock();
+    }
+
+    /*
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
+    {
+        m_dataQueue.lock();
+
+        m_newLiveQuality = MEDIA_Quality_Low;
 
         QnAbstractMediaDataPtr dataLow;
         QnAbstractMediaDataPtr dataHi;
@@ -277,6 +308,8 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         }
         m_dataQueue.unlock();
     }
+    */
+
     while(m_dataQueue.size() > 120) // queue to large
     {
         QnAbstractDataPacketPtr tmp;

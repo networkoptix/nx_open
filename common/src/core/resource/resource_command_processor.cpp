@@ -55,12 +55,14 @@ void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 
 bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
+    if (!data)
+        return true;
     QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
 
     bool result = command->execute();
 
     if (!result) // if command failed for this resource. => resource must be not available, lets remove everything related to the resouce from the queue
-        m_dataQueue.removeDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
+        m_dataQueue.detachDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
         
     
 

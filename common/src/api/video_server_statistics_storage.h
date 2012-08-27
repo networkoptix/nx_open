@@ -15,15 +15,15 @@
 class QnStatisticsStorage: QObject{
     Q_OBJECT
 public:
-
     /**
      * Constructor
      *
-     * \param parent            Parent of the object
      * \param apiConnection     Api connection of the server that will provide the statistics.
+     * \param parent            Parent of the object
      */
-    QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection);
+    QnStatisticsStorage(QnVideoServerConnectionPtr apiConnection, QObject *parent);
 
+    // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
      *  Register the consumer object (usually widget).
      *
@@ -37,8 +37,11 @@ public:
      *
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unRegisterServerWidget(QObject *target);
+    void unregisterServerWidget(QObject *target);
 
+    // TODO: #GDM #1.4 I think we can have a simpler API here, like 
+    // QnStatisticsHistory history() const;
+    // This way we'll avoid the need to store request ID at the caller's side.
     /**
      *  Get history data for the selected server resource.
      *
@@ -54,6 +57,9 @@ public:
     void update();
 
 signals:
+    // TODO: #GDM rename to statisticsUpdated? Or statisticsChanged?
+    // at_somewhere_somethingHappened() is a name template for signal handlers,
+    // somethingHappened() --- for signals.
 
     /**
      * Signal emitted when new data is received.

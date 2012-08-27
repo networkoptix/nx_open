@@ -15,7 +15,6 @@ class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
-class QnVideoServerStatisticsManager;
 
 /**
  * This class simplifies access to workbench context. 
@@ -62,8 +61,6 @@ protected:
     QnWorkbenchDisplay *display() const;
 
     QnWorkbenchNavigator *navigator() const;
-
-    QnVideoServerStatisticsManager *videoServerStatisticsManager() const;
 private:
     QnWorkbenchContext *m_context;
 };
