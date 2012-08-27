@@ -471,7 +471,7 @@ namespace{
                  it != m_devNameToStat.end();
                  ++it )
             {
-                output->append(QnPerformance::QnHddData(it->second.prevStat.diskUtilizationPercent, QString("HDD%1").arg(i)) );
+                output->append(QnPerformance::QnHddData(it->second.prevStat.diskUtilizationPercent, QString(QLatin1String("HDD%1")).arg(i)) );
                 i++;
             }
             return !output->isEmpty();
