@@ -1156,9 +1156,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
     layout->setParentId(context()->user()->getId());
-    //layout->setTimeBounds(period);
 
     QnLayoutItemDataList items;
+    qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1166,38 +1166,19 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
+        item.dataByRole[Qn::ItemPausedRole] = true;
+        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
+        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue(period);
+        item.dataByRole[Qn::ItemTimeRole] = time;
 
         items.push_back(item);
         layout->addItem(item);
     }
 
+    layout->setData(Qn::LayoutTimeLabelsRole, true);
+
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-
-    /* Navigate. */
-    //display()->setStreamsSynchronized(NULL);
-    qint64 time = period.startTimeMs;
-    foreach(const QnLayoutItemData &item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
-        if(!widget)
-            continue;
-
-        // TODO: don't start reader!
-
-        /* TODO: this code does not belong here. */
-        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        //widget->display()->archiveReader()->pauseMedia();
-        //widget->display()->camDisplay()->playAudio(false);
-        //widget->display()->archiveReader()->setSingleShotMode(true);
-
-        widget->setDecorationsVisible(true, false);
-        widget->setInfoVisible(true, false);
-        widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
-
-        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
-
-        time += step;
-    }
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {

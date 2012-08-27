@@ -40,6 +40,7 @@ namespace Qn {
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. */
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. */
+        LayoutTimeLabelsRole,                       /**< . */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. */
