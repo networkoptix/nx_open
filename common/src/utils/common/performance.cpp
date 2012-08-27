@@ -72,13 +72,16 @@ namespace {
             return m_totalUsage;
         }
 
-        bool hddUsage(QList<int> *output){
+        bool hddUsage(QList<QnPerformance::QnHddData> *output){
             QMutexLocker lk( &m_mutex );
 
             output->clear();
-            foreach(int item, m_hddUsage)
-                output->append(item);
-            return !m_hddUsage.isEmpty();
+
+            for (int i = 0; i < qMin(m_hddUsage.size(), m_hddNames.size()); i++){
+                output->append(QnPerformance::QnHddData(m_hddUsage.at(i), QLatin1String("HDD") + m_hddNames.at(i)));
+            }
+
+            return !(output->isEmpty());
         }
 
     private:
@@ -137,7 +140,7 @@ namespace {
             return result;
         }
 
-        QList<quint64> *enumerateWbemSeparate(QString queryStr, LPCWSTR value, QList<quint64> *dataList){
+        void enumerateWbemHdds(QString queryStr, LPCWSTR value, LPCWSTR nameValue, QList<quint64> &dataList, QList<QString> &nameList){
             IEnumWbemClassObject* pEnumerator = query(queryStr.toLocal8Bit().data());
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
@@ -146,13 +149,14 @@ namespace {
                 while (uReturn != 0)
                 {
                     quint64 data = getWbemLongLong(pclsObj, value);
-                    dataList->append(data);
+                    dataList.append(data);
+                    QString name = getWbemString(pclsObj, nameValue);
+                    nameList.append(name);
                     pclsObj->Release();
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
             }
-            return dataList;
         }
 
         void refresh() {
@@ -169,16 +173,22 @@ namespace {
             quint64 idle = enumerateWbem(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE Name = \"Idle\""),
                 L"PercentProcessorTime");
-             QList<quint64> *hdds = enumerateWbemSeparate(
+            QList<quint64> hdds;
+            QList<QString> hddnames;
+            enumerateWbemHdds(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfDisk_PhysicalDisk WHERE Name !=\"_Total\" AND PercentDiskTime > 0"),
-                L"PercentIdleTime",
-                new QList<quint64>);
+                    L"PercentIdleTime", L"Name",
+                    hdds, hddnames);
 
             if (m_timeStamp && timeStamp){
                 qulonglong timespan = (timeStamp - m_timeStamp);
                 m_hddUsage.clear();
-                for (int i = 0; i < qMin(hdds->count(), m_rawHddUsageIdle.count()); i++){
-                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds->at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                for (int i = 0; i < qMin(hdds.count(), m_rawHddUsageIdle.count()); i++){
+                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds.at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                }
+                m_hddNames.clear();
+                for (int i = 0; i < hddnames.count(); i++){
+                    m_hddNames.append(hddnames.at(i));
                 }
 
                 timespan *= QnPerformance::cpuCoreCount(); // cpu counters are relayed on this coeff
@@ -187,8 +197,8 @@ namespace {
             }
 
             m_rawHddUsageIdle.clear();
-            for(int i = 0; i < hdds->count(); i++)
-                m_rawHddUsageIdle.append(hdds->at(i));
+            for(int i = 0; i < hdds.count(); i++)
+                m_rawHddUsageIdle.append(hdds.at(i));
             delete hdds;
 
             m_totalIdle = idle;
@@ -352,6 +362,9 @@ namespace {
         /** Total hdd usage percent for all drives for the last STATISTICS_USAGE_REFRESH seconds. */
         QList<int> m_hddUsage;
 
+        /** Hdd names for all drives existing STATISTICS_USAGE_REFRESH seconds ago. */
+        QList<QString> m_hddNames;
+
         /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
     };
@@ -448,17 +461,19 @@ namespace{
             calcDiskUsage();
         }
 
-        bool hddUsage( QList<int>* output ) const
+        bool hddUsage( QList<QnPerformance::QnHddData>* output ) const
         {
             QMutexLocker lk( &m_mutex );
 
+            int i = 0;
             output->clear();
             for( map<pair<int, int>, DiskStatContext>::const_iterator
                  it = m_devNameToStat.begin();
                  it != m_devNameToStat.end();
                  ++it )
             {
-                output->append( it->second.prevStat.diskUtilizationPercent );
+                output->append(QnPerformance::QnHddData(it->second.prevStat.diskUtilizationPercent, QString("HDD%1").arg(i)) );
+                i++;
             }
             return !output->isEmpty();
         }
@@ -860,7 +875,7 @@ int QnPerformance::cpuCoreCount() {
     return QThread::idealThreadCount();
 }
 
-bool QnPerformance::currentHddUsage(QList<int> *output){
+bool QnPerformance::currentHddUsage(QList<QnHddData> *output){
     return refresherInstance()->hddUsage(output);
 }
 
