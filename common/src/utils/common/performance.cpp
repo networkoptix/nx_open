@@ -424,6 +424,7 @@ namespace{
             m_timer = 0;
             m_initialized = init();
             memset( &m_prevClock, 0, sizeof(m_prevClock) );
+            m_prevPartitionListReadTime = 0;
         }
 
         ~CpuUsageRefresher() {
@@ -464,15 +465,15 @@ namespace{
         {
             QMutexLocker lk( &m_mutex );
 
-            int i = 0;
             output->clear();
             for( map<pair<int, int>, DiskStatContext>::const_iterator
                  it = m_devNameToStat.begin();
                  it != m_devNameToStat.end();
                  ++it )
             {
-                output->append(QnPerformance::QnHddData(it->second.prevStat.diskUtilizationPercent, QString(QLatin1String("HDD%1")).arg(i)) );
-                i++;
+                output->append( QnPerformance::QnHddData(
+					it->second.prevStat.diskUtilizationPercent,
+					QString::fromStdString(it->second.prevStat.deviceName) ) );
             }
             return !output->isEmpty();
         }
@@ -598,6 +599,11 @@ namespace{
             }
         };
 
+        //!Timeout (in seconds) during which partition list expires (needed to detect mounts/umounts)
+        static const time_t PARTITION_LIST_EXPIRE_TIMEOUT_SEC = 60;
+        //!Disk usage is evaluated as average on \a APPROXIMATION_VALUES_NUMBER prev values
+        static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
+
         void calcDiskUsage()
         {
             static const size_t MAX_LINE_LENGTH = 256;
@@ -605,8 +611,43 @@ namespace{
 
             char devName[MAX_LINE_LENGTH];
             memset( devName, 0, sizeof(devName) );
-            if( m_partitions.empty() )
+            const time_t curTime = ::time( NULL );
+            if( m_partitions.empty() || curTime - m_prevPartitionListReadTime > PARTITION_LIST_EXPIRE_TIMEOUT_SEC )
             {
+//                //using all mount points
+//                FILE* mntF = popen( "mount | grep ^/dev/", "r" );
+//                if( mntF == NULL )
+//                {
+//                    //failed to get partition list
+//                }
+//                else
+//                {
+//                    m_partitions.clear();
+//                    char PARTITION_NAME[1024];
+//                    while( fgets(PARTITION_NAME, sizeof(PARTITION_NAME)-1, mntF) != NULL)
+//                    {
+//                        char* sepPos = strchr( PARTITION_NAME, ' ' );
+//                        if( sepPos == NULL || sepPos == PARTITION_NAME )
+//                            continue;
+//                        //searching device name
+//                        const char* shortNameStart = PARTITION_NAME;
+//                        for( const char*
+//                             curPos = PARTITION_NAME;
+//                             curPos < sepPos && curPos != NULL;
+//                             curPos = strchr( curPos+1, '/' ) )
+//                        {
+//                            shortNameStart = curPos;
+//                        }
+
+//                        m_partitions.insert( string( shortNameStart+1, sepPos-shortNameStart-1 ) );
+//                    }
+
+//                    pclose( mntF );
+//                    m_prevPartitionListReadTime = curTime;
+//                }
+
+
+                //using all disk drives
                 unsigned int majorNumber = 0, minorNumber = 0, numBlocks = 0;
                 //reading partition names
                 FILE* partitionsFile = fopen( "/proc/partitions", "r" );
@@ -617,9 +658,14 @@ namespace{
                     if( i == 0 ||   //skipping header
                             sscanf( line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName ) != 4 )  //skipping unrecognized line
                         continue;
-                    m_partitions.insert( string( devName ) );
+                    string devNameStr( devName );
+                    if( devNameStr.empty() || isdigit(devNameStr[devNameStr.size()-1]) )
+                        continue;   //not a physical drive
+                    m_partitions.insert( devNameStr );
                 }
                 fclose( partitionsFile );
+
+                //TODO/IMPL read network drives
             }
 
             DiskStatSys curDiskStat;
@@ -633,6 +679,12 @@ namespace{
                 m_prevClock = curClock;
                 return; //first time doing nothing
             }
+
+            //reading current disk statistics
+            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
+            if( !diskstatFile )
+                return;
+
             unsigned int clockElapsed = (curClock.tv_sec - m_prevClock.tv_sec) * 1000;
             if( curClock.tv_nsec >= m_prevClock.tv_nsec )
                 clockElapsed += (curClock.tv_nsec - m_prevClock.tv_nsec) / 1000000;
@@ -642,12 +694,7 @@ namespace{
                 return; //there's no sense to calculate anything
             m_prevClock = curClock;
 
-            //reading current disk statistics
-            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
-            if( !diskstatFile )
-                return;
-
-            while( fgets( line, FILENAME_MAX, diskstatFile ) != NULL )
+            while( fgets( line, MAX_LINE_LENGTH, diskstatFile ) != NULL )
             {
                 memset( curDiskStat.device_name, 0, sizeof(curDiskStat.device_name) );
                 if( sscanf( line, "%u %u %s %u %u %u %u %u %u %u %u %u %u %u",
@@ -690,6 +737,7 @@ namespace{
                 {
                     //calculating disk utilization
                     ctx.prevStat.diskUtilizationPercent = (curDiskStat.tot_io_ms - ctx.prevSysStat.tot_io_ms) * 100 / clockElapsed;
+                    //std::cout<<ctx.prevStat.deviceName<<": "<<ctx.prevStat.diskUtilizationPercent<<"%\n";
                 }
                 ctx.prevSysStat = curDiskStat;
             }
@@ -708,6 +756,7 @@ namespace{
         //!map<pair<majorNumber, minorNumber>, statistics calculation context>
         map<pair<int, int>, DiskStatContext> m_devNameToStat;
         set<string> m_partitions;
+        time_t m_prevPartitionListReadTime;
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
