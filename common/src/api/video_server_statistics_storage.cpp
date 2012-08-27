@@ -53,8 +53,19 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
 void QnStatisticsStorage::update(){
     if (m_alreadyUpdating)
         return;
-    if (!m_listeners)
+    if (!m_listeners){
+        m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
+        m_lastId++;
+
+        QnStatisticsHistory::iterator iter;
+        for (iter = m_history.begin(); iter != m_history.end(); iter++){
+            QnStatisticsData &stats = iter.value();
+            stats.append(0);
+            if (stats.size() > STORAGE_LIMIT)
+                stats.removeFirst();
+        }
         return;
+    }
 
     m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
     m_alreadyUpdating = true;
