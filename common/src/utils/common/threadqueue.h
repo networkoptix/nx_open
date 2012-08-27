@@ -201,6 +201,7 @@ public:
             index = (index + 1) % m_buffer.size();
         }
         m_bufferLen = 0;
+		m_headIndex = 0;
     }
 
     /*
