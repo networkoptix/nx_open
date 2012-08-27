@@ -76,6 +76,7 @@
 
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "../extensions/workbench_stream_synchronizer.h"
 
 
 
@@ -1112,7 +1113,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
         1000ll * 60,                    /* 1 minute. */
-        1000ll * 60 * 10,               /* 5 minutes. */
+        1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
@@ -1121,7 +1122,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 12; // TODO: take it from config?
+    const qint64 maxItems = 16; // TODO: take it from config?
+
+    if(period.durationMs < steps[1]) {
+        QMessageBox::warning(widget(), tr("Could not perform thumbnails search"), tr("Selected time period is too short to perform thumbnails search. Please select a longer period."), QMessageBox::Ok);
+        return;
+    }
 
     /* Find best time step. */
     qint64 step = 0;
@@ -1169,13 +1175,16 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
         item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue(period);
-        item.dataByRole[Qn::ItemTimeRole] = time;
+        item.dataByRole[Qn::ItemTimeRole] = time * 1000;
 
         items.push_back(item);
         layout->addItem(item);
+
+        time += step;
     }
 
     layout->setData(Qn::LayoutTimeLabelsRole, true);
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);

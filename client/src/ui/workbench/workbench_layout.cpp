@@ -97,6 +97,7 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
+    m_dataByRole = resource->data(); // TODO: emit signals?
 
     bool result = true;
 

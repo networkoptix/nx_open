@@ -1271,9 +1271,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
-    foreach(QnResourceWidget *widget, widgets())
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    foreach(QnResourceWidget *widget, widgets()) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->currentTimeUSec());
+            mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
+        }
+    }
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
@@ -1296,7 +1299,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             continue;
 
         qint64 time = mediaWidget->item()->data(Qn::ItemTimeRole).value<qint64>();
+        bool paused = mediaWidget->item()->data(Qn::ItemPausedRole).toBool();
+
         mediaWidget->display()->archiveReader()->jumpTo(time, time); /* NOTE: non-precise seek doesn't work here. */
+        if(paused)
+            mediaWidget->display()->archiveReader()->setSingleShotMode(true);
 
         // TODO: don't start reader for thumbnails search
         //widget->display()->archiveReader()->pauseMedia();
@@ -1306,7 +1313,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(hasTimeLabels) {
             widget->setDecorationsVisible(true, false);
             widget->setInfoVisible(true, false);
-            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
+            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time / 1000).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time / 1000).toString(tr("\thh:mm:ss")));
         }
     }
 
