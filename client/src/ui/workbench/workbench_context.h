@@ -26,7 +26,7 @@ class QnActionManager;
  * and serves as an application context.
  */
 class QnWorkbenchContext: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent = NULL);
 

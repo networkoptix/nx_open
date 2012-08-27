@@ -46,6 +46,7 @@ public:
     */
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) = 0;
     QString getLastError() const;
+
 protected:
     QString m_lastErrMessage;
     Params m_params;
@@ -63,12 +64,14 @@ public:
     //!Set picture size (in pixels) of output video stream
     /*!
         By default, output stream has the same picture size as input
-        \param value If (0,0) than input stream picture size is used
+        \ param value If (0,0) than input stream picture size is used
+        \ if width=0, width MUST be autodetected (keep source aspect ratio)
     */
     virtual void setResolution( const QSize& value );
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
 
+    void open(QnCompressedVideoDataPtr video);
 protected:
     QSize m_resolution;
 };

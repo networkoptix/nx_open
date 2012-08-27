@@ -19,7 +19,8 @@ QnResourceConsumer(res),
 m_videoParser(0),
 m_audioParser(0),
 m_videoIO(0),
-m_audioIO(0)
+m_audioIO(0),
+m_pleaseStop(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -50,23 +51,15 @@ void QnMulticodecRtpReader::setNeedKeyData()
 
 void QnMulticodecRtpReader::checkIfNeedKeyData()
 {
-    for (int i = 0; i < m_lastVideoData.size();)
+    if (m_lastVideoData)
     {
-        QnAbstractMediaDataPtr video = m_lastVideoData[i];
-        
-        Q_ASSERT_X(video->channelNumber < (quint32)m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
-        if (video->channelNumber < (quint32)m_gotKeyData.size())
+        Q_ASSERT_X(m_lastVideoData->channelNumber < (quint32)m_gotKeyData.size(), Q_FUNC_INFO, "Invalid channel number");
+        if (m_lastVideoData->channelNumber < (quint32)m_gotKeyData.size())
         {
-            if (video->flags & AV_PKT_FLAG_KEY)
-                m_gotKeyData[video->channelNumber] = true;
-             if (!m_gotKeyData[video->channelNumber])
-                 m_lastVideoData.removeAt(i);
-             else {
-                 ++i;
-             }
-        }
-        else {
-            ++i;
+            if (m_lastVideoData->flags & AV_PKT_FLAG_KEY)
+                m_gotKeyData[m_lastVideoData->channelNumber] = true;
+             if (!m_gotKeyData[m_lastVideoData->channelNumber])
+                 m_lastVideoData.clear();
         }
     }
 }
@@ -105,7 +98,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     QTime dataTimer;
     dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int readed = m_RtpSession.readBinaryResponce(rtpBuffer, sizeof(rtpBuffer));
         m_RtpSession.sendKeepAliveIfNeeded();
@@ -146,10 +139,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
         }
     }
 
-    if (!m_lastVideoData.isEmpty())
+    if (m_lastVideoData)
     {
-        result = m_lastVideoData[0];
-        m_lastVideoData.removeAt(0);
+        result = m_lastVideoData;
+		m_lastVideoData.clear();
         return result;
     }
     if (!m_lastAudioData.isEmpty())
@@ -160,8 +153,8 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
         return result;
     }
-
-    qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
+    if (m_RtpSession.isOpened() && !m_pleaseStop)
+        qWarning() << "RTP read timeout for camera " << getResource()->getName() << ". Reopen stream";
     return result;
 }
 
@@ -183,7 +176,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
     QTime dataTimer;
     dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && m_lastVideoData.isEmpty() && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && !m_lastVideoData && m_lastAudioData.isEmpty() && dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
     {
         int nfds = 0;
         FD_ZERO(&read_set);
@@ -234,10 +227,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
         }
     }
 
-    if (!m_lastVideoData.isEmpty())
+    if (m_lastVideoData)
     {
-        result = m_lastVideoData[0];
-        m_lastVideoData.removeAt(0);
+        result = m_lastVideoData;
+        m_lastVideoData.clear();
         return result;
     }
     if (!m_lastAudioData.isEmpty())
@@ -349,7 +342,7 @@ void QnMulticodecRtpReader::openStream()
 
         m_RtpSession.play(AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0);
         
-        m_videoParser = createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO).toUpper());
+        m_videoParser = dynamic_cast<QnRtpVideoStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_VIDEO).toUpper()));
         if (m_videoParser)
             m_videoParser->setTimeHelper(&m_timeHelper);
         m_audioParser = dynamic_cast<QnRtpAudioStreamParser*> (createParser(m_RtpSession.getCodecNameByType(RTPSession::TT_AUDIO).toUpper()));
@@ -385,4 +378,9 @@ const QnResourceAudioLayout* QnMulticodecRtpReader::getAudioLayout() const
         return m_audioParser->getAudioLayout();
     else
         return 0;
+}
+
+void QnMulticodecRtpReader::pleaseStop()
+{
+    m_pleaseStop = true;
 }

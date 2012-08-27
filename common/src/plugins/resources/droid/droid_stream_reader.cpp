@@ -41,13 +41,13 @@ PlDroidStreamReader::~PlDroidStreamReader()
 
 QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
 {
-    QList<QnAbstractMediaDataPtr> result;
+    QnAbstractMediaDataPtr result;
     quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (!m_needStop && result.isEmpty())
+    while (!m_needStop && !result)
     {
         if (!m_gotSDP) {
             msleep(10);
@@ -58,7 +58,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
         int readed = m_videoIoDevice->read( (char*) rtpBuffer, sizeof(rtpBuffer));
         m_h264Parser->processData(rtpBuffer, readed, m_videoIoDevice->getStatistic(), result );
     }
-    return result.isEmpty() ? QnAbstractMediaDataPtr() : result[0];
+    return result;
 }
 
 void PlDroidStreamReader::openStream()

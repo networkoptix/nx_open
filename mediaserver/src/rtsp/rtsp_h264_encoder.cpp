@@ -98,7 +98,7 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
         // fragmented FU_A_PACKET
         quint8 nalType = m_nalType;
 
-        int payloadLen = qMin(m_nalEnd - m_currentData, RTSP_H264_MAX_LEN - 2);
+        int payloadLen = qMin((int) (m_nalEnd - m_currentData), RTSP_H264_MAX_LEN - 2);
 
         // write 2 bytes header
         quint8 rtspNalType = FU_A_PACKET | 0x80 | m_nalRefIDC;

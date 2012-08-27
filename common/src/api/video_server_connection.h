@@ -12,7 +12,7 @@
 #include "recording/time_period_list.h"
 
 #include <utils/common/request_param.h>
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>
 
 #include "api_fwd.h"
 
@@ -50,12 +50,12 @@ namespace detail {
         Q_OBJECT;
     public:
         VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
-            qRegisterMetaType<QnStatisticsDataVector>("QnStatisticsDataVector");
+            qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
         }
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
-        void finished(const QnStatisticsDataVector &/* usage data */);
+        void finished(const QnStatisticsDataList &/* usage data */);
     };
 
     //!Handles response on GetParam request

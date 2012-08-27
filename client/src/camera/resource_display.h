@@ -36,7 +36,7 @@ namespace detail {
 
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     /**
      * Constructor.
@@ -44,7 +44,7 @@ public:
      * \param resource                  Resource that this display is associated with. Must not be NULL.
      * \param parent                    Parent of this display.                
      */
-    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent, bool liveOnly);
 
     /**
      * Virtual destructor. 

@@ -890,6 +890,13 @@ const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
     return m_multiCodec.getAudioLayout();
 }
 
+void QnOnvifStreamReader::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_multiCodec.pleaseStop();
+}
+
+
 /*
 for (;it != response.Configurations.end(); ++it) 
 {
