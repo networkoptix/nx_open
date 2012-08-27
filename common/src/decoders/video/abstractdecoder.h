@@ -1,5 +1,5 @@
-#ifndef clabstractdecoder_h_2155
-#define clabstractdecoder_h_2155
+#ifndef clabstractvideodecoder_h_2155
+#define clabstractvideodecoder_h_2155
 
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/frame_info.h"
@@ -96,4 +96,4 @@ private:
     static CLCodecManufacture m_codecManufacture;
 };
 
-#endif //clabstractdecoder_h_2155
+#endif //clabstractvideodecoder_h_2155

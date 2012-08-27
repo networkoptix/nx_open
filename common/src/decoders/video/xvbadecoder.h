@@ -98,6 +98,8 @@ public:
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
     //!Implementation of AbstractDecoder::setOutPictureSize
     virtual void setOutPictureSize( const QSize& outSize );
+    //!Implementation of AbstractDecoder::setLightCpuMode
+    virtual void setLightCpuMode( QnAbstractVideoDecoder::DecodeMode );
 
 private:
     typedef void* XVBASurface;

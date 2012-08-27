@@ -1,8 +1,13 @@
 
 #include "abstractdecoder.h"
+
+#include <iostream>
+
+#include <libavcodec/avcodec.h>
+
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
-
+#include "xvbadecoder.h"
 
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = FFMPEG;
@@ -20,7 +25,18 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
 
     case FFMPEG:
     default:
-        return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
+        {
+            if( data->compressionType == CODEC_ID_H264 )
+            {
+                QnAbstractVideoDecoder* decoder = new QnXVBADecoder(data);
+                if( decoder->isHardwareAccelerationEnabled() )
+                    return decoder;
+                std::cout<<"mark22\n";
+                delete decoder;
+                cl_log.log( QString::fromAscii("XVBA acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
+            }
+            return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding );
+        }
     }
 
     return 0;
