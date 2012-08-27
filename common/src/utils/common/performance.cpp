@@ -78,7 +78,11 @@ namespace {
             output->clear();
 
             for (int i = 0; i < qMin(m_hddUsage.size(), m_hddNames.size()); i++){
-                output->append(QnPerformance::QnHddData(m_hddUsage.at(i), QLatin1String("HDD") + m_hddNames.at(i)));
+                QString hddName = m_hddNames[i];
+                int delimiter = hddName.indexOf(QLatin1Char(' '));
+                if (delimiter <= 0)
+                    continue;
+                output->append(QnPerformance::QnHddData(m_hddUsage.at(i), hddName.mid(delimiter + 1)));
             }
 
             return !(output->isEmpty());
