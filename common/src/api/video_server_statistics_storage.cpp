@@ -9,7 +9,7 @@
 
 #define STORAGE_LIMIT 60
 
-QnStatisticsStorage::QnStatisticsStorage(QnVideoServerConnectionPtr apiConnection, QObject *parent):
+QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
