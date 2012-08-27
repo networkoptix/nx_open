@@ -11,8 +11,6 @@
 #include <api/serializer/serializer.h>
 #include <api/video_server_statistics_data.h>
 
-#include "utils/common/rand.h"
-
 QString QnVideoServerConnection::m_proxyAddr;
 int QnVideoServerConnection::m_proxyPort = 0;
 

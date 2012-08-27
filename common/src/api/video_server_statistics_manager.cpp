@@ -21,15 +21,15 @@ QnVideoServerStatisticsManager::QnVideoServerStatisticsManager(QObject *parent):
 void QnVideoServerStatisticsManager::registerServerWidget(QnVideoServerResourcePtr resource, QObject *target, const char *slot){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(this, resource->apiConnection());
+        m_statistics[id] = new QnStatisticsStorage(resource->apiConnection(), this);
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
-void QnVideoServerStatisticsManager::unRegisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
+void QnVideoServerStatisticsManager::unregisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return;
-    m_statistics[id]->unRegisterServerWidget(target);
+    m_statistics[id]->unregisterServerWidget(target);
 }
 
 qint64 QnVideoServerStatisticsManager::getHistory(QnVideoServerResourcePtr resource, qint64 lastId, QnStatisticsHistory *history){
@@ -40,9 +40,6 @@ qint64 QnVideoServerStatisticsManager::getHistory(QnVideoServerResourcePtr resou
 }
 
 void QnVideoServerStatisticsManager::at_timer_timeout(){
-    QHashIterator<QString, QnStatisticsStorage *> iter(m_statistics);
-    while (iter.hasNext()){
-        iter.next();
-        iter.value()->update();
-    }
+    foreach(QnStatisticsStorage *storage, m_statistics)
+        storage->update();
 }
