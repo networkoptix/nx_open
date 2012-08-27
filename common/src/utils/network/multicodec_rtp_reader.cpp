@@ -142,6 +142,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
     if (m_lastVideoData)
     {
         result = m_lastVideoData;
+		m_lastVideoData.clear();
         return result;
     }
     if (!m_lastAudioData.isEmpty())

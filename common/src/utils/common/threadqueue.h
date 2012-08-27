@@ -20,10 +20,10 @@ class CLThreadQueue
 {
 public:
     CLThreadQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
-        : m_maxSize( maxSize ),
-        m_cs(QMutex::Recursive),
+        : m_headIndex(0),
         m_bufferLen(0),
-        m_headIndex(0)
+        m_maxSize( maxSize ),
+        m_cs(QMutex::Recursive)
     {
         reallocateBuffer(maxSize);
     }

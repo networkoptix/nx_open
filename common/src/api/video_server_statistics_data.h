@@ -24,13 +24,13 @@ struct QnStatisticsDataItem {
     QnStatisticsDataItem(QString description, int value, DeviceType device): description(description), value(value), device(device) {}
 };
 
-typedef QList<QnStatisticsDataItem> QnStatisticsDataList;//todo
+typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
 typedef QLinkedList<int> QnStatisticsData;
 typedef QLinkedListIterator<int> QnStatisticsDataIterator;
-typedef QHash<QString, QnStatisticsData*> QnStatisticsHistory;
-typedef QHashIterator<QString, QnStatisticsData*> QnStatisticsIterator;
-typedef QMutableHashIterator<QString, QnStatisticsData*> QnStatisticsCleaner;
+typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
+typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
+typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 
 Q_DECLARE_METATYPE(QnStatisticsDataList)
 
