@@ -15,14 +15,13 @@
 class QnStatisticsStorage: QObject{
     Q_OBJECT
 public:
-    // TODO: #GDM QObject *parent is usually the last parameter in a constructor. All Qt classes follow this rule.
     /**
      * Constructor
      *
-     * \param parent            Parent of the object
      * \param apiConnection     Api connection of the server that will provide the statistics.
+     * \param parent            Parent of the object
      */
-    QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection);
+    QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent);
 
     // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**

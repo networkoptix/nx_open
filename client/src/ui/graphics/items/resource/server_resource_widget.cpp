@@ -42,7 +42,7 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(const QnStatisticsData *values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
+    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
         QPainterPath path;
         int max_value = -1;
         int prev_value = 0;
@@ -58,7 +58,7 @@ namespace {
 
         bool first(true);
 
-        QnStatisticsDataIterator iter(*values);
+        QnStatisticsDataIterator iter(values);
         bool last = !iter.hasNext();
         while (!last){
             int i_value = iter.next();
@@ -281,16 +281,16 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setWidthF(pen_width * 2);
         graphPen.setCapStyle(Qt::FlatCap);
 
-        QnStatisticsIterator iter(m_history);
         int counter = 0;
-        while (iter.hasNext()){
-            iter.next();
-            qreal current_value = 0;
-            QPainterPath path = createChartPath(iter.value(), x_step, -1.0 * oh, elapsed_step, &current_value);
-            values.append(current_value);
 
+        foreach(QString key, m_sortedKeys){
+            QnStatisticsData &stats = m_history[key];
+            qreal current_value = 0;
+            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &current_value);
+            values.append(current_value);
             graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);
+
         }
     }
 
@@ -334,20 +334,24 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
-
             legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
 
-            legendTransform.translate(width * 0.5 - offset * m_history.size(), oh + offset * 1.5);
+            legendTransform.translate(width * 0.5, oh + offset * 1.5);
+
+            qreal legendOffset = 0.0;
+            int space = offset; // space for the square drawing and between legend elements
+            foreach(QString key, m_sortedKeys)
+                legendOffset += painter->fontMetrics().width(key) + space;
+            legendTransform.translate(-legendOffset * 0.5, 0.0);
             painter->setTransform(legendTransform);
+
             int counter = 0;
-            QnStatisticsIterator iter(m_history);
-            while (iter.hasNext()){
-                iter.next();
+            foreach(QString key, m_sortedKeys){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, iter.key());
-                legendTransform.translate(offset * 2, 0.0);
+                painter->drawText(offset*0.1, offset*0.1, key);
+                legendTransform.translate(painter->fontMetrics().width(key) + space, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
@@ -374,25 +378,30 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
+            painter->translate(width * 0.5, oh + offset * 1.5);
 
-            painter->translate(width * 0.5 - offset * m_history.size(), oh + offset * 1.5);
             qreal c = offset*0.02;
             painter->scale(c, c);
-            c = 1/c;
+
+            qreal legendOffset = 0.0;
+            int space = 50; // space for the square drawing and between legend elements
+            foreach(QString key, m_sortedKeys)
+                legendOffset += painter->fontMetrics().width(key) + space;
+            painter->translate(-legendOffset * 0.5, 0.0);
+
+            c = 1/c; // 50 / offset
 
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset*0.2*c, -offset*0.2*c);
+            legend.addRect(0.0, 0.0, -10, -10);
             main_pen.setWidthF(pen_width * 2 * c);
 
             int counter = 0;
-            QnStatisticsIterator iter(m_history);
-            while (iter.hasNext()){
-                iter.next();
+            foreach(QString key, m_sortedKeys){
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1*c, offset*0.1*c, iter.key());
-                painter->translate(offset * 2*c, 0.0);
+                painter->drawText(5, 5, key);
+                painter->translate(painter->fontMetrics().width(key) + space, 0.0);
             }
             painter->scale(c, c);
         }
@@ -409,11 +418,9 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_statistics_received() {
-    // TODO: #GDM there is no need to allocate memory via new() here as it is freed 30 lines afterwards.
-    // QnStatisticsHistory can be allocated on the stack.
 
-    QnStatisticsHistory *history_update = new QnStatisticsHistory(); 
-    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, history_update);
+    QnStatisticsHistory history_update;
+    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
     if (id < 0){
         m_renderStatus = Qn::CannotRender;
         return;
@@ -424,22 +431,32 @@ void QnServerResourceWidget::at_statistics_received() {
         return;
     }
 
+    bool reSort = false;
+
     // remove charts that are no exist anymore
     QnStatisticsCleaner cleaner(m_history);
     while (cleaner.hasNext()) {
          cleaner.next();
-         if (!(history_update->contains(cleaner.key())))
-            cleaner.remove(); // TODO: #GDM Memleak!
+         if (!(history_update.contains(cleaner.key()))){
+            cleaner.remove();
+            reSort = true;
+         }
     }
 
     // update existsing charts
-    QnStatisticsIterator updater(*history_update);
+    QnStatisticsIterator updater(history_update);
     while (updater.hasNext()) {
          updater.next();
-         updateValues(updater.key(), updater.value(), id);
+         reSort = reSort | !m_history.contains(updater.key());
+         updateValues(updater.key(), updater.value());
     }
 
-    delete history_update; 
+    if (reSort){
+        m_sortedKeys.clear();
+        foreach(QString key, m_history.keys())
+            m_sortedKeys.append(key);
+        m_sortedKeys.sort();
+    }
 
     m_lastHistoryId = id;
     m_renderStatus = Qn::NewFrameRendered;
@@ -448,29 +465,13 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 }
 
-void QnServerResourceWidget::updateValues(QString key, QnStatisticsData *newValues, qint64 newId){
-    QnStatisticsData *oldValues;
+void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues){
+    QnStatisticsData &oldValues = m_history[key];
 
-    if (!m_history.contains(key)){
-        oldValues = new QnStatisticsData();
-        for (int i = 0; i < CHART_POINTS_LIMIT; i++)
-            oldValues->append(0);
-        m_history[key] = oldValues;
-    } else {
-        oldValues = m_history[key];
-    }
-
-    // minimal stored id
-    qint64 minId = qMin(newId - CHART_POINTS_LIMIT + 1, qint64(0));
-
-    if (m_lastHistoryId < minId){
-        oldValues->clear();
-    } else {
-        int size = oldValues->size();
-        for (int i = 1; i < size - (m_lastHistoryId - minId); i++)
-            oldValues->removeFirst();
-    }
-
-    while (!newValues->isEmpty())
-        oldValues->append(newValues->takeFirst());
+    while (!newValues.isEmpty())
+        oldValues.append(newValues.takeFirst());
+    while (oldValues.size() > CHART_POINTS_LIMIT)
+        oldValues.removeFirst();
+    while (oldValues.size() < CHART_POINTS_LIMIT)
+        oldValues.prepend(0);
 }

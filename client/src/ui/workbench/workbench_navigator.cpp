@@ -30,6 +30,7 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/widgets/calendar_widget.h>
 
+#include "extensions/workbench_stream_synchronizer.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -44,6 +45,7 @@
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
+    m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
     m_timeSlider(NULL),
     m_timeScrollBar(NULL),
     m_centralWidget(NULL),
@@ -65,6 +67,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastPlaying(false),
     m_lastPlayingSupported(false),
     m_pausedOverride(false),
+    m_preciseNextSeek(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
@@ -164,9 +167,10 @@ void QnWorkbenchNavigator::initialize() {
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
-    connect(display(),                          SIGNAL(streamsSynchronizedChanged()),               this,   SLOT(updateCurrentWidget()));
     connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
-    
+
+    connect(m_streamSynchronizer,               SIGNAL(runningChanged()),                           this,   SLOT(updateCurrentWidget()));
+
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
     connect(m_timeSlider,                       SIGNAL(sliderReleased()),                           this,   SLOT(at_timeSlider_sliderReleased()));
@@ -585,7 +589,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
     bool isCentral = false;
-    if (m_centralWidget != NULL || !display()->isStreamsSynchronized()) {
+    if (m_centralWidget != NULL || !m_streamSynchronizer->isRunning()) {
         widget = m_centralWidget;
         isCentral = true;
     } else if(m_syncedWidgets.contains(m_currentMediaWidget)) {
@@ -626,7 +630,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateCurrentWidgetFlags();
     updateLines();
 
-    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && display()->isStreamsSynchronized()) && m_currentWidget) {
+    if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget) {
         m_sliderDataInvalid = true;
         m_sliderWindowInvalid = (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
     }
@@ -763,7 +767,7 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
-    if(display()->isStreamsSynchronized() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
+    if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             if(QnCachingTimePeriodLoader *loader = this->loader(widget))
                 loader->setTargetPeriod(period);
@@ -1062,10 +1066,11 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (value == DATETIME_NOW) {
                 reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                if (m_timeSlider->isSliderDown()) {
+                if (m_timeSlider->isSliderDown() && !m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, 0);
                 } else {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                    m_preciseNextSeek = false;
                 }
             }
         }
@@ -1077,6 +1082,9 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
     if (!m_currentWidget)
         return;
+
+    if(!isPlaying())
+        m_preciseNextSeek = true; /* When paused, use precise seeks on click. */
 
     if(m_lastPlaying) 
         setPlayingTemporary(false);

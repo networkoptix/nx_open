@@ -2,6 +2,7 @@
 #include "socket.h"
 #include "utils/common/log.h"
 #include "tcp_connection_processor.h"
+#include "ssl.h"
 
 // ------------------------ QnRtspListenerPrivate ---------------------------
 
@@ -11,6 +12,8 @@ public:
     QnTcpListenerPrivate() {
         serverSocket = 0;
         newPort = 0;
+        method = 0;
+        ctx = 0;
     }
     TCPServerSocket* serverSocket;
     QMap<TCPSocket*, QnLongRunnable*> connections;
@@ -18,6 +21,8 @@ public:
     QMutex portMutex;
     int newPort;
     QHostAddress serverAddress;
+    const SSL_METHOD *method;
+    SSL_CTX *ctx;
 };
 
 // ------------------------ QnRtspListener ---------------------------
@@ -110,6 +115,37 @@ void QnTcpListener::updatePort(int newPort)
     d->newPort = newPort;
 }
 
+bool QnTcpListener::enableSSLMode()
+{
+    Q_D(QnTcpListener);
+
+    QFile f(QLatin1String(":/cert.pem"));
+    if (!f.open(QIODevice::ReadOnly)) 
+    {
+        qWarning() << "No SSL sertificate for mediaServer!";
+        return false;
+    }
+    QByteArray certData = f.readAll();
+
+    SSL_library_init();
+    OpenSSL_add_all_algorithms();   
+    SSL_load_error_strings();     
+    d->method = SSLv23_server_method();
+    d->ctx = SSL_CTX_new(d->method);
+
+    BIO *bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
+    X509 *x = PEM_read_bio_X509_AUX(bufio, NULL, d->ctx->default_passwd_callback, d->ctx->default_passwd_callback_userdata);
+    SSL_CTX_use_certificate(d->ctx, x);
+    BIO_free(bufio);
+
+    bufio = BIO_new_mem_buf((void*) certData.data(), certData.size());
+    EVP_PKEY *pkey = PEM_read_bio_PrivateKey(bufio, NULL, d->ctx->default_passwd_callback, d->ctx->default_passwd_callback_userdata);
+    SSL_CTX_use_PrivateKey(d->ctx, pkey);
+    BIO_free(bufio);
+
+    return true;
+}
+
 void QnTcpListener::run()
 {
     Q_D(QnTcpListener);
@@ -138,4 +174,10 @@ void QnTcpListener::run()
         }
         removeDisconnectedConnections();
     }
+}
+
+void* QnTcpListener::getOpenSSLContext()
+{
+    Q_D(QnTcpListener);
+    return d->ctx;
 }

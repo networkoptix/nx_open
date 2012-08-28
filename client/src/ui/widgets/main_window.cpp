@@ -131,7 +131,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    display()->setStreamsSynchronized(true, DATETIME_NOW, 1.0);
     display()->setScene(scene);
     display()->setView(m_view);
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);

@@ -9,7 +9,7 @@
 
 #define STORAGE_LIMIT 60
 
-QnStatisticsStorage::QnStatisticsStorage(QObject *parent, QnVideoServerConnectionPtr apiConnection):
+QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
@@ -35,21 +35,16 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
 
     QnStatisticsIterator iter(m_history);
     while (iter.hasNext()){
-        // TODO: #GDM if a function allocates memory that is to be freed by the caller,
-        // then this behavior should be documented. However, it is much better to
-        // avoid the need to document it altogether by working with classes that
-        // manage memory automatically. Discuss this with me before fixing.
         iter.next();
-        QnStatisticsData* stats = new QnStatisticsData();
-        history->insert(iter.key(), stats);
-
+        QnStatisticsData stats;
         qint64 counter = m_lastId;
-        QnStatisticsDataIterator peeker(*iter.value());
+        QnStatisticsDataIterator peeker(iter.value());
         peeker.toBack();
         while (counter > lastId && peeker.hasPrevious()){
-            stats->prepend(peeker.previous());
+            stats.prepend(peeker.previous());
             counter--;
         }
+        history->insert(iter.key(), stats);
     }
 
     return m_lastId;
@@ -58,16 +53,25 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
 void QnStatisticsStorage::update(){
     if (m_alreadyUpdating)
         return;
-    if (!m_listeners)
+    if (!m_listeners){
+        m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
+        m_lastId++;
+
+        QnStatisticsHistory::iterator iter;
+        for (iter = m_history.begin(); iter != m_history.end(); iter++){
+            QnStatisticsData &stats = iter.value();
+            stats.append(0);
+            if (stats.size() > STORAGE_LIMIT)
+                stats.removeFirst();
+        }
         return;
+    }
 
     m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
     m_alreadyUpdating = true;
 }
 
 void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data){
-    int cpuCounter = 0;
-    int hddCounter = 0;
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
@@ -76,17 +80,13 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
         QnStatisticsDataItem next_data = iter.next();
 
         QString id = next_data.device == QnStatisticsDataItem::CPU
-           ? tr("CPU") + QString::number(cpuCounter++)
-           : tr("HDD") + QString::number(hddCounter++);
+           ? tr("CPU")
+           : next_data.description;
 
-        // TODO: #GDM I see calls to operator new() here, but there are no calls to operator delete() in this file. Please re-check for memleaks.
-        if (!m_history.contains(id))
-            m_history[id] = new QnStatisticsData();
-
-        QnStatisticsData *stats = m_history[id];
-        stats->append(next_data.value);
-        if (stats->size() > STORAGE_LIMIT)
-            stats->removeFirst();
+        QnStatisticsData &stats = m_history[id];
+        stats.append(next_data.value);
+        if (stats.size() > STORAGE_LIMIT)
+            stats.removeFirst();
     }
     m_alreadyUpdating = false;
 

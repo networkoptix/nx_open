@@ -34,6 +34,9 @@ public:
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
+    void setStreamingUrl(const QString& value);
+    QString getStreamingUrl() const;
+
     void setNetAddrList(const QList<QHostAddress>&);
     QList<QHostAddress> getNetAddrList();
 
@@ -64,6 +67,7 @@ protected:
 private:
     QnVideoServerConnectionPtr m_restConnection;
     QString m_apiUrl;
+    QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
     QnAbstractStorageResourceList m_storages;

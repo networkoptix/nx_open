@@ -52,9 +52,8 @@ private:
      *
      * \param key                       Id of the corresponding history item.
      * \param newValues                 Updated values.
-     * \param newId                     Id of the last provided value.
      */
-    void updateValues(QString key, QnStatisticsData *newValues, qint64 newId);
+    void updateValues(QString key, QnStatisticsData newValues);
 
 private:
     QnVideoServerStatisticsManager *m_manager;
@@ -64,6 +63,9 @@ private:
 
     /** History of last usage responses. */
     QnStatisticsHistory m_history;
+
+    /** Sorted keys of history data. */
+    QStringList m_sortedKeys;
 
     /** Id of the last received response. */
     qint64 m_lastHistoryId;
