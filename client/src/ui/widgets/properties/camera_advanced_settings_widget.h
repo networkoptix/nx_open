@@ -49,6 +49,8 @@ public:
 
     const CameraSetting& param() const;
 
+    virtual void refresh() = 0;
+
 signals:
     void setAdvancedParam(const CameraSetting& val);
 
@@ -73,6 +75,8 @@ public:
     QnSettingsOnOffWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
     ~QnSettingsOnOffWidget();
 
+    void refresh() override;
+
 public slots:
     void updateParam(QString val);
 
@@ -87,6 +91,8 @@ class QnSettingsMinMaxStepWidget : public QnAbstractSettingsWidget
     Q_OBJECT
 public:
     QnSettingsMinMaxStepWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
 
 public slots:
     void updateParam(QString val);
@@ -106,6 +112,8 @@ class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
 public:
     QnSettingsEnumerationWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
 
+    void refresh() override;
+
 public slots:
     void updateParam(QString val);
 
@@ -124,6 +132,8 @@ class QnSettingsButtonWidget : public QnAbstractSettingsWidget
     Q_OBJECT
 public:
     QnSettingsButtonWidget(QObject* handler, const CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
 
 public slots:
     void updateParam(QString val);

@@ -5,6 +5,7 @@
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;
 typedef QHash<QString, CameraSettingPtr> CameraSettings;
+class QnAbstractSettingsWidget;
 
 //
 // interface ParentOfRootElemFoundAware
@@ -81,6 +82,7 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 
 public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
+    typedef QHash<QString, QnAbstractSettingsWidget*> SettingsWidgetsById;
 
     CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
         QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler);
@@ -101,6 +103,9 @@ protected slots:
     void treeWidgetItemPressed(QTreeWidgetItem * item, int column);
     void treeWidgetItemSelectionChanged();
 
+signals:
+    void refreshAdvancedSettings();
+
 private:
 
     CameraSettingsWidgetsCreator();
@@ -118,6 +123,7 @@ private:
     QWidget* m_owner;
     WidgetsAndParentsById m_emptyGroupsById;
     LayoutIndById m_layoutIndById;
+    SettingsWidgetsById m_settingsWidgetsById;
 };
 
 //

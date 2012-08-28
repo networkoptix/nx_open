@@ -82,6 +82,8 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
     connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
+
+    connect(this, SIGNAL( refreshAdvancedSettings() ), handler, SLOT( refreshAdvancedSettings() )  );
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
@@ -118,11 +120,11 @@ void CameraSettingsWidgetsCreator::removeLayoutItems()
 
 bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 {
-    removeEmptyWidgetGroups();
+    /*removeEmptyWidgetGroups();
     m_layoutIndById.clear();
 
     removeLayoutItems();
-    m_owner = new QWidget();
+    m_owner = new QWidget();*/
 
     m_settings = &settings;
 
@@ -142,49 +144,12 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
         return false;
     }
 
-    //QTreeWidgetItem* tabWidget = 0;
-    /*QTreeWidgetItem* parentItem = 0;
-    if (!parentId.isEmpty()) {
-        WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
-        if (it == m_widgetsById.end())
-        {
-            parentItem = it.value();
-        }
-        else
-        {
-            //This should mean that parent is empty group
-            WidgetsAndParentsById::ConstIterator eGroupsIt = m_emptyGroupsById.find(parentId);
-            if (eGroupsIt == m_emptyGroupsById.end()) {
-                //Parent must be already created!
-                Q_ASSERT(false);
-            }
-            parentItem = eGroupsIt.value()->get();
-        } 
-    }*/
-
-    QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
-
-    /**if (parentId.isEmpty())
+    if (m_emptyGroupsById.find(id) == m_emptyGroupsById.end())
     {
-        m_rootWidget.addTopLevelItem(item);
-
-        //tabWidget = new QWidget();
-        //m_rootLayout.addWidget(tabWidget);
-
-    } else {
-
-        WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
-        if (it == m_widgetsById.end()) {
-            //Parent must be already created!
-            Q_ASSERT(false);
-        }
-        it.value()->addChild(item);
-    }**/
-
-    //item->setObjectName(id);
-    item->setData(0, Qt::UserRole, 0);
-    /**m_widgetsById.insert(id, item);**/
-    m_emptyGroupsById.insert(id, new WidgetAndParent(item, parentId));
+        QTreeWidgetItem* item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(name));
+        item->setData(0, Qt::UserRole, 0);
+        m_emptyGroupsById.insert(id, new WidgetAndParent(item, parentId));
+    }
 
     return true;
 }
@@ -213,6 +178,12 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
         return;
     }
 
+    SettingsWidgetsById::ConstIterator swbiIt = m_settingsWidgetsById.find(value.getId());
+    if (swbiIt != m_settingsWidgetsById.end()) {
+        swbiIt.value()->refresh();
+        return;
+    }
+
     QnSettingsScrollArea* rootWidget = 0;
     LayoutIndById::ConstIterator lIndIt = m_layoutIndById.find(parentId);
     if (lIndIt != m_layoutIndById.end()) {
@@ -231,7 +202,7 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
     //setting it from camera_settings.xml file.
     if (currIt != m_settings->end()) currIt.value()->setDescription(value.getDescription());
 
-    QWidget* tabWidget = 0;
+    QnAbstractSettingsWidget* tabWidget = 0;
     switch(value.getType())
     {
         case CameraSetting::OnOff:
@@ -254,6 +225,8 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             //Unknown widget type!
             Q_ASSERT(false);
     }
+
+    m_settingsWidgetsById.insert(value.getId(), tabWidget);
 }
 
 QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString& parentId)
@@ -331,12 +304,15 @@ void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, 
         return;
     }
 
+    emit refreshAdvancedSettings();
+
     m_rootLayout.setCurrentIndex(ind);
 }
 
 void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
 {
     if (m_rootLayout.count() > 0) {
+        emit refreshAdvancedSettings();
         m_rootLayout.setCurrentIndex(0);
     }
 }
@@ -483,8 +459,8 @@ void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 {
     m_settings = settings;
 
-    m_widgetsById.clear();
-    m_rootWidget.clear();
+    //m_widgetsById.clear();
+    //m_rootWidget.clear();
 
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
 }

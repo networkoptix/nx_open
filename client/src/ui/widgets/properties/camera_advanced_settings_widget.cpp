@@ -110,6 +110,16 @@ QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& ob
     //setMinimumSize(m_checkBox->sizeHint());
 }
 
+void QnSettingsOnOffWidget::refresh()
+{
+    if (mParam.getCurrent() == mParam.getMax()) {
+        m_checkBox->setCheckState(Qt::Checked);
+    } else {
+        m_checkBox->setCheckState(Qt::Unchecked);
+    }
+
+}
+
 QnSettingsOnOffWidget::~QnSettingsOnOffWidget()
 {
 }
@@ -171,6 +181,15 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
 
     mWidget = groupBox;
     //setMinimumSize(groupBox->sizeHint());
+}
+
+void QnSettingsMinMaxStepWidget::refresh()
+{
+    m_slider->setRange(mParam.getMin(), mParam.getMax());
+    m_slider->setValue(mParam.getCurrent());
+    m_slider->setWindowTitle(mParam.getName() + QLatin1String(" (") + (QString)mParam.getCurrent() + QLatin1Char(')'));
+
+    static_cast<QGroupBox*>(mWidget)->setTitle(mParam.getName() + QLatin1String(" (") + (QString)mParam.getCurrent() + QLatin1Char(')'));
 }
 
 void QnSettingsMinMaxStepWidget::onValChanged(int val)
@@ -236,6 +255,22 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     //setMinimumSize(groupBox->sizeHint());
 }
 
+void QnSettingsEnumerationWidget::refresh()
+{
+    QStringList values = static_cast<QString>(mParam.getMin()).split(QLatin1Char(','));
+    for (int i = 0; i < values.length(); ++i)
+    {
+        QString val = values[i].trimmed();
+        QRadioButton *btn = m_radioBtns.at(i);
+
+        if (val == mParam.getCurrent()) {
+            btn->setChecked(true);
+        } else {
+            btn->setChecked(false);
+        }
+    }
+}
+
 void QnSettingsEnumerationWidget::onClicked()
 {
     QString val = QObject::sender()->objectName();
@@ -279,6 +314,10 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
 
     mWidget = btn;
     //setMinimumSize(btn->sizeHint());
+}
+
+void QnSettingsButtonWidget::refresh()
+{
 }
 
 void QnSettingsButtonWidget::onClicked()

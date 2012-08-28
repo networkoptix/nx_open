@@ -59,6 +59,7 @@ public:
 
 public slots:
     void setAdvancedParam(const CameraSetting& val);
+    void refreshAdvancedSettings();
 
 signals:
     void hasChangesChanged();

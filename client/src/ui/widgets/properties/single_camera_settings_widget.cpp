@@ -111,6 +111,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
             delete m_widgetsRecreator;
+            m_cameraSettings.clear();
             m_widgetsRecreator = 0;
         }
 
@@ -474,6 +475,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         return;
     }
 
+    QVariant id;
+    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && id != m_widgetsRecreator->getId()) {
+        //If so, we received update for some other camera
+        return;
+    }
+
     bool changesFound = false;
     QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
 
@@ -597,4 +604,9 @@ void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
     m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
     m_hasCameraChanges = true;//ToDo: at_cameraDataChanged();
     emit advancedSettingChanged();
+}
+
+void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
+{
+    loadAdvancedSettings();
 }
