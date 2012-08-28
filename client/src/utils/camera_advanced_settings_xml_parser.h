@@ -106,6 +106,7 @@ private:
     CameraSettingsWidgetsCreator();
 
     void removeEmptyWidgetGroups();
+    void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
 
     ParentOfRootElemFoundAware& m_obj;

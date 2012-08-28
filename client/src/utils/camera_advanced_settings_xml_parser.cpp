@@ -87,6 +87,9 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 {
     removeEmptyWidgetGroups();
+    m_layoutIndById.clear();
+
+    removeLayoutItems();
 }
 
 void CameraSettingsWidgetsCreator::removeEmptyWidgetGroups()
@@ -99,11 +102,8 @@ void CameraSettingsWidgetsCreator::removeEmptyWidgetGroups()
     m_emptyGroupsById.clear();
 }
 
-bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
+void CameraSettingsWidgetsCreator::removeLayoutItems()
 {
-    removeEmptyWidgetGroups();
-    m_layoutIndById.clear();
-
     if (m_owner)
     {
         QObjectList children = m_owner->children();
@@ -112,7 +112,16 @@ bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
             m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
         }
         delete m_owner;
+        m_owner = 0;
     }
+}
+
+bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
+{
+    removeEmptyWidgetGroups();
+    m_layoutIndById.clear();
+
+    removeLayoutItems();
     m_owner = new QWidget();
 
     m_settings = &settings;
@@ -455,7 +464,8 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
 
 CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 {
-    //ToDo: clean m_rootLayout
+    m_widgetsById.clear();
+    m_rootWidget.clear();
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)

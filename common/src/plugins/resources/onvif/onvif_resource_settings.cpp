@@ -160,7 +160,7 @@ QHash<QString, OnvifCameraSettingOperationAbstract*>& createOnvifCameraSettingOp
     tmp->insert(QString::fromLatin1("%%Imaging%%Contrast"),                        new ImagingContrastOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Priority"),              new ImagingExposurePriorityOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Sharpness"),                       new ImagingSharpnessOperation());
-    tmp->insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Modes"),             new ImagingIrCutFilterModesOperation());
+    tmp->insert(QString::fromLatin1("%%Imaging%%Ir Cut Filter Mode"),              new ImagingIrCutFilterModesOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%White Balance%%Yr Gain"),          new ImagingWhiteBalanceYrGainOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Min Gain"),              new ImagingExposureMinGainOperation());
     tmp->insert(QString::fromLatin1("%%Imaging%%Exposure%%Gain"),                  new ImagingExposureGainOperation());
