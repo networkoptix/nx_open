@@ -29,7 +29,9 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     }
 
     if(targetItem) {
-        GraphicsTooltip::showText(targetItem->toolTip(), targetItem);
+        QRectF vprect(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()));
+        qDebug() << "scenepos" << scenePos << "viewport" << vprect;
+        GraphicsTooltip::showText(targetItem->toolTip(), targetItem, scenePos, vprect);
     }
 
     helpEvent->setAccepted(targetItem != NULL);

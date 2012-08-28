@@ -6,8 +6,8 @@
 
 class GraphicsTooltip{
 public:
-    static void showText(QString text, QGraphicsItem *item);
-    static inline void hideText() { showText(QString(), NULL); }
+    static void showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport);
+    static inline void hideText() { showText(QString(), NULL, QPointF(), QRectF()); }
 };
 
 
