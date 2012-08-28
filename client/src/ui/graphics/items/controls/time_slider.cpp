@@ -1654,7 +1654,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
 }
 
 void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, const QRectF &targetRect, const QRectF &boundingRect) {
-    const QImage &image = data.thumbnail.pixmap();
+    const QImage &image = data.thumbnail.image();
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * data.opacity);

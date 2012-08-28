@@ -1161,9 +1161,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
-    layout->setParentId(context()->user()->getId());
+    if(context()->user())
+        layout->setParentId(context()->user()->getId());
 
-    QnLayoutItemDataList items;
     qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
         QnLayoutItemData item;
@@ -1174,10 +1174,9 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.resource.path = resource->getUniqueId();
         item.dataByRole[Qn::ItemPausedRole] = true;
         item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
-        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue(period);
-        item.dataByRole[Qn::ItemTimeRole] = time * 1000;
+        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
+        item.dataByRole[Qn::ItemTimeRole] = time;
 
-        items.push_back(item);
         layout->addItem(item);
 
         time += step;
@@ -1185,6 +1184,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     layout->setData(Qn::LayoutTimeLabelsRole, true);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+    layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
