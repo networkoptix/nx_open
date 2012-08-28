@@ -341,6 +341,8 @@ void QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged() {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
+    m_resource->setData(m_layout->data());
+
     clearLayout();
 }
 

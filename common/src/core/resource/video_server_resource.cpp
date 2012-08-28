@@ -64,6 +64,18 @@ QString QnVideoServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
+void QnVideoServerResource::setStreamingUrl(const QString& value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_streamingUrl = value;
+}
+
+QString QnVideoServerResource::getStreamingUrl() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_streamingUrl;
+}
+
 void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
@@ -211,6 +223,7 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         m_reserve = localOther->m_reserve;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
+        m_streamingUrl = localOther->getStreamingUrl();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
