@@ -1273,7 +1273,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->currentTimeUSec());
+            mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->currentTimeUSec() / 1000);
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
     }
@@ -1301,7 +1301,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         qint64 time = mediaWidget->item()->data(Qn::ItemTimeRole).value<qint64>();
         bool paused = mediaWidget->item()->data(Qn::ItemPausedRole).toBool();
 
-        mediaWidget->display()->archiveReader()->jumpTo(time, time); /* NOTE: non-precise seek doesn't work here. */
+        mediaWidget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
         if(paused)
             mediaWidget->display()->archiveReader()->setSingleShotMode(true);
 
@@ -1313,7 +1313,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(hasTimeLabels) {
             widget->setDecorationsVisible(true, false);
             widget->setInfoVisible(true, false);
-            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time / 1000).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time / 1000).toString(tr("\thh:mm:ss")));
+            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
         }
     }
 
