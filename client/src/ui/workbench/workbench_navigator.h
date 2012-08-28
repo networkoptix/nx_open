@@ -204,6 +204,7 @@ private:
     bool m_lastPlaying;
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
+    bool m_preciseNextSeek;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
