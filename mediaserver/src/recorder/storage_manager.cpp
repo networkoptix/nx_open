@@ -430,7 +430,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             result = candidates[i];
         }
     }
-    qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+
+	if (result)
+		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+	else
+		qDebug() << "No storage available for recording";
 
     return result;
 }
