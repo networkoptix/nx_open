@@ -165,10 +165,7 @@ public:
         for (int i = 0; i < m_bufferLen; ++i)
         {
             if (cond(m_buffer[index], opaque))
-            {
-                m_sem.acquire(1);
                 m_buffer[index] = T();
-            }
             index = (index + 1) % m_buffer.size();
         }
     }
@@ -186,7 +183,7 @@ public:
     void setMaxSize(int value) 
     {
         m_maxSize = value;
-        reallocateBuffer(qMax(m_maxSize, m_bufferLen));
+        reallocateBuffer(qMax(m_maxSize, m_buffer.size()));
     }
 
     void clear()
@@ -201,6 +198,7 @@ public:
             index = (index + 1) % m_buffer.size();
         }
         m_bufferLen = 0;
+        m_headIndex = 0;
     }
 
     /*
@@ -224,7 +222,7 @@ private:
         int oldSize = m_buffer.size();
         m_buffer.resize(newSize);
 
-        if (m_headIndex > 0 && m_bufferLen > 0)
+        if (m_headIndex > 0 && m_bufferLen > 0 && newSize > oldSize)
         {
             int tailIndex = (m_headIndex + m_bufferLen) % oldSize;
             int delta = newSize-oldSize;

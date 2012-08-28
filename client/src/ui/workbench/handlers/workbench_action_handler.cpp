@@ -76,6 +76,7 @@
 
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "../extensions/workbench_stream_synchronizer.h"
 
 
 
@@ -1112,7 +1113,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
         1000ll * 60,                    /* 1 minute. */
-        1000ll * 60 * 10,               /* 5 minutes. */
+        1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
@@ -1121,7 +1122,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 12; // TODO: take it from config?
+    const qint64 maxItems = 16; // TODO: take it from config?
+
+    if(period.durationMs < steps[1]) {
+        QMessageBox::warning(widget(), tr("Could not perform thumbnails search"), tr("Selected time period is too short to perform thumbnails search. Please select a longer period."), QMessageBox::Ok);
+        return;
+    }
 
     /* Find best time step. */
     qint64 step = 0;
@@ -1155,10 +1161,10 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
-    layout->setParentId(context()->user()->getId());
-    //layout->setTimeBounds(period);
+    if(context()->user())
+        layout->setParentId(context()->user()->getId());
 
-    QnLayoutItemDataList items;
+    qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1166,38 +1172,23 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
+        item.dataByRole[Qn::ItemPausedRole] = true;
+        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
+        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
+        item.dataByRole[Qn::ItemTimeRole] = time;
 
-        items.push_back(item);
         layout->addItem(item);
-    }
-
-    resourcePool()->addResource(layout);
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-
-    /* Navigate. */
-    display()->setStreamsSynchronized(NULL);
-    qint64 time = period.startTimeMs;
-    foreach(const QnLayoutItemData &item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
-        if(!widget)
-            continue;
-
-        // TODO: don't start reader!
-
-        /* TODO: this code does not belong here. */
-        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        //widget->display()->archiveReader()->pauseMedia();
-        //widget->display()->camDisplay()->playAudio(false);
-        //widget->display()->archiveReader()->setSingleShotMode(true);
-
-        widget->setDecorationsVisible(true, false);
-        widget->setInfoVisible(true, false);
-        widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
-
-        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
 
         time += step;
     }
+
+    layout->setData(Qn::LayoutTimeLabelsRole, true);
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+    layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {

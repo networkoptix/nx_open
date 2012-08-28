@@ -21,6 +21,8 @@ public:
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
+    void* getOpenSSLContext();
+    bool enableSSLMode();
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

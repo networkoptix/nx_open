@@ -25,9 +25,9 @@ SHARESTAGE=$STAGE$SHARETARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-PROXY_BIN_PATH=${project.build.directory}/bin
-PROXY_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
-ECS_PRESTAGE_PATH=${project.build.directory}/appserver/*
+PROXY_BIN_PATH=${libdir}/bin/${build.configuration}
+PROXY_LIB_PATH=${libdir}/build/bin/${build.configuration}
+ECS_PRESTAGE_PATH=${libdir}/../../appserver/setup/build/stage
 	
 #. $SERVER_BIN_PATH/env.sh
 
@@ -40,7 +40,7 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 ############### Enterprise Controller
-cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
+cp -r $ECS_PRESTAGE_PATH/* $PKGSTAGE
 
 touch $ETCSTAGE/entcontroller.conf
 

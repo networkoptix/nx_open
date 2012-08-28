@@ -23,6 +23,8 @@ static const int CODE_INVALID_PARAMETER = 451;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
+#include "ssl.h"
+
 class QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 public:
@@ -58,4 +60,6 @@ public:
     QnByteArray sendBuffer;
     int socketTimeout;
     bool chunkedMode;
+    SSL* ssl;
+
 };

@@ -142,6 +142,8 @@ protected slots:
     void at_widget_rotationStartRequested();
     void at_widget_rotationStopRequested();
 
+    void at_workbench_currentLayoutChanged();
+
     void at_selectAllAction_triggered();
     void at_startSmartSearchAction_triggered();
     void at_stopSmartSearchAction_triggered();

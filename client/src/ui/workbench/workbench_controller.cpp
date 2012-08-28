@@ -80,6 +80,8 @@
 #include "workbench_context.h"
 #include "workbench.h"
 #include "workbench_display.h"
+#include "workbench_access_controller.h"
+
 #include "help/context_help.h"
 
 
@@ -347,6 +349,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
     m_zoomedToggle = new QnToggle(false, this);
@@ -1278,4 +1281,12 @@ void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
 
+void QnWorkbenchController::at_workbench_currentLayoutChanged() {
+    // TODO: subscribe to permission changes.
 
+    Qn::Permissions permissions = accessController()->permissions(workbench()->currentLayout()->resource());
+    bool writable = permissions & Qn::WritePermission;
+
+    m_moveInstrument->setEnabled(writable);
+    m_resizingInstrument->setEnabled(writable);
+}

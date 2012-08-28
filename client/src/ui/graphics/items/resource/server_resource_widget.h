@@ -64,6 +64,9 @@ private:
     /** History of last usage responses. */
     QnStatisticsHistory m_history;
 
+    /** Sorted keys of history data. */
+    QStringList m_sortedKeys;
+
     /** Id of the last received response. */
     qint64 m_lastHistoryId;
 

@@ -21,7 +21,7 @@ public:
      * \param apiConnection     Api connection of the server that will provide the statistics.
      * \param parent            Parent of the object
      */
-    QnStatisticsStorage(QnVideoServerConnectionPtr apiConnection, QObject *parent);
+    QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent);
 
     // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
