@@ -1,7 +1,14 @@
 #include "graphics_tooltip.h"
 #include "graphics_label.h"
 
+#include <QtGui/QStyle>
+#include <QtGui/QStyleOption>
+#include <QtGui/QPainter>
+#include <QtGui/QToolTip>
+
 class QnGraphicsTooltipLabel: public GraphicsLabel{
+
+    typedef GraphicsLabel base_type;
 public:
     QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *parent);
     ~QnGraphicsTooltipLabel();
@@ -16,6 +23,8 @@ public:
     void restartExpireTimer();
     void placeTip(const QPointF &pos, const QRectF &viewport);
     bool tipChanged(const QString &text, QGraphicsItem *item);
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 protected:
     void timerEvent(QTimerEvent *e);
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
@@ -26,14 +35,18 @@ private:
 QnGraphicsTooltipLabel *QnGraphicsTooltipLabel::instance = 0;
 
 QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *parent):
-    GraphicsLabel(text, parent),
+    base_type(text, parent),
     item(parent)
 {
     delete instance;
     instance = this;
     setFlags(flags() | QGraphicsItem::ItemIgnoresTransformations);
+    //setPerformanceHint(QStaticText::AggressiveCaching);
+  //  setFrameShape(GraphicsFrame::Box);
+
     QPointF scenePos;
     setPos(scenePos);
+    setPalette(QToolTip::palette());
     qApp->installEventFilter(this);
     setAcceptHoverEvents(true);
     reuseTip(text);
@@ -111,6 +124,17 @@ bool QnGraphicsTooltipLabel::tipChanged(const QString &text, QGraphicsItem *item
             item != this->item);
 }
 
+void QnGraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+
+    QStyleOptionFrame opt;
+    opt.rect = this->boundingRect().toRect();
+    opt.rect.adjust(-5, -5, 5, 5);
+
+    style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);
+    painter->setPen(QPen(Qt::black));
+    base_type::paint(painter, option, widget);
+}
+
 void QnGraphicsTooltipLabel::timerEvent(QTimerEvent *e)
 {
     if (e->timerId() == hideTimer.timerId()
@@ -123,7 +147,7 @@ void QnGraphicsTooltipLabel::timerEvent(QTimerEvent *e)
 
 void QnGraphicsTooltipLabel::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
     hideTip();
-    GraphicsLabel::hoverLeaveEvent(event);
+    base_type::hoverLeaveEvent(event);
 }
 
 void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport){

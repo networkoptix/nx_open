@@ -30,7 +30,6 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
 
     if(targetItem) {
         QRectF vprect(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()));
-        qDebug() << "scenepos" << scenePos << "viewport" << vprect;
         GraphicsTooltip::showText(targetItem->toolTip(), targetItem, scenePos, vprect);
     }
 
