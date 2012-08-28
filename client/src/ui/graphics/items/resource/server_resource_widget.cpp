@@ -227,7 +227,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glColor4f(0.0, 0.0, 0.0, 1.0);
+        glColor4f(0.0, 0.0, 0.0, painter->opacity());
         glBegin(GL_QUADS);
         glVertices(rect);
         glEnd();
@@ -236,7 +236,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glTranslatef(inner.center().x(), inner.center().y(), 1.0);
         qreal radius = min * 0.5 - offset;
         glScale(radius, radius);
-        m_backgroundGradientPainter->paint(qnGlobals->backgroundGradientColor());
+        m_backgroundGradientPainter->paint(toTransparent(qnGlobals->backgroundGradientColor(), painter->opacity()));
         glPopMatrix();
 
         glDisable(GL_BLEND);
