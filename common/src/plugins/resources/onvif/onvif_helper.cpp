@@ -73,15 +73,26 @@ bool PasswordHelper::isNotAuthenticated(const SOAP_ENV__Fault* faultInfo)
 {
     qDebug() << "PasswordHelper::isNotAuthenticated: all fault info: " << SoapErrorHelper::fetchDescription(faultInfo);
 
-    if (faultInfo && faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
-        QString subcodeValue(QLatin1String(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value));
-        subcodeValue = subcodeValue.toLower();
-        qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << subcodeValue;
-        return subcodeValue.indexOf(QLatin1String("notauthorized")) != -1 || subcodeValue.indexOf(QLatin1String("not permitted")) != -1
-                || subcodeValue.indexOf(QLatin1String("failedauthentication")) != -1 || subcodeValue.indexOf(QLatin1String("operationprohibited")) != -1;
+    if (!faultInfo) {
+        return false;
     }
 
-    return false;
+    QString info;
+
+    if (faultInfo->SOAP_ENV__Code && faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode) {
+        info = QString::fromLatin1(faultInfo->SOAP_ENV__Code->SOAP_ENV__Subcode->SOAP_ENV__Value);
+    } else if (faultInfo->faultstring) {
+        info = QString::fromLatin1(faultInfo->faultstring);
+    }
+
+    info = info.toLower();
+    qDebug() << "PasswordHelper::isNotAuthenticated: gathered string: " << info;
+
+    return info.indexOf(QLatin1String("notauthorized")) != -1 ||
+        info.indexOf(QLatin1String("not permitted")) != -1 ||
+        info.indexOf(QLatin1String("failedauthentication")) != -1 ||
+        info.indexOf(QLatin1String("operationprohibited")) != -1 ||
+        info.indexOf(QLatin1String("unauthorized")) != -1;
 }
 
 bool PasswordHelper::isConflictError(const SOAP_ENV__Fault* faultInfo)

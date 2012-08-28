@@ -612,7 +612,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     emit currentWidgetAboutToBeChanged();
 
     WidgetFlags previousWidgetFlags = m_currentWidgetFlags;
-    updateItemDataFromSlider(m_currentWidget);
+
+    if(m_currentWidget) {
+        updateItemDataFromSlider(m_currentWidget);
+    } else {
+        m_sliderDataInvalid = true;
+        m_sliderWindowInvalid = true;
+    }
 
     if(m_currentMediaWidget) {
         QnAbstractArchiveReader  *archiveReader = m_currentMediaWidget->display()->archiveReader();
@@ -632,7 +638,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget) {
         m_sliderDataInvalid = true;
-        m_sliderWindowInvalid = (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
+        m_sliderWindowInvalid |= (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
     }
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
@@ -985,15 +991,12 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     QnTimePeriod selection;
     if(m_timeSlider->isSelectionValid())
         selection = QnTimePeriod(m_timeSlider->selectionStart(), m_timeSlider->selectionEnd() - m_timeSlider->selectionStart());
-        /*QnTimePeriodList existsPeriods = m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole);
-        if (!existsPeriods.intersectPeriod(selection))
-            selection.clear();*/
 
     QScopedPointer<QMenu> menu(manager->newMenu(
         Qn::SliderScope, 
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodParameter, selection).
-            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)) // TODO: move this out into global scope?
+            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)) // TODO: move this out into global scope!
     ));
     if(menu->isEmpty())
         return;
