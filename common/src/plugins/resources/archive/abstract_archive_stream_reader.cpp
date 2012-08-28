@@ -76,7 +76,7 @@ bool QnAbstractArchiveReader::isRealTimeSource() const
 void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)
 {
     if (usec != DATETIME_NOW)
-        jumpTo(qMax(0ll, usec - 200 * 1000), usec);
+        jumpTo(qMax(0ll, usec - 200 * 1000), usec-1);
     else
         jumpTo(usec, 0);
 }
