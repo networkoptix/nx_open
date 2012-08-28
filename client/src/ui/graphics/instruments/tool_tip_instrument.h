@@ -4,7 +4,7 @@
 #include "instrument.h"
 
 class ToolTipInstrument: public Instrument {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef Instrument base_type;
 

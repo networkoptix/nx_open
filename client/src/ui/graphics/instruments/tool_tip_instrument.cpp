@@ -1,7 +1,7 @@
 #include "tool_tip_instrument.h"
 
 #include <QtGui/QHelpEvent>
-
+#include <ui/graphics/items/standard/graphics_tooltip.h>
 
 ToolTipInstrument::ToolTipInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::ToolTip), parent)
@@ -29,10 +29,12 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     }
 
     if(targetItem) {
-        // TODO: create tooltip item here.
+        QRectF vprect(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()));
+        GraphicsTooltip::showText(targetItem->toolTip(), targetItem, scenePos, vprect);
     }
 
     helpEvent->setAccepted(targetItem != NULL);
     return true;
 }
+
 
