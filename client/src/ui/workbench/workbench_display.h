@@ -41,6 +41,8 @@ class QnGridItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
+class QnThumbnailsLoader;
+class QnThumbnail;
 
 class QnVideoCamera;
 class QnCamDisplay;
@@ -291,7 +293,7 @@ protected:
     Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
     Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
-    bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
+    bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     void deinitSceneContext();
@@ -347,6 +349,8 @@ protected slots:
 
     void at_resource_disabledChanged();
     void at_resource_disabledChanged(const QnResourcePtr &resource);
+
+    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
 
 private:
     /* Directly visible state */
@@ -446,7 +450,7 @@ private:
 
     
 
-
+    QnThumbnailsLoader *m_loader;
 };
 
 #endif // QN_WORKBENCH_MANAGER_H

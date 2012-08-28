@@ -1,4 +1,7 @@
-if [ ${buildLib} != staticlib ]; then
+#!/bin/bash
+export buildlib=${buildLib}
+
+if [[ $buildlib != 'staticlib' ]]; then
 
   mkdir -p ${libdir}/qtlibs/build/bin/debug
   mkdir -p ${libdir}/qtlibs/build/bin/release

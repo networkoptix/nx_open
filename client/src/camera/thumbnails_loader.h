@@ -27,7 +27,7 @@ class QnThumbnailsLoader: public QnLongRunnable {
     typedef QnLongRunnable base_type;
 
 public:
-    QnThumbnailsLoader(QnResourcePtr resource);
+    QnThumbnailsLoader(QnResourcePtr resource, bool decode = true);
     virtual ~QnThumbnailsLoader();
 
     QnResourcePtr resource() const;
@@ -91,6 +91,7 @@ private:
 
     mutable QMutex m_mutex;
     const QnResourcePtr m_resource;
+    bool m_decode;
     QList<QnAbstractArchiveDelegatePtr> m_delegates;
 
     qint64 m_timeStep, m_requestStart, m_requestEnd, m_processingStart, m_processingEnd;

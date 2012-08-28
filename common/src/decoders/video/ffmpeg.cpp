@@ -387,7 +387,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     // -------------------------
     Q_ASSERT(m_context->codec);
     avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-    if (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice)
+    if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice))
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
 
     AVFrame* copyFromFrame = m_frame;

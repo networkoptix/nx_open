@@ -63,6 +63,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
+#include "camera/thumbnails_loader.h" // TODO: remove?
 
 
 Q_DECLARE_METATYPE(QUuid) // TODO: move out
@@ -146,7 +147,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
-    m_normalMarginFlags(0)
+    m_normalMarginFlags(0),
+    m_loader(NULL)
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -673,7 +675,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
     bringToFront(widget);
 }
 
-bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
+bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
     if (m_widgetByRenderer.size() >= 24) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
@@ -752,8 +754,9 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate) {
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-        mediaWidget->display()->start();
+    if(startDisplay)
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+            mediaWidget->display()->start();
 
     return true;
 }
@@ -1282,11 +1285,33 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
         at_layout_itemRemoved(item);
 }
 
+
 void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
+    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
+
+    if(thumbnailed) {
+        if(m_loader) {
+            disconnect(m_loader, NULL, this, NULL);
+            m_loader->pleaseStop();
+        }
+
+        if(QnResourcePtr resource = resourcePool()->getResourceByUniqId((**layout->items().begin()).resourceUid())) {
+            m_loader = new QnThumbnailsLoader(resource, false);
+            
+            connect(m_loader, SIGNAL(thumbnailLoaded(const QnThumbnail &)), this, SLOT(at_loader_thumbnailLoaded(const QnThumbnail &)));
+            connect(m_loader, SIGNAL(finished()), m_loader, SLOT(deleteLater()));
+
+            m_loader->setTimePeriod(searchState.period);
+            m_loader->setTimeStep(searchState.step);
+            m_loader->start();
+        }
+    }
+
     foreach(QnWorkbenchItem *item, layout->items())
-        at_layout_itemAdded(item);
+        addItemInternal(item, false, !thumbnailed);
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
@@ -1321,7 +1346,39 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(boundingRectChanged()),                  this,                   SLOT(fitInView()));
 
+    synchronizeSceneBounds();
     fitInView(false);
+}
+
+namespace {
+    struct WidgetPositionCmp {
+        bool operator()(QnResourceWidget *l, QnResourceWidget *r) const {
+            QRect lg = l->item()->geometry();
+            QRect rg = r->item()->geometry();
+            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+        }
+    };
+} // anonymous namespace
+
+void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
+    QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    if(searchState.step <= 0)
+        return;
+
+    int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
+    QList<QnResourceWidget *> widgets = this->widgets();
+    if(index < 0 || index >= widgets.size())
+        return;
+
+    qSort(widgets.begin(), widgets.end(), WidgetPositionCmp());
+
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
+    if(!mediaWidget)
+        return;
+
+    mediaWidget->display()->camDisplay()->setMTDecoding(false);
+    mediaWidget->display()->camDisplay()->putData(thumbnail.data());
+    mediaWidget->display()->start();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

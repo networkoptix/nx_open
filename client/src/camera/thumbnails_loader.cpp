@@ -39,9 +39,10 @@ namespace {
 
 //#define QN_THUMBNAILS_LOADER_DEBUG
 
-QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
+QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource, bool decode):
     m_mutex(QMutex::NonRecursive),
     m_resource(resource),
+    m_decode(decode),
     m_timeStep(0),
     m_requestStart(0),
     m_requestEnd(0),
@@ -415,10 +416,19 @@ void QnThumbnailsLoader::process() {
 
                 timingsQueue << frame->timestamp;
                 frameFlags << frame->flags;
-                if (decoder.decode(frame, &outFrame)) 
-                {
-                    outFrame.pkt_dts = timingsQueue.dequeue();
-                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+
+                if(m_decode) {
+                    if (decoder.decode(frame, &outFrame)) 
+                    {
+                        outFrame.pkt_dts = timingsQueue.dequeue();
+                        thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                        time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
+                    }
+                } else {
+                    frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;
+
+                    qint64 actualTime = (timingsQueue.dequeue() + 999) / 1000;
+                    thumbnail = QnThumbnail(frame, qRound(actualTime, timeStep), actualTime, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
@@ -430,10 +440,10 @@ void QnThumbnailsLoader::process() {
                     }
                 }
 
-                frame = qSharedPointerDynamicCast<QnCompressedVideoData> (client->getNextData());
+                frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
             }
 
-            if(!invalidated) {
+            if(!invalidated && m_decode) { // TODO: m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
@@ -556,6 +566,6 @@ qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
 
-        return qMin(startTime, endTime + thumbnail.timeStep());
+        return qMax(startTime, endTime + thumbnail.timeStep());
     }
 }
