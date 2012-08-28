@@ -103,9 +103,14 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedSplitter->addWidget(advancedTreeWidget);
             advancedSplitter->addWidget(advancedWidget);
         } else {
-            if (id == m_widgetsRecreator->getId()) {
-                //ToDo: disable all
+            if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;
+            }
+
+            if (id == m_widgetsRecreator->getId()) {
+                //ToDo: disable all and return. Currently, will do the same as for another type of cameras
+                //disable;
+                //return;
             }
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
@@ -115,7 +120,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             m_widgetsRecreator = 0;
         }
 
-        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(id.toString(), *advancedTreeWidget, *advancedLayout, this);
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
 }
 
@@ -476,7 +481,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     }
 
     QVariant id;
-    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && id != m_widgetsRecreator->getId()) {
+    if (!m_camera || m_camera->getUniqueId() != m_widgetsRecreator->getCameraId()) {
         //If so, we received update for some other camera
         return;
     }

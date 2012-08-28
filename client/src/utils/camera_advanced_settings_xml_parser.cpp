@@ -423,15 +423,16 @@ QStringList CameraSettingsTreeLister::proceed()
 // class CameraSettingsWidgetsTreeCreator
 //
 
-CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& id, QTreeWidget& rootWidget,
-        QStackedLayout& rootLayout, QObject* handler):
+CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString& cameraId,
+        const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler):
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
     m_widgetsById(),
     m_handler(handler),
     m_settings(0),
-    m_id(id)
+    m_id(id),
+    m_cameraId(cameraId)
 {
     //Default - show empty widget
     //ToDo: owner?
@@ -468,6 +469,11 @@ void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
 QString CameraSettingsWidgetsTreeCreator::getId() const
 {
     return m_id;
+}
+
+QString CameraSettingsWidgetsTreeCreator::getCameraId() const
+{
+    return m_cameraId;
 }
 
 QTreeWidget* CameraSettingsWidgetsTreeCreator::getRootWidget()
