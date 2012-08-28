@@ -40,6 +40,7 @@ namespace Qn {
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
+        LayoutSearchStateRole,                      /**< */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
 
