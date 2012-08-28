@@ -1350,6 +1350,16 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     fitInView(false);
 }
 
+namespace {
+    struct WidgetPositionCmp {
+        bool operator()(QnResourceWidget *l, QnResourceWidget *r) const {
+            QRect lg = l->item()->geometry();
+            QRect rg = r->item()->geometry();
+            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+        }
+    };
+} // anonymous namespace
+
 void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
@@ -1360,13 +1370,6 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     if(index < 0 || index >= widgets.size())
         return;
 
-    struct WidgetPositionCmp {
-        bool operator()(QnResourceWidget *l, QnResourceWidget *r) const {
-            QRect lg = l->item()->geometry();
-            QRect rg = r->item()->geometry();
-            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-        }
-    };
     qSort(widgets.begin(), widgets.end(), WidgetPositionCmp());
 
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
