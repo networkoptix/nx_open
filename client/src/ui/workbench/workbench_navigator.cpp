@@ -67,6 +67,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastPlaying(false),
     m_lastPlayingSupported(false),
     m_pausedOverride(false),
+    m_preciseNextSeek(false),
     m_lastSpeed(0.0),
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
@@ -1065,10 +1066,11 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (value == DATETIME_NOW) {
                 reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                if (m_timeSlider->isSliderDown()) {
+                if (m_timeSlider->isSliderDown() && !m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, 0);
                 } else {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                    m_preciseNextSeek = false;
                 }
             }
         }
@@ -1080,6 +1082,9 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 void QnWorkbenchNavigator::at_timeSlider_sliderPressed() {
     if (!m_currentWidget)
         return;
+
+    if(!isPlaying())
+        m_preciseNextSeek = true; /* When paused, use precise seeks on click. */
 
     if(m_lastPlaying) 
         setPlayingTemporary(false);
