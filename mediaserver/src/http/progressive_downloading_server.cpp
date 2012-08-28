@@ -240,25 +240,32 @@ void QnProgressiveDownloadingConsumer::run()
                 QnServerArchiveDelegate serverArchive;
                 serverArchive.open(resource);
                 serverArchive.seek(timeMs, true);
+                qint64 timestamp = AV_NOPTS_VALUE;
                 for (int i = 0; i < 20; ++i) 
                 {
                     QnAbstractMediaDataPtr data = serverArchive.getNextData();
                     if (data && (data->dataType == QnAbstractMediaData::VIDEO || data->dataType == QnAbstractMediaData::AUDIO))
                     {
-                        if (utcFormatOK) {
-                            QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
-                            d->responseBody = callback + QByteArray("({'pos' : ") + QByteArray::number(data->timestamp/1000) + QByteArray("});"); 
-                            sendResponse("HTTP", CODE_OK, "application/json");
-                        } else {
-                            d->responseBody = QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString(Qt::ISODate).toLocal8Bit();
-                            sendResponse("HTTP", CODE_OK, "text/plain");
-                        }
-
-                        return;
+                        timestamp = data->timestamp;
+                        break;
                     }
                 }
-                d->responseBody = "Internal server error";
-                sendResponse("HTTP", CODE_INTERNAL_ERROR, "text/plain");
+
+                QByteArray ts("now");
+                if (utcFormatOK) {
+                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                    if (timestamp != AV_NOPTS_VALUE)
+                        ts = QByteArray::number(timestamp/1000);
+                    d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                    sendResponse("HTTP", CODE_OK, "application/json");
+                } else {
+                    if (timestamp != AV_NOPTS_VALUE)
+                        d->responseBody = QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit();
+                    else
+                        d->responseBody = ts;
+                    sendResponse("HTTP", CODE_OK, "text/plain");
+                }
+
                 return;
             }
 
