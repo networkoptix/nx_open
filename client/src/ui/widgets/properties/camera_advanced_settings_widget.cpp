@@ -30,6 +30,7 @@ void QnSettingsScrollArea::showEvent(QShowEvent* event)
 
 void QnSettingsScrollArea::addWidget(QWidget& widgetToAdd)
 {
+    widgetToAdd.setParent(widget());
     dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(&widgetToAdd);
 }
 
@@ -106,7 +107,7 @@ QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& ob
     //QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
 
     mWidget = m_checkBox;
-    setMinimumSize(m_checkBox->sizeHint());
+    //setMinimumSize(m_checkBox->sizeHint());
 }
 
 QnSettingsOnOffWidget::~QnSettingsOnOffWidget()
@@ -169,7 +170,7 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
 
     mWidget = groupBox;
-    setMinimumSize(groupBox->sizeHint());
+    //setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsMinMaxStepWidget::onValChanged(int val)
@@ -232,7 +233,7 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     }
 
     mWidget = groupBox;
-    setMinimumSize(groupBox->sizeHint());
+    //setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsEnumerationWidget::onClicked()
@@ -277,7 +278,7 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
     btn->setFocusPolicy(Qt::NoFocus);
 
     mWidget = btn;
-    setMinimumSize(btn->sizeHint());
+    //setMinimumSize(btn->sizeHint());
 }
 
 void QnSettingsButtonWidget::onClicked()
