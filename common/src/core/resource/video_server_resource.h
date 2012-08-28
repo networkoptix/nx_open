@@ -34,8 +34,8 @@ public:
     void setApiUrl(const QString& restUrl);
     QString getApiUrl() const;
 
-    void QnVideoServerResource::setStreamingUrl(const QString& value);
-    QString QnVideoServerResource::getStreamingUrl() const;
+    void setStreamingUrl(const QString& value);
+    QString getStreamingUrl() const;
 
     void setNetAddrList(const QList<QHostAddress>&);
     QList<QHostAddress> getNetAddrList();
