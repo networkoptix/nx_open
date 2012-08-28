@@ -251,20 +251,17 @@ void QnProgressiveDownloadingConsumer::run()
                     }
                 }
 
-                QByteArray ts("now");
-                if (utcFormatOK) {
-                    QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
-                    if (timestamp != AV_NOPTS_VALUE)
+                QByteArray ts("\"now\"");
+                QByteArray callback = getDecodedUrl().queryItemValue("callback").toLocal8Bit();
+                if (timestamp != AV_NOPTS_VALUE) 
+                {
+                    if (utcFormatOK)
                         ts = QByteArray::number(timestamp/1000);
-                    d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
-                    sendResponse("HTTP", CODE_OK, "application/json");
-                } else {
-                    if (timestamp != AV_NOPTS_VALUE)
-                        d->responseBody = QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit();
                     else
-                        d->responseBody = ts;
-                    sendResponse("HTTP", CODE_OK, "text/plain");
+                        ts = QByteArray("\"") + QDateTime::fromMSecsSinceEpoch(timestamp/1000).toString(Qt::ISODate).toLocal8Bit() + QByteArray("\"");
                 }
+                d->responseBody = callback + QByteArray("({'pos' : ") + ts + QByteArray("});"); 
+                sendResponse("HTTP", CODE_OK, "application/json");
 
                 return;
             }
