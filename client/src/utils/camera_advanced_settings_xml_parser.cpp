@@ -445,10 +445,17 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_rootLayout(rootLayout),
     m_widgetsById(),
     m_handler(handler),
-    m_settings(0)
+    m_settings(0),
+    m_id(id)
 {
     //Default - show empty widget
+    //ToDo: owner?
     m_rootLayout.addWidget(new QWidget());
+}
+
+CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
+{
+    //ToDo: clean m_rootLayout
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
@@ -470,4 +477,19 @@ void CameraSettingsWidgetsTreeCreator::proceed(CameraSettings* settings)
     m_rootWidget.clear();
 
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>::proceed();
+}
+
+QString CameraSettingsWidgetsTreeCreator::getId() const
+{
+    return m_id;
+}
+
+QTreeWidget* CameraSettingsWidgetsTreeCreator::getRootWidget()
+{
+    return &m_rootWidget;
+}
+
+QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
+{
+    return &m_rootLayout;
 }

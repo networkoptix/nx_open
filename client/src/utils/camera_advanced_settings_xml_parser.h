@@ -179,6 +179,7 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     WidgetsById m_widgetsById;
     QObject* m_handler;
     CameraSettings* m_settings;
+    QString m_id;
 
 protected:
     virtual CameraSettings& getCallback() override;
@@ -186,10 +187,15 @@ protected:
 public:
 
     CameraSettingsWidgetsTreeCreator(const QString& id, QTreeWidget& rootWidget, QStackedLayout& rootLayout, QObject* handler);
+    ~CameraSettingsWidgetsTreeCreator();
 
     CameraSettingsWidgetsCreator* createElement(const QString& id) override;
 
     void proceed(CameraSettings* settings);
+
+    QString getId() const;
+    QTreeWidget* getRootWidget();
+    QStackedLayout* getRootLayout();
 };
 
 #endif //camera_advanced_settings_xml_parser_h_1819

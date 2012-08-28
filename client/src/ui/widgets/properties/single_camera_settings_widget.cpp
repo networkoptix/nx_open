@@ -78,24 +78,41 @@ QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
-    if (!m_widgetsRecreator && m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
+
+    if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
-        QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
-        if(!layout) {
-            delete ui->tabAdvanced->layout();
-            ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+        QTreeWidget* advancedTreeWidget = 0;
+        QStackedLayout* advancedLayout = 0;
+
+        if (!m_widgetsRecreator)
+        {
+            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
+            if(!layout) {
+                delete ui->tabAdvanced->layout();
+                ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+            }
+            QSplitter* advancedSplitter = new QSplitter();
+            layout->addWidget(advancedSplitter);
+
+            advancedTreeWidget = new QTreeWidget();
+            advancedTreeWidget->setColumnCount(1);
+            advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
+
+            QWidget* advancedWidget = new QWidget();
+            advancedLayout = new QStackedLayout(advancedWidget);
+            advancedSplitter->addWidget(advancedTreeWidget);
+            advancedSplitter->addWidget(advancedWidget);
+        } else {
+            if (id == m_widgetsRecreator->getId()) {
+                //ToDo: disable all
+                return;
+            }
+
+            advancedTreeWidget = m_widgetsRecreator->getRootWidget();
+            advancedLayout = m_widgetsRecreator->getRootLayout();
+            delete m_widgetsRecreator;
+            m_widgetsRecreator = 0;
         }
-        QSplitter* advancedSplitter = new QSplitter();
-        layout->addWidget(advancedSplitter);
-
-        QTreeWidget* advancedTreeWidget = new QTreeWidget();
-        advancedTreeWidget->setColumnCount(1);
-        advancedTreeWidget->setHeaderLabel(QString::fromLatin1("Category"));
-
-        QWidget* advancedWidget = new QWidget();
-        QStackedLayout* advancedLayout = new QStackedLayout(advancedWidget);
-        advancedSplitter->addWidget(advancedTreeWidget);
-        advancedSplitter->addWidget(advancedWidget);
 
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
