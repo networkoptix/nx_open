@@ -453,7 +453,9 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
+    QVariant predefinedMaxFps;
+    getParam(MAX_FPS_PARAM_NAME, predefinedMaxFps, QnDomainMemory);
+    setParam(MAX_FPS_PARAM_NAME, qMin(f, predefinedMaxFps.toInt()), QnDomainDatabase);
 }
 
 int QnPlOnvifResource::getMaxFps()
