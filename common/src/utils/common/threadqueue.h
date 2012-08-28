@@ -165,10 +165,7 @@ public:
         for (int i = 0; i < m_bufferLen; ++i)
         {
             if (cond(m_buffer[index], opaque))
-            {
-                m_sem.acquire(1);
                 m_buffer[index] = T();
-            }
             index = (index + 1) % m_buffer.size();
         }
     }
