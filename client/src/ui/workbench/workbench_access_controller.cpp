@@ -115,7 +115,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
-        return permissions.toInt(); // TODO: listen to changes
+        return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
     } if(isFileLayout(layout)) {
         return Qn::ReadPermission;
     } else if(m_user && (m_user->getRights() & Qn::EditLayoutRight)) {
