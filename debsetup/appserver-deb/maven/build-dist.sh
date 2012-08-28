@@ -40,7 +40,7 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 ############### Enterprise Controller
-cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
+cp -r $ECS_PRESTAGE_PATH/* $PKGSTAGE
 
 touch $ETCSTAGE/entcontroller.conf
 
