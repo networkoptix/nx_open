@@ -5,38 +5,42 @@
 #include <QtGui/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QToolTip>
+#include <QtGui/QGraphicsScene>
+
+#define NOPARENT
 
 class QnGraphicsTooltipLabel: public GraphicsLabel{
 
     typedef GraphicsLabel base_type;
 public:
-    QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *parent);
+    QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem);
     ~QnGraphicsTooltipLabel();
 
     static QnGraphicsTooltipLabel *instance;
     bool eventFilter(QObject *, QEvent *);
 
     QBasicTimer hideTimer, expireTimer;
-    void reuseTip(const QString &text);
+    void reuseTip(const QString &newText, QGraphicsItem *newItem);
     void hideTip();
     void hideTipImmediately();
     void restartExpireTimer();
     void placeTip(const QPointF &pos, const QRectF &viewport);
-    bool tipChanged(const QString &text, QGraphicsItem *item);
+    bool tipChanged(const QString &newText, QGraphicsItem *parent);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 protected:
     void timerEvent(QTimerEvent *e);
-    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    //virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 private:
     QGraphicsItem *item;
 };
 
 QnGraphicsTooltipLabel *QnGraphicsTooltipLabel::instance = 0;
 
-QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *parent):
-    base_type(text, parent),
-    item(parent)
+QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem):
+    base_type(text),
+    item(0)
 {
     delete instance;
     instance = this;
@@ -48,8 +52,7 @@ QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsIt
     setPos(scenePos);
     setPalette(QToolTip::palette());
     qApp->installEventFilter(this);
-    setAcceptHoverEvents(true);
-    reuseTip(text);
+    reuseTip(text, newItem);
 }
 
 QnGraphicsTooltipLabel::~QnGraphicsTooltipLabel(){
@@ -64,10 +67,26 @@ void QnGraphicsTooltipLabel::restartExpireTimer()
     hideTimer.stop();
 }
 
-void QnGraphicsTooltipLabel::reuseTip(const QString &text)
+void QnGraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newItem)
 {
-    setText(text);
+    if (item)
+        item->removeSceneEventFilter(this);
+#ifdef NOPARENT
+    if (scene())
+        scene()->removeItem(this);
+    newItem->scene()->addItem(this);
+#else
+    // required to calculate size corectly
+    this->setParentItem(newItem);
+#endif
+
+    item = newItem;
+    setText(newText);
+    qDebug() << "self width before resize" << sceneBoundingRect().width();
     resize(sizeHint(Qt::PreferredSize));
+    qDebug() << "self width after resize" << sceneBoundingRect().width();
+    newItem->installSceneEventFilter(this);
+    newItem->setAcceptHoverEvents(true); // this wont be undone, can be stored in inner field
     restartExpireTimer();
 }
 
@@ -105,23 +124,51 @@ bool QnGraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
 void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 {
     // ensure that mouse cursor is inside rect
-    QPointF p = pos - QPointF(10.0, 10.0);
+    QPointF p = pos;
 
+    // default pos - below the button and below the cursor
+    qDebug() << "item y from" << item->sceneBoundingRect().y()  << "to" << item->sceneBoundingRect().y() + item->sceneBoundingRect().height();
+    qDebug() << "cursor y" << p.y();
+    p.setY(qMax(p.y(), item->sceneBoundingRect().y() + item->sceneBoundingRect().height()));
+
+    qDebug() << "scene transofrm" <<  sceneTransform();
+
+#ifdef NOPARENT
+    QRectF self = item->sceneTransform().mapRect(this->boundingRect());
+#else
     QRectF self = this->sceneBoundingRect();
-    if (p.y() < viewport.y())
-        p.setY(viewport.y());
+#endif
+
+    qDebug() << "self x" << p.x();
+    qDebug() << "self width" << self.width();
+
+
+    qDebug() << "viewport from" << viewport.x() << "to" << viewport.x() + viewport.width();
     if (p.x() + self.width() > viewport.x() + viewport.width())
         p.setX(viewport.x() + viewport.width() - self.width());
+
     if (p.x() < viewport.x())
         p.setX(viewport.x());
+
+    // if cursor is too high (o_O), place tip below the button
+    if (p.y() < viewport.y())
+        p.setY(item->sceneBoundingRect().y() + item->sceneBoundingRect().height());
+
+    // if cursor is too low, place tip over the button
     if (p.y() + self.height() > viewport.y() + viewport.height())
-        p.setY(viewport.y() + viewport.height() - self.height());
-    this->setPos(this->item->mapFromScene(p));
+        p.setY(item->sceneBoundingRect().y() - self.height());
+
+    qDebug() << "result y" << p.y();
+
+#ifdef NOPARENT
+    this->setPos(p);
+#else
+    this->setPos(item->mapFromScene(p));
+#endif
 }
 
-bool QnGraphicsTooltipLabel::tipChanged(const QString &text, QGraphicsItem *item){
-    return (text != this->text() ||
-            item != this->item);
+bool QnGraphicsTooltipLabel::tipChanged(const QString &newText, QGraphicsItem *parent){
+    return (newText != this->text() || parent != this->item);
 }
 
 void QnGraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
@@ -145,9 +192,11 @@ void QnGraphicsTooltipLabel::timerEvent(QTimerEvent *e)
     }
 }
 
-void QnGraphicsTooltipLabel::hoverLeaveEvent(QGraphicsSceneHoverEvent *event){
-    hideTip();
-    base_type::hoverLeaveEvent(event);
+bool QnGraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *event){
+    if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == item){
+        hideTip();
+    }
+    return base_type::sceneEventFilter(watched, event);
 }
 
 void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport){
@@ -161,7 +210,7 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
             // If the tip has changed, reuse the one
             // that is showing (removes flickering)
             if (QnGraphicsTooltipLabel::instance->tipChanged(text, item)){
-                QnGraphicsTooltipLabel::instance->reuseTip(text);
+                QnGraphicsTooltipLabel::instance->reuseTip(text, item);
                 QnGraphicsTooltipLabel::instance->placeTip(pos, viewport);
             }
             return;
