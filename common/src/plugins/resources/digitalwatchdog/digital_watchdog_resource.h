@@ -27,6 +27,7 @@ protected:
 
 private:
     bool isDualStreamingEnabled(bool& unauth);
+    void enableOnvifSecondStream();
     QString fetchCameraModel();
 
 private:
