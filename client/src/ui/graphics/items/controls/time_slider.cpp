@@ -1,6 +1,7 @@
 #include "time_slider.h"
 
 #include <cassert>
+#include <cmath>
 #include <limits>
 
 #include <QtCore/QDateTime>
@@ -291,7 +292,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_oldMinimum(0),
     m_oldMaximum(0),
     m_options(0),
-    m_unzooming(false),
+    m_animating(false),
     m_dragMarker(NoMarker),
     m_dragIsClick(false),
     m_selecting(false),
@@ -543,7 +544,7 @@ void QnTimeSlider::setWindowEnd(qint64 windowEnd) {
     setWindow(qMin(m_windowStart, windowEnd - m_minimalWindow), windowEnd);
 }
 
-void QnTimeSlider::setWindow(qint64 start, qint64 end) {
+void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
     start = qBound(minimum(), start, maximum());
     end = qMax(start, qBound(minimum(), end, maximum()));
 
@@ -566,15 +567,22 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end) {
     }
 
     if (m_windowStart != start || m_windowEnd != end) {
-        m_windowStart = start;
-        m_windowEnd = end;
+        if(animate) {
+            kineticProcessor()->reset(); /* Stop kinetic zoom. */
+            m_animating = true;
+            m_animationStart = start;
+            m_animationEnd = end;
+        } else {
+            m_windowStart = start;
+            m_windowEnd = end;
 
-        sliderChange(SliderMappingChange);
-        emit windowChanged(m_windowStart, m_windowEnd);
+            sliderChange(SliderMappingChange);
+            emit windowChanged(m_windowStart, m_windowEnd);
 
-        updateToolTipVisibility();
-        updateMSecsPerPixel();
-        updateThumbnailsPeriod();
+            updateToolTipVisibility();
+            updateMSecsPerPixel();
+            updateThumbnailsPeriod();
+        }
     }
 }
 
@@ -729,21 +737,16 @@ void QnTimeSlider::finishAnimations() {
     animateStepValues(10 * 1000);
     animateThumbnails(10 * 1000);
 
-    if(m_unzooming) {
-        setWindow(minimum(), maximum());
-        m_unzooming = false;
+    if(m_animating) {
+        setWindow(m_animationStart, m_animationEnd);
+        m_animating = false;
     }
 
     kineticProcessor()->reset();
 }
 
-void QnTimeSlider::animatedUnzoom() {
-    kineticProcessor()->reset(); /* Stop kinetic zoom. */
-    m_unzooming = true;
-}
-
 bool QnTimeSlider::isAnimatingWindow() const {
-    return m_unzooming || kineticProcessor()->isRunning();
+    return m_animating || kineticProcessor()->isRunning();
 }
 
 bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
@@ -1706,7 +1709,7 @@ QSizeF QnTimeSlider::sizeHint(Qt::SizeHint which, const QSizeF &constraint) cons
 }
 
 void QnTimeSlider::tick(int deltaMSecs) {
-    if((m_options & AdjustWindowToPosition) && !m_unzooming && !isSliderDown()) {
+    if((m_options & AdjustWindowToPosition) && !m_animating && !isSliderDown()) {
         /* Apply window position corrections if no animation or user interaction is in progress. */
         qint64 position = this->sliderPosition();
         if(position >= m_windowStart && position <= m_windowEnd) {
@@ -1732,28 +1735,26 @@ void QnTimeSlider::tick(int deltaMSecs) {
         }
     }
 
-    if(!m_unzooming) {
+    if(!m_animating) {
         animateStepValues(deltaMSecs);
     } else {
-        qreal sliderRange = maximum() - minimum();
-        qreal windowRange = m_windowEnd - m_windowStart;
+        qreal distance = qAbs(m_animationStart - m_windowStart) + qAbs(m_animationEnd - m_windowEnd);
+        qreal delta = 8.0 * deltaMSecs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
 
-        if(!qFuzzyCompare(sliderRange, windowRange)) {
-            qreal progress = windowRange / sliderRange;
-            qreal speed = qMin(4.0 - 3.0 * progress, progress * 16.0);
-            qreal delta = speed * deltaMSecs / 1000.0 * sliderRange;
-
-            qreal startFraction = (m_windowStart - minimum()) / (sliderRange - windowRange);
-            qreal endFraction  = (maximum() - m_windowEnd) / (sliderRange - windowRange);
+        if(delta > distance) {
+            setWindow(m_animationStart, m_animationEnd);
+        } else {
+            qreal startFraction = (m_animationStart - m_windowStart) / distance;
+            qreal endFraction  = (m_animationEnd - m_windowEnd) / distance;
 
             setWindow(
-                m_windowStart - static_cast<qint64>(delta * startFraction),
+                m_windowStart + static_cast<qint64>(delta * startFraction),
                 m_windowEnd + static_cast<qint64>(delta * endFraction)
             );
         }
 
-        if(minimum() == m_windowStart && maximum() == m_windowEnd)
-            m_unzooming = false;
+        if(m_animationStart == m_windowStart && m_animationEnd == m_windowEnd)
+            m_animating = false;
 
         animateStepValues(8.0 * deltaMSecs);
     }
@@ -1811,7 +1812,7 @@ void QnTimeSlider::sliderChange(SliderChange change) {
 }
 
 void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
-    if(m_unzooming) {
+    if(m_animating) {
         event->accept();
         return; /* Do nothing if animated unzoom is in progress. */
     }
@@ -1884,7 +1885,7 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
     if((m_options & UnzoomOnDoubleClick) && event->button() == Qt::LeftButton)
-        animatedUnzoom();
+        setWindow(minimum(), maximum(), true);
 }
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
