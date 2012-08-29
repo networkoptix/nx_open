@@ -57,7 +57,7 @@ public:
 
     virtual ~DWCameraSetting() {};
 
-    DWCameraSetting& DWCameraSetting::operator=(const DWCameraSetting& rhs);
+    DWCameraSetting& operator=(const DWCameraSetting& rhs);
 
     bool getFromCamera(DWCameraProxy& proxy);
     bool getFromBuffer(DWCameraProxy& proxy);
