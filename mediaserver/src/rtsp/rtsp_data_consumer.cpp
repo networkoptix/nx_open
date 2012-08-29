@@ -549,7 +549,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
     UDPSocket* mediaSocket = 0;
     if (!m_owner->isTcpMode())
-        mediaSocket = &trackInfo->mediaSocket;
+        mediaSocket = trackInfo->mediaSocket;
 
     {
         QMutexLocker lock(&m_mutex);

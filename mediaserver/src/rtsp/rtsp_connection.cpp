@@ -567,8 +567,8 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
                         if (trackInfo->openServerSocket(d->socket->getPeerAddress())) {
-                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket.getLocalPort()));
-                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket.getLocalPort()));
+                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalPort()));
+                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
                         }
                     }
                 }

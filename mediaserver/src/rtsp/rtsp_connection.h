@@ -13,18 +13,24 @@ class QnAbstractStreamDataProvider;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(0), clientRtcpPort(0), sequence(0), firstRtpTime(-1) {}
-    ~RtspServerTrackInfo()
+    RtspServerTrackInfo(): clientPort(0), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
     {
 
+    }
+    ~RtspServerTrackInfo()
+    {
+        delete mediaSocket;
+        delete rtcpSocket;
     }
 
     bool openServerSocket(const QString& peerAddress)
     {
-        if (mediaSocket.setLocalPort(0) && rtcpSocket.setLocalPort(0))
+        mediaSocket = new UDPSocket();
+        rtcpSocket = new UDPSocket();
+        if (mediaSocket->setLocalPort(0) && rtcpSocket->setLocalPort(0))
         {
-            mediaSocket.setDestAddr(peerAddress, clientPort);
-            rtcpSocket.setDestAddr(peerAddress, clientRtcpPort);
+            mediaSocket->setDestAddr(peerAddress, clientPort);
+            rtcpSocket->setDestAddr(peerAddress, clientRtcpPort);
             return true;
         }
         return false;
@@ -32,8 +38,8 @@ struct RtspServerTrackInfo
 
     int clientPort;
     int clientRtcpPort;
-    UDPSocket mediaSocket;
-    UDPSocket rtcpSocket;
+    UDPSocket* mediaSocket;
+    UDPSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
     quint16 sequence;
     qint64 firstRtpTime;
