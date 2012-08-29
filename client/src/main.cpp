@@ -207,6 +207,12 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
+    /* Init common resources. */
+    Q_INIT_RESOURCE(common_common);
+    Q_INIT_RESOURCE(common_custom);
+    Q_INIT_RESOURCE(common_generated);
+
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -275,11 +281,6 @@ int main(int argc, char *argv[])
 
     /* Initialize application instance. */
     application->setStartDragDistance(20);
-
-    /* Support old straight build scripts. */
-#ifndef NO_TRANSLATIONS
-    Q_INIT_RESOURCE(common_common);
-#endif
 
     QString language = qnSettings->language();
     QTranslator appTranslator;

@@ -230,6 +230,7 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_rejected();
+    void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
@@ -279,6 +280,11 @@ protected slots:
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);
 
+
+    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
+
+private:
+    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;

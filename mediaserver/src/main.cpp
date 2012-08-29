@@ -209,8 +209,8 @@ void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
 #else
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
-    server->setStreamingUrl(QString("http://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
+    server->setApiUrl(QString("https://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setStreamingUrl(QString("https://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
 #endif
 }
 
@@ -632,6 +632,7 @@ void QnMain::run()
     QUrl apiUrl(m_videoServer->getApiUrl());
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
+    m_restServer ->enableSSLMode();
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
     m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
@@ -788,6 +789,10 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+    /* Init common resources. */
+    Q_INIT_RESOURCE(common_common);
+    Q_INIT_RESOURCE(common_custom);
+    Q_INIT_RESOURCE(common_generated);
 
     QnVideoService service(argc, argv);
 

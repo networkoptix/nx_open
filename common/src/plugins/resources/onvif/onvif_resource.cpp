@@ -28,6 +28,7 @@ const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
+const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 1; //1 second
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -85,6 +86,8 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 //
 
 QnPlOnvifResource::QnPlOnvifResource() :
+    m_physicalParamsMutex(QMutex::Recursive),
+    m_advSettingsLastUpdated(QDateTime::currentDateTime()),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
@@ -98,12 +101,13 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
-    m_forceCodecFromPrimaryEncoder(false)
+    m_forceCodecFromPrimaryEncoder(false),
+    m_onvifAdditionalSettings(0)
 {
 }
 
 QnPlOnvifResource::~QnPlOnvifResource() {
-    return;
+    delete m_onvifAdditionalSettings;
 }
 
 
@@ -276,7 +280,7 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
-    if (getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
+    if (getImagingUrl().isEmpty() || getMediaUrl().isEmpty() || getName().contains(QLatin1String("Unknown")) || getMAC().isEmpty() || m_needUpdateOnvifUrl)
     {
         if (!fetchAndSetDeviceInformation() && getMediaUrl().isEmpty())
         {
@@ -300,6 +304,9 @@ bool QnPlOnvifResource::initInternal()
 
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
+
+    //Additional camera settings
+    fetchAndSetCameraSettings();
 
     save();
 
@@ -548,6 +555,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             {
                 setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
             }
+            if (response.Capabilities->Imaging)
+            {
+                setImagingUrl(QString::fromStdString(response.Capabilities->Imaging->XAddr));
+            }
             if (response.Capabilities->Device) 
             {
                 setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
@@ -631,7 +642,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsResp& re
 
     QMutexLocker lock(&m_mutex);
     m_secondaryResolutionList.clear();
-    for (int i = 0; i < resolutions.size(); ++i)
+    for (unsigned int i = 0; i < resolutions.size(); ++i)
         m_secondaryResolutionList.append(ResolutionPair(resolutions[i]->Width, resolutions[i]->Height));
     qSort(m_secondaryResolutionList.begin(), m_secondaryResolutionList.end(), resolutionGreaterThan);
 }
@@ -812,6 +823,18 @@ QString QnPlOnvifResource::getMediaUrl() const
 void QnPlOnvifResource::setMediaUrl(const QString& src) 
 {
     setParam(MEDIA_URL_PARAM_NAME, src, QnDomainDatabase);
+}
+
+QString QnPlOnvifResource::getImagingUrl() const 
+{ 
+    QMutexLocker lock(&m_mutex);
+    return m_imagingUrl;
+}
+
+void QnPlOnvifResource::setImagingUrl(const QString& src) 
+{
+    QMutexLocker lock(&m_mutex);
+    m_imagingUrl = src;
 }
 
 void QnPlOnvifResource::save()
@@ -1370,6 +1393,7 @@ bool QnPlOnvifResource::fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper)
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
             m_videoSourceId = QString::fromStdString(conf->token);
+            m_videoSourceToken = QString::fromStdString(conf->SourceToken);
         }
     }
 
@@ -1427,6 +1451,116 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
 bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 {
     return m_forceCodecFromPrimaryEncoder;
+}
+
+bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
+{
+    QMutexLocker lock(&m_physicalParamsMutex);
+    if (!m_onvifAdditionalSettings) {
+        return false;
+    }
+
+    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings::Iterator it = settings.find(param.name());
+
+    if (it == settings.end()) {
+        //return false;
+        return true;
+    }
+
+    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    if (currTime > m_advSettingsLastUpdated) {
+        if (!m_onvifAdditionalSettings->makeGetRequest()) {
+            return false;
+        }
+        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+    }
+
+    if (it.value().getFromCamera(*m_onvifAdditionalSettings)) {
+        val.setValue(it.value().serializeToStr());
+        return true;
+    }
+
+    //return false;
+    return true;
+}
+
+bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& val )
+{
+    QMutexLocker lock(&m_physicalParamsMutex);
+    if (!m_onvifAdditionalSettings) {
+        return false;
+    }
+
+    CameraSetting tmp;
+    tmp.deserializeFromStr(val.toString());
+
+    CameraSettings& settings = m_onvifAdditionalSettings->getCameraSettings();
+    CameraSettings::Iterator it = settings.find(param.name());
+
+    if (it == settings.end())
+    {
+        if (tmp.getType() != CameraSetting::Button) {
+            return false;
+        }
+
+        //For Button only operation object is required
+        QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator opIt =
+            OnvifCameraSettingOperationAbstract::operations.find(param.name());
+
+        if (opIt == OnvifCameraSettingOperationAbstract::operations.end()) {
+            return false;
+        }
+
+        return opIt.value()->set(tmp, *m_onvifAdditionalSettings);
+    }
+
+    CameraSettingValue oldVal = it.value().getCurrent();
+    it.value().setCurrent(tmp.getCurrent());
+
+
+    if (!it.value().setToCamera(*m_onvifAdditionalSettings)) {
+        it.value().setCurrent(oldVal);
+        return false;
+    }
+
+    return true;
+}
+
+void QnPlOnvifResource::fetchAndSetCameraSettings()
+{
+    QString imagingUrl = getImagingUrl();
+    if (imagingUrl.isEmpty()) {
+        qDebug() << "QnPlOnvifResource::fetchAndSetCameraSettings: imaging service is absent on device (URL: "
+            << getDeviceOnvifUrl() << ", UniqId: " << getUniqueId() << ").";
+    }
+
+    QAuthenticator auth(getAuth());
+    OnvifCameraSettingsResp* settings = new OnvifCameraSettingsResp(getDeviceOnvifUrl().toLatin1().data(), imagingUrl.toLatin1().data(),
+        auth.user().toStdString(), auth.password().toStdString(), m_videoSourceToken.toStdString(), getUniqueId());
+
+    if (!imagingUrl.isEmpty()) {
+        settings->makeGetRequest();
+    }
+
+    OnvifCameraSettingReader reader(*settings);
+
+    reader.read() && reader.proceed();
+
+    CameraSettings& onvifSettings = settings->getCameraSettings();
+    CameraSettings::ConstIterator it = onvifSettings.begin();
+
+    for (; it != onvifSettings.end(); ++it) {
+        setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
+    }
+
+    QMutexLocker lock(&m_physicalParamsMutex);
+
+    if (m_onvifAdditionalSettings) {
+        delete m_onvifAdditionalSettings;
+    }
+
+    m_onvifAdditionalSettings = settings;    
 }
 
 int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
