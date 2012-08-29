@@ -73,7 +73,7 @@
 										<include>**/version.h</include>
 										<include>**/filetypes.h</include>
 										<include>**/compatibility_info.cpp</include>
-										<include>*-${arch}*.*</include>
+										<include>*-${arch}*.vcproj</include>
 									</includes>
 								</fileset>								
 								<fileset>

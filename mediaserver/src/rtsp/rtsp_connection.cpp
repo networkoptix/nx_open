@@ -483,6 +483,9 @@ int QnRtspConnectionProcessor::composeDescribe()
     }
 
     //d->metadataChannelNum = i;
+    RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
+    d->trackInfo.insert(d->metadataChannelNum, trackInfo);
+
     sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
     sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
     sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
