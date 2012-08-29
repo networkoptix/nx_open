@@ -73,6 +73,7 @@ public:
 protected:
     inline bool reinitSrc(OnvifCameraSettingsResp& src, bool reinit) const { return !reinit || src.makeGetRequest(); }
     template<class T> bool compareAndSendToCamera(T* field, const T val, OnvifCameraSettingsResp& src) const;
+    float calcStep(double min, double max) const;
 };
 
 class OnvifCameraSettingOperationEmpty: public OnvifCameraSettingOperationAbstract

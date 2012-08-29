@@ -192,6 +192,15 @@ bool OnvifCameraSettingOperationAbstract::compareAndSendToCamera(T* field, const
     return true;
 }
 
+float OnvifCameraSettingOperationAbstract::calcStep(double min, double max) const
+{
+    if (max - min < 1.0 + 0.1) {
+        return 0.1f;
+    }
+
+    return 1.0f;
+}
+
 bool OnvifCameraSettingOperationEmpty::get(CameraSetting&, OnvifCameraSettingsResp&, bool) const
 {
     return true;
@@ -218,7 +227,7 @@ bool ImagingWhiteBalanceYbGainOperation::get(CameraSetting& output, OnvifCameraS
     output.setMin(rangesResp.ImagingOptions->WhiteBalance->YbGain->Min);
     output.setMax(rangesResp.ImagingOptions->WhiteBalance->YbGain->Max);
 
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
 
     output.setCurrent(*(valsResp.ImagingSettings->WhiteBalance->CbGain));
 
@@ -254,7 +263,7 @@ bool ImagingExposureIrisOperation::get(CameraSetting& output, OnvifCameraSetting
 
     output.setMin(rangesResp.ImagingOptions->Exposure->Iris->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->Iris->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->Iris));
 
     return true;
@@ -289,7 +298,7 @@ bool ImagingExposureExposureTimeOperation::get(CameraSetting& output, OnvifCamer
 
     output.setMin(rangesResp.ImagingOptions->Exposure->ExposureTime->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->ExposureTime->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->ExposureTime));
 
     return true;
@@ -394,7 +403,7 @@ bool ImagingExposureMaxGainOperation::get(CameraSetting& output, OnvifCameraSett
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MaxGain->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MaxGain->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxGain));
 
     return true;
@@ -429,7 +438,7 @@ bool ImagingExposureMinExposureTimeOperation::get(CameraSetting& output, OnvifCa
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MinExposureTime->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MinExposureTime->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinExposureTime));
 
     return true;
@@ -464,7 +473,7 @@ bool ImagingBacklightCompensationLevelOperation::get(CameraSetting& output, Onvi
 
     output.setMin(rangesResp.ImagingOptions->BacklightCompensation->Level->Min);
     output.setMax(rangesResp.ImagingOptions->BacklightCompensation->Level->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->BacklightCompensation->Level));
 
     return true;
@@ -499,7 +508,7 @@ bool ImagingContrastOperation::get(CameraSetting& output, OnvifCameraSettingsRes
 
     output.setMin(rangesResp.ImagingOptions->Contrast->Min);
     output.setMax(rangesResp.ImagingOptions->Contrast->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Contrast));
 
     return true;
@@ -573,7 +582,7 @@ bool ImagingSharpnessOperation::get(CameraSetting& output, OnvifCameraSettingsRe
 
     output.setMin(rangesResp.ImagingOptions->Sharpness->Min);
     output.setMax(rangesResp.ImagingOptions->Sharpness->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Sharpness));
 
     return true;
@@ -673,7 +682,7 @@ bool ImagingWhiteBalanceYrGainOperation::get(CameraSetting& output, OnvifCameraS
 
     output.setMin(rangesResp.ImagingOptions->WhiteBalance->YrGain->Min);
     output.setMax(rangesResp.ImagingOptions->WhiteBalance->YrGain->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->WhiteBalance->CrGain));
 
     return true;
@@ -708,7 +717,7 @@ bool ImagingExposureMinGainOperation::get(CameraSetting& output, OnvifCameraSett
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MinGain->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MinGain->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinGain));
 
     return true;
@@ -743,7 +752,7 @@ bool ImagingExposureGainOperation::get(CameraSetting& output, OnvifCameraSetting
 
     output.setMin(rangesResp.ImagingOptions->Exposure->Gain->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->Gain->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->Gain));
 
     return true;
@@ -815,7 +824,7 @@ bool ImagingWideDynamicRangeLevelOperation::get(CameraSetting& output, OnvifCame
 
     output.setMin(rangesResp.ImagingOptions->WideDynamicRange->Level->Min);
     output.setMax(rangesResp.ImagingOptions->WideDynamicRange->Level->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->WideDynamicRange->Level));
 
     return true;
@@ -850,7 +859,7 @@ bool ImagingExposureMaxIrisOperation::get(CameraSetting& output, OnvifCameraSett
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MaxIris->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MaxIris->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxIris));
 
     return true;
@@ -885,7 +894,7 @@ bool ImagingBrightnessOperation::get(CameraSetting& output, OnvifCameraSettingsR
 
     output.setMin(rangesResp.ImagingOptions->Brightness->Min);
     output.setMax(rangesResp.ImagingOptions->Brightness->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Brightness));
 
     return true;
@@ -920,7 +929,7 @@ bool ImagingExposureMinIrisOperation::get(CameraSetting& output, OnvifCameraSett
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MinIris->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MinIris->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MinIris));
 
     return true;
@@ -988,7 +997,7 @@ bool ImagingColorSaturationOperation::get(CameraSetting& output, OnvifCameraSett
 
     output.setMin(rangesResp.ImagingOptions->ColorSaturation->Min);
     output.setMax(rangesResp.ImagingOptions->ColorSaturation->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->ColorSaturation));
 
     return true;
@@ -1023,7 +1032,7 @@ bool ImagingExposureMaxExposureTimeOperation::get(CameraSetting& output, OnvifCa
 
     output.setMin(rangesResp.ImagingOptions->Exposure->MaxExposureTime->Min);
     output.setMax(rangesResp.ImagingOptions->Exposure->MaxExposureTime->Max);
-    output.setStep(1.0);
+    output.setStep(calcStep(output.getMin(), output.getMax()));
     output.setCurrent(*(valsResp.ImagingSettings->Exposure->MaxExposureTime));
 
     return true;
