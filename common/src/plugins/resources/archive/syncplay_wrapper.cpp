@@ -13,11 +13,11 @@ static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
 
 struct ReaderInfo
 {
-    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
+    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam, bool _enabled):
         reader(_reader),
         oldDelegate(_oldDelegate),
         cam(_cam),
-        enabled(true),
+        enabled(_enabled),
         buffering(false),
         isEOF(false),
         paused(false),
@@ -281,7 +281,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     QMutexLocker lock(&d->timeMutex);
 
-    d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
+    d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam, d->enabled);
     
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
