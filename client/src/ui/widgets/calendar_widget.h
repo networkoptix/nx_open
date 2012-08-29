@@ -38,9 +38,11 @@ signals:
     * Signal is emitted when cell was clicked (even if it is already selected date)
     */
     void dateClicked(const QDate &date);
+
 protected:
     bool eventFilter(QObject *watched, QEvent *event);
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
+
 private:
     void updateEmpty();
 
