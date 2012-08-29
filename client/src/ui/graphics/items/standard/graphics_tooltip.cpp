@@ -1,6 +1,8 @@
 #include "graphics_tooltip.h"
 #include "graphics_label.h"
 
+#include <limits>
+
 #include <QtGui/QStyle>
 #include <QtGui/QStyleOption>
 #include <QtGui/QPainter>
@@ -45,11 +47,6 @@ QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsIt
     delete instance;
     instance = this;
     setFlags(flags() | QGraphicsItem::ItemIgnoresTransformations);
-    //setPerformanceHint(QStaticText::AggressiveCaching);
-  //  setFrameShape(GraphicsFrame::Box);
-
-    QPointF scenePos;
-    setPos(scenePos);
     setPalette(QToolTip::palette());
     qApp->installEventFilter(this);
     reuseTip(text, newItem);
@@ -72,19 +69,20 @@ void QnGraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *new
     if (item)
         item->removeSceneEventFilter(this);
 #ifdef NOPARENT
-    if (scene())
-        scene()->removeItem(this);
-    newItem->scene()->addItem(this);
+    if (scene() != newItem->scene()){
+        if (scene())
+            scene()->removeItem(this);
+        newItem->scene()->addItem(this);
+    }
 #else
-    // required to calculate size corectly
     this->setParentItem(newItem);
 #endif
 
     item = newItem;
+
+    setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
-    qDebug() << "self width before resize" << sceneBoundingRect().width();
     resize(sizeHint(Qt::PreferredSize));
-    qDebug() << "self width after resize" << sceneBoundingRect().width();
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); // this wont be undone, can be stored in inner field
     restartExpireTimer();
@@ -123,15 +121,12 @@ bool QnGraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
 
 void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 {
-    // ensure that mouse cursor is inside rect
     QPointF p = pos;
 
     // default pos - below the button and below the cursor
-    qDebug() << "item y from" << item->sceneBoundingRect().y()  << "to" << item->sceneBoundingRect().y() + item->sceneBoundingRect().height();
-    qDebug() << "cursor y" << p.y();
-    p.setY(qMax(p.y(), item->sceneBoundingRect().y() + item->sceneBoundingRect().height()));
+    QRectF cursorRect = item->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
 
-    qDebug() << "scene transofrm" <<  sceneTransform();
+    p.setY(qMax(p.y() + cursorRect.height(), item->sceneBoundingRect().y() + item->sceneBoundingRect().height()));
 
 #ifdef NOPARENT
     QRectF self = item->sceneTransform().mapRect(this->boundingRect());
@@ -139,11 +134,6 @@ void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport
     QRectF self = this->sceneBoundingRect();
 #endif
 
-    qDebug() << "self x" << p.x();
-    qDebug() << "self width" << self.width();
-
-
-    qDebug() << "viewport from" << viewport.x() << "to" << viewport.x() + viewport.width();
     if (p.x() + self.width() > viewport.x() + viewport.width())
         p.setX(viewport.x() + viewport.width() - self.width());
 
@@ -157,8 +147,6 @@ void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport
     // if cursor is too low, place tip over the button
     if (p.y() + self.height() > viewport.y() + viewport.height())
         p.setY(item->sceneBoundingRect().y() - self.height());
-
-    qDebug() << "result y" << p.y();
 
 #ifdef NOPARENT
     this->setPos(p);
