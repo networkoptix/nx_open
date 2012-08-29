@@ -202,8 +202,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator = new QnCurtainAnimator(this);
     m_curtainAnimator->setSpeed(1.0); /* (255, 0, 0) -> (0, 0, 0) in 1 second. */
     m_curtainAnimator->setTimer(animationTimer);
-    connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
-    connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
+    connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(updateCurtainedCursor()));
+    connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(updateCurtainedCursor()));
 
     /* Create viewport animator. */
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
@@ -312,7 +312,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), Qn::CurtainLayer);
+    setLayer(m_curtainItem.data(), Qn::BackLayer);
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
@@ -563,6 +563,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         /* Update margin flags. */
         updateCurrentMarginFlags();
+
+        /* Update curtain. */
+        if(m_curtainAnimator->isCurtained())
+            updateCurtainedCursor();
 
         break;
     }
@@ -1236,6 +1240,13 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
 }
 
+void QnWorkbenchDisplay::updateCurtainedCursor() {
+    bool curtained = m_curtainAnimator->isCurtained();
+
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
@@ -1429,24 +1440,6 @@ void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
     foreach(QnResourceWidget *widget, m_widgetByRenderer) 
         widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
-}
-
-void QnWorkbenchDisplay::at_curtained() {
-    QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
-    foreach(QnResourceWidget *widget, m_widgetByItem)
-        if(widget != zoomedWidget)
-            widget->hide();
-
-    if(m_view != NULL)
-        m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
-}
-
-void QnWorkbenchDisplay::at_uncurtained() {
-    foreach(QnResourceWidget *widget, m_widgetByItem)
-        widget->show();
-
-    if(m_view != NULL)
-        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {

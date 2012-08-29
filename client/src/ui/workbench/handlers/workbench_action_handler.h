@@ -9,6 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "../workbench_globals.h"
 
 class QAction;
 class QMenu;
@@ -229,6 +230,7 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_rejected();
+    void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
@@ -269,10 +271,20 @@ protected slots:
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
-    void at_togglePanicModeAction_toggled(bool);
+    void at_togglePanicModeAction_toggled(bool checked);
+
+    void at_toggleTourAction_toggled(bool checked);
+    void at_tourTimer_timeout();
+    void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);
+
+
+    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
+
+private:
+    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -299,6 +311,9 @@ private:
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;
+
+
+    QTimer *m_tourTimer;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
