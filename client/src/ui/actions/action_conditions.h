@@ -254,5 +254,13 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnToggleTourActionCondition: public QnActionCondition {
+public:
+    QnToggleTourActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
 
 #endif // QN_ACTION_CONDITIONS_H

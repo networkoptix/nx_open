@@ -148,8 +148,10 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
-    m_layoutExportCamera(0)
+    m_layoutExportCamera(0),
+    m_tourTimer(new QTimer())
 {
+    connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -225,6 +227,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+    connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
 
     /* Run handlers that update state. */
@@ -2073,3 +2076,38 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
     }
 }
 
+void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
+    if(!checked) {
+        m_tourTimer->stop();
+    } else {
+        m_tourTimer->start(2000);
+        at_tourTimer_timeout();
+    }
+}
+
+struct ItemPositionCmp {
+    bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
+        QRect lg = l->geometry();
+        QRect rg = r->geometry();
+        return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+    }
+};
+
+
+void QnWorkbenchActionHandler::at_tourTimer_timeout() {
+    QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
+    qSort(items.begin(), items.end(), ItemPositionCmp());
+
+    if(items.empty()) {
+        action(Qn::ToggleTourModeAction)->setChecked(false);
+        return;
+    }
+
+    QnWorkbenchItem *item = context()->workbench()->item(Qn::ZoomedRole);
+    if(item) {
+        item = items[(items.indexOf(item) + 1) % items.size()];
+    } else {
+        item = items[0];
+    }
+    context()->workbench()->setItem(Qn::ZoomedRole, item);
+}

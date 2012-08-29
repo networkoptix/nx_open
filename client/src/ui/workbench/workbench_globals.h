@@ -100,7 +100,6 @@ namespace Qn {
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */

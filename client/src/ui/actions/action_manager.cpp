@@ -465,7 +465,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
     if (QnScreenRecorder::isSupported()){
-        factory(Qn::ScreenRecordingAction).
+        factory(Qn::ToggleScreenRecordingAction).
             flags(Qn::Main).
             text(tr("Start Screen Recording")).
             toggledText(tr("Stop Screen Recording")).
@@ -822,6 +822,12 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("Large"));
 
     } factory.leaveSubMenu();
+
+    factory(Qn::ToggleTourModeAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Start Tour")).
+        toggledText(tr("Stop Tour")).
+        condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).

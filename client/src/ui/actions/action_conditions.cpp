@@ -284,3 +284,7 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return Qn::DisabledAction;
 }
 
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+    return context()->workbench()->currentLayout()->items().empty() ? Qn::DisabledAction : Qn::EnabledAction;
+}
+

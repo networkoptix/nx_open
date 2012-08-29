@@ -269,10 +269,14 @@ protected slots:
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
-    void at_togglePanicModeAction_toggled(bool);
+    void at_togglePanicModeAction_toggled(bool checked);
+
+    void at_toggleTourAction_toggled(bool checked);
+    void at_tourTimer_timeout();
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);
+
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -299,6 +303,9 @@ private:
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;
+
+
+    QTimer *m_tourTimer;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H
