@@ -469,8 +469,12 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if(!cameraSettingsDialog())
         return;
 
-    if(!cameraSettingsDialog()->widget()->hasChanges())
+    bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
+    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
+
+    if (!hasDbChanges && !hasCameraChanges) {
         return;
+    }
 
     QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
     if(cameras.empty())
@@ -491,10 +495,62 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-    
+
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
-    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+
+    if (hasDbChanges) {
+        connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
+
+    if (hasCameraChanges) {
+        saveAdvancedCameraSettingsAsync(cameras);
+    }
+}
+
+void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras)
+{
+    if (cameraSettingsDialog()->widget()->mode() != QnCameraSettingsWidget::SingleMode || cameras.size() != 1)
+    {
+        //Advanced camera settings must be available only for single mode
+        Q_ASSERT(false);
+    }
+
+    QnVirtualCameraResourcePtr cameraPtr = cameras.front();
+    QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
+    if (serverConnectionPtr.isNull())
+    {
+        QString error = QString::fromLatin1("Currently parameters can't be saved. Connection refused.");
+
+        QString failedParams;
+        QList< QPair< QString, QVariant> >::ConstIterator it =
+            cameraSettingsDialog()->widget()->getModifiedAdvancedParams().begin();
+        for (; it != cameraSettingsDialog()->widget()->getModifiedAdvancedParams().end(); ++it)
+        {
+            QString formattedParam(it->first.right(it->first.length() - 2));
+            failedParams += QString::fromLatin1("\n");
+            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+        }
+
+        if (!failedParams.isEmpty()) {
+            QnResourceListDialog::exec(
+                widget(),
+                QnResourceList(),
+                tr("Error"),
+                tr(error.toLatin1()),
+                tr("Failed to save the following parameters:\n%1").arg(failedParams),
+                QDialogButtonBox::Ok
+                );
+
+            cameraSettingsDialog()->widget()->updateFromResources();
+        }
+
+        return;
+    }
+
+    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
+    serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
+        this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -1230,10 +1286,13 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
+        connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
     }
 
     if(cameraSettingsDialog()->widget()->resources() != resources) {
-        if(cameraSettingsDialog()->isVisible() && cameraSettingsDialog()->widget()->hasChanges()) {
+        if(cameraSettingsDialog()->isVisible() && (
+           cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
+        {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
                 widget(), 
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
@@ -1270,6 +1329,24 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
     cameraSettingsDialog()->widget()->updateFromResources();
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsAdvanced_changed() {
+    if(!cameraSettingsDialog())
+        return;
+
+    bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
+
+    if (!hasCameraChanges) {
+        return;
+    }
+
+    QnVirtualCameraResourceList cameras = cameraSettingsDialog()->widget()->cameras();
+    if(cameras.empty())
+        return;
+
+    cameraSettingsDialog()->widget()->submitToResources();
+    saveAdvancedCameraSettingsAsync(cameras);
 }
 
 void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
@@ -1810,6 +1887,37 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
         camera->stopExport();
 
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
+{
+    QString error = QString::fromLatin1("Currently parameters can't be saved. ");
+    error += httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now."):
+        QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
+
+    QString failedParams;
+    QList<QPair<QString, bool> >::ConstIterator it = operationResult.begin();
+    for (; it != operationResult.end(); ++it)
+    {
+        if (!it->second) {
+            QString formattedParam(QString::fromLatin1("Advanced->") + it->first.right(it->first.length() - 2));
+            failedParams += QString::fromLatin1("\n");
+            failedParams += formattedParam.replace(QString::fromLatin1("%%"), QString::fromLatin1("->"));
+        }
+    }
+
+    if (!failedParams.isEmpty()) {
+        QnResourceListDialog::exec(
+            widget(),
+            QnResourceList(),
+            tr("Error"),
+            tr(error.toLatin1()),
+            tr("Failed to save the following parameters:\n%1").arg(failedParams),
+            QDialogButtonBox::Ok
+            );
+
+        //ToDo: restore old values by invoking smth like updateFromResource();
+    }
 }
 
 void QnWorkbenchActionHandler::at_exportTimeSelectionAction_triggered() {

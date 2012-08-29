@@ -2,6 +2,7 @@
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
+#include "api/video_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 
@@ -29,8 +30,20 @@ public:
     void updateFromResources();
     void submitToResources();
 
-    bool hasChanges() const {
-        return m_hasChanges;
+    bool hasDbChanges() const {
+        return m_hasDbChanges;
+    }
+
+    const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
+        //Currently this ability avaible only for single camera settings
+        Q_ASSERT(false);
+        return *(new QList< QPair< QString, QVariant> >);
+    }
+
+    QnVideoServerConnectionPtr getServerConnection() const {
+        //This ability avaible only for single camera settings
+        Q_ASSERT(false);
+        return QnVideoServerConnectionPtr(0);
     }
 
     bool isReadOnly() const;
@@ -41,20 +54,20 @@ signals:
     void moreLicensesRequested();
 
 private slots:
-    void at_dataChanged();
+    void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
 private:
-    void setHasChanges(bool hasChanges);
+    void setHasDbChanges(bool hasChanges);
 
 private:
     Q_DISABLE_COPY(QnMultipleCameraSettingsWidget);
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;
-    bool m_hasChanges;
+    bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
     bool m_readOnly;

@@ -4,7 +4,8 @@
 
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
-      m_audioEnabled(false)
+      m_audioEnabled(false),
+      m_advancedWorking(false)
 {
 }
 
@@ -143,4 +144,14 @@ void QnVirtualCameraResource::setAudioEnabled(bool enabled)
 bool QnVirtualCameraResource::isAudioEnabled() const
 {
     return m_audioEnabled;
+}
+
+bool QnVirtualCameraResource::isAdvancedWorking() const
+{
+    return m_advancedWorking;
+}
+
+void QnVirtualCameraResource::setAdvancedWorking(bool value)
+{
+    m_advancedWorking = value;
 }
