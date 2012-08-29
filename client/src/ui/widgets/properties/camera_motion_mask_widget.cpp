@@ -56,6 +56,7 @@ void QnCameraMotionMaskWidget::init() {
 
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(NULL, this));
+    m_context->workbench()->setCurrentLayout(new QnWorkbenchLayout(this));
     
     QnWorkbenchDisplay *display = m_context->display();
     display->setScene(m_scene.data());
