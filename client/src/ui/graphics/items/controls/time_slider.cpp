@@ -1738,7 +1738,7 @@ void QnTimeSlider::tick(int deltaMSecs) {
     if(!m_animating) {
         animateStepValues(deltaMSecs);
     } else {
-        qreal distance = std::abs(m_animationStart - m_windowStart) + std::abs(m_animationEnd - m_windowEnd);
+        qreal distance = qAbs(m_animationStart - m_windowStart) + qAbs(m_animationEnd - m_windowEnd);
         qreal delta = 8.0 * deltaMSecs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
 
         if(delta > distance) {
