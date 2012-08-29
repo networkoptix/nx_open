@@ -67,8 +67,8 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 // class CameraSettingsWidgetsCreator
 //
 
-CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget,
-        QStackedLayout& rootLayout, WidgetsById& widgetsById, LayoutIndById& layoutIndById, QObject* handler):
+CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
+        WidgetsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, QObject* handler):
     CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
@@ -76,6 +76,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     m_rootLayout(rootLayout),
     m_widgetsById(widgetsById),
     m_layoutIndById(layoutIndById),
+    m_settingsWidgetsById(settingsWidgetsById),
     m_handler(handler),
     m_owner(0),
     m_emptyGroupsById()
@@ -422,6 +423,7 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_rootLayout(rootLayout),
     m_widgetsById(),
     m_layoutIndById(),
+    m_settingsWidgetsById(),
     m_handler(handler),
     m_settings(0),
     m_id(id),
@@ -440,7 +442,8 @@ CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById, m_layoutIndById, m_handler);
+    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById,
+        m_layoutIndById, m_settingsWidgetsById, m_handler);
 }
 
 CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()

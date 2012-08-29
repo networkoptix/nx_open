@@ -180,7 +180,7 @@
              query = "wbred1"/>
 
         <param name = "Blue"
-             description = "White Balance Red Offset"
+             description = "White Balance Blue Offset"
              widget_type = "MinMaxStep"
              min = "0"
              max = "20"
