@@ -17,9 +17,11 @@
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
+class onvifXsd__VideoEncoderConfiguration;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
+typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -128,7 +130,7 @@ public:
 
     void setDeviceOnvifUrl(const QString& src);
 
-    CODECS getCodec() const;
+    CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
@@ -136,7 +138,7 @@ public:
     bool forcePrimaryEncoderCodec() const;
 
 protected:
-    void setCodec(CODECS c);
+    void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
     bool initInternal() override;
@@ -183,7 +185,8 @@ private:
     static float getResolutionAspectRatio(const ResolutionPair& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int getH264StreamProfile(const VideoOptionsResp& response);
-
+    void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
+    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
@@ -203,7 +206,8 @@ private:
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
-    CODECS m_codec;
+    CODECS m_primaryCodec;
+    CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;

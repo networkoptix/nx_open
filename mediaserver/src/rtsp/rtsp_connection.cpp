@@ -483,6 +483,9 @@ int QnRtspConnectionProcessor::composeDescribe()
     }
 
     //d->metadataChannelNum = i;
+    RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
+    d->trackInfo.insert(d->metadataChannelNum, trackInfo);
+
     sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
     sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
     sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
@@ -564,8 +567,8 @@ int QnRtspConnectionProcessor::composeSetup()
                     trackInfo->clientRtcpPort = ports[1].toInt();
                     if (!d->tcpMode) {
                         if (trackInfo->openServerSocket(d->socket->getPeerAddress())) {
-                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket.getLocalPort()));
-                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket.getLocalPort()));
+                            transport.append(";server_port=").append(QByteArray::number(trackInfo->mediaSocket->getLocalPort()));
+                            transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
                         }
                     }
                 }
@@ -852,6 +855,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->thumbnailsDP->addDataProcessor(d->dataProcessor);
         d->thumbnailsDP->setRange(d->startTime, d->endTime, d->requestHeaders.value("x-media-step").toLongLong(), d->lastPlayCSeq);
+        d->thumbnailsDP->setQuality(d->quality);
     }
 
     addResponseRangeHeader();

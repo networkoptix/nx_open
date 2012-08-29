@@ -20,12 +20,12 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
 
     result.append("<storages>\n");
 
-    QList<int> hddUsage;
+    QList<QnPerformance::QnHddData> hddUsage;
     QnPerformance::currentHddUsage(&hddUsage);
     for (int i = 0; i < hddUsage.count(); i++){
         result.append("<storage>\n");
-        result.append(QString("<url>HDD%1</url>\n").arg(i));
-        result.append(QString("<usage>%1</usage>\n").arg(hddUsage.at(i)));
+        result.append(QString("<url>%1</url>\n").arg(hddUsage.at(i).name));
+        result.append(QString("<usage>%1</usage>\n").arg(hddUsage.at(i).usage));
         result.append("</storage>\n");
     }
     result.append("</storages>\n");

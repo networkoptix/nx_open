@@ -15,38 +15,14 @@
 	<name>Common POM for cpp projects</name>
 
 	<properties>
-		<assembly-skip>false</assembly-skip>
-		<convert-only>true</convert-only>
-		<ffmpeg.version>git-SNAPSHOT</ffmpeg.version>
-		<openssl.version>1.0.0j-custom</openssl.version>
-		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
-		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<buildLib/>
-		<qtlib1/>
-		<qtlib2/>
-		<qtlib3/>
-		<qtlib4/>
-		<qtlib5/>
-		<qtlib6/>
-		<qtlib7/>
-		<qtlib8/>
-		<qtlib9/>	
 	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>org</groupId>
-			<artifactId>openssl</artifactId>
-			<version>${openssl.version}</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>
-	</dependencies>		
 
 	<build>
 		<directory>${arch}</directory>
 		<outputDirectory>${arch}</outputDirectory>
-		<sourceDirectory>${basedir}/src</sourceDirectory> 	
+		<sourceDirectory>${basedir}/src</sourceDirectory> 
+		<defaultGoal>compile</defaultGoal>
 		<plugins>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -61,6 +37,7 @@
 						<configuration>
 							<files>
 								<file>../build-${customization}.properties</file>
+								<file>../build-environment/${arch}/libdir.properties</file>
 							</files>
 						</configuration>
 					</execution>
@@ -96,6 +73,19 @@
 										<include>**/version.h</include>
 										<include>**/filetypes.h</include>
 										<include>**/compatibility_info.cpp</include>
+										<include>*-${arch}*.vcproj</include>
+									</includes>
+								</fileset>								
+								<fileset>
+									<directory>${libdir}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<includes>
+										<include>**/${project.artifactId}.lib</include>
+										<include>**/${project.artifactId}.exe</include>
+										<include>**/${project.artifactId}.so</include>
+										<include>**/${project.artifactId}</include>
+										<include>**/${project.artifactId}-bin</include>
 									</includes>
 								</fileset>								
 							</filesets>
@@ -188,18 +178,23 @@
 							<target>							
 								<chmod file="${project.build.directory}/*.sh" perm="755"/>
 
-								<!-- This ugly hack prevents creating symlinks instead of text files (this is known unzip issue).
-								First everything except *.h is unpacked then *.h only -->
+								<!--<if>
+									<not>
+										<available file="${libdir}/build/bin/debug/common.lib"/>
+									</not>
+									<then>
+										<echo file="${libdir}/build/bin/debug/common.lib" append="false"/>
+									</then>
+								</if>
 
-								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip -x **/include/** *.a"/>
-								</exec>
-								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip **/include/**"/>
-								</exec>
-								<exec dir="${project.build.directory}" executable="unzip" failifexecutionfails="false">
-									<arg line="-a -u *.zip *.a"/>
-								</exec>                             
+								<if>
+									<not>
+										<available file="${libdir}/build/bin/release/common.lib"/>
+									</not>
+									<then>
+										<echo file="${libdir}/build/bin/release/common.lib" append="false"/>
+									</then>
+								</if> -->
 
 								<concat destfile="${project.build.directory}/${project.artifactId}.pro" append="false">
 									<filelist dir="${project.build.directory}" files="template.pro"/>
@@ -209,53 +204,65 @@
 									<filelist dir="${project.build.directory}" files="${project.artifactId}-specifics.pro"/>
 								</concat>								
 
-								<dirset id="includes_path" dir="${project.build.directory}/build/include" includes="*" erroronmissingdir="false"/>
+								<dirset id="includes_path" dir="${libdir}/build/include" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="includes" refid="includes_path">
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes}</echo>
 
-								<fileset id="debug_libs_path" dir="${project.build.directory}/build/bin/debug" erroronmissingdir="false">
+								<fileset id="debug_libs_path" dir="${libdir}/build/bin/debug" erroronmissingdir="false">
 									<include name="**/*.lib" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="debug_libs" refid="debug_libs_path">
-									<map from="${project.build.directory}/build/bin/debug/" to="     LIBS += -l"/>									
+									<map from="${libdir}/build/bin/debug/" to="     LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${debug_libs}${line.separator}}</echo>
 
-								<fileset id="release_libs_path" dir="${project.build.directory}/build/bin/release" erroronmissingdir="false">
+								<fileset id="release_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
 									<include name="**/*.lib" />
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="release_libs" refid="release_libs_path">
-									<map from="${project.build.directory}/build/bin/release/" to="    LIBS += -l"/>									
+									<map from="${libdir}/build/bin/release/" to="    LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.lib$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${release_libs}${line.separator}}</echo>
 
-								<fileset id="linux_debug_libs_path" dir="${project.build.directory}/build/bin/debug" erroronmissingdir="false">
+								<fileset id="linux_debug_libs_path" dir="${libdir}/build/bin/debug" erroronmissingdir="false">
 									<include name="**/*.so" />
 									<include name="**/*.a" />
+									<exclude name="**/libcommon.a" />																		
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(debug, debug|release) {</echo>
 								<pathconvert pathsep="${line.separator}" property="linux_debug_libs" refid="linux_debug_libs_path">
-									<map from="${project.build.directory}/build/bin/debug/lib" to="     LIBS += -l"/>									
+									<map from="${libdir}/build/bin/debug/lib" to="    LIBS += -l"/>									
 									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_debug_libs}${line.separator}}</echo>
 
-								<fileset id="linux_release_libs_path" dir="${project.build.directory}/build/bin/release" erroronmissingdir="false">
+								<fileset id="linux_release_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
+									<include name="**/*.so" />
+									<include name="**/*.a" />									
+									<exclude name="**/libcommon.a" />									
+								</fileset>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
+								<pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
+									<map from="${libdir}/build/bin/release/lib" to="    LIBS += -l"/>									
+									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
+								
+								<!--<fileset id="linux_release_link_libs_path" dir="${libdir}/build/bin/release" erroronmissingdir="false">
 									<include name="**/*.so" />
 									<include name="**/*.a" />									
 								</fileset>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}CONFIG(release, debug|release) {</echo>
-								<pathconvert pathsep="${line.separator}" property="linux_release_libs" refid="linux_release_libs_path">
-									<map from="${project.build.directory}/build/bin/release/lib" to="    LIBS += -l"/>									
-									<regexpmapper from="^(.*)\.(.*)$$" to="\1"/>
+								<pathconvert pathsep="${line.separator}" property="linux_release_link_libs" refid="linux_release_link_libs_path">
+									<map from="" to="    QMAKE_LFLAGS += "/>									
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_libs}${line.separator}}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${linux_release_link_libs}${line.separator}}</echo>	-->							
 
 								<fileset id="headers_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.h" />
@@ -266,7 +273,7 @@
 								</pathconvert>									
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${headers}</echo>
 
-								<!--<fileset id="libs_headers_path" dir="${project.build.directory}" erroronmissingdir="false">
+								<!--<fileset id="libs_headers_path" dir="${libdir}" erroronmissingdir="false">
 									<include name="**/*.c" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="libs_headers" refid="libs_headers_path">
@@ -284,7 +291,7 @@
 								</pathconvert>
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${sources}</echo>
 
-								<!-- <fileset id="add_sources_path" dir="${project.build.directory}/build/include" erroronmissingdir="false">
+								<!-- <fileset id="add_sources_path" dir="${libdir}/build/include" erroronmissingdir="false">
 									<include name="**/*.cpp" />
 									<include name="**/*.cc" />
 									<include name="**/*.c" />
@@ -318,20 +325,20 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${forms}</echo>
 
-								<dirset id="includes_pri_path" dir="${project.build.directory}/build/pri" includes="*" erroronmissingdir="false"/>
+								<!-- <dirset id="includes_pri_path" dir="${libdir}/build/pri" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="includes_pri" refid="includes_pri_path">
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes_pri}</echo>	
 
-								<fileset id="pri_path" dir="${project.build.directory}/build/pri" erroronmissingdir="false">
+								<fileset id="pri_path" dir="${libdir}/build/pri" erroronmissingdir="false">
 									<include name="**/*/*.pri" />
 								</fileset>
 								<pathconvert pathsep="${line.separator}" property="pri" refid="pri_path">
 									<map from="" to="include("/>
 									<globmapper from="*.pri" to="*.pri)"/>
 								</pathconvert>								
-								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri}</echo>
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${pri}</echo> -->
 
 								<fileset id="proto_path" dir="${project.build.sourceDirectory}" erroronmissingdir="false">
 									<include name="**/*.proto" />
@@ -356,17 +363,7 @@
 					<family>Windows</family>
 				</os>
 			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.ffmpeg</groupId>
-					<artifactId>ffmpeg-misc-headers-win32</artifactId>
-					<version>dev</version>
-					<type>zip</type>
-					<classifier>${platform}</classifier>	
-				</dependency>		
-			</dependencies>			
 			<properties>
-				<qtlib9>multimedia</qtlib9>
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
@@ -436,102 +433,6 @@
 							</execution>
 						</executions>
 					</plugin>
-
-					<!--<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>unpack-platform-libs</id>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>unpack-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin> -->
-					<plugin>
-						<groupId>com.goldin.plugins</groupId>
-						<artifactId>maven-copy-plugin</artifactId>
-						<version>0.2.3.8-beta-9</version>
-						<executions>
-							<execution>
-								<id>copy-qt-libraries</id>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<runIf>{{ buildLib != "staticlib" }}</runIf>
-									<failIfNotFound>false</failIfNotFound>
-									<resources>
-										<resource>
-											<targetPath>${project.build.directory}/bin</targetPath>
-											<directory>${environment.dir}/qt/bin/${arch}</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>**/qt${qtlib1}4.*</include>
-												<include>**/qt${qtlib2}4.*</include>
-												<include>**/qt${qtlib3}4.*</include>
-												<include>**/qt${qtlib4}4.*</include>
-												<include>**/qt${qtlib5}4.*</include>
-												<include>**/qt${qtlib6}4.*</include>
-												<include>**/qt${qtlib7}4.*</include>
-												<include>**/qt${qtlib8}4.*</include>
-												<include>**/qt${qtlib9}4.*</include>
-												<include>**/qt${qtlib1}d4.*</include>
-												<include>**/qt${qtlib2}d4.*</include>
-												<include>**/qt${qtlib3}d4.*</include>
-												<include>**/qt${qtlib4}d4.*</include>
-												<include>**/qt${qtlib5}d4.*</include>
-												<include>**/qt${qtlib6}d4.*</include>
-												<include>**/qt${qtlib7}d4.*</include>
-												<include>**/qt${qtlib8}d4.*</include>
-												<include>**/qt${qtlib9}d4.*</include>												
-											</includes>
-											<excludes>
-												<exclude>**/*.lib</exclude>
-											</excludes>
-										</resource>
-										<resource>
-											<targetPath>${project.build.directory}/bin</targetPath>
-											<directory>${environment.dir}/qt/plugins/${arch}</directory>
-											<preservePath>true</preservePath>
-											<includes>
-												<include>*/${qtplugin1}/**</include>
-												<include>*/${qtplugin2}/**</include>
-												<include>*/${qtplugin3}/**</include>
-											</includes>										
-										</resource>	
-									</resources>								
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
-
-					<plugin>
-						<artifactId>maven-assembly-plugin</artifactId>
-						<version>2.2.2</version>
-						<executions>
-							<execution>
-								<id>pack-binaries</id>
-								<phase>package</phase>
-								<goals>
-									<goal>single</goal>
-								</goals>
-								<configuration>
-									<descriptors>
-										<descriptor>${project.build.directory}/binaries-${build.configuration}.xml</descriptor>
-									</descriptors>	
-									<skip>${assembly-skip}</skip>									
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>					
 				</plugins>
 			</build>
 		</profile>
@@ -550,23 +451,6 @@
 			</properties>
 			<build>	
 				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>copy-platform-libs</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
@@ -618,7 +502,7 @@
 						</executions>
 					</plugin>
 
-					<plugin>
+					<!--<plugin>
 						<artifactId>maven-assembly-plugin</artifactId>
 						<version>2.2.2</version>
 						<executions>
@@ -635,7 +519,7 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
+					</plugin>-->
 				</plugins>	
 			</build>			
 		</profile>	

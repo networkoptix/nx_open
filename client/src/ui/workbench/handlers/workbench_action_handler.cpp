@@ -17,6 +17,7 @@
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
+#include <utils/common/time.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -76,6 +77,7 @@
 
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
+#include "../extensions/workbench_stream_synchronizer.h"
 
 
 
@@ -146,8 +148,11 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
-    m_layoutExportCamera(0)
+    m_layoutExportCamera(0),
+    m_tourTimer(new QTimer())
 {
+    connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
+    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -223,6 +228,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
+    connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
 
     /* Run handlers that update state. */
@@ -770,8 +776,6 @@ void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
     arguments << QLatin1String("--delayed-drop");
     arguments << QLatin1String(serializedData.toBase64().data());
 
-    qDebug() << "args";
-    qDebug() << arguments[1];
     openNewWindow(arguments);
 }
 
@@ -1170,7 +1174,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
         1000ll * 60,                    /* 1 minute. */
-        1000ll * 60 * 10,               /* 5 minutes. */
+        1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
@@ -1179,7 +1183,12 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 60 * 24 * 30,     /* 30 days. */
         0,
     };
-    const qint64 maxItems = 12; // TODO: take it from config?
+    const qint64 maxItems = 16; // TODO: take it from config?
+
+    if(period.durationMs < steps[1]) {
+        QMessageBox::warning(widget(), tr("Could not perform thumbnails search"), tr("Selected time period is too short to perform thumbnails search. Please select a longer period."), QMessageBox::Ok);
+        return;
+    }
 
     /* Find best time step. */
     qint64 step = 0;
@@ -1198,9 +1207,33 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         step = period.durationMs / itemCount;
     } else {
         /* In this case we want to adjust the period. */
-        qint64 startTime = qFloor(period.startTimeMs, step);
-        qint64 endTime = qCeil(period.endTimeMs(), step);
-        period = QnTimePeriod(startTime, endTime - startTime);
+
+        if(resource->flags() & QnResource::utc) {
+            QDateTime startDateTime = QDateTime::fromMSecsSinceEpoch(period.startTimeMs);
+            QDateTime endDateTime = QDateTime::fromMSecsSinceEpoch(period.endTimeMs());
+            const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
+
+            if(step < dayMSecs) {
+                QTime base;
+
+                startDateTime.setTime(msecsToTime(qFloor(timeToMSecs(startDateTime.time()), step)));
+                endDateTime.setTime(msecsToTime(qCeil(timeToMSecs(endDateTime.time()), step)));
+            } else {
+                int stepDays = step / dayMSecs;
+
+                startDateTime.setTime(QTime());
+                startDateTime.setDate(QDate::fromJulianDay(qFloor(startDateTime.date().toJulianDay(), stepDays)));
+
+                endDateTime.setTime(QTime());
+                endDateTime.setDate(QDate::fromJulianDay(qCeil(endDateTime.date().toJulianDay(), stepDays)));
+            }
+
+            period = QnTimePeriod(startDateTime.toMSecsSinceEpoch(), endDateTime.toMSecsSinceEpoch() - startDateTime.toMSecsSinceEpoch());
+        } else {
+            qint64 startTime = qFloor(period.startTimeMs, step);
+            qint64 endTime = qCeil(period.endTimeMs(), step);
+            period = QnTimePeriod(startTime, endTime - startTime);
+        }
 
         itemCount = period.durationMs / step;
     }
@@ -1213,10 +1246,10 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
-    layout->setParentId(context()->user()->getId());
-    //layout->setTimeBounds(period);
+    if(context()->user())
+        layout->setParentId(context()->user()->getId());
 
-    QnLayoutItemDataList items;
+    qint64 time = period.startTimeMs;
     for(int i = 0; i < itemCount; i++) {
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1224,38 +1257,23 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
         item.resource.path = resource->getUniqueId();
+        item.dataByRole[Qn::ItemPausedRole] = true;
+        item.dataByRole[Qn::ItemSliderSelectionRole] = QVariant::fromValue<QnTimePeriod>(QnTimePeriod(time, step));
+        item.dataByRole[Qn::ItemSliderWindowRole] = QVariant::fromValue<QnTimePeriod>(period);
+        item.dataByRole[Qn::ItemTimeRole] = time;
 
-        items.push_back(item);
         layout->addItem(item);
-    }
-
-    resourcePool()->addResource(layout);
-    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-
-    /* Navigate. */
-    display()->setStreamsSynchronized(NULL);
-    qint64 time = period.startTimeMs;
-    foreach(const QnLayoutItemData &item, items) {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(display()->widget(context()->workbench()->currentLayout()->item(item.uuid)));
-        if(!widget)
-            continue;
-
-        // TODO: don't start reader!
-
-        /* TODO: this code does not belong here. */
-        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        //widget->display()->archiveReader()->pauseMedia();
-        //widget->display()->camDisplay()->playAudio(false);
-        //widget->display()->archiveReader()->setSingleShotMode(true);
-
-        widget->setDecorationsVisible(true, false);
-        widget->setInfoVisible(true, false);
-        widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
-
-        //navigator()->setUserData(widget, period, QnTimePeriod(time, step), true);
 
         time += step;
     }
+
+    layout->setData(Qn::LayoutTimeLabelsRole, true);
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+    layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+    layout->setData(Qn::LayoutSearchStateRole, QVariant::fromValue<QnThumbnailsSearchState>(QnThumbnailsSearchState(period, step)));
+
+    resourcePool()->addResource(layout);
+    menu()->trigger(Qn::OpenSingleLayoutAction, layout);
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
@@ -1505,13 +1523,10 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->setEditorRights(accessController()->rights());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    if(accessController()->isOwner()) {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible | QnUserSettingsDialog::Editable);
-    } else {
-        dialog->setElementFlags(QnUserSettingsDialog::AccessRights, QnUserSettingsDialog::Visible);
-    }
+
 
     if(!dialog->exec())
         return;
@@ -1663,6 +1678,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
+    dialog->setEditorRights(accessController()->rights());
     
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
@@ -2169,3 +2185,42 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
     }
 }
 
+void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
+    if(!checked) {
+        m_tourTimer->stop();
+    } else {
+        m_tourTimer->start(2000);
+        at_tourTimer_timeout();
+    }
+}
+
+struct ItemPositionCmp {
+    bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
+        QRect lg = l->geometry();
+        QRect rg = r->geometry();
+        return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+    }
+};
+
+void QnWorkbenchActionHandler::at_tourTimer_timeout() {
+    QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
+    qSort(items.begin(), items.end(), ItemPositionCmp());
+
+    if(items.empty()) {
+        action(Qn::ToggleTourModeAction)->setChecked(false);
+        return;
+    }
+
+    QnWorkbenchItem *item = context()->workbench()->item(Qn::ZoomedRole);
+    if(item) {
+        item = items[(items.indexOf(item) + 1) % items.size()];
+    } else {
+        item = items[0];
+    }
+    context()->workbench()->setItem(Qn::ZoomedRole, item);
+}
+
+void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
+    if(!workbench()->item(Qn::ZoomedRole))
+        action(Qn::ToggleTourModeAction)->setChecked(false);
+}

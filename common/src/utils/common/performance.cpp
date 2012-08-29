@@ -28,7 +28,7 @@
 
 
 /** statistics usage update timer, in seconds. */
-#define STATISTICS_USAGE_REFRESH 1
+#define STATISTICS_USAGE_REFRESH 2
 
 using namespace std;
 
@@ -72,13 +72,20 @@ namespace {
             return m_totalUsage;
         }
 
-        bool hddUsage(QList<int> *output){
+        bool hddUsage(QList<QnPerformance::QnHddData> *output){
             QMutexLocker lk( &m_mutex );
 
             output->clear();
-            foreach(int item, m_hddUsage)
-                output->append(item);
-            return !m_hddUsage.isEmpty();
+
+            for (int i = 0; i < qMin(m_hddUsage.size(), m_hddNames.size()); i++){
+                QString hddName = m_hddNames[i];
+                int delimiter = hddName.indexOf(QLatin1Char(' '));
+                if (delimiter <= 0)
+                    continue;
+                output->append(QnPerformance::QnHddData(m_hddUsage.at(i), hddName.mid(delimiter + 1)));
+            }
+
+            return !(output->isEmpty());
         }
 
     private:
@@ -137,7 +144,7 @@ namespace {
             return result;
         }
 
-        QList<quint64> *enumerateWbemSeparate(QString queryStr, LPCWSTR value, QList<quint64> *dataList){
+        void enumerateWbemHdds(QString queryStr, LPCWSTR value, LPCWSTR nameValue, QList<quint64> &dataList, QList<QString> &nameList){
             IEnumWbemClassObject* pEnumerator = query(queryStr.toLocal8Bit().data());
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
@@ -146,13 +153,14 @@ namespace {
                 while (uReturn != 0)
                 {
                     quint64 data = getWbemLongLong(pclsObj, value);
-                    dataList->append(data);
+                    dataList.append(data);
+                    QString name = getWbemString(pclsObj, nameValue);
+                    nameList.append(name);
                     pclsObj->Release();
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
             }
-            return dataList;
         }
 
         void refresh() {
@@ -169,16 +177,22 @@ namespace {
             quint64 idle = enumerateWbem(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE Name = \"Idle\""),
                 L"PercentProcessorTime");
-             QList<quint64> *hdds = enumerateWbemSeparate(
+            QList<quint64> hdds;
+            QList<QString> hddnames;
+            enumerateWbemHdds(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfDisk_PhysicalDisk WHERE Name !=\"_Total\" AND PercentDiskTime > 0"),
-                L"PercentIdleTime",
-                new QList<quint64>);
+                    L"PercentIdleTime", L"Name",
+                    hdds, hddnames);
 
             if (m_timeStamp && timeStamp){
                 qulonglong timespan = (timeStamp - m_timeStamp);
                 m_hddUsage.clear();
-                for (int i = 0; i < qMin(hdds->count(), m_rawHddUsageIdle.count()); i++){
-                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds->at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                for (int i = 0; i < qMin(hdds.count(), m_rawHddUsageIdle.count()); i++){
+                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds.at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                }
+                m_hddNames.clear();
+                for (int i = 0; i < hddnames.count(); i++){
+                    m_hddNames.append(hddnames.at(i));
                 }
 
                 timespan *= QnPerformance::cpuCoreCount(); // cpu counters are relayed on this coeff
@@ -187,9 +201,8 @@ namespace {
             }
 
             m_rawHddUsageIdle.clear();
-            for(int i = 0; i < hdds->count(); i++)
-                m_rawHddUsageIdle.append(hdds->at(i));
-            delete hdds;
+            for(int i = 0; i < hdds.count(); i++)
+                m_rawHddUsageIdle.append(hdds.at(i));
 
             m_totalIdle = idle;
             m_processCpu = cpu;
@@ -352,6 +365,9 @@ namespace {
         /** Total hdd usage percent for all drives for the last STATISTICS_USAGE_REFRESH seconds. */
         QList<int> m_hddUsage;
 
+        /** Hdd names for all drives existing STATISTICS_USAGE_REFRESH seconds ago. */
+        QList<QString> m_hddNames;
+
         /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
     };
@@ -412,6 +428,7 @@ namespace{
             m_timer = 0;
             m_initialized = init();
             memset( &m_prevClock, 0, sizeof(m_prevClock) );
+            m_prevPartitionListReadTime = 0;
         }
 
         ~CpuUsageRefresher() {
@@ -448,7 +465,7 @@ namespace{
             calcDiskUsage();
         }
 
-        bool hddUsage( QList<int>* output ) const
+        bool hddUsage( QList<QnPerformance::QnHddData>* output ) const
         {
             QMutexLocker lk( &m_mutex );
 
@@ -458,7 +475,9 @@ namespace{
                  it != m_devNameToStat.end();
                  ++it )
             {
-                output->append( it->second.prevStat.diskUtilizationPercent );
+                output->append( QnPerformance::QnHddData(
+					it->second.prevStat.diskUtilizationPercent,
+					QString::fromStdString(it->second.prevStat.deviceName) ) );
             }
             return !output->isEmpty();
         }
@@ -584,6 +603,11 @@ namespace{
             }
         };
 
+        //!Timeout (in seconds) during which partition list expires (needed to detect mounts/umounts)
+        static const time_t PARTITION_LIST_EXPIRE_TIMEOUT_SEC = 60;
+        //!Disk usage is evaluated as average on \a APPROXIMATION_VALUES_NUMBER prev values
+        static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
+
         void calcDiskUsage()
         {
             static const size_t MAX_LINE_LENGTH = 256;
@@ -591,8 +615,43 @@ namespace{
 
             char devName[MAX_LINE_LENGTH];
             memset( devName, 0, sizeof(devName) );
-            if( m_partitions.empty() )
+            const time_t curTime = ::time( NULL );
+            if( m_partitions.empty() || curTime - m_prevPartitionListReadTime > PARTITION_LIST_EXPIRE_TIMEOUT_SEC )
             {
+//                //using all mount points
+//                FILE* mntF = popen( "mount | grep ^/dev/", "r" );
+//                if( mntF == NULL )
+//                {
+//                    //failed to get partition list
+//                }
+//                else
+//                {
+//                    m_partitions.clear();
+//                    char PARTITION_NAME[1024];
+//                    while( fgets(PARTITION_NAME, sizeof(PARTITION_NAME)-1, mntF) != NULL)
+//                    {
+//                        char* sepPos = strchr( PARTITION_NAME, ' ' );
+//                        if( sepPos == NULL || sepPos == PARTITION_NAME )
+//                            continue;
+//                        //searching device name
+//                        const char* shortNameStart = PARTITION_NAME;
+//                        for( const char*
+//                             curPos = PARTITION_NAME;
+//                             curPos < sepPos && curPos != NULL;
+//                             curPos = strchr( curPos+1, '/' ) )
+//                        {
+//                            shortNameStart = curPos;
+//                        }
+
+//                        m_partitions.insert( string( shortNameStart+1, sepPos-shortNameStart-1 ) );
+//                    }
+
+//                    pclose( mntF );
+//                    m_prevPartitionListReadTime = curTime;
+//                }
+
+
+                //using all disk drives
                 unsigned int majorNumber = 0, minorNumber = 0, numBlocks = 0;
                 //reading partition names
                 FILE* partitionsFile = fopen( "/proc/partitions", "r" );
@@ -603,9 +662,14 @@ namespace{
                     if( i == 0 ||   //skipping header
                             sscanf( line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName ) != 4 )  //skipping unrecognized line
                         continue;
-                    m_partitions.insert( string( devName ) );
+                    string devNameStr( devName );
+                    if( devNameStr.empty() || isdigit(devNameStr[devNameStr.size()-1]) )
+                        continue;   //not a physical drive
+                    m_partitions.insert( devNameStr );
                 }
                 fclose( partitionsFile );
+
+                //TODO/IMPL read network drives
             }
 
             DiskStatSys curDiskStat;
@@ -619,6 +683,12 @@ namespace{
                 m_prevClock = curClock;
                 return; //first time doing nothing
             }
+
+            //reading current disk statistics
+            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
+            if( !diskstatFile )
+                return;
+
             unsigned int clockElapsed = (curClock.tv_sec - m_prevClock.tv_sec) * 1000;
             if( curClock.tv_nsec >= m_prevClock.tv_nsec )
                 clockElapsed += (curClock.tv_nsec - m_prevClock.tv_nsec) / 1000000;
@@ -628,12 +698,7 @@ namespace{
                 return; //there's no sense to calculate anything
             m_prevClock = curClock;
 
-            //reading current disk statistics
-            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
-            if( !diskstatFile )
-                return;
-
-            while( fgets( line, FILENAME_MAX, diskstatFile ) != NULL )
+            while( fgets( line, MAX_LINE_LENGTH, diskstatFile ) != NULL )
             {
                 memset( curDiskStat.device_name, 0, sizeof(curDiskStat.device_name) );
                 if( sscanf( line, "%u %u %s %u %u %u %u %u %u %u %u %u %u %u",
@@ -676,6 +741,7 @@ namespace{
                 {
                     //calculating disk utilization
                     ctx.prevStat.diskUtilizationPercent = (curDiskStat.tot_io_ms - ctx.prevSysStat.tot_io_ms) * 100 / clockElapsed;
+                    //std::cout<<ctx.prevStat.deviceName<<": "<<ctx.prevStat.diskUtilizationPercent<<"%\n";
                 }
                 ctx.prevSysStat = curDiskStat;
             }
@@ -694,6 +760,7 @@ namespace{
         //!map<pair<majorNumber, minorNumber>, statistics calculation context>
         map<pair<int, int>, DiskStatContext> m_devNameToStat;
         set<string> m_partitions;
+        time_t m_prevPartitionListReadTime;
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
@@ -860,7 +927,7 @@ int QnPerformance::cpuCoreCount() {
     return QThread::idealThreadCount();
 }
 
-bool QnPerformance::currentHddUsage(QList<int> *output){
+bool QnPerformance::currentHddUsage(QList<QnHddData> *output){
     return refresherInstance()->hddUsage(output);
 }
 

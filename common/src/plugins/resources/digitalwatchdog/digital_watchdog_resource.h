@@ -26,7 +26,7 @@ protected:
     virtual bool setParamPhysical(const QnParam &param, const QVariant& val) override;
 
 private:
-    bool isDualStreamingEnabled();
+    bool isDualStreamingEnabled(bool& unauth);
     QString fetchCameraModel();
 
 private:

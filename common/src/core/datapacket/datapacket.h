@@ -25,10 +25,10 @@ public:
     qint64 mediaLength() const
     {
         QMutexLocker mutex(&m_cs);
-        if (m_queue.isEmpty())
+        if (m_bufferLen == 0)
             return 0;
         else
-            return m_queue.last()->timestamp - m_queue.front()->timestamp;
+            return last()->timestamp - front()->timestamp;
     }
 };
 

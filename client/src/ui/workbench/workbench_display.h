@@ -41,6 +41,8 @@ class QnGridItem;
 class QnWorkbenchContext;
 class QnWorkbenchStreamSynchronizer;
 class QnToggle;
+class QnThumbnailsLoader;
+class QnThumbnail;
 
 class QnVideoCamera;
 class QnCamDisplay;
@@ -66,18 +68,6 @@ public:
      * Virtual destructor.
      */
     virtual ~QnWorkbenchDisplay();
-
-    /**
-     * \param widget              Whether camera streams on the scene should
-     *                                  be synchronized.
-     */
-    void setStreamsSynchronized(QnResourceWidget *widget);
-    void setStreamsSynchronized(bool synchronized, qint64 currentTime, float speed);
-
-
-    bool isStreamsSynchronized() const;
-
-    bool isStreamsSynchronizationEffective() const;
 
     /**
      * \returns                         Instrument manager owned by this workbench display. 
@@ -283,9 +273,6 @@ signals:
     void widgetAboutToBeRemoved(QnResourceWidget *widget);
     void widgetChanged(Qn::ItemRole role);
 
-    void streamsSynchronizedChanged();
-    void streamsSynchronizationEffectiveChanged();
-
 protected:
     WidgetAnimator *animator(QnResourceWidget *widget);
 
@@ -306,7 +293,7 @@ protected:
     Qn::ItemLayer synchronizedLayer(QnResourceWidget *widget) const;
     Qn::ItemLayer shadowLayer(Qn::ItemLayer itemLayer) const;
 
-    bool addItemInternal(QnWorkbenchItem *item, bool animate = true);
+    bool addItemInternal(QnWorkbenchItem *item, bool animate = true, bool startDisplay = true);
     bool removeItemInternal(QnWorkbenchItem *item, bool destroyWidget, bool destroyItem);
 
     void deinitSceneContext();
@@ -324,17 +311,20 @@ protected slots:
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
+    void updateCurtainedCursor();
+
     void at_scene_destroyed();
     void at_scene_selectionChanged();
 
     void at_viewportAnimator_finished();
 
-    void at_workbench_itemAdded(QnWorkbenchItem *item);
-    void at_workbench_itemRemoved(QnWorkbenchItem *item);
-
     void at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item);
     void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
+
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
 
     void at_context_permissionsChanged(const QnResourcePtr &resource);
 
@@ -348,9 +338,6 @@ protected slots:
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
 
-    void at_curtained();
-    void at_uncurtained();
-
     void at_widget_aboutToBeDestroyed();
 
     void at_view_destroyed();
@@ -362,6 +349,8 @@ protected slots:
     void at_resource_disabledChanged();
     void at_resource_disabledChanged(const QnResourcePtr &resource);
 
+    void at_loader_thumbnailLoaded(const QnThumbnail &thumbnail);
+
 private:
     /* Directly visible state */
 
@@ -370,9 +359,6 @@ private:
 
     /** Current view. */
     QGraphicsView *m_view;
-
-    /** Stream synchronizer. */
-    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
 
     /** Zoomed state toggle. */
     QnToggle *m_zoomedToggle;
@@ -459,6 +445,11 @@ private:
 
     /** Stored dummy scene. */
     QGraphicsScene *m_dummyScene;
+
+
+    
+
+    QnThumbnailsLoader *m_loader;
 };
 
 #endif // QN_WORKBENCH_MANAGER_H

@@ -9,6 +9,7 @@
 
 #include <core/resource/media_resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -19,6 +20,7 @@
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
@@ -47,7 +49,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         qnCritical("Media resource widget was created with a non-media resource.");
 
     /* Set up video rendering. */
-    m_display = new QnResourceDisplay(m_resource, this);
+    bool liveOnly = (m_resource->flags() & QnResource::live) && (!accessController()->hasRights(Qn::ViewArchiveRight));
+    m_display = new QnResourceDisplay(m_resource, this, liveOnly);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     setChannelLayout(m_display->videoLayout());

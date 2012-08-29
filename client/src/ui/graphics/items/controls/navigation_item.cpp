@@ -20,6 +20,7 @@
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/widgets/calendar_widget.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
@@ -27,9 +28,9 @@
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 
-QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *context): 
+QnNavigationItem::QnNavigationItem(QGraphicsItem *parent): 
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent->toGraphicsObject()),
+    QnWorkbenchContextAware(parent->toGraphicsObject()),
     m_updatingSpeedSliderFromNavigator(false),
     m_updatingNavigatorFromSpeedSlider(false)
 {
@@ -191,9 +192,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(display(),              SIGNAL(streamsSynchronizedChanged()),       this,           SLOT(updateSyncButtonChecked()));
-    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonChecked()));
-    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonEnabled()));
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    connect(streamSynchronizer,     SIGNAL(runningChanged()),                   this,           SLOT(updateSyncButtonChecked()));
+    connect(streamSynchronizer,     SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonChecked()));
+    connect(streamSynchronizer,     SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonEnabled()));
 
     connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),               this,           SLOT(updateMuteButtonChecked()));
@@ -408,13 +410,15 @@ void QnNavigationItem::updateLiveButtonEnabled() {
 }
 
 void QnNavigationItem::updateSyncButtonChecked() {
-    m_syncButton->setChecked(display()->isStreamsSynchronized() && display()->isStreamsSynchronizationEffective());
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    m_syncButton->setChecked(streamSynchronizer->isEffective() && streamSynchronizer->isRunning());
 }
 
 void QnNavigationItem::updateSyncButtonEnabled() {
-    bool enabled = display()->isStreamsSynchronizationEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync);
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    m_syncButton->setEnabled(enabled);
+    m_syncButton->setEnabled(streamSynchronizer->isEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync));
 }
 
 void QnNavigationItem::updatePlayButtonChecked() {
@@ -471,12 +475,14 @@ void QnNavigationItem::at_liveButton_clicked() {
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
 }
 
-void QnNavigationItem::at_syncButton_clicked() 
-{
-    if (m_syncButton->isChecked())
-        display()->setStreamsSynchronized(navigator()->currentWidget());
-    else
-        display()->setStreamsSynchronized(0);
+void QnNavigationItem::at_syncButton_clicked() {
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    if (m_syncButton->isChecked()) {
+        streamSynchronizer->setState(navigator()->currentWidget());
+    } else {
+        streamSynchronizer->setState(NULL);
+    }
 }
 
 void QnNavigationItem::at_stepBackwardButton_clicked() {

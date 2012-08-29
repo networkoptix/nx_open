@@ -39,7 +39,6 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_menu.reset(new QnActionManager(this));
     m_display.reset(new QnWorkbenchDisplay(this));
     m_navigator.reset(new QnWorkbenchNavigator(this));
-    m_videoServerStatisticsManager.reset(new QnVideoServerStatisticsManager(this));
 }
 
 QnWorkbenchContext::~QnWorkbenchContext() {
@@ -59,7 +58,6 @@ QnWorkbenchContext::~QnWorkbenchContext() {
     m_snapshotManager.reset();
     m_synchronizer.reset();
     m_workbench.reset();
-    m_videoServerStatisticsManager.reset();
 
     m_resourcePool = NULL;
 }

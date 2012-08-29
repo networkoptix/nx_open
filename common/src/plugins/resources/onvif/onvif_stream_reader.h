@@ -16,7 +16,6 @@ class onvifXsd__AudioEncoderConfiguration;
 class onvifXsd__AudioSourceConfiguration;
 
 typedef onvifXsd__Profile Profile;
-typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
@@ -32,6 +31,7 @@ public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
     const QnResourceAudioLayout* getDPAudioLayout() const;
+    virtual void pleaseStop() override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;

@@ -227,7 +227,7 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
 
 void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const
 {
-    encoder.Encoding = m_onvifRes->getCodec() == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
+    encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
     QnStreamQuality quality = getQuality();
@@ -235,14 +235,17 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 
     if (!encoder.H264)
     {
-        qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: H264 object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
+        //qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: H264 object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
     } else 
     {
         encoder.H264->GovLength = m_onvifRes->getGovLength();
         int profile = isPrimary? m_onvifRes->getPrimaryH264Profile(): m_onvifRes->getSecondaryH264Profile();
         if (profile != -1)
             encoder.H264->H264Profile = onvifXsd__H264Profile(profile);
+        if (encoder.RateControl)
+            encoder.RateControl->EncodingInterval = 1;
     }
+
 
     if (!encoder.RateControl) 
     {
@@ -889,6 +892,13 @@ const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }
+
+void QnOnvifStreamReader::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_multiCodec.pleaseStop();
+}
+
 
 /*
 for (;it != response.Configurations.end(); ++it) 

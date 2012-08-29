@@ -20,7 +20,6 @@ class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
 class QnWorkbenchUserWatcher;
 class QnActionManager;
-class QnVideoServerStatisticsManager;
 
 /**
  * This is a class that ties together all objects comprising the global state 
@@ -80,10 +79,6 @@ public:
         return static_cast<T *>(result);
     }
 
-    QnVideoServerStatisticsManager *videoServerStatisticsManager() const {
-        return m_videoServerStatisticsManager.data();
-    }
-
 signals:
     /**
      * This signal is emitted whenever the user that is currently logged in changes.
@@ -110,7 +105,6 @@ private:
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
-    QScopedPointer<QnVideoServerStatisticsManager> m_videoServerStatisticsManager;
 
     QnWorkbenchUserWatcher *m_userWatcher;
     QHash<QByteArray, QObject *> m_instanceByTypeName;

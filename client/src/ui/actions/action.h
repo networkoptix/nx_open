@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_globals.h>
+#include <core/resource/user_resource.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -85,6 +86,8 @@ public:
     void setForbiddenPermissions(const QString &target, Qn::Permissions forbiddenPermissions);
 
     void setForbiddenPermissions(Qn::Permissions forbiddenPermissions);
+
+    void setRequiredRights(Qn::UserRights requiredRigths);
 
     Qn::ActionFlags flags() const {
         return m_flags;
@@ -194,6 +197,7 @@ private:
 
     const Qn::ActionId m_id;
     Qn::ActionFlags m_flags;
+    Qn::UserRights m_requiredRights;
     QHash<QString, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
     QWeakPointer<QnActionCondition> m_condition;

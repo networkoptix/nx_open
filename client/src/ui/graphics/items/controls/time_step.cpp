@@ -4,17 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/math.h>
-
-namespace {
-    qint64 timeToMSecs(const QTime &time) {
-        return QTime(0, 0, 0, 0).msecsTo(time);
-    }
-
-    QTime msecsToTime(qint64 msecs) {
-        return QTime(0, 0, 0, 0).addMSecs(msecs); 
-    }
-
-} // anonymous namespace
+#include <utils/common/time.h>
 
 
 qint64 roundUp(qint64 msecs, const QnTimeStep &step) {

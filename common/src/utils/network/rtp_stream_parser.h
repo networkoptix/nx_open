@@ -43,8 +43,6 @@ public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
     
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
-
     virtual ~QnRtpStreamParser();
 
     // used for sync audio/video streams
@@ -64,10 +62,18 @@ private:
     AudioTrack m_audioTrack;
 };
 
+class QnRtpVideoStreamParser: public QnRtpStreamParser
+{
+public:
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
+};
+
 class QnRtpAudioStreamParser: public QnRtpStreamParser
 {
 public:
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
+
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
 protected:
     void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);

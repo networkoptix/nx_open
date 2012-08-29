@@ -13,9 +13,7 @@
 #include "workbench_context_aware.h"
 #include "workbench_globals.h"
 
-class QRegion;
 class QAction;
-class QGraphicsSceneContextMenuEvent;
 
 class QnWorkbenchDisplay;
 class QnTimeSlider;
@@ -26,6 +24,7 @@ class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
 class QnCalendarWidget;
+class QnWorkbenchStreamSynchronizer;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -180,6 +179,8 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
 
+    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
+
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
 
@@ -203,6 +204,7 @@ private:
     bool m_lastPlaying;
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
+    bool m_preciseNextSeek;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;

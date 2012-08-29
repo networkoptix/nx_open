@@ -206,7 +206,7 @@ QSize QnCamDisplay::getFrameSize(int channel) const {
 
 void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
-    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
+    bool isVideoCamera = vd->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
     if (isVideoCamera)
         hurryUpCheckForCamera(vd, speed, needToSleep, realSleepTime);
     else

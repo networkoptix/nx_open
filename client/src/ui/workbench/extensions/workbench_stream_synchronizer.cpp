@@ -40,7 +40,7 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(m_counter,                  SIGNAL(reachedZero()),  m_syncPlay,     SLOT(deleteLater()));
     connect(m_counter,                  SIGNAL(reachedZero()),  m_counter,      SLOT(deleteLater()));
 
-    /* Prepare render instance. */
+    /* Prepare render watcher instance. */
     QnWorkbenchRenderWatcher *renderWatcher = context()->instance<QnWorkbenchRenderWatcher>();
     connect(renderWatcher, SIGNAL(displayingChanged(QnAbstractRenderer *, bool)), this, SLOT(at_renderWatcher_displayingChanged(QnAbstractRenderer *, bool)));
 
@@ -49,23 +49,62 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
         at_display_widgetAdded(widget);
 }
 
-void QnWorkbenchStreamSynchronizer::disableSync() {
-    if(m_syncPlay->isEnabled())
-        m_syncPlay->disableSync();
-}
-
-void QnWorkbenchStreamSynchronizer::enableSync(qint64 currentTime, float speed) 
-{
+void QnWorkbenchStreamSynchronizer::stop() {
     if(!m_syncPlay->isEnabled())
-        m_syncPlay->enableSync(currentTime, speed);
+        return;
+
+    m_syncPlay->disableSync();
+    
+    emit runningChanged();
 }
 
-bool QnWorkbenchStreamSynchronizer::isEnabled() const {
+void QnWorkbenchStreamSynchronizer::start(qint64 timeUSec, float speed) {
+    bool wasRunning = isRunning();
+
+    m_syncPlay->enableSync(timeUSec, speed);
+
+    if(!wasRunning)
+        emit runningChanged();
+}
+
+bool QnWorkbenchStreamSynchronizer::isRunning() const {
     return m_syncPlay->isEnabled();
 }
 
 bool QnWorkbenchStreamSynchronizer::isEffective() const {
     return m_widgetCount > 0;
+}
+
+QnStreamSynchronizationState QnWorkbenchStreamSynchronizer::state() const {
+    QnStreamSynchronizationState result;
+    
+    result.started = m_syncPlay->isEnabled();
+    if(result.started) {
+        result.speed = 1.0; // TODO: need getSpeed() here.
+        result.time = m_syncPlay->getCurrentTime();
+    }
+    
+    return result;
+}
+
+void QnWorkbenchStreamSynchronizer::setState(const QnStreamSynchronizationState &state) {
+    if(state.started) {
+        start(state.time, state.speed);
+    } else {
+        stop();
+    }
+}
+
+void QnWorkbenchStreamSynchronizer::setState(QnResourceWidget *widget) {
+    QnStreamSynchronizationState state;
+
+    if (QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+        state.started = true;
+        state.time = mediaWidget->display()->currentTimeUSec();
+        state.speed = mediaWidget->display()->camDisplay()->getSpeed();
+    }
+
+    setState(state);
 }
 
 void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *widget) {

@@ -98,7 +98,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
                                                                                   QnFrameScaler::DownscaleFactor force_factor)
 {
     if (m_drawer->constantDownscaleFactor())
-       force_factor = QnFrameScaler::factor_2;
+       force_factor = QnFrameScaler::factor_1;
 
     if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
     {

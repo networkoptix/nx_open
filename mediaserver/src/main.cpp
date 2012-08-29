@@ -64,6 +64,7 @@
 static const char COMPONENT_NAME[] = "MediaServer";
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
+static const int DEFAULT_STREAMING_PORT = 8890;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -209,6 +210,7 @@ void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddr
 #else
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
     server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setStreamingUrl(QString("http://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
 #endif
 }
 
@@ -637,7 +639,8 @@ void QnMain::run()
     m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
 
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, 8890);
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt());
+    m_progressiveDownloadingServer->enableSSLMode();
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {

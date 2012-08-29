@@ -3,6 +3,7 @@
 
 QnUserResource::QnUserResource()
     : base_type(),
+      m_rights(0),
       m_isAdmin(false)
 {
     setStatus(Online, true);
@@ -28,14 +29,24 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
-bool QnUserResource::isAdmin() const
+quint64 QnUserResource::getRights() const
 {
+    if (m_isAdmin)
+        return Qn::OwnerRight;
+    return m_rights;
+}
+
+void QnUserResource::setRights(quint64 rights)
+{
+    m_rights = rights;
+}
+
+bool QnUserResource::isAdmin() const{
     return m_isAdmin;
 }
 
-void QnUserResource::setAdmin(bool admin)
-{
-    m_isAdmin = admin;
+void QnUserResource::setAdmin(bool isAdmin){
+    m_isAdmin = isAdmin;
 }
 
 void QnUserResource::updateInner(QnResourcePtr other) {
@@ -44,7 +55,7 @@ void QnUserResource::updateInner(QnResourcePtr other) {
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
-
+        setRights(localOther->getRights());
         setAdmin(localOther->isAdmin());
     }
 }
