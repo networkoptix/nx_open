@@ -296,16 +296,16 @@ void CameraSettingsWidgetsCreator::treeWidgetItemPressed(QTreeWidgetItem* item, 
         return;
     }
 
-    emit refreshAdvancedSettings();
-
     m_rootLayout.setCurrentIndex(ind);
+
+    emit refreshAdvancedSettings();
 }
 
 void CameraSettingsWidgetsCreator::treeWidgetItemSelectionChanged()
 {
     if (m_rootLayout.count() > 0) {
-        emit refreshAdvancedSettings();
         m_rootLayout.setCurrentIndex(0);
+        emit refreshAdvancedSettings();
     }
 }
 
