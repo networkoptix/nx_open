@@ -131,6 +131,7 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
     }
 
     ui->panicModeLabel->setText(tr("Off"));
+    ui->panicModeLabel->setPalette(this->palette());
     if(enabledCount > 0) {
         QnVideoServerResourcePtr server = qnResPool->getResourceById(m_cameras[0]->getParentId()).dynamicCast<QnVideoServerResource>();
         if(server && server->isPanicMode()) {
