@@ -15,9 +15,11 @@
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
+class onvifXsd__VideoEncoderConfiguration;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
+typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -170,7 +172,8 @@ private:
     static float getResolutionAspectRatio(const ResolutionPair& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int getH264StreamProfile(const VideoOptionsResp& response);
-
+    void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
+    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;

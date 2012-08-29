@@ -440,9 +440,7 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    QVariant predefinedMaxFps;
-    getParam(MAX_FPS_PARAM_NAME, predefinedMaxFps, QnDomainMemory);
-    setParam(MAX_FPS_PARAM_NAME, qMin(f, predefinedMaxFps.toInt()), QnDomainDatabase);
+    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
 int QnPlOnvifResource::getMaxFps()
@@ -670,7 +668,6 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     if (response.Options->H264->FrameRateRange) 
     {
         setMaxFps(response.Options->H264->FrameRateRange->Max);
-        checkMaxFps();
     } 
     else 
     {
@@ -731,7 +728,6 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
     if (response.Options->JPEG->FrameRateRange) 
     {
         setMaxFps(response.Options->JPEG->FrameRateRange->Max);
-        checkMaxFps();
     } 
     else 
     {
@@ -955,7 +951,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         MediaSoapWrapperPtr soapWrapperPtr(new MediaSoapWrapper(endpoint, login, password));
         soapWrappersList.append(soapWrapperPtr);
 
-        qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
+        //qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
 
         optionsList.append(VideoOptionsLocal());
         VideoOptionsLocal& currVideoOpts = optionsList.back();
@@ -1019,7 +1015,10 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     else if (optionsList[0].optionsResp.Options->JPEG) {
         setCodec(JPEG, true);
     }
+
     setVideoEncoderOptions(optionsList[0].optionsResp);
+    checkMaxFps(confResponse, optionsList[0].id);
+
     {
         QMutexLocker lock(&m_mutex);
         m_secondaryResolutionList = m_resolutionList;
@@ -1428,4 +1427,90 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
 bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 {
     return m_forceCodecFromPrimaryEncoder;
+}
+
+int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
+    SetVideoConfigReq request;
+    SetVideoConfigResp response;
+    request.Configuration = &encoder;
+    request.ForcePersistence = false;
+
+    int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
+    if (soapRes != SOAP_OK) {
+        qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
+            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+        if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
+            soapRes = -2;
+    }
+    return soapRes;
+}
+
+void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
+{
+    VideoEncoder* vEncoder = 0;
+    for (int i = 0; i < response.Configurations.size(); ++i)
+    {
+        if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
+            vEncoder = response.Configurations[i];
+    }
+    if (!vEncoder)    
+        return;
+
+    int maxFpsOrig = getMaxFps();
+    int rangeHi = getMaxFps()-2;
+    int rangeLow = getMaxFps()/4;
+    int currentFps = rangeHi;
+    int prevFpsValue = -1;
+
+    vEncoder->Resolution->Width = m_resolutionList[0].first;
+    vEncoder->Resolution->Height = m_resolutionList[0].second;
+    
+    while (currentFps != prevFpsValue)
+    {
+        vEncoder->RateControl->FrameRateLimit = currentFps;
+        bool success = false;
+        bool invalidFpsDetected = false;
+        int retryCount = getMaxOnvifRequestTries();
+        for (int i = 0; i < 3; ++i)
+        {
+            vEncoder->RateControl->FrameRateLimit = currentFps;
+            int errCode = sendVideoEncoderToCamera(*vEncoder);
+            if (errCode == SOAP_OK) 
+            {
+                if (currentFps >= maxFpsOrig-2) {
+                    // If first try success, does not change maxFps at all. (HikVision has working range 0..15, and 25 fps, so try from max-1 checking)
+                    return; 
+                }
+                setMaxFps(currentFps);
+                success = true;
+                break;
+            }
+            else if (errCode == -2)
+            {
+                invalidFpsDetected = true;
+                break; // invalid fps
+            }
+        }
+        if (!invalidFpsDetected && !success)
+        {
+            // can't determine fps (cameras does not answer e.t.c)
+            setMaxFps(maxFpsOrig);
+            return;
+        }
+
+        prevFpsValue = currentFps;
+        if (success) {
+            rangeLow = currentFps;
+            currentFps += (rangeHi-currentFps+1)/2;
+        }
+        else {
+            rangeHi = currentFps-1;
+            currentFps -= (currentFps-rangeLow+1)/2;
+        }
+    }
 }
