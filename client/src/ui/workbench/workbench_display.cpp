@@ -1310,11 +1310,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
     }
 
-    foreach(QnWorkbenchItem *item, layout->items())
-        addItemInternal(item, false, !thumbnailed);
-
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
+
+    foreach(QnWorkbenchItem *item, layout->items())
+        addItemInternal(item, false, !thumbnailed);
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();
 
