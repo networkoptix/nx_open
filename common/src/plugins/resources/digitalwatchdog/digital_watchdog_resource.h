@@ -24,6 +24,7 @@ protected:
 
 private:
     bool isDualStreamingEnabled();
+    QString fetchCameraModel();
 
 private:
     DWCameraProxy* m_cameraProxy;

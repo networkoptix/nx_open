@@ -116,8 +116,8 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
             delete m_widgetsRecreator;
-            m_cameraSettings.clear();
             m_widgetsRecreator = 0;
+            m_cameraSettings.clear();
         }
 
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, this);
@@ -613,5 +613,8 @@ void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
 
 void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
 {
-    loadAdvancedSettings();
+    if (m_widgetsRecreator)
+    {
+        loadAdvancedSettings();
+    }
 }

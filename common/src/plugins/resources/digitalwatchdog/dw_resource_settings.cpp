@@ -191,8 +191,20 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 const QString& DWCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
 const QString& DWCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
 
-DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings):
-    CameraSettingReader(QString::fromLatin1("DIGITALWATCHDOG")),
+QString DWCameraSettingReader::getIdSuffixByModel(const QString& cameraModel)
+{
+    QString tmp = cameraModel.toLower();
+    tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
+
+    if (tmp.contains(QLatin1String("mv421d"))) {
+        return QString::fromLatin1("-FOCUS");
+    }
+
+    return QString();
+}
+
+DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& cameraModel):
+    CameraSettingReader(QString::fromLatin1("DIGITALWATCHDOG") + getIdSuffixByModel(cameraModel)),
     m_settings(settings)
 {
 

@@ -83,7 +83,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
     connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
 
-    connect(this, SIGNAL( refreshAdvancedSettings() ), handler, SLOT( refreshAdvancedSettings() )  );
+    connect(this, SIGNAL( refreshAdvancedSettings() ), handler, SLOT( refreshAdvancedSettings() ), Qt::QueuedConnection);
 }
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()

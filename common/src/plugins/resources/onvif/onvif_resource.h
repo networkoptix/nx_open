@@ -151,9 +151,9 @@ protected:
 
     virtual void fetchAndSetCameraSettings();
 
-private:
     QString getDeviceOnvifUrl() const;
 
+private:
     void setMaxFps(int f);
 
     bool fetchAndSetDeviceInformation();

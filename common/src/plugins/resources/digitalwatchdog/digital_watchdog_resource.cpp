@@ -1,4 +1,7 @@
 #include "digital_watchdog_resource.h"
+#include "onvif/soapDeviceBindingProxy.h"
+
+const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 
 QnPlWatchDogResource::QnPlWatchDogResource():
     QnPlOnvifResource(),
@@ -90,14 +93,41 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
-    QMutexLocker lock(&m_mutex);
+    QString cameraModel = fetchCameraModel();
+    QVariant id;
+    getParam(CAMERA_SETTINGS_ID_PARAM, id, QnDomainDatabase);
+    setParam(CAMERA_SETTINGS_ID_PARAM, id.toString() + DWCameraSettingReader::getIdSuffixByModel(cameraModel), QnDomainDatabase);
+
+    QMutexLocker lock(&m_physicalParamsMutex);
 
     if (!m_cameraProxy) {
         m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
     }
 
-    DWCameraSettingReader reader(m_settings);
+    DWCameraSettingReader reader(m_settings, cameraModel);
     reader.read() && reader.proceed();
+}
+
+QString QnPlWatchDogResource::fetchCameraModel()
+{
+    QAuthenticator auth(getAuth());
+    //TODO:UTF unuse StdString
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
+    DeviceInfoReq request;
+    DeviceInfoResp response;
+
+    int soapRes = soapWrapper.getDeviceInformation(request, response);
+    if (soapRes != SOAP_OK) 
+    {
+        qWarning() << "QnPlWatchDogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
+            << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
+
+        return QString();
+    } 
+
+    return QString::fromLatin1(response.Model.c_str());
 }
 
 bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)

@@ -84,7 +84,9 @@ class DWCameraSettingReader: public CameraSettingReader
     DWCameraSettings& m_settings;
 
 public:
-    DWCameraSettingReader(DWCameraSettings& settings);
+    static QString getIdSuffixByModel(const QString& cameraModel);
+
+    DWCameraSettingReader(DWCameraSettings& settings, const QString& cameraModel);
     virtual ~DWCameraSettingReader();
 
 protected:
