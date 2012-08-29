@@ -65,7 +65,9 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
     QString desiredVal = src.getCurrentAsIntStr();
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
-    QByteArray query((QString::fromLatin1("cgi-bin/camerasetup.cgi?") + src.getQuery() + QString::fromLatin1("=") + desiredVal).toLatin1());
+    QString paramQuery = src.getQuery();
+    QByteArray query = paramQuery.startsWith(QLatin1String("/"))? paramQuery.toLatin1() : 
+        (QString::fromLatin1("cgi-bin/camerasetup.cgi?") + paramQuery + QString::fromLatin1("=") + desiredVal).toLatin1();
 
     bool res = httpClient.doGET(query) == CL_HTTP_SUCCESS;
     res = getFromCameraImpl() && res;

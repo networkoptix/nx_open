@@ -318,10 +318,10 @@ bool QnPlOnvifResource::initInternal()
     //if (getStatus() == QnResource::Offline || getStatus() == QnResource::Unauthorized)
     //    setStatus(QnResource::Online, true); // to avoid infinit status loop in this version
 
-    save();
-
     //Additional camera settings
     fetchAndSetCameraSettings();
+
+    save();
 
     return true;
 }
