@@ -1386,10 +1386,11 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
     if(!mediaWidget)
         return;
-
+    
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-    mediaWidget->display()->start();
+    mediaWidget->display()->camDisplay()->start();
+    //mediaWidget->display()->start();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

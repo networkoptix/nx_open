@@ -946,6 +946,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         channeljumpToUnsync(newTime, 0, skipTime);
     }
 
+    //start(QThread::HighPriority);
+
     if (isSingleShotMode())
         QnLongRunnable::resume();
     return needJump;

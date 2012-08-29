@@ -418,7 +418,6 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_statistics_received() {
-
     QnStatisticsHistory history_update;
     qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
     if (id < 0){
