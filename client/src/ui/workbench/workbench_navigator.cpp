@@ -975,7 +975,7 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event) {
         if(m_timeSlider->scene() && m_timeSlider->scene()->sendEvent(m_timeSlider, event))
             return true;
     } else if(watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneMouseDoubleClick) {
-        m_timeSlider->animatedUnzoom();
+        m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum(), true);
     }
 
     return base_type::eventFilter(watched, event);
@@ -1230,8 +1230,6 @@ void QnWorkbenchNavigator::at_calendar_dateChanged(const QDate &date){
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
     m_timeSlider->finishAnimations();
-    m_timeSlider->setWindow(startMSec, endMSec);
-    // do not update value to avoid window scrolling if no data is recorded
-    //  m_timeSlider->setValue(startMSec);
+    m_timeSlider->setWindow(startMSec, endMSec, true);
 }
 
