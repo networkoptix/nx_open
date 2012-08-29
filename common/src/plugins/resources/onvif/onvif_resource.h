@@ -120,7 +120,7 @@ public:
 
     void setDeviceOnvifUrl(const QString& src);
 
-    CODECS getCodec() const;
+    CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
@@ -128,7 +128,7 @@ public:
     bool forcePrimaryEncoderCodec() const;
 
 protected:
-    void setCodec(CODECS c);
+    void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
     bool initInternal() override;
@@ -186,7 +186,8 @@ private:
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
-    CODECS m_codec;
+    CODECS m_primaryCodec;
+    CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;

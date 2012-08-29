@@ -106,7 +106,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
-    m_codec(H264),
+    m_primaryCodec(H264),
+    m_secondaryCodec(H264),
     m_audioCodec(AUDIO_NONE),
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
     m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
@@ -240,16 +241,19 @@ int QnPlOnvifResource::getAudioSamplerate() const
     return m_audioSamplerate;
 }
 
-QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
+QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec(bool isPrimary) const
 {
     QMutexLocker lock(&m_mutex);
-    return m_codec;
+    return isPrimary ? m_primaryCodec : m_secondaryCodec;
 }
 
-void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c)
+void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c, bool isPrimary)
 {
     QMutexLocker lock(&m_mutex);
-    m_codec = c;
+    if (isPrimary)
+        m_primaryCodec = c;
+    else
+        m_secondaryCodec = c;
 }
 
 QnPlOnvifResource::AUDIO_CODECS QnPlOnvifResource::getAudioCodec() const
@@ -276,7 +280,8 @@ void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 
 bool QnPlOnvifResource::initInternal()
 {
-    setCodec(H264);
+    setCodec(H264, true);
+    setCodec(H264, false);
 
     if (getDeviceOnvifUrl().isEmpty()) {
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
@@ -636,7 +641,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsResp& re
     if (!response.Options)
         return;
     const std::vector<onvifXsd__VideoResolution*>* resolutionsPtr = 0;
-    if (getCodec() == H264 && response.Options->H264)
+    if (getCodec(false) == H264 && response.Options->H264)
         resolutionsPtr = &response.Options->H264->ResolutionsAvailable;
     else if (response.Options->JPEG)
         resolutionsPtr = &response.Options->JPEG->ResolutionsAvailable;
@@ -664,7 +669,7 @@ void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response)
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: camera didn't return quality range. UniqueId: " << getUniqueId();
     }
 
-    if (getCodec() == H264) 
+    if (response.Options->H264) 
     {
         setVideoEncoderOptionsH264(response);
     } 
@@ -1016,7 +1021,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
-    QList<VideoOptionsLocal>::const_iterator optIt = optionsList.begin();
     if (optionsList.isEmpty())
     {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: all video options are empty. (URL: "
@@ -1025,6 +1029,59 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
+
+    int primaryIndex = -1;
+    int secondaryIndex = -1;
+    for (int i = 0; i < optionsList.size(); ++i)
+    {
+        if (optionsList[i].optionsResp.Options->H264) 
+        {
+            if (primaryIndex == -1) {
+                primaryIndex = i;
+                m_primaryH264Profile = getH264StreamProfile(optionsList[i].optionsResp);
+            }
+            else if (secondaryIndex == -1) {
+                secondaryIndex = i;
+                m_secondaryH264Profile = getH264StreamProfile(optionsList[i].optionsResp);
+            }
+            else {
+                break;
+            }
+        }
+    }
+    for (int i = 0; i < optionsList.size(); ++i)
+    {
+        if (optionsList[i].optionsResp.Options->JPEG)
+        {
+            if (primaryIndex == -1) {
+                primaryIndex = i;
+                setCodec(JPEG, true);
+            }
+            else if (secondaryIndex == -1) {
+                secondaryIndex = i;
+                setCodec(JPEG, false);
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    QMutexLocker lock(&m_mutex);
+    if (primaryIndex != -1) {
+        setVideoEncoderOptions(optionsList[primaryIndex].optionsResp);
+        m_primaryVideoEncoderId = optionsList[primaryIndex].id;
+    }
+
+    if (secondaryIndex != -1)
+    {
+        m_secondaryResolutionList = m_resolutionList;
+        m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
+        updateSecondaryResolutionList(optionsList[secondaryIndex].optionsResp);
+    }
+
+    /*
+    QList<VideoOptionsLocal>::const_iterator optIt = optionsList.begin();
     if (optIt->optionsResp.Options->H264) 
     {
         setCodec(H264);
@@ -1047,6 +1104,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
             updateSecondaryResolutionList(optIt->optionsResp);
         }
     }
+    */
 
     return true;
 }
