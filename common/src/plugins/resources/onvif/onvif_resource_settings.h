@@ -333,7 +333,7 @@ public:
 
     virtual ~OnvifCameraSetting() {};
 
-    OnvifCameraSetting& OnvifCameraSetting::operator=(const OnvifCameraSetting& rhs);
+    OnvifCameraSetting& operator=(const OnvifCameraSetting& rhs);
 
     bool getFromCamera(OnvifCameraSettingsResp& src) { return m_operation->get(*this, src); }
     bool setToCamera(OnvifCameraSettingsResp& src) { return m_operation->set(*this, src); }
