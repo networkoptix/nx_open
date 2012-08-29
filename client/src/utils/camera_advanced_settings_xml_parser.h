@@ -78,14 +78,13 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
 
     typedef QHash<QString, WidgetAndParent*> WidgetsAndParentsById;
 
-    typedef QHash<QString, int> LayoutIndById;
-
 public:
     typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
+    typedef QHash<QString, int> LayoutIndById;
     typedef QHash<QString, QnAbstractSettingsWidget*> SettingsWidgetsById;
 
-    CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj,
-        QTreeWidget& rootWidget, QStackedLayout& rootLayout, WidgetsById& widgetsById, QObject* handler);
+    CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget,
+        QStackedLayout& rootLayout, WidgetsById& widgetsById, LayoutIndById& layoutIndById, QObject* handler);
 
     virtual ~CameraSettingsWidgetsCreator();
 
@@ -119,10 +118,10 @@ private:
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     WidgetsById& m_widgetsById;
+    LayoutIndById& m_layoutIndById;
     QObject* m_handler;
     QWidget* m_owner;
     WidgetsAndParentsById m_emptyGroupsById;
-    LayoutIndById m_layoutIndById;
     SettingsWidgetsById m_settingsWidgetsById;
 };
 
@@ -181,9 +180,12 @@ public:
 class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
     typedef CameraSettingsWidgetsCreator::WidgetsById WidgetsById;
+    typedef CameraSettingsWidgetsCreator::LayoutIndById LayoutIndById;
+
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     WidgetsById m_widgetsById;
+    LayoutIndById m_layoutIndById;
     QObject* m_handler;
     CameraSettings* m_settings;
     QString m_id;

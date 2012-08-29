@@ -311,13 +311,13 @@
 
     </group>
 
-    <!--<group name = "Maintenance"
+    <group name = "Maintenance"
          description ="">
       <param name = "Firmware Upgrade"
              description = "Upgrade the device’s firmware"
              widget_type = "Button"
              query = ""/>
-    </group>-->
+    </group>
 
   </camera>
 
