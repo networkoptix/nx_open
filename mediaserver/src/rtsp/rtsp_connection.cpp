@@ -855,6 +855,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->thumbnailsDP->addDataProcessor(d->dataProcessor);
         d->thumbnailsDP->setRange(d->startTime, d->endTime, d->requestHeaders.value("x-media-step").toLongLong(), d->lastPlayCSeq);
+        d->thumbnailsDP->setQuality(d->quality);
     }
 
     addResponseRangeHeader();
