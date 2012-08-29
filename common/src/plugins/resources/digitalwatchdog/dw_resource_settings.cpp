@@ -83,7 +83,7 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 bool DWCameraProxy::getFromBuffer(DWCameraSetting& src)
 {
     if (src.getQuery().startsWith(QLatin1String("/"))) {
-        return true;
+        return false;
     }
 
     QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
