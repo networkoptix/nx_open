@@ -1338,8 +1338,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         bool paused = mediaWidget->item()->data(Qn::ItemPausedRole).toBool();
 
         mediaWidget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        if(paused)
-            mediaWidget->display()->archiveReader()->setSingleShotMode(true);
+        if(paused) {
+            mediaWidget->display()->archiveReader()->pauseMedia();
+            mediaWidget->display()->camDisplay()->setSingleShotMode(true);
+        }
 
         // TODO: don't start reader for thumbnails search
         //widget->display()->archiveReader()->pauseMedia();
@@ -1390,7 +1392,9 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
     mediaWidget->display()->camDisplay()->start();
-    //mediaWidget->display()->start();
+    //mediaWidget->display()->archiveReader()->pauseMedia();
+    //mediaWidget->display()->archiveReader()->setSingleShotMode(true);
+    //mediaWidget->display()->archiveReader()->start();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {
