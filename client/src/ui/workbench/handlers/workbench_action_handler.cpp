@@ -17,6 +17,7 @@
 #include <utils/common/mime_data.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
+#include <utils/common/time.h>
 
 #include <core/resourcemanagment/resource_discovery_manager.h>
 #include <core/resourcemanagment/resource_pool.h>
@@ -1146,9 +1147,33 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         step = period.durationMs / itemCount;
     } else {
         /* In this case we want to adjust the period. */
-        qint64 startTime = qFloor(period.startTimeMs, step);
-        qint64 endTime = qCeil(period.endTimeMs(), step);
-        period = QnTimePeriod(startTime, endTime - startTime);
+
+        if(resource->flags() & QnResource::utc) {
+            QDateTime startDateTime = QDateTime::fromMSecsSinceEpoch(period.startTimeMs);
+            QDateTime endDateTime = QDateTime::fromMSecsSinceEpoch(period.endTimeMs());
+            const qint64 dayMSecs = 1000ll * 60 * 60 * 24;
+
+            if(step < dayMSecs) {
+                QTime base;
+
+                startDateTime.setTime(msecsToTime(qFloor(timeToMSecs(startDateTime.time()), step)));
+                endDateTime.setTime(msecsToTime(qCeil(timeToMSecs(endDateTime.time()), step)));
+            } else {
+                int stepDays = step / dayMSecs;
+
+                startDateTime.setTime(QTime());
+                startDateTime.setDate(QDate::fromJulianDay(qFloor(startDateTime.date().toJulianDay(), stepDays)));
+
+                endDateTime.setTime(QTime());
+                endDateTime.setDate(QDate::fromJulianDay(qCeil(endDateTime.date().toJulianDay(), stepDays)));
+            }
+
+            period = QnTimePeriod(startDateTime.toMSecsSinceEpoch(), endDateTime.toMSecsSinceEpoch() - startDateTime.toMSecsSinceEpoch());
+        } else {
+            qint64 startTime = qFloor(period.startTimeMs, step);
+            qint64 endTime = qCeil(period.endTimeMs(), step);
+            period = QnTimePeriod(startTime, endTime - startTime);
+        }
 
         itemCount = period.durationMs / step;
     }
