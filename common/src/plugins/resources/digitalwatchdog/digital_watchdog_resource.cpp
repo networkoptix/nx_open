@@ -3,17 +3,28 @@
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
 
+QString getIdSuffixByModel(const QString& cameraModel)
+{
+    QString tmp = cameraModel.toLower();
+    tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
+
+    if (tmp.contains(QLatin1String("mv421d"))) {
+        return QString::fromLatin1("-FOCUS");
+    }
+
+    return QString();
+}
+
 QnPlWatchDogResource::QnPlWatchDogResource():
     QnPlOnvifResource(),
-    m_cameraProxy(0),
-    m_settings()
+    m_additionalSettings()
 {
 
 }
 
 QnPlWatchDogResource::~QnPlWatchDogResource()
 {
-    delete m_cameraProxy;
+
 }
 
 bool QnPlWatchDogResource::isDualStreamingEnabled()
@@ -94,18 +105,31 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
-    QVariant id;
-    getParam(CAMERA_SETTINGS_ID_PARAM, id, QnDomainDatabase);
-    setParam(CAMERA_SETTINGS_ID_PARAM, id.toString() + DWCameraSettingReader::getIdSuffixByModel(cameraModel), QnDomainDatabase);
+    QVariant baseId;
+    getParam(CAMERA_SETTINGS_ID_PARAM, baseId, QnDomainDatabase);
+    QString baseIdStr = baseId.toString();
+
+    QString suffix = getIdSuffixByModel(cameraModel);
+    if (!suffix.isEmpty()) {
+        if (baseIdStr.endsWith(suffix))
+        {
+            baseIdStr = baseIdStr.left(baseIdStr.length() - suffix.length());
+        }
+        else
+        {
+            setParam(CAMERA_SETTINGS_ID_PARAM, baseIdStr + suffix, QnDomainDatabase);
+        }
+    }
 
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    if (!m_cameraProxy) {
-        m_cameraProxy = new DWCameraProxy(getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
-    }
+    m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
+        getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr)));
 
-    DWCameraSettingReader reader(m_settings, cameraModel);
-    reader.read() && reader.proceed();
+    if (!suffix.isEmpty()) {
+        m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
+            getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
+    }
 }
 
 QString QnPlWatchDogResource::fetchCameraModel()
@@ -134,25 +158,22 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    if (m_cameraProxy)
-    {
-        QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
-        if (currTime > m_advSettingsLastUpdated) {
-            if (!m_cameraProxy->getFromCameraIntoBuffer())
+    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    if (currTime > m_advSettingsLastUpdated) {
+        foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+        {
+            if (!setting->refreshValsFromCamera())
             {
                 return false;
             }
-            m_advSettingsLastUpdated = QDateTime::currentDateTime();
         }
+        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+    }
 
-        DWCameraSettings::Iterator it = m_settings.find(param.name());
-        if (it != m_settings.end()) {
-            if (it.value().getFromBuffer(*m_cameraProxy)){
-                val.setValue(it.value().serializeToStr());
-                return true;
-            }
-
-            //return false;
+    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    {
+        if (setting->getParamPhysicalFromBuffer(param, val))
+        {
             return true;
         }
     }
@@ -164,24 +185,72 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    if (m_cameraProxy)
+    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
-        CameraSetting tmp;
-        tmp.deserializeFromStr(val.toString());
-
-        DWCameraSettings::Iterator it = m_settings.find(param.name());
-        if (it != m_settings.end()) {
-            CameraSettingValue oldVal = it.value().getCurrent();
-            it.value().setCurrent(tmp.getCurrent());
-
-            if (!it.value().setToCamera(*m_cameraProxy)) {
-                it.value().setCurrent(oldVal);
-                return false;
-            }
-
+        if (setting->setParamPhysical(param, val))
+        {
             return true;
         }
     }
 
     return QnPlOnvifResource::setParamPhysical(param, val);
+}
+
+//
+// class QnPlWatchDogResourceAdditionalSettings
+//
+
+QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host,
+        int port, unsigned int timeout, const QAuthenticator& auth, const QString& cameraSettingId) :
+    m_cameraProxy(new DWCameraProxy(host, port, timeout, auth)),
+    m_settings()
+{
+    DWCameraSettingReader reader(m_settings, cameraSettingId);
+    reader.read() && reader.proceed();
+}
+
+QnPlWatchDogResourceAdditionalSettings::~QnPlWatchDogResourceAdditionalSettings()
+{
+    delete m_cameraProxy;
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::refreshValsFromCamera()
+{
+    return m_cameraProxy->getFromCameraIntoBuffer();
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const QnParam &param, QVariant &val)
+{
+    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        if (it.value().getFromBuffer(*m_cameraProxy)){
+            val.setValue(it.value().serializeToStr());
+            return true;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &param, const QVariant& val)
+{
+    CameraSetting tmp;
+    tmp.deserializeFromStr(val.toString());
+
+    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        CameraSettingValue oldVal = it.value().getCurrent();
+        it.value().setCurrent(tmp.getCurrent());
+
+        if (!it.value().setToCamera(*m_cameraProxy)) {
+            it.value().setCurrent(oldVal);
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
 }

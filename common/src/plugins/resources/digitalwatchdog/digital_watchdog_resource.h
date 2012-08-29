@@ -8,6 +8,9 @@
 #include "../onvif/onvif_resource.h"
 #include "dw_resource_settings.h"
 
+class QnPlWatchDogResourceAdditionalSettings;
+typedef QSharedPointer<QnPlWatchDogResourceAdditionalSettings> QnPlWatchDogResourceAdditionalSettingsPtr;
+
 class QnPlWatchDogResource : public QnPlOnvifResource
 {
 public:
@@ -27,10 +30,30 @@ private:
     QString fetchCameraModel();
 
 private:
-    DWCameraProxy* m_cameraProxy;
-    DWCameraSettings m_settings;
+    typedef QList<QnPlWatchDogResourceAdditionalSettingsPtr> AdditionalSettings;
+
+    AdditionalSettings m_additionalSettings;
 };
 
 typedef QnSharedResourcePointer<QnPlWatchDogResource> QnPlWatchDogResourcePtr;
+
+class QnPlWatchDogResourceAdditionalSettings
+{
+    QnPlWatchDogResourceAdditionalSettings();
+
+public:
+    
+    QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host, int port, unsigned int timeout,
+        const QAuthenticator& auth, const QString& cameraSettingId);
+    ~QnPlWatchDogResourceAdditionalSettings();
+
+    bool refreshValsFromCamera();
+    bool getParamPhysicalFromBuffer(const QnParam &param, QVariant &val);
+    bool setParamPhysical(const QnParam &param, const QVariant& val);
+
+private:
+    DWCameraProxy* m_cameraProxy;
+    DWCameraSettings m_settings;
+};
 
 #endif //dw_resource_h_1854

@@ -47,6 +47,10 @@ bool DWCameraProxy::getFromCameraImpl()
 
 bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
+    if (src.getQuery().startsWith(QLatin1String("/"))) {
+        return true;
+    }
+
     if (!getFromCameraImpl()) {
         return false;
     }
@@ -78,6 +82,10 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 
 bool DWCameraProxy::getFromBuffer(DWCameraSetting& src)
 {
+    if (src.getQuery().startsWith(QLatin1String("/"))) {
+        return true;
+    }
+
     QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
     if (it == m_bufferedValues.end()) {
         return false;
@@ -193,20 +201,8 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 const QString& DWCameraSettingReader::IMAGING_GROUP_NAME = *(new QString(QLatin1String("%%Imaging")));
 const QString& DWCameraSettingReader::MAINTENANCE_GROUP_NAME = *(new QString(QLatin1String("%%Maintenance")));
 
-QString DWCameraSettingReader::getIdSuffixByModel(const QString& cameraModel)
-{
-    QString tmp = cameraModel.toLower();
-    tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
-
-    if (tmp.contains(QLatin1String("mv421d"))) {
-        return QString::fromLatin1("-FOCUS");
-    }
-
-    return QString();
-}
-
-DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& cameraModel):
-    CameraSettingReader(QString::fromLatin1("DIGITALWATCHDOG") + getIdSuffixByModel(cameraModel)),
+DWCameraSettingReader::DWCameraSettingReader(DWCameraSettings& settings, const QString& cameraSettingId):
+    CameraSettingReader(cameraSettingId),
     m_settings(settings)
 {
 
