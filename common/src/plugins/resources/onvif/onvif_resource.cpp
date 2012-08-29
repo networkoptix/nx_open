@@ -52,9 +52,8 @@ struct VideoOptionsLocal
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
-    if (!s1.optionsResp.Options || !s2.optionsResp.Options) {
+    if (!s1.optionsResp.Options || !s2.optionsResp.Options)
         return s1.optionsResp.Options > s2.optionsResp.Options;
-    }
 
     typedef std::vector<onvifXsd__VideoResolution*> ResVector;
 
@@ -63,39 +62,22 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     const ResVector& resolutionsAvailableS2 = (s2.optionsResp.Options->H264 ? s2.optionsResp.Options->H264->ResolutionsAvailable:
         (s2.optionsResp.Options->JPEG ? s2.optionsResp.Options->JPEG->ResolutionsAvailable: ResVector()));
 
-    long long square1 = 0;
-    ResVector::const_iterator it1 = resolutionsAvailableS1.begin();
-    while (it1 != resolutionsAvailableS1.end()) {
-        if (!*it1) {
-            ++it1;
-            continue;
-        }
-
-        long long tmpSquare = (*it1)->Width * (*it1)->Height;
-        if (square1 < tmpSquare) {
-            square1 = tmpSquare;
-        }
-
-        ++it1;
+    int square1 = 0;
+    for (int i = 0; i < resolutionsAvailableS1.size(); ++i) {
+        if (resolutionsAvailableS1[i])
+            square1 = qMax(square1, resolutionsAvailableS1[i]->Width * resolutionsAvailableS1[i]->Height);
+    }
+    
+    int square2 = 0;
+    for (int i = 0; i < resolutionsAvailableS2.size(); ++i) {
+        if (resolutionsAvailableS2[i])
+            square2 = qMax(square2, resolutionsAvailableS2[i]->Width * resolutionsAvailableS2[i]->Height);
     }
 
-    long long square2 = 0;
-    ResVector::const_iterator it2 = resolutionsAvailableS2.begin();
-    while (it2 != resolutionsAvailableS2.end()) {
-        if (!*it2) {
-            ++it2;
-            continue;
-        }
+    if (square1 != square2)
+        return square1 > square2;
 
-        long long tmpSquare = (*it2)->Width * (*it2)->Height;
-        if (square2 < tmpSquare) {
-            square2 = tmpSquare;
-        }
-
-        ++it2;
-    }
-
-    return square1 > square2;
+    return s1.optionsResp.Options->H264 > s2.optionsResp.Options->H264; // if some option doesn't have H264 it "less"
 }
 
 //
@@ -106,7 +88,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),
-    m_codec(H264),
+    m_primaryCodec(H264),
+    m_secondaryCodec(H264),
     m_audioCodec(AUDIO_NONE),
     m_primaryResolution(EMPTY_RESOLUTION_PAIR),
     m_secondaryResolution(EMPTY_RESOLUTION_PAIR),
@@ -240,16 +223,19 @@ int QnPlOnvifResource::getAudioSamplerate() const
     return m_audioSamplerate;
 }
 
-QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec() const
+QnPlOnvifResource::CODECS QnPlOnvifResource::getCodec(bool isPrimary) const
 {
     QMutexLocker lock(&m_mutex);
-    return m_codec;
+    return isPrimary ? m_primaryCodec : m_secondaryCodec;
 }
 
-void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c)
+void QnPlOnvifResource::setCodec(QnPlOnvifResource::CODECS c, bool isPrimary)
 {
     QMutexLocker lock(&m_mutex);
-    m_codec = c;
+    if (isPrimary)
+        m_primaryCodec = c;
+    else
+        m_secondaryCodec = c;
 }
 
 QnPlOnvifResource::AUDIO_CODECS QnPlOnvifResource::getAudioCodec() const
@@ -276,7 +262,8 @@ void QnPlOnvifResource::setCropingPhysical(QRect /*croping*/)
 
 bool QnPlOnvifResource::initInternal()
 {
-    setCodec(H264);
+    setCodec(H264, true);
+    setCodec(H264, false);
 
     if (getDeviceOnvifUrl().isEmpty()) {
         qCritical() << "QnPlOnvifResource::initInternal: Can't do anything: ONVIF device url is absent. Id: " << getPhysicalId();
@@ -453,9 +440,7 @@ int QnPlOnvifResource::getSecondaryH264Profile() const
 
 void QnPlOnvifResource::setMaxFps(int f)
 {
-    QVariant predefinedMaxFps;
-    getParam(MAX_FPS_PARAM_NAME, predefinedMaxFps, QnDomainMemory);
-    setParam(MAX_FPS_PARAM_NAME, qMin(f, predefinedMaxFps.toInt()), QnDomainDatabase);
+    setParam(MAX_FPS_PARAM_NAME, f, QnDomainDatabase);
 }
 
 int QnPlOnvifResource::getMaxFps()
@@ -636,7 +621,7 @@ void QnPlOnvifResource::updateSecondaryResolutionList(const VideoOptionsResp& re
     if (!response.Options)
         return;
     const std::vector<onvifXsd__VideoResolution*>* resolutionsPtr = 0;
-    if (getCodec() == H264 && response.Options->H264)
+    if (getCodec(false) == H264 && response.Options->H264)
         resolutionsPtr = &response.Options->H264->ResolutionsAvailable;
     else if (response.Options->JPEG)
         resolutionsPtr = &response.Options->JPEG->ResolutionsAvailable;
@@ -664,7 +649,7 @@ void QnPlOnvifResource::setVideoEncoderOptions(const VideoOptionsResp& response)
         qCritical() << "QnPlOnvifResource::setVideoEncoderOptions: camera didn't return quality range. UniqueId: " << getUniqueId();
     }
 
-    if (getCodec() == H264) 
+    if (response.Options->H264) 
     {
         setVideoEncoderOptionsH264(response);
     } 
@@ -683,7 +668,6 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     if (response.Options->H264->FrameRateRange) 
     {
         setMaxFps(response.Options->H264->FrameRateRange->Max);
-        qDebug() << "ONVIF max FPS: " << getMaxFps();
     } 
     else 
     {
@@ -725,7 +709,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     QMutexLocker lock(&m_mutex);
 
     //Printing fetched resolutions
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
+    if (cl_log.logLevel() > cl_logDEBUG1) {
         qDebug() << "ONVIF resolutions: ";
         foreach (ResolutionPair resolution, m_resolutionList) {
             qDebug() << resolution.first << " x " << resolution.second;
@@ -744,7 +728,6 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
     if (response.Options->JPEG->FrameRateRange) 
     {
         setMaxFps(response.Options->JPEG->FrameRateRange->Max);
-        qDebug() << "ONVIF max FPS: " << getMaxFps();
     } 
     else 
     {
@@ -772,7 +755,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
 
     QMutexLocker lock(&m_mutex);
     //Printing fetched resolutions
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
+    if (cl_log.logLevel() > cl_logDEBUG1) {
         qDebug() << "ONVIF resolutions: ";
         foreach (ResolutionPair resolution, m_resolutionList) {
             qDebug() << resolution.first << " x " << resolution.second;
@@ -968,7 +951,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         MediaSoapWrapperPtr soapWrapperPtr(new MediaSoapWrapper(endpoint, login, password));
         soapWrappersList.append(soapWrapperPtr);
 
-        qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
+        //qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
 
         optionsList.append(VideoOptionsLocal());
         VideoOptionsLocal& currVideoOpts = optionsList.back();
@@ -1016,7 +999,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
-    QList<VideoOptionsLocal>::const_iterator optIt = optionsList.begin();
     if (optionsList.isEmpty())
     {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: all video options are empty. (URL: "
@@ -1025,26 +1007,34 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
-    if (optIt->optionsResp.Options->H264) 
-    {
-        setCodec(H264);
-        m_primaryH264Profile = getH264StreamProfile(optIt->optionsResp);
-    } 
-    else if (optIt->optionsResp.Options->JPEG) 
-    {
-        setCodec(JPEG);
+
+    if (optionsList[0].optionsResp.Options->H264) {
+        m_primaryH264Profile = getH264StreamProfile(optionsList[0].optionsResp);
+        setCodec(H264, true);
+    }
+    else if (optionsList[0].optionsResp.Options->JPEG) {
+        setCodec(JPEG, true);
     }
 
-    setVideoEncoderOptions(optIt->optionsResp);
+    setVideoEncoderOptions(optionsList[0].optionsResp);
+    checkMaxFps(confResponse, optionsList[0].id);
+
     {
         QMutexLocker lock(&m_mutex);
         m_secondaryResolutionList = m_resolutionList;
-        m_primaryVideoEncoderId = optIt->id;
+        m_primaryVideoEncoderId = optionsList[0].id;
 
-        if (++optIt != optionsList.end()) {
-            m_secondaryVideoEncoderId = optIt->id;
-            m_secondaryH264Profile = getH264StreamProfile(optIt->optionsResp);
-            updateSecondaryResolutionList(optIt->optionsResp);
+        if (optionsList.size() > 1) 
+        {
+            m_secondaryVideoEncoderId = optionsList[1].id;
+            if (optionsList[1].optionsResp.Options->H264) {
+                m_secondaryH264Profile = getH264StreamProfile(optionsList[1].optionsResp);
+                setCodec(H264, false);
+            }
+            else {
+                setCodec(JPEG, false);
+            }
+            updateSecondaryResolutionList(optionsList[1].optionsResp);
         }
     }
 
@@ -1437,4 +1427,90 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
 bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
 {
     return m_forceCodecFromPrimaryEncoder;
+}
+
+int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+
+    SetVideoConfigReq request;
+    SetVideoConfigResp response;
+    request.Configuration = &encoder;
+    request.ForcePersistence = false;
+
+    int soapRes = soapWrapper.setVideoEncoderConfiguration(request, response);
+    if (soapRes != SOAP_OK) {
+        qCritical() << "QnOnvifStreamReader::sendVideoEncoderToCamera: can't set required values into ONVIF physical device (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() 
+            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
+        if (soapWrapper.getLastError().contains(QLatin1String("not possible to set")))
+            soapRes = -2;
+    }
+    return soapRes;
+}
+
+void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
+{
+    VideoEncoder* vEncoder = 0;
+    for (int i = 0; i < response.Configurations.size(); ++i)
+    {
+        if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
+            vEncoder = response.Configurations[i];
+    }
+    if (!vEncoder)    
+        return;
+
+    int maxFpsOrig = getMaxFps();
+    int rangeHi = getMaxFps()-2;
+    int rangeLow = getMaxFps()/4;
+    int currentFps = rangeHi;
+    int prevFpsValue = -1;
+
+    vEncoder->Resolution->Width = m_resolutionList[0].first;
+    vEncoder->Resolution->Height = m_resolutionList[0].second;
+    
+    while (currentFps != prevFpsValue)
+    {
+        vEncoder->RateControl->FrameRateLimit = currentFps;
+        bool success = false;
+        bool invalidFpsDetected = false;
+        int retryCount = getMaxOnvifRequestTries();
+        for (int i = 0; i < 3; ++i)
+        {
+            vEncoder->RateControl->FrameRateLimit = currentFps;
+            int errCode = sendVideoEncoderToCamera(*vEncoder);
+            if (errCode == SOAP_OK) 
+            {
+                if (currentFps >= maxFpsOrig-2) {
+                    // If first try success, does not change maxFps at all. (HikVision has working range 0..15, and 25 fps, so try from max-1 checking)
+                    return; 
+                }
+                setMaxFps(currentFps);
+                success = true;
+                break;
+            }
+            else if (errCode == -2)
+            {
+                invalidFpsDetected = true;
+                break; // invalid fps
+            }
+        }
+        if (!invalidFpsDetected && !success)
+        {
+            // can't determine fps (cameras does not answer e.t.c)
+            setMaxFps(maxFpsOrig);
+            return;
+        }
+
+        prevFpsValue = currentFps;
+        if (success) {
+            rangeLow = currentFps;
+            currentFps += (rangeHi-currentFps+1)/2;
+        }
+        else {
+            rangeHi = currentFps-1;
+            currentFps -= (currentFps-rangeLow+1)/2;
+        }
+    }
 }

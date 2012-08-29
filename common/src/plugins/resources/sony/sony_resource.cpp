@@ -48,7 +48,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password);
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
-    request.Configuration->Encoding = getCodec() == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
+    request.Configuration->Encoding = getCodec(true) == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;
     request.ForcePersistence = false;
     SetVideoConfigResp response;
 
