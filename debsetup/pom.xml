@@ -20,6 +20,12 @@
 	<packaging>pom</packaging>
 	<name>Common POM for debs projects</name>	
 
+	<build>
+		<directory>${arch}</directory>
+		<outputDirectory>${arch}</outputDirectory>
+		<sourceDirectory>${basedir}/src</sourceDirectory> 		
+	</build>				
+
 	<profiles>
 		<profile>
 			<id>installer</id>
@@ -27,9 +33,6 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>		
 			<build>
-				<directory>${arch}</directory>
-				<outputDirectory>${arch}</outputDirectory>
-				<sourceDirectory>${basedir}/src</sourceDirectory> 	
 				<plugins>	
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
