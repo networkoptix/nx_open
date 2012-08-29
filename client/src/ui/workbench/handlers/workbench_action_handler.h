@@ -9,6 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "../workbench_globals.h"
 
 class QAction;
 class QMenu;
@@ -273,6 +274,7 @@ protected slots:
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
+    void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);

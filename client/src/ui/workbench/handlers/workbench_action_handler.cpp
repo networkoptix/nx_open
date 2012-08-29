@@ -152,6 +152,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
+    connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(submitDelayedDrops()), Qt::QueuedConnection);
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(updateCameraSettingsEditibility()));
@@ -2093,7 +2094,6 @@ struct ItemPositionCmp {
     }
 };
 
-
 void QnWorkbenchActionHandler::at_tourTimer_timeout() {
     QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
     qSort(items.begin(), items.end(), ItemPositionCmp());
@@ -2110,4 +2110,9 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
         item = items[0];
     }
     context()->workbench()->setItem(Qn::ZoomedRole, item);
+}
+
+void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
+    if(!workbench()->item(Qn::ZoomedRole))
+        action(Qn::ToggleTourModeAction)->setChecked(false);
 }
