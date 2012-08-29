@@ -140,7 +140,9 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>&
                 QnTimePeriod& last = result.last();
                 if (periods[minIndex][startIdx].durationMs == -1) 
                 {
-                    if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
+                    if (last.durationMs == -1)
+                        last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
+                    else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
                         result << periods[minIndex][startIdx];
                     else 
                         last.durationMs = -1;

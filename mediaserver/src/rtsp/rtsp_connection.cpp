@@ -171,14 +171,6 @@ void QnRtspConnectionProcessor::parseRequest()
         d->useProprietaryFormat = true;
     processRangeHeader();
 
-    if (!d->requestHeaders.value("x-media-step").isEmpty())
-        d->liveMode = Mode_ThumbNails;
-    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
-        d->liveMode = Mode_Live;
-    else
-        d->liveMode = Mode_Archive;
-
-
     if (d->requestHeaders.value("x-media-quality") == QString("low"))
         d->quality = MEDIA_Quality_Low;
     else
@@ -630,13 +622,6 @@ void QnRtspConnectionProcessor::processRangeHeader()
     Q_D(QnRtspConnectionProcessor);
     QString rangeStr = d->requestHeaders.value("Range");
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (rangeStr.isNull()) {
-        if (cameraResource)
-            d->startTime = DATETIME_NOW;
-        else
-            d->startTime = 0;
-        return;
-    }
     parseRangeHeader(rangeStr, &d->startTime, &d->endTime);
     if (cameraResource && d->startTime == 0 && !d->useProprietaryFormat)
         d->startTime = DATETIME_NOW;
@@ -751,6 +736,20 @@ int QnRtspConnectionProcessor::composePlay()
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
+
+    if (d->requestHeaders.value("Range").isNull())
+    {
+        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
+        d->startTime = cameraResource ? DATETIME_NOW : 0;
+    }
+
+    if (!d->requestHeaders.value("x-media-step").isEmpty())
+        d->liveMode = Mode_ThumbNails;
+    else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
+        d->liveMode = Mode_Live;
+    else
+        d->liveMode = Mode_Archive;
+
     createDataProvider();
     checkQuality();
 
@@ -917,7 +916,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             {
                 d->dataProcessor->lockDataQueue();
 
-                connectToLiveDataProviders();
+                //connectToLiveDataProviders();
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
                 d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time); // for fast quality switching
@@ -1068,14 +1067,6 @@ void QnRtspConnectionProcessor::run()
     d->trackInfo.clear();
     m_runing = false;
     //deleteLater(); // does not works for this thread
-}
-
-void QnRtspConnectionProcessor::switchToLive()
-{
-    Q_D(QnRtspConnectionProcessor);
-    QMutexLocker lock(&d->mutex);
-    d->liveMode = Mode_Live;
-    composePlay();
 }
 
 void QnRtspConnectionProcessor::resetTrackTiming()
