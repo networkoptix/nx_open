@@ -243,7 +243,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         if (profile != -1)
             encoder.H264->H264Profile = onvifXsd__H264Profile(profile);
         if (encoder.RateControl)
-            encoder.RateControl->EncodingInterval = 20;
+            encoder.RateControl->EncodingInterval = 1;
     }
 
 

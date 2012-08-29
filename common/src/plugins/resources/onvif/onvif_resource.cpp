@@ -52,9 +52,8 @@ struct VideoOptionsLocal
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
-    if (!s1.optionsResp.Options || !s2.optionsResp.Options) {
+    if (!s1.optionsResp.Options || !s2.optionsResp.Options)
         return s1.optionsResp.Options > s2.optionsResp.Options;
-    }
 
     typedef std::vector<onvifXsd__VideoResolution*> ResVector;
 
@@ -63,39 +62,22 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     const ResVector& resolutionsAvailableS2 = (s2.optionsResp.Options->H264 ? s2.optionsResp.Options->H264->ResolutionsAvailable:
         (s2.optionsResp.Options->JPEG ? s2.optionsResp.Options->JPEG->ResolutionsAvailable: ResVector()));
 
-    long long square1 = 0;
-    ResVector::const_iterator it1 = resolutionsAvailableS1.begin();
-    while (it1 != resolutionsAvailableS1.end()) {
-        if (!*it1) {
-            ++it1;
-            continue;
-        }
-
-        long long tmpSquare = (*it1)->Width * (*it1)->Height;
-        if (square1 < tmpSquare) {
-            square1 = tmpSquare;
-        }
-
-        ++it1;
+    int square1 = 0;
+    for (int i = 0; i < resolutionsAvailableS1.size(); ++i) {
+        if (resolutionsAvailableS1[i])
+            square1 = qMax(square1, resolutionsAvailableS1[i]->Width * resolutionsAvailableS1[i]->Height);
+    }
+    
+    int square2 = 0;
+    for (int i = 0; i < resolutionsAvailableS2.size(); ++i) {
+        if (resolutionsAvailableS2[i])
+            square2 = qMax(square2, resolutionsAvailableS2[i]->Width * resolutionsAvailableS2[i]->Height);
     }
 
-    long long square2 = 0;
-    ResVector::const_iterator it2 = resolutionsAvailableS2.begin();
-    while (it2 != resolutionsAvailableS2.end()) {
-        if (!*it2) {
-            ++it2;
-            continue;
-        }
+    if (square1 != square2)
+        return square1 > square2;
 
-        long long tmpSquare = (*it2)->Width * (*it2)->Height;
-        if (square2 < tmpSquare) {
-            square2 = tmpSquare;
-        }
-
-        ++it2;
-    }
-
-    return square1 > square2;
+    return s1.optionsResp.Options->H264 > s2.optionsResp.Options->H264; // if some option doesn't have H264 it "less"
 }
 
 //
@@ -688,7 +670,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     if (response.Options->H264->FrameRateRange) 
     {
         setMaxFps(response.Options->H264->FrameRateRange->Max);
-        qDebug() << "ONVIF max FPS: " << getMaxFps();
+        checkMaxFps();
     } 
     else 
     {
@@ -730,7 +712,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsH264(const VideoOptionsResp& respo
     QMutexLocker lock(&m_mutex);
 
     //Printing fetched resolutions
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
+    if (cl_log.logLevel() > cl_logDEBUG1) {
         qDebug() << "ONVIF resolutions: ";
         foreach (ResolutionPair resolution, m_resolutionList) {
             qDebug() << resolution.first << " x " << resolution.second;
@@ -749,7 +731,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
     if (response.Options->JPEG->FrameRateRange) 
     {
         setMaxFps(response.Options->JPEG->FrameRateRange->Max);
-        qDebug() << "ONVIF max FPS: " << getMaxFps();
+        checkMaxFps();
     } 
     else 
     {
@@ -777,7 +759,7 @@ void QnPlOnvifResource::setVideoEncoderOptionsJpeg(const VideoOptionsResp& respo
 
     QMutexLocker lock(&m_mutex);
     //Printing fetched resolutions
-    if (cl_log.logLevel() >= cl_logDEBUG1) {
+    if (cl_log.logLevel() > cl_logDEBUG1) {
         qDebug() << "ONVIF resolutions: ";
         foreach (ResolutionPair resolution, m_resolutionList) {
             qDebug() << resolution.first << " x " << resolution.second;
@@ -1030,81 +1012,32 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     }
 
 
-    int primaryIndex = -1;
-    int secondaryIndex = -1;
-    for (int i = 0; i < optionsList.size(); ++i)
-    {
-        if (optionsList[i].optionsResp.Options->H264) 
-        {
-            if (primaryIndex == -1) {
-                primaryIndex = i;
-                m_primaryH264Profile = getH264StreamProfile(optionsList[i].optionsResp);
-            }
-            else if (secondaryIndex == -1) {
-                secondaryIndex = i;
-                m_secondaryH264Profile = getH264StreamProfile(optionsList[i].optionsResp);
-            }
-            else {
-                break;
-            }
-        }
+    if (optionsList[0].optionsResp.Options->H264) {
+        m_primaryH264Profile = getH264StreamProfile(optionsList[0].optionsResp);
+        setCodec(H264, true);
     }
-    for (int i = 0; i < optionsList.size(); ++i)
-    {
-        if (optionsList[i].optionsResp.Options->JPEG)
-        {
-            if (primaryIndex == -1) {
-                primaryIndex = i;
-                setCodec(JPEG, true);
-            }
-            else if (secondaryIndex == -1) {
-                secondaryIndex = i;
-                setCodec(JPEG, false);
-            }
-            else {
-                break;
-            }
-        }
+    else if (optionsList[0].optionsResp.Options->JPEG) {
+        setCodec(JPEG, true);
     }
-
-    QMutexLocker lock(&m_mutex);
-    if (primaryIndex != -1) {
-        setVideoEncoderOptions(optionsList[primaryIndex].optionsResp);
-        m_primaryVideoEncoderId = optionsList[primaryIndex].id;
-    }
-
-    if (secondaryIndex != -1)
-    {
-        m_secondaryResolutionList = m_resolutionList;
-        m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
-        updateSecondaryResolutionList(optionsList[secondaryIndex].optionsResp);
-    }
-
-    /*
-    QList<VideoOptionsLocal>::const_iterator optIt = optionsList.begin();
-    if (optIt->optionsResp.Options->H264) 
-    {
-        setCodec(H264);
-        m_primaryH264Profile = getH264StreamProfile(optIt->optionsResp);
-    } 
-    else if (optIt->optionsResp.Options->JPEG) 
-    {
-        setCodec(JPEG);
-    }
-
-    setVideoEncoderOptions(optIt->optionsResp);
+    setVideoEncoderOptions(optionsList[0].optionsResp);
     {
         QMutexLocker lock(&m_mutex);
         m_secondaryResolutionList = m_resolutionList;
-        m_primaryVideoEncoderId = optIt->id;
+        m_primaryVideoEncoderId = optionsList[0].id;
 
-        if (++optIt != optionsList.end()) {
-            m_secondaryVideoEncoderId = optIt->id;
-            m_secondaryH264Profile = getH264StreamProfile(optIt->optionsResp);
-            updateSecondaryResolutionList(optIt->optionsResp);
+        if (optionsList.size() > 1) 
+        {
+            m_secondaryVideoEncoderId = optionsList[1].id;
+            if (optionsList[1].optionsResp.Options->H264) {
+                m_secondaryH264Profile = getH264StreamProfile(optionsList[1].optionsResp);
+                setCodec(H264, false);
+            }
+            else {
+                setCodec(JPEG, false);
+            }
+            updateSecondaryResolutionList(optionsList[1].optionsResp);
         }
     }
-    */
 
     return true;
 }
