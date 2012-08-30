@@ -42,7 +42,7 @@ def genqrc(qrcname, qrcprefix, path, extensions, additions=''):
 
 if __name__ == '__main__':
   os.system('mkdir build')
-  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv'])
+  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'])
   genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/default', [''])
   genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''])
   genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''])  
