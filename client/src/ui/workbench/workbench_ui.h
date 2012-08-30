@@ -439,8 +439,6 @@ private:
     HoverFocusProcessor *m_calendarOpacityProcessor;
 
     bool m_inCalendarGeometryUpdate;
-
-    QnImageButtonWidget *m_panicButton;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

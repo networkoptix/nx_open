@@ -90,7 +90,10 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
                 delete ui->tabAdvanced->layout();
                 ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
             }
+            
             QSplitter* advancedSplitter = new QSplitter();
+            advancedSplitter->setChildrenCollapsible(false);
+
             layout->addWidget(advancedSplitter);
 
             advancedTreeWidget = new QTreeWidget();
@@ -101,6 +104,11 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedLayout = new QStackedLayout(advancedWidget);
             advancedSplitter->addWidget(advancedTreeWidget);
             advancedSplitter->addWidget(advancedWidget);
+
+            QList<int> sizes = advancedSplitter->sizes();
+            sizes[0] = 200;
+            sizes[1] = 400;
+            advancedSplitter->setSizes(sizes);
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;

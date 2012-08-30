@@ -4,7 +4,7 @@
 // class DWCameraProxy
 //
 
-QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},]"));
+QRegExp DW_RES_SETTINGS_FILTER(QString::fromLatin1("[{},']"));
 
 
 DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
@@ -18,26 +18,23 @@ DWCameraProxy::DWCameraProxy(const QHostAddress& host, int port, unsigned int ti
 
 bool DWCameraProxy::getFromCameraImpl()
 {
+    m_bufferedValues.clear();
+
+    return getFromCameraImpl(QByteArray("cgi-bin/getconfig.cgi?action=color")) &&
+        getFromCameraImpl(QByteArray("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo"));
+}
+
+bool DWCameraProxy::getFromCameraImpl(const QByteArray& query)
+{
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 
-    CLHttpStatus status = httpClient.doGET(QByteArray("cgi-bin/getconfig.cgi?action=color"));
+    CLHttpStatus status = httpClient.doGET(query);
     if (status == CL_HTTP_SUCCESS) 
     {
-        m_bufferedValues.clear();
-
         QByteArray body;
         httpClient.readAll(body);
-        QList<QByteArray> lines = body.split(',');
-        for (int i = 0; i < lines.size(); ++i) 
-        {
-            QString str = QString::fromLatin1(lines[i]);
-            str.replace(DW_RES_SETTINGS_FILTER, QString());
-            QStringList pairStrs = str.split(QString::fromLatin1(":"));
-            if (pairStrs.size() == 2) {
-                m_bufferedValues.insert(pairStrs[0].trimmed(), pairStrs[1].trimmed());
-            }
-        }
 
+        fetchParamsFromHttpRespons(body);
         return true;
     }
 
@@ -45,9 +42,23 @@ bool DWCameraProxy::getFromCameraImpl()
     return false;
 }
 
+void DWCameraProxy::fetchParamsFromHttpRespons(const QByteArray& body)
+{
+    QList<QByteArray> lines = body.split(',');
+    for (int i = 0; i < lines.size(); ++i) 
+    {
+        QString str = QString::fromLatin1(lines[i]);
+        str.replace(DW_RES_SETTINGS_FILTER, QString());
+        QStringList pairStrs = str.split(QString::fromLatin1(":"));
+        if (pairStrs.size() == 2) {
+            m_bufferedValues.insert(pairStrs[0].trimmed(), pairStrs[1].trimmed());
+        }
+    }
+}
+
 bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
-    if (src.getQuery().startsWith(QLatin1String("/"))) {
+    if (src.getType() == CameraSetting::Button) {
         return true;
     }
 
@@ -68,16 +79,39 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 {
     QString desiredVal = src.getCurrentAsIntStr();
 
+    bool res = src.getMethod() == QString::fromLatin1("POST")? setToCameraPost(src, desiredVal) :
+        setToCameraGet(src, desiredVal);
+    res = getFromCameraImpl() && res;
+    res = getFromCamera(src) && res;    
+
+    return res && desiredVal == src.getCurrentAsIntStr();
+}
+
+bool DWCameraProxy::setToCameraGet(DWCameraSetting& src, const QString& desiredVal)
+{
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     QString paramQuery = src.getQuery();
     QByteArray query = paramQuery.startsWith(QLatin1String("/"))? paramQuery.toLatin1() : 
         (QString::fromLatin1("cgi-bin/camerasetup.cgi?") + paramQuery + QString::fromLatin1("=") + desiredVal).toLatin1();
 
-    bool res = httpClient.doGET(query) == CL_HTTP_SUCCESS;
-    res = getFromCameraImpl() && res;
-    res = getFromCamera(src) && res;    
+    return httpClient.doGET(query) == CL_HTTP_SUCCESS;
+}
 
-    return res && desiredVal == src.getCurrentAsIntStr();
+bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desiredVal)
+{
+    CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
+    QString paramQuery = src.getQuery();
+    QByteArray query;
+
+    if (paramQuery.startsWith(QLatin1String("/"))) {
+        query = paramQuery.toLatin1();
+        paramQuery = QString::fromLatin1("action=all");
+    } else {
+        query = "/cgi-bin/systemsetup.cgi";
+        paramQuery = QString::fromLatin1("ftp_upgrade_") + paramQuery + QString::fromLatin1("=") + desiredVal;
+    }
+
+    return httpClient.doPOST(query, paramQuery) == CL_HTTP_SUCCESS;
 }
 
 bool DWCameraProxy::getFromBuffer(DWCameraSetting& src)
@@ -104,9 +138,9 @@ bool DWCameraProxy::getFromCameraIntoBuffer()
 // class DWCameraSetting: public CameraSetting
 // 
 
-DWCameraSetting::DWCameraSetting(const QString& id, const QString& name, WIDGET_TYPE type, const QString& query, const QString& description,
+DWCameraSetting::DWCameraSetting(const QString& id, const QString& name, WIDGET_TYPE type, const QString& query, const QString& method, const QString& description,
         const CameraSettingValue min, const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
-    CameraSetting(id, name, type, query, description, min, max, step, current)
+    CameraSetting(id, name, type, query, method, description, min, max, step, current)
 {
     initAdditionalValues();
 }
@@ -228,7 +262,7 @@ bool DWCameraSettingReader::isParamEnabled(const QString& /*id*/, const QString&
 void DWCameraSettingReader::paramFound(const CameraSetting& value, const QString& /*parentId*/)
 {
     m_settings.insert(value.getId(), DWCameraSetting(value.getId(), value.getName(), value.getType(), value.getQuery(),
-        value.getDescription(), value.getMin(), value.getMax(), value.getStep()));
+        value.getMethod(), value.getDescription(), value.getMin(), value.getMax(), value.getStep()));
 }
 
 void DWCameraSettingReader::cleanDataOnFail()

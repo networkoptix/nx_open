@@ -10,6 +10,8 @@
 #include "core/resource/resource_directory_browser.h"
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
+#include "utils/network/ip_range_checker.h"
+
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -195,6 +197,9 @@ void printInLogNetResources(const QnResourceList& resources)
 
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 {
+
+    //findResources(QHostAddress(), QHostAddress());
+
     //bool allow_to_change_ip = true;
     static const int  threads = 5;
 
@@ -539,6 +544,18 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     
 
     return resources;
+}
+
+QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr, QHostAddress endAddr)
+{
+    QnResourceList result;
+    // looking for a new resources from this ip range;
+    QnIprangeChecker ip_cheker;
+
+    ip_cheker.onlineHosts(QHostAddress(QLatin1String("192.168.0.0")), QHostAddress(QLatin1String("192.168.0.255")));
+
+
+    return result;
 }
 
 //==========================check_if_accessible========================
