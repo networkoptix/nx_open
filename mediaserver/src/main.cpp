@@ -391,7 +391,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events/");
-    appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
+    appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrl.addQueryItem("format", "pb");
 
