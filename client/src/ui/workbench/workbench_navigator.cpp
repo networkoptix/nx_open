@@ -302,7 +302,6 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
             setSpeed(1.0);
     } else {
         reader->pauseMedia();
-        camDisplay->playAudio(false);
         reader->setSingleShotMode(true);
 
         setSpeed(0.0);
