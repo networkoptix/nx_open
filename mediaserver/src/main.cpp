@@ -56,6 +56,8 @@
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
 #include "rest/handlers/cameraparamshttphandler.h"
+#include "rest/handlers/manual_camera_addition.h"
+
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
@@ -639,6 +641,7 @@ void QnMain::run()
     m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
     m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+    m_restServer->registerHandler("api/manualAddcams", new QnManualCameraAdditionHandler());
 
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt());
     m_progressiveDownloadingServer->enableSSLMode();
