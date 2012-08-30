@@ -69,9 +69,6 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-
-#include <utils/settings.h>
-
 #include "client_message_processor.h"
 #include "file_processor.h"
 
@@ -553,9 +550,16 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
-/*void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
-
-}*/
+void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
+    QnConnectionDataList connections = qnSettings->customConnections();
+    // todo 1: compare only url's
+    // todo 2: rename ALL that require it (compatibility with prev versions)
+    // todo 3: limit stored connections number by 10 (const)
+    if (connections.contains(connectionData))
+        connections.removeOne(connectionData);
+    connections.prepend(connectionData);
+    qnSettings->setCustomConnections(connections);
+}
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
@@ -1086,7 +1090,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
-  //  updateStoredConnections(connectionData);
+    updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
