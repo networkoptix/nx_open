@@ -1033,7 +1033,7 @@ void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
     }
 }
 
-bool QnArchiveStreamReader::getQuality() const
+MediaQuality QnArchiveStreamReader::getQuality() const
 {
     return m_quality;
 }

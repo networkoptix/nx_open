@@ -554,11 +554,15 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
             if (oldMediaWidget->display()->archiveReader()) {
                 oldMediaWidget->display()->archiveReader()->enableQualityChange();
-                oldMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                if (oldMediaWidget->display()->archiveReader()->getQuality() == MEDIA_Quality_AlwaysHigh)
+                    oldMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             if (newMediaWidget->display()->archiveReader()) {
-                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
+                if (newMediaWidget->display()->camDisplay()->isRealTimeSource())
+                    newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
+                else
+                    newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
                 newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
