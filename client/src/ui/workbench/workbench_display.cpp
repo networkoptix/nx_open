@@ -75,6 +75,14 @@ namespace {
         }
     };
 
+    struct WidgetPositionLess {
+        bool operator()(QnResourceWidget *l, QnResourceWidget *r) const {
+            QRect lg = l->item()->geometry();
+            QRect rg = r->item()->geometry();
+            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
+        }
+    };
+
     void calculateExpansionValues(qreal start, qreal end, qreal center, qreal newLength, qreal *deltaStart, qreal *deltaEnd) {
         qreal newStart = center - newLength / 2;
         qreal newEnd = center + newLength / 2;
@@ -544,11 +552,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         /* Update media quality. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
-            if (oldMediaWidget->display()->archiveReader())
+            if (oldMediaWidget->display()->archiveReader()) {
                 oldMediaWidget->display()->archiveReader()->enableQualityChange();
+                oldMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+            }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             if (newMediaWidget->display()->archiveReader()) {
-                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
                 newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
@@ -1329,18 +1339,28 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();
 
-    foreach(QnResourceWidget *widget, widgets()) {
-        QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-        if(!mediaWidget)
+    QList<QnResourceWidget *> widgets = this->widgets();
+    if(thumbnailed)
+        qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
+
+    for(int i = 0; i < widgets.size(); i++) {
+        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[i]);
+        if(!widget)
             continue;
 
-        qint64 time = mediaWidget->item()->data(Qn::ItemTimeRole).value<qint64>();
-        bool paused = mediaWidget->item()->data(Qn::ItemPausedRole).toBool();
+        qint64 time;
+        if(thumbnailed) {
+            time = searchState.period.startTimeMs + searchState.step * i;
+        } else {
+            time = widget->item()->data(Qn::ItemTimeRole).value<qint64>();
+        }
 
-        mediaWidget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
+        bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
+
+        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
         if(paused) {
-            mediaWidget->display()->archiveReader()->pauseMedia();
-            mediaWidget->display()->camDisplay()->setSingleShotMode(true);
+            widget->display()->archiveReader()->pauseMedia();
+            widget->display()->camDisplay()->setSingleShotMode(true);
         }
 
         // TODO: don't start reader for thumbnails search
@@ -1363,16 +1383,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     fitInView(false);
 }
 
-namespace {
-    struct WidgetPositionCmp {
-        bool operator()(QnResourceWidget *l, QnResourceWidget *r) const {
-            QRect lg = l->item()->geometry();
-            QRect rg = r->item()->geometry();
-            return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-        }
-    };
-} // anonymous namespace
-
 void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail) {
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
@@ -1383,7 +1393,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     if(index < 0 || index >= widgets.size())
         return;
 
-    qSort(widgets.begin(), widgets.end(), WidgetPositionCmp());
+    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
     if(!mediaWidget)
@@ -1392,9 +1402,9 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
     mediaWidget->display()->camDisplay()->start();
-    //mediaWidget->display()->archiveReader()->pauseMedia();
-    //mediaWidget->display()->archiveReader()->setSingleShotMode(true);
-    //mediaWidget->display()->archiveReader()->start();
+    //widget->display()->archiveReader()->pauseMedia();
+    //widget->display()->archiveReader()->setSingleShotMode(true);
+    mediaWidget->display()->archiveReader()->startPaused();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

@@ -313,10 +313,47 @@
 
     <group name = "Maintenance"
          description ="">
-      <param name = "Firmware Upgrade"
-             description = "Upgrade the device’s firmware"
-             widget_type = "Button"
-             query = ""/>
+
+      <group name = "Firmware Upgrade"
+         description ="">
+
+        <param name = "Server Address"
+               description = "Upgrade the device’s firmware"
+               widget_type = "TextField"
+               query = "address1"
+               method = "POST"/>
+
+        <param name = "Port"
+               description = "Upgrade the device’s firmware"
+               widget_type = "TextField"
+               query = "port1"
+               method = "POST"/>
+
+        <param name = "User ID"
+               description = "Upgrade the device’s firmware"
+               widget_type = "TextField"
+               query = "username1"
+               method = "POST"/>
+
+        <param name = "Password"
+               description = "Upgrade the device’s firmware"
+               widget_type = "TextField"
+               query = "password1"
+               method = "POST"/>
+
+        <param name = "Directory"
+               description = "Upgrade the device’s firmware"
+               widget_type = "TextField"
+               query = "directory1"
+               method = "POST"/>
+
+        <param name = "Check Upgrade"
+               description = "Upgrade the device’s firmware"
+               widget_type = "Button"
+               query = "/cgi-bin/checkFTPupgrade.cgi"
+               method = "POST"/>
+
+      </group>
     </group>
 
   </camera>

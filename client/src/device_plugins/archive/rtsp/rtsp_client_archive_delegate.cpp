@@ -760,7 +760,14 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
 
-    QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
+    QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
+    if (quality == MEDIA_Quality_AlwaysHigh)
+        value = "alwaysHigh";
+    else if (quality == MEDIA_Quality_High)
+        value = "high";
+    else
+        value = "low";
+
     QByteArray paramName = "x-media-quality";
     m_rtspSession.setAdditionAttribute(paramName, value);
 

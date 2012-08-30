@@ -3,19 +3,20 @@
 #include <QtGui/QApplication>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
+#include <QtGui/QVBoxLayout>
 
 
 QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
     QScrollArea(parent),
     m_alreadyShowed(false)
 {
-    setLayout(new QHBoxLayout());
-    setWidget(new QWidget());
-    layout()->addWidget(widget());
-    widget()->setLayout(new QVBoxLayout());
+    QWidget *widget = new QWidget();
+    widget->setLayout(new QVBoxLayout());
+    setWidget(widget);
+    if(isVisible())
+        widget->show();
 
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setWidgetResizable(true);
 }
 
 void QnSettingsScrollArea::showEvent(QShowEvent* event)
@@ -328,4 +329,37 @@ void QnSettingsButtonWidget::onClicked()
 void QnSettingsButtonWidget::updateParam(QString /*val*/)
 {
     //cl_log.log("updateParam", cl_logALWAYS);
+}
+
+//==============================================
+QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+{
+    QLineEdit *lineEdit = new QLineEdit();
+    lineEdit->setText(obj.getCurrent());
+
+    mlayout->addWidget(new QWidget());
+    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    mlayout->addWidget(lineEdit);
+    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    mlayout->addWidget(new QLabel(obj.getName()));
+
+    connect(lineEdit, SIGNAL(editingFinished()), this, SLOT(onChange()));
+
+    mWidget = lineEdit;
+}
+
+void QnSettingsTextFieldWidget::onChange()
+{
+    setParam(static_cast<QLineEdit*>(mWidget)->text());
+}
+
+void QnSettingsTextFieldWidget::refresh()
+{
+    static_cast<QLineEdit*>(mWidget)->setText(mParam.getCurrent());
+}
+
+void QnSettingsTextFieldWidget::updateParam(QString val)
+{
+
 }

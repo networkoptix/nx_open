@@ -53,7 +53,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     //ui->savePasswordCheckBox->hide();
 
     QDir dir(QLatin1String(":/skin"));
-    QStringList    introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
+    QStringList introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
     QString resourceName = QLatin1String(":/skin/intro");
     if (!introList.isEmpty())
         resourceName = QLatin1String(":/skin/") + introList.first();
