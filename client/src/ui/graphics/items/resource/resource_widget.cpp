@@ -499,7 +499,6 @@ void QnResourceWidget::updateButtonsVisibility() {
     m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
 }
 
-
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
     return m_channelState[channel].overlay;
 }

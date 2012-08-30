@@ -376,8 +376,9 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
+        icon(qnSkin->icon("panic.png")).
         //requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
-        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elrik
+        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
 
     factory().
         flags(Qn::Main | Qn::Tree).

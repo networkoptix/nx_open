@@ -15,7 +15,7 @@
 
 
 //!max time (milliseconds) to wait for async operation completion
-static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
+static const unsigned long MAX_WAIT_TIMEOUT_MS = 450000;
 
 namespace HttpStatusCode
 {
