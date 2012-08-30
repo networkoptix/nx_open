@@ -124,7 +124,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
         advancedTreeWidget = m_widgetsRecreator->getRootWidget();
         advancedLayout = m_widgetsRecreator->getRootLayout();
 
-        void cleanAdvancedSettings();
+        cleanAdvancedSettings();
 
         //Dummy creator: required for cameras, that doesn't support advanced settings
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
