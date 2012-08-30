@@ -167,7 +167,7 @@ namespace Qn {
         /**
          * Starts / stops screen recording.
          */
-        ScreenRecordingAction,
+        ToggleScreenRecordingAction,
 
         /**
          * Toggles client's fullscreen state.
@@ -267,7 +267,6 @@ namespace Qn {
          * Opens given layouts.
          */
         OpenAnyNumberOfLayoutsAction,
-
 
         /**
          * Opens selected layouts in a new window.
@@ -468,6 +467,11 @@ namespace Qn {
          * Toggles panic recording.
          */
         TogglePanicModeAction,
+
+        /**
+         * Toggles tour mode.
+         */
+        ToggleTourModeAction,
 
 
 

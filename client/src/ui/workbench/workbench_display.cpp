@@ -202,8 +202,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_curtainAnimator = new QnCurtainAnimator(this);
     m_curtainAnimator->setSpeed(1.0); /* (255, 0, 0) -> (0, 0, 0) in 1 second. */
     m_curtainAnimator->setTimer(animationTimer);
-    connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(at_curtained()));
-    connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(at_uncurtained()));
+    connect(m_curtainAnimator,              SIGNAL(curtained()),                                        this,                   SLOT(updateCurtainedCursor()));
+    connect(m_curtainAnimator,              SIGNAL(uncurtained()),                                      this,                   SLOT(updateCurtainedCursor()));
 
     /* Create viewport animator. */
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
@@ -312,7 +312,7 @@ void QnWorkbenchDisplay::initSceneContext() {
     /* Set up curtain. */
     m_curtainItem = new QnCurtainItem();
     m_scene->addItem(m_curtainItem.data());
-    setLayer(m_curtainItem.data(), Qn::CurtainLayer);
+    setLayer(m_curtainItem.data(), Qn::BackLayer);
     m_curtainItem.data()->setColor(QColor(0, 0, 0, 255));
     m_curtainAnimator->setCurtainItem(m_curtainItem.data());
 
@@ -544,11 +544,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         /* Update media quality. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
-            if (oldMediaWidget->display()->archiveReader())
+            if (oldMediaWidget->display()->archiveReader()) {
                 oldMediaWidget->display()->archiveReader()->enableQualityChange();
+                oldMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+            }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             if (newMediaWidget->display()->archiveReader()) {
-                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
                 newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
@@ -563,6 +565,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         /* Update margin flags. */
         updateCurrentMarginFlags();
+
+        /* Update curtain. */
+        if(m_curtainAnimator->isCurtained())
+            updateCurtainedCursor();
 
         break;
     }
@@ -1236,6 +1242,13 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
 }
 
+void QnWorkbenchDisplay::updateCurtainedCursor() {
+    bool curtained = m_curtainAnimator->isCurtained();
+
+    if(m_view != NULL)
+        m_view->viewport()->setCursor(QCursor(curtained ? Qt::BlankCursor : Qt::ArrowCursor));
+}
+
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: handlers
@@ -1310,11 +1323,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
     }
 
-    foreach(QnWorkbenchItem *item, layout->items())
-        addItemInternal(item, false, !thumbnailed);
-
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
+
+    foreach(QnWorkbenchItem *item, layout->items())
+        addItemInternal(item, false, !thumbnailed);
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();
 
@@ -1327,8 +1340,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         bool paused = mediaWidget->item()->data(Qn::ItemPausedRole).toBool();
 
         mediaWidget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
-        if(paused)
-            mediaWidget->display()->archiveReader()->setSingleShotMode(true);
+        if(paused) {
+            mediaWidget->display()->archiveReader()->pauseMedia();
+            mediaWidget->display()->camDisplay()->setSingleShotMode(true);
+        }
 
         // TODO: don't start reader for thumbnails search
         //widget->display()->archiveReader()->pauseMedia();
@@ -1375,10 +1390,13 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
     if(!mediaWidget)
         return;
-
+    
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-    mediaWidget->display()->start();
+    mediaWidget->display()->camDisplay()->start();
+    //mediaWidget->display()->archiveReader()->pauseMedia();
+    //mediaWidget->display()->archiveReader()->setSingleShotMode(true);
+    //mediaWidget->display()->archiveReader()->start();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {
@@ -1429,24 +1447,6 @@ void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
     foreach(QnResourceWidget *widget, m_widgetByRenderer) 
         widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
-}
-
-void QnWorkbenchDisplay::at_curtained() {
-    QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
-    foreach(QnResourceWidget *widget, m_widgetByItem)
-        if(widget != zoomedWidget)
-            widget->hide();
-
-    if(m_view != NULL)
-        m_view->viewport()->setCursor(QCursor(Qt::BlankCursor));
-}
-
-void QnWorkbenchDisplay::at_uncurtained() {
-    foreach(QnResourceWidget *widget, m_widgetByItem)
-        widget->show();
-
-    if(m_view != NULL)
-        m_view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {

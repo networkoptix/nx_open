@@ -96,6 +96,10 @@ void QnCurtainAnimator::uncurtain() {
     setCurtained(false);
 }
 
+bool QnCurtainAnimator::isCurtained() const {
+    return m_curtained;
+}
+
 void QnCurtainAnimator::restoreFrameColor() {
     QnResourceWidget *frontWidget = static_cast<QnResourceWidget *>(m_frameOpacityAnimator->targetObject());
     if(frontWidget == NULL)

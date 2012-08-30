@@ -60,9 +60,6 @@
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
 
-#include <X11/Xlib.h>
-
-
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -210,11 +207,12 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-#ifdef Q_WS_X11
-    XInitThreads();
-#endif
-    
-    
+    /* Init common resources. */
+    Q_INIT_RESOURCE(common_common);
+    Q_INIT_RESOURCE(common_custom);
+    Q_INIT_RESOURCE(common_generated);
+
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -283,11 +281,6 @@ int main(int argc, char *argv[])
 
     /* Initialize application instance. */
     application->setStartDragDistance(20);
-
-    /* Support old straight build scripts. */
-#ifndef NO_TRANSLATIONS
-    Q_INIT_RESOURCE(common_common);
-#endif
 
     QString language = qnSettings->language();
     QTranslator appTranslator;

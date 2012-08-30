@@ -11,6 +11,7 @@ syntax: glob
 *.sln
 *.suo
 *.user
+*.orig
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters

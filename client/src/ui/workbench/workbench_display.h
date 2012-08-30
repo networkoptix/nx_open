@@ -311,6 +311,8 @@ protected slots:
     void synchronizeRaisedGeometry();
     void updateFrameWidths();
 
+    void updateCurtainedCursor();
+
     void at_scene_destroyed();
     void at_scene_selectionChanged();
 
@@ -335,9 +337,6 @@ protected slots:
     void at_curtainActivityInstrument_activityStarted();
     void at_widgetActivityInstrument_activityStopped();
     void at_widgetActivityInstrument_activityStarted();
-
-    void at_curtained();
-    void at_uncurtained();
 
     void at_widget_aboutToBeDestroyed();
 

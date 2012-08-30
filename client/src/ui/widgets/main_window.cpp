@@ -221,6 +221,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
+    m_titleLayout->addSpacing(6);
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
@@ -519,6 +521,9 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
 #endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
+    if(isFullScreen())
+        return Qt::NoSection;
+
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
     if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
         result = Qt::TitleBarArea;
