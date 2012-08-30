@@ -25,6 +25,7 @@ Debug
 Release
 
 build-environment/x86
+build-environment/x86
 
 appserver/gen
 appserver/db/ecs.db
