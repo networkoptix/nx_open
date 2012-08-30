@@ -105,10 +105,10 @@ bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desired
 
     if (paramQuery.startsWith(QLatin1String("/"))) {
         query = paramQuery.toLatin1();
-        paramQuery.clear();
+        paramQuery = QString::fromLatin1("action=all");
     } else {
         query = "/cgi-bin/systemsetup.cgi";
-        paramQuery += QString::fromLatin1("=") + desiredVal;
+        paramQuery = QString::fromLatin1("ftp_upgrade_") + paramQuery + QString::fromLatin1("=") + desiredVal;
     }
 
     return httpClient.doPOST(query, paramQuery) == CL_HTTP_SUCCESS;
