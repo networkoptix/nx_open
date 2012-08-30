@@ -80,21 +80,19 @@ QnCameraAdditionDialog::~QnCameraAdditionDialog() {
     return;
 }
 
-int QnCameraAdditionDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
- /*   int row = ui->storagesTable->rowCount();
-    ui->storagesTable->insertRow(row);
+int QnCameraAdditionDialog::addTableRow(const QByteArray &data) {
+    int row = ui->camerasTable->rowCount();
+    ui->camerasTable->insertRow(row);
 
-    QTableWidgetItem *urlItem = new QTableWidgetItem(url);
-    urlItem->setData(Qt::UserRole, id);
+    QTableWidgetItem *urlItem = new QTableWidgetItem(QString::fromLatin1(data));
     QTableWidgetItem *spaceItem = new QTableWidgetItem();
-    spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
 
-    ui->storagesTable->setItem(row, 0, urlItem);
-    ui->storagesTable->setItem(row, 1, spaceItem);
+    ui->camerasTable->setItem(row, 0, urlItem);
+    ui->camerasTable->setItem(row, 1, spaceItem);
 
     updateSpaceLimitCell(row, true);
 
-    return row;*/
+    return row;
 }
 
 void QnCameraAdditionDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
@@ -202,7 +200,6 @@ void QnCameraAdditionDialog::updateSpaceLimitCell(int row, bool force) {
         } else {
             ui->storagesTable->closePersistentEditor(spaceItem);
         }*/
-    }
 }
 
 
@@ -211,6 +208,22 @@ void QnCameraAdditionDialog::updateSpaceLimitCell(int row, bool force) {
 // -------------------------------------------------------------------------- //
 
 void QnCameraAdditionDialog::at_scanButton_clicked(){
-    ui->buttonBox->setEnabled(!ui->buttonBox->isEnabled());
-    ui->scanProgressBar->setVisible(!ui->scanProgressBar->isVisible());
+    ui->buttonBox->setEnabled(false);
+    ui->scanProgressBar->setVisible(true);
+
+    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
+
+    QScopedPointer<detail::CheckCamerasFoundReplyProcessor> processor(new detail::CheckCamerasFoundReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
+
+    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)));
+    Q_UNUSED(handle)
+
+    eventLoop->exec();
+
+    ui->buttonBox->setEnabled(true);
+    ui->scanProgressBar->setVisible(false);
+    ui->camerasGroupBox->setVisible(true);
+    addTableRow(processor->getData());
 }

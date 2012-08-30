@@ -36,12 +36,12 @@ struct QnThumbnailsSearchState {
     qint64 step;
 };
 
-Q_DECLARE_METATYPE(QnThumbnailsSearchState);
+Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
@@ -55,7 +55,7 @@ namespace detail {
     };
 
     class QnResourceReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceReplyProcessor(QObject *parent = NULL);
 
@@ -82,14 +82,14 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnResourceList m_resources;
-        int m_handle;
     };
 
     class QnConnectReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnConnectReplyProcessor(QObject *parent = NULL);
 
@@ -116,10 +116,10 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnConnectInfoPtr m_connectInfo;
-        int m_handle;
     };
 
 } // namespace detail
@@ -130,7 +130,7 @@ namespace detail {
  * This class implements logic for client actions.
  */
 class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();

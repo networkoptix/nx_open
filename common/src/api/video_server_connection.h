@@ -21,7 +21,7 @@ class VideoServerSessionManager;
 namespace detail {
     class VideoServerSessionManagerReplyProcessor: public QObject
     {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
@@ -34,7 +34,7 @@ namespace detail {
 
     class VideoServerSessionManagerFreeSpaceRequestReplyProcessor: public QObject
     {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         VideoServerSessionManagerFreeSpaceRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
@@ -47,7 +47,7 @@ namespace detail {
 
     class VideoServerSessionManagerStatisticsRequestReplyProcessor: public QObject
     {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
             qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
@@ -56,6 +56,17 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
         void finished(const QnStatisticsDataList &/* usage data */);
+    };
+
+    class VideoServerSessionManagerAddCamerasRequestReplyProcessor: public QObject
+    {
+        Q_OBJECT
+    public:
+        VideoServerSessionManagerAddCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) { }
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+    signals:
+        void finished(int status, QByteArray/* data */); //TODO: #gdm correct profile
     };
 
     //!Handles response on GetParam request
@@ -110,7 +121,7 @@ namespace detail {
 
 class QN_EXPORT QnVideoServerConnection: public QObject
 {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnVideoServerConnection(const QUrl &url, QObject *parent = 0);
     virtual ~QnVideoServerConnection();
@@ -167,8 +178,7 @@ public:
     /** Returns request handle */
     int asyncGetStatistics(QObject *target, const char *slot);
 
-    /** Returns status */
-    int syncGetStatistics(QObject *target, const char *slot);
+    int asyncGetCameraAddition(QObject *target, const char *slot);
 
 private:
     int recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& timePeriodList, QByteArray& errorString);
