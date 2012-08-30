@@ -39,53 +39,49 @@ namespace {
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
-    m_server(server),
-    m_hasStorageChanges(false)
+    m_server(server)
 {
     ui->setupUi(this);
-    ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+/*    ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
     ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
+    ui->storagesTable->horizontalHeader()->setVisible(true); */
+    /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
     QStyledItemDelegate *itemDelegate = new QStyledItemDelegate(this);
     itemDelegate->setItemEditorFactory(new StorageSettingsItemEditorFactory());
-    ui->storagesTable->setItemDelegate(itemDelegate);
+    ui->camerasTable->setItemDelegate(itemDelegate);
 
     setButtonBox(ui->buttonBox);
 
-    connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
-    connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));
-    connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));
+    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLabel, SLOT(setVisible(bool)));
+    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLineEdit, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLabel, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLineEdit, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLabel, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLineEdit, SLOT(setVisible(bool)));
 
-    updateFromResources();
+    ui->startIPLabel->setVisible(false);
+    ui->startIPLineEdit->setVisible(false);
+    ui->endIPLabel->setVisible(false);
+    ui->endIPLineEdit->setVisible(false);
+    ui->scanProgressBar->setVisible(false);
+    ui->camerasGroupBox->setVisible(false);
+
+    connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
+
+
+/*    connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
+    connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));
+    connect(ui->storagesTable,          SIGNAL(cellChanged(int, int)),  this,   SLOT(at_storagesTable_cellChanged(int, int)));*/
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog() {
     return;
 }
 
-void QnCameraAdditionDialog::accept() {
-    setEnabled(false);
-    setCursor(Qt::WaitCursor);
-
-    bool valid = m_hasStorageChanges ? validateStorages(tableStorages(), NULL) : true;
-    if (valid) {
-        submitToResources(); 
-
-        base_type::accept();
-    }
-
-    unsetCursor();
-    setEnabled(true);
-}
-
-void QnCameraAdditionDialog::reject() {
-    base_type::reject();
-}
-
 int QnCameraAdditionDialog::addTableRow(int id, const QString &url, int spaceLimitGb) {
-    int row = ui->storagesTable->rowCount();
+ /*   int row = ui->storagesTable->rowCount();
     ui->storagesTable->insertRow(row);
 
     QTableWidgetItem *urlItem = new QTableWidgetItem(url);
@@ -98,19 +94,19 @@ int QnCameraAdditionDialog::addTableRow(int id, const QString &url, int spaceLim
 
     updateSpaceLimitCell(row, true);
 
-    return row;
+    return row;*/
 }
 
 void QnCameraAdditionDialog::setTableStorages(const QnAbstractStorageResourceList &storages) {
-    ui->storagesTable->setRowCount(0);
+/*    ui->storagesTable->setRowCount(0);
     ui->storagesTable->setColumnCount(2);
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages)
-        addTableRow(storage->getId().toInt(), storage->getUrl(), storage->getSpaceLimit() / BILLION);
+        addTableRow(storage->getId().toInt(), storage->getUrl(), storage->getSpaceLimit() / BILLION);*/
 }
 
 QnAbstractStorageResourceList QnCameraAdditionDialog::tableStorages() const {
-    QnAbstractStorageResourceList result;
+/*    QnAbstractStorageResourceList result;
 
     int rowCount = ui->storagesTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
@@ -129,32 +125,7 @@ QnAbstractStorageResourceList QnCameraAdditionDialog::tableStorages() const {
         result.append(storage);
     }
 
-    return result;
-}
-
-void QnCameraAdditionDialog::updateFromResources() {
-    ui->nameLineEdit->setText(m_server->getName());
-    ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->apiPortLineEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
-    ui->rtspPortLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
-
-    bool panicMode = m_server->isPanicMode();
-    ui->panicModeLabel->setText(panicMode ? tr("On") : tr("Off"));
-    {
-        QPalette palette = this->palette();
-        if(panicMode)
-            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-        ui->panicModeLabel->setPalette(palette);
-    }
-
-    setTableStorages(m_server->getStorages());
-
-    m_hasStorageChanges = false;
-}
-
-void QnCameraAdditionDialog::submitToResources() {
-    m_server->setStorages(tableStorages());
-    m_server->setName(ui->nameLineEdit->text());
+    return result;*/
 }
 
 bool QnCameraAdditionDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
@@ -195,16 +166,6 @@ bool QnCameraAdditionDialog::validateStorages(const QnAbstractStorageResourceLis
         if (!storage)
             continue;
 
-        /*
-        QMessageBox::warning(this, tr("Not enough disk space"), 
-            tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
-            arg(storage->getUrl()).
-            arg(formatGbStr(needRecordingSpace)).
-            arg(formatGbStr(itr.value().freeSpace)).
-            arg(formatGbStr(itr.value().usedSpace)).
-            arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
-        */
-
         qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
         if (itr.value().errorCode == -1)
         {
@@ -234,35 +195,13 @@ bool QnCameraAdditionDialog::validateStorages(const QnAbstractStorageResourceLis
 }
 
 void QnCameraAdditionDialog::updateSpaceLimitCell(int row, bool force) {
-    QTableWidgetItem *urlItem = ui->storagesTable->item(row, 0);
-    QTableWidgetItem *spaceItem = ui->storagesTable->item(row, 1);
-    if(!urlItem || !spaceItem)
-        return;
 
-    QString url = urlItem->data(Qt::DisplayRole).toString();
-
-    bool newSupportsSpaceLimit = !url.trimmed().startsWith(QLatin1String("coldstore://")); // TODO: evil hack, move out the check somewhere into storage factory.
-    bool oldSupportsSpaceLimit = spaceItem->flags() & Qt::ItemIsEditable;
-    if(newSupportsSpaceLimit != oldSupportsSpaceLimit || force) {
-        spaceItem->setFlags(newSupportsSpaceLimit ? (spaceItem->flags() | Qt::ItemIsEditable) : (spaceItem->flags() & ~Qt::ItemIsEditable));
-        
-        /* Adjust value. */
-        if(newSupportsSpaceLimit) {
-            bool ok;
-            int spaceLimitGb = spaceItem->data(Qt::DisplayRole).toInt(&ok);
-            if(!ok)
-                spaceLimitGb = defaultSpaceLimitGb;
-            spaceItem->setData(Qt::DisplayRole, spaceLimitGb);
-        } else {
-            spaceItem->setData(Qt::DisplayRole, QVariant());
-        }
-        
         /* Open/close editor. */
-        if(newSupportsSpaceLimit) {
+   /*     if(newSupportsSpaceLimit) {
             ui->storagesTable->openPersistentEditor(spaceItem);
         } else {
             ui->storagesTable->closePersistentEditor(spaceItem);
-        }
+        }*/
     }
 }
 
@@ -270,27 +209,8 @@ void QnCameraAdditionDialog::updateSpaceLimitCell(int row, bool force) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnCameraAdditionDialog::at_storageAddButton_clicked() {
-    addTableRow(0, QString(), defaultSpaceLimitGb);
 
-    m_hasStorageChanges = true;
-}
-
-void QnCameraAdditionDialog::at_storageRemoveButton_clicked() {
-    QList<int> rows;
-    foreach (QModelIndex index, ui->storagesTable->selectionModel()->selectedRows())
-        rows.push_back(index.row());
-
-    qSort(rows.begin(), rows.end(), std::greater<int>()); /* Sort in descending order. */
-    foreach(int row, rows)
-        ui->storagesTable->removeRow(row);
-
-    m_hasStorageChanges = true;
-}
-
-void QnCameraAdditionDialog::at_storagesTable_cellChanged(int row, int column) {
-    Q_UNUSED(column)
-    updateSpaceLimitCell(row);
-
-    m_hasStorageChanges = true;
+void QnCameraAdditionDialog::at_scanButton_clicked(){
+    ui->buttonBox->setEnabled(!ui->buttonBox->isEnabled());
+    ui->scanProgressBar->setVisible(!ui->scanProgressBar->isVisible());
 }

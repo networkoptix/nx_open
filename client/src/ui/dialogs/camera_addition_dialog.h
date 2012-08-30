@@ -59,15 +59,7 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
-
-public slots:
-    virtual void accept() override;
-    virtual void reject() override;
-
 private:
-    void updateFromResources();
-    void submitToResources();
-
     int addTableRow(int id, const QString &url, int spaceLimitGb);
 
     void setTableStorages(const QnAbstractStorageResourceList &storages);
@@ -78,17 +70,13 @@ private:
     void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
-    void at_storageAddButton_clicked();
-    void at_storageRemoveButton_clicked();
-    void at_storagesTable_cellChanged(int row, int column);
+    void at_scanButton_clicked();
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
     QnVideoServerResourcePtr m_server;
-
-    bool m_hasStorageChanges;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H
