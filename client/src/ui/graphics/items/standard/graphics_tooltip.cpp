@@ -11,14 +11,14 @@
 
 #define NOPARENT
 
-class QnGraphicsTooltipLabel: public GraphicsLabel{
+class GraphicsTooltipLabel: public GraphicsLabel {
 
     typedef GraphicsLabel base_type;
 public:
-    QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem);
-    ~QnGraphicsTooltipLabel();
+    GraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem);
+    ~GraphicsTooltipLabel();
 
-    static QnGraphicsTooltipLabel *instance;
+    static GraphicsTooltipLabel *instance;
     bool eventFilter(QObject *, QEvent *);
 
     QBasicTimer hideTimer, expireTimer;
@@ -38,9 +38,9 @@ private:
     QGraphicsItem *item;
 };
 
-QnGraphicsTooltipLabel *QnGraphicsTooltipLabel::instance = 0;
+GraphicsTooltipLabel *GraphicsTooltipLabel::instance = 0;
 
-QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem):
+GraphicsTooltipLabel::GraphicsTooltipLabel(const QString & text, QGraphicsItem *newItem):
     base_type(text),
     item(0)
 {
@@ -52,19 +52,19 @@ QnGraphicsTooltipLabel::QnGraphicsTooltipLabel(const QString & text, QGraphicsIt
     reuseTip(text, newItem);
 }
 
-QnGraphicsTooltipLabel::~QnGraphicsTooltipLabel(){
+GraphicsTooltipLabel::~GraphicsTooltipLabel(){
     instance = 0;
 }
 
 
-void QnGraphicsTooltipLabel::restartExpireTimer()
+void GraphicsTooltipLabel::restartExpireTimer()
 {
     int time = 10000 + 40 * qMax(0, text().length()-100); //formula from the default tooltip
     expireTimer.start(time, this);
     hideTimer.stop();
 }
 
-void QnGraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newItem)
+void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newItem)
 {
     if (item)
         item->removeSceneEventFilter(this);
@@ -88,19 +88,19 @@ void QnGraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *new
     restartExpireTimer();
 }
 
-void QnGraphicsTooltipLabel::hideTip()
+void GraphicsTooltipLabel::hideTip()
 {
     if (!hideTimer.isActive())
         hideTimer.start(300, this);
 }
 
-void QnGraphicsTooltipLabel::hideTipImmediately()
+void GraphicsTooltipLabel::hideTipImmediately()
 {
     close(); // to trigger QEvent::Close which stops the animation
     deleteLater();
 }
 
-bool QnGraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
+bool GraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
 {
     switch (e->type()) {
     case QEvent::WindowActivate:
@@ -119,7 +119,7 @@ bool QnGraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
     return false;
 }
 
-void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
+void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 {
     QPointF p = pos;
 
@@ -155,11 +155,11 @@ void QnGraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport
 #endif
 }
 
-bool QnGraphicsTooltipLabel::tipChanged(const QString &newText, QGraphicsItem *parent){
+bool GraphicsTooltipLabel::tipChanged(const QString &newText, QGraphicsItem *parent){
     return (newText != this->text() || parent != this->item);
 }
 
-void QnGraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
+void GraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget){
 
     QStyleOptionFrame opt;
     opt.rect = this->boundingRect().toRect();
@@ -170,7 +170,7 @@ void QnGraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphics
     base_type::paint(painter, option, widget);
 }
 
-void QnGraphicsTooltipLabel::timerEvent(QTimerEvent *e)
+void GraphicsTooltipLabel::timerEvent(QTimerEvent *e)
 {
     if (e->timerId() == hideTimer.timerId()
         || e->timerId() == expireTimer.timerId()){
@@ -180,7 +180,7 @@ void QnGraphicsTooltipLabel::timerEvent(QTimerEvent *e)
     }
 }
 
-bool QnGraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *event){
+bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *event){
     if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == item){
         hideTip();
     }
@@ -188,28 +188,28 @@ bool QnGraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *ev
 }
 
 void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport){
-    if (QnGraphicsTooltipLabel::instance && QnGraphicsTooltipLabel::instance->isVisible()){ // a tip does already exist
+    if (GraphicsTooltipLabel::instance && GraphicsTooltipLabel::instance->isVisible()){ // a tip does already exist
         if (text.isEmpty()){ // empty text means hide current tip
-            QnGraphicsTooltipLabel::instance->hideTip();
+            GraphicsTooltipLabel::instance->hideTip();
             return;
         }
         else
         {
             // If the tip has changed, reuse the one
             // that is showing (removes flickering)
-            if (QnGraphicsTooltipLabel::instance->tipChanged(text, item)){
-                QnGraphicsTooltipLabel::instance->reuseTip(text, item);
-                QnGraphicsTooltipLabel::instance->placeTip(pos, viewport);
+            if (GraphicsTooltipLabel::instance->tipChanged(text, item)){
+                GraphicsTooltipLabel::instance->reuseTip(text, item);
+                GraphicsTooltipLabel::instance->placeTip(pos, viewport);
             }
             return;
         }
     }
 
     if (!text.isEmpty()){ // no tip can be reused, create new tip:
-        new QnGraphicsTooltipLabel(text, item); // sets QnGraphicsTooltipLabel::instance to itself
-        QnGraphicsTooltipLabel::instance->placeTip(pos, viewport);
-        QnGraphicsTooltipLabel::instance->setObjectName(QLatin1String("graphics_tooltip_label"));
-        QnGraphicsTooltipLabel::instance->show();
+        new GraphicsTooltipLabel(text, item); // sets GraphicsTooltipLabel::instance to itself
+        GraphicsTooltipLabel::instance->placeTip(pos, viewport);
+        GraphicsTooltipLabel::instance->setObjectName(QLatin1String("graphics_tooltip_label"));
+        GraphicsTooltipLabel::instance->show();
     }
 
 }

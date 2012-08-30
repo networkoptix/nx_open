@@ -2189,7 +2189,7 @@ void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     if(!checked) {
         m_tourTimer->stop();
     } else {
-        m_tourTimer->start(2000);
+        m_tourTimer->start(4000);
         at_tourTimer_timeout();
     }
 }
