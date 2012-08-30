@@ -5,6 +5,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif/soapPTZBindingProxy.h"
+#include "onvif/soapImagingBindingProxy.h"
 #include "onvif/wsseapi.h"
 
 #include <QtGlobal>
@@ -22,7 +23,8 @@ SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& logi
     m_passwd(0),
     invoked(false)
 {
-    Q_ASSERT(!endpoint.empty());
+    //Q_ASSERT(!endpoint.empty());
+	Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
     m_endpoint = new char[endpoint.size() + 1];
     strcpy(m_endpoint, endpoint.c_str());
     m_endpoint[endpoint.size()] = '\0';
@@ -246,6 +248,26 @@ int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesRes
     return m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, &response);
 }
 
+int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SystemReboot(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Hard;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Soft;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
+}
+
 //
 // MediaSoapWrapper
 //
@@ -399,6 +421,54 @@ PtzSoapWrapper::~PtzSoapWrapper()
 }
 
 //
+// ImagingSoapWrapper
+//
+
+ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
+    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd),
+    passwordsData(PasswordHelper::instance())
+{
+
+}
+
+ImagingSoapWrapper::~ImagingSoapWrapper()
+{
+
+}
+
+int ImagingSoapWrapper::getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetOptions(m_endpoint, NULL, &request, &response);
+}
+
+int ImagingSoapWrapper::getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetImagingSettings(m_endpoint, NULL, &request, &response);
+}
+
+int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
+}
+
+// ---------------------------------------- PtzSoapWrapper -------------------------------------------
+
+int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetServiceCapabilities(m_endpoint, NULL, &request, &response);
+}
+
+//
 // Explicit instantiating
 //
 
@@ -425,3 +495,11 @@ template const QString SoapWrapper<PTZBindingProxy>::getLastError();
 template const QString SoapWrapper<PTZBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<PTZBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<PTZBindingProxy>::isConflictError();
+
+template soap* SoapWrapper<ImagingBindingProxy>::getSoap();
+template const char* SoapWrapper<ImagingBindingProxy>::getLogin();
+template const char* SoapWrapper<ImagingBindingProxy>::getPassword();
+template const QString SoapWrapper<ImagingBindingProxy>::getLastError();
+template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();
+template bool SoapWrapper<ImagingBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<ImagingBindingProxy>::isConflictError();

@@ -1,6 +1,28 @@
 #include "digital_watchdog_resource.h"
+#include "onvif/soapDeviceBindingProxy.h"
 
-QnPlWatchDogResource::QnPlWatchDogResource()
+const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
+
+QString getIdSuffixByModel(const QString& cameraModel)
+{
+    QString tmp = cameraModel.toLower();
+    tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
+
+    if (!tmp.contains(QLatin1String("mpa20m")) && !tmp.contains(QLatin1String("mc421"))) {
+        return QString::fromLatin1("-FOCUS");
+    }
+
+    return QString();
+}
+
+QnPlWatchDogResource::QnPlWatchDogResource():
+    QnPlOnvifResource(),
+    m_additionalSettings()
+{
+
+}
+
+QnPlWatchDogResource::~QnPlWatchDogResource()
 {
 
 }
@@ -86,4 +108,159 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     result *= (resolutionFactor * frameRateFactor);
 
     return qMax(512,result);
+}
+
+void QnPlWatchDogResource::fetchAndSetCameraSettings()
+{
+    QnPlOnvifResource::fetchAndSetCameraSettings();
+
+    QString cameraModel = fetchCameraModel();
+    QVariant baseId;
+    getParam(CAMERA_SETTINGS_ID_PARAM, baseId, QnDomainDatabase);
+    QString baseIdStr = baseId.toString();
+
+    QString suffix = getIdSuffixByModel(cameraModel);
+    if (!suffix.isEmpty()) {
+        if (baseIdStr.endsWith(suffix))
+        {
+            baseIdStr = baseIdStr.left(baseIdStr.length() - suffix.length());
+        }
+        else
+        {
+            setParam(CAMERA_SETTINGS_ID_PARAM, baseIdStr + suffix, QnDomainDatabase);
+        }
+    }
+
+    QMutexLocker lock(&m_physicalParamsMutex);
+
+    m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
+        getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr)));
+
+    if (!suffix.isEmpty()) {
+        m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
+            getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
+    }
+}
+
+QString QnPlWatchDogResource::fetchCameraModel()
+{
+    QAuthenticator auth(getAuth());
+    //TODO:UTF unuse StdString
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+
+    DeviceInfoReq request;
+    DeviceInfoResp response;
+
+    int soapRes = soapWrapper.getDeviceInformation(request, response);
+    if (soapRes != SOAP_OK) 
+    {
+        qWarning() << "QnPlWatchDogResource::fetchCameraModel: GetDeviceInformation SOAP to endpoint "
+            << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError() << ". Only base (base for DW) advanced settings will be available for this camera.";
+
+        return QString();
+    } 
+
+    return QString::fromLatin1(response.Model.c_str());
+}
+
+bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
+{
+    QMutexLocker lock(&m_physicalParamsMutex);
+
+    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    if (currTime > m_advSettingsLastUpdated) {
+        foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+        {
+            if (!setting->refreshValsFromCamera())
+            {
+                return false;
+            }
+        }
+        m_advSettingsLastUpdated = QDateTime::currentDateTime();
+    }
+
+    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    {
+        if (setting->getParamPhysicalFromBuffer(param, val))
+        {
+            return true;
+        }
+    }
+
+    return QnPlOnvifResource::getParamPhysical(param, val);
+}
+
+bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant& val )
+{
+    QMutexLocker lock(&m_physicalParamsMutex);
+
+    foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
+    {
+        if (setting->setParamPhysical(param, val))
+        {
+            return true;
+        }
+    }
+
+    return QnPlOnvifResource::setParamPhysical(param, val);
+}
+
+//
+// class QnPlWatchDogResourceAdditionalSettings
+//
+
+QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host,
+        int port, unsigned int timeout, const QAuthenticator& auth, const QString& cameraSettingId) :
+    m_cameraProxy(new DWCameraProxy(host, port, timeout, auth)),
+    m_settings()
+{
+    DWCameraSettingReader reader(m_settings, cameraSettingId);
+    reader.read() && reader.proceed();
+}
+
+QnPlWatchDogResourceAdditionalSettings::~QnPlWatchDogResourceAdditionalSettings()
+{
+    delete m_cameraProxy;
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::refreshValsFromCamera()
+{
+    return m_cameraProxy->getFromCameraIntoBuffer();
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const QnParam &param, QVariant &val)
+{
+    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        if (it.value().getFromBuffer(*m_cameraProxy)){
+            val.setValue(it.value().serializeToStr());
+            return true;
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool QnPlWatchDogResourceAdditionalSettings::setParamPhysical(const QnParam &param, const QVariant& val)
+{
+    CameraSetting tmp;
+    tmp.deserializeFromStr(val.toString());
+
+    DWCameraSettings::Iterator it = m_settings.find(param.name());
+    if (it != m_settings.end()) {
+        CameraSettingValue oldVal = it.value().getCurrent();
+        it.value().setCurrent(tmp.getCurrent());
+
+        if (!it.value().setToCamera(*m_cameraProxy)) {
+            it.value().setCurrent(oldVal);
+            return false;
+        }
+
+        return true;
+    }
+
+    return false;
 }

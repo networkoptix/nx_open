@@ -57,7 +57,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQuality(MEDIA_Quality_High),
     m_oldQualityFastSwitch(true),
     m_isStillImage(false),
-    m_speed(1.0)
+    m_speed(1.0),
+    m_pausedStart(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -301,10 +302,24 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::createEmptyPacket(bool isReverseMo
     return rez;
 }
 
+void QnArchiveStreamReader::startPaused()
+{
+    m_pausedStart = true;
+    start();
+}
+
 QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
 {
     while (!m_skippedMetadata.isEmpty())
         return m_skippedMetadata.dequeue();
+
+    if (m_pausedStart)
+    {
+        m_pausedStart = false;
+        QMutexLocker mutex(&m_jumpMtx);
+        while (m_singleShot && m_singleQuantProcessed && !m_needStop)
+            m_singleShowWaitCond.wait(&m_jumpMtx);
+    }
 
     //=================
     {
@@ -638,7 +653,7 @@ begin_label:
             {
                 if (m_nextData->flags & QnAbstractMediaData::MediaFlags_LIVE)
                     setSkipFramesToTime(0, true);
-                else if (!reverseMode && m_nextData->timestamp < m_skipFramesToTime)
+                else if (!reverseMode && m_nextData->timestamp <= m_skipFramesToTime)
                     videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
                 else if (reverseMode && m_nextData->timestamp > m_skipFramesToTime)
                     videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
@@ -945,6 +960,8 @@ bool QnArchiveStreamReader::jumpTo(qint64 mksec, qint64 skipTime)
         beforeJumpInternal(newTime);
         channeljumpToUnsync(newTime, 0, skipTime);
     }
+
+    //start(QThread::HighPriority);
 
     if (isSingleShotMode())
         QnLongRunnable::resume();

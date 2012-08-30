@@ -20,10 +20,13 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+    bool isAdvancedWorking() const;
+    void setAdvancedWorking(bool value);
 
 private:
     bool m_scheduleDisabled;
     bool m_audioEnabled;
+    bool m_advancedWorking;
 };
 
 

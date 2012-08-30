@@ -478,11 +478,11 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
-    if(!display()->camDisplay()->isStillImage())
+    if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
     if(m_resource.dynamicCast<QnSecurityCamResource>())
-        result |= MotionSearchButton;
+        result |= MotionSearchButton | InfoButton;
 
     return result;
 }

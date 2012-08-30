@@ -251,6 +251,9 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
     if(!parameters.hasArgument(Qn::TimePeriodParameter))
         return Qn::InvisibleAction;
 
+    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
+        return m_nonMatchingVisibility;
+
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
     if(!(m_periodTypes & period.type())) {
         return m_nonMatchingVisibility;
@@ -265,6 +268,9 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
     if(!(Qn::NormalTimePeriod & period.type()))
+        return Qn::DisabledAction;
+
+    if(!context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
@@ -282,5 +288,9 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
         if(!camera->isScheduleDisabled())
             return Qn::EnabledAction;
     return Qn::DisabledAction;
+}
+
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+    return context()->workbench()->currentLayout()->items().empty() ? Qn::DisabledAction : Qn::EnabledAction;
 }
 

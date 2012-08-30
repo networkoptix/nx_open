@@ -1,4 +1,5 @@
 #!/bin/bash
+export buildlib=${buildLib}
 
 case `uname -s` in
     "Linux")
@@ -15,4 +16,9 @@ case `uname -s` in
         ;;
 esac
 
-colormake -f Makefile.${build.configuration} -j $[NPROCESSORS+1]
+make -f Makefile.${build.configuration} -j $[NPROCESSORS+1]
+
+if [[ $buildlib != 'staticlib' ]]; then
+  echo "export LD_LIBRARY_PATH=${libdir}/build/bin/${build.configuration}:/usr/lib" > ${libdir}/bin/${build.configuration}/env.sh
+  mv ${libdir}/bin/${build.configuration}/${project.artifactId} ${libdir}/bin/${build.configuration}/${project.artifactId}-bin
+fi

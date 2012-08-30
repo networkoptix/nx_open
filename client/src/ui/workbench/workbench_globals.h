@@ -29,32 +29,34 @@ namespace Qn {
 
         /* Resource-based. */
         ResourceRole,                               /**< Role for QnResourcePtr. */
-        ResourceNameRole,                           /**< Role for resource name. */
-        ResourceFlagsRole,                          /**< Role for resource flags. */
-        ResourceSearchStringRole,                   /**< Role for resource search string. */
-        ResourceStatusRole,                         /**< Role for resource status. */
-        ResourceUidRole,                            /**< Role for resource unique id. */
+        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
+        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
+        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
+        ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
+        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
 
         /* Layout-based. */
-        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. */
-        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. */
-        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. */
-        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. */
-        LayoutTimeLabelsRole,                       /**< . */
+        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
+        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
+        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
+        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
+        LayoutSearchStateRole,                      /**< */
+        LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
+        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
 
         /* Item-based. */
-        ItemUuidRole,                               /**< Role for item's UUID. */
-        ItemGeometryRole,                           /**< Role for item's integer geometry. */
-        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. */
-        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. */
-        ItemFlagsRole,                              /**< Role for item's flags. */
-        ItemRotationRole,                           /**< Role for item's rotation. */
+        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
+        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
+        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
+        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
+        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
+        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
 
-        ItemTimeRole,                               /**< Role for item's playback position. */
-        ItemPausedRole,                             /**< Role for item's paused state. */
-        ItemSpeedRole,                              /**< Role for item's playback speed. */
-        ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. */
-        ItemSliderSelectionRole                     /**< Role for slider window that is displayed when the item is active. */
+        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
+        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
+        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
+        ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
+        ItemSliderSelectionRole                     /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
     };
 
 
@@ -98,7 +100,6 @@ namespace Qn {
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */

@@ -296,6 +296,7 @@ void QnMulticodecRtpReader::initIO(RTPIODevice** ioDevice, QnRtpStreamParser* pa
 
 void QnMulticodecRtpReader::openStream()
 {
+    m_pleaseStop = false;
     if (isStreamOpened())
         return;
     m_timeHelper.reset();
