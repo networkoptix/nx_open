@@ -453,6 +453,19 @@ int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetIm
     return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
 }
 
+// ---------------------------------------- PtzSoapWrapper -------------------------------------------
+
+int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetServiceCapabilities(m_endpoint, NULL, &request, &response);
+}
 
 //
 // Explicit instantiating

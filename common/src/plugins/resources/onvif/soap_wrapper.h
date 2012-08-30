@@ -134,6 +134,19 @@ typedef _onvifImg__GetOptionsResponse ImagingOptionsResp;
 typedef _onvifImg__SetImagingSettings SetImagingSettingsReq;
 typedef _onvifImg__SetImagingSettingsResponse SetImagingSettingsResp;
 
+class _onvifPtz__GetServiceCapabilities;
+class _onvifPtz__GetServiceCapabilitiesResponse;
+class _onvifPtz__AbsoluteMove;
+class _onvifPtz__AbsoluteMoveResponse;
+class _onvifPtz__RelativeMove;
+class _onvifPtz__RelativeMoveResponse;
+
+typedef _onvifPtz__AbsoluteMove AbsoluteMoveReq;
+typedef _onvifPtz__AbsoluteMoveResponse AbsoluteMoveResp;
+typedef _onvifPtz__RelativeMove RelativeMoveReq;
+typedef _onvifPtz__RelativeMoveResponse RelativeMoveResp;
+typedef _onvifPtz__GetServiceCapabilities PtzGetServiceCapabilitiesReq;
+typedef _onvifPtz__GetServiceCapabilitiesResponse PtzPtzGetServiceCapabilitiesResp;
 
 //
 // SoapWrapper
@@ -263,6 +276,8 @@ public:
     PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
     virtual ~PtzSoapWrapper();
 
+    int GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
+    int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
 private:
     PtzSoapWrapper();
     PtzSoapWrapper(const PtzSoapWrapper&);
