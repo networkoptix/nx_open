@@ -107,6 +107,7 @@ QString& CAMERA_SETTING_TYPE_BOOL   = *(new QString(QLatin1String("Boolean")));
 QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep")));
 QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
 QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
+QString& CAMERA_SETTING_TYPE_TEXTFIELD = *(new QString(QLatin1String("TextField")));
 QString& CAMERA_SETTING_VAL_ON = *(new QString(QLatin1String("On")));
 QString& CAMERA_SETTING_VAL_OFF = *(new QString(QLatin1String("Off")));
 
@@ -132,6 +133,9 @@ CameraSetting::WIDGET_TYPE CameraSetting::typeFromStr(const QString& value)
     if (value == CAMERA_SETTING_TYPE_BUTTON) {
         return Button;
     }
+    if (value == CAMERA_SETTING_TYPE_TEXTFIELD) {
+        return TextField;
+    }
     return None;
 }
 
@@ -145,26 +149,37 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
         case MinMaxStep: return CAMERA_SETTING_TYPE_MINMAX;
         case Enumeration: return CAMERA_SETTING_TYPE_ENUM;
         case Button: return CAMERA_SETTING_TYPE_BUTTON;
+        case TextField: return CAMERA_SETTING_TYPE_TEXTFIELD;
         default: return QString();
     }
 }
 
 CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
-        const QString& query, const QString& description, const CameraSettingValue min, const CameraSettingValue max,
-        const CameraSettingValue step, const CameraSettingValue current) :
+        const QString& query, const QString& method, const QString& description, const CameraSettingValue min,
+        const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
     m_id(id),
     m_name(name),
     m_type(type),
     m_query(query),
+    m_method(method),
     m_description(description),
     m_min(min),
     m_max(max),
     m_step(step),
     m_current(current)
 {
-    if (m_type == OnOff) {
-        m_min = CAMERA_SETTING_VAL_OFF;
-        m_max = CAMERA_SETTING_VAL_ON;
+    switch (m_type)
+    {
+        case OnOff:
+            m_min = CAMERA_SETTING_VAL_OFF;
+            m_max = CAMERA_SETTING_VAL_ON;
+            break;
+        case TextField:
+            m_min = QString::fromLatin1("min");
+            m_max = QString::fromLatin1("max");
+            break;
+        default:
+            break;
     }
 }
 
@@ -200,6 +215,16 @@ void CameraSetting::setQuery(const QString& query)
 QString CameraSetting::getQuery() const
 {
     return m_query;
+}
+
+void CameraSetting::setMethod(const QString& method)
+{
+    m_method = method;
+}
+
+QString CameraSetting::getMethod() const
+{
+    return m_method;
 }
 
 void CameraSetting::setDescription(const QString& description)
@@ -250,6 +275,7 @@ CameraSetting& CameraSetting::operator= (const CameraSetting& rhs)
     setName(rhs.getName());
     setType(rhs.getType());
     setQuery(rhs.getQuery());
+    setMethod(rhs.getMethod());
     setDescription(rhs.getDescription());
     setMin(rhs.getMin());
     setMax(rhs.getMax());
@@ -323,6 +349,7 @@ const QString& CameraSettingReader::ATTR_ID = *(new QString(QLatin1String("id"))
 const QString& CameraSettingReader::ATTR_NAME = *(new QString(QLatin1String("name")));
 const QString& CameraSettingReader::ATTR_WIDGET_TYPE = *(new QString(QLatin1String("widget_type")));
 const QString& CameraSettingReader::ATTR_QUERY = *(new QString(QLatin1String("query")));
+const QString& CameraSettingReader::ATTR_METHOD = *(new QString(QLatin1String("method")));
 const QString& CameraSettingReader::ATTR_DESCRIPTION = *(new QString(QLatin1String("description")));
 const QString& CameraSettingReader::ATTR_MIN = *(new QString(QLatin1String("min")));
 const QString& CameraSettingReader::ATTR_MAX = *(new QString(QLatin1String("max")));
@@ -474,6 +501,7 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
     CameraSetting::WIDGET_TYPE widgetType = CameraSetting::typeFromStr(widgetTypeStr);
 
     QString query = elementXml.attribute(ATTR_QUERY);
+    QString method = elementXml.attribute(ATTR_METHOD);
     QString description = elementXml.attribute(ATTR_DESCRIPTION);
     CameraSettingValue min = CameraSettingValue(elementXml.attribute(ATTR_MIN));
     CameraSettingValue max = CameraSettingValue(elementXml.attribute(ATTR_MAX));
@@ -481,8 +509,8 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
 
     switch(widgetType)
     {
-    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
-        paramFound(CameraSetting(id, name, widgetType, query, description, min, max, step), parentId);
+    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button: case CameraSetting::TextField:
+        paramFound(CameraSetting(id, name, widgetType, query, method, description, min, max, step), parentId);
         return true;
 
     default:
