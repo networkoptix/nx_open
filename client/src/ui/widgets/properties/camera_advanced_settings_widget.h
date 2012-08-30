@@ -2,6 +2,7 @@
 #define camera_settings_widgets_h_1214
 
 #include <QtGui/QSlider>
+#include <QtGui/QScrollArea>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 

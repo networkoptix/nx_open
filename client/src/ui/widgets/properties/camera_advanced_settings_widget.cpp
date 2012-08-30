@@ -3,19 +3,20 @@
 #include <QtGui/QApplication>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
+#include <QtGui/QVBoxLayout>
 
 
 QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
     QScrollArea(parent),
     m_alreadyShowed(false)
 {
-    setLayout(new QHBoxLayout());
-    setWidget(new QWidget());
-    layout()->addWidget(widget());
-    widget()->setLayout(new QVBoxLayout());
+    QWidget *widget = new QWidget();
+    widget->setLayout(new QVBoxLayout());
+    setWidget(widget);
+    if(isVisible())
+        widget->show();
 
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    setWidgetResizable(true);
 }
 
 void QnSettingsScrollArea::showEvent(QShowEvent* event)
