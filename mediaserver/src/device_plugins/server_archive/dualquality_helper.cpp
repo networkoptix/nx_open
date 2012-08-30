@@ -16,7 +16,7 @@ void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
 
 void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod) const
 {
-    catalog = (m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow);
+    catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi);
     if (catalog == 0)
         return; // no data in archive
 
@@ -25,10 +25,10 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
     qint64 timeDistance = chunk.distanceToTime(time);
     if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
         timeDistance = INT_MAX; // actually chunk not found
-    if (timeDistance > 0)
+    if (timeDistance > 0 && m_quality != MEDIA_Quality_AlwaysHigh)
     {
         // chunk not found. check in alternate quality
-        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_High ? m_catalogLow : m_catalogHi);
+        DeviceFileCatalogPtr catalogAlt = (m_quality == MEDIA_Quality_Low ? m_catalogHi : m_catalogLow);
         DeviceFileCatalog::Chunk altChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(time, findMethod));
         qint64 timeDistanceAlt = altChunk.distanceToTime(time);
         if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)

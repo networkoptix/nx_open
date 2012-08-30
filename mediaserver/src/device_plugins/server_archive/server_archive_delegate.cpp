@@ -78,7 +78,7 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_LiveVideo);
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 
-    m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
+    m_currentChunkCatalog = m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi;
 
     return true;
 }
@@ -358,6 +358,9 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 
 bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive)
 {
+    if (quality == MEDIA_Quality_AlwaysHigh)
+        quality = MEDIA_Quality_High;
+
     m_dialQualityHelper.setPrefferedQuality(quality);
     m_quality = quality;
     m_newQualityTmpData.clear();
