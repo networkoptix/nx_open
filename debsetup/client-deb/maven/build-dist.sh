@@ -29,8 +29,9 @@ mkdir -p $BINSTAGE
 mkdir -p $BINSTAGE/styles
 mkdir -p $LIBSTAGE
 
-# Copy client binary
+# Copy client binary and x264
 install -m 755 $CLIENT_BIN_PATH/client* $BINSTAGE
+install -m 755 $CLIENT_BIN_PATH/x264 $BINSTAGE
 
 # Copy client startup script
 install -m 755 bin/client $BINSTAGE
