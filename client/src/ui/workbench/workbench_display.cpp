@@ -1396,7 +1396,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     mediaWidget->display()->camDisplay()->start();
     //mediaWidget->display()->archiveReader()->pauseMedia();
     //mediaWidget->display()->archiveReader()->setSingleShotMode(true);
-    //mediaWidget->display()->archiveReader()->start();
+    mediaWidget->display()->archiveReader()->start();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {
