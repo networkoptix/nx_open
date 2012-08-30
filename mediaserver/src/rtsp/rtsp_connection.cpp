@@ -171,7 +171,10 @@ void QnRtspConnectionProcessor::parseRequest()
         d->useProprietaryFormat = true;
     processRangeHeader();
 
-    if (d->requestHeaders.value("x-media-quality") == QString("low"))
+    QString q = d->requestHeaders.value("x-media-quality");
+    if (q == QString("alwaysHigh"))
+        d->quality = MEDIA_Quality_AlwaysHigh;
+    else if (q == QString("low"))
         d->quality = MEDIA_Quality_Low;
     else
         d->quality = MEDIA_Quality_High;
@@ -376,7 +379,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
 
     QnAbstractMediaDataPtr rez;
     
-    bool isHQ = d->quality == MEDIA_Quality_High;
+    bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_AlwaysHigh;
  
     // 1. check packet in GOP keeper
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(getResource());
@@ -720,11 +723,11 @@ void QnRtspConnectionProcessor::checkQuality()
     if (d->quality == MEDIA_Quality_Low)
     {
         if (d->liveDpLow == 0) {
-            d->quality = MEDIA_Quality_High;
+            d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
         }
         else if (d->liveDpLow->onPause()) {
-            d->quality = MEDIA_Quality_High;
+            d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->getUniqueId() << ". Secondary stream is disabled.";
         }
     }
@@ -799,7 +802,7 @@ int QnRtspConnectionProcessor::composePlay()
 
         int copySize = 0;
         if (!getResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, 0);
+            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0);
         }
 
         if (copySize == 0) {
@@ -907,7 +910,12 @@ int QnRtspConnectionProcessor::composeSetParameter()
             QList<QByteArray> vals = parameter.split(':');
             if (vals.size() < 2)
                 return CODE_INVALID_PARAMETER;
-            d->quality = vals[1].trimmed() == "low" ? MEDIA_Quality_Low : MEDIA_Quality_High;
+            if (vals[1].trimmed() == "alwaysHigh")
+                d->quality = MEDIA_Quality_AlwaysHigh;
+            else if (vals[1].trimmed() == "low")
+                d->quality = MEDIA_Quality_Low;
+            else
+                d->quality = MEDIA_Quality_High;
 
             checkQuality();
             d->qualityFastSwitch = false;
@@ -916,10 +924,10 @@ int QnRtspConnectionProcessor::composeSetParameter()
             {
                 d->dataProcessor->lockDataQueue();
 
-				d->dataProcessor->setLiveQuality(d->quality);
+                d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time); // for fast quality switching
+                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
