@@ -57,13 +57,10 @@ QnFfmpegTranscoder::~QnFfmpegTranscoder()
 
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
-    if (m_ioContext)
-        avio_close(m_ioContext);
-    m_ioContext = 0;
     if (m_formatCtx) {
-        m_formatCtx->pb = 0;
         avformat_close_input(&m_formatCtx);
     }
+    m_ioContext = 0;
 }
 
 int QnFfmpegTranscoder::setContainer(const QString& container)

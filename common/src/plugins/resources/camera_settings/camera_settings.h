@@ -31,7 +31,7 @@ public:
 
 class CameraSetting {
 public:
-    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button };
+    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField };
 
     static WIDGET_TYPE typeFromStr(const QString& value);
 
@@ -45,6 +45,7 @@ public:
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
+        const QString& method,
         const QString& description,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),
@@ -64,6 +65,9 @@ public:
 
     void setQuery(const QString& query);
     QString getQuery() const;
+
+    void setMethod(const QString& query);
+    QString getMethod() const;
 
     void setDescription(const QString& description);
     QString getDescription() const;
@@ -92,6 +96,7 @@ private:
     QString m_name;
     WIDGET_TYPE m_type;
     QString m_query;
+    QString m_method;
     CameraSettingValue m_min;
     CameraSettingValue m_max;
     CameraSettingValue m_step;
@@ -117,6 +122,7 @@ public:
     static const QString& ATTR_NAME;
     static const QString& ATTR_WIDGET_TYPE;
     static const QString& ATTR_QUERY;
+    static const QString& ATTR_METHOD;
     static const QString& ATTR_DESCRIPTION;
     static const QString& ATTR_MIN;
     static const QString& ATTR_MAX;

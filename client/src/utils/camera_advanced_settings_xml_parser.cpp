@@ -214,6 +214,10 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
             tabWidget = new QnSettingsButtonWidget(m_handler, value, *rootWidget);
             break;
 
+        case CameraSetting::TextField:
+            tabWidget = new QnSettingsTextFieldWidget(m_handler, *(currIt.value()), *rootWidget);
+            break;
+
         default:
             //Unknown widget type!
             Q_ASSERT(false);

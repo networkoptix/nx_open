@@ -2,6 +2,7 @@
 #define camera_settings_widgets_h_1214
 
 #include <QtGui/QSlider>
+#include <QtGui/QScrollArea>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 
@@ -143,6 +144,26 @@ private slots:
 
 private:
     CameraSetting dummyVal;
+};
+
+//==============================================
+class QnSettingsTextFieldWidget : public QnAbstractSettingsWidget
+{
+    Q_OBJECT
+public:
+    QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
+
+public slots:
+    void updateParam(QString val);
+
+private slots:
+    void onChange();
+
+private:
+    QnSettingsSlider* m_slider;
+    QGroupBox* groupBox;
 };
 
 #endif //camera_settings_widgets_h_1214
