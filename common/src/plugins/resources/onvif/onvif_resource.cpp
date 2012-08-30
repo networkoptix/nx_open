@@ -1609,8 +1609,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         vEncoder->RateControl->FrameRateLimit = currentFps;
         bool success = false;
         bool invalidFpsDetected = false;
-        int retryCount = getMaxOnvifRequestTries();
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < getMaxOnvifRequestTries(); ++i)
         {
             vEncoder->RateControl->FrameRateLimit = currentFps;
             int errCode = sendVideoEncoderToCamera(*vEncoder);
