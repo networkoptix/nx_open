@@ -41,6 +41,7 @@
 #include "camera/thumbnails_loader.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
+#include "handlers/workbench_action_handler.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QObject(parent),
@@ -699,15 +700,16 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 
     QnScopedValueRollback<bool> guard(&m_updatingSliderFromReader, true);
 
-    bool isQuickSearch = false; //workbench()->currentLayout()->resource() && !workbench()->currentLayout()->resource()->timeBounds().isEmpty();
+    QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+    bool isSearch = searchState.step > 0;
 
     qint64 startTimeUSec, endTimeUSec;
     qint64 endTimeMSec, startTimeMSec;
-    if(isQuickSearch) {
-        /*endTimeMSec = workbench()->currentLayout()->resource()->timeBounds().endTimeMs();
+    if(isSearch) {
+        endTimeMSec = searchState.period.endTimeMs();
         endTimeUSec = endTimeMSec * 1000;
-        startTimeMSec = workbench()->currentLayout()->resource()->timeBounds().startTimeMs;
-        startTimeUSec = startTimeMSec * 1000;*/
+        startTimeMSec = searchState.period.startTimeMs;
+        startTimeUSec = startTimeMSec * 1000;
     } else {
         endTimeUSec = reader->endTime();
         endTimeMSec = endTimeUSec == DATETIME_NOW ? qnSyncTime->currentMSecsSinceEpoch() : (endTimeUSec == AV_NOPTS_VALUE ? m_timeSlider->maximum() : endTimeUSec / 1000);
@@ -742,7 +744,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         if(timeUSec != AV_NOPTS_VALUE)
             updateLive();
 
-        if(isQuickSearch) {
+        if(isSearch) {
             QVector<qint64> indicators;
             foreach(QnResourceWidget *widget, display()->widgets())
                 if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
