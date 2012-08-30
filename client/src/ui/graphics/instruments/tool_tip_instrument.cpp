@@ -1,6 +1,7 @@
 #include "tool_tip_instrument.h"
 
 #include <QtGui/QHelpEvent>
+#include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/graphics/items/standard/graphics_tooltip.h>
 
 ToolTipInstrument::ToolTipInstrument(QObject *parent):
@@ -23,6 +24,8 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
         /* Note that we don't handle proxy widgets separately. */
         if (!item->toolTip().isEmpty()) {
+            if (dynamic_cast<QnToolTipSlider* >(item)) //TODO: #gdm Bug #1072, fix later
+                continue;
             targetItem = item;
             break;
         }
