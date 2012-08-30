@@ -163,7 +163,7 @@ void GraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsIt
 
     QStyleOptionFrame opt;
     opt.rect = this->boundingRect().toRect();
-    opt.rect.adjust(-5, -5, 5, 5);
+    opt.rect.adjust(-5, -5, 0, 0);
 
     style()->drawPrimitive(QStyle::PE_PanelTipLabel, &opt, painter);
     painter->setPen(QPen(Qt::black));

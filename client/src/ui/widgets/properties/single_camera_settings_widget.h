@@ -99,6 +99,8 @@ private:
     void initAdvancedTab();
     void loadAdvancedSettings();
 
+    void cleanAdvancedSettings();
+
 private:
     Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
 
