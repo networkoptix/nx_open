@@ -1,13 +1,14 @@
 #ifndef QN_WARNINGS_H
 #define QN_WARNINGS_H
 
-#include <QString>
-#include <QTextStream>
-#include <QDebug>
+#include <QtCore/QString>
+#include <QtCore/QTextStream>
+#include <QtCore/QDebug>
+#include <QtCore/QVariant>
 
 #ifndef QT_STRINGIFY
-#  define QT_STRINGIFY2(x) #x
-#  define QT_STRINGIFY(x) QT_STRINGIFY2(x)
+#   define QT_STRINGIFY2(x) #x
+#   define QT_STRINGIFY(x) QT_STRINGIFY2(x)
 #endif
 
 namespace detail {

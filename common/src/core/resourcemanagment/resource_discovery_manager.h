@@ -43,6 +43,8 @@ public:
 
     void setReady(bool ready);
 
+    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr);
+
 protected:
     QnResourceDiscoveryManager();
 
