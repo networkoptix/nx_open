@@ -916,7 +916,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             {
                 d->dataProcessor->lockDataQueue();
 
-                //connectToLiveDataProviders();
+				d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
                 d->dataProcessor->copyLastGopFromCamera(d->quality == MEDIA_Quality_High, time); // for fast quality switching
