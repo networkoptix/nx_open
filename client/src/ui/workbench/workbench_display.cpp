@@ -1355,9 +1355,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             time = widget->item()->data(Qn::ItemTimeRole).value<qint64>();
         }
 
-        bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
+        if(!thumbnailed)
+            widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
 
-        widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
+        bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
         if(paused) {
             widget->display()->archiveReader()->pauseMedia();
             widget->display()->camDisplay()->setSingleShotMode(true);
@@ -1398,7 +1399,8 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
     if(!mediaWidget)
         return;
-    
+
+    mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
     mediaWidget->display()->camDisplay()->start();
