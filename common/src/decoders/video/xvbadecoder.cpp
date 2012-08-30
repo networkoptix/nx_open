@@ -13,6 +13,12 @@
 #define USE_OPENGL_SURFACE
 
 
+/*
+ * - унаследовать QnWorkbenchContextAware, чтобы иметь доступ к QnWorkbenchDisplay и из него получить текущий контекст (из QGLWidget'а)
+ * - в QT opengl-классы не thread-safe и, возможно, придётся создавать контекст декодера в главном потоке приложения
+ * - контекст декодера надо при создании шарить с главным контекстом приложения
+ * */
+
 static const unsigned int MAX_SURFACE_COUNT = 12;
 
 namespace H264Profile
@@ -71,13 +77,31 @@ QnXVBADecoder::GLSurfaceContext::GLSurfaceContext()
 {
 }
 
-QnXVBADecoder::GLSurfaceContext::GLSurfaceContext( unsigned int _glTexture, XVBASurface _surface )
+QnXVBADecoder::GLSurfaceContext::GLSurfaceContext(
+	GLXContext _glContext,
+	unsigned int _glTexture,
+	XVBASurface _surface )
 :
+	glContext( _glContext ),
     glTexture( _glTexture ),
     surface( _surface ),
     state( ready ),
     pts( 0 )
 {
+}
+
+QnXVBADecoder::GLSurfaceContext::~GLSurfaceContext()
+{
+	if( surface )
+	{
+		XVBADestroySurface( surface );
+		surface = NULL;
+	}
+	if( glTexture )
+	{
+		glDeleteTextures( 1, &glTexture );
+		glTexture = 0;
+	}
 }
 
 
@@ -86,51 +110,21 @@ QnXVBADecoder::GLSurfaceContext::GLSurfaceContext( unsigned int _glTexture, XVBA
 /////////////////////////////////////////////////////
 QnXVBADecoder::QnXVBAOpenGLPictureData::QnXVBAOpenGLPictureData( GLSurfaceContext* ctx )
 :
+	QnOpenGLPictureData(
+//		ctx->glContext,
+		ctx->glTexture ),
     m_ctx( ctx )
 {
-    Q_ASSERT( m_ctx->state == GLSurfaceContext::readyToRender );
+    Q_ASSERT_X(
+    		ctx->state == GLSurfaceContext::readyToRender,
+    		"QnXVBADecoder::QnXVBAOpenGLPictureData::QnXVBAOpenGLPictureData",
+    		QString::fromAscii("ctx->state = %1").arg(ctx->state).toAscii().data() );
     m_ctx->state = GLSurfaceContext::renderingInProcess;
 }
 
 QnXVBADecoder::QnXVBAOpenGLPictureData::~QnXVBAOpenGLPictureData()
 {
     m_ctx->state = GLSurfaceContext::ready;
-}
-
-//!Returns OGL texture name
-unsigned int QnXVBADecoder::QnXVBAOpenGLPictureData::glTexture() const
-{
-    return m_ctx->glTexture;
-}
-
-//!Returns context of texture
-GLXContext QnXVBADecoder::QnXVBAOpenGLPictureData::glContext() const
-{
-    //TODO/IMPL
-    return NULL;
-}
-
-
-/////////////////////////////////////////////////////
-//  class QnSysMemPictureData
-/////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////
-//  class QnOpenGLPictureData
-/////////////////////////////////////////////////////
-//!Returns OGL texture name
-unsigned int QnOpenGLPictureData::glTexture() const
-{
-    //TODO/IMPL
-    return 0;
-}
-
-//!Returns context of texture
-GLXContext QnOpenGLPictureData::glContext() const
-{
-    //TODO/IMPL
-    return NULL;
 }
 
 
@@ -144,12 +138,14 @@ QnXVBADecoder::QnXVBADecoder( const QnCompressedVideoDataPtr& data )
     m_decodeSession( NULL ),
     m_glContext( NULL ),
     m_display( NULL ),
-    m_getCapDecodeOutputSize( 0 )
+    m_getCapDecodeOutputSize( 0 ),
+    m_mediaBuf( NULL ),
+    m_mediaBufCapacity( 0 )
 {
     cl_log.log( QString::fromAscii("Initializing XVBA decoder"), cl_logDEBUG1 );
 
     int version = 0;
-    m_display = QX11Info::display();    //retreiving display pointer
+    m_display = QX11Info::display();    //retrieving display pointer
     m_hardwareAccelerationEnabled = XVBAQueryExtension( m_display, &version );
     if( !m_hardwareAccelerationEnabled )
     {
@@ -189,26 +185,22 @@ QnXVBADecoder::QnXVBADecoder( const QnCompressedVideoDataPtr& data )
     {
         //TODO make context current? (assuming we have one QnXVBADecoder object per thread)
     }
+
+    m_mediaBufCapacity = 1024*1024;
+    m_mediaBuf = new quint8[m_mediaBufCapacity];
 }
 
 QnXVBADecoder::~QnXVBADecoder()
 {
+	delete[] m_mediaBuf;
+
     if( m_decodeSession )
     {
         XVBADestroyDecode( m_decodeSession );
         m_decodeSession = NULL;
     }
 
-    //destroy surfaces
-    for( std::vector<GLSurfaceContext>::size_type
-         i = 0;
-         i < m_glSurfaces.size();
-         ++i )
-    {
-        XVBADestroySurface( m_glSurfaces[i].surface );
-        //releasing gltexture
-        glDeleteTextures( 1, &m_glSurfaces[i].glTexture );
-    }
+    m_glSurfaces.clear();
 
     if( m_context )
     {
@@ -221,9 +213,14 @@ QnXVBADecoder::~QnXVBADecoder()
 }
 
 //!Implementation of AbstractDecoder::GetPixelFormat
-PixelFormat QnXVBADecoder::GetPixelFormat()
+PixelFormat QnXVBADecoder::GetPixelFormat() const
 {
-    return PIX_FMT_NV12;
+    return PIX_FMT_RGBA;
+}
+
+QnAbstractPictureData::PicStorageType QnXVBADecoder::targetMemoryType() const
+{
+	return QnAbstractPictureData::pstOpenGL;
 }
 
 //!Implementation of AbstractDecoder::decode
@@ -243,11 +240,13 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     GLSurfaceContext* targetSurfaceCtx = NULL;
     GLSurfaceContext* decodedPicSurface = NULL;
     checkSurfaces( &targetSurfaceCtx, &decodedPicSurface );
+    Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= GLSurfaceContext::renderingInProcess );
 
     if( decodedPicSurface )
     {
         //TODO/IMPL copying picture to output
-        //*outFrame = *decodedPicSurface;
+        cl_log.log( QString::fromAscii("QnXVBADecoder. Found decoded picture (pts %1). Providing it to output...").arg(decodedPicSurface->pts), cl_logDEBUG1 );
+    	fillOutputFrame( outFrame, decodedPicSurface );
         decodedPicSurface->state = GLSurfaceContext::renderingInProcess;
     }
 
@@ -284,22 +283,24 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         return decodedPicSurface != NULL;
     }
 
-    char* dataStart = data->data.data();
-
     //giving XVBA_DATA_BUFFER & XVBA_DATA_CTRL_BUFFER
     m_ctrlBufDescriptor.buffer_size = m_dataCtrlBuffers.size() * sizeof(XVBADataCtrl);
     m_ctrlBufDescriptor.bufferXVBA = &m_dataCtrlBuffers[0];
     m_ctrlBufDescriptor.data_size_in_buffer = m_ctrlBufDescriptor.buffer_size;
 
+    char* dataStart = (char*)ALIGN128((size_t)m_mediaBuf);
+    memcpy( dataStart, data->data.data(), data->data.size() );
+
     //TODO/IMPL align data buf to 128 bytes
     m_dataBufDescriptor.buffer_size = ALIGN128(data->data.size() /*- firstSliceOffset*/);
-    m_dataBufDescriptor.bufferXVBA = dataStart /*+ firstSliceOffset*/;
+    m_dataBufDescriptor.bufferXVBA = dataStart;//dataStart /*+ firstSliceOffset*/;
     m_dataBufDescriptor.data_size_in_buffer = data->data.size();
 
     m_prevOperationStatus = XVBADecodePicture( &m_srcDataDecodeInput );
     if( m_prevOperationStatus != Success )
     {
-        cl_log.log( QString::fromAscii("QnXVBADecoder. Error giving src data to decoder. %1").arg(lastErrorText()), cl_logERROR );
+        cl_log.log( QString::fromAscii("QnXVBADecoder. Error giving src data to decoder. %1. buf %2, bufsize %3").
+        		arg(lastErrorText()).arg((size_t)dataStart, 0, 16).arg(m_dataBufDescriptor.buffer_size, 0, 16), cl_logERROR );
         return decodedPicSurface != NULL;
     }
 
@@ -313,7 +314,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     targetSurfaceCtx->pts = data->timestamp;
     targetSurfaceCtx->state = GLSurfaceContext::decodingInProcess;
 
-    cl_log.log( QString::fromAscii("QnXVBADecoder. Submitted %1 bytes of data to XVBA decoder").arg(data->data.size()), cl_logDEBUG1 );
+    cl_log.log( QString::fromAscii("QnXVBADecoder. Submitted %1 bytes of data (pts %2) to XVBA decoder").arg(data->data.size()).arg(data->timestamp), cl_logDEBUG1 );
     return decodedPicSurface != NULL;
 }
 
@@ -557,7 +558,7 @@ bool QnXVBADecoder::createDecodeSession( const QnCompressedVideoDataPtr& data )
 
 bool QnXVBADecoder::createSurface()
 {
-#ifdef USE_OPENGL_SURFACE
+//#ifdef USE_OPENGL_SURFACE
     XVBA_Create_GLShared_Surface_Input in;
     memset( &in, 0, sizeof(in) );
     in.size = sizeof(in);
@@ -574,15 +575,15 @@ bool QnXVBADecoder::createSurface()
         return false;
     }
     glBindTexture( GL_TEXTURE_2D, gltexture );
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    glPixelStorei( GL_UNPACK_ALIGNMENT, 4 );
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, 
                   m_sps.pic_width_in_mbs*16, 
                   m_sps.pic_height_in_map_units*16,
                   0, GL_RGBA, GL_UNSIGNED_BYTE, NULL );
     glErrorCode = glGetError();
-    cl_log.log( QString::fromAscii("Created opengl texture %1x%2" ).arg(m_sps.pic_width_in_mbs*16).arg(m_sps.pic_height_in_map_units*16 ), cl_logDEBUG1 );
+    cl_log.log( QString::fromAscii("Created opengl texture %1x%2").arg(m_sps.pic_width_in_mbs*16).arg(m_sps.pic_height_in_map_units*16 ), cl_logDEBUG1 );
     in.gltexture = gltexture;
 
     XVBA_Create_GLShared_Surface_Output out;
@@ -598,34 +599,34 @@ bool QnXVBADecoder::createSurface()
         return false;
     }
 
-    cl_log.log( QString::fromAscii("XVBA opengl surface created successfully" ), cl_logDEBUG1 );
-    m_glSurfaces.push_back( GLSurfaceContext( in.gltexture, out.surface ) );
+    m_glSurfaces.push_back( QSharedPointer<GLSurfaceContext>( new GLSurfaceContext( m_glContext, in.gltexture, out.surface ) ) );
+    cl_log.log( QString::fromAscii("XVBA opengl surface created successfully. Total surface count: %1" ).arg(m_glSurfaces.size()), cl_logDEBUG1 );
     return true;
-#else
-    XVBA_Create_Surface_Input in;
-    memset( &in, 0, sizeof(in) );
-    in.size = sizeof(in);
-    in.session = m_decodeSession;
-    in.width = m_pictureDescriptor.width_in_mb * 16;
-    in.height = m_pictureDescriptor.height_in_mb * 16;
-    in.surface_type = XVBA_NV12;
-
-    XVBA_Create_Surface_Output out;
-    memset( &out, 0, sizeof(out) );
-    out.size = sizeof(out);
-    
-    m_prevOperationStatus = XVBACreateSurface( &in, &out );
-    if( m_prevOperationStatus != Success )
-    {
-        std::cout<<"XVBACreateSurface failed "<<lastErrorText().toStdString()<<"\n";
-        cl_log.log( QString::fromAscii("QnXVBADecoder. Failed to create XVBA surface. %1 (%2)").arg(lastErrorText()).arg(m_prevOperationStatus), cl_logERROR );
-        return false;
-    }
-
-    cl_log.log( QString::fromAscii("XVBA surface created successfully" ), cl_logDEBUG1 );
-    m_glSurfaces.push_back( GLSurfaceContext( 0, out.surface ) );
-    return true;
-#endif
+//#else
+//    XVBA_Create_Surface_Input in;
+//    memset( &in, 0, sizeof(in) );
+//    in.size = sizeof(in);
+//    in.session = m_decodeSession;
+//    in.width = m_pictureDescriptor.width_in_mb * 16;
+//    in.height = m_pictureDescriptor.height_in_mb * 16;
+//    in.surface_type = XVBA_NV12;
+//
+//    XVBA_Create_Surface_Output out;
+//    memset( &out, 0, sizeof(out) );
+//    out.size = sizeof(out);
+//
+//    m_prevOperationStatus = XVBACreateSurface( &in, &out );
+//    if( m_prevOperationStatus != Success )
+//    {
+//        std::cout<<"XVBACreateSurface failed "<<lastErrorText().toStdString()<<"\n";
+//        cl_log.log( QString::fromAscii("QnXVBADecoder. Failed to create XVBA surface. %1 (%2)").arg(lastErrorText()).arg(m_prevOperationStatus), cl_logERROR );
+//        return false;
+//    }
+//
+//    cl_log.log( QString::fromAscii("XVBA surface created successfully" ), cl_logDEBUG1 );
+//    m_glSurfaces.push_back( GLSurfaceContext( 0, out.surface ) );
+//    return true;
+//#endif
 }
 
 bool QnXVBADecoder::readSequenceHeader( const QnCompressedVideoDataPtr& data )
@@ -634,7 +635,7 @@ bool QnXVBADecoder::readSequenceHeader( const QnCompressedVideoDataPtr& data )
         return false;
 
     memset( &m_pictureDescriptor, 0, sizeof(m_pictureDescriptor) );
-    
+
     bool spsFound = false;
     bool ppsFound = false;
     const quint8* dataStart = reinterpret_cast<const quint8*>(data->data.data());
@@ -779,20 +780,20 @@ void QnXVBADecoder::analyzeInputBufSlices(
 
 void QnXVBADecoder::checkSurfaces( GLSurfaceContext** const targetSurfaceCtx, GLSurfaceContext** const decodedPicSurface )
 {
-    for( std::vector<GLSurfaceContext>::size_type
-         i = 0;
-         i < m_glSurfaces.size();
+    for( std::list<QSharedPointer<GLSurfaceContext> >::iterator
+         it = m_glSurfaces.begin();
+         it != m_glSurfaces.end();
           )
     {
-        switch( m_glSurfaces[i].state )
+        switch( (*it)->state )
         {
             case GLSurfaceContext::ready:
                 if( !*targetSurfaceCtx )
-                    *targetSurfaceCtx = &m_glSurfaces[i];
+                    *targetSurfaceCtx = it->data();
                 break;
 
             case GLSurfaceContext::decodingInProcess:
-                m_syncIn.surface = m_glSurfaces[i].surface;
+                m_syncIn.surface = it->data();
                 m_syncIn.query_status = (XVBA_QUERY_STATUS)(XVBA_GET_SURFACE_STATUS /*| XVBA_GET_DECODE_ERRORS*/);
                 memset( &m_syncOut, 0, sizeof(m_syncOut) );
                 m_syncOut.size = sizeof(m_syncOut);
@@ -805,7 +806,7 @@ void QnXVBADecoder::checkSurfaces( GLSurfaceContext** const targetSurfaceCtx, GL
                 }
                 if( m_syncOut.status_flags & XVBA_STILL_PENDING )
                     break;   //surface still being used
-                cl_log.log( QString::fromAscii("QnXVBADecoder. Surface sync result: %1").arg(m_syncOut.status_flags), cl_logDEBUG1 );
+                cl_log.log( QString::fromAscii("QnXVBADecoder. Surface sync result: %1").arg(m_syncOut.status_flags), cl_logDEBUG2 );
 
                 if( m_syncOut.status_flags & XVBA_COMPLETED )
                 {
@@ -827,7 +828,7 @@ void QnXVBADecoder::checkSurfaces( GLSurfaceContext** const targetSurfaceCtx, GL
 //                    if( m_syncOut.status_flags & XVBA_NO_ERROR_DECODE )
 //                    {
                         cl_log.log( QString::fromAscii("QnXVBADecoder. Surface is ready to be rendered"), cl_logDEBUG1 );
-                        m_glSurfaces[i].state = GLSurfaceContext::readyToRender;
+                        (*it)->state = GLSurfaceContext::readyToRender;
                         continue;   //checking surface once again (in case it is the only surface with decoded picture)
 //                    }
 //                    if( m_syncOut.status_flags & XVBA_ERROR_DECODE )
@@ -855,25 +856,20 @@ void QnXVBADecoder::checkSurfaces( GLSurfaceContext** const targetSurfaceCtx, GL
             case GLSurfaceContext::readyToRender:
                 //can return only one decoded frame at a time. Choosing frame with lowest pts (with respect to overflow)
                 //TODO/IMPL check pts for overflow
-                if( !*decodedPicSurface || m_glSurfaces[i].pts < (*decodedPicSurface)->pts )
-                    *decodedPicSurface = &m_glSurfaces[i];
+                if( !*decodedPicSurface || (*it)->pts < (*decodedPicSurface)->pts )
+                    *decodedPicSurface = it->data();
                 break;
 
             case GLSurfaceContext::renderingInProcess:
-                //TODO/IMPL checking whether surface still being used
-                if( false /*not used by renderer*/ )
-                {
-                    m_glSurfaces[i].state = GLSurfaceContext::ready;
-                    continue;   //checking surface once again (in case it is the only ready surface)
-                }
+            	//surface still being used by renderer
                 break;
         }
 
-        ++i;
+        ++it;
     }
 
     if( !*targetSurfaceCtx && (m_glSurfaces.size() < MAX_SURFACE_COUNT) && createSurface() )
-        *targetSurfaceCtx = &m_glSurfaces.back();
+        *targetSurfaceCtx = m_glSurfaces.back().data();
 }
 
 QString QnXVBADecoder::lastErrorText() const
@@ -943,4 +939,54 @@ QString QnXVBADecoder::decodeErrorToString( XVBA_DECODE_ERROR errorCode ) const
         default:
             return QString::fromAscii("Unknown error code %1").arg(errorCode);
     }
+}
+
+void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, GLSurfaceContext* const decodedPicSurface )
+{
+    Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= GLSurfaceContext::renderingInProcess );
+	outFrame->picData =	QSharedPointer<QnAbstractPictureData>( new QnXVBAOpenGLPictureData( decodedPicSurface ) );
+
+//    if( !outFrame->isExternalData() )
+//    {
+//        //copying frame data if needed
+//        outFrame->reallocate( decodedFrame->Info.Width, decodedFrame->Info.Height, pixelFormat );
+//        memcpy( outFrame->data[0], decodedFrame->Data.Y, decodedFrame->Data.Pitch * decodedFrame->Info.Height );
+//        memcpy( outFrame->data[1], decodedFrame->Data.U, decodedFrame->Data.Pitch / 2 * decodedFrame->Info.Height / 2 );
+//        memcpy( outFrame->data[2], decodedFrame->Data.V, decodedFrame->Data.Pitch / 2 * decodedFrame->Info.Height / 2 );
+//    }
+//    else
+//    {
+//        outFrame->data[0] = decodedFrame->Data.Y;
+//        outFrame->data[1] = decodedFrame->Data.U;
+//        outFrame->data[2] = decodedFrame->Data.V;
+//    }
+//    if( pixelFormat == PIX_FMT_NV12 )
+//    {
+//        outFrame->linesize[0] = decodedFrame->Data.Pitch;       //y_stride
+//        //outFrame->linesize[1] = decodedFrame->Data.Pitch;   //uv_stride
+//        //outFrame->linesize[2] = 0;
+//        outFrame->linesize[1] = decodedFrame->Data.Pitch / 2;   //uv_stride
+//        outFrame->linesize[2] = decodedFrame->Data.Pitch / 2;
+//    }
+//    else if( pixelFormat == PIX_FMT_YUV420P )
+//    {
+//        outFrame->linesize[0] = decodedFrame->Data.Pitch;       //y_stride
+//        outFrame->linesize[1] = decodedFrame->Data.Pitch / 2;   //u_stride
+//        outFrame->linesize[2] = decodedFrame->Data.Pitch / 2;   //v_stride
+//    }
+
+    outFrame->width = m_sps.pic_width_in_mbs*16;
+    outFrame->height = m_sps.pic_height_in_map_units*16;
+    outFrame->format = PIX_FMT_RGBA;
+    //outFrame->format = pixelFormat;
+    //outFrame->key_frame = decodedFrame->Data.
+    //outFrame->pts = av_rescale_q( decodedFrame->Data.TimeStamp, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION, SRC_DATA_TMESTAMP_RESOLUTION );
+    outFrame->pts = decodedPicSurface->pts;
+    outFrame->pkt_dts = decodedPicSurface->pts;
+
+//    outFrame->display_picture_number = decodedFrame->Data.FrameOrder;
+    outFrame->interlaced_frame = 0;
+//        decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_TFF ||
+//        decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_BFF ||
+//        decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_REPEATED;
 }

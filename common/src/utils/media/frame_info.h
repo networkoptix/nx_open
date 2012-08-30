@@ -7,9 +7,65 @@
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered
 
+
+//!base class for differently-stored pictures
+class QnAbstractPictureData
+{
+public:
+    enum PicStorageType
+    {
+        //!Picture data is stored in memory
+        pstSysMemPic,
+        //!Picture is stored as OpenGL texture
+        pstOpenGL
+    };
+
+    virtual ~QnAbstractPictureData() {}
+    //!Returns pic type
+    virtual PicStorageType type() const = 0;
+};
+
+//!Picture data stored in system memory
+class QnSysMemPictureData
+:
+    public QnAbstractPictureData
+{
+public:
+    //TODO/IMPL
+
+    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstSysMemPic; }
+};
+
+//!OpenGL texture (type \a pstOpenGL)
+class QnOpenGLPictureData
+:
+    public QnAbstractPictureData
+{
+public:
+    QnOpenGLPictureData(
+//  		GLXContext _glContext,
+   		unsigned int _glTexture );
+
+    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstOpenGL; }
+
+    //!Returns context of texture
+//    virtual GLXContext glContext() const;
+    //!Returns OGL texture name
+    virtual unsigned int glTexture() const;
+
+private:
+//    GLXContext m_glContext;
+    unsigned int m_glTexture;
+};
+
+
+//!Decoded frame, ready to be rendered
 class CLVideoDecoderOutput: public AVFrame
 {
 public:
+	//!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
+	QSharedPointer<QnAbstractPictureData> picData;
+
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
 

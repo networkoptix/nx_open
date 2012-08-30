@@ -24,6 +24,8 @@ public:
     virtual ~QnAbstractVideoDecoder(){};
 
     virtual PixelFormat GetPixelFormat() const { return PIX_FMT_NONE; }
+    //!Returns memory type to which decoder places decoded frames (system memory or opengl)
+    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const = 0;
 
     /**
       * Decode video frame.

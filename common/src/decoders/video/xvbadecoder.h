@@ -32,56 +32,16 @@ namespace H264Level
     QString toString( const unsigned int level_idc, const int constraint_set3_flag = 0 );
 }
 
-//!base class for differently-stored pictures
-class QnAbstractPictureData
-{
-public:
-    enum PicStorageType
-    {
-        //!Picture data is stored in memory
-        pstSysMemPic,
-        //!Picture is stored as OpenGL texture
-        pstOpenGL
-    };
-
-    //!Returns pic type
-    virtual PicStorageType type() const = 0;
-};
-
-//!Picture data stored in system memory
-class QnSysMemPictureData
-:
-    public QnAbstractPictureData
-{
-public:
-    //TODO/IMPL
-
-    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstSysMemPic; }
-};
-
-//!OpenGL texture (type \a pstOpenGL)
-class QnOpenGLPictureData
-:
-    public QnAbstractPictureData
-{
-public:
-    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstOpenGL; }
-
-    //!Returns OGL texture name
-    virtual unsigned int glTexture() const;
-    //!Returns context of texture
-    virtual GLXContext glContext() const;
-};
-
 //!Uses AMD XVBA API to decode h.264 stream
 /*!
-    To use it system MUST have Radeon videocard installed and AMD proprietary videocard driver.
+    To use it system MUST have Radeon graphics card installed and AMD proprietary driver.
 
     After object creation, one MUST check \a isHardwareAccelerationEnabled(). If it returns \a false, usage of the \a XVBADecoder object is prohibited (it will trigger an assert in decode)
 */
 class QnXVBADecoder
 :
     public QnAbstractVideoDecoder
+//    ,public QnWorkbenchContextAware
 {
 public:
     /*!
@@ -91,7 +51,9 @@ public:
     virtual ~QnXVBADecoder();
 
     //!Implementation of AbstractDecoder::GetPixelFormat
-    virtual PixelFormat GetPixelFormat();
+    virtual PixelFormat GetPixelFormat() const;
+    //!Implementation of AbstractDecoder::targetMemoryType
+    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
     //!Implementation of AbstractDecoder::decode
     virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
     //!Implementation of AbstractDecoder::resetDecoder
@@ -119,6 +81,7 @@ private:
             renderingInProcess
         };
 
+        GLXContext glContext;
         unsigned int glTexture;
         XVBASurface surface;
         State state;
@@ -126,7 +89,11 @@ private:
         quint64 pts;
 
         GLSurfaceContext();
-        GLSurfaceContext( unsigned int _glTexture, XVBASurface _surface );
+        GLSurfaceContext(
+        	GLXContext _glContext,
+        	unsigned int _glTexture,
+        	XVBASurface _surface );
+        ~GLSurfaceContext();
     };
 
     //!Locks GL texture for rendering. While this object is alive, texture cannot be used for decoding
@@ -138,13 +105,8 @@ private:
         QnXVBAOpenGLPictureData( GLSurfaceContext* ctx );
         virtual ~QnXVBAOpenGLPictureData();
 
-        //!Returns OGL texture name
-        virtual unsigned int glTexture() const;
-        //!Returns context of texture
-        virtual GLXContext glContext() const;
-
     private:
-        GLSurfaceContext* m_ctx;
+        GLSurfaceContext* m_ctx;	//TODO switch to weakpointer
     };
 
     Status m_prevOperationStatus;
@@ -153,7 +115,7 @@ private:
     GLXContext m_glContext;
     Display* m_display;
     unsigned int m_getCapDecodeOutputSize;
-    std::vector<GLSurfaceContext> m_glSurfaces;
+    std::list<QSharedPointer<GLSurfaceContext> > m_glSurfaces;
     XVBAPictureDescriptor m_pictureDescriptor;
     SPSUnit m_sps;
     PPSUnit m_pps;
@@ -174,6 +136,9 @@ private:
     XVBA_Decode_Picture_End_Input m_decodeEndInput;
     XVBA_Surface_Sync_Input m_syncIn;
     XVBA_Surface_Sync_Output m_syncOut;
+
+    quint8* m_mediaBuf;
+    size_t m_mediaBufCapacity;
 
     //!Creates XVBA context
     /*!
@@ -214,6 +179,7 @@ private:
     //!Guess what
     QString lastErrorText() const;
     QString decodeErrorToString( XVBA_DECODE_ERROR errorCode ) const;
+	void fillOutputFrame( CLVideoDecoderOutput* const outFrame, GLSurfaceContext* const decodedPicSurface );
 
     QnXVBADecoder( const QnXVBADecoder& );
     QnXVBADecoder& operator=( const QnXVBADecoder& );

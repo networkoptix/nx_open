@@ -8,6 +8,8 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 
+#include <iostream>
+
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
@@ -384,9 +386,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     if (dec->getWidth() > 0)
         scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
-    bool useTmpFrame =  !QnGLRenderer::isPixelFormatSupported(pixFmt) ||
-        !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) || 
-        scaleFactor != QnFrameScaler::factor_1;
+
+    //if true, decoding to tmp frame which will be later scaled/converted to supported format
+    const bool useTmpFrame =
+  		(dec->targetMemoryType() == QnAbstractPictureData::pstSysMemPic) &&
+    	(!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
+         !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
+         scaleFactor != QnFrameScaler::factor_1);
 
     CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = data->channelNumber;
@@ -523,35 +529,46 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
 {
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
+
+//	if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
+//	{
+//		std::cout<<"mark1\n";
+//		return true;
+//	}
+
     if (outFrame->data[0]) 
     {
-        if (enableFrameQueue) 
-        {
-            Q_ASSERT(!outFrame->isExternalData());
-            if (m_bufferedFrameDisplayer)
-            {
-                bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
-                qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-                //cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
-                if (wasWaiting) {
-                    dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
-                    m_queueWasFilled = true;
-                }
-                else {
-                    if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
-                        dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-                }
-            }
-            else
-                m_drawer->draw(outFrame);
-            m_lastDisplayedFrame = outFrame;
-            m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-            m_queueUsed = true;
-        }
-        else {
-            m_drawer->draw(outFrame);
-            m_drawer->waitForFrameDisplayed(outFrame->channel);
-        }
+#if 0
+    		if (enableFrameQueue)
+    		{
+    			Q_ASSERT(!outFrame->isExternalData());
+    			if (m_bufferedFrameDisplayer)
+    			{
+    				bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
+    				std::cout<<"mark1\n";
+    				qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
+    				//cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
+    				if (wasWaiting) {
+    					dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+    					m_queueWasFilled = true;
+    				}
+    				else {
+    					if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
+    						dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+    				}
+    			}
+    			else if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
+    				m_drawer->draw(outFrame);
+    			m_lastDisplayedFrame = outFrame;
+    			m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+    			m_queueUsed = true;
+    		}
+    		else if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
+    		{
+    			m_drawer->draw(outFrame);
+    			m_drawer->waitForFrameDisplayed(outFrame->channel);
+    		}
+#endif
 
         if (m_prevFrameToDelete) {
             Q_ASSERT(outFrame != m_prevFrameToDelete);

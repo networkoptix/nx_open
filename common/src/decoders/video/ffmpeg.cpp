@@ -536,6 +536,11 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat() const
     }
 }
 
+QnAbstractPictureData::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() const
+{
+	return QnAbstractPictureData::pstSysMemPic;
+}
+
 void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)
 {
     if (m_decodeMode == val)
