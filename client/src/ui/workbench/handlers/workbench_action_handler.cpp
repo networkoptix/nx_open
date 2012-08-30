@@ -553,6 +553,10 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
+/*void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
+
+}*/
+
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(!widgets.empty()) {
@@ -1081,6 +1085,8 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionData connectionData;
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
+
+  //  updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }

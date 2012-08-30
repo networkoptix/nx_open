@@ -36,12 +36,12 @@ struct QnThumbnailsSearchState {
     qint64 step;
 };
 
-Q_DECLARE_METATYPE(QnThumbnailsSearchState);
+Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
@@ -55,7 +55,7 @@ namespace detail {
     };
 
     class QnResourceReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceReplyProcessor(QObject *parent = NULL);
 
@@ -89,7 +89,7 @@ namespace detail {
     };
 
     class QnConnectReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnConnectReplyProcessor(QObject *parent = NULL);
 
@@ -130,7 +130,7 @@ namespace detail {
  * This class implements logic for client actions.
  */
 class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();
@@ -285,6 +285,7 @@ protected slots:
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    //void updateStoredConnections(QnConnectionData connectionData);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
