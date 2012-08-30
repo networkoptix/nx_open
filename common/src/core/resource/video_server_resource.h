@@ -24,6 +24,7 @@ class QnVideoServerResource : public QnMediaResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
+    Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
     QnVideoServerResource();
