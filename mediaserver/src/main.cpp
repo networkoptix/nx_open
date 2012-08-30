@@ -630,6 +630,7 @@ void QnMain::run()
 
     QUrl rtspUrl(m_videoServer->getUrl());
     QUrl apiUrl(m_videoServer->getApiUrl());
+    QUrl streamingUrl(m_videoServer->getStreamingUrl());
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
     m_restServer ->enableSSLMode();
@@ -640,7 +641,7 @@ void QnMain::run()
     m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
 
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt());
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingUrl.port());
     m_progressiveDownloadingServer->enableSSLMode();
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
