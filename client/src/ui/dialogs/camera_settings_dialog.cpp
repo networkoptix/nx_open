@@ -41,7 +41,7 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
-    m_applyButton->setEnabled(m_settingsWidget->hasDbChanges() || m_settingsWidget->hasCameraChanges());
+    m_applyButton->setEnabled(m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges());
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {

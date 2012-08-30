@@ -160,10 +160,29 @@ public slots:
 
 private slots:
     void onChange();
+};
+
+//==============================================
+class QnSettingsControlButtonsPairWidget : public QnAbstractSettingsWidget
+{
+    Q_OBJECT
+public:
+    QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
+
+public slots:
+    void updateParam(QString val);
+
+private slots:
+    void onMinPressed();
+    void onMinReleased();
+    void onMaxPressed();
+    void onMaxReleased();
 
 private:
-    QnSettingsSlider* m_slider;
-    QGroupBox* groupBox;
+    QPushButton* minBtn;
+    QPushButton* maxBtn;
 };
 
 #endif //camera_settings_widgets_h_1214

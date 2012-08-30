@@ -472,7 +472,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
-    if (!hasDbChanges && !hasCameraChanges) {
+    if (!hasDbChanges && !hasCameraChanges && !cameraSettingsDialog()->widget()->hasAnyCameraChanges()) {
         return;
     }
 
@@ -1128,6 +1128,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
     }
 #endif
+
+    if(context()->user()) /* If we were connected... */
+        workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);

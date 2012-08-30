@@ -108,6 +108,7 @@ QString& CAMERA_SETTING_TYPE_MINMAX = *(new QString(QLatin1String("MinMaxStep"))
 QString& CAMERA_SETTING_TYPE_ENUM   = *(new QString(QLatin1String("Enumeration")));
 QString& CAMERA_SETTING_TYPE_BUTTON = *(new QString(QLatin1String("Button")));
 QString& CAMERA_SETTING_TYPE_TEXTFIELD = *(new QString(QLatin1String("TextField")));
+QString& CAMERA_SETTING_TYPE_CTRL_BTNS = *(new QString(QLatin1String("ControlButtonsPair")));
 QString& CAMERA_SETTING_VAL_ON = *(new QString(QLatin1String("On")));
 QString& CAMERA_SETTING_VAL_OFF = *(new QString(QLatin1String("Off")));
 
@@ -136,6 +137,9 @@ CameraSetting::WIDGET_TYPE CameraSetting::typeFromStr(const QString& value)
     if (value == CAMERA_SETTING_TYPE_TEXTFIELD) {
         return TextField;
     }
+    if (value == CAMERA_SETTING_TYPE_CTRL_BTNS) {
+        return ControlButtonsPair;
+    }
     return None;
 }
 
@@ -150,6 +154,7 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
         case Enumeration: return CAMERA_SETTING_TYPE_ENUM;
         case Button: return CAMERA_SETTING_TYPE_BUTTON;
         case TextField: return CAMERA_SETTING_TYPE_TEXTFIELD;
+        case ControlButtonsPair: return CAMERA_SETTING_TYPE_CTRL_BTNS;
         default: return QString();
     }
 }
@@ -177,6 +182,9 @@ CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE
         case TextField:
             m_min = QString::fromLatin1("min");
             m_max = QString::fromLatin1("max");
+            break;
+        case ControlButtonsPair:
+            m_current = m_step;
             break;
         default:
             break;
@@ -509,7 +517,8 @@ bool CameraSettingReader::parseElementXml(const QDomElement& elementXml, const Q
 
     switch(widgetType)
     {
-    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button: case CameraSetting::TextField:
+    case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::Button:
+    case CameraSetting::TextField: case CameraSetting::ControlButtonsPair:
         paramFound(CameraSetting(id, name, widgetType, query, method, description, min, max, step), parentId);
         return true;
 

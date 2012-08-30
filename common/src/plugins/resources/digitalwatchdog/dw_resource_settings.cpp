@@ -58,7 +58,7 @@ void DWCameraProxy::fetchParamsFromHttpRespons(const QByteArray& body)
 
 bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
-    if (src.getType() == CameraSetting::Button) {
+    if (src.getType() == CameraSetting::Button || src.getType() == CameraSetting::ControlButtonsPair) {
         return true;
     }
 
@@ -91,10 +91,15 @@ bool DWCameraProxy::setToCameraGet(DWCameraSetting& src, const QString& desiredV
 {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     QString paramQuery = src.getQuery();
-    QByteArray query = paramQuery.startsWith(QLatin1String("/"))? paramQuery.toLatin1() : 
-        (QString::fromLatin1("cgi-bin/camerasetup.cgi?") + paramQuery + QString::fromLatin1("=") + desiredVal).toLatin1();
 
-    return httpClient.doGET(query) == CL_HTTP_SUCCESS;
+    if (src.getType() == CameraSetting::ControlButtonsPair) {
+        paramQuery = paramQuery + QString::fromLatin1("=") + desiredVal;
+    } else {
+        paramQuery = paramQuery.startsWith(QLatin1String("/")) ? paramQuery : 
+            (QString::fromLatin1("cgi-bin/camerasetup.cgi?") + paramQuery + QString::fromLatin1("=") + desiredVal);
+    }
+
+    return httpClient.doGET(QByteArray(paramQuery.toLatin1())) == CL_HTTP_SUCCESS;
 }
 
 bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desiredVal)
@@ -117,7 +122,10 @@ bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desired
 bool DWCameraProxy::getFromBuffer(DWCameraSetting& src)
 {
     if (src.getQuery().startsWith(QLatin1String("/"))) {
-        return false;
+        if (src.getType() == CameraSetting::Button)
+            return false;
+        else
+            return true;//ToDo: required only for ctrlbtnspair?
     }
 
     QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
