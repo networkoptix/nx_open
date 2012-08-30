@@ -181,6 +181,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
     /* Run handlers. */
     updateButtonsVisibility();
+    at_statistics_received();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
