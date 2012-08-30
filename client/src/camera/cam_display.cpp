@@ -699,8 +699,10 @@ void QnCamDisplay::onNextFrameOccured()
 void QnCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
-    if (m_singleShotMode)
+    if (m_singleShotMode) {
         m_isRealTimeSource = false;
+        playAudio(false);
+    }
 }
 
 float QnCamDisplay::getSpeed() const
@@ -1154,6 +1156,9 @@ void QnCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
         return;
+
+    if (m_singleShotMode && play)
+        return; // ignore audio playing if camDisplay is paused
 
     m_needChangePriority = true;
     m_playAudio = play;
