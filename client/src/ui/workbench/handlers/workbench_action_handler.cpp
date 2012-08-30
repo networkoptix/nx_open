@@ -472,7 +472,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
-    if (!hasDbChanges && !hasCameraChanges) {
+    if (!hasDbChanges && !hasCameraChanges && !cameraSettingsDialog()->widget()->hasAnyCameraChanges()) {
         return;
     }
 
