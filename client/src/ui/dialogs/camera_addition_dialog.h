@@ -27,7 +27,10 @@ namespace detail {
         Q_OBJECT
     public:
 
-        CheckCamerasFoundReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        CheckCamerasFoundReplyProcessor(QObject *parent = NULL):
+            QObject(parent),
+            m_cancelled(false)
+        {}
 
         CamerasFoundInfoMap freeSpaceInfo() const {
             return m_freeSpace;
@@ -43,6 +46,9 @@ namespace detail {
     public slots:
         void processReply(int status, const QByteArray &data) //TODO: #gdm change profile
         {
+            if (m_cancelled)
+                return;
+
             m_data.clear();
             m_data.append(data);
             qDebug() << "reply status" << status;
@@ -50,9 +56,15 @@ namespace detail {
             emit replyReceived();
         }
 
+        void cancel(){
+            m_cancelled = true;
+            qDebug() << "request cancelled";
+        }
+
     private:
         CamerasFoundInfoMap m_freeSpace;
         QByteArray m_data;
+        bool m_cancelled;
     };
 
 } // namespace detail

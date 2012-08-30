@@ -67,6 +67,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->endIPLineEdit->setVisible(false);
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(false);
+    ui->stopScanButton->setVisible(false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
 
@@ -210,11 +211,14 @@ void QnCameraAdditionDialog::updateSpaceLimitCell(int row, bool force) {
 void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->buttonBox->setEnabled(false);
     ui->scanProgressBar->setVisible(true);
+    ui->stopScanButton->setVisible(true);
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
     QScopedPointer<detail::CheckCamerasFoundReplyProcessor> processor(new detail::CheckCamerasFoundReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
+    connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
+    connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)));
@@ -222,6 +226,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     eventLoop->exec();
 
+    ui->stopScanButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(true);
