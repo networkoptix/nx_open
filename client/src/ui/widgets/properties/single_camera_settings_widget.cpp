@@ -58,7 +58,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
 }
 
 QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
-    delete m_widgetsRecreator;
+    cleanAdvancedSettings();
 }
 
 QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() const {
@@ -78,12 +78,11 @@ QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() c
 void QnSingleCameraSettingsWidget::initAdvancedTab()
 {
     QVariant id;
+    QTreeWidget* advancedTreeWidget = 0;
+    QStackedLayout* advancedLayout = 0;
 
     if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
-        QTreeWidget* advancedTreeWidget = 0;
-        QStackedLayout* advancedLayout = 0;
-
         if (!m_widgetsRecreator)
         {
             QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
@@ -115,13 +114,28 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             advancedTreeWidget = m_widgetsRecreator->getRootWidget();
             advancedLayout = m_widgetsRecreator->getRootLayout();
-            delete m_widgetsRecreator;
-            m_widgetsRecreator = 0;
-            m_cameraSettings.clear();
+            cleanAdvancedSettings();
         }
 
         m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(m_camera->getUniqueId(), id.toString(), *advancedTreeWidget, *advancedLayout, this);
     }
+    else if (m_widgetsRecreator)
+    {
+        advancedTreeWidget = m_widgetsRecreator->getRootWidget();
+        advancedLayout = m_widgetsRecreator->getRootLayout();
+
+        void cleanAdvancedSettings();
+
+        //Dummy creator: required for cameras, that doesn't support advanced settings
+        m_widgetsRecreator = new CameraSettingsWidgetsTreeCreator(QString(), QString(), *advancedTreeWidget, *advancedLayout, this);
+    }
+}
+
+void QnSingleCameraSettingsWidget::cleanAdvancedSettings()
+{
+    delete m_widgetsRecreator;
+    m_widgetsRecreator = 0;
+    m_cameraSettings.clear();
 }
 
 void QnSingleCameraSettingsWidget::loadAdvancedSettings()
