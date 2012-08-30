@@ -552,12 +552,37 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
 
 void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
     QnConnectionDataList connections = qnSettings->customConnections();
-    // todo 1: compare only url's
-    // todo 2: rename ALL that require it (compatibility with prev versions)
-    // todo 3: limit stored connections number by 10 (const)
-    if (connections.contains(connectionData))
-        connections.removeOne(connectionData);
+
+    // remove all existing duplicates
+    int i = 0;
+    int sameIdx = -1;
+    while (i < connections.count()){
+        QString url = connections[i].url.toString(QUrl::RemovePassword);
+        if (sameIdx < 0 && connectionData.url.toString(QUrl::RemovePassword) == url)
+            sameIdx = i;
+
+        int j = i + 1;
+        while (j < connections.count()){
+            if (connections[j].url.toString(QUrl::RemovePassword) == url){
+                connections.removeAt(j);
+            }
+            else{
+                j++;
+            }
+        }
+        i++;
+    }
+
+    if (sameIdx >= 0)
+        connections.removeAt(sameIdx);
+
+    // todo #gdm: rename ALL that require it (compatibility with prev versions)
+    connectionData.name = connectionData.url.host();
     connections.prepend(connectionData);
+
+    while (connections.count() > 10) // TODO: #gdm move const out of here
+        connections.removeLast();
+
     qnSettings->setCustomConnections(connections);
 }
 
