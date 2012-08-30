@@ -456,6 +456,13 @@ void QnServerResourceWidget::at_statistics_received() {
         foreach(QString key, m_history.keys())
             m_sortedKeys.append(key);
         m_sortedKeys.sort();
+
+        // ugly hack
+        // TODO: #gdm Think about it. Later.
+        if (m_sortedKeys.contains(tr("CPU"))){
+            m_sortedKeys.removeOne(tr("CPU"));
+            m_sortedKeys.prepend(tr("CPU"));
+        }
     }
 
     m_lastHistoryId = id;
