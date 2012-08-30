@@ -1498,6 +1498,10 @@ void QnWorkbenchUi::at_activityStarted() {
     m_inactive = false;
 
     updateControlsVisibility(true);
+
+    foreach(QnResourceWidget *widget, display()->widgets())
+        if(widget->isInfoVisible()) // TODO: wrong place?
+            widget->setDecorationsVisible(true);
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
