@@ -116,6 +116,7 @@ private:
     void removeEmptyWidgetGroups();
     void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
+    bool isEnabledByOtherSettings(const QString& id, const QString& parentId);
 
     ParentOfRootElemFoundAware& m_obj;
     CameraSettings* m_settings;

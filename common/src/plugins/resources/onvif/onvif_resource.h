@@ -77,7 +77,7 @@ public:
     static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
-    static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in seconds)
+    static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 

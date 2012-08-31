@@ -20,7 +20,6 @@
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
 
-
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     QnWorkbenchContextAware(context),
@@ -28,7 +27,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
-    m_settings(qnSettings)
+    m_settings(qnSettings),
+    m_licenseTabIndex(0)
 {
     ui->setupUi(this);
 
@@ -44,17 +44,17 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 
     if (QnScreenRecorder::isSupported()){
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-        ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+        ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(PageYouTubeSettings, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->addTab(youTubeSettingsWidget, tr("YouTube"));
 #endif
 
 #ifndef CL_TRIAL_MODE
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
-    ui->tabWidget->insertTab(PageLicense, m_licenseManagerWidget, tr("Licenses"));
+    m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -173,9 +173,9 @@ void QnPreferencesDialog::updateFromSettings() {
         ui->languageComboBox->setCurrentIndex(id);
 }
 
-void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
+void QnPreferencesDialog::openLicensesPage()
 {
-    ui->tabWidget->setCurrentIndex(int(page));
+    ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
 }
 
 

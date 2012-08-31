@@ -147,10 +147,68 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     return true;
 }
 
-bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& /*parentId*/)
+bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& /*parentId*/)
 {
-    if (m_widgetsById.find(id) != m_widgetsById.end()) {
-        //Widget already created - so returning false
+    //ToDo: remove hardcode
+    if (!getCameraId().startsWith(QString::fromLatin1("DIGITALWATCHDOG"))) {
+        return true;
+    }
+
+    if (id == QString::fromLatin1("%%Imaging%%White Balance%%Kelvin") ||
+        id == QString::fromLatin1("%%Imaging%%White Balance%%Red") ||
+        id == QString::fromLatin1("%%Imaging%%White Balance%%Blue") )
+    {
+        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%White Balance%%Mode"));
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
+        if (val == QString::fromLatin1("MANUAL")) {
+            return true;
+        }
+        return false;
+    }
+
+    if (id == QString::fromLatin1("%%Imaging%%Exposure%%Shutter Speed") )
+    {
+        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Exposure%%Shutter Mode"));
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
+        if (val == QString::fromLatin1("MANUAL")) {
+            return true;
+        }
+        return false;
+    }
+
+    if (id == QString::fromLatin1("%%Imaging%%Day & Night%%Switching from Color to B/W") ||
+        id == QString::fromLatin1("%%Imaging%%Day & Night%%Switching from B/W to Color") )
+    {
+        CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Day & Night%%Mode"));
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
+        if (val == QString::fromLatin1("AUTO")) {
+            return true;
+        }
+        return false;
+    }
+
+    return true;
+}
+
+bool CameraSettingsWidgetsCreator::isParamEnabled(const QString& id, const QString& parentId)
+{
+    bool enabled = isEnabledByOtherSettings(id, parentId);
+
+    SettingsWidgetsById::Iterator swbiIt = m_settingsWidgetsById.find(id);
+    if (swbiIt != m_settingsWidgetsById.end())
+    {
+        if (enabled) {
+            swbiIt.value()->refresh();
+        } else {
+            delete swbiIt.value();
+            m_settingsWidgetsById.erase(swbiIt);
+        }
+
+        //Already created, so we don't need creation, so returning false
+        return false;
+    }
+
+    if (!enabled) {
         return false;
     }
 
@@ -168,12 +226,6 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
     CameraSettings::Iterator currIt = m_settings->find(value.getId());
     if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
         //ToDo: uncomment and explore: qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
-        return;
-    }
-
-    SettingsWidgetsById::ConstIterator swbiIt = m_settingsWidgetsById.find(value.getId());
-    if (swbiIt != m_settingsWidgetsById.end()) {
-        swbiIt.value()->refresh();
         return;
     }
 

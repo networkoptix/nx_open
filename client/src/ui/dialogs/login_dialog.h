@@ -31,7 +31,6 @@ public:
 public slots:
     virtual void accept() override;
     virtual void reject() override;
-    void reset();
 
 protected:
     virtual void changeEvent(QEvent *event) override;

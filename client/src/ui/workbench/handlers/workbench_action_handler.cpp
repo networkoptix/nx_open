@@ -1116,7 +1116,7 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
-    dialog->setCurrentPage(QnPreferencesDialog::PageLicense);
+    dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }

@@ -50,8 +50,12 @@ void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 {
     qint64 endPoint1 = startTimeMs + durationMs;
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
+
     startTimeMs = qMin(startTimeMs, timePeriod.startTimeMs);
-    durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
+    if (durationMs == -1 || timePeriod.durationMs == -1)
+        durationMs = -1;
+    else
+        durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
 
 QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const

@@ -197,6 +197,7 @@ void QnWorkbenchNavigator::initialize() {
     m_timeScrollBar->installEventFilter(this);
 
     connect(m_calendar,                         SIGNAL(dateClicked(const QDate&)),                  this,   SLOT(at_calendar_dateChanged(const QDate&)));
+    connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     updateLines();
     updateScrollBarFromSlider();
@@ -772,12 +773,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
 void QnWorkbenchNavigator::updateTargetPeriod() {
     if (!m_currentWidgetLoaded) 
         return;
-    
-    // TODO: #GDM also take calendar into account. Invoke this method when calendar page changes.
 
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+
+    if (m_calendar){
+        QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
+        QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
+        period.addPeriod(calendarPeriod);
+    }
+
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             if(QnCachingTimePeriodLoader *loader = this->loader(widget))
