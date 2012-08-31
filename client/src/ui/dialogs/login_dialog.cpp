@@ -47,7 +47,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         qnNullWarning(context);
 
     ui->setupUi(this);
-    QPushButton *resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
 
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
@@ -70,8 +69,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->setContentsMargins(0,0,0,10);
     layout->addWidget(m_renderingWidget);
 
-    resetButton->setText(tr("&Reset"));
-
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
@@ -83,11 +80,10 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
     connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
     connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
-    connect(resetButton,                    SIGNAL(clicked()),                      this,   SLOT(reset()));
 
     m_dataWidgetMapper = new QDataWidgetMapper(this);
     m_dataWidgetMapper->setModel(m_connectionsModel);
-    m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+    m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     m_dataWidgetMapper->setOrientation(Qt::Horizontal);
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
     m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
@@ -134,11 +130,16 @@ QUrl LoginDialog::currentUrl() const {
 
     QUrl url;
     url.setScheme(QLatin1String("https"));
-    url.setHost(m_connectionsModel->item(row, 1)->text());
+    url.setHost(ui->hostnameLineEdit->text());
+    url.setPort(ui->portSpinBox->value());
+    url.setUserName(ui->loginLineEdit->text());
+    url.setPassword(ui->passwordLineEdit->text());
+
+    /*url.setHost(m_connectionsModel->item(row, 1)->text());
     url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
     url.setUserName(m_connectionsModel->item(row, 3)->text());
     url.setPassword(m_connectionsModel->item(row, 4)->text());
-
+*/
     return url;
 }
 
@@ -148,7 +149,7 @@ QnConnectInfoPtr LoginDialog::currentInfo() const {
 
 void LoginDialog::accept() {
     /* Widget data may not be written out to the model yet. Force it. */
-    m_dataWidgetMapper->submit();
+ //   m_dataWidgetMapper->submit();
 
     QUrl url = currentUrl();
     if (!url.isValid()) {
@@ -160,6 +161,7 @@ void LoginDialog::accept() {
     m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
 
     {
+        // TODO: #gdm ask Elrik about it a bit later
         // Temporary 1.0/1.1 version check.
         // Let's remove it 1.3/1.4.
         QUrl httpUrl;
@@ -182,15 +184,6 @@ void LoginDialog::reject() {
 
     m_requestHandle = -1;
     updateUsability();
-}
-
-void LoginDialog::reset() {
-    ui->hostnameLineEdit->clear();
-    ui->portSpinBox->setValue(0);
-    ui->loginLineEdit->clear();
-    ui->passwordLineEdit->clear();
-
-    resetConnectionsModel();
 }
 
 void LoginDialog::changeEvent(QEvent *event) {
