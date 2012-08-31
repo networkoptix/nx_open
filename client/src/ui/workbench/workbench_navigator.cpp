@@ -781,7 +781,9 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     if (m_calendar){
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
         QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
-        period.addPeriod(calendarPeriod);
+        // todo: signal deadlock here!
+        // GDEM, fix it!
+        //period.addPeriod(calendarPeriod);
     }
 
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
