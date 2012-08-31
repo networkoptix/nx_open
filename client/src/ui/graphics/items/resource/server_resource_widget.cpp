@@ -260,7 +260,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             grid_path.moveTo(i, offset);
             grid_path.lineTo(i, oh + offset);
         }
-        for (qreal i = x_step*2 + offset; i < oh; i += x_step*4){
+        for (qreal i = x_step*2 + offset; i < oh + offset; i += x_step*4){
             grid_path.moveTo(offset, i);
             grid_path.lineTo(ow + offset, i);
         }
