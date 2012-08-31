@@ -138,16 +138,6 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(QByteArray streamingFor
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    if (d->transcoder.setContainer(d->streamingFormat) != 0)
-    //if (d->transcoder.setContainer("mpegts") != 0)
-    {
-        QByteArray msg;
-        msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
-        qWarning() << msg;
-        d->responseBody = msg;
-        sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
-        return;
-    }
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
@@ -279,6 +269,17 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
+
+        if (d->transcoder.setContainer(d->streamingFormat) != 0)
+        {
+            QByteArray msg;
+            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
+            qWarning() << msg;
+            d->responseBody = msg;
+            sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
+            return;
+        }
+
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
         d->responseHeaders.setValue("Cache-Control", "no-cache");
