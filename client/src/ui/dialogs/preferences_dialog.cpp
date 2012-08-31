@@ -14,6 +14,7 @@
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/workbench/workbench_tranlation_manager.h"
 #include "ui/screen_recording/screen_recorder.h"
 
 #include <ui/widgets/settings/license_manager_widget.h>
@@ -97,30 +98,17 @@ void QnPreferencesDialog::initColorPicker() {
     w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
-void QnPreferencesDialog::initLanguages(){
-    QDir qmDir(QLatin1String(":/translations"));
-    QStringList fileNames =
-        qmDir.entryList(QStringList(QLatin1String("client_*.qm")));
+void QnPreferencesDialog::initLanguages() {
+    QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
-    for (int i = 0; i < fileNames.size(); ++i) {
-        QString filename = fileNames[i];
-
-        QTranslator translator;
-        translator.load(filename, qmDir.absolutePath());
-        QString language = translator.translate("Language", "Language Name");   // This should be translated by all means!
-
-        
-        filename.remove(0, filename.indexOf(QLatin1Char('_')) + 1);             // remove "client_"
-        filename.chop(3);                                                       // remove ".qm"
-        ui->languageComboBox->addItem(language, filename);
-    }
-
+    foreach(const QnTranslationInfo &translation, translationManager->translations())
+        ui->languageComboBox->addItem(translation.languageName, translation.translationPath);
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldLanguage = m_settings->language();
+    QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-    if (oldLanguage != m_settings->language())
+    if (oldLanguage != m_settings->translationPath())
         QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
     //m_youTubeSettingsWidget->accept();
     base_type::accept();
@@ -168,7 +156,7 @@ void QnPreferencesDialog::updateFromSettings() {
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
-    int id = ui->languageComboBox->findData(m_settings->language());
+    int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)
         ui->languageComboBox->setCurrentIndex(id);
 }
