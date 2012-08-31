@@ -1,22 +1,22 @@
 ----------------------------------------------- 1.3 Beta -----------------------------------------------
 
-Calendar Search - "Cal" button in right bottom corner opens the calendar that helps navigate through the timeline. 
-Tours through items - (Context Menu on scene's empty space). Enables slideshow of videos on the scene (if more than one). 
-Panic Recording (button in top right corner). If enabled, all cameras recording is setup on start recording with maximum FPS and quality
-Thumbnail search - this featre allows more advanced thumbnail search. How to use:
- - select a video on Scene
- - select a region to search on the timeline (use right click)
- - open context menu and choose Thumbnail Search. New layout will be opened which displays this camera from particular moments. Each item can be played back, ff/rew. It is possible to perform thumbnail search once more, export etc.
-Several User Roles 
- - live - only live monitoring
- - playback - only archive viewing
- - settings - only set up cameras and system
- These roles can be combined
- - admin - can do everything except deleting himself and owners
- - owner - can do everything except deleting himself
-Web Client. Allows to view live/archive video from a single camera. It can be accessed by https://<IP>:<Port>/web (IP and Port of EC).
-Camera settings (incl. Zoom and Focus) - ability to setup a proprietary camera parameters. Can be opened by a camera's Context Menu (Advanced tab).
-Health Monitoring - this feature allows monitoring server in the real-time mode (CPU and hard disk load). Cam be opened from a server's Context Menu (or just drag a server on Scene).
+ - Calendar Search - "Cal" button in right bottom corner opens the calendar that helps navigate through the timeline. 
+ - Tours through items - (Context Menu on scene's empty space). Enables slideshow of videos on the scene (if more than one). 
+ - Panic Recording (button in top right corner). If enabled, all cameras recording is setup on start recording with maximum FPS and quality
+ - Thumbnail search - this featre allows more advanced thumbnail search. How to use:
+   - select a video on Scene
+   - select a region to search on the timeline (use right click)
+   - open context menu and choose Thumbnail Search. New layout will be opened which displays this camera from particular moments. Each item can be played back, ff/rew. It is possible to perform thumbnail search once more, export etc.
+ - Several User Roles 
+   - live - only live monitoring
+   - playback - only archive viewing
+   - settings - only set up cameras and system
+ - These roles can be combined
+   - admin - can do everything except deleting himself and owners
+   - owner - can do everything except deleting himself
+ - Web Client. Allows to view live/archive video from a single camera. It can be accessed by https://<IP>:<Port>/web (IP and Port of EC).
+ - Camera settings (incl. Zoom and Focus) - ability to setup a proprietary camera parameters. Can be opened by a camera's Context Menu (Advanced tab).
+ - Health Monitoring - this feature allows monitoring server in the real-time mode (CPU and hard disk load). Cam be opened from a server's Context Menu (or just drag a server on Scene).
 
 ----------------------------------------------- 1.2 -----------------------------------------------
 
