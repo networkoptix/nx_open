@@ -26,7 +26,6 @@ public:
     virtual bool setAudioChannel(unsigned int num);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
-    virtual void setSingleShotMode(bool single);
     virtual bool isSingleShotMode() const;
 
 

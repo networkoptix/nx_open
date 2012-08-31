@@ -302,8 +302,6 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
             setSpeed(1.0);
     } else {
         reader->pauseMedia();
-        reader->setSingleShotMode(true);
-
         setSpeed(0.0);
     }
 
@@ -567,7 +565,10 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing) {
     if (!m_currentMediaWidget)
         return;
 
-    m_currentMediaWidget->display()->archiveReader()->setSingleShotMode(!playing);
+    if (playing)
+        m_currentMediaWidget->display()->archiveReader()->resumeMedia();
+    else
+        m_currentMediaWidget->display()->archiveReader()->pauseMedia();
     m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
 }
 
