@@ -576,13 +576,39 @@ void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connecti
     if (sameIdx >= 0)
         connections.removeAt(sameIdx);
 
-    // todo #gdm: rename ALL that require it (compatibility with prev versions)
-    connectionData.name = connectionData.url.host();
     connections.prepend(connectionData);
 
     while (connections.count() > 10) // TODO: #gdm move const out of here
         connections.removeLast();
 
+    for (QnConnectionDataList::iterator iter = connections.begin(); iter != connections.end(); ++iter){
+
+        // there is at least one connection with same port
+        bool samePort = false;
+
+        // there is at least one connection with different port
+        bool otherPort = false;
+
+        foreach(QnConnectionData compared, connections){
+            if (*iter == compared)
+                continue;
+
+            if ((*iter).url.host() != compared.url.host())
+                continue;
+
+            if ((*iter).url.port() != compared.url.port())
+                otherPort = true;
+            else
+                samePort = true;
+        }
+
+        (*iter).name = (*iter).url.host();
+        if (samePort)
+            (*iter).name.prepend((*iter).url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
+
+        if (otherPort)
+            (*iter).name.append(QLatin1Char(':') + QString::number((*iter).url.port()));
+    }
     qnSettings->setCustomConnections(connections);
 }
 
