@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, logLevel;
-    QString customTranslations;
+    QString translationsPath;
     
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,     "--no-single-application",  NULL, QString(),    true);
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
     commandLineParser.addParameter(&screen,                  "--screen",                 NULL, QString());
     commandLineParser.addParameter(&delayedDrop,             "--delayed-drop",           NULL, QString());
     commandLineParser.addParameter(&logLevel,                "--log-level",              NULL, QString());
-    commandLineParser.addParameter(&customTranslations,      "--translations",           NULL, QString());
+    commandLineParser.addParameter(&translationsPath,        "--translations",           NULL, QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Set authentication parameters from command line. */
@@ -285,43 +285,25 @@ int main(int argc, char *argv[])
     /* Initialize application instance. */
     application->setStartDragDistance(20);
 
-
     QString language = qnSettings->language();
-    // TODO: #GDM copypasta!!!
-    //
-    // Why don't you write it like this:
-    // 
-    // QString translationPath; /* This one is loaded from command line. */
-    // QString translationSuffix;
-    // if(translationPath.isEmpty()) {
-    //      translationPath = QLatin1String(":/translations");
-    //      translationSuffix = QLatin1String("_") + language;
-    // }
-    // 
-    // ?
-    if (customTranslations.isEmpty()){
-        QTranslator appTranslator;
-        if (appTranslator.load(QLatin1String(":/translations/client_") + language + QLatin1String(".qm")))
-            application->installTranslator(&appTranslator);
-
-        QTranslator commonTranslator;
-        if (commonTranslator.load(QLatin1String(":/translations/common_") + language + QLatin1String(".qm")))
-            application->installTranslator(&commonTranslator);
-    } else {
-        QTranslator appTranslator;
-        if (appTranslator.load(customTranslations + QLatin1String("/client.qm")))
-            application->installTranslator(&appTranslator);
-
-        QTranslator commonTranslator;
-        if (commonTranslator.load(customTranslations + QLatin1String("/common.qm")))
-            application->installTranslator(&commonTranslator);
+    QString translationSuffix = QLatin1String(".qm");
+    if(translationsPath.isEmpty()) {
+        translationsPath = QLatin1String(":/translations");
+        translationSuffix.prepend(QLatin1String("_") + language);
     }
 
-    // qt standart translations are still loaded depending on selected language
-    QTranslator qtTranslator;
-    if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-        application->installTranslator(&qtTranslator);
-    
+    QTranslator *clientTranslator = new QTranslator(application.data());
+    if (clientTranslator->load(translationsPath + QLatin1String("/client") + translationSuffix))
+        application->installTranslator(clientTranslator);
+
+    QTranslator *commonTranslator = new QTranslator(application.data());
+    if (commonTranslator->load(translationsPath + QLatin1String("/common") + translationSuffix))
+        application->installTranslator(commonTranslator);
+
+    QTranslator *qtTranslator = new QTranslator(application.data());
+    if (qtTranslator->load(QLatin1String("qt_") + language + QLatin1String(".qm")))
+        application->installTranslator(qtTranslator);
+
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();
