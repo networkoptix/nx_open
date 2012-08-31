@@ -24,7 +24,18 @@ struct EndpointAdditionalInfo
     {
 
     }
+
+    EndpointAdditionalInfo(const EndpointAdditionalInfo& src) :
+        name(src.name),
+        manufacturer(src.manufacturer),
+        mac(src.mac),
+        uniqId(src.uniqId),
+        discoveryIp(src.discoveryIp)
+    {
+
+    }
 };
+typedef QSharedPointer<EndpointAdditionalInfo> CameraInfoPtr;
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
