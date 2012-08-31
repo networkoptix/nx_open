@@ -69,9 +69,6 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-
-#include <utils/settings.h>
-
 #include "client_message_processor.h"
 #include "file_processor.h"
 
@@ -551,6 +548,68 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
+}
+
+void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    // remove all existing duplicates
+    int i = 0;
+    int sameIdx = -1;
+    while (i < connections.count()){
+        QString url = connections[i].url.toString(QUrl::RemovePassword);
+        if (sameIdx < 0 && connectionData.url.toString(QUrl::RemovePassword) == url)
+            sameIdx = i;
+
+        int j = i + 1;
+        while (j < connections.count()){
+            if (connections[j].url.toString(QUrl::RemovePassword) == url){
+                connections.removeAt(j);
+            }
+            else{
+                j++;
+            }
+        }
+        i++;
+    }
+
+    if (sameIdx >= 0)
+        connections.removeAt(sameIdx);
+
+    connections.prepend(connectionData);
+
+    while (connections.count() > 10) // TODO: #gdm move const out of here
+        connections.removeLast();
+
+    for (QnConnectionDataList::iterator iter = connections.begin(); iter != connections.end(); ++iter){
+
+        // there is at least one connection with same port
+        bool samePort = false;
+
+        // there is at least one connection with different port
+        bool otherPort = false;
+
+        foreach(QnConnectionData compared, connections){
+            if (*iter == compared)
+                continue;
+
+            if ((*iter).url.host() != compared.url.host())
+                continue;
+
+            if ((*iter).url.port() != compared.url.port())
+                otherPort = true;
+            else
+                samePort = true;
+        }
+
+        (*iter).name = (*iter).url.host();
+        if (samePort)
+            (*iter).name.prepend((*iter).url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
+
+        if (otherPort)
+            (*iter).name.append(QLatin1Char(':') + QString::number((*iter).url.port()));
+    }
+    qnSettings->setCustomConnections(connections);
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -1081,6 +1140,8 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionData connectionData;
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
+
+    updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }

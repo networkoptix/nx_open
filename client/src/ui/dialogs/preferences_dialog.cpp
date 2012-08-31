@@ -10,12 +10,12 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
+#include "utils/settings.h"
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/screen_recording/screen_recorder.h"
 
-#include <ui/widgets/settings/connections_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
@@ -25,7 +25,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    m_connectionsSettingsWidget(NULL), 
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
@@ -42,9 +41,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
     ui->lookAndFeelGroupBox->hide();
 #endif
-
-    m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
-    ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
 
     if (QnScreenRecorder::isSupported()){
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
@@ -142,16 +138,6 @@ void QnPreferencesDialog::submitToSettings() {
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     m_settings->setExtraMediaFolders(extraMediaFolders);
 
-    if (m_connectionsSettingsWidget) {
-        QnConnectionData defaultConnection = qnSettings->defaultConnection();
-
-        QnConnectionDataList connections;
-        foreach (const QnConnectionData &connection, m_connectionsSettingsWidget->connections())
-            if (connection != defaultConnection)
-                connections.append(connection);
-        m_settings->setCustomConnections(connections);
-    }
-
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
 
@@ -178,10 +164,6 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->networkInterfacesList->clear();
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
-
-    QnConnectionDataList connections = qnSettings->customConnections();
-    connections.push_front(qnSettings->defaultConnection());
-    m_connectionsSettingsWidget->setConnections(connections);
 
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
