@@ -169,20 +169,6 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     }
 }
 
-void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->timeMutex);
-    foreach(const ReaderInfo& info, d->readers)
-    {
-        info.reader->setNavDelegate(0);
-        info.reader->setSingleShotMode(value);
-        info.reader->setNavDelegate(this);
-    }
-    if (!value)
-        reinitTime(getDisplayedTime());
-}
-
 void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);

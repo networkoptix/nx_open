@@ -15,7 +15,6 @@ public:
     virtual void nextFrame() = 0;
     virtual void pauseMedia() = 0;
     virtual void resumeMedia() = 0;
-    virtual void setSingleShotMode(bool single) = 0;
 
     virtual bool isMediaPaused() const = 0;
 

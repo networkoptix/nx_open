@@ -168,7 +168,7 @@ void QnResourceDisplay::pause() {
         return;
 
     m_archiveReader->pause();
-    m_archiveReader->setSingleShotMode(true);
+    m_archiveReader->pauseMedia();
     m_archiveReader->pauseDataProcessors();
 
 }

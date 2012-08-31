@@ -123,8 +123,11 @@ void QnArchiveStreamReader::resumeMedia()
     if (m_singleShot)
     {
         emit streamResumed();
-        setSingleShotMode(false);
+        m_delegate->setSingleshotMode(false);
+        m_singleShot = false;
         resumeDataProcessors();
+        QMutexLocker lock(&m_jumpMtx);
+        m_singleShowWaitCond.wakeAll();
     }
 }
 
@@ -141,6 +144,7 @@ void QnArchiveStreamReader::pauseMedia()
         m_singleShot = true;
         m_singleQuantProcessed = true;
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE;
+        m_delegate->setSingleshotMode(true);
     }
 }
 
@@ -836,25 +840,6 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
     return !m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
-}
-
-void QnArchiveStreamReader::setSingleShotMode(bool single)
-{
-    if (m_navDelegate) {
-        m_navDelegate->setSingleShotMode(single);
-        return;
-    }
-
-    if (single == m_singleShot)
-        return;
-    m_delegate->setSingleshotMode(single);
-    {
-        QMutexLocker lock(&m_jumpMtx);
-        m_singleShot = single;
-        m_singleQuantProcessed = false;
-        if (!m_singleShot)
-            m_singleShowWaitCond.wakeAll();
-    }
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const

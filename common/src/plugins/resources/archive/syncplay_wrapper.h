@@ -35,7 +35,6 @@ public:
     virtual void nextFrame();
     virtual void pauseMedia();
     virtual void resumeMedia();
-    virtual void setSingleShotMode(bool single);
     virtual bool isMediaPaused() const;
     //void setPlaybackMask(const QnTimePeriodList& playbackMask);
 
