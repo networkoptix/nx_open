@@ -69,7 +69,7 @@ void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(m_started) {
         runnable->pleaseStop();
     } else {
-        runnable->deleteLater();
+        //runnable->deleteLater();
     }
 }
 

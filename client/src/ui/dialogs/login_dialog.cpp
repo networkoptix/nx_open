@@ -77,7 +77,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
-    connect(ui->configureConnectionsButton, SIGNAL(clicked()),                      this,   SLOT(at_configureConnectionsButton_clicked()));
     connect(ui->passwordLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
@@ -95,7 +94,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
     m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
-    updateStoredConnections();
+    resetConnectionsModel();
     updateFocus();
 }
 
@@ -191,7 +190,7 @@ void LoginDialog::reset() {
     ui->loginLineEdit->clear();
     ui->passwordLineEdit->clear();
 
-    updateStoredConnections();
+    resetConnectionsModel();
 }
 
 void LoginDialog::changeEvent(QEvent *event) {
@@ -206,20 +205,12 @@ void LoginDialog::changeEvent(QEvent *event) {
     }
 }
 
-void LoginDialog::updateStoredConnections() {
+void LoginDialog::resetConnectionsModel() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
-    connections.push_front(qnSettings->defaultConnection());
-
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    if(!lastUsedConnection.isValid()) {
-        lastUsedConnection = qnSettings->defaultConnection();
-        lastUsedConnection.name = QString();
-    }
-    if(connections.contains(lastUsedConnection))
-        connections.removeOne(lastUsedConnection);
-    connections.push_front(lastUsedConnection);
+    if (connections.isEmpty())
+        connections.append(qnSettings->defaultConnection());
 
     foreach (const QnConnectionData &connection, connections) {
         QList<QStandardItem *> row;
@@ -337,12 +328,4 @@ void LoginDialog::at_testButton_clicked() {
     dialog->exec();
 
     updateFocus();
-}
-
-void LoginDialog::at_configureConnectionsButton_clicked() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
-    dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
-
-    if (dialog->exec() == QDialog::Accepted)
-        updateStoredConnections();
 }

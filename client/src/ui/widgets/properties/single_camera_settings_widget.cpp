@@ -22,6 +22,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
     m_hasCameraChanges(false),
+    m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
     m_readOnly(false),
@@ -80,6 +81,7 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     QVariant id;
     QTreeWidget* advancedTreeWidget = 0;
     QStackedLayout* advancedLayout = 0;
+    setAnyCameraChanges(false);
 
     if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
@@ -90,7 +92,10 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
                 delete ui->tabAdvanced->layout();
                 ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
             }
+            
             QSplitter* advancedSplitter = new QSplitter();
+            advancedSplitter->setChildrenCollapsible(false);
+
             layout->addWidget(advancedSplitter);
 
             advancedTreeWidget = new QTreeWidget();
@@ -101,12 +106,18 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
             advancedLayout = new QStackedLayout(advancedWidget);
             advancedSplitter->addWidget(advancedTreeWidget);
             advancedSplitter->addWidget(advancedWidget);
+
+            QList<int> sizes = advancedSplitter->sizes();
+            sizes[0] = 200;
+            sizes[1] = 400;
+            advancedSplitter->setSizes(sizes);
         } else {
             if (m_camera->getUniqueId() == m_widgetsRecreator->getCameraId()) {
                 return;
             }
 
             if (id == m_widgetsRecreator->getId()) {
+                
                 //ToDo: disable all and return. Currently, will do the same as for another type of cameras
                 //disable;
                 //return;
@@ -258,6 +269,8 @@ void QnSingleCameraSettingsWidget::submitToResource() {
         m_modifiedAdvancedParamsOutgoing.append(m_modifiedAdvancedParams);
         m_modifiedAdvancedParams.clear();
         setHasCameraChanges(false);
+    } else {
+        setAnyCameraChanges(false);
     }
 }
 
@@ -405,6 +418,17 @@ void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
 
     m_hasCameraChanges = hasChanges;
     if(!m_hasCameraChanges && !hasDbChanges())
+        m_hasScheduleChanges = false;
+
+    emit hasChangesChanged();
+}
+
+void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
+    if(m_anyCameraChanges == hasChanges)
+        return;
+
+    m_anyCameraChanges = hasChanges;
+    if(!m_anyCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
     emit hasChangesChanged();
@@ -621,7 +645,8 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
 {
     m_modifiedAdvancedParams.push_back(QPair<QString, QVariant>(val.getId(), QVariant(val.serializeToStr())));
-    m_hasCameraChanges = true;//ToDo: at_cameraDataChanged();
+    setAnyCameraChanges(true);
+    at_cameraDataChanged();
     emit advancedSettingChanged();
 }
 

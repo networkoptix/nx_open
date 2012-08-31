@@ -10,6 +10,7 @@
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "../workbench_globals.h"
+#include <utils/settings.h>
 
 class QAction;
 class QMenu;
@@ -286,6 +287,7 @@ protected slots:
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    void updateStoredConnections(QnConnectionData connectionData);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
