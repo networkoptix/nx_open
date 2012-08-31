@@ -147,7 +147,7 @@ bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QStri
     return true;
 }
 
-bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& parentId)
+bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, const QString& /*parentId*/)
 {
     //ToDo: remove hardcode
     if (!getCameraId().startsWith(QString::fromLatin1("DIGITALWATCHDOG"))) {
@@ -159,7 +159,7 @@ bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, c
         id == QString::fromLatin1("%%Imaging%%White Balance%%Blue") )
     {
         CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%White Balance%%Mode"));
-        QString val = settingIt != m_settings->end() ? settingIt.value()->getCurrent() : QString();
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
         if (val == QString::fromLatin1("MANUAL")) {
             return true;
         }
@@ -169,7 +169,7 @@ bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, c
     if (id == QString::fromLatin1("%%Imaging%%Exposure%%Shutter Speed") )
     {
         CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Exposure%%Shutter Mode"));
-        QString val = settingIt != m_settings->end() ? settingIt.value()->getCurrent() : QString();
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
         if (val == QString::fromLatin1("MANUAL")) {
             return true;
         }
@@ -180,7 +180,7 @@ bool CameraSettingsWidgetsCreator::isEnabledByOtherSettings(const QString& id, c
         id == QString::fromLatin1("%%Imaging%%Day & Night%%Switching from B/W to Color") )
     {
         CameraSettings::Iterator settingIt = m_settings->find(QString::fromLatin1("%%Imaging%%Day & Night%%Mode"));
-        QString val = settingIt != m_settings->end() ? settingIt.value()->getCurrent() : QString();
+        QString val = settingIt != m_settings->end() ? static_cast<QString>(settingIt.value()->getCurrent()) : QString();
         if (val == QString::fromLatin1("AUTO")) {
             return true;
         }
