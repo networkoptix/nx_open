@@ -130,6 +130,7 @@ protected slots:
     void updateSyncedPeriods(Qn::TimePeriodRole type);
     void updateTargetPeriod();
     void updateLines();
+    void updateCalendar();
 
     void updateLive();
     void updateLiveSupported();

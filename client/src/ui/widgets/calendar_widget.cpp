@@ -38,7 +38,8 @@ namespace {
 QnCalendarWidget::QnCalendarWidget():
     m_tableView(0),
     m_empty(true),
-    m_currentTime(0)
+    m_currentTime(0),
+    m_currentWidgetIsCentral(false)
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));
@@ -96,6 +97,14 @@ void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd)
         update();
 }
 
+void QnCalendarWidget::setCurrentWidgetIsCentral(bool currentWidgetIsCentral){
+    if (m_currentWidgetIsCentral == currentWidgetIsCentral)
+        return;
+
+    m_currentWidgetIsCentral = currentWidgetIsCentral;
+    update();
+}
+
 bool QnCalendarWidget::isEmpty() {
     return m_empty;
 }
@@ -121,9 +130,9 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         QBrush brush = painter->brush();
 
         QColor bgcolor;
-        if (m_currentTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+        if (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionRole).intersects(period)) {
             bgcolor = motionColor;
-        } else if (m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+        } else if (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
             bgcolor = recordingColor;
         } else {
             bgcolor = backgroundColor;

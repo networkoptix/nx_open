@@ -604,6 +604,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         if(m_currentWidgetIsCentral != isCentral) {
             m_currentWidgetIsCentral = isCentral;
             updateLines();
+            updateCalendar();
         }
 
         return;
@@ -846,6 +847,11 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
+}
+
+void QnWorkbenchNavigator::updateCalendar(){
+    if (m_calendar)
+        m_calendar->setCurrentWidgetIsCentral(m_currentWidgetIsCentral);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
