@@ -663,7 +663,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
         if (!filePath.isEmpty()) {
             if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
+                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
