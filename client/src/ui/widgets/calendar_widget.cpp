@@ -18,9 +18,11 @@ namespace {
     const QColor backgroundColor(24, 24, 24, 0);
     //const QColor backgroundColor(0, 0, 0, 0);
 
+    const QColor denseRecordingColor(32, 255, 32, 255);
     const QColor recordingColor(32, 128, 32, 255);
     //const QColor recordingColor(16, 64, 16, 255);
 
+    const QColor denseMotionColor(255, 0, 0, 255);
     const QColor motionColor(128, 0, 0, 255);
     //const QColor motionColor(64, 0, 0, 255);
 
@@ -57,6 +59,10 @@ QnCalendarWidget::QnCalendarWidget():
     QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
 
     m_tableView->viewport()->installEventFilter(this);
+
+    QPalette palette = m_tableView->palette();
+    palette.setColor(QPalette::Highlight, QColor(0, 0, 0, 255));
+    m_tableView->setPalette(palette);
 
     QWidget* navBarBackground = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
     navBarBackground->setBackgroundRole(QPalette::Window);
@@ -114,26 +120,30 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     {
         QBrush brush = painter->brush();
 
+        QColor bgcolor;
         if (m_currentTimeStorage.periods(Qn::MotionRole).intersects(period)) {
-            brush.setColor(motionColor);
-            brush.setStyle(Qt::SolidPattern);
+            bgcolor = motionColor;
         } else if (m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
-            brush.setColor(recordingColor);
-            brush.setStyle(Qt::SolidPattern);
+            bgcolor = recordingColor;
         } else {
-            brush.setColor(backgroundColor);
-            brush.setStyle(Qt::SolidPattern);
+            bgcolor = backgroundColor;
         }
+        brush.setColor(bgcolor);
+        brush.setStyle(Qt::SolidPattern);
         painter->fillRect(rect, brush);
 
-        if (m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
-            brush.setColor(motionColor);
-            brush.setStyle(Qt::BDiagPattern);
-        } else if (m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
-            brush.setColor(recordingColor);
-            brush.setStyle(Qt::BDiagPattern);
+        if ( bgcolor != motionColor &&
+                m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+            brush.setColor(denseMotionColor);
+            brush.setStyle(Qt::Dense6Pattern);
+            painter->fillRect(rect, brush);
+        } else if ( bgcolor != recordingColor &&
+                m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+            brush.setColor(denseRecordingColor);
+            brush.setStyle(Qt::Dense6Pattern);
+            painter->fillRect(rect, brush);
         }
-        painter->fillRect(rect, brush);
+
     }
 
     QnScopedPainterPenRollback penRollback(painter);
