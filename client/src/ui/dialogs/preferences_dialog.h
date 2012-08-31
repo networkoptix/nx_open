@@ -25,17 +25,10 @@ class QnPreferencesDialog: public QDialog, protected QnWorkbenchContextAware {
     typedef QDialog base_type;
 
 public:
-    enum SettingsPage {
-        PageGeneral = 0,
-        PageRecordingSettings = 2,
-        PageLicense = 3,
-        PageYouTubeSettings = 10,
-    };
-
     QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnPreferencesDialog();
 
-    void setCurrentPage(SettingsPage page);
+    void openLicensesPage();
 
     virtual void accept() override;
 
@@ -63,6 +56,9 @@ private:
     QnLicenseManagerWidget *m_licenseManagerWidget;
 
     QnSettings *m_settings;
+
+    /** Index of "Licenses" tab to open it from outside */
+    int m_licenseTabIndex;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H
