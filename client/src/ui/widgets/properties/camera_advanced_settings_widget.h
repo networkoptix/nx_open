@@ -8,18 +8,12 @@
 
 class QnSettingsScrollArea : public QScrollArea
 {
-    bool m_alreadyShowed;
-
     QnSettingsScrollArea();
 
 public:
 
     QnSettingsScrollArea(QWidget* parent);
     void addWidget(QWidget& widget);
-
-protected:
-
-    void showEvent(QShowEvent* event) override;
 };
 
 //==============================================

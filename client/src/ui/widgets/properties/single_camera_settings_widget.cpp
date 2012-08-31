@@ -563,9 +563,9 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         }
     }
 
-    if (changesFound) {
+    //if (changesFound) {
         m_widgetsRecreator->proceed(&m_cameraSettings);
-    }
+    //}
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
@@ -648,6 +648,12 @@ void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
     setAnyCameraChanges(true);
     at_cameraDataChanged();
     emit advancedSettingChanged();
+
+    if (m_widgetsRecreator && m_camera->getUniqueId() == m_widgetsRecreator->getCameraId())
+    {
+        m_widgetsRecreator->proceed(&m_cameraSettings);
+        loadAdvancedSettings();
+    }
 }
 
 void QnSingleCameraSettingsWidget::refreshAdvancedSettings()
