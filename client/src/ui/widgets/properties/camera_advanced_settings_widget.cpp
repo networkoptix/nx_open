@@ -7,8 +7,7 @@
 
 
 QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
-    QScrollArea(parent),
-    m_alreadyShowed(false)
+    QScrollArea(parent)
 {
     QWidget *widget = new QWidget();
     widget->setLayout(new QVBoxLayout());
@@ -19,20 +18,14 @@ QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
     setWidgetResizable(true);
 }
 
-void QnSettingsScrollArea::showEvent(QShowEvent* event)
-{
-    if (!m_alreadyShowed) {
-        m_alreadyShowed = true;
-        static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
-    }
-
-    QScrollArea::showEvent(event);
-}
-
 void QnSettingsScrollArea::addWidget(QWidget& widgetToAdd)
 {
+    if (widget()->layout()->count() != 0)
+        widget()->layout()->removeItem(widget()->layout()->itemAt(widget()->layout()->count() - 1));
+
     widgetToAdd.setParent(widget());
     dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(&widgetToAdd);
+    static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
 }
 
 //==============================================
@@ -413,7 +406,7 @@ void QnSettingsControlButtonsPairWidget::onMaxReleased()
 
 void QnSettingsControlButtonsPairWidget::refresh()
 {
-    setParam(mParam.getStep());
+    
 }
 
 void QnSettingsControlButtonsPairWidget::updateParam(QString val)

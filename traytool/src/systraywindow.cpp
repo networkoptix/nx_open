@@ -9,6 +9,8 @@
 #include "version.h"
 
 
+#define USE_SINGLE_STREAMING_PORT
+
 static const QString MEDIA_SERVER_NAME (QString(ORGANIZATION_NAME) + QString(" Media Server"));
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
@@ -50,6 +52,12 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
 {
     ui->setupUi(this);
+
+#ifdef USE_SINGLE_STREAMING_PORT
+    ui->apiPortLineEdit->setVisible(false);
+    ui->label_ApiPort->setVisible(false);
+    ui->label_RtspPort->setText(tr("Port"));
+#endif
 
     m_iconOK = QIcon(":/traytool.png");
     m_iconBad = QIcon(":/traytool.png");
@@ -613,7 +621,9 @@ void QnSystrayWindow::onSettingsAction()
     else
         ui->rtspTransportComboBox->setCurrentIndex(0);
 
+#ifndef USE_SINGLE_STREAMING_PORT
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
+#endif
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
     ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
 
@@ -646,8 +656,10 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     if (ui->rtspPortLineEdit->text().toInt() != m_mServerSettings.value("rtspPort").toInt())
         return true;
 
+#ifndef USE_SINGLE_STREAMING_PORT
     if (ui->apiPortLineEdit->text().toInt() != m_mServerSettings.value("apiPort").toInt())
         return true;
+#endif
 
     return false;
 }
@@ -740,7 +752,9 @@ bool QnSystrayWindow::validateData()
     if (m_mediaServerHandle)
     {
         checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP");
+#ifndef USE_SINGLE_STREAMING_PORT
         checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API");
+#endif
     }
     
     for(int i = 0; i < checkedPorts.size(); ++i)
@@ -772,7 +786,9 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("appserverLogin", ui->appServerLogin->text());
     m_mServerSettings.setValue("appserverPassword",ui->appServerPassword->text());
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
+#ifndef USE_SINGLE_STREAMING_PORT
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
+#endif
 
     m_mServerSettings.setValue("rtspTransport", ui->rtspTransportComboBox->currentText());
 

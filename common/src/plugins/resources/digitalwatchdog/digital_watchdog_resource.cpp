@@ -168,7 +168,7 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
-    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
     if (currTime > m_advSettingsLastUpdated) {
         foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
         {
