@@ -66,11 +66,14 @@ void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 
+#if 0
     if(m_started) {
         runnable->pleaseStop();
     } else {
-        //runnable->deleteLater();
+        runnable->deleteLater();
     }
+#endif
+    runnable->pleaseStop();
 }
 
 QnCamDisplay *QnResourceDisplay::camDisplay() const {
@@ -101,9 +104,11 @@ void QnResourceDisplay::disconnectFromResource() {
     foreach(detail::QnRendererGuard *guard, m_guards)
         guard->renderer()->beforeDestroy();
 
+#if 0
     if(!m_started)
         foreach(detail::QnRendererGuard *guard, m_guards)
             delete guard;
+#endif
 
     m_mediaResource.clear();
     m_dataProvider = NULL;
