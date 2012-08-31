@@ -772,6 +772,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     if (!m_currentWidgetLoaded) 
         return;
     
+    // TODO: #GDM also take calendar into account. Invoke this method when calendar page changes.
+
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());

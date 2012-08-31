@@ -1365,7 +1365,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
         if(paused) {
             widget->display()->archiveReader()->pauseMedia();
-            widget->display()->camDisplay()->setSingleShotMode(true);
+            widget->display()->archiveReader()->setSingleShotMode(true);
         }
 
         // TODO: don't start reader for thumbnails search

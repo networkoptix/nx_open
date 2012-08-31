@@ -211,7 +211,7 @@ void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
 #else
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
-    server->setApiUrl(QString("https://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
     server->setStreamingUrl(QString("https://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
 #endif
 }
@@ -635,7 +635,6 @@ void QnMain::run()
     QUrl streamingUrl(m_videoServer->getStreamingUrl());
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
-    m_restServer ->enableSSLMode();
     m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
     m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
     m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
@@ -645,7 +644,7 @@ void QnMain::run()
     m_restServer->registerHandler("api/manualAddcams", new QnManualCameraAdditionHandler());
 
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingUrl.port());
-    m_progressiveDownloadingServer->enableSSLMode();
+//    m_progressiveDownloadingServer->enableSSLMode();
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {

@@ -11,6 +11,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
+#include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
