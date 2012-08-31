@@ -24,19 +24,24 @@ public:
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
     /**
-    * \return true is all loaded periods of all roles are empty
-    */
+     * If current widget is not central, calendar should not draw current periods.
+     */
+    void setCurrentWidgetIsCentral(bool currentWidgetIsCentral);
+
+    /**
+     * \return true is all loaded periods of all roles are empty
+     */
     bool isEmpty();
 
 signals:
     /**
-    * Signal is emitted when empty state is changed, e.g. loaded new time periods.
-    */
+     * Signal is emitted when empty state is changed, e.g. loaded new time periods.
+     */
     void emptyChanged();
 
     /**
-    * Signal is emitted when cell was clicked (even if it is already selected date)
-    */
+     * Signal is emitted when cell was clicked (even if it is already selected date)
+     */
     void dateClicked(const QDate &date);
 
 protected:
@@ -51,6 +56,7 @@ private:
     QTableView* m_tableView;
     QnTimePeriod m_window;
     bool m_empty;
+    bool m_currentWidgetIsCentral;
 
     /** Current server time in msecs since epoch */
     qint64 m_currentTime;

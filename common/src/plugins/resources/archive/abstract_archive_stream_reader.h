@@ -90,7 +90,7 @@ public:
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
-    virtual bool getQuality() const = 0;
+    virtual MediaQuality getQuality() const = 0;
     virtual void disableQualityChange() = 0;
     virtual void enableQualityChange() = 0;
 

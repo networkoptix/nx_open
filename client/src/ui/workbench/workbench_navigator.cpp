@@ -49,20 +49,17 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
     m_timeSlider(NULL),
     m_timeScrollBar(NULL),
+    m_calendar(NULL),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
-    m_calendar(NULL),
-    m_updatingSliderFromReader(false),
-    m_updatingSliderFromScrollBar(false),
-    m_updatingScrollBarFromSlider(false),
     m_currentWidgetFlags(0),
     m_currentWidgetLoaded(false),
     m_currentWidgetIsCentral(false),
     m_sliderDataInvalid(false),
-    m_startSelectionAction(new QAction(this)),
-    m_endSelectionAction(new QAction(this)),
-    m_clearSelectionAction(new QAction(this)),
+    m_updatingSliderFromReader(false),
+    m_updatingSliderFromScrollBar(false),
+    m_updatingScrollBarFromSlider(false),
     m_lastLive(false),
     m_lastLiveSupported(false),
     m_lastPlaying(false),
@@ -73,7 +70,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
     m_lastUpdateSlider(0),
-    m_lastCameraTime(0)
+    m_lastCameraTime(0),
+    m_startSelectionAction(new QAction(this)),
+    m_endSelectionAction(new QAction(this)),
+    m_clearSelectionAction(new QAction(this))
 {}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
@@ -604,6 +604,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         if(m_currentWidgetIsCentral != isCentral) {
             m_currentWidgetIsCentral = isCentral;
             updateLines();
+            updateCalendar();
         }
 
         return;
@@ -771,6 +772,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     if (!m_currentWidgetLoaded) 
         return;
     
+    // TODO: #GDM also take calendar into account. Invoke this method when calendar page changes.
+
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
@@ -846,6 +849,11 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLineVisible(CurrentLine, false);
         m_timeSlider->setLineVisible(SyncedLine, false);
     }
+}
+
+void QnWorkbenchNavigator::updateCalendar(){
+    if (m_calendar)
+        m_calendar->setCurrentWidgetIsCentral(m_currentWidgetIsCentral);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
