@@ -27,7 +27,6 @@ class QnPreferencesDialog: public QDialog, protected QnWorkbenchContextAware {
 public:
     enum SettingsPage {
         PageGeneral = 0,
-        PageConnections = 1,
         PageRecordingSettings = 2,
         PageLicense = 3,
         PageYouTubeSettings = 10,
@@ -59,7 +58,6 @@ private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
-    QnConnectionsSettingsWidget *m_connectionsSettingsWidget;
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
     QnLicenseManagerWidget *m_licenseManagerWidget;
