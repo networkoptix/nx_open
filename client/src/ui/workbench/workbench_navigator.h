@@ -175,11 +175,11 @@ protected slots:
     void at_calendar_dateChanged(const QDate &date);
 
 private:
+    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
+
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
-
-    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;

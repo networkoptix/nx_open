@@ -49,20 +49,17 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_streamSynchronizer(context()->instance<QnWorkbenchStreamSynchronizer>()),
     m_timeSlider(NULL),
     m_timeScrollBar(NULL),
+    m_calendar(NULL),
     m_centralWidget(NULL),
     m_currentWidget(NULL),
     m_currentMediaWidget(NULL),
-    m_calendar(NULL),
-    m_updatingSliderFromReader(false),
-    m_updatingSliderFromScrollBar(false),
-    m_updatingScrollBarFromSlider(false),
     m_currentWidgetFlags(0),
     m_currentWidgetLoaded(false),
     m_currentWidgetIsCentral(false),
     m_sliderDataInvalid(false),
-    m_startSelectionAction(new QAction(this)),
-    m_endSelectionAction(new QAction(this)),
-    m_clearSelectionAction(new QAction(this)),
+    m_updatingSliderFromReader(false),
+    m_updatingSliderFromScrollBar(false),
+    m_updatingScrollBarFromSlider(false),
     m_lastLive(false),
     m_lastLiveSupported(false),
     m_lastPlaying(false),
@@ -73,7 +70,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_lastMinimalSpeed(0.0),
     m_lastMaximalSpeed(0.0),
     m_lastUpdateSlider(0),
-    m_lastCameraTime(0)
+    m_lastCameraTime(0),
+    m_startSelectionAction(new QAction(this)),
+    m_endSelectionAction(new QAction(this)),
+    m_clearSelectionAction(new QAction(this))
 {}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
