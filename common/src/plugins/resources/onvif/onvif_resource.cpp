@@ -28,7 +28,7 @@ const char* QnPlOnvifResource::PROFILE_NAME_PRIMARY = "Netoptix Primary";
 const char* QnPlOnvifResource::PROFILE_NAME_SECONDARY = "Netoptix Secondary";
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
-const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 1; //1 second
+const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 200; //200 ms
 
 //Forth times greater than default = 320 x 240
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
@@ -1468,7 +1468,7 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
         return true;
     }
 
-    QDateTime currTime = QDateTime::currentDateTime().addSecs(-ADVANCED_SETTINGS_VALID_TIME);
+    QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
     if (currTime > m_advSettingsLastUpdated) {
         if (!m_onvifAdditionalSettings->makeGetRequest()) {
             return false;

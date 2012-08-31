@@ -136,6 +136,7 @@ public:
 
     bool read();
     bool proceed();
+    QString getCameraId() const { return m_cameraId; };
 
 protected:
 
