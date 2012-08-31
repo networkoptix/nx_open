@@ -198,7 +198,10 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
     AVRational srcRate = {1, 1000000};
-    AVStream* stream = m_formatCtx->streams[media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1];
+    int streamIndex = media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1;
+    if (streamIndex >= m_formatCtx->nb_streams)
+        return 0; // skip audio data if no audio codec configured
+    AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
     packet.data = 0;
