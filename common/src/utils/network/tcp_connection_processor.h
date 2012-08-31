@@ -26,10 +26,13 @@ public:
     int getSocketTimeout();
 
     bool sendChunk(const QnByteArray& chunk);
-protected:
+
+    void execute(QMutex& mutex);
     virtual void pleaseStop();
+protected:
     virtual void parseRequest();
     QString extractPath() const;
+    static QString extractPath(const QString& fullUrl);
     void sendData(const char* data, int size);
     inline void sendData(const QByteArray& data) { sendData(data.constData(), data.size()); }
 
@@ -42,6 +45,7 @@ protected:
     void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType);
     QString codeToMessage(int code);
 
+    void copyClientRequestTo(QnTCPConnectionProcessor& other);
     bool readRequest();
     QUrl getDecodedUrl() const;
 

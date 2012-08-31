@@ -4,6 +4,7 @@
 #include "utils/common/longrunnable.h"
 #include "core/resource/video_server_resource.h"
 #include "http/progressive_downloading_server.h"
+#include "network/universal_tcp_listener.h"
 
 class QnAppserverResourceProcessor;
 class QnRtspListener;
@@ -33,6 +34,7 @@ private:
     QnRtspListener* m_rtspListener;
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
+    QnUniversalTcpListener* m_universalTcpListener;
     QnVideoServerResourcePtr m_videoServer;
 };
 

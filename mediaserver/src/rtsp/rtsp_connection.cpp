@@ -1033,6 +1033,12 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+
+    if (!d->clientRequest.isEmpty()) {
+        parseRequest();
+        processRequest();
+    }
+
     QTime t;
     while (!m_needStop && d->socket->isConnected())
     {

@@ -144,7 +144,11 @@ void QnProgressiveDownloadingConsumer::run()
     d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
     d->socket->setWriteTimeOut(CONNECTION_TIMEOUT);
 
-    if (readRequest())
+    bool ready = true;
+    if (d->clientRequest.isEmpty())
+        ready = readRequest();
+
+    if (ready)
     {
         parseRequest();
         d->responseBody.clear();
