@@ -4,7 +4,7 @@
 <context>
     <name>CommunicatingSocket</name>
     <message>
-        <location filename="../utils/network/socket.cpp" line="318"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="318"/>
         <source>Connect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12,7 +12,7 @@
 <context>
     <name>OnvifResourceInformationFetcher</name>
     <message>
-        <location filename="../plugins/resources/onvif/onvif_resource_information_fetcher.cpp" line="100"/>
+        <location filename="../../../src/plugins/resources/onvif/onvif_resource_information_fetcher.cpp" line="99"/>
         <source>Unknown - %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20,12 +20,12 @@
 <context>
     <name>QnCommandLineParser</name>
     <message>
-        <location filename="../utils/common/command_line_parser.cpp" line="124"/>
+        <location filename="../../../src/utils/common/command_line_parser.cpp" line="124"/>
         <source>No value provided for the &apos;%1&apos; argument.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/common/command_line_parser.cpp" line="136"/>
+        <location filename="../../../src/utils/common/command_line_parser.cpp" line="136"/>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -33,12 +33,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <location filename="../utils/common/environment.cpp" line="44"/>
+        <location filename="../../../src/utils/common/environment.cpp" line="44"/>
         <source>Launching Windows Explorer failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/common/environment.cpp" line="45"/>
+        <location filename="../../../src/utils/common/environment.cpp" line="45"/>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -46,7 +46,7 @@
 <context>
     <name>QnPropertyStorage</name>
     <message>
-        <location filename="../utils/common/property_storage.cpp" line="239"/>
+        <location filename="../../../src/utils/common/property_storage.cpp" line="239"/>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -54,65 +54,73 @@
 <context>
     <name>QnSignHelper</name>
     <message>
-        <location filename="../export/sign_helper.cpp" line="223"/>
+        <location filename="../../../src/export/sign_helper.cpp" line="223"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/sign_helper.cpp" line="224"/>
+        <location filename="../../../src/export/sign_helper.cpp" line="224"/>
         <source>Hardware ID: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/sign_helper.cpp" line="226"/>
+        <location filename="../../../src/export/sign_helper.cpp" line="226"/>
         <source>FREE license</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/sign_helper.cpp" line="233"/>
+        <location filename="../../../src/export/sign_helper.cpp" line="233"/>
         <source>Licensed to: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../export/sign_helper.cpp" line="234"/>
+        <location filename="../../../src/export/sign_helper.cpp" line="234"/>
         <source>Watermark: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnStatisticsStorage</name>
+    <message>
+        <location filename="../../../src/api/video_server_statistics_storage.cpp" line="83"/>
+        <source>CPU</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="296"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="296"/>
         <source>No %1 container in FFMPEG library.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="316"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="316"/>
         <source>Can&apos;t create output file &apos;%1&apos; for video recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="342"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="342"/>
         <source>Can&apos;t allocate output stream for recording.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="396"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="396"/>
         <source>Can&apos;t allocate output audio stream.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="410"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="410"/>
         <source>Can&apos;t create output file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="422"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="422"/>
         <source>Video or audio codec is incompatible with %1 format. Try another format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../recording/stream_recorder.cpp" line="517"/>
+        <location filename="../../../src/recording/stream_recorder.cpp" line="517"/>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -120,27 +128,27 @@
 <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
-        <location filename="../utils/network/tcp_connection_processor.cpp" line="205"/>
+        <location filename="../../../src/utils/network/tcp_connection_processor.cpp" line="257"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/tcp_connection_processor.cpp" line="207"/>
+        <location filename="../../../src/utils/network/tcp_connection_processor.cpp" line="259"/>
         <source>Not Found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/tcp_connection_processor.cpp" line="209"/>
+        <location filename="../../../src/utils/network/tcp_connection_processor.cpp" line="261"/>
         <source>Not Implemented</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/tcp_connection_processor.cpp" line="211"/>
+        <location filename="../../../src/utils/network/tcp_connection_processor.cpp" line="263"/>
         <source>Internal Server Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/tcp_connection_processor.cpp" line="213"/>
+        <location filename="../../../src/utils/network/tcp_connection_processor.cpp" line="265"/>
         <source>Invalid Parameter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -148,7 +156,7 @@
 <context>
     <name>QnTestCameraResourceSearcher</name>
     <message>
-        <location filename="../plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="46"/>
+        <location filename="../../../src/plugins/resources/test_camera/testcamera_resource_searcher.cpp" line="46"/>
         <source>TestCameraLive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -156,7 +164,7 @@
 <context>
     <name>QtSoapHttpTransport</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="3224"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="3224"/>
         <source>Network transport error (%1): %2</source>
         <translation type="unfinished"></translation>
     </message>
@@ -164,38 +172,38 @@
 <context>
     <name>QtSoapMessage</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2389"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2389"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2450"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2450"/>
         <source>XML parse error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2492"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2501"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2516"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2525"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2534"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2492"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2501"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2516"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2525"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2534"/>
         <source>SOAP structure invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2494"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2494"/>
         <source>root element &quot;%1&quot;/&quot;%2&quot; is not envelope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2502"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2517"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2526"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2502"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2517"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2526"/>
         <source>mandatory body element missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2535"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2535"/>
         <source>Unsupported namespace for envelope element</source>
         <translation type="unfinished"></translation>
     </message>
@@ -203,7 +211,7 @@
 <context>
     <name>QtSoapSimpleType</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2196"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2196"/>
         <source>Type error at element &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -211,12 +219,12 @@
 <context>
     <name>QtSoapStruct</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="1793"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="1793"/>
         <source>In the struct element %1, the %2th child is not an element.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="1799"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="1799"/>
         <source>In the struct element %1, the %2th child was not recognized as a SOAP type.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -224,8 +232,8 @@
 <context>
     <name>QtSoapType</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="478"/>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="489"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="478"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="489"/>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -233,7 +241,7 @@
 <context>
     <name>QtSoapTypeFactory</name>
     <message>
-        <location filename="../utils/qtsoap/qtsoap.cpp" line="2953"/>
+        <location filename="../../../src/utils/qtsoap/qtsoap.cpp" line="2953"/>
         <source>A handler for %1 is already registered.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -241,27 +249,27 @@
 <context>
     <name>Socket</name>
     <message>
-        <location filename="../utils/network/socket.cpp" line="99"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="99"/>
         <source>Couldn&apos;t resolve %1: %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/socket.cpp" line="126"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="126"/>
         <source>Unable to load WinSock DLL.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/socket.cpp" line="134"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="134"/>
         <source>Socket creation failed (socket()).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/socket.cpp" line="243"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="243"/>
         <source>Set of local address and port failed (bind()).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../utils/network/socket.cpp" line="253"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="253"/>
         <source>WSACleanup() failed.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -269,7 +277,7 @@
 <context>
     <name>TCPServerSocket</name>
     <message>
-        <location filename="../utils/network/socket.cpp" line="531"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="541"/>
         <source>Set listening socket failed (listen()).</source>
         <translation type="unfinished"></translation>
     </message>
@@ -277,7 +285,7 @@
 <context>
     <name>UDPSocket</name>
     <message>
-        <location filename="../utils/network/socket.cpp" line="606"/>
+        <location filename="../../../src/utils/network/socket.cpp" line="616"/>
         <source>Disconnect failed (connect()).</source>
         <translation type="unfinished"></translation>
     </message>

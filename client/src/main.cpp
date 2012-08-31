@@ -287,6 +287,18 @@ int main(int argc, char *argv[])
 
 
     QString language = qnSettings->language();
+    // TODO: #GDM copypasta!!!
+    //
+    // Why don't you write it like this:
+    // 
+    // QString translationPath; /* This one is loaded from command line. */
+    // QString translationSuffix;
+    // if(translationPath.isEmpty()) {
+    //      translationPath = QLatin1String(":/translations");
+    //      translationSuffix = QLatin1String("_") + language;
+    // }
+    // 
+    // ?
     if (customTranslations.isEmpty()){
         QTranslator appTranslator;
         if (appTranslator.load(QLatin1String(":/translations/client_") + language + QLatin1String(".qm")))
