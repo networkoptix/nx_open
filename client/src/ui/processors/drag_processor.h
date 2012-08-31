@@ -95,9 +95,13 @@ public:
         return m_startDragDistance;
     }
 
-    int effectiveStartDragDistance() const;
-
     void setStartDragDistance(int startDragDistance);
+
+    int startDragTime() const {
+        return m_startDragTime;
+    }
+
+    void setStartDragTime(int startDragTime);
 
     /**
      * Resets this drag processor, moving it into <tt>Waiting</tt> state. 
@@ -207,6 +211,9 @@ private:
     /** Start drag distance. */
     int m_startDragDistance;
 
+    /** Start drag timeout, in milliseconds. */
+    int m_startDragTime;
+
     /** Drag handler. */
     DragProcessHandler *m_handler;
 
@@ -227,7 +234,7 @@ private:
     QWeakPointer<QObject> m_object;
 
     /** Identifier of a timer used to track mouse press time. */
-    int m_dragTimerId;
+    int m_dragTimerId; // TODO: use QBasicTimer
 
     /** Whether the first drag notification was sent. */
     bool m_firstDragSent;
