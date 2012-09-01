@@ -197,9 +197,6 @@ void printInLogNetResources(const QnResourceList& resources)
 
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 {
-
-    //findResources(QHostAddress(), QHostAddress());
-
     //bool allow_to_change_ip = true;
     static const int  threads = 5;
 
@@ -552,7 +549,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     // looking for a new resources from this ip range;
     QnIprangeChecker ip_cheker;
 
-    ip_cheker.onlineHosts(QHostAddress(QLatin1String("192.168.0.0")), QHostAddress(QLatin1String("192.168.0.255")));
+    ip_cheker.onlineHosts(QHostAddress(QLatin1String("10.0.2.0")), QHostAddress(QLatin1String("10.0.2.255")));
 
 
     return result;

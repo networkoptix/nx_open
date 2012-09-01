@@ -11,6 +11,17 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
 {
     Q_UNUSED(path)
 
+    if (params.size() < 4)
+    {
+        // to few params
+        result.append(QByteArray("To few params"));
+        return CODE_INVALID_PARAMETER;
+    }
+
+
+
+    //QnResourceDiscoveryManager::instance().findResources()
+
     return CODE_OK;
 }
 

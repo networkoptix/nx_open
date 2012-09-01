@@ -2,6 +2,7 @@
 #include <QTcpSocket>
 #include "../common/sleep.h"
 #include "socket.h"
+#include "simple_http_client.h"
 
 struct QnIprangeCheckerHelper 
 {
@@ -14,11 +15,9 @@ struct QnIprangeCheckerHelper
         online = false;
         
 
-        TCPSocket sock;
-        sock.setReadTimeOut(1000);
-        sock.setWriteTimeOut(1000);
-
-        if (sock.connect(QHostAddress(ip).toString(), 80))
+        CLSimpleHTTPClient http (QHostAddress(ip), 80, 1500, QAuthenticator());
+        CLHttpStatus status = http.doGET(QByteArray(""));
+        if (status != CL_TRANSPORT_ERROR) 
         {
             online = true;
         }
@@ -58,7 +57,7 @@ QList<QHostAddress> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostA
     }
 
 
-    int threads = 10;
+    int threads = 32;
     QThreadPool* global = QThreadPool::globalInstance();
     for (int i = 0; i < threads; ++i ) global->releaseThread();
     QtConcurrent::blockingMap(candidates, &QnIprangeCheckerHelper::check);
