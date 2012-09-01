@@ -146,6 +146,8 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
     server->setGuid(QString::fromStdString(pb_serverResource.guid()));
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
+    if (pb_server.has_streamingurl())
+        server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -729,6 +731,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
     pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
+    pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
 
     if (!serverPtr->getNetAddrList().isEmpty())

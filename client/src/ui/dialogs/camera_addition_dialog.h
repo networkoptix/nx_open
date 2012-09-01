@@ -27,25 +27,44 @@ namespace detail {
         Q_OBJECT
     public:
 
-        CheckCamerasFoundReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        CheckCamerasFoundReplyProcessor(QObject *parent = NULL):
+            QObject(parent),
+            m_cancelled(false)
+        {}
 
         CamerasFoundInfoMap freeSpaceInfo() const {
             return m_freeSpace;
         }
 
+        QByteArray getData() const {
+            return m_data;
+        }
+
     signals:
-        void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
+        void replyReceived();
 
     public slots:
-        void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) 
+        void processReply(int status, const QByteArray &data) //TODO: #gdm change profile
         {
-            int errCode = status == 0 ? (freeSpace > 0 ? 0 : -1) : -2;
-            m_freeSpace.insert(handle, CamerasFoundInfo(freeSpace, usedSpace, errCode));
-            emit replyReceived(status, freeSpace, usedSpace, handle);
+            if (m_cancelled)
+                return;
+
+            m_data.clear();
+            m_data.append(data);
+            qDebug() << "reply status" << status;
+            qDebug() << "data received" << data;
+            emit replyReceived();
+        }
+
+        void cancel(){
+            m_cancelled = true;
+            qDebug() << "request cancelled";
         }
 
     private:
         CamerasFoundInfoMap m_freeSpace;
+        QByteArray m_data;
+        bool m_cancelled;
     };
 
 } // namespace detail
@@ -60,7 +79,7 @@ public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
 private:
-    int addTableRow(int id, const QString &url, int spaceLimitGb);
+    int addTableRow(const QByteArray &data);
 
     void setTableStorages(const QnAbstractStorageResourceList &storages);
     QnAbstractStorageResourceList tableStorages() const;

@@ -39,6 +39,7 @@ public:
 
     bool hasDbChanges() const;
     bool hasCameraChanges() const;
+    bool hasAnyCameraChanges() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
     QnVideoServerConnectionPtr getServerConnection() const;

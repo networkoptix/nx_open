@@ -363,3 +363,60 @@ void QnSettingsTextFieldWidget::updateParam(QString val)
 {
 
 }
+
+//==============================================
+QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+{
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    mlayout->addLayout(hlayout);
+
+    minBtn = new QPushButton(QString::fromLatin1("-"));
+    minBtn->setFocusPolicy(Qt::NoFocus);
+    maxBtn = new QPushButton(QString::fromLatin1("+"));
+    maxBtn->setFocusPolicy(Qt::NoFocus);
+
+    hlayout->addStretch(1);
+    hlayout->addWidget(new QLabel(obj.getName()));
+    hlayout->addWidget(minBtn);
+    hlayout->addWidget(maxBtn);
+    hlayout->addStretch(1);
+
+    QObject::connect(minBtn, SIGNAL(pressed()), this, SLOT(onMinPressed()));
+    QObject::connect(minBtn, SIGNAL(released()), this, SLOT(onMinReleased()));
+
+    QObject::connect(maxBtn, SIGNAL(pressed()), this, SLOT(onMaxPressed()));
+    QObject::connect(maxBtn, SIGNAL(released()), this, SLOT(onMaxReleased()));
+
+    mWidget = 0;
+}
+
+void QnSettingsControlButtonsPairWidget::onMinPressed()
+{
+    setParam(mParam.getMin());
+}
+
+void QnSettingsControlButtonsPairWidget::onMinReleased()
+{
+    setParam(mParam.getStep());
+}
+
+void QnSettingsControlButtonsPairWidget::onMaxPressed()
+{
+    setParam(mParam.getMax());
+}
+
+void QnSettingsControlButtonsPairWidget::onMaxReleased()
+{
+    setParam(mParam.getStep());
+}
+
+void QnSettingsControlButtonsPairWidget::refresh()
+{
+    setParam(mParam.getStep());
+}
+
+void QnSettingsControlButtonsPairWidget::updateParam(QString val)
+{
+    
+}

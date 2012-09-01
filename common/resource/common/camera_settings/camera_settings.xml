@@ -365,31 +365,22 @@
     <group name = "Lens"
          description ="">
       
-      <param name = "Zoom In"
-             description = "Press button to zoom in."
-             widget_type = "Button"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue=zoomIn"/>
+      <param name = "Zoom"
+             description = "Zoom In / Zoom Out."
+             widget_type = "ControlButtonsPair"
+             min = "zoomOut"
+             max = "zoomIn"
+             step = "stop"
+             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue"/>
 
-      <param name = "Zoom Out"
-             description = "Press button to zoom out."
-             widget_type = "Button"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue=zoomOut"/>
+      <param name = "Focus"
+             description = "Move focus near / far"
+             widget_type = "ControlButtonsPair"
+             min = "focusFar"
+             max = "focusNear"
+             step = "stop"
+             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue"/>
 
-      <param name = "Focus Near"
-             description = "Press button to move focus near."
-             widget_type = "Button"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue=focusNear"/>
-
-      <param name = "Focus Far"
-             description = "Press button to move focus far."
-             widget_type = "Button"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue=focusFar"/>
-
-      <param name = "Stop Movement"
-             description = "Press button to stop current movement."
-             widget_type = "Button"
-             query = "/cgi-bin/ptzctrl.cgi?ptzchannel=0&amp;ptzctrlvalue=stop"/>
-      
     </group>
     
   </camera>

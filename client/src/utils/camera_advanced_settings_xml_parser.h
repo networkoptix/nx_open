@@ -1,6 +1,10 @@
 #ifndef camera_advanced_settings_xml_parser_h_1819
 #define camera_advanced_settings_xml_parser_h_1819
 
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QSet>
+
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;

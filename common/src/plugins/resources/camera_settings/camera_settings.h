@@ -31,7 +31,7 @@ public:
 
 class CameraSetting {
 public:
-    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField };
+    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField, ControlButtonsPair };
 
     static WIDGET_TYPE typeFromStr(const QString& value);
 
