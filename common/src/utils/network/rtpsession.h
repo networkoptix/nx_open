@@ -182,6 +182,8 @@ public:
 
     RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
     int buildClientRTCPReport(quint8 *dstBuffer);
+
+    void setSimpleOpenMode();
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -206,7 +208,7 @@ private:
 
     // in case of error return false
     bool checkIfDigestAuthIsneeded(const QByteArray& response);
-
+    void usePredefinedTracks();
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
 
@@ -252,6 +254,7 @@ private:
 
     QString m_realm;
     QString m_nonce;
+    bool m_useSimpleOpen;
 };
 
 #endif //rtp_session_h_1935_h
