@@ -113,7 +113,8 @@ public:
     int getPrimaryH264Profile() const;
     int getSecondaryH264Profile() const;
     ResolutionPair getMaxResolution() const;
-    bool isSoapAuthorized() const;
+    int getTimeDrift() const; // return clock diff between camera and local clock at seconds
+    //bool isSoapAuthorized() const;
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
@@ -136,7 +137,7 @@ public:
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
     bool forcePrimaryEncoderCodec() const;
-
+    int calcTimeDrift() const; // return clock diff between camera and local clock at seconds
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -154,7 +155,6 @@ protected:
     virtual void fetchAndSetCameraSettings();
 
     QString getDeviceOnvifUrl() const;
-
 private:
     void setMaxFps(int f);
 
@@ -227,6 +227,7 @@ private:
     bool m_forceCodecFromPrimaryEncoder;
 
     QString m_imagingUrl;
+    int m_timeDrift;
 };
 
 #endif //onvif_resource_h

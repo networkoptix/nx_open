@@ -146,7 +146,7 @@ QString QnPlWatchDogResource::fetchCameraModel()
 {
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
-    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString());
+    DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), getTimeDrift());
 
     DeviceInfoReq request;
     DeviceInfoResp response;

@@ -25,7 +25,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
     std::string password = auth.password().toStdString();
     std::string endpoint = getMediaUrl().toStdString();
 
-    MediaSoapWrapper soapWrapperGet(endpoint.c_str(), login, password);
+    MediaSoapWrapper soapWrapperGet(endpoint.c_str(), login, password, getTimeDrift());
     VideoConfigReq confRequest;
     confRequest.ConfigurationToken = confToken;
     VideoConfigResp confResponse;
@@ -45,7 +45,7 @@ bool QnPlSonyResource::updateResourceCapabilities()
         resolutionListPtr = ResolutionListPtr(new QList<ResolutionPair>(m_resolutionList)); //Sorted desc
     }
 
-    MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password);
+    MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
     SetVideoConfigReq request;
     request.Configuration = confResponse.Configuration;
     request.Configuration->Encoding = getCodec(true) == H264 ? onvifXsd__VideoEncoding__H264 : onvifXsd__VideoEncoding__JPEG;

@@ -13,6 +13,8 @@ class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
 class _onvifDevice__GetCapabilities;
 class _onvifDevice__GetCapabilitiesResponse;
+class _onvifDevice__GetSystemDateAndTime;
+class _onvifDevice__GetSystemDateAndTimeResponse;
 class _onvifDevice__GetDeviceInformation;
 class _onvifDevice__GetDeviceInformationResponse;
 class _onvifDevice__GetNetworkInterfaces;
@@ -158,6 +160,7 @@ class SoapWrapper
     char* m_login;
     char* m_passwd;
     bool invoked;
+    int m_timeDrift;
 
 protected:
 
@@ -166,12 +169,13 @@ protected:
 
 public:
 
-    SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~SoapWrapper();
 
     soap* getSoap();
     const char* getLogin();
     const char* getPassword();
+    int getTimeDrift();
     const QString getLastError();
     const QString getEndpointUrl();
     bool isNotAuthenticated();
@@ -198,7 +202,7 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 public:
 
     //TODO:UTF unuse std::string
-    DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
@@ -207,6 +211,7 @@ public:
     int getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response);
     int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
     int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
+    int GetSystemDateAndTime(_onvifDevice__GetSystemDateAndTime& request, _onvifDevice__GetSystemDateAndTimeResponse& response);
 
     int createUsers(CreateUsersReq& request, CreateUsersResp& response);
 
@@ -229,7 +234,7 @@ class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 
 public:
 
-    MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~MediaSoapWrapper();
 
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
@@ -273,7 +278,7 @@ class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 
 public:
 
-    PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~PtzSoapWrapper();
 
     int GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
@@ -295,7 +300,7 @@ class ImagingSoapWrapper: public SoapWrapper<ImagingBindingProxy>
 
 public:
 
-    ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd);
+    ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~ImagingSoapWrapper();
 
     int getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response);

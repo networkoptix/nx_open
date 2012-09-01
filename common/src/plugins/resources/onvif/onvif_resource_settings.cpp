@@ -8,10 +8,10 @@ enum onvifXsd__WideDynamicMode;
 //
 
 OnvifCameraSettingsResp::OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl,
-        const std::string& login, const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId):
-    m_deviceSoapWrapper(deviceUrl.empty()? 0: new DeviceSoapWrapper(deviceUrl, login, passwd)),
-    m_rangesSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd)),
-    m_valsSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd)),
+        const std::string& login, const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift):
+    m_deviceSoapWrapper(deviceUrl.empty()? 0: new DeviceSoapWrapper(deviceUrl, login, passwd, _timeDrift)),
+    m_rangesSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
+    m_valsSoapWrapper(imagingUrl.empty()? 0: new ImagingSoapWrapper(imagingUrl, login, passwd, _timeDrift)),
     m_rangesResponse(new ImagingOptionsResp()),
     m_valsResponse(new ImagingSettingsResp()),
     m_videoSrcToken(videoSrcToken),
@@ -79,7 +79,7 @@ bool OnvifCameraSettingsResp::makeSetRequest()
     QString login = getLogin();
     QString passwd = getPassword();
 
-    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login.toStdString(), passwd.toStdString());
+    ImagingSoapWrapper soapWrapper(endpoint.toStdString(), login.toStdString(), passwd.toStdString(), getTimeDrift());
     SetImagingSettingsResp response;
     SetImagingSettingsReq request;
     request.ImagingSettings = m_valsResponse->ImagingSettings;
@@ -123,6 +123,11 @@ QString OnvifCameraSettingsResp::getLogin() const
 QString OnvifCameraSettingsResp::getPassword() const
 {
     return m_rangesSoapWrapper? QString::fromLatin1(m_rangesSoapWrapper->getPassword()): QString();
+}
+
+int OnvifCameraSettingsResp::getTimeDrift() const
+{
+    return m_rangesSoapWrapper? m_rangesSoapWrapper->getTimeDrift(): 0;
 }
 
 QString OnvifCameraSettingsResp::getUniqueId() const
