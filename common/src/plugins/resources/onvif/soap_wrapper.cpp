@@ -93,7 +93,7 @@ soap* SoapWrapper<T>::getSoap()
     return m_soapProxy->soap;
 }
 
-void correctTimeInternal(char* buffer, QDateTime& dt)
+void correctTimeInternal(char* buffer, const QDateTime& dt)
 {
     if (strlen(buffer) > 19) {
         QByteArray datetime = dt.toString(Qt::ISODate).toLocal8Bit();
