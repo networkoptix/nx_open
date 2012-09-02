@@ -1,3 +1,5 @@
+#include <QByteArray>
+
 static const int TCP_READ_BUFFER_SIZE = 65536;
 static const QByteArray ENDL("\r\n");
 
