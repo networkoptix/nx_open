@@ -69,7 +69,6 @@
 static const char COMPONENT_NAME[] = "MediaServer";
 
 static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
-static const int DEFAULT_STREAMING_PORT = 8890;
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -80,6 +79,7 @@ void stopServer(int signal);
 //#define TEST_RTSP_SERVER
 
 static const int DEFAUT_RTSP_PORT = 50000;
+static const int DEFAULT_STREAMING_PORT = 50000;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {

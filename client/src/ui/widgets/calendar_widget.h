@@ -45,7 +45,11 @@ signals:
     void dateClicked(const QDate &date);
 
 protected:
-    bool eventFilter(QObject *watched, QEvent *event);
+    virtual void wheelEvent(QWheelEvent *event) override;
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
     virtual void paintCell(QPainter * painter, const QRect & rect, const QDate & date ) const override;
 
 private:

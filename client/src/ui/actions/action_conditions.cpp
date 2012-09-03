@@ -290,7 +290,17 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
     return Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
     return context()->workbench()->currentLayout()->items().empty() ? Qn::DisabledAction : Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    bool watchable = !(resources[0]->flags() & QnResource::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
+    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+
+    // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
 }
 
