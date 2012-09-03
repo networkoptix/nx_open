@@ -104,7 +104,7 @@
         <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes"/>
         <Property Id="SERVER_PORT" Secure="yes">
-            <RegistrySearch Id="ServerRtspPortReg"
+            <RegistrySearch Id="ServerPortReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="rtspPort"
@@ -171,11 +171,11 @@
         <CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
         
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
-        <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_PORT" Value="[SERVER_PORT]"/>
+        <CustomAction Id="AssignOldServerPort" Property="OLD_SERVER_PORT" Value="[SERVER_PORT]"/>
         <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
-        <CustomAction Id="AssignServerRtspPort" Property="SERVER_PORT" Value="[FREEPORT2]"/>
+        <CustomAction Id="AssignServerPort" Property="SERVER_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
@@ -232,11 +232,11 @@
             <AppSearch Before="LaunchConditions" />
             
             <Custom Action="FindFreePorts" Before="AssignOldAppServerPort"/>
-            <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
-            <Custom Action="AssignOldServerRtspPort" Before="AssignOldProxyPort">1</Custom>
+            <Custom Action="AssignOldAppServerPort" Before="AssignOldServerPort">1</Custom>
+            <Custom Action="AssignOldServerPort" Before="AssignOldProxyPort">1</Custom>
             <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
-            <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
-            <Custom Action="AssignServerRtspPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
+            <Custom Action="AssignAppServerPort" Before="AssignServerPort">NOT APPSERVER_PORT</Custom>
+            <Custom Action="AssignServerPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
