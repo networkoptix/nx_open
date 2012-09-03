@@ -1208,7 +1208,7 @@ void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QStr
 
     switch(value.getType())
     {
-        case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration:
+        case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::TextField case CameraSetting::ControlButtonsPair:
             it = OnvifCameraSettingOperationAbstract::operations.find(id);
             if (it == OnvifCameraSettingOperationAbstract::operations.end()) {
                 //Operations must be defined for all settings
