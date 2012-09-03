@@ -203,10 +203,16 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#include <X11/Xlib.h>
+
 #ifndef API_TEST_MAIN
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_WS_X11
+	XInitThreads();
+#endif
+
     /* Init common resources. */
     Q_INIT_RESOURCE(common_common);
     Q_INIT_RESOURCE(common_custom);
