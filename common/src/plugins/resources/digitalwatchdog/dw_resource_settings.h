@@ -31,6 +31,10 @@ public:
 private:
 
     bool getFromCameraImpl();
+    bool getFromCameraImpl(const QByteArray& query);
+    void fetchParamsFromHttpRespons(const QByteArray& body);
+    bool setToCameraGet(DWCameraSetting& src, const QString& desiredVal);
+    bool setToCameraPost(DWCameraSetting& src, const QString& desiredVal);
 };
 
 //
@@ -49,6 +53,7 @@ public:
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
+        const QString& method,
         const QString& description,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),

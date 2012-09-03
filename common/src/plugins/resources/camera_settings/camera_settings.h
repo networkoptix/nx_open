@@ -31,7 +31,7 @@ public:
 
 class CameraSetting {
 public:
-    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button };
+    enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField, ControlButtonsPair };
 
     static WIDGET_TYPE typeFromStr(const QString& value);
 
@@ -45,6 +45,7 @@ public:
         const QString& name,
         WIDGET_TYPE type,
         const QString& query,
+        const QString& method,
         const QString& description,
         const CameraSettingValue min = CameraSettingValue(),
         const CameraSettingValue max = CameraSettingValue(),
@@ -64,6 +65,9 @@ public:
 
     void setQuery(const QString& query);
     QString getQuery() const;
+
+    void setMethod(const QString& query);
+    QString getMethod() const;
 
     void setDescription(const QString& description);
     QString getDescription() const;
@@ -92,6 +96,7 @@ private:
     QString m_name;
     WIDGET_TYPE m_type;
     QString m_query;
+    QString m_method;
     CameraSettingValue m_min;
     CameraSettingValue m_max;
     CameraSettingValue m_step;
@@ -117,6 +122,7 @@ public:
     static const QString& ATTR_NAME;
     static const QString& ATTR_WIDGET_TYPE;
     static const QString& ATTR_QUERY;
+    static const QString& ATTR_METHOD;
     static const QString& ATTR_DESCRIPTION;
     static const QString& ATTR_MIN;
     static const QString& ATTR_MAX;
@@ -128,15 +134,25 @@ public:
     CameraSettingReader(const QString& cameraId);
     virtual ~CameraSettingReader();
 
-    bool read();
-    bool proceed();
+    bool read(); //reads data from xml file
+    bool proceed(); //parses data from file
+    QString getCameraId() const { return m_cameraId; };
 
 protected:
 
+    //If 'isGroupEnabled' returns 'true' the reader will enter it, otherwise the group will be ignored.
     virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name) = 0;
+
+    //If 'isParamEnabled' returns 'true' the reader will create it, otherwise the param will be ignored.
     virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;
+
+    //The reader sends created param to the child
     virtual void paramFound(const CameraSetting& value, const QString& parentId) = 0;
+
+    //Cleaning activities in the case of any error
     virtual void cleanDataOnFail() = 0;
+
+    //The reader sends parent id of current <camera> tag to the child
     virtual void parentOfRootElemFound(const QString& parentId) = 0;
 
 private:

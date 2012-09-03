@@ -2,23 +2,18 @@
 #define camera_settings_widgets_h_1214
 
 #include <QtGui/QSlider>
+#include <QtGui/QScrollArea>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 
 class QnSettingsScrollArea : public QScrollArea
 {
-    bool m_alreadyShowed;
-
     QnSettingsScrollArea();
 
 public:
 
     QnSettingsScrollArea(QWidget* parent);
     void addWidget(QWidget& widget);
-
-protected:
-
-    void showEvent(QShowEvent* event) override;
 };
 
 //==============================================
@@ -143,6 +138,45 @@ private slots:
 
 private:
     CameraSetting dummyVal;
+};
+
+//==============================================
+class QnSettingsTextFieldWidget : public QnAbstractSettingsWidget
+{
+    Q_OBJECT
+public:
+    QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
+
+public slots:
+    void updateParam(QString val);
+
+private slots:
+    void onChange();
+};
+
+//==============================================
+class QnSettingsControlButtonsPairWidget : public QnAbstractSettingsWidget
+{
+    Q_OBJECT
+public:
+    QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent);
+
+    void refresh() override;
+
+public slots:
+    void updateParam(QString val);
+
+private slots:
+    void onMinPressed();
+    void onMinReleased();
+    void onMaxPressed();
+    void onMaxReleased();
+
+private:
+    QPushButton* minBtn;
+    QPushButton* maxBtn;
 };
 
 #endif //camera_settings_widgets_h_1214

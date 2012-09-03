@@ -272,8 +272,11 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
 {
     if (m_codec==0)
     {
-        cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
-        return false;
+        if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
+            // try to decode in QT for still image
+            cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+            return false;
+        }
     }
 
     if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
@@ -385,10 +388,12 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     }
 
     // -------------------------
-    Q_ASSERT(m_context->codec);
-    avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-    if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice))
+    if(m_context->codec)
+    {
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+        if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice))
+            avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+    }
 
     AVFrame* copyFromFrame = m_frame;
 
@@ -534,11 +539,6 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat() const
     default:
         return m_context->pix_fmt;
     }
-}
-
-QnAbstractPictureData::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() const
-{
-	return QnAbstractPictureData::pstSysMemPic;
 }
 
 void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)

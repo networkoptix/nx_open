@@ -31,19 +31,20 @@ public:
 public slots:
     virtual void accept() override;
     virtual void reject() override;
-    void reset();
 
 protected:
     virtual void changeEvent(QEvent *event) override;
 
-    void updateStoredConnections();
+    /**
+     * Reset connections model to its initial state. Select last used connection.
+     */
+    void resetConnectionsModel();
 
 private slots:
     void updateAcceptibility();
     void updateFocus();
     void updateUsability();
 
-    void at_configureConnectionsButton_clicked();
     void at_testButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
 	void at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle);

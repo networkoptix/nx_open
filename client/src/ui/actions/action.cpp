@@ -24,8 +24,7 @@ QnAction::QnAction(Qn::ActionId id, QObject *parent):
     QAction(parent), 
     QnWorkbenchContextAware(parent),
     m_id(id),
-    m_flags(0),
-    m_requiredRights(0)
+    m_flags(0)
 {}
 
 QnAction::~QnAction() {
@@ -48,10 +47,6 @@ void QnAction::setForbiddenPermissions(const QString &target, Qn::Permissions fo
 
 void QnAction::setForbiddenPermissions(Qn::Permissions forbiddenPermissions) {
     setForbiddenPermissions(QString(), forbiddenPermissions);
-}
-
-void QnAction::setRequiredRights(Qn::UserRights requiredRigths){
-    m_requiredRights = requiredRigths;
 }
 
 void QnAction::setFlags(Qn::ActionFlags flags) {
@@ -115,9 +110,6 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
 
     Qn::ActionParameterType type = parameters.type();
     if(!(this->defaultParameterTypes() & type) && size != 0)
-        return Qn::InvisibleAction;
-
-    if (m_requiredRights && (!accessController()->hasRights(m_requiredRights)))
         return Qn::InvisibleAction;
 
     if(!m_permissions.empty()) {

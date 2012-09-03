@@ -18,7 +18,8 @@
 DragProcessor::DragProcessor(QObject *parent):
     QObject(parent),
     m_flags(0),
-    m_startDragDistance(-1),
+    m_startDragDistance(QApplication::startDragDistance()),
+    m_startDragTime(QApplication::startDragTime()),
     m_handler(NULL),
     m_state(Waiting),
     m_dragTimerId(0),
@@ -51,18 +52,29 @@ void DragProcessor::setHandler(DragProcessHandler *handler) {
         m_handler->m_processor = this;
 }
 
-int DragProcessor::effectiveStartDragDistance() const {
-    return m_startDragDistance < 0 ? QApplication::startDragDistance() : m_startDragDistance;
+void DragProcessor::setStartDragDistance(int startDragDistance) {
+    if(startDragDistance <= 0) {
+        qnWarning("Invalid non-positive start drag distance '%1'.", startDragDistance);
+        return;
+    }
+
+    m_startDragDistance = startDragDistance;
 }
 
-void DragProcessor::setStartDragDistance(int startDragDistance) {
-    m_startDragDistance = startDragDistance;
+void DragProcessor::setStartDragTime(int startDragTime) {
+    if(startDragTime < 0) {
+        qnWarning("Invalid negative start drag time '%1'.", startDragTime);
+        return;
+    }
+
+    m_startDragTime = startDragTime;
 }
 
 void DragProcessor::startDragTimer() {
     killDragTimer();
 
-    m_dragTimerId = startTimer(QApplication::startDragTime());
+    if(m_startDragTime > 0)
+        m_dragTimerId = startTimer(m_startDragTime);
 }
 
 void DragProcessor::killDragTimer() {
@@ -348,7 +360,7 @@ void DragProcessor::mouseMoveEventInternal(T *object, Event *event) {
 
     /* Check for drag distance. */
     if (m_state == Prepairing) {
-        if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < effectiveStartDragDistance()) {
+        if ((m_info.m_mousePressScreenPos - screenPos(object, event)).manhattanLength() < m_startDragDistance) {
             return;
         } else {
             transition(event, object, Running);

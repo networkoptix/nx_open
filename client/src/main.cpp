@@ -11,6 +11,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
+#include <QtCore/QTranslator>
+#include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
@@ -59,6 +61,7 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
+#include "ui/workbench/workbench_tranlation_manager.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -240,13 +243,15 @@ int main(int argc, char *argv[])
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, logLevel;
+    QString translationPath = qnSettings->translationPath();
     
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&noSingleApplication,     "--no-single-application",  NULL, QString(),    true);
-    commandLineParser.addParameter(&authenticationString,    "--auth",                   NULL, QString());
-    commandLineParser.addParameter(&screen,                  "--screen",                 NULL, QString());
-    commandLineParser.addParameter(&delayedDrop,             "--delayed-drop",           NULL, QString());
-    commandLineParser.addParameter(&logLevel,                "--log-level",              NULL, QString());
+    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",  NULL,   QString(),    true);
+    commandLineParser.addParameter(&authenticationString,   "--auth",                   NULL,   QString());
+    commandLineParser.addParameter(&screen,                 "--screen",                 NULL,   QString());
+    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",           NULL,   QString());
+    commandLineParser.addParameter(&logLevel,               "--log-level",              NULL,   QString());
+    commandLineParser.addParameter(&translationPath,        "--translation",            NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Set authentication parameters from command line. */
@@ -287,20 +292,7 @@ int main(int argc, char *argv[])
 
     /* Initialize application instance. */
     application->setStartDragDistance(20);
-
-    QString language = qnSettings->language();
-    QTranslator appTranslator;
-    if (appTranslator.load(QLatin1String(":/translations/client_") + language + QLatin1String(".qm")))
-        application->installTranslator(&appTranslator);
-
-    QTranslator commonTranslator;
-    if (commonTranslator.load(QLatin1String(":/translations/common_") + language + QLatin1String(".qm")))
-        application->installTranslator(&commonTranslator);
-
-    QTranslator qtTranslator;
-    if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-        application->installTranslator(&qtTranslator);
-    
+    QnWorkbenchTranslationManager::installTranslation(translationPath);
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();

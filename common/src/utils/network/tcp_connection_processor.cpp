@@ -186,17 +186,22 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
     }
 }
 
+
 QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    QString path = d->requestHeaders.path();
-    int pos = path.indexOf(QLatin1String("://"));
+    return extractPath(d->requestHeaders.path());
+}
+
+QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
+{
+    int pos = fullUrl.indexOf(QLatin1String("://"));
+    if (pos == -1)
+        return fullUrl;
+    pos = fullUrl.indexOf(QLatin1Char('/'), pos+3);
     if (pos == -1)
         return QString();
-    pos = path.indexOf(QLatin1Char('/'), pos+3);
-    if (pos == -1)
-        return QString();
-    return path.mid(pos+1);
+    return fullUrl.mid(pos+1);
 }
 
 void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType)
@@ -331,6 +336,13 @@ bool QnTCPConnectionProcessor::readRequest()
     return false;
 }
 
+void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& other)
+{
+    Q_D(const QnTCPConnectionProcessor);
+    other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->ssl = d->ssl;
+}
+
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -338,4 +350,12 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
     data = data.replace("+", "%20");
     return QUrl::fromEncoded(data);
 
+}
+
+void QnTCPConnectionProcessor::execute(QMutex& mutex)
+{
+    m_needStop = false;
+    mutex.unlock();
+    run();
+    mutex.lock();
 }

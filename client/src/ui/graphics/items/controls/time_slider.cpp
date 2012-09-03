@@ -316,7 +316,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Set default vector sizes. */
     m_lineData.resize(maxLines);
 
-    /* Prepare kinetic zoom kineticProcessor. */
+    /* Prepare kinetic zoom processor. */
     KineticCuttingProcessor *kineticProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
     kineticProcessor->setHandler(this);
     kineticProcessor->setMaxShiftInterval(0.4);
@@ -326,11 +326,12 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     kineticProcessor->setFlags(KineticProcessor::IGNORE_DELTA_TIME);
     registerAnimation(kineticProcessor);
 
-    /* Prepare zoom kineticProcessor. */
+    /* Prepare zoom processor. */
     DragProcessor *dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(this);
     dragProcessor->setFlags(DragProcessor::DONT_COMPRESS);
     dragProcessor->setStartDragDistance(startDragDistance);
+    dragProcessor->setStartDragTime(0); /* No drag on timeout. */
 
     /* Prepare animation timer listener. */
     startListening();

@@ -9,6 +9,8 @@
 
 static const int CONNECTION_TIMEOUT = 60 * 1000;
 
+QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
+
 class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 };
@@ -28,9 +30,13 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
+
+    bool ready = true;
+    if (d->clientRequest.isEmpty())
+        ready = readRequest();
+
     while (1)
     {
-        bool ready = readRequest();
         bool isKeepAlive = false;
         if (ready)
         {
@@ -45,7 +51,7 @@ void QnRestConnectionProcessor::run()
             int rez = CODE_OK;
             QByteArray encoding = "application/xml";
             QUrl url = getDecodedUrl();
-            QnRestRequestHandler* handler = static_cast<QnRestServer*>(d->owner)->findHandler(url.path());
+            QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
             {
                 QList<QPair<QString, QString> > params = url.queryItems();
@@ -82,8 +88,7 @@ void QnRestConnectionProcessor::run()
                 d->responseBody.append("<body>\n");
 
                 d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-                const QnRestServer::Handlers& allHandlers = static_cast<QnRestServer*>(d->owner)->allHandlers();
-                for(QnRestServer::Handlers::const_iterator itr = allHandlers.begin(); itr != allHandlers.end(); ++itr)
+                for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
                 {
                     QString str = itr.key();
                     if (str.startsWith("api/"))
@@ -106,12 +111,31 @@ void QnRestConnectionProcessor::run()
         }
         if (!isKeepAlive)
             break;
+        ready = readRequest();
     }
     d->socket->close();
     m_runing = false;
 }
 
-void QnRestConnectionProcessor::parseRequest()
+void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestRequestHandler* handler)
 {
-    QnTCPConnectionProcessor::parseRequest();
+    m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
+    handler->setPath(path);
+}
+
+QnRestRequestHandlerPtr QnRestConnectionProcessor::findHandler(QString path)
+{
+    if (path.startsWith('/'))
+        path = path.mid(1);
+    if (path.endsWith('/'))
+        path = path.left(path.length()-1);
+
+    for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
+    {
+        QRegExp expr(i.key(), Qt::CaseSensitive, QRegExp::Wildcard);
+        if (expr.indexIn(path) != -1)
+            return i.value();
+    }
+
+    return QnRestRequestHandlerPtr();
 }

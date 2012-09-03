@@ -146,6 +146,8 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
     server->setGuid(QString::fromStdString(pb_serverResource.guid()));
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
+    if (pb_server.has_streamingurl())
+        server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -280,7 +282,7 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
 
     user->setName(QString::fromUtf8(pb_userResource.name().c_str()));
     user->setAdmin(pb_user.isadmin());
-    user->setRights(pb_user.rights());
+    user->setPermissions(pb_user.rights());
     user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
 }
 
@@ -729,6 +731,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
     pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
+    pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
 
     if (!serverPtr->getNetAddrList().isEmpty())
@@ -766,7 +769,7 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     pb_userResource.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
-    pb_user.set_rights(userPtr->getRights());
+    pb_user.set_rights(userPtr->getPermissions());
     pb_user.set_isadmin(userPtr->isAdmin());
     pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
 

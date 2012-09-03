@@ -26,7 +26,6 @@ public:
     virtual bool setAudioChannel(unsigned int num);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
-    virtual void setSingleShotMode(bool single);
     virtual bool isSingleShotMode() const;
 
 
@@ -54,7 +53,7 @@ public:
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
-    virtual bool getQuality() const override;
+    virtual MediaQuality getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
@@ -70,6 +69,7 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
+    virtual void startPaused() override;
 protected:
     virtual bool init();
 
@@ -152,6 +152,7 @@ private:
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
+    bool m_pausedStart;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

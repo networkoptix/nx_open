@@ -8,7 +8,7 @@
 #include <QByteArray>
 #include "utils/common/request_param.h"
 #include "utils/common/pimpl.h"
-
+#include <QSharedPointer>
 
 class TCPSocket;
 class QnRestRequestHandler: public QObject
@@ -25,12 +25,14 @@ public:
 
     // incoming connection socket
     virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket) return QString(); }
-    friend class QnRestServer;
+    friend class QnRestConnectionProcessor;
 protected:
     void setPath(const QString& path) { m_path = path; }
 protected:
     QString m_path;
 };
+
+typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
 
 class QnRestGUIRequestHandler: public QnRestRequestHandler
 {

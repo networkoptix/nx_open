@@ -25,7 +25,7 @@ class OnvifCameraSettingsResp
 public:
 
     OnvifCameraSettingsResp(const std::string& deviceUrl, const std::string& imagingUrl, const std::string& login,
-        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId);
+        const std::string& passwd, const std::string& videoSrcToken, const QString& uniqId, int _timeDrift);
 
     ~OnvifCameraSettingsResp();
 
@@ -37,6 +37,7 @@ public:
     QString getImagingUrl() const;
     QString getLogin() const;
     QString getPassword() const;
+    int getTimeDrift() const;
     QString getUniqueId() const;
     CameraSettings& getCameraSettings() { return m_cameraSettings; }
     DeviceSoapWrapper* getDeviceSoapWrapper();

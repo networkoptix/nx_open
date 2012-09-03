@@ -51,8 +51,6 @@ public:
 
     void setMTDecoding(bool value);
 
-    void setSingleShotMode(bool single);
-
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const;
@@ -80,6 +78,8 @@ signals:
     void stillImageChanged();
 
 protected:
+    void setSingleShotMode(bool single);
+
     bool haveAudio(float speed) const;
 
     // puts in in queue and returns first in queue

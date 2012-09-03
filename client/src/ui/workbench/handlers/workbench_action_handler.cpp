@@ -69,9 +69,6 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 
-
-#include <utils/settings.h>
-
 #include "client_message_processor.h"
 #include "file_processor.h"
 
@@ -472,7 +469,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
-    if (!hasDbChanges && !hasCameraChanges) {
+    if (!hasDbChanges && !hasCameraChanges && !cameraSettingsDialog()->widget()->hasAnyCameraChanges()) {
         return;
     }
 
@@ -551,6 +548,68 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
+}
+
+void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    // remove all existing duplicates
+    int i = 0;
+    int sameIdx = -1;
+    while (i < connections.count()){
+        QString url = connections[i].url.toString(QUrl::RemovePassword);
+        if (sameIdx < 0 && connectionData.url.toString(QUrl::RemovePassword) == url)
+            sameIdx = i;
+
+        int j = i + 1;
+        while (j < connections.count()){
+            if (connections[j].url.toString(QUrl::RemovePassword) == url){
+                connections.removeAt(j);
+            }
+            else{
+                j++;
+            }
+        }
+        i++;
+    }
+
+    if (sameIdx >= 0)
+        connections.removeAt(sameIdx);
+
+    connections.prepend(connectionData);
+
+    while (connections.count() > 10) // TODO: #gdm move const out of here
+        connections.removeLast();
+
+    for (QnConnectionDataList::iterator iter = connections.begin(); iter != connections.end(); ++iter){
+
+        // there is at least one connection with same port
+        bool samePort = false;
+
+        // there is at least one connection with different port
+        bool otherPort = false;
+
+        foreach(QnConnectionData compared, connections){
+            if (*iter == compared)
+                continue;
+
+            if ((*iter).url.host() != compared.url.host())
+                continue;
+
+            if ((*iter).url.port() != compared.url.port())
+                otherPort = true;
+            else
+                samePort = true;
+        }
+
+        (*iter).name = (*iter).url.host();
+        if (samePort)
+            (*iter).name.prepend((*iter).url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
+
+        if (otherPort)
+            (*iter).name.append(QLatin1Char(':') + QString::number((*iter).url.port()));
+    }
+    qnSettings->setCustomConnections(connections);
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -842,6 +901,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         newLayout->setGuid(QUuid::createUuid());
         newLayout->setName(name);
         newLayout->setParentId(user->getId());
+        newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
         context()->resourcePool()->addResource(newLayout);
 
         QnLayoutItemDataList items = layout->getItems().values();
@@ -1057,7 +1117,7 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
 
 void QnWorkbenchActionHandler::at_getMoreLicensesAction_triggered() {
     QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(context(), widget()));
-    dialog->setCurrentPage(QnPreferencesDialog::PageLicense);
+    dialog->openLicensesPage();
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->exec();
 }
@@ -1081,6 +1141,8 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     QnConnectionData connectionData;
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
+
+    updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
@@ -1128,6 +1190,9 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
     }
 #endif
+
+    if(context()->user()) /* If we were connected... */
+        workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1246,6 +1311,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
     layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     if(context()->user())
         layout->setParentId(context()->user()->getId());
 
@@ -1523,7 +1589,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->setEditorRights(accessController()->rights());
+    dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
 
@@ -1554,6 +1620,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     layout->setGuid(QUuid::createUuid());
     layout->setName(dialog->name());
     layout->setParentId(user->getId());
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     resourcePool()->addResource(layout);
 
     snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -1678,7 +1745,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::Login, loginFlags);
     dialog->setElementFlags(QnUserSettingsDialog::Password, passwordFlags);
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
-    dialog->setEditorRights(accessController()->rights());
+    dialog->setEditorPermissions(accessController()->globalPermissions());
     
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);

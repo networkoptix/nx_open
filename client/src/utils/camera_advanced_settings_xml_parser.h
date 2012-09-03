@@ -1,6 +1,10 @@
 #ifndef camera_advanced_settings_xml_parser_h_1819
 #define camera_advanced_settings_xml_parser_h_1819
 
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QSet>
+
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 typedef QSharedPointer<CameraSetting> CameraSettingPtr;
@@ -112,6 +116,7 @@ private:
     void removeEmptyWidgetGroups();
     void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
+    bool isEnabledByOtherSettings(const QString& id, const QString& parentId);
 
     ParentOfRootElemFoundAware& m_obj;
     CameraSettings* m_settings;

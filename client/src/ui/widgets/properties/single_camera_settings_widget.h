@@ -38,6 +38,9 @@ public:
     bool hasCameraChanges() const {
         return m_hasCameraChanges;
     }
+    bool hasAnyCameraChanges() const {
+        return m_anyCameraChanges;
+    }
     bool hasDbChanges() const {
         return m_hasDbChanges;
     }
@@ -85,6 +88,7 @@ private slots:
 
 private:
     void setHasCameraChanges(bool hasChanges);
+    void setAnyCameraChanges(bool hasChanges);
     void setHasDbChanges(bool hasChanges);
 
     void updateMotionWidgetFromResource();
@@ -109,6 +113,7 @@ private:
     bool m_cameraSupportsMotion;
 
     bool m_hasCameraChanges;
+    bool m_anyCameraChanges;
     bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_readOnly;

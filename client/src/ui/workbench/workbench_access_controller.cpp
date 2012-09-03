@@ -43,14 +43,12 @@ bool QnWorkbenchAccessController::hasPermissions(const QnResourcePtr &resource, 
     return (permissions(resource) & requiredPermissions) == requiredPermissions;
 }
 
-quint64 QnWorkbenchAccessController::rights() const{
-    if (!m_user)
-        return 0;
-    return m_user->getRights();
+Qn::Permissions QnWorkbenchAccessController::globalPermissions() const {
+    return permissions(m_user);
 }
 
-bool QnWorkbenchAccessController::hasRights(Qn::UserRights requiredRights) const {
-    return m_user && ((m_user->getRights() & requiredRights) == requiredRights);
+bool QnWorkbenchAccessController::hasGlobalPermissions(Qn::Permissions requiredPermissions) const {
+    return hasPermissions(m_user, requiredPermissions);
 }
 
 QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnResourcePtr &resource) const {
@@ -61,6 +59,14 @@ QnWorkbenchPermissionsNotifier *QnWorkbenchAccessController::notifier(const QnRe
     if(!data.notifier)
         data.notifier = new QnWorkbenchPermissionsNotifier(const_cast<QnWorkbenchAccessController *>(this));
     return data.notifier;
+}
+
+Qn::Permissions QnWorkbenchAccessController::calculateGlobalPermissions(const QnUserResourcePtr &user) {
+    if(!user) {
+        return static_cast<Qn::Permissions>(0);
+    } else {
+        return static_cast<Qn::Permissions>(user->getPermissions() | (user->isAdmin() ? Qn::GlobalOwnerPermission : 0));
+    }
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr &resource) {
@@ -89,36 +95,36 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserResourcePtr &user) {
+    assert(user);
 
     Qn::Permissions result = 0;
-    if (!m_user)
-        return result;
-
-    quint64 rights = m_user->getRights();
-
-    if (user == m_user){
-        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission;    // everyone can edit own data
+    if (user == m_user) {
+        result |= m_userPermissions; /* Add global permissions for current user. */
+        result |= Qn::ReadWriteSavePermission | Qn::WritePasswordPermission; /* Everyone can edit own data. */
     }
 
-    if (rights & Qn::EditLayoutRight)                                          // layout-admin can create layouts
+    if (m_userPermissions & Qn::GlobalEditLayoutsPermission) /* Layout-admin can create layouts. */
         result |= Qn::CreateLayoutPermission;
 
-    if ((user != m_user) && (rights & Qn::EditUserRight)){
+    if ((user != m_user) && (m_userPermissions & Qn::GlobalEditUsersPermission)) {
         result |= Qn::ReadPermission;
-        // protected users (admins?) can only be edited by super-user
-        if ((rights & Qn::EditProtectedUserRight) ||  !(user->getRights() & Qn::ProtectedRight))
+        
+        /* Protected users can only be edited by super-user. */
+        if ((m_userPermissions & Qn::GlobalEditProtectedUserPermission) || !(calculateGlobalPermissions(user) & Qn::GlobalProtectedPermission))
             result |= Qn::ReadWriteSavePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
     return result;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayoutResourcePtr &layout) {
+    assert(layout);
+
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
     } if(isFileLayout(layout)) {
         return Qn::ReadPermission;
-    } else if(m_user && (m_user->getRights() & Qn::EditLayoutRight)) {
+    } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
@@ -133,20 +139,26 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &) {
-    if(m_user && (m_user->getRights() & Qn::EditCameraRight)) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
+    assert(camera);
+
+    if(m_userPermissions & Qn::GlobalEditCamerasPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return Qn::ReadPermission;
     }
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &media) {
+    assert(media);
+
     return Qn::ReadPermission;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &) {
-    if(m_user && (m_user->getRights() & Qn::EditServerRight)) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
+    assert(server);
+
+    if(m_userPermissions & Qn::GlobalEditServersPermissions) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission;
     } else {
         return 0;
@@ -188,6 +200,7 @@ void QnWorkbenchAccessController::setPermissionsInternal(const QnResourcePtr &re
 // -------------------------------------------------------------------------- //
 void QnWorkbenchAccessController::at_context_userChanged(const QnUserResourcePtr &) {
     m_user = context()->user();
+    m_userPermissions = calculateGlobalPermissions(m_user);
 
     updatePermissions(resourcePool()->getResources());
     updatePermissions(QnResourcePtr());

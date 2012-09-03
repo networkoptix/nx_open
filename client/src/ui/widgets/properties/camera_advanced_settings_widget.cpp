@@ -3,35 +3,29 @@
 #include <QtGui/QApplication>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleFactory>
+#include <QtGui/QVBoxLayout>
 
 
 QnSettingsScrollArea::QnSettingsScrollArea(QWidget* parent):
-    QScrollArea(parent),
-    m_alreadyShowed(false)
+    QScrollArea(parent)
 {
-    setLayout(new QHBoxLayout());
-    setWidget(new QWidget());
-    layout()->addWidget(widget());
-    widget()->setLayout(new QVBoxLayout());
+    QWidget *widget = new QWidget();
+    widget->setLayout(new QVBoxLayout());
+    setWidget(widget);
+    if(isVisible())
+        widget->show();
 
-    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-}
-
-void QnSettingsScrollArea::showEvent(QShowEvent* event)
-{
-    if (!m_alreadyShowed) {
-        m_alreadyShowed = true;
-        static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
-    }
-
-    QScrollArea::showEvent(event);
+    setWidgetResizable(true);
 }
 
 void QnSettingsScrollArea::addWidget(QWidget& widgetToAdd)
 {
+    if (widget()->layout()->count() != 0)
+        widget()->layout()->removeItem(widget()->layout()->itemAt(widget()->layout()->count() - 1));
+
     widgetToAdd.setParent(widget());
     dynamic_cast<QVBoxLayout*>(widget()->layout())->addWidget(&widgetToAdd);
+    static_cast<QVBoxLayout*>(widget()->layout())->addStretch(1);
 }
 
 //==============================================
@@ -328,4 +322,94 @@ void QnSettingsButtonWidget::onClicked()
 void QnSettingsButtonWidget::updateParam(QString /*val*/)
 {
     //cl_log.log("updateParam", cl_logALWAYS);
+}
+
+//==============================================
+QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+{
+    QLineEdit *lineEdit = new QLineEdit();
+    lineEdit->setText(obj.getCurrent());
+
+    mlayout->addWidget(new QWidget());
+    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    mlayout->addWidget(lineEdit);
+    mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
+    mlayout->addWidget(new QLabel(obj.getName()));
+
+    connect(lineEdit, SIGNAL(editingFinished()), this, SLOT(onChange()));
+
+    mWidget = lineEdit;
+}
+
+void QnSettingsTextFieldWidget::onChange()
+{
+    setParam(static_cast<QLineEdit*>(mWidget)->text());
+}
+
+void QnSettingsTextFieldWidget::refresh()
+{
+    static_cast<QLineEdit*>(mWidget)->setText(mParam.getCurrent());
+}
+
+void QnSettingsTextFieldWidget::updateParam(QString val)
+{
+
+}
+
+//==============================================
+QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
+    QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
+{
+    QHBoxLayout *hlayout = new QHBoxLayout();
+    mlayout->addLayout(hlayout);
+
+    minBtn = new QPushButton(QString::fromLatin1("-"));
+    minBtn->setFocusPolicy(Qt::NoFocus);
+    maxBtn = new QPushButton(QString::fromLatin1("+"));
+    maxBtn->setFocusPolicy(Qt::NoFocus);
+
+    hlayout->addStretch(1);
+    hlayout->addWidget(new QLabel(obj.getName()));
+    hlayout->addWidget(minBtn);
+    hlayout->addWidget(maxBtn);
+    hlayout->addStretch(1);
+
+    QObject::connect(minBtn, SIGNAL(pressed()), this, SLOT(onMinPressed()));
+    QObject::connect(minBtn, SIGNAL(released()), this, SLOT(onMinReleased()));
+
+    QObject::connect(maxBtn, SIGNAL(pressed()), this, SLOT(onMaxPressed()));
+    QObject::connect(maxBtn, SIGNAL(released()), this, SLOT(onMaxReleased()));
+
+    mWidget = 0;
+}
+
+void QnSettingsControlButtonsPairWidget::onMinPressed()
+{
+    setParam(mParam.getMin());
+}
+
+void QnSettingsControlButtonsPairWidget::onMinReleased()
+{
+    setParam(mParam.getStep());
+}
+
+void QnSettingsControlButtonsPairWidget::onMaxPressed()
+{
+    setParam(mParam.getMax());
+}
+
+void QnSettingsControlButtonsPairWidget::onMaxReleased()
+{
+    setParam(mParam.getStep());
+}
+
+void QnSettingsControlButtonsPairWidget::refresh()
+{
+    
+}
+
+void QnSettingsControlButtonsPairWidget::updateParam(QString val)
+{
+    
 }

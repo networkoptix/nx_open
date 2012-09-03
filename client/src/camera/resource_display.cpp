@@ -30,7 +30,6 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
 
-
     if(m_dataProvider != NULL) {
         if (!liveOnly)
             m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
@@ -66,11 +65,14 @@ void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 
+#if 0
     if(m_started) {
         runnable->pleaseStop();
     } else {
         runnable->deleteLater();
     }
+#endif
+    runnable->pleaseStop();
 }
 
 QnCamDisplay *QnResourceDisplay::camDisplay() const {
@@ -101,9 +103,11 @@ void QnResourceDisplay::disconnectFromResource() {
     foreach(detail::QnRendererGuard *guard, m_guards)
         guard->renderer()->beforeDestroy();
 
+#if 0
     if(!m_started)
         foreach(detail::QnRendererGuard *guard, m_guards)
             delete guard;
+#endif
 
     m_mediaResource.clear();
     m_dataProvider = NULL;
@@ -163,7 +167,7 @@ void QnResourceDisplay::pause() {
         return;
 
     m_archiveReader->pause();
-    m_archiveReader->setSingleShotMode(true);
+    m_archiveReader->pauseMedia();
     m_archiveReader->pauseDataProcessors();
 
 }

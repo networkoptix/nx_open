@@ -42,11 +42,6 @@ public:
         m_utcShift(0)
 
     {}
-    void sendResponse()
-    {
-        m_needStop = false;
-        run();
-    }
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
         CLDataQueue tmpQueue(20);
@@ -138,23 +133,17 @@ QByteArray QnProgressiveDownloadingConsumer::getMimeType(QByteArray streamingFor
 void QnProgressiveDownloadingConsumer::run()
 {
     Q_D(QnProgressiveDownloadingConsumer);
-    if (d->transcoder.setContainer(d->streamingFormat) != 0)
-    //if (d->transcoder.setContainer("mpegts") != 0)
-    {
-        QByteArray msg;
-        msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
-        qWarning() << msg;
-        d->responseBody = msg;
-        sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
-        return;
-    }
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
     d->socket->setReadTimeOut(CONNECTION_TIMEOUT);
     d->socket->setWriteTimeOut(CONNECTION_TIMEOUT);
 
-    if (readRequest())
+    bool ready = true;
+    if (d->clientRequest.isEmpty())
+        ready = readRequest();
+
+    if (ready)
     {
         parseRequest();
         d->responseBody.clear();
@@ -205,10 +194,17 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
+        if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
+        {
+            d->responseBody = "Video camera is not ready yet";
+            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+            return;
+        }
 
         QnProgressiveDownloadingDataConsumer dataConsumer(this);
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
         bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
         if (position.isEmpty() || position == "now")
         {
             if (isUTCRequest)
@@ -218,15 +214,17 @@ void QnProgressiveDownloadingConsumer::run()
                 return;
             }
 
-            QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
             if (!camera) {
                 d->responseBody = "Media not found";
                 sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
                 return;
             }
             dataProvider = camera->getLiveReader(QnResource::Role_LiveVideo);
-            if (dataProvider)
+            if (dataProvider) {
                 dataConsumer.copyLastGopFromCamera(camera);
+                dataProvider->start();
+                camera->inUse(this);
+            }
         }
         else {
             bool utcFormatOK = false;
@@ -279,14 +277,33 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
+
+        if (d->transcoder.setContainer(d->streamingFormat) != 0)
+        {
+            QByteArray msg;
+            msg = QByteArray("Transcoding error. Can not setup output format:") + d->transcoder.getLastErrorMessage().toLocal8Bit();
+            qWarning() << msg;
+            d->responseBody = msg;
+            sendResponse("HTTP", CODE_INTERNAL_ERROR, "plain/text");
+            return;
+        }
+
         dataProvider->addDataProcessor(&dataConsumer);
         d->chunkedMode = true;
         d->responseHeaders.setValue("Cache-Control", "no-cache");
         sendResponse("HTTP", CODE_OK, mimeType);
-        dataConsumer.sendResponse();
+
+        //dataConsumer.sendResponse();
+        dataConsumer.start();
+        while (dataConsumer.isRunning() && d->socket->isConnected())
+            readRequest(); // just reading socket to determine client connection is closed
+        dataConsumer.pleaseStop();
+
         QnByteArray emptyChunk((unsigned)0,0);
         sendChunk(emptyChunk);
         dataProvider->removeDataProcessor(&dataConsumer);
+        if (camera)
+            camera->notInUse(this);
     }
 
     d->socket->close();

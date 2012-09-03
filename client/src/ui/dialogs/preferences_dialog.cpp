@@ -10,26 +10,26 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
+#include "utils/settings.h"
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/workbench/workbench_tranlation_manager.h"
 #include "ui/screen_recording/screen_recorder.h"
 
-#include <ui/widgets/settings/connections_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
-
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    m_connectionsSettingsWidget(NULL), 
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
-    m_settings(qnSettings)
+    m_settings(qnSettings),
+    m_licenseTabIndex(0)
 {
     ui->setupUi(this);
 
@@ -43,22 +43,19 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->lookAndFeelGroupBox->hide();
 #endif
 
-    m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
-    ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
-
     if (QnScreenRecorder::isSupported()){
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-        ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+        ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(PageYouTubeSettings, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->addTab(youTubeSettingsWidget, tr("YouTube"));
 #endif
 
 #ifndef CL_TRIAL_MODE
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
-    ui->tabWidget->insertTab(PageLicense, m_licenseManagerWidget, tr("Licenses"));
+    m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -101,30 +98,17 @@ void QnPreferencesDialog::initColorPicker() {
     w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
-void QnPreferencesDialog::initLanguages(){
-    QDir qmDir(QLatin1String(":/translations"));
-    QStringList fileNames =
-        qmDir.entryList(QStringList(QLatin1String("client_*.qm")));
+void QnPreferencesDialog::initLanguages() {
+    QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
-    for (int i = 0; i < fileNames.size(); ++i) {
-        QString filename = fileNames[i];
-
-        QTranslator translator;
-        translator.load(filename, qmDir.absolutePath());
-        QString language = translator.translate("Language", "Language Name");   // This should be translated by all means!
-
-        
-        filename.remove(0, filename.indexOf(QLatin1Char('_')) + 1);             // remove "client_"
-        filename.chop(3);                                                       // remove ".qm"
-        ui->languageComboBox->addItem(language, filename);
-    }
-
+    foreach(const QnTranslationInfo &translation, translationManager->translations())
+        ui->languageComboBox->addItem(translation.languageName, translation.translationPath);
 }
 
 void QnPreferencesDialog::accept() {
-    QString oldLanguage = m_settings->language();
+    QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-    if (oldLanguage != m_settings->language())
+    if (oldLanguage != m_settings->translationPath())
         QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
     //m_youTubeSettingsWidget->accept();
     base_type::accept();
@@ -141,16 +125,6 @@ void QnPreferencesDialog::submitToSettings() {
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     m_settings->setExtraMediaFolders(extraMediaFolders);
-
-    if (m_connectionsSettingsWidget) {
-        QnConnectionData defaultConnection = qnSettings->defaultConnection();
-
-        QnConnectionDataList connections;
-        foreach (const QnConnectionData &connection, m_connectionsSettingsWidget->connections())
-            if (connection != defaultConnection)
-                connections.append(connection);
-        m_settings->setCustomConnections(connections);
-    }
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
@@ -179,21 +153,17 @@ void QnPreferencesDialog::updateFromSettings() {
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
-    QnConnectionDataList connections = qnSettings->customConnections();
-    connections.push_front(qnSettings->defaultConnection());
-    m_connectionsSettingsWidget->setConnections(connections);
-
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
 
-    int id = ui->languageComboBox->findData(m_settings->language());
+    int id = ui->languageComboBox->findData(m_settings->translationPath());
     if (id >= 0)
         ui->languageComboBox->setCurrentIndex(id);
 }
 
-void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
+void QnPreferencesDialog::openLicensesPage()
 {
-    ui->tabWidget->setCurrentIndex(int(page));
+    ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
 }
 
 

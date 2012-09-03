@@ -152,50 +152,85 @@ namespace Qn {
 
 
     /**
-     * Flags describing the actions permitted for the user to do with the selected resource.
+     * Flags describing the actions permitted for the user to do with the 
+     * selected resource.
      */
     enum Permission {
         /* Generic permissions. */
 
         /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        ReadPermission              = 0x00000001,   
+        ReadPermission                      = 0x00010000,   
 
         /** Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
-        WritePermission             = 0x00000002,   
+        WritePermission                     = 0x00020000,   
 
         /** Generic save access. Entity can be saved to appserver. */
-        SavePermission              = 0x00000004,   
+        SavePermission                      = 0x00040000,   
 
         /** Generic delete permission. */
-        RemovePermission            = 0x00000008,
+        RemovePermission                    = 0x00080000,
 
         /** Generic read-write-save permission. */
-        ReadWriteSavePermission     = ReadPermission | WritePermission | SavePermission,
+        ReadWriteSavePermission             = ReadPermission | WritePermission | SavePermission,
 
 
         /* Layout-specific permissions. */
 
         /** Permission to add or remove items from a layout. */
-        AddRemoveItemsPermission    = 0x00000010,
+        AddRemoveItemsPermission            = 0x00100000,
 
 
         /* User-specific permissions. */
 
         /** Permission to edit login. */
-        WriteLoginPermission        = 0x00000100, // TODO: replace with generic WriteNamePermission
+        WriteLoginPermission                = 0x01000000, // TODO: replace with generic WriteNamePermission
 
         /** Permission to edit associated password. */
-        WritePasswordPermission     = 0x00000200,
+        WritePasswordPermission             = 0x02000000,
 
         /** Permission to edit access rights. */
-        WriteAccessRightsPermission = 0x00000400,
+        WriteAccessRightsPermission         = 0x04000000,
 
         /** Permission to create layouts for the user. */
-        CreateLayoutPermission      = 0x00000800,
+        CreateLayoutPermission              = 0x08000000,
 
-        AllPermissions              = 0xFFFFFFFF
+
+
+        /* Global permissions, applicable to current user only. */
+
+        /** Root, can edit admins. */
+        GlobalEditProtectedUserPermission   = 0x00000001,
+
+        /** Admin, can edit other non-admins. */
+        GlobalProtectedPermission           = 0x00000002,
+
+        /** Can create and edit layouts. */
+        GlobalEditLayoutsPermission         = 0x00000004,
+
+        /** Can create and edit users. */        
+        GlobalEditUsersPermission            = 0x00000008,
+
+        /** Can edit camera settings. */
+        GlobalEditCamerasPermission         = 0x00000010,
+
+        /** Can edit server settings. */
+        GlobalEditServersPermissions        = 0x00000020,
+
+        /** Can view archives of available cameras. */
+        GlobalViewArchivePermission         = 0x00000040,
+
+        /* Shortcuts. */
+        GlobalLiveViewerPermission          = 0,
+        GlobalViewerPermission              = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
+        GlobalAdvancedViewerPermission      = GlobalViewerPermission           | GlobalEditCamerasPermission,
+        GlobalAdminPermission               = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalOwnerPermission               = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
+
+
+        AllPermissions                      = 0xFFFFFFFF,
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
+
 
 } // namespace Qn
 
@@ -205,5 +240,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
+
 
 #endif // QN_WORKBENCH_GLOBALS_H

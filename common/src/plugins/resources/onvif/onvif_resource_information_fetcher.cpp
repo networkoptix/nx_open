@@ -58,7 +58,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString name = info.name;
     QHostAddress sender(QUrl(endpoint).host());
     //TODO:UTF unuse std::string
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string());
+    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
     soapWrapper.fetchLoginPassword(info.manufacturer);
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();

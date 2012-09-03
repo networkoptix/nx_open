@@ -192,10 +192,10 @@ public:
             }
             break;
         case Qn::UsersNode:
-            bastard = !m_model->accessController()->hasRights(Qn::EditUserRight);
+            bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
             break;
         case Qn::ServersNode:
-            bastard = !m_model->accessController()->hasRights(Qn::EditServerRight);
+            bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
             break;
         default:
             break;
@@ -584,7 +584,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         return m_rootNode;
 
     if(node->resourceFlags() & QnResource::user) {
-        if(!accessController()->hasRights(Qn::EditUserRight)) {
+        if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
             return m_rootNode;
         } else {
             return m_usersNode;

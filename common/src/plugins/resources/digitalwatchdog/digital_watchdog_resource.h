@@ -31,8 +31,10 @@ private:
     QString fetchCameraModel();
 
 private:
-    typedef QList<QnPlWatchDogResourceAdditionalSettingsPtr> AdditionalSettings;
 
+    //The List contains hierarchy of DW models from child to parent "DIGITALWATCHDOG" (see in camera_settings.xml)
+    //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
+    typedef QList<QnPlWatchDogResourceAdditionalSettingsPtr> AdditionalSettings;
     AdditionalSettings m_additionalSettings;
 };
 

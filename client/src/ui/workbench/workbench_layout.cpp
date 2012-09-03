@@ -97,7 +97,12 @@ bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
-    m_dataByRole = resource->data(); // TODO: emit signals?
+
+    // TODO: note that we keep items that are not present in resource's data.
+    // This is not correct, but we currently need it.
+    const QHash<int, QVariant> data = resource->data();
+    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
+        setData(i.key(), i.value());
 
     bool result = true;
 

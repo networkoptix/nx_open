@@ -57,13 +57,26 @@ QnFfmpegTranscoder::~QnFfmpegTranscoder()
 
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
-    if (m_ioContext)
-        avio_close(m_ioContext);
-    m_ioContext = 0;
-    if (m_formatCtx) {
-        m_formatCtx->pb = 0;
-        avformat_close_input(&m_formatCtx);
+    QMutexLocker mutex(&global_ffmpeg_mutex);
+    if (m_formatCtx)
+    {
+        for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
+        {
+            if (m_formatCtx->streams[i]->codec->codec)
+                avcodec_close(m_formatCtx->streams[i]->codec);
+        }
     }
+    if (m_ioContext)
+    {
+        m_ioContext->opaque = 0;
+        avio_close(m_ioContext);
+        m_ioContext = 0;
+        if (m_formatCtx)
+            m_formatCtx->pb = 0;
+    }
+
+    if (m_formatCtx) 
+        avformat_close_input(&m_formatCtx);
 }
 
 int QnFfmpegTranscoder::setContainer(const QString& container)
@@ -92,6 +105,8 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio)
 {
+    QMutexLocker mutex(&global_ffmpeg_mutex);
+
     if (m_videoCodec != CODEC_ID_NONE)
     {
         AVStream* videoStream = av_new_stream(m_formatCtx, 0);
@@ -183,7 +198,10 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
     AVRational srcRate = {1, 1000000};
-    AVStream* stream = m_formatCtx->streams[media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1];
+    int streamIndex = media->dataType == QnAbstractMediaData::VIDEO ? 0 : 1;
+    if (streamIndex >= m_formatCtx->nb_streams)
+        return 0; // skip audio data if no audio codec configured
+    AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
     packet.data = 0;

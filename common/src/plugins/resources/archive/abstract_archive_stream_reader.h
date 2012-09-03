@@ -15,7 +15,6 @@ public:
     virtual void nextFrame() = 0;
     virtual void pauseMedia() = 0;
     virtual void resumeMedia() = 0;
-    virtual void setSingleShotMode(bool single) = 0;
 
     virtual bool isMediaPaused() const = 0;
 
@@ -90,7 +89,7 @@ public:
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
-    virtual bool getQuality() const = 0;
+    virtual MediaQuality getQuality() const = 0;
     virtual void disableQualityChange() = 0;
     virtual void enableQualityChange() = 0;
 
@@ -101,6 +100,7 @@ public:
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) = 0;
     virtual double getSpeed() const = 0;
 
+    virtual void startPaused() = 0;
 signals:
     void beforeJump(qint64 mksec);
     void jumpOccured(qint64 mksec);

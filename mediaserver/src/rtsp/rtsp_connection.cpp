@@ -477,14 +477,15 @@ int QnRtspConnectionProcessor::composeDescribe()
         sdp << encoder->getAdditionSDP();
     }
 
-    //d->metadataChannelNum = i;
-    RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
-    d->trackInfo.insert(d->metadataChannelNum, trackInfo);
+    if (d->liveMode != Mode_ThumbNails)
+    {
+        RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
+        d->trackInfo.insert(d->metadataChannelNum, trackInfo);
 
-    sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
-    sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
-    sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
-
+        sdp << "m=metadata " << d->metadataChannelNum << " RTP/AVP " << RTP_METADATA_CODE << ENDL;
+        sdp << "a=control:trackID=" << d->metadataChannelNum << ENDL;
+        sdp << "a=rtpmap:" << RTP_METADATA_CODE << ' ' << RTP_METADATA_GENERIC_STR << "/" << CLOCK_FREQUENCY << ENDL;
+    }
     return CODE_OK;
 }
 
@@ -733,12 +734,43 @@ void QnRtspConnectionProcessor::checkQuality()
     }
 }
 
+void QnRtspConnectionProcessor::createPredefinedTracks()
+{
+    Q_D(QnRtspConnectionProcessor);
+
+    RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
+    vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+    vTrack->clientPort = 0;
+    vTrack->clientRtcpPort = 1;
+    d->trackInfo.insert(0, vTrack);
+
+    RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
+    aTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+    aTrack->clientPort = 2;
+    aTrack->clientRtcpPort = 3;
+    d->trackInfo.insert(1, aTrack);
+
+    RtspServerTrackInfoPtr metaTrack(new RtspServerTrackInfo());
+    metaTrack->clientPort = d->metadataChannelNum*2;
+    metaTrack->clientRtcpPort = d->metadataChannelNum*2+1;
+    d->trackInfo.insert(d->metadataChannelNum, metaTrack);
+
+}
+
 int QnRtspConnectionProcessor::composePlay()
 {
 
     Q_D(QnRtspConnectionProcessor);
     if (d->mediaRes == 0)
         return CODE_NOT_FOUND;
+
+    if (d->trackInfo.isEmpty())
+    {
+        if (d->requestHeaders.value("x-play-now").isEmpty())
+            return CODE_INTERNAL_ERROR;
+        d->useProprietaryFormat = true;
+        createPredefinedTracks();
+    }
 
     if (d->requestHeaders.value("Range").isNull())
     {
@@ -786,6 +818,8 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
+
+    addResponseRangeHeader();
 
     if (!currentDP)
         return CODE_NOT_FOUND;
@@ -860,7 +894,6 @@ int QnRtspConnectionProcessor::composePlay()
         d->thumbnailsDP->setQuality(d->quality);
     }
 
-    addResponseRangeHeader();
     d->dataProcessor->setUseUTCTime(d->useProprietaryFormat);
     d->dataProcessor->start();
 
@@ -1033,6 +1066,12 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+
+    if (!d->clientRequest.isEmpty()) {
+        parseRequest();
+        processRequest();
+    }
+
     QTime t;
     while (!m_needStop && d->socket->isConnected())
     {
