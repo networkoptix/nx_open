@@ -1502,10 +1502,14 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
     CameraSettings::Iterator it = settings.find(param.name());
 
     if (it == settings.end()) {
-        //return false;
+        //This is the case when camera doesn't contain Media Service, but the client doesn't know about it and
+        //sends request for param from this service. Can't return false in this case, because our framework stops
+        //fetching physical params after first failed.
         return true;
     }
 
+    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
+    //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
     if (currTime > m_advSettingsLastUpdated) {
         if (!m_onvifAdditionalSettings->makeGetRequest()) {
@@ -1519,7 +1523,9 @@ bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)
         return true;
     }
 
-    //return false;
+    //If server can't get value from camera, it will be marked in "QVariant &val" as empty m_current param
+    //Completely empty "QVariant &val" means enabled setting with no value (ex: Settings tree element or button)
+    //Can't return false in this case, because our framework stops fetching physical params after first failed.
     return true;
 }
 
@@ -1538,11 +1544,12 @@ bool QnPlOnvifResource::setParamPhysical(const QnParam &param, const QVariant& v
 
     if (it == settings.end())
     {
+        //Buttons are not contained in CameraSettings
         if (tmp.getType() != CameraSetting::Button) {
             return false;
         }
 
-        //For Button only operation object is required
+        //For Button - only operation object is required
         QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator opIt =
             OnvifCameraSettingOperationAbstract::operations.find(param.name());
 
