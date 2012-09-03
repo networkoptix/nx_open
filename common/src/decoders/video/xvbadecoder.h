@@ -9,6 +9,8 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
+#include <fstream>
+
 #include "amdxvba.h"
 #include "abstractdecoder.h"
 #include "../../utils/media/nalUnits.h"
@@ -87,6 +89,7 @@ private:
         State state;
         //!Pts of a picture. Valid only in states \a decodingInProcess, \a readyToRender and \a renderingInProcess
         quint64 pts;
+        std::vector<XVBABufferDescriptor*> usedDecodeBuffers;
 
         GLSurfaceContext();
         GLSurfaceContext(
@@ -126,19 +129,26 @@ private:
     XVBA_Decode_Picture_Input m_pictureDescriptorDecodeInput;
 
     XVBADecodeCap m_decodeCap;
-    XVBABufferDescriptor m_ctrlBufDescriptor;
-    XVBABufferDescriptor m_dataBufDescriptor;
+//    XVBABufferDescriptor m_ctrlBufDescriptor;
+//    XVBABufferDescriptor m_dataBufDescriptor;
     XVBA_Decode_Picture_Input m_srcDataDecodeInput;
     XVBABufferDescriptor* m_srcDataDecodeBufArray[2];
-    std::vector<XVBADataCtrl> m_dataCtrlBuffers;
 
     XVBA_Decode_Picture_Start_Input m_decodeStartInput;
     XVBA_Decode_Picture_End_Input m_decodeEndInput;
     XVBA_Surface_Sync_Input m_syncIn;
     XVBA_Surface_Sync_Output m_syncOut;
 
+    //!vector<pair<buffer, true if used> >
+    std::vector<std::pair<XVBABufferDescriptor*, bool> > m_xvbaDecodeBuffers;
+
     quint8* m_mediaBuf;
     size_t m_mediaBufCapacity;
+
+    quint8* m_decodedPictureRgbaBuf;
+    size_t m_decodedPictureRgbaBufSize;
+
+    std::ofstream m_inStream;
 
     //!Creates XVBA context
     /*!
@@ -155,7 +165,7 @@ private:
         \param data Access unit of media stream. MUST contain sequence header
         \return true on success
     */
-    bool createDecodeSession( const QnCompressedVideoDataPtr& data );
+    bool createDecodeSession();
     //!Creates OpenGL texture and XVBA surface and appends it to the \a m_glSurfaces array
     /*!
         \return true on success
@@ -163,11 +173,14 @@ private:
     bool createSurface();
     //!Parses sps & pps from \a data and fills \a m_pictureDescriptor
     bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
-    //!Finds all slices in \a data, adds element to \a dataCtrlBuffers for each slice, fills neccessary \a pictureDescriptor fields with values from the first slice
-    void analyzeInputBufSlices(
+    //!Finds first slice in \a data, fills \a dataCtrlBuffer with data offset and size and fills neccessary \a pictureDescriptor fields with values from the first slice
+    /*!
+     * 	\return false if no slice found in \a data. true otherwise
+     * */
+    bool analyzeInputBufSlices(
         const QnCompressedVideoDataPtr& data,
         XVBAPictureDescriptor* const pictureDescriptor,
-        std::vector<XVBADataCtrl>* const dataCtrlBuffers,
+        std::vector<XVBABufferDescriptor*>* const dataCtrlBuffers,
         size_t* firstSliceOffset );
     //!Checks all surfaces and updates state if neccessary
     /*!
@@ -180,6 +193,11 @@ private:
     QString lastErrorText() const;
     QString decodeErrorToString( XVBA_DECODE_ERROR errorCode ) const;
 	void fillOutputFrame( CLVideoDecoderOutput* const outFrame, GLSurfaceContext* const decodedPicSurface );
+	XVBABufferDescriptor* getDecodeBuffer( XVBA_BUFFER bufferType );
+	void ungetBuffer( XVBABufferDescriptor* bufDescriptor );
+	void readSPS( const quint8* curNalu, const quint8* nextNalu );
+	void readPPS( const quint8* curNalu, const quint8* nextNalu );
+	GLSurfaceContext* findUnusedSurface();
 
     QnXVBADecoder( const QnXVBADecoder& );
     QnXVBADecoder& operator=( const QnXVBADecoder& );
