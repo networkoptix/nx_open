@@ -4,6 +4,8 @@
 #include <QtGui/QTableView>
 #include <QtGui/QHeaderView>
 #include <QtGui/QToolButton>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QMouseEvent>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -208,4 +210,16 @@ void QnCalendarWidget::updateEmpty(){
 
     m_empty = value;
     emit emptyChanged();
+}
+
+void QnCalendarWidget::wheelEvent(QWheelEvent *event) {
+    event->accept(); /* Do not propagate wheel events past the calendar widget. */
+}
+
+void QnCalendarWidget::mousePressEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
+void QnCalendarWidget::mouseReleaseEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
 }
