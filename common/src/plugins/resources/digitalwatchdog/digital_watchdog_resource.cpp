@@ -8,11 +8,12 @@ QString getIdSuffixByModel(const QString& cameraModel)
     QString tmp = cameraModel.toLower();
     tmp = tmp.replace(QLatin1String(" "), QLatin1String(""));
 
-    if (!tmp.contains(QLatin1String("mpa20m")) && !tmp.contains(QLatin1String("mc421"))) {
-        return QString::fromLatin1("-FOCUS");
+    if (tmp.contains(QLatin1String("mpa20m")) || tmp.contains(QLatin1String("mc421"))) {
+        //without focus
+        return QString::fromLatin1("-WOFOCUS");
     }
 
-    return QString();
+    return QString::fromLatin1("-FOCUS");
 }
 
 QnPlWatchDogResource::QnPlWatchDogResource():
