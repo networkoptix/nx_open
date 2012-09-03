@@ -881,6 +881,77 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
         shortcut(tr("Ctrl+Alt+Shift+-")).
         text(tr("Decrement Debug Counter"));
+
+
+
+    factory(Qn::PlayPauseAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Space")).
+        text(tr("Play / Pause")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::SpeedDownAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl+-")).
+        text(tr("Speed Down")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::SpeedUpAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl++")).
+        text(tr("Speed Up")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::PreviousFrameAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl+Left")).
+        text(tr("Previous Frame")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::NextFrameAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl+Right")).
+        text(tr("Next Frame")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::JumpToStartAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Z")).
+        text(tr("To Start")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::JumpToEndAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("X")).
+        text(tr("To End")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::VolumeUpAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl+Down")).
+        text(tr("Volume Down"));
+
+    factory(Qn::VolumeDownAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("Ctrl+Up")).
+        text(tr("Volume Up"));
+
+    factory(Qn::ToggleMuteAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
+        shortcut(tr("M")).
+        text(tr("Toggle Mute"));
+
+    factory(Qn::JumpToLiveAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::SingleTarget).
+        shortcut(tr("L")).
+        text(tr("Jump to Live")).
+        condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::ToggleSyncAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::SingleTarget).
+        shortcut(tr("S")).
+        text(tr("Toggle Sync")).
+        condition(new QnArchiveActionCondition(this));
 }
 
 QnActionManager::~QnActionManager() {

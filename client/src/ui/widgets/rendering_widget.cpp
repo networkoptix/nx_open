@@ -55,7 +55,7 @@ void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
     }
     
     if(resource) {
-        m_display = new QnResourceDisplay(resource, this, false);
+        m_display = new QnResourceDisplay(resource, this);
         m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
         updateChannelScreenSize();
 

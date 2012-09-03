@@ -49,8 +49,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         qnCritical("Media resource widget was created with a non-media resource.");
 
     /* Set up video rendering. */
-    bool liveOnly = (m_resource->flags() & QnResource::live) && (!accessController()->hasGlobalPermissions(Qn::GlobalViewArchivePermission));
-    m_display = new QnResourceDisplay(m_resource, this, liveOnly);
+    m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     setChannelLayout(m_display->videoLayout());

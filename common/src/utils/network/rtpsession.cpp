@@ -847,13 +847,14 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         return false;
 
 
+    QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
+    if (!tmp.isEmpty())
+        parseRangeHeader(tmp);
+
     if (response.startsWith("RTSP/1.0 200"))
     {
         updateTransportHeader(response);
 
-        QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
-        if (!tmp.isEmpty())
-            parseRangeHeader(tmp);
 
         m_keepAliveTime.restart();
         return true;
