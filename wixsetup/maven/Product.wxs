@@ -103,19 +103,11 @@
         <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000"/>
         <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
         <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes"/>
-        <Property Id="SERVER_RTSP_PORT" Secure="yes">
+        <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerRtspPortReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="rtspPort"
-                            Type="raw"
-                            Win64="no"/>
-        </Property>
-        <Property Id="SERVER_API_PORT" Secure="yes">
-            <RegistrySearch Id="ServerApiPortReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}"
-                            Name="apiPort"
                             Type="raw"
                             Win64="no"/>
         </Property>
@@ -179,13 +171,11 @@
         <CustomAction Id="SetNewGuidForServer" Property="SERVER_GUID" Value="[SERVER_GUID_NEW]"/>
         
         <CustomAction Id="AssignOldAppServerPort" Property="OLD_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
-        <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_RTSP_PORT" Value="[SERVER_RTSP_PORT]"/>
-        <CustomAction Id="AssignOldServerApiPort" Property="OLD_SERVER_API_PORT" Value="[SERVER_API_PORT]"/>
+        <CustomAction Id="AssignOldServerRtspPort" Property="OLD_SERVER_PORT" Value="[SERVER_PORT]"/>
         <CustomAction Id="AssignOldProxyPort" Property="OLD_PROXY_PORT" Value="[PROXY_PORT]"/>
         
         <CustomAction Id="AssignAppServerPort" Property="APPSERVER_PORT" Value="[FREEPORT1]"/>
-        <CustomAction Id="AssignServerRtspPort" Property="SERVER_RTSP_PORT" Value="[FREEPORT2]"/>
-        <CustomAction Id="AssignServerApiPort" Property="SERVER_API_PORT" Value="[FREEPORT3]"/>
+        <CustomAction Id="AssignServerRtspPort" Property="SERVER_PORT" Value="[FREEPORT2]"/>
         <CustomAction Id="AssignProxyPort" Property="PROXY_PORT" Value="[FREEPORT4]"/>
         
         <!-- Assign default values for Quick installation -->
@@ -243,12 +233,10 @@
             
             <Custom Action="FindFreePorts" Before="AssignOldAppServerPort"/>
             <Custom Action="AssignOldAppServerPort" Before="AssignOldServerRtspPort">1</Custom>
-            <Custom Action="AssignOldServerRtspPort" Before="AssignOldServerApiPort">1</Custom>
-            <Custom Action="AssignOldServerApiPort" Before="AssignOldProxyPort">1</Custom>
+            <Custom Action="AssignOldServerRtspPort" Before="AssignOldProxyPort">1</Custom>
             <Custom Action="AssignOldProxyPort" Before="AssignAppServerPort">1</Custom>
             <Custom Action="AssignAppServerPort" Before="AssignServerRtspPort">NOT APPSERVER_PORT</Custom>
-            <Custom Action="AssignServerRtspPort" Before="AssignServerApiPort">NOT SERVER_RTSP_PORT</Custom>
-            <Custom Action="AssignServerApiPort" Before="AssignProxyPort">NOT SERVER_API_PORT</Custom>
+            <Custom Action="AssignServerRtspPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
             <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
@@ -463,8 +451,8 @@
                                     <RegistryValue Type="string" Name="appserverPort" Value="[SERVER_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_APPSERVER_PASSWORD]"/>
-                                    <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_RTSP_PORT]"/>
-                                    <RegistryValue Type="string" Name="apiPort" Value="[SERVER_API_PORT]"/>
+                                    <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_PORT]"/>
+                                    <RegistryValue Type="string" Name="apiPort" Value="[SERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="mediaDir" Value="[SERVER_DIRECTORY]"/>
                                     <RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]"/>
                                 </RegistryKey>
@@ -833,8 +821,8 @@
             <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstalling)]]></Publish>
 
             
-            <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_RTSP_PORT<>APPSERVER_PORT AND SERVER_API_PORT<>APPSERVER_PORT AND SERVER_RTSP_PORT<>PROXY_PORT AND SERVER_API_PORT<>PROXY_PORT AND SERVER_API_PORT<>SERVER_RTSP_PORT) OR (&AppServerFeature<>3 AND SERVER_API_PORT<>SERVER_RTSP_PORT))" ?>
-            <?define IsSettingsFilled="(SERVER_RTSP_PORT AND SERVER_API_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
+            <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (&AppServerFeature<>3))" ?>
+            <?define IsSettingsFilled="(SERVER_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
             <?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
@@ -852,11 +840,9 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN]" Order="4">1</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="BUSYPORT" Value="{}">1</Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT = OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT = OLD_SERVER_API_PORT]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_API_PORT] [SERVER_RTSP_PORT]" Order="1"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT AND SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Property="PORTSTOTEST" Value="[SERVER_PORT]" Order="1"><![CDATA[ SERVER_PORT <> OLD_SERVER_PORT]]></Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_RTSP_PORT <> OLD_SERVER_RTSP_PORT OR SERVER_API_PORT <> OLD_SERVER_API_PORT]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="DoAction" Value="CheckPorts2" Order="2"><![CDATA[ SERVER_PORT <> OLD_SERVER_PORT]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3">BUSYPORT</Publish>
             
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>

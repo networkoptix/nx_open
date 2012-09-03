@@ -1,3 +1,5 @@
+import os
+
 def fixasfiles():
     fragment1 = r"""            <Component Id="ecs.exe" Guid="*">
                 <File Id="ecs.exe" KeyPath="yes" Source="$(var.AppServerSourceDir)\ecs.exe" />
@@ -23,4 +25,5 @@ def fixasfiles():
     open('AppServerFiles.wxs', 'w').write(text)
 
 if __name__ == '__main__':
+    os.system(r'heat dir ..\..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
     fixasfiles()
