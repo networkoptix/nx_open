@@ -277,8 +277,8 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
 
     if( decodedPicSurface )
     {
-        //TODO/IMPL copying picture to output
         cl_log.log( QString::fromAscii("QnXVBADecoder. Found decoded picture (pts %1). Providing it to output...").arg(decodedPicSurface->pts), cl_logDEBUG1 );
+        //copying picture to output
     	fillOutputFrame( outFrame, decodedPicSurface );
         decodedPicSurface->state = GLSurfaceContext::renderingInProcess;
     }
