@@ -11,6 +11,27 @@ struct SOAP_ENV__Header;
 typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
 
 
+struct CameraInfo: public EndpointAdditionalInfo
+{
+    QString onvifUrl;
+
+    CameraInfo() {}
+
+    CameraInfo(const QString& newOnvifUrl, const EndpointAdditionalInfo& additionalInfo):
+        onvifUrl(newOnvifUrl),
+        EndpointAdditionalInfo(additionalInfo)
+    {
+
+    }
+
+    CameraInfo(const CameraInfo& src) :
+    onvifUrl(src.onvifUrl),
+        EndpointAdditionalInfo(src)
+    {
+
+    }
+};
+
 class OnvifResourceSearcherWsdd
 {
     OnvifResourceSearcherWsdd();
@@ -35,7 +56,7 @@ public:
 
     void pleaseStop();
 
-    CameraInfoPtr findCamera(const QHostAddress& camAddr) const;
+    CameraInfo findCamera(const QHostAddress& camAddr) const;
 private:
 
     //void updateInterfacesListenSockets() const;
