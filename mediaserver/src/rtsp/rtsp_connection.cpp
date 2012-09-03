@@ -768,6 +768,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (d->requestHeaders.value("x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
+        d->useProprietaryFormat = true;
         createPredefinedTracks();
     }
 
