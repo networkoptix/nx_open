@@ -384,12 +384,6 @@ void QnGLRenderer::beforeDestroy()
 
 void QnGLRenderer::draw(CLVideoDecoderOutput *img)
 {
-	 if( img->picData.data() && (img->picData->type() == QnAbstractPictureData::pstOpenGL) )
-	 {
-		 std::cout<<"mark1\n";
-		 return;	//decoded picture is already in OpenGL texture
-	 }
-
 	 QMutexLocker locker(&m_displaySync);
 
     //m_imageList.enqueue(img);
@@ -466,10 +460,7 @@ bool QnGLRenderer::isYuvFormat() const
 void QnGLRenderer::updateTexture()
 {
 	 if( m_curImg->picData.data() && (m_curImg->picData->type() == QnAbstractPictureData::pstOpenGL) )
-	 {
-		 std::cout<<"mark1\n";
 		 return;	//decoded picture is already in OpenGL texture
-	 }
 
     unsigned int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
     unsigned int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visible
@@ -720,7 +711,8 @@ CLVideoDecoderOutput *QnGLRenderer::update()
 {
     QMutexLocker locker(&m_displaySync);
 
-    if (m_curImg && m_curImg->linesize[0]) {
+    if (m_curImg && (m_curImg->linesize[0] || m_curImg->picData.data()))
+    {
         m_videoWidth = m_curImg->width;
         m_videoHeight = m_curImg->height;
         updateTexture();

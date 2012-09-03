@@ -530,22 +530,14 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
     if (outFrame->pkt_dts != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
 
-//	if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
-//	{
-//		std::cout<<"mark1\n";
-//		return true;
-//	}
-
-    if (outFrame->data[0]) 
+    if( outFrame->data[0] || outFrame->picData.data() )
     {
-#if 0
     		if (enableFrameQueue)
     		{
     			Q_ASSERT(!outFrame->isExternalData());
     			if (m_bufferedFrameDisplayer)
     			{
     				bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
-    				std::cout<<"mark1\n";
     				qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
     				//cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
     				if (wasWaiting) {
@@ -557,20 +549,20 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
     						dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
     				}
     			}
-    			else if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
+    			else
     				m_drawer->draw(outFrame);
     			m_lastDisplayedFrame = outFrame;
     			m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
     			m_queueUsed = true;
     		}
-    		else if( outFrame->picData.data() && (outFrame->picData->type() == QnAbstractPictureData::pstOpenGL) )
+    		else
     		{
     			m_drawer->draw(outFrame);
     			m_drawer->waitForFrameDisplayed(outFrame->channel);
     		}
-#endif
 
-        if (m_prevFrameToDelete) {
+        if (m_prevFrameToDelete)
+        {
             Q_ASSERT(outFrame != m_prevFrameToDelete);
             Q_ASSERT(!m_prevFrameToDelete->isExternalData());
             QMutexLocker lock(&m_mtx);
@@ -581,8 +573,9 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
             m_prevFrameToDelete = outFrame;
         return !m_bufferedFrameDisplayer;
     }
-    else {
-        delete outFrame;
+    else
+    {
+//        delete outFrame;
         return false;
     }
 }
