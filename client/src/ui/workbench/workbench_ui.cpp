@@ -73,6 +73,7 @@
 #include "workbench_layout.h"
 #include "workbench_context.h"
 #include "workbench_navigator.h"
+#include "workbench_access_controller.h"
 
 
 Q_DECLARE_METATYPE(VariantAnimator *)
@@ -823,6 +824,8 @@ void QnWorkbenchUi::setSliderVisible(bool visible, bool animate) {
         updateTreeGeometry();
         updateHelpGeometry();
         updateCalendarVisibility(animate);
+
+        m_sliderItem->setEnabled(m_sliderVisible); /* So that it doesn't handle mouse events while disappearing. */
     }
 }
 
@@ -1066,7 +1069,10 @@ void QnWorkbenchUi::updateCalendarVisibility(bool animate) {
 }
 
 void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
-    bool sliderVisible = navigator()->currentWidget() != NULL && !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server));
+    bool sliderVisible = 
+        navigator()->currentWidget() != NULL && 
+        !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server)) &&
+        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live));
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
