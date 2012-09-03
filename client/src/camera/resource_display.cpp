@@ -30,7 +30,6 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
 
-
     if(m_dataProvider != NULL) {
         if (!liveOnly)
             m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);

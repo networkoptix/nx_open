@@ -129,7 +129,7 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
     updateElement(element);
 }
 
-void QnUserSettingsDialog::setEditorRights(quint64 rights){
+void QnUserSettingsDialog::setEditorPermissions(quint64 rights){
     m_editorRights = rights;
     if (m_user){
         createAccessRightsPresets();
@@ -192,7 +192,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
 
-        loadAccessRightsToUi(m_user->getRights());
+        loadAccessRightsToUi(m_user->getPermissions());
         updatePassword();
     }
     setHasChanges(false);
@@ -210,7 +210,7 @@ void QnUserSettingsDialog::submitToResource() {
     if (rights == CUSTOM_RIGHTS)
         rights = readAccessRightsAdvanced();
 
-    m_user->setRights(rights);
+    m_user->setPermissions(rights);
 
     setHasChanges(false);
 }
@@ -344,21 +344,19 @@ void QnUserSettingsDialog::createAccessRightsPresets(){
     if (!m_user)
         return;
 
-    quint64 rights = m_user->getRights();
+    quint64 rights = m_user->getPermissions();
 
     // show only for view of owner
-    if (rights & Qn::EditProtectedUserRight){
-        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::OwnerRight);
-    }
+    if (rights & Qn::GlobalEditProtectedUserPermission)
+        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermission);
 
     // show for an admin or for anyone opened by owner
-    if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight)){
-        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::AdminRight);
-    }
+    if ((rights & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermission);
 
-    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::AdvancedViewerRight);
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::ViewerRight);
-    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::LiveViewerRight);
+    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermission);
+    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermission);
+    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermission);
 
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }
@@ -367,14 +365,14 @@ void QnUserSettingsDialog::createAccessRightsAdvanced(){
     if (!m_user)
         return;
 
-    quint64 rights = m_user->getRights();
+    quint64 rights = m_user->getPermissions();
 
-    if (rights & Qn::EditProtectedUserRight)
-        createAccessRightCheckBox(tr("Owner"), Qn::EditProtectedUserRight);
-    if ((rights & Qn::ProtectedRight) || (m_editorRights & Qn::EditProtectedUserRight))
-        createAccessRightCheckBox(tr("Administrator"), Qn::ProtectedRight | Qn::EditUserRight | Qn::EditLayoutRight | Qn::EditServerRight);
-    createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::EditCameraRight);
-    createAccessRightCheckBox(tr("Can view video archives"), Qn::ViewArchiveRight);
+    if (rights & Qn::GlobalEditProtectedUserPermission)
+        createAccessRightCheckBox(tr("Owner"), Qn::GlobalEditProtectedUserPermission);
+    if ((rights & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+        createAccessRightCheckBox(tr("Administrator"), Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions);
+    createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission);
+    createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission);
 }
 
 void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right){
