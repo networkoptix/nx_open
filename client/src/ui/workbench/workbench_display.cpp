@@ -1365,7 +1365,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
         if(paused) {
             widget->display()->archiveReader()->pauseMedia();
-            widget->display()->archiveReader()->setSpeed(0.0);
+            widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
         }
 
         // TODO: don't start reader for thumbnails search

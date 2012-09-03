@@ -180,7 +180,7 @@ bool QnResourceDisplay::isPaused() {
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    return m_camera->getCamDisplay()->isStillImage();
+    return m_resource->flags() & QnResource::still_image;
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {
