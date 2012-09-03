@@ -624,7 +624,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
 
     if(m_currentMediaWidget) {
-        QnAbstractArchiveReader  *archiveReader = m_currentMediaWidget->display()->archiveReader();
+        QnAbstractArchiveReader *archiveReader = m_currentMediaWidget->display()->archiveReader();
         if (archiveReader)
             archiveReader->setPlaybackMask(QnTimePeriodList());
     }
@@ -645,6 +645,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
+
+    if(m_currentMediaWidget) {
+        QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: evil hacks...
+        QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
+    }
 
     updateCurrentPeriods();
     updateLiveSupported();

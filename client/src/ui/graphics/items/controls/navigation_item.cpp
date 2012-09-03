@@ -223,7 +223,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(),            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
 
     /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
-    connect(navigator(),            SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()));
+    connect(navigator(),            SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()), Qt::QueuedConnection);
 
 
     /* Create actions. */

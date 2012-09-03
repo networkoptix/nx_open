@@ -1363,8 +1363,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
 
         bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
-        if(paused)
+        if(paused) {
             widget->display()->archiveReader()->pauseMedia();
+            widget->display()->archiveReader()->setSpeed(0.0);
+        }
 
         // TODO: don't start reader for thumbnails search
         //widget->display()->archiveReader()->pauseMedia();
