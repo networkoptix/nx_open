@@ -134,16 +134,25 @@ public:
     CameraSettingReader(const QString& cameraId);
     virtual ~CameraSettingReader();
 
-    bool read();
-    bool proceed();
+    bool read(); //reads data from xml file
+    bool proceed(); //parses data from file
     QString getCameraId() const { return m_cameraId; };
 
 protected:
 
+    //If 'isGroupEnabled' returns 'true' the reader will enter it, otherwise the group will be ignored.
     virtual bool isGroupEnabled(const QString& id, const QString& parentId, const QString& name) = 0;
+
+    //If 'isParamEnabled' returns 'true' the reader will create it, otherwise the param will be ignored.
     virtual bool isParamEnabled(const QString& id, const QString& parentId) = 0;
+
+    //The reader sends created param to the child
     virtual void paramFound(const CameraSetting& value, const QString& parentId) = 0;
+
+    //Cleaning activities in the case of any error
     virtual void cleanDataOnFail() = 0;
+
+    //The reader sends parent id of current <camera> tag to the child
     virtual void parentOfRootElemFound(const QString& parentId) = 0;
 
 private:

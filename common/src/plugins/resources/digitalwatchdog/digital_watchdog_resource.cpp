@@ -113,6 +113,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
 {
+    //The grandparent "ONVIF" is processed by invoking of parent 'fetchAndSetCameraSettings' method
     QnPlOnvifResource::fetchAndSetCameraSettings();
 
     QString cameraModel = fetchCameraModel();
@@ -134,9 +135,11 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QMutexLocker lock(&m_physicalParamsMutex);
 
+    //Put base model in list
     m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
         getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr)));
 
+    //Put expanded model in list
     if (!suffix.isEmpty()) {
         m_additionalSettings.push_front(QnPlWatchDogResourceAdditionalSettingsPtr(new QnPlWatchDogResourceAdditionalSettings(
             getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth(), baseIdStr + suffix)));
@@ -169,6 +172,8 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 {
     QMutexLocker lock(&m_physicalParamsMutex);
 
+    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
+    //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
     QDateTime currTime = QDateTime::currentDateTime().addMSecs(-ADVANCED_SETTINGS_VALID_TIME);
     if (currTime > m_advSettingsLastUpdated) {
         foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
@@ -183,12 +188,14 @@ bool QnPlWatchDogResource::getParamPhysical(const QnParam &param, QVariant &val)
 
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
+        //If param is not in list of child, it will return false. Then will try to find it in parent.
         if (setting->getParamPhysicalFromBuffer(param, val))
         {
             return true;
         }
     }
 
+    //If param is not found in DW models, will try to find it in "ONVIF".
     return QnPlOnvifResource::getParamPhysical(param, val);
 }
 
@@ -198,12 +205,14 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
 
     foreach (QnPlWatchDogResourceAdditionalSettingsPtr setting, m_additionalSettings)
     {
+        //If param is not in list of child, it will return false. Then will try to find it in parent.
         if (setting->setParamPhysical(param, val))
         {
             return true;
         }
     }
 
+    //If param is not found in DW models, will try to find it in "ONVIF".
     return QnPlOnvifResource::setParamPhysical(param, val);
 }
 
@@ -239,6 +248,9 @@ bool QnPlWatchDogResourceAdditionalSettings::getParamPhysicalFromBuffer(const Qn
             return true;
         }
 
+        //If server can't get value from camera, it will be marked in "QVariant &val" as empty m_current param
+        //Completely empty "QVariant &val" means enabled setting with no value (ex: Settings tree element or button)
+        //Can't return false in this case, because our framework stops fetching physical params after first failed.
         return true;
     }
 
