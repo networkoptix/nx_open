@@ -232,6 +232,7 @@
         <param name = "BLC Mode"
              description = "Back Light Compensation Mode: This setup allows the camera to process an image that is harshly silhouette against a bright light source."
              widget_type = "OnOff"
+             step = "2"
              query = "blcmode1"/>
 
       </group>

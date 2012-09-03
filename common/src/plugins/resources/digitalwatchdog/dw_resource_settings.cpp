@@ -193,8 +193,14 @@ void DWCameraSetting::initAdditionalValues()
 
     if (getType() == CameraSetting::OnOff)
     {
-        m_enumStrToInt.push_back(getMin());
+        QString stepStr = getStep();
+        unsigned int step = stepStr.isEmpty()? 1 : stepStr.toUInt();
+
+        while (step-- > 0) {
+            m_enumStrToInt.push_back(getMin());
+        }
         m_enumStrToInt.push_back(getMax());
+
         return;
     }
 }
