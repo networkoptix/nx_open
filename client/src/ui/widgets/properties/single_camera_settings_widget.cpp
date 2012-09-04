@@ -104,6 +104,9 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             QWidget* advancedWidget = new QWidget();
             advancedLayout = new QStackedLayout(advancedWidget);
+            //Default - show empty widget, ind = 0
+            advancedLayout->addWidget(new QWidget());
+
             advancedSplitter->addWidget(advancedTreeWidget);
             advancedSplitter->addWidget(advancedWidget);
 

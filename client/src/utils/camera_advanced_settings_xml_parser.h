@@ -37,6 +37,7 @@ public:
     CameraSettingsLister(const QString& id, ParentOfRootElemFoundAware& obj);
     virtual ~CameraSettingsLister();
 
+    //Set into 'out' all params from camera_settings.xml for desired camera
     bool proceed(QSet<QString>& out);
 
 protected:
@@ -83,15 +84,16 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
     typedef QHash<QString, WidgetAndParent*> WidgetsAndParentsById;
 
 public:
-    typedef QHash<QString, QTreeWidgetItem*> WidgetsById;
+    typedef QHash<QString, QTreeWidgetItem*> TreeWidgetItemsById;
     typedef QHash<QString, int> LayoutIndById;
     typedef QHash<QString, QnAbstractSettingsWidget*> SettingsWidgetsById;
 
     CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        WidgetsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, QObject* handler);
+        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, QObject* handler);
 
     virtual ~CameraSettingsWidgetsCreator();
 
+    //Create or refresh advanced settings widgets according to info got from mediaserver ('settings' param)
     bool proceed(CameraSettings& settings);
 
 protected:
@@ -122,7 +124,7 @@ private:
     CameraSettings* m_settings;
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
-    WidgetsById& m_widgetsById;
+    TreeWidgetItemsById& m_treeWidgetsById;
     LayoutIndById& m_layoutIndById;
     SettingsWidgetsById& m_settingsWidgetsById;
     QObject* m_handler;
@@ -145,9 +147,16 @@ protected:
 
     QList<T*> m_objList;
 
+    //Notification, that new parent was found
     virtual void parentOfRootElemFound(const QString& parentId);
+
+    //Create T class to proceed new parent
     virtual T* createElement(const QString& id) = 0;
-    virtual E& getCallback() = 0;
+
+    //Method should return some object (additional info) required in proceed method of T class
+    virtual E& getAdditionalInfo() = 0;
+
+    //Cleaning activities
     void clean();
 
 public:
@@ -155,6 +164,8 @@ public:
     CameraSettingTreeReader(const QString& id);
     ~CameraSettingTreeReader();
 
+    //Apply 'proceed' method of T class for all parents of current camera
+    //(current camera is included also)
     bool proceed();
 };
 
@@ -167,7 +178,7 @@ class CameraSettingsTreeLister: public CameraSettingTreeReader<CameraSettingsLis
     QSet<QString> m_params;
 
 protected:
-    virtual QSet<QString>& getCallback() override;
+    virtual QSet<QString>& getAdditionalInfo() override;
 
 public:
 
@@ -184,13 +195,13 @@ public:
 
 class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>
 {
-    typedef CameraSettingsWidgetsCreator::WidgetsById WidgetsById;
+    typedef CameraSettingsWidgetsCreator::TreeWidgetItemsById TreeWidgetItemsById;
     typedef CameraSettingsWidgetsCreator::LayoutIndById LayoutIndById;
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
 
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
-    WidgetsById m_widgetsById;
+    TreeWidgetItemsById m_treeWidgetsById;
     LayoutIndById m_layoutIndById;
     SettingsWidgetsById m_settingsWidgetsById;
     QObject* m_handler;
@@ -199,7 +210,7 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     QString m_cameraId;
 
 protected:
-    virtual CameraSettings& getCallback() override;
+    virtual CameraSettings& getAdditionalInfo() override;
 
 public:
 
