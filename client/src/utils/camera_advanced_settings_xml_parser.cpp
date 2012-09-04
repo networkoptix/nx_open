@@ -110,7 +110,7 @@ void CameraSettingsWidgetsCreator::removeLayoutItems()
         QObjectList children = m_owner->children();
         for (int i = 0; i < children.count(); ++i)
         {
-            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
+            m_rootLayout.removeWidget(static_cast<QnSettingsScrollArea*>(children[i]));
         }
         delete m_owner;
         m_owner = 0;

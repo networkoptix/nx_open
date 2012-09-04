@@ -48,7 +48,6 @@ QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetti
     : QWidget(0),
       m_handler(handler),
       m_param(obj),
-      m_widget(0),
       m_layout(new QHBoxLayout()),
       m_hint(hint)
 {
@@ -70,11 +69,6 @@ const CameraSetting& QnAbstractSettingsWidget::param() const
     return m_param;
 }
 
-QWidget* QnAbstractSettingsWidget::toWidget()
-{
-    return m_widget;
-}
-
 void QnAbstractSettingsWidget::setParam(const CameraSettingValue& val)
 {
     m_param.setCurrent(val);
@@ -86,22 +80,12 @@ QnSettingsOnOffWidget::QnSettingsOnOffWidget(QObject* handler, CameraSetting& ob
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     m_checkBox = new QCheckBox(m_param.getName());
-
-    //mlayout->addWidget(new QWidget());
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addWidget(m_checkBox);
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    //mlayout->addWidget(new QWidget());
 
     if (m_param.getCurrent() == m_param.getMax())
         m_checkBox->setCheckState(Qt::Checked);
 
     connect(m_checkBox, SIGNAL(stateChanged ( int )), this, SLOT(stateChanged(int)));
-
-    //QPalette plt;	plt.setColor(QPalette::WindowText, Qt::white);	checkBox->setPalette(plt);//black
-
-    m_widget = m_checkBox;
-    //setMinimumSize(m_checkBox->sizeHint());
 }
 
 void QnSettingsOnOffWidget::refresh()
@@ -120,12 +104,6 @@ QnSettingsOnOffWidget::~QnSettingsOnOffWidget()
 
 void QnSettingsOnOffWidget::stateChanged(int state)
 {
-    //if (mParam.value.possible_values.count()<2)
-    //{
-    //    cl_log.log(QLatin1String("param.value.possible_values.count()<2 !!!!"), cl_logERROR);
-    //    return;
-    //}
-
     QString val = state == Qt::Checked ? (QString)m_param.getMax() : (QString)m_param.getMin();
     setParam(val);
 }
@@ -140,11 +118,7 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
-    //mlayout->addWidget(new QWidget());
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addLayout(vlayout);
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    //mlayout->addWidget(new QWidget());
 
     m_groupBox = new QGroupBox();
     vlayout->addWidget(new QWidget());
@@ -154,11 +128,6 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     vlayout->addWidget(new QWidget());
 
     m_slider = new QnSettingsSlider(Qt::Horizontal, m_groupBox);
-    //m_slider->setMinimumWidth(130);
-    //m_slider->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-
-    //QFont font("Courier New", 11);
-    //groupBox->setFont(font);
 
     m_slider->setRange(m_param.getMin(), m_param.getMax());
     m_slider->setValue(m_param.getCurrent());
@@ -172,9 +141,6 @@ QnSettingsMinMaxStepWidget::QnSettingsMinMaxStepWidget(QObject* handler, CameraS
     connect(m_slider, SIGNAL(sliderReleased()), this, SLOT(onValChanged()));
     connect(m_slider, SIGNAL(onKeyReleased()), this, SLOT(onValChanged()));
     connect(m_slider, SIGNAL(valueChanged(int)), this, SLOT(onValChanged(int)) );
-
-    m_widget = m_groupBox;
-    //setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsMinMaxStepWidget::refresh()
@@ -183,7 +149,7 @@ void QnSettingsMinMaxStepWidget::refresh()
     m_slider->setValue(m_param.getCurrent());
     m_slider->setWindowTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
 
-    static_cast<QGroupBox*>(m_widget)->setTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
+    m_groupBox->setTitle(m_param.getName() + QLatin1String(" (") + (QString)m_param.getCurrent() + QLatin1Char(')'));
 }
 
 void QnSettingsMinMaxStepWidget::onValChanged(int val)
@@ -207,11 +173,7 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
     QVBoxLayout *vlayout = new QVBoxLayout();
-    //mlayout->addWidget(new QWidget());
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addLayout(vlayout);
-    //mlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    //mlayout->addWidget(new QWidget());
 
     QGroupBox* groupBox = new QGroupBox();
     vlayout->addWidget(new QWidget());
@@ -220,9 +182,7 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
     vlayout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     vlayout->addWidget(new QWidget());
 
-    //groupBox->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     groupBox->setTitle(m_param.getName());
-    //groupBox->setMinimumWidth(140);
 
     QVBoxLayout *layout = new QVBoxLayout(groupBox);
 
@@ -238,15 +198,11 @@ QnSettingsEnumerationWidget::QnSettingsEnumerationWidget(QObject* handler, Camer
             btn->setChecked(true);
 
         btn->setObjectName(val);
-        //btn->setFont(settings_font);
     
         m_radioBtns.push_back(btn);
 
         connect(btn , SIGNAL(clicked()), this, SLOT(onClicked()));
     }
-
-    m_widget = groupBox;
-    //setMinimumSize(groupBox->sizeHint());
 }
 
 void QnSettingsEnumerationWidget::refresh()
@@ -305,9 +261,6 @@ QnSettingsButtonWidget::QnSettingsButtonWidget(QObject* handler, const CameraSet
     QObject::connect(btn, SIGNAL(released()), this, SLOT(onClicked()));
 
     btn->setFocusPolicy(Qt::NoFocus);
-
-    m_widget = btn;
-    //setMinimumSize(btn->sizeHint());
 }
 
 void QnSettingsButtonWidget::refresh()
@@ -321,35 +274,33 @@ void QnSettingsButtonWidget::onClicked()
 
 void QnSettingsButtonWidget::updateParam(QString /*val*/)
 {
-    //cl_log.log("updateParam", cl_logALWAYS);
+    
 }
 
 //==============================================
 QnSettingsTextFieldWidget::QnSettingsTextFieldWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent):
     QnAbstractSettingsWidget(handler, obj, parent, obj.getDescription())
 {
-    QLineEdit *lineEdit = new QLineEdit();
-    lineEdit->setText(obj.getCurrent());
+    m_lineEdit = new QLineEdit();
+    m_lineEdit->setText(obj.getCurrent());
 
     m_layout->addWidget(new QWidget());
     m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
-    m_layout->addWidget(lineEdit);
+    m_layout->addWidget(m_lineEdit);
     m_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Expanding));
     m_layout->addWidget(new QLabel(obj.getName()));
 
-    connect(lineEdit, SIGNAL(editingFinished()), this, SLOT(onChange()));
-
-    m_widget = lineEdit;
+    connect(m_lineEdit, SIGNAL(editingFinished()), this, SLOT(onChange()));
 }
 
 void QnSettingsTextFieldWidget::onChange()
 {
-    setParam(static_cast<QLineEdit*>(m_widget)->text());
+    m_lineEdit->text();
 }
 
 void QnSettingsTextFieldWidget::refresh()
 {
-    static_cast<QLineEdit*>(m_widget)->setText(m_param.getCurrent());
+    m_lineEdit->setText(m_param.getCurrent());
 }
 
 void QnSettingsTextFieldWidget::updateParam(QString val)
@@ -380,8 +331,6 @@ QnSettingsControlButtonsPairWidget::QnSettingsControlButtonsPairWidget(QObject* 
 
     QObject::connect(m_maxBtn, SIGNAL(pressed()), this, SLOT(onMaxPressed()));
     QObject::connect(m_maxBtn, SIGNAL(released()), this, SLOT(onMaxReleased()));
-
-    m_widget = 0;
 }
 
 void QnSettingsControlButtonsPairWidget::onMinPressed()

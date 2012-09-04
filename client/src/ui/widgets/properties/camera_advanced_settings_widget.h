@@ -40,8 +40,6 @@ public:
     QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent, const QString& hint);
     virtual ~QnAbstractSettingsWidget();
 
-    virtual QWidget* toWidget();
-
     const CameraSetting& param() const;
 
     virtual void refresh() = 0;
@@ -58,7 +56,6 @@ protected:
 protected:
     CameraSetting& m_param;
     QObject* m_handler;
-    QWidget* m_widget;
     QHBoxLayout *m_layout;
     QString m_hint;
 };
@@ -154,6 +151,9 @@ public slots:
 
 private slots:
     void onChange();
+
+private:
+    QLineEdit* m_lineEdit;
 };
 
 //==============================================
