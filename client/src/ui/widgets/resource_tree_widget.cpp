@@ -488,6 +488,10 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
+void QnResourceTreeWidget::mouseReleaseEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
     if (event->key() == Qt::Key_Menu){

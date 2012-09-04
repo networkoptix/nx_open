@@ -522,6 +522,21 @@ namespace Qn {
         ToggleCalendarAction,
 
 
+        /* Playback actions. */
+        PlayPauseAction,
+        SpeedDownAction,
+        SpeedUpAction,
+        PreviousFrameAction,
+        NextFrameAction,
+        JumpToStartAction,
+        JumpToEndAction,
+        VolumeUpAction,
+        VolumeDownAction,
+        ToggleMuteAction,
+        JumpToLiveAction,
+        ToggleSyncAction,
+
+
         /* Debug actions. */
 
         /**

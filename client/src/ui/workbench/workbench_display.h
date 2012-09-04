@@ -366,6 +366,8 @@ private:
 
     /* Internal state. */
 
+    QList<QnResourceWidget *> m_widgets;
+
     /** Item to widget mapping. */
     QHash<QnWorkbenchItem *, QnResourceWidget *> m_widgetByItem;
 

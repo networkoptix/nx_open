@@ -32,12 +32,25 @@ public:
     QnWorkbenchAccessController(QObject *parent = NULL);
     virtual ~QnWorkbenchAccessController();
 
+    /**
+     * \param resource                  Resource to get permissions for.
+     * \returns                         Permissions for the given resource.
+     *                                  Includes global permissions if requested for the current user.
+     */
     Qn::Permissions permissions(const QnResourcePtr &resource) const;
-    quint64 rights() const;
 
+    /**
+     * \param resource                  Resource to check permissions for.
+     * \param requiredPermissions       Permissions to check.
+     * \returns                         Whether actual permissions for the given resource
+     *                                  include required permissions.
+     */
     bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
-    bool hasRights(Qn::UserRights requiredRights) const;
-
+    
+    /**
+     * \param resources                 List of resources to get combined permissions for.
+     * \returns                         Bitwise AND combination of permissions for the provided resources.
+     */
     template<class ResourceList>
     Qn::Permissions permissions(const ResourceList &resources, const typename ResourceList::const_iterator * = NULL /* Let SFINAE filter out non-lists. */) const {
         Qn::Permissions result = Qn::AllPermissions;
@@ -46,6 +59,24 @@ public:
         return result;
     }
 
+    /**
+     * \returns                         Global permissions of the current user. 
+     *                                  Same as <tt>permissions(context()->user())</tt>.
+     */
+    Qn::Permissions globalPermissions() const;
+
+    /**
+     * \param requiredPermissions       Global permissions to check.
+     * \returns                         Whether actual global permissions
+     *                                  include required permissions.
+     */
+    bool hasGlobalPermissions(Qn::Permissions requiredPermissions) const;
+
+    /**
+     * \param resource                  Resource to get permissions change notifier for.
+     * \returns                         Notifier that can be used to track permission changes for
+     *                                  the given resource.
+     */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
 signals:
@@ -68,6 +99,8 @@ protected slots:
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout);
 
 private:
+    Qn::Permissions calculateGlobalPermissions(const QnUserResourcePtr &user);
+
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource);
@@ -86,6 +119,7 @@ private:
     };
 
     QnUserResourcePtr m_user;
+    Qn::Permissions m_userPermissions;
     QHash<QnResourcePtr, PermissionsData> m_dataByResource;
 };
 

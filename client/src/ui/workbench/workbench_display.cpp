@@ -571,7 +571,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget)
             opacityAnimator(newWidget)->animateTo(1.0);
         qreal opacity = newWidget ? 0.0 : 1.0;
-        foreach(QnResourceWidget *widget, m_widgetByRenderer)
+        foreach(QnResourceWidget *widget, m_widgets)
             if(widget != newWidget)
                 opacityAnimator(widget)->animateTo(opacity);
 
@@ -608,7 +608,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
-    return m_widgetByRenderer.values();
+    return m_widgets;
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {
@@ -694,7 +694,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgetByRenderer.size() >= 24) { // TODO: item limit must be changeable.
+    if (m_widgets.size() >= 24) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -737,13 +737,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
-    {
-        QPalette palette = widget->palette();
-        palette.setColor(QPalette::Active, QPalette::Shadow, qnGlobals->selectedFrameColor());
-        palette.setColor(QPalette::Inactive, QPalette::Shadow, qnGlobals->frameColor());
-        widget->setPalette(palette);
-    }
-
     m_scene->addItem(widget);
 
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
@@ -751,6 +744,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
+    m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
     m_widgetsByResource[widget->resource()].push_back(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -798,6 +792,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
+    m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
     m_widgetsByResource[widget->resource()].removeOne(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -882,7 +877,7 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
 
     m_frameOpacity = opacity;
     
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+    foreach(QnResourceWidget *widget, m_widgets) 
         widget->setFrameOpacity(opacity);
 }
 
@@ -1250,7 +1245,7 @@ void QnWorkbenchDisplay::updateFrameWidths() {
     if(!m_frameWidthsDirty)
         return;
 
-    foreach(QnResourceWidget *widget, m_widgetByRenderer)
+    foreach(QnResourceWidget *widget, this->widgets())
         widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
 }
 
@@ -1365,6 +1360,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
         if(paused) {
             widget->display()->archiveReader()->pauseMedia();
+            widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
         }
 
         // TODO: don't start reader for thumbnails search
@@ -1453,12 +1449,12 @@ void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+    foreach(QnResourceWidget *widget, m_widgets) 
         widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, true);
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+    foreach(QnResourceWidget *widget, m_widgets) 
         widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
 }
 

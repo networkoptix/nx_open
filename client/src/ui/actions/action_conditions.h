@@ -258,11 +258,16 @@ public:
 
 class QnToggleTourActionCondition: public QnActionCondition {
 public:
-    QnToggleTourActionCondition(QObject *parent = NULL):
-        QnActionCondition(parent)
-    {}
+    QnToggleTourActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnArchiveActionCondition: public QnActionCondition {
+public:
+    QnArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

@@ -7,6 +7,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -284,13 +285,20 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
-    foreach(const QnVirtualCameraResourcePtr &camera, resourcePool()->getResources().filtered<QnVirtualCameraResource>())
-        if(!camera->isScheduleDisabled())
-            return Qn::EnabledAction;
-    return Qn::DisabledAction;
+    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
-Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
     return context()->workbench()->currentLayout()->items().empty() ? Qn::DisabledAction : Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    bool watchable = !(resources[0]->flags() & QnResource::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
+    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+
+    // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
 }
 

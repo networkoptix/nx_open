@@ -4,6 +4,8 @@
 #include <QtGui/QTableView>
 #include <QtGui/QHeaderView>
 #include <QtGui/QToolButton>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QMouseEvent>
 
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -55,7 +57,6 @@ QnCalendarWidget::QnCalendarWidget():
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
 
     m_tableView = findChild<QTableView *>(QLatin1String("qt_calendar_calendarview"));
-    Q_ASSERT(m_tableView);
     m_tableView->horizontalHeader()->setMinimumSectionSize(18);
     QObject::connect(m_tableView, SIGNAL(changeDate(const QDate&, bool)), this, SIGNAL(dateClicked(const QDate&)));
 
@@ -141,18 +142,16 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         brush.setStyle(Qt::SolidPattern);
         painter->fillRect(rect, brush);
 
-        if ( bgcolor != motionColor &&
-                m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+        // TODO: #GDM logic based on color comparisons is a bad practice. Introduce additional booleans if needed, but don't compare colors.
+        if (bgcolor != motionColor && m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
             brush.setColor(denseMotionColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);
-        } else if ( bgcolor != recordingColor &&
-                m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+        } else if (bgcolor != recordingColor && m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
             brush.setColor(denseRecordingColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);
         }
-
     }
 
     QnScopedPainterPenRollback penRollback(painter);
@@ -193,7 +192,7 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     }
 }
 
-void QnCalendarWidget::updateEmpty(){
+void QnCalendarWidget::updateEmpty() {
     bool value = true;
     for(int type = 0; type < Qn::TimePeriodRoleCount; type++) {
         if (!m_currentTimeStorage.periods(static_cast<Qn::TimePeriodRole>(type)).empty() ||
@@ -208,4 +207,16 @@ void QnCalendarWidget::updateEmpty(){
 
     m_empty = value;
     emit emptyChanged();
+}
+
+void QnCalendarWidget::wheelEvent(QWheelEvent *event) {
+    event->accept(); /* Do not propagate wheel events past the calendar widget. */
+}
+
+void QnCalendarWidget::mousePressEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
+void QnCalendarWidget::mouseReleaseEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
 }

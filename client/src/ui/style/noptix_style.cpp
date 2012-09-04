@@ -48,6 +48,7 @@ namespace {
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
     m_skin(qnSkin),
+    m_globals(qnGlobals),
     m_animator(new QnNoptixStyleAnimator(this))
 {
     GraphicsStyle::setBaseStyle(this);
@@ -181,6 +182,12 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
+
+    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
+
+    QPalette palette = application->palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
+    application->setPalette(palette);
 
     QFont font;
     font.setPixelSize(12);

@@ -641,7 +641,8 @@ bool QnDesktopFileEncoder::init()
 
     avformat_write_header(m_formatCtx, 0);
 
-    m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate * 1000; // keep in ms
+    if (m_audioCodecCtx)
+        m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate * 1000; // keep in ms
     //m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
 
     // 50 ms as max jitter

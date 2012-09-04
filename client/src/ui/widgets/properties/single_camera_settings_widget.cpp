@@ -104,6 +104,9 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
 
             QWidget* advancedWidget = new QWidget();
             advancedLayout = new QStackedLayout(advancedWidget);
+            //Default - show empty widget, ind = 0
+            advancedLayout->addWidget(new QWidget());
+
             advancedSplitter->addWidget(advancedTreeWidget);
             advancedSplitter->addWidget(advancedWidget);
 
@@ -652,7 +655,11 @@ void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
     if (m_widgetsRecreator && m_camera->getUniqueId() == m_widgetsRecreator->getCameraId())
     {
         m_widgetsRecreator->proceed(&m_cameraSettings);
-        loadAdvancedSettings();
+        //We assume, that the user will not very quickly navigate through settings tree and
+        //click on various settings, so we don't need get changes after setting 'em.
+        //Navigating through settings tree causes 'refreshAdvancedSettings' method invocation
+        //(which causes get request to mediaserver)
+        //loadAdvancedSettings();
     }
 }
 

@@ -374,6 +374,9 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
 
+    if(m_syncedWidgets.contains(m_currentMediaWidget))
+        updateItemDataFromSlider(widget);
+
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
     m_syncedResources.erase(m_syncedResources.find(widget->resource()));
@@ -601,6 +604,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     } else {
         widget = *m_syncedWidgets.begin();
     }
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
 
     if (m_currentWidget == widget) {
         if(m_currentWidgetIsCentral != isCentral) {
@@ -624,13 +628,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
 
     if(m_currentMediaWidget) {
-        QnAbstractArchiveReader  *archiveReader = m_currentMediaWidget->display()->archiveReader();
+        QnAbstractArchiveReader *archiveReader = m_currentMediaWidget->display()->archiveReader();
         if (archiveReader)
             archiveReader->setPlaybackMask(QnTimePeriodList());
     }
 
     m_currentWidget = widget;
-    m_currentMediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+    m_currentMediaWidget = mediaWidget;
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
@@ -645,6 +649,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     }
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
+
+    if(m_currentMediaWidget) {
+        QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: evil hacks...
+        QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
+    }
 
     updateCurrentPeriods();
     updateLiveSupported();
@@ -778,11 +787,11 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
 
-    if (m_calendar){
+    if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
         QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
         // todo: signal deadlock here!
-        // GDEM, fix it!
+        // #GDM, fix it!
         //period.addPeriod(calendarPeriod);
     }
 

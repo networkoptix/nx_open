@@ -548,8 +548,13 @@ void QnImageButtonWidget::updateState(StateFlags state) {
             m_action->setChecked(isChecked());
     }
 
-    if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
-        setDisabled(m_state & DISABLED);
+    if((oldState ^ m_state) & DISABLED) { /* DISABLED has changed, perform back-sync. */
+        /* Disabled state change may have been propagated from parent item,
+         * and in this case we shouldn't do any back-sync. */
+        bool newDisabled = m_state & DISABLED;
+        if(newDisabled != isDisabled())
+            setDisabled(newDisabled); 
+    }
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED)) /* !HOVERED -> HOVERED transition */
         m_action->hover();

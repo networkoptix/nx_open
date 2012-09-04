@@ -1,10 +1,8 @@
 #include "user_resource.h"
-#include <utils/common/warnings.h>
 
-QnUserResource::QnUserResource()
-    : base_type(),
-      m_rights(0),
-      m_isAdmin(false)
+QnUserResource::QnUserResource(): 
+    m_permissions(0),
+    m_isAdmin(false)
 {
     setStatus(Online, true);
     addFlags(QnResource::user | QnResource::remote);
@@ -29,33 +27,34 @@ void QnUserResource::setPassword(const QString& password)
     m_password = password;
 }
 
-quint64 QnUserResource::getRights() const
+quint64 QnUserResource::getPermissions() const
 {
-    if (m_isAdmin)
-        return Qn::OwnerRight;
-    return m_rights;
+    return m_permissions;
 }
 
-void QnUserResource::setRights(quint64 rights)
+void QnUserResource::setPermissions(quint64 rights)
 {
-    m_rights = rights;
+    m_permissions = rights;
 }
 
-bool QnUserResource::isAdmin() const{
+bool QnUserResource::isAdmin() const
+{
     return m_isAdmin;
 }
 
-void QnUserResource::setAdmin(bool isAdmin){
+void QnUserResource::setAdmin(bool isAdmin)
+{
     m_isAdmin = isAdmin;
 }
 
-void QnUserResource::updateInner(QnResourcePtr other) {
+void QnUserResource::updateInner(QnResourcePtr other) 
+{
     base_type::updateInner(other);
 
     QnUserResourcePtr localOther = other.dynamicCast<QnUserResource>();
     if(localOther) {
         setPassword(localOther->getPassword());
-        setRights(localOther->getRights());
+        setPermissions(localOther->getPermissions());
         setAdmin(localOther->isAdmin());
     }
 }

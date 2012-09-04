@@ -768,6 +768,7 @@ int QnRtspConnectionProcessor::composePlay()
     {
         if (d->requestHeaders.value("x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
+        d->useProprietaryFormat = true;
         createPredefinedTracks();
     }
 
@@ -817,6 +818,8 @@ int QnRtspConnectionProcessor::composePlay()
     }
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
+
+    addResponseRangeHeader();
 
     if (!currentDP)
         return CODE_NOT_FOUND;
@@ -891,7 +894,6 @@ int QnRtspConnectionProcessor::composePlay()
         d->thumbnailsDP->setQuality(d->quality);
     }
 
-    addResponseRangeHeader();
     d->dataProcessor->setUseUTCTime(d->useProprietaryFormat);
     d->dataProcessor->start();
 
