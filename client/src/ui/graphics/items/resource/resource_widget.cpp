@@ -65,6 +65,10 @@ namespace {
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160);
 
+    const QColor selectedFrameColor = qnGlobals->selectedFrameColor();
+
+    const QColor frameColor = qnGlobals->frameColor();
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -622,7 +626,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = palette().color(isSelected() ? QPalette::Active : QPalette::Inactive, QPalette::Shadow);
+    QColor color = isSelected() ? selectedFrameColor : frameColor;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
