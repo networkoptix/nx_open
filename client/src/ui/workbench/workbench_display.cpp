@@ -1296,7 +1296,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->currentTimeUSec() / 1000);
+            qint64 time = mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : mediaWidget->display()->currentTimeUSec() / 1000;
+
+            mediaWidget->item()->setData(Qn::ItemTimeRole, time);
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
     }
@@ -1351,13 +1353,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         if(thumbnailed) {
             time = searchState.period.startTimeMs + searchState.step * i;
         } else {
-            time = widget->item()->data(Qn::ItemTimeRole).value<qint64>();
+            time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
         }
 
-        if(!thumbnailed)
-            widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
+        if(!thumbnailed && time != -1) {
+            qreal timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
+            widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+        }
 
-        bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
+        bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);
         if(paused) {
             widget->display()->archiveReader()->pauseMedia();
             widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
