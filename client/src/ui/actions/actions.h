@@ -123,8 +123,6 @@ namespace Qn {
          * Opens the main menu.
          */
         MainMenuAction,
-        LightMainMenuAction,
-        DarkMainMenuAction,
 
         /**
          * Opens a new tab (layout).

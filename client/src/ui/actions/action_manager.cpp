@@ -346,17 +346,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
-        autoRepeat(false);
-
-    factory(Qn::LightMainMenuAction).
-        flags(Qn::NoTarget).
-        text(tr("Main Menu")).
-        icon(qnSkin->icon("main_menu_fullscreen.png"));
-
-    factory(Qn::DarkMainMenuAction).
-        flags(Qn::NoTarget).
-        text(tr("Main Menu")).
-        icon(qnSkin->icon("main_menu_windowed.png"));
+        autoRepeat(false).
+        icon(qnSkin->icon("main_menu.png"));
 
     factory(Qn::ConnectToServerAction).
         flags(Qn::Main).

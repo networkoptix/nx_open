@@ -373,7 +373,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::LightMainMenuAction), 1.5);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
 
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     windowButtonsLayout->setContentsMargins(0, 0, 0, 0);

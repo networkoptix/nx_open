@@ -196,7 +196,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * main menu is updated. However, menu buttons do not activate their corresponding 
      * actions as they do not receive release events. We work this around by making
      * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction), 1.5);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
