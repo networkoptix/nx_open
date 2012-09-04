@@ -58,7 +58,7 @@ private:
     QnTimePeriodStorage m_currentTimeStorage;
     QnTimePeriodStorage m_syncedTimeStorage;
     QTableView* m_tableView;
-    QnTimePeriod m_window;
+    QnTimePeriod m_window, m_dayWindow;
     bool m_empty;
     bool m_currentWidgetIsCentral;
 
