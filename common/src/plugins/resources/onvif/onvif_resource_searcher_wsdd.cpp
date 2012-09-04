@@ -674,10 +674,10 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl(EndpointInfoHash& result, cons
     qSocket.close();
 }
 
-CameraInfoPtr OnvifResourceSearcherWsdd::findCamera(const QHostAddress& camAddr) const
+CameraInfo OnvifResourceSearcherWsdd::findCamera(const QHostAddress& camAddr) const
 {
     EndpointInfoHash result;
     findEndpointsImpl(result, 0, &camAddr);
 
-    return CameraInfoPtr(result.size() == 1 ? new EndpointAdditionalInfo(result.begin().value()) : 0);
+    return result.size() == 1 ? CameraInfo(result.begin().key(), result.begin().value()) : CameraInfo();
 }
