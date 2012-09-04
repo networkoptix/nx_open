@@ -15,11 +15,11 @@ QnAbstractPtzController::QnAbstractPtzController(QnResourcePtr netRes)
 void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)
 {
     QVariant val;
-    res->getParam(QLatin1String("xVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    res->getParam(QLatin1String("xVelocityCoeff"), val, QnDomainDatabase);
     xVelocityCoeff = val.toFloat();
-    res->getParam(QLatin1String("yVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    res->getParam(QLatin1String("yVelocityCoeff"), val, QnDomainDatabase);
     yVelocityCoeff = val.toFloat();
-    res->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    res->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomainDatabase);
     zoomVelocityCoeff = val.toFloat();
 }
 
@@ -30,9 +30,9 @@ void QnAbstractPtzController::getCalibrate(qreal &xVelocityCoeff, qreal &yVeloci
 
 bool QnAbstractPtzController::calibrate(QnVirtualCameraResourcePtr res, qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff)
 {
-    res->setParam(QLatin1String("xVelocityCoeff"), xVelocityCoeff, QnDomain::QnDomainDatabase);
-    res->setParam(QLatin1String("yVelocityCoeff"), yVelocityCoeff, QnDomain::QnDomainDatabase);
-    res->setParam(QLatin1String("zoomVelocityCoeff"), zoomVelocityCoeff, QnDomain::QnDomainDatabase);
+    res->setParam(QLatin1String("xVelocityCoeff"), xVelocityCoeff, QnDomainDatabase);
+    res->setParam(QLatin1String("yVelocityCoeff"), yVelocityCoeff, QnDomainDatabase);
+    res->setParam(QLatin1String("zoomVelocityCoeff"), zoomVelocityCoeff, QnDomainDatabase);
 
     QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
@@ -53,20 +53,20 @@ bool QnAbstractPtzController::calibrate(qreal xVelocityCoeff, qreal yVelocityCoe
 qreal QnAbstractPtzController::getXVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("xVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    m_resource->getParam(QLatin1String("xVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }
 
 qreal QnAbstractPtzController::getYVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("yVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    m_resource->getParam(QLatin1String("yVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }
 
 qreal QnAbstractPtzController::getZoomVelocityCoeff() const
 {
     QVariant val = 1.0;
-    m_resource->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomain::QnDomainDatabase);
+    m_resource->getParam(QLatin1String("zoomVelocityCoeff"), val, QnDomainDatabase);
     return val.toFloat();
 }
