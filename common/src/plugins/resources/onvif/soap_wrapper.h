@@ -23,6 +23,9 @@ class _onvifDevice__SetSystemFactoryDefault;
 class _onvifDevice__SetSystemFactoryDefaultResponse;
 class _onvifDevice__SystemReboot;
 class _onvifDevice__SystemRebootResponse;
+class _onvifMedia__GetCompatibleMetadataConfigurations;
+class _onvifMedia__GetCompatibleMetadataConfigurationsResponse;
+
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
@@ -36,6 +39,8 @@ typedef _onvifDevice__SetSystemFactoryDefault FactoryDefaultReq;
 typedef _onvifDevice__SetSystemFactoryDefaultResponse FactoryDefaultResp;
 typedef _onvifDevice__SystemReboot RebootReq;
 typedef _onvifDevice__SystemRebootResponse RebootResp;
+typedef _onvifMedia__GetCompatibleMetadataConfigurations CompatibleMetadataConfiguration;
+typedef _onvifMedia__GetCompatibleMetadataConfigurationsResponse CompatibleMetadataConfigurationResp;
 
 
 class _onvifMedia__AddAudioEncoderConfiguration;
@@ -46,6 +51,8 @@ class _onvifMedia__AddVideoEncoderConfiguration;
 class _onvifMedia__AddVideoEncoderConfigurationResponse;
 class _onvifMedia__AddVideoSourceConfiguration;
 class _onvifMedia__AddVideoSourceConfigurationResponse;
+class _onvifMedia__AddPTZConfiguration;
+class _onvifMedia__AddPTZConfigurationResponse;
 class _onvifMedia__CreateProfile;
 class _onvifMedia__CreateProfileResponse;
 class _onvifMedia__GetAudioEncoderConfigurationOptions;
@@ -84,8 +91,13 @@ typedef _onvifMedia__AddAudioEncoderConfiguration AddAudioConfigReq;
 typedef _onvifMedia__AddAudioEncoderConfigurationResponse AddAudioConfigResp;
 typedef _onvifMedia__AddAudioSourceConfiguration AddAudioSrcConfigReq;
 typedef _onvifMedia__AddAudioSourceConfigurationResponse AddAudioSrcConfigResp;
+
 typedef _onvifMedia__AddVideoEncoderConfiguration AddVideoConfigReq;
 typedef _onvifMedia__AddVideoEncoderConfigurationResponse AddVideoConfigResp;
+
+typedef _onvifMedia__AddPTZConfiguration AddPTZConfigReq;
+typedef _onvifMedia__AddPTZConfigurationResponse AddPTZConfigResp;
+
 typedef _onvifMedia__AddVideoSourceConfiguration AddVideoSrcConfigReq;
 typedef _onvifMedia__AddVideoSourceConfigurationResponse AddVideoSrcConfigResp;
 typedef _onvifMedia__CreateProfile CreateProfileReq;
@@ -142,6 +154,10 @@ class _onvifPtz__AbsoluteMove;
 class _onvifPtz__AbsoluteMoveResponse;
 class _onvifPtz__RelativeMove;
 class _onvifPtz__RelativeMoveResponse;
+class _onvifPtz__GetNode;
+class _onvifPtz__GetNodeResponse;
+class _onvifPtz__GetNodes;
+class _onvifPtz__GetNodesResponse;
 
 typedef _onvifPtz__AbsoluteMove AbsoluteMoveReq;
 typedef _onvifPtz__AbsoluteMoveResponse AbsoluteMoveResp;
@@ -149,6 +165,13 @@ typedef _onvifPtz__RelativeMove RelativeMoveReq;
 typedef _onvifPtz__RelativeMoveResponse RelativeMoveResp;
 typedef _onvifPtz__GetServiceCapabilities PtzGetServiceCapabilitiesReq;
 typedef _onvifPtz__GetServiceCapabilitiesResponse PtzPtzGetServiceCapabilitiesResp;
+
+class _onvifPtz__ContinuousMove;
+class _onvifPtz__ContinuousMoveResponse;
+class _onvifPtz__Stop;
+class _onvifPtz__StopResponse;
+class _onvifPtz__Stop;
+class onvifPtz__StopResponse;
 
 //
 // SoapWrapper
@@ -180,7 +203,7 @@ public:
     const QString getEndpointUrl();
     bool isNotAuthenticated();
     bool isConflictError();
-
+    void setLoginPassword(const std::string& login, const std::string& passwd);
 private:
     SoapWrapper();
     SoapWrapper(const SoapWrapper<T>&);
@@ -188,7 +211,6 @@ private:
 
 protected:
     void beforeMethodInvocation();
-    void setLoginPassword(const std::string& login, const std::string& passwd);
 };
 
 //
@@ -249,9 +271,12 @@ public:
     int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
     int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
 
+    int getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response);
+
     int addAudioEncoderConfiguration(AddAudioConfigReq& request, AddAudioConfigResp& response);
     int addAudioSourceConfiguration(AddAudioSrcConfigReq& request, AddAudioSrcConfigResp& response);
     int addVideoEncoderConfiguration(AddVideoConfigReq& request, AddVideoConfigResp& response);
+    int addPTZConfiguration(AddPTZConfigReq& request, AddPTZConfigResp& response);
     int addVideoSourceConfiguration(AddVideoSrcConfigReq& request, AddVideoSrcConfigResp& response);
 
     int createProfile(CreateProfileReq& request, CreateProfileResp& response);
@@ -281,8 +306,12 @@ public:
     PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~PtzSoapWrapper();
 
-    int GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
+    int doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodesResponse& response);
+    int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
+    int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
+    int doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response);
+    int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);
 private:
     PtzSoapWrapper();
     PtzSoapWrapper(const PtzSoapWrapper&);

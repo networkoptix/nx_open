@@ -821,3 +821,8 @@ bool QnResource::isInitialized() const
 {
     return m_initialized;
 }
+
+QnAbstractPtzController* QnResource::getPtzController()
+{
+    return 0;
+}

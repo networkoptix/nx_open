@@ -336,6 +336,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetCompatibleMetadataConfigurations(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response)
 {
     beforeMethodInvocation();
@@ -364,6 +370,12 @@ int MediaSoapWrapper::addVideoEncoderConfiguration(AddVideoConfigReq& request, A
 {
     beforeMethodInvocation();
     return m_soapProxy->AddVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addPTZConfiguration(AddPTZConfigReq& request, AddPTZConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddPTZConfiguration(m_endpoint, NULL, &request, &response);
 }
 
 int MediaSoapWrapper::setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response)
@@ -496,10 +508,41 @@ int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& r
     return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
 }
 
-int PtzSoapWrapper::GetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response)
+int PtzSoapWrapper::doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response)
 {
     beforeMethodInvocation();
-    return m_soapProxy->GetServiceCapabilities(m_endpoint, NULL, &request, &response);
+    int rez = m_soapProxy->GetNode(m_endpoint, NULL, &request, &response);
+    if (rez != SOAP_OK)
+    {
+        qWarning() << "PTZ settings reading error: " << m_endpoint <<  ". " << getLastError();
+    }
+    return rez;
+}
+
+int PtzSoapWrapper::doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodesResponse& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetNodes(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
+int PtzSoapWrapper::doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->ContinuousMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->Stop(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetServiceCapabilities(m_endpoint, NULL, &request, &response);
+    return rez;
 }
 
 //
