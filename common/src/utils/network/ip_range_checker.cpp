@@ -14,6 +14,7 @@ struct QnIprangeCheckerHelper
     {
         online = false;
         
+        QString ips = QHostAddress(ip).toString();
 
         CLSimpleHTTPClient http (QHostAddress(ip), 80, 1500, QAuthenticator());
         CLHttpStatus status = http.doGET(QByteArray(""));
@@ -72,12 +73,6 @@ QList<QHostAddress> QnIprangeChecker::onlineHosts(QHostAddress startAddr, QHostA
         if(h.online)
             result.push_back(QHostAddress(h.ip));
     }
-
-    foreach(QHostAddress addr, result)
-    {
-        qDebug() << addr.toString();
-    }
-    
 
     return result;
 }

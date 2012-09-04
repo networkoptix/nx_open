@@ -125,6 +125,7 @@ QnAbstractStorageResourceList QnCameraAdditionDialog::tableStorages() const {
     }
 
     return result;*/
+    return QnAbstractStorageResourceList();
 }
 
 bool QnCameraAdditionDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {

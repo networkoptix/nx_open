@@ -147,7 +147,7 @@ QString QnPlDroidResourceSearcher::manufacture() const
     return QLatin1String(QnDroidResource::MANUFACTURE);
 }
 
-QnResourcePtr QnPlDroidResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlDroidResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth)
 {
     return QnResourcePtr(0);
 }
