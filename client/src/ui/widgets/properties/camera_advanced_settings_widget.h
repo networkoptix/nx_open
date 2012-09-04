@@ -56,10 +56,10 @@ protected:
     virtual void setParam(const CameraSettingValue& val);
 
 protected:
-    CameraSetting& mParam;
-    QObject* mHandler;
-    QWidget* mWidget;
-    QHBoxLayout *mlayout;
+    CameraSetting& m_param;
+    QObject* m_handler;
+    QWidget* m_widget;
+    QHBoxLayout *m_layout;
     QString m_hint;
 };
 //==============================================
@@ -98,7 +98,7 @@ public slots:
 
 private:
     QnSettingsSlider* m_slider;
-    QGroupBox* groupBox;
+    QGroupBox* m_groupBox;
 };
 //==============================================
 class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
@@ -137,7 +137,7 @@ private slots:
     void onClicked();
 
 private:
-    CameraSetting dummyVal;
+    CameraSetting m_dummyVal;
 };
 
 //==============================================
@@ -175,8 +175,8 @@ private slots:
     void onMaxReleased();
 
 private:
-    QPushButton* minBtn;
-    QPushButton* maxBtn;
+    QPushButton* m_minBtn;
+    QPushButton* m_maxBtn;
 };
 
 #endif //camera_settings_widgets_h_1214
