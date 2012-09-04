@@ -34,8 +34,8 @@ public:
     enum WIDGET_TYPE { None, Value, OnOff, Boolean, MinMaxStep, Enumeration, Button, TextField, ControlButtonsPair };
 
     static WIDGET_TYPE typeFromStr(const QString& value);
-
     static QString strFromType(const WIDGET_TYPE value);
+    static bool isTypeWithoutValue(const WIDGET_TYPE value);
 
     static QString& SEPARATOR;
 

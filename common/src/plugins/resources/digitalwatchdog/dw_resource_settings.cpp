@@ -38,12 +38,13 @@ bool DWCameraProxy::getFromCameraImpl(const QByteArray& query)
         return true;
     }
 
-    //ToDo: log warning
+    qWarning() << "DWCameraProxy::getFromCameraImpl: HTTP GET request '" << query.data() << "' failed: status: " << status;
     return false;
 }
 
 void DWCameraProxy::fetchParamsFromHttpRespons(const QByteArray& body)
 {
+    //Fetching params sent in JSON format
     QList<QByteArray> lines = body.split(',');
     for (int i = 0; i < lines.size(); ++i) 
     {
@@ -58,7 +59,8 @@ void DWCameraProxy::fetchParamsFromHttpRespons(const QByteArray& body)
 
 bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
 {
-    if (src.getType() == CameraSetting::Button || src.getType() == CameraSetting::ControlButtonsPair) {
+    //If type doesn't contain value, we shouldn't ask camera for it
+    if (CameraSetting::isTypeWithoutValue(src.getType())) {
         return true;
     }
 
@@ -66,13 +68,7 @@ bool DWCameraProxy::getFromCamera(DWCameraSetting& src)
         return false;
     }
 
-    QHash<QString,QString>::ConstIterator it = m_bufferedValues.find(src.getQuery());
-    if (it == m_bufferedValues.end()) {
-        return false;
-    }
-
-    src.setCurrent(src.getIntStrAsCurrent(it.value()));
-    return true;
+    return getFromBuffer(src);
 }
 
 bool DWCameraProxy::setToCamera(DWCameraSetting& src)
@@ -81,8 +77,7 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 
     bool res = src.getMethod() == QString::fromLatin1("POST")? setToCameraPost(src, desiredVal) :
         setToCameraGet(src, desiredVal);
-    res = getFromCameraImpl() && res;
-    res = getFromCamera(src) && res;    
+    res = getFromCamera(src) && res; //If we set incorrect value, camera will silently ignore it, so we need to compare desired value with actual
 
     return res && desiredVal == src.getCurrentAsIntStr();
 }
@@ -92,6 +87,7 @@ bool DWCameraProxy::setToCameraGet(DWCameraSetting& src, const QString& desiredV
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     QString paramQuery = src.getQuery();
 
+    //Todo: get rid of tricky logic
     if (src.getType() == CameraSetting::ControlButtonsPair) {
         paramQuery = paramQuery + QString::fromLatin1("=") + desiredVal;
     } else {
@@ -108,6 +104,7 @@ bool DWCameraProxy::setToCameraPost(DWCameraSetting& src, const QString& desired
     QString paramQuery = src.getQuery();
     QByteArray query;
 
+    //Todo: get rid of tricky logic
     if (paramQuery.startsWith(QLatin1String("/"))) {
         query = paramQuery.toLatin1();
         paramQuery = QString::fromLatin1("action=all");
@@ -194,6 +191,7 @@ void DWCameraSetting::initAdditionalValues()
     if (getType() == CameraSetting::OnOff)
     {
         QString stepStr = getStep();
+        //Step is required, because not always Off = 0 and On = 1
         unsigned int step = stepStr.isEmpty()? 1 : stepStr.toUInt();
 
         while (step-- > 0) {
@@ -221,7 +219,8 @@ QString DWCameraSetting::getCurrentAsIntStr() const
         }
     }
 
-    //Log warning
+    qWarning() << "DWCameraSetting::getCurrentAsIntStr: advanced settings current value doesn't match any correct value. "
+        << "Value state: " << serializeToStr();
     return QString();
 }
 
@@ -234,8 +233,7 @@ QString DWCameraSetting::getIntStrAsCurrent(const QString& numStr) const
 
     int i = numStr.toInt();
     if (i < 0 || i >= m_enumStrToInt.size()) {
-        //ToDo: Log warning, currently let's be assert
-        Q_ASSERT(false);
+        qWarning() << "DWCameraSetting::getIntStrAsCurrent: index " << numStr << " is out of range. Value state: " << serializeToStr();
         return QString();
     }
 
@@ -263,7 +261,11 @@ DWCameraSettingReader::~DWCameraSettingReader()
 
 bool DWCameraSettingReader::isGroupEnabled(const QString& id, const QString& /*parentId*/, const QString& /*name*/)
 {
-    //ToDo: check for the duplicated id
+    if (m_settings.contains(id)) {
+        qWarning() << "DWCameraSettingReader::isGroupEnabled: id=" << id << " found multiple times!";
+        return true;
+    }
+
     m_settings.insert(id, DWCameraSetting());
     return true;
 }

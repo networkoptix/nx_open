@@ -159,6 +159,11 @@ QString CameraSetting::strFromType(const WIDGET_TYPE value)
     }
 }
 
+bool CameraSetting::isTypeWithoutValue(const WIDGET_TYPE value)
+{
+    return value == Button || value == ControlButtonsPair;
+}
+
 CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE type,
         const QString& query, const QString& method, const QString& description, const CameraSettingValue min,
         const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
@@ -176,14 +181,17 @@ CameraSetting::CameraSetting(const QString& id, const QString& name, WIDGET_TYPE
     switch (m_type)
     {
         case OnOff:
+            //For this type, min and max values are constant
             m_min = CAMERA_SETTING_VAL_OFF;
             m_max = CAMERA_SETTING_VAL_ON;
             break;
         case TextField:
+            //For this type, min and max values are not required, so insert dummy values
             m_min = QString::fromLatin1("min");
             m_max = QString::fromLatin1("max");
             break;
         case ControlButtonsPair:
+            //For this type, 'current' is not defined unless user presses min or max buttons
             m_current = m_step;
             break;
         default:
