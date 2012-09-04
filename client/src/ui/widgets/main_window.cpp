@@ -245,9 +245,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
-
-
-    connect(action(Qn::IncrementDebugCounterAction), SIGNAL(triggered()), this, SLOT(test()));
 }
 
 QnMainWindow::~QnMainWindow() {

@@ -84,10 +84,6 @@ protected slots:
     void at_sessionManager_error(int error);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
-    void test() {
-        setOptions(m_options ^ WindowButtonsVisible);
-    }
-
 private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
