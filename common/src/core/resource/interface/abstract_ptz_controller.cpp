@@ -4,6 +4,7 @@
 #include "api/app_server_connection.h"
 #include "core/resource/camera_resource.h"
 #include "api/api_fwd.h"
+#include "core/resource/param.h"
 
 QnAbstractPtzController::QnAbstractPtzController(QnResourcePtr netRes)
 {
