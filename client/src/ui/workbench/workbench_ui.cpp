@@ -444,7 +444,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
     connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
-    connect(action(Qn::MainMenuAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_mainMenuAction_triggered()));
 
 
     /* Help window. */
@@ -1467,24 +1466,6 @@ void QnWorkbenchUi::at_fullscreenAction_triggered() {
     if(m_inFreespace)
         at_freespaceAction_triggered();
 }
-
-void QnWorkbenchUi::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    const char *inShowMenuPropertyName = "_qn_inShowMenu";
-
-    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
-    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
-        if(menu)
-            menu->hide();
-    } else {
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
-        m_mainMenuButton->click(); /* This call starts event loop. */
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
-    }
-}
-
 
 void QnWorkbenchUi::at_fpsChanged(qreal fps) {
     m_fpsItem->setText(QString::number(fps, 'g', 4));

@@ -173,7 +173,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -563,19 +562,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    const char *inShowMenuPropertyName = "_qn_inShowMenu";
-
-    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
-    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
-        if(menu)
-            menu->hide();
-    } else {
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
-        m_mainMenuButton->click(); /* This call starts event loop. */
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
-    }
-}

@@ -83,7 +83,6 @@ protected slots:
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_sessionManager_error(int error);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
-    void at_mainMenuAction_triggered();
 
     void test() {
         setOptions(m_options ^ WindowButtonsVisible);
