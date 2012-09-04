@@ -764,6 +764,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
@@ -773,6 +774,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory().
