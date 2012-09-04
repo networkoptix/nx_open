@@ -13,7 +13,6 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
-
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
@@ -22,6 +21,9 @@ public:
 
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
+
+signals:
+    void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
 
 private:
     bool m_scheduleDisabled;

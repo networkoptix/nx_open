@@ -7,6 +7,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -284,10 +285,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
-    foreach(const QnVirtualCameraResourcePtr &camera, resourcePool()->getResources().filtered<QnVirtualCameraResource>())
-        if(!camera->isScheduleDisabled())
-            return Qn::EnabledAction;
-    return Qn::DisabledAction;
+    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {

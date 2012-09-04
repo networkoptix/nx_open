@@ -68,6 +68,7 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -226,11 +227,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
+    at_scheduleWatcher_scheduleEnabledChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -2239,6 +2242,10 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
+}
+
+void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
+    action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled());
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
