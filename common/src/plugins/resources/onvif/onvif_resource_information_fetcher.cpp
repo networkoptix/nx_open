@@ -3,6 +3,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
@@ -60,7 +61,11 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //TODO:UTF unuse std::string
     DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
-    soapWrapper.fetchLoginPassword(info.manufacturer);
+    QnNetworkResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId);
+    if (existResource)
+        soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
+    else
+        soapWrapper.fetchLoginPassword(info.manufacturer);
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
