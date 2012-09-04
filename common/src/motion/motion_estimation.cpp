@@ -911,7 +911,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
 #define ANALIZE_PER_PIXEL_DIF
 #ifdef ANALIZE_PER_PIXEL_DIF
-    if (m_totalFrames > 0)
+    // do not calc motion if resolution just changed
+    if (m_frames[0]->width == m_frames[1]->width && m_frames[0]->height == m_frames[1]->height  && m_frames[0]->format == m_frames[1]->format) 
     {
         // calculate difference between frames
         if (m_xStep == 8)
