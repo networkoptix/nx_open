@@ -288,6 +288,7 @@ protected:
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
+    Qn::RenderStatus channelRenderStatus(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
 

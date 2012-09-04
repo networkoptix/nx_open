@@ -520,7 +520,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
-        QString error = QString::fromLatin1("Currently parameters can't be saved. Connection refused.");
+        QString error = QString::fromLatin1("Connection refused");
 
         QString failedParams;
         QList< QPair< QString, QVariant> >::ConstIterator it =
@@ -533,14 +533,11 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         }
 
         if (!failedParams.isEmpty()) {
-            QnResourceListDialog::exec(
+            QMessageBox::warning(
                 widget(),
-                QnResourceList(),
-                tr("Error"),
-                tr(error.toLatin1()),
-                tr("Failed to save the following parameters:\n%1").arg(failedParams),
-                QDialogButtonBox::Ok
-                );
+                tr("Currently parameters can't be saved."),
+                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
+                1, 0);
 
             cameraSettingsDialog()->widget()->updateFromResources();
         }
@@ -1982,7 +1979,7 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
             tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
             1, 0);
 
-        //ToDo: restore old values by invoking smth like updateFromResource();
+        cameraSettingsDialog()->widget()->updateFromResources();
     }
 }
 

@@ -764,6 +764,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
@@ -773,6 +774,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory().
@@ -856,7 +858,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Thumbnails Search...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, true, this));
+        condition(new QnExportActionCondition(this));
 
     factory().
         flags(Qn::Slider).

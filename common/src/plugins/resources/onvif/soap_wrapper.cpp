@@ -72,10 +72,6 @@ void SoapWrapper<T>::cleanLoginPassword()
 template <class T>
 void SoapWrapper<T>::setLoginPassword(const std::string& login, const std::string& passwd)
 {
-    if (login.empty()) {
-        return;
-    }
-
     cleanLoginPassword();
 
     m_login = new char[login.size() + 1];
@@ -238,6 +234,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
                 qDebug() << "User is NOT created";
             }
 
+            setLoginPassword(std::string(), std::string());
             return false;
         }
 
@@ -247,6 +244,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
 
     } while (true);
 
+    setLoginPassword(std::string(), std::string());
     return false;
 }
 
