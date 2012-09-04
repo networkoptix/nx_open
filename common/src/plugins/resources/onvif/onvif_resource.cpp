@@ -103,12 +103,14 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_needUpdateOnvifUrl(false),
     m_forceCodecFromPrimaryEncoder(false),
     m_onvifAdditionalSettings(0),
-    m_timeDrift(0)
+    m_timeDrift(0),
+    m_ptzController(0)
 {
 }
 
 QnPlOnvifResource::~QnPlOnvifResource() {
     delete m_onvifAdditionalSettings;
+    delete m_ptzController;
 }
 
 
@@ -1599,6 +1601,16 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
         setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
     }
 
+
+    if (m_ptzController == 0) 
+    {
+        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer(), QLatin1String(QnOnvifStreamReader::NETOPTIX_PRIMARY_TOKEN));
+        if (!controller->getPtzNodeToken().isEmpty())
+            m_ptzController = controller;
+        else
+            delete controller;
+    }
+
     QMutexLocker lock(&m_physicalParamsMutex);
 
     if (m_onvifAdditionalSettings) {
@@ -1691,4 +1703,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
             currentFps -= (currentFps-rangeLow+1)/2;
         }
     }
+}
+
+QnOnvifPtzController* QnPlOnvifResource::getPtzController()
+{
+    return m_ptzController;
 }

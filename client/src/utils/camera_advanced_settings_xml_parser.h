@@ -81,15 +81,14 @@ class CameraSettingsWidgetsCreator: public QObject, public CameraSettingReader
         QString getParentId() { return m_parentId; }
     };
 
-    typedef QHash<QString, WidgetAndParent*> WidgetsAndParentsById;
-
 public:
     typedef QHash<QString, QTreeWidgetItem*> TreeWidgetItemsById;
     typedef QHash<QString, int> LayoutIndById;
     typedef QHash<QString, QnAbstractSettingsWidget*> SettingsWidgetsById;
+    typedef QHash<QString, WidgetAndParent*> EmptyGroupsById;
 
     CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, QObject* handler);
+        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById, QObject* handler);
 
     virtual ~CameraSettingsWidgetsCreator();
 
@@ -115,7 +114,6 @@ private:
 
     CameraSettingsWidgetsCreator();
 
-    void removeEmptyWidgetGroups();
     void removeLayoutItems();
     QTreeWidgetItem* findParentForParam(const QString& parentId);
     bool isEnabledByOtherSettings(const QString& id, const QString& parentId);
@@ -127,9 +125,9 @@ private:
     TreeWidgetItemsById& m_treeWidgetsById;
     LayoutIndById& m_layoutIndById;
     SettingsWidgetsById& m_settingsWidgetsById;
+    EmptyGroupsById& m_emptyGroupsById;
     QObject* m_handler;
     QWidget* m_owner;
-    WidgetsAndParentsById m_emptyGroupsById;
 };
 
 //
@@ -198,12 +196,14 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
     typedef CameraSettingsWidgetsCreator::TreeWidgetItemsById TreeWidgetItemsById;
     typedef CameraSettingsWidgetsCreator::LayoutIndById LayoutIndById;
     typedef CameraSettingsWidgetsCreator::SettingsWidgetsById SettingsWidgetsById;
+    typedef CameraSettingsWidgetsCreator::EmptyGroupsById EmptyGroupsById;
 
     QTreeWidget& m_rootWidget;
     QStackedLayout& m_rootLayout;
     TreeWidgetItemsById m_treeWidgetsById;
     LayoutIndById m_layoutIndById;
     SettingsWidgetsById m_settingsWidgetsById;
+    EmptyGroupsById m_emptyGroupsById;
     QObject* m_handler;
     CameraSettings* m_settings;
     QString m_id;
@@ -211,6 +211,9 @@ class CameraSettingsWidgetsTreeCreator: public CameraSettingTreeReader<CameraSet
 
 protected:
     virtual CameraSettings& getAdditionalInfo() override;
+
+private:
+    void removeEmptyWidgetGroups();
 
 public:
 

@@ -59,6 +59,8 @@
 #include "rest/handlers/manual_camera_addition.h"
 #include "rest/server/rest_connection_processor.h"
 #include "rtsp/rtsp_connection.h"
+#include "network/default_tcp_connection_processor.h"
+#include "rest/handlers/ptz_rest_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -727,11 +729,13 @@ void QnMain::run()
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualAddcams", new QnManualCameraAdditionHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspUrl.port());
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
     m_universalTcpListener->start();
 #else
     m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
