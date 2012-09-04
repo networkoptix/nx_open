@@ -1961,8 +1961,7 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
 {
-    QString error = QString::fromLatin1("Currently parameters can't be saved. ");
-    error += httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now."):
+    QString error = httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now"):
         QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
 
     QString failedParams;
@@ -1977,14 +1976,11 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     }
 
     if (!failedParams.isEmpty()) {
-        QnResourceListDialog::exec(
+        QMessageBox::warning(
             widget(),
-            QnResourceList(),
-            tr("Error"),
-            tr(error.toLatin1()),
-            tr("Failed to save the following parameters:\n%1").arg(failedParams),
-            QDialogButtonBox::Ok
-            );
+            tr("Currently parameters can't be saved."),
+            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
+            1, 0);
 
         //ToDo: restore old values by invoking smth like updateFromResource();
     }
