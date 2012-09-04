@@ -856,7 +856,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Thumbnails Search...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, true, this));
+        condition(new QnExportActionCondition(this));
 
     factory().
         flags(Qn::Slider).

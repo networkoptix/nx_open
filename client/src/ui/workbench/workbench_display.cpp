@@ -1352,6 +1352,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         qint64 time;
         if(thumbnailed) {
             time = searchState.period.startTimeMs + searchState.step * i;
+            widget->item()->setData(Qn::ItemTimeRole, time);
         } else {
             time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
         }
@@ -1394,8 +1395,20 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
 
     int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
     QList<QnResourceWidget *> widgets = this->widgets();
-    if(index < 0 || index >= widgets.size())
+    if(index < 0)
         return;
+    if(index >= widgets.size()) {
+        foreach(QnResourceWidget *widget, this->widgets()) {
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+                if(!mediaWidget->display()->camDisplay()->isRunning()) {
+                    mediaWidget->display()->camDisplay()->setMTDecoding(false);
+                    mediaWidget->display()->camDisplay()->start();
+                    mediaWidget->display()->archiveReader()->startPaused();
+                }
+            }
+        }
+        return;
+    }
 
     qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
