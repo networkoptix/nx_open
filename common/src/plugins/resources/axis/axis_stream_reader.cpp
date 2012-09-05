@@ -23,7 +23,7 @@ QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
 
 QnAxisStreamReader::~QnAxisStreamReader()
 {
-
+    stop();
 }
 
 int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
