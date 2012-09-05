@@ -420,7 +420,7 @@ bool checkIfAppServerIsOld()
     QUrl httpUrl;
     httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
     httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme("http");
+    httpUrl.setScheme("https");
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 
