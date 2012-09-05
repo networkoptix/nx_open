@@ -103,12 +103,14 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_needUpdateOnvifUrl(false),
     m_forceCodecFromPrimaryEncoder(false),
     m_onvifAdditionalSettings(0),
-    m_timeDrift(0)
+    m_timeDrift(0),
+    m_ptzController(0)
 {
 }
 
 QnPlOnvifResource::~QnPlOnvifResource() {
     delete m_onvifAdditionalSettings;
+    delete m_ptzController;
 }
 
 
@@ -574,6 +576,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             {
                 setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
             }
+            if (response.Capabilities->PTZ) 
+            {
+                setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
+            }
         }
     }
 
@@ -873,6 +879,18 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
 {
     QMutexLocker lock(&m_mutex);
     m_imagingUrl = src;
+}
+
+void QnPlOnvifResource::setPtzfUrl(const QString& src) 
+{
+    QMutexLocker lock(&m_mutex);
+    m_ptzUrl = src;
+}
+
+QString QnPlOnvifResource::getPtzfUrl() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ptzUrl;
 }
 
 void QnPlOnvifResource::save()
@@ -1599,6 +1617,16 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
         setParam(it.key(), it.value().serializeToStr(), QnDomainPhysical);
     }
 
+
+    if (m_ptzController == 0) 
+    {
+        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer());
+        if (!controller->getPtzConfigurationToken().isEmpty())
+            m_ptzController = controller;
+        else
+            delete controller;
+    }
+
     QMutexLocker lock(&m_physicalParamsMutex);
 
     if (m_onvifAdditionalSettings) {
@@ -1691,4 +1719,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
             currentFps -= (currentFps-rangeLow+1)/2;
         }
     }
+}
+
+QnOnvifPtzController* QnPlOnvifResource::getPtzController()
+{
+    return m_ptzController;
 }

@@ -154,7 +154,7 @@ void QnSettingsMinMaxStepWidget::refresh()
 
 void QnSettingsMinMaxStepWidget::onValChanged(int val)
 {
-    m_groupBox->setTitle(m_param.getName() + QLatin1Char('(') + QString::number(val) + QLatin1Char(')'));
+    m_groupBox->setTitle(m_param.getName() + QLatin1String(" (") + QString::number(val) + QLatin1Char(')'));
 }
 
 void QnSettingsMinMaxStepWidget::onValChanged()

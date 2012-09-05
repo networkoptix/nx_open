@@ -12,7 +12,8 @@
 #include "core/datapacket/mediadatapacket.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
-
+#include "core/resource/interface/abstract_ptz_controller.h"
+#include "onvif_ptz_controller.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -129,6 +130,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    void setPtzfUrl(const QString& src);
+    QString getPtzfUrl() const;
+
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec(bool isPrimary) const;
@@ -138,6 +142,8 @@ public:
 
     bool forcePrimaryEncoderCodec() const;
     int calcTimeDrift() const; // return clock diff between camera and local clock at seconds
+
+    virtual QnOnvifPtzController* getPtzController() override;
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -187,6 +193,7 @@ private:
     int getH264StreamProfile(const VideoOptionsResp& response);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    void readPtzInfo();
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
@@ -225,8 +232,10 @@ private:
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;
+    QnOnvifPtzController* m_ptzController;
 
     QString m_imagingUrl;
+    QString m_ptzUrl;
     int m_timeDrift;
 };
 

@@ -152,8 +152,10 @@ void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayout
         return;
     }
 
-    if(*pos == item)
+    if(*pos == item) {
+        pos->dataByRole = item.dataByRole; // TODO: hack hack hack
         return;
+    }
 
     *pos = item;
 

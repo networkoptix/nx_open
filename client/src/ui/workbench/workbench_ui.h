@@ -201,7 +201,6 @@ protected slots:
     void setTreeShowButtonUsed(bool used = true);
     void setHelpShowButtonUsed(bool used = true);
 
-    void at_mainMenuAction_triggered();
     void at_freespaceAction_triggered();
     void at_fullscreenAction_triggered();
     void at_activityStopped();

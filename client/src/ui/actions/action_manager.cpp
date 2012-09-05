@@ -346,17 +346,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
-        autoRepeat(false);
-
-    factory(Qn::LightMainMenuAction).
-        flags(Qn::NoTarget).
-        text(tr("Main Menu")).
-        icon(qnSkin->icon("main_menu_fullscreen.png"));
-
-    factory(Qn::DarkMainMenuAction).
-        flags(Qn::NoTarget).
-        text(tr("Main Menu")).
-        icon(qnSkin->icon("main_menu_windowed.png"));
+        autoRepeat(false).
+        icon(qnSkin->icon("main_menu.png"));
 
     factory(Qn::ConnectToServerAction).
         flags(Qn::Main).
@@ -764,6 +755,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Camera Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::live_cam), Qn::Any, this));
 
     factory(Qn::OpenInCameraSettingsDialogAction).
@@ -773,6 +765,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ServerSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(tr("Server Settings...")).
+        requiredPermissions(Qn::WritePermission).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory().
@@ -856,7 +849,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Thumbnails Search...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, true, this));
+        condition(new QnExportActionCondition(this));
 
     factory().
         flags(Qn::Slider).

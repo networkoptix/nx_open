@@ -22,12 +22,12 @@ typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
+public:
     static const char* NETOPTIX_PRIMARY_NAME;
     static const char* NETOPTIX_SECONDARY_NAME;
     static const char* NETOPTIX_PRIMARY_TOKEN;
     static const char* NETOPTIX_SECONDARY_TOKEN;
 
-public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
     const QnResourceAudioLayout* getDPAudioLayout() const;

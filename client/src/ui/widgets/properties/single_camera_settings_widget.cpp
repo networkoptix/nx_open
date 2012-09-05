@@ -521,7 +521,6 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         return;
     }
 
-    QVariant id;
     if (!m_camera || m_camera->getUniqueId() != m_widgetsRecreator->getCameraId()) {
         //If so, we received update for some other camera
         return;

@@ -405,6 +405,10 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
+Qn::RenderStatus QnResourceWidget::channelRenderStatus(int channel) const {
+    return m_channelState[channel].renderStatus;
+}
+
 bool QnResourceWidget::isDecorationsVisible() const {
     return !qFuzzyIsNull(m_headerOverlayWidget->opacity()); /* Note that it's OK to check only header opacity here. */
 }
