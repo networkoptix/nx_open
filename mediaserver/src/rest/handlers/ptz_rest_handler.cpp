@@ -139,9 +139,9 @@ QString QnPtzRestHandler::description(TCPSocket* tcpSocket) const
     rez += "<b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff) <BR>";
     rez += "<b>api/ptz/getCalibrate</b> - read current calibration settings <BR>";
     rez += "All commands uses same input arguments except of 'getCalibrate' there is not arguments";
-    rez += "<BR>Param <b>xSpeed</b> - rorate X velocity in range [-1..+1]";
-    rez += "<BR>Param <b>ySpeed</b> - rorate Y velocity in range [-1..+1]";
-    rez += "<BR>Param <b>zoom</b> - zoom velocity in range [-1..+1]";
+    rez += "<BR>Param <b>xSpeed</b> - rotation X velocity in range [-1..+1]";
+    rez += "<BR>Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1]";
+    rez += "<BR>Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1]";
     rez += "<BR>Returns 'OK' if PTZ command complete success. Otherwise returns error message. For getCalibrate command returns XML with coeffecients";
     return rez;
 }
