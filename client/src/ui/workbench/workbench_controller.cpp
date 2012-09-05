@@ -444,7 +444,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DisplayMotion, display);
+        widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
 }
 
@@ -1011,7 +1011,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+    widget->setOption(QnResourceWidget::DisplayMotion, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             if(QnMediaResourceWidget *otherMediaWidget = dynamic_cast<QnMediaResourceWidget *>(otherWidget))
@@ -1238,7 +1238,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotion))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->options() & QnResourceWidget::DisplayMotion))
             hidden = true;
 
     if(hidden) {

@@ -92,11 +92,12 @@ private slots:
     void at_renderer_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
+    void at_ptzButton_toggled(bool checked);
 
 protected:
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
-    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) override;
+    virtual void optionsChangedNotify(Options changedFlags) override;
 
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;

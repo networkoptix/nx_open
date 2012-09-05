@@ -150,8 +150,8 @@ protected slots:
 
     void at_widget_motionSelectionChanged(QnMediaResourceWidget *widget);
     void at_widget_motionSelectionChanged();
-    void at_widget_displayFlagsChanged(QnResourceWidget *widget);
-    void at_widget_displayFlagsChanged();
+    void at_widget_optionsChanged(QnResourceWidget *widget);
+    void at_widget_optionsChanged();
 
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);

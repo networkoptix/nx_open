@@ -72,7 +72,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
-            if(static_cast<bool>(widget->displayFlags() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
+            if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
                 return Qn::EnabledAction;
         } else {
             return Qn::EnabledAction;
@@ -89,7 +89,7 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
         if(!widget)
             continue;
 
-        if(widget->displayFlags() & QnResourceWidget::DisplayMotion) {
+        if(widget->options() & QnResourceWidget::DisplayMotion) {
             hasDisplayedGrid = true;
 
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
