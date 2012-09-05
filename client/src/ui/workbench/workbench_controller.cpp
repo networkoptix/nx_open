@@ -63,6 +63,7 @@
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
+#include <ui/graphics/instruments/ptz_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -215,6 +216,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
+    PtzInstrument *ptzInstrument = new PtzInstrument(this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -239,6 +241,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_itemLeftClickInstrument);
     m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
+    m_manager->installInstrument(ptzInstrument);
 
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, dndEventTypes, this));
