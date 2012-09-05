@@ -263,6 +263,7 @@ QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
 {
     QnVideoServerResourceList servers;
     QByteArray errorString;
+    serverPtr->setStatus(QnResource::Online);
     if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
