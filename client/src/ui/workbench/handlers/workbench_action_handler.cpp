@@ -160,8 +160,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
-    connect(action(Qn::LightMainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
-    connect(action(Qn::DarkMainMenuAction),                     SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
     connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -723,8 +722,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
-    action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
-    action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
+    action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {

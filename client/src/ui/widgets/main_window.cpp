@@ -173,7 +173,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -196,7 +195,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * main menu is updated. However, menu buttons do not activate their corresponding 
      * actions as they do not receive release events. We work this around by making
      * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction), 1.5);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
@@ -246,9 +245,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
-
-
-    connect(action(Qn::IncrementDebugCounterAction), SIGNAL(triggered()), this, SLOT(test()));
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -563,19 +559,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    const char *inShowMenuPropertyName = "_qn_inShowMenu";
-
-    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
-    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
-        if(menu)
-            menu->hide();
-    } else {
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
-        m_mainMenuButton->click(); /* This call starts event loop. */
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
-    }
-}
