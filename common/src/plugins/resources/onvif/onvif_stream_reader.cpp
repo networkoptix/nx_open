@@ -626,7 +626,6 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
 
     if (getRole() == QnResource::Role_LiveVideo && m_onvifRes->getPtzController())
     {
-        m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
         if (profile.PTZConfiguration == 0)
         {
             AddPTZConfigReq request;
@@ -636,13 +635,19 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
             request.ConfigurationToken = m_onvifRes->getPtzController()->getPtzConfigurationToken().toStdString();
 
             int soapRes = soapWrapper.addPTZConfiguration(request, response);
-            if (soapRes != SOAP_OK) {
-                qCritical() << "QnOnvifStreamReader::addVideoEncoderConfiguration: can't add video encoder to profile. Gsoap error: " 
+            if (soapRes == SOAP_OK) {
+                m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
+            }
+            else {
+                qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
                     << soapRes << ", description: " << soapWrapper.getLastError() 
                     << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
 
                 return false;
             }
+        }
+        else {
+            m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
         }
     }
 

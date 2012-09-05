@@ -19,14 +19,17 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
 
     QString action = path.mid(path.lastIndexOf('/') + 1);
     
-    qreal xSpeed = 1.0;
-    qreal ySpeed = 1.0;
-    qreal zoomSpeed = 1.0;
+    qreal xSpeed = 0;
+    qreal ySpeed = 0;
+    qreal zoomSpeed = 0;
+    
+    bool resParamFound = false;
 
     for (int i = 0; i < params.size(); ++i)
     {
         if (params[i].first == "res_id")
         {
+            resParamFound = true;
             res = qSharedPointerDynamicCast<QnVirtualCameraResource> (QnResourcePool::instance()->getNetResourceByPhysicalId(params[i].second));
             if (res) {
                 errStr.clear();
@@ -52,7 +55,7 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
         else if (params[i].first == "zoomSpeed")
             zoomSpeed = params[i].second.toDouble();
     }
-    if (res == 0)
+    if (!resParamFound)
         errStr = QLatin1String("parameter 'res_id' is absent");
     else if (action.isEmpty())
     {
@@ -90,16 +93,18 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
         result.append("<root>\n");
         result.append(errStr);
         result.append("</root>\n");
-        return CODE_NOT_FOUND;
+        return CODE_INVALID_PARAMETER;
     }
 
     if (action == "move")
     {
-        ptz->startMove(xSpeed, ySpeed, zoomSpeed);
+        if (ptz->startMove(xSpeed, ySpeed, zoomSpeed) != 0)
+            errStr = "Error executing PTZ command";
     }
     else if (action == "stop")
     {
-        ptz->stopMove();
+        if (ptz->stopMove() != 0)
+            errStr = "Error executing PTZ command";
     }
     else {
         result.append("<root>\n");
@@ -108,10 +113,13 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     }
 
     result.append("<root>\n");
-    result.append("SUCCESS");
+    if (errStr.isEmpty())
+        result.append("SUCCESS");
+    else
+        result.append(errStr);
     result.append("</root>\n");
 
-    return CODE_OK;
+    return errStr.isEmpty() ? CODE_OK : CODE_INVALID_PARAMETER;
 
 }
 

@@ -14,7 +14,7 @@ QnAbstractPtzController::QnAbstractPtzController(QnResourcePtr netRes)
 
 void QnAbstractPtzController::getCalibrate(QnVirtualCameraResourcePtr res, qreal &xVelocityCoeff, qreal &yVelocityCoeff, qreal &zoomVelocityCoeff)
 {
-    QVariant val;
+    QVariant val = 1.0;
     res->getParam(QLatin1String("xVelocityCoeff"), val, QnDomainDatabase);
     xVelocityCoeff = val.toFloat();
     res->getParam(QLatin1String("yVelocityCoeff"), val, QnDomainDatabase);

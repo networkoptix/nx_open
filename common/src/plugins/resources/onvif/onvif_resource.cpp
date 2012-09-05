@@ -576,6 +576,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             {
                 setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
             }
+            if (response.Capabilities->PTZ) 
+            {
+                setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
+            }
         }
     }
 
@@ -875,6 +879,18 @@ void QnPlOnvifResource::setImagingUrl(const QString& src)
 {
     QMutexLocker lock(&m_mutex);
     m_imagingUrl = src;
+}
+
+void QnPlOnvifResource::setPtzfUrl(const QString& src) 
+{
+    QMutexLocker lock(&m_mutex);
+    m_ptzUrl = src;
+}
+
+QString QnPlOnvifResource::getPtzfUrl() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_ptzUrl;
 }
 
 void QnPlOnvifResource::save()
@@ -1604,8 +1620,8 @@ void QnPlOnvifResource::fetchAndSetCameraSettings()
 
     if (m_ptzController == 0) 
     {
-        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer(), QLatin1String(QnOnvifStreamReader::NETOPTIX_PRIMARY_TOKEN));
-        if (!controller->getPtzNodeToken().isEmpty())
+        QnOnvifPtzController* controller = new QnOnvifPtzController(toSharedPointer());
+        if (!controller->getPtzConfigurationToken().isEmpty())
             m_ptzController = controller;
         else
             delete controller;

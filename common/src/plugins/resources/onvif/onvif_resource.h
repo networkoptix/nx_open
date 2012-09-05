@@ -130,6 +130,9 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
+    void setPtzfUrl(const QString& src);
+    QString getPtzfUrl() const;
+
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec(bool isPrimary) const;
@@ -232,6 +235,7 @@ private:
     QnOnvifPtzController* m_ptzController;
 
     QString m_imagingUrl;
+    QString m_ptzUrl;
     int m_timeDrift;
 };
 

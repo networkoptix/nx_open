@@ -158,6 +158,8 @@ class _onvifPtz__GetNode;
 class _onvifPtz__GetNodeResponse;
 class _onvifPtz__GetNodes;
 class _onvifPtz__GetNodesResponse;
+class _onvifPtz__GetConfigurations;
+class _onvifPtz__GetConfigurationsResponse;
 
 typedef _onvifPtz__AbsoluteMove AbsoluteMoveReq;
 typedef _onvifPtz__AbsoluteMoveResponse AbsoluteMoveResp;
@@ -306,6 +308,7 @@ public:
     PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
     virtual ~PtzSoapWrapper();
 
+    int doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response);
     int doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodesResponse& response);
     int doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response);
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);

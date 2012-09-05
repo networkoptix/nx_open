@@ -3,25 +3,50 @@
 #include "soap_wrapper.h"
 #include "onvif/soapDeviceBindingProxy.h"
 
-QnOnvifPtzController::QnOnvifPtzController(QnResourcePtr res, const QString& mediaProfile): QnAbstractPtzController(res)
+QnOnvifPtzController::QnOnvifPtzController(QnResourcePtr res): QnAbstractPtzController(res)
 {
     m_res = qSharedPointerDynamicCast<QnPlOnvifResource> (res);
-    m_xNativeVelocityCoeff.first = m_xNativeVelocityCoeff.second = 1.0;
-    m_yNativeVelocityCoeff.first = m_yNativeVelocityCoeff.second = 1.0;
-    m_zoomNativeVelocityCoeff.first = m_zoomNativeVelocityCoeff.second = 1.0;
+    m_xNativeVelocityCoeff.first = 1.0;
+    m_yNativeVelocityCoeff.first = 1.0;
+    m_zoomNativeVelocityCoeff.first = 1.0;
+    m_xNativeVelocityCoeff.second = -1.0;
+    m_yNativeVelocityCoeff.second = -1.0;
+    m_zoomNativeVelocityCoeff.second = -1.0;
 
     // read PTZ params
 
-    _onvifPtz__GetNodes request;
-    _onvifPtz__GetNodesResponse response;
+    if (m_res->getPtzfUrl().isEmpty())
+        return;
+
     QAuthenticator auth(m_res->getAuth());
-    PtzSoapWrapper ptz (m_res->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
-    if (ptz.doGetNodes(request, response) == SOAP_OK)
+    PtzSoapWrapper ptz (m_res->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
+
+    _onvifPtz__GetConfigurations request;
+    _onvifPtz__GetConfigurationsResponse response;
+    if (ptz.doGetConfigurations(request, response) == SOAP_OK && response.PTZConfiguration.size() > 0)
     {
-        if (response.PTZNode.size() > 0) 
+        m_ptzConfigurationToken = QString::fromStdString(response.PTZConfiguration[0]->token);
+        //qCritical() << "reading PTZ configuration success. token=" << m_ptzConfigurationToken;
+    }
+    else {
+        //qCritical() << "reading PTZ configuration failed. " << ptz.getLastError();
+        return;
+    } 
+
+
+    _onvifPtz__GetNode nodeRequest;
+    _onvifPtz__GetNodeResponse nodeResponse;
+    nodeRequest.NodeToken = response.PTZConfiguration[0]->NodeToken;
+
+    if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK)
+    {
+        qCritical() << "reading PTZ token success";
+        if (nodeResponse.PTZNode) 
         {
-            onvifXsd__PTZNode* ptzNode = response.PTZNode[0];
-            m_ptzToken = QString::fromStdString(ptzNode[0].token);
+            //qCritical() << "reading PTZ token success and data exists";
+
+            onvifXsd__PTZNode* ptzNode = nodeResponse.PTZNode;
+            //m_ptzToken = QString::fromStdString(ptzNode[0].token);
             if (ptzNode[0].SupportedPTZSpaces) 
             {
                 onvifXsd__PTZSpaces* spaces = ptzNode[0].SupportedPTZSpaces;
@@ -44,13 +69,17 @@ QnOnvifPtzController::QnOnvifPtzController(QnResourcePtr res, const QString& med
             }
         }
     }
-    m_mediaProfile = mediaProfile;
+    else {
+        //qCritical() << "can't read PTZ node info. errCode=" << ptz.getLastError() << ". Use default ranges";
+    }
+
+    //qCritical() << "reading PTZ token finished. minX=" << m_xNativeVelocityCoeff.second;
 }
 
 int QnOnvifPtzController::stopMove()
 {
     QAuthenticator auth(m_res->getAuth());
-    PtzSoapWrapper ptz (m_res->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
+    PtzSoapWrapper ptz (m_res->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
     _onvifPtz__Stop request;
     _onvifPtz__StopResponse response;
 
@@ -58,6 +87,9 @@ int QnOnvifPtzController::stopMove()
         QMutexLocker lock(&m_mutex);
         request.ProfileToken = m_mediaProfile.toStdString();
     }    
+    bool StopValue = true;
+    request.PanTilt = &StopValue;
+    request.Zoom = &StopValue;
 
     int rez = ptz.doStop(request, response);
     if (rez != SOAP_OK)
@@ -67,17 +99,18 @@ int QnOnvifPtzController::stopMove()
     return rez;
 }
 
-float QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff)
+double QnOnvifPtzController::normalizeSpeed(qreal inputVelocity, const QPair<qreal, qreal>& nativeCoeff, qreal userCoeff)
 {
     inputVelocity *= inputVelocity >= 0 ? nativeCoeff.first : -nativeCoeff.second;
     inputVelocity *= userCoeff;
-    return qBound(nativeCoeff.second, inputVelocity, nativeCoeff.first);
+    double rez = qBound(nativeCoeff.second, inputVelocity, nativeCoeff.first);
+    return rez;
 }
 
 int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity)
 {
     QAuthenticator auth(m_res->getAuth());
-    PtzSoapWrapper ptz (m_res->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
+    PtzSoapWrapper ptz (m_res->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
     _onvifPtz__ContinuousMove request;
     _onvifPtz__ContinuousMoveResponse response;
 
@@ -94,6 +127,7 @@ int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoom
     request.Velocity->PanTilt->y = normalizeSpeed(yVelocity, m_yNativeVelocityCoeff, getYVelocityCoeff());
     request.Velocity->Zoom->x = normalizeSpeed(zoomVelocity, m_zoomNativeVelocityCoeff, getZoomVelocityCoeff());
 
+
     int rez = ptz.doContinuousMove(request, response);
     if (rez != SOAP_OK)
     {
@@ -107,35 +141,12 @@ int QnOnvifPtzController::startMove(qreal xVelocity, qreal yVelocity, qreal zoom
     return rez;
 }
 
-QString QnOnvifPtzController::getPtzNodeToken() const
-{
-    return m_ptzToken;
-}
-
 QString QnOnvifPtzController::getPtzConfigurationToken()
 {
-    if (!m_ptzConfigurationToken.isEmpty())
-        return m_ptzConfigurationToken;
-
-    QAuthenticator auth(m_res->getAuth());
-    MediaSoapWrapper media (m_res->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
-    CompatibleMetadataConfiguration request;
-    CompatibleMetadataConfigurationResp response;
-    {
-        QMutexLocker lock(&m_mutex);
-        request.ProfileToken = m_mediaProfile.toStdString();
-    }
-    if (media.getCompatibleMetadataConfigurations(request, response) == SOAP_OK)
-    {
-        if (response.Configurations.size() > 0)
-            m_ptzConfigurationToken = QString::fromStdString(response.Configurations[0]->token);
-        //m_ptzConfigurationToken = response.
-    }
     return m_ptzConfigurationToken;
 }
 
 void QnOnvifPtzController::setMediaProfileToken(const QString& value)
 {
-    QMutexLocker lock(&m_mutex);
     m_mediaProfile = value;
 }

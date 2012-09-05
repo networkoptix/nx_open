@@ -524,6 +524,13 @@ int PtzSoapWrapper::doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodes
     return rez;
 }
 
+int PtzSoapWrapper::doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetConfigurations(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
 int PtzSoapWrapper::doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response)
 {
     beforeMethodInvocation();
