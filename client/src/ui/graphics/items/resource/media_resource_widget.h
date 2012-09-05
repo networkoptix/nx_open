@@ -19,7 +19,9 @@ class QnMediaResourceWidget: public QnResourceWidget {
 
 public:
     static const Button MotionSearchButton = static_cast<Button>(0x8);
+    static const Button PtzButton = static_cast<Button>(0x10);
 #define MotionSearchButton MotionSearchButton
+#define PtzButton PtzButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -145,8 +147,6 @@ private:
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;
-
-    QnImageButtonWidget *m_searchButton;
 
     QStaticText m_sensStaticText[10];
 

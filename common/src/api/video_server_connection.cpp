@@ -263,7 +263,7 @@ int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr &camer
         SIGNAL(finished( int, const QList< QPair< QString, QVariant> >& )),
         target,
         slot,
-        Qt::QueuedConnection );
+        Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
     requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );

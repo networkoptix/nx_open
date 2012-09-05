@@ -504,7 +504,7 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
+    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
 }
 
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {

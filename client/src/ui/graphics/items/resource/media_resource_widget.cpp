@@ -69,13 +69,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
-    m_searchButton = new QnImageButtonWidget();
-    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    QnImageButtonWidget *searchButton = new QnImageButtonWidget();
+    searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
+    searchButton->setCheckable(true);
+    searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
-    buttonBar()->addButton(MotionSearchButton, m_searchButton);
+    //m_ptzButton = new QnImageButtonWidget();
+
+
+    buttonBar()->addButton(MotionSearchButton, searchButton);
     updateButtonsVisibility();
 }
 
@@ -435,7 +438,7 @@ void QnMediaResourceWidget::displayFlagsChangedNotify(DisplayFlags changedFlags)
         if (QnAbstractArchiveReader *reader = m_display->archiveReader())
             reader->setSendMotion(displayFlags() & DisplayMotion);
 
-        m_searchButton->setChecked(displayFlags() & DisplayMotion);
+        buttonBar()->setButtonsChecked(MotionSearchButton, displayFlags() & DisplayMotion);
 
         if(displayFlags() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);

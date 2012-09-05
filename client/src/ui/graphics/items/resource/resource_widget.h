@@ -49,6 +49,7 @@ public:
         DisplayMotion               = 0x4,  /**< Whether motion is to be displayed. */                              // TODO: this flag also handles smart search, separate!
         DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x20, // TODO
     };
     Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
 
