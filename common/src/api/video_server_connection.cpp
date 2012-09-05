@@ -203,7 +203,12 @@ namespace detail
         emit finished(status, m_operationResult);
         deleteLater();
     }
-}
+
+    void VideoServerSimpleReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
+        emit finished(status, handle);
+    }
+
+} // namespace detail
 
 // ---------------------------------- QnVideoServerConnection ---------------------
 
@@ -511,13 +516,27 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     deleteLater();
 }
 
-void TestReceiver::getParamsCompleted(int status, const QList< QPair< QString, QVariant> > &params)
-{
-    Q_UNUSED(status)
-    Q_UNUSED(params)
+int QnVideoServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot) {
+    detail::VideoServerSimpleReplyProcessor* processor = new detail::VideoServerSimpleReplyProcessor();
+    connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+    requestParams << QnRequestParam("xSpeed", QString::number(xSpeed));
+    requestParams << QnRequestParam("ySpeed", QString::number(ySpeed));
+    requestParams << QnRequestParam("zoomSpeed", QString::number(zoomSpeed));
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/move"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
-void TestReceiver::setParamCompleted(int status)
-{
-    Q_UNUSED(status)
+int QnVideoServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    detail::VideoServerSimpleReplyProcessor* processor = new detail::VideoServerSimpleReplyProcessor();
+    connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/stop"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
+
+

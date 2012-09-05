@@ -50,6 +50,7 @@ public:
         DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x20, // TODO
+        ControlPtz                  = 0x40, // TODO
     };
     Q_DECLARE_FLAGS(Options, Option)
 

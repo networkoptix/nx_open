@@ -11,6 +11,8 @@ public:
     PtzInstrument(QObject *parent = NULL);
     virtual ~PtzInstrument();
 
+protected:
+    virtual bool registeredNotify(QGraphicsItem *item) override;
 
 private:
 

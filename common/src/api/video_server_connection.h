@@ -19,6 +19,19 @@
 class VideoServerSessionManager;
 
 namespace detail {
+    class VideoServerSimpleReplyProcessor: public QObject
+    {
+        Q_OBJECT;
+    public:
+        VideoServerSimpleReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+
+    signals:
+        void finished(int status, int handle);
+    };
+
     class VideoServerSessionManagerReplyProcessor: public QObject
     {
         Q_OBJECT;
@@ -26,7 +39,7 @@ namespace detail {
         VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle);
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
 
     signals:
         void finished(int status, const QnTimePeriodList& timePeriods, int handle);
@@ -177,9 +190,8 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-
-    int asyncMove(const QnNetworkResourcePtr &);
-
+    int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
+    int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
 private:
     int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
@@ -195,15 +207,5 @@ private:
     static int m_proxyPort;
 };
 
-
-// TODO: what is the purpose of this class?
-class TestReceiver: public QObject
-{
-    Q_OBJECT
-
-public slots:
-    void getParamsCompleted( int status, const QList< QPair< QString, QVariant> >& params );
-    void setParamCompleted( int status );
-};
 
 #endif // __VIDEO_SERVER_CONNECTION_H_
