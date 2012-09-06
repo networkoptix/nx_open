@@ -194,11 +194,7 @@ QnAbstractStorageResourcePtr createDefaultStorage()
     //QnStorageResourcePtr storage(new QnStorageResource());
     QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
-#ifdef Q_OS_WIN
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString()));
-#else
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString()));
-#endif
+    storage->setUrl(defaultStoragePath());
     storage->setSpaceLimit(5ll * 1000000000);
 
     cl_log.log("Creating new storage", cl_logINFO);
@@ -627,13 +623,16 @@ void QnMain::run()
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
         server->setNetAddrList(allLocalAddresses());
 
-        if (server->getStorages().isEmpty())
+        QnAbstractStorageResourceList storages = server->getStorages();
+        if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
             server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
         m_videoServer = registerServer(appServerConnection, server);
         if (m_videoServer.isNull())
             QnSleep::msleep(1000);
     }
+
+    syncStoragesToSettings(m_videoServer);
 
     int status;
     do
