@@ -205,6 +205,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     quint8* bufferEnd = rtpBuffer + readed;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
+
     
     bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
     if (m_videoBuffer.size() > (uint)MAX_ALLOWED_FRAME_SIZE)
