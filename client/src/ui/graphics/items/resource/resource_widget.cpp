@@ -99,7 +99,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DisplaySelectionOverlay | DisplayButtons)
+    m_options(DisplaySelectionOverlay | DisplayButtons)
 {
     setAcceptHoverEvents(true);
 
@@ -464,18 +464,18 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
-    if(m_displayFlags == flags)
+void QnResourceWidget::setOptions(Options options) {
+    if(m_options == options)
         return;
 
-    DisplayFlags changedFlags = m_displayFlags ^ flags;
-    m_displayFlags = flags;
+    Options changedOptions = m_options ^ options;
+    m_options = options;
 
-    if(changedFlags & DisplayButtons)
-        m_headerOverlayWidget->setVisible(flags & DisplayButtons);
+    if(changedOptions & DisplayButtons)
+        m_headerOverlayWidget->setVisible(options & DisplayButtons);
 
-    displayFlagsChangedNotify(changedFlags);
-    emit displayFlagsChanged();
+    optionsChangedNotify(changedOptions);
+    emit optionsChanged();
 }
 
 const QSize &QnResourceWidget::channelScreenSize() const {
@@ -504,7 +504,7 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
+    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
 }
 
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
@@ -659,7 +659,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!isSelected())
         return;
 
-    if(!(m_displayFlags & DisplaySelectionOverlay))
+    if(!(m_options & DisplaySelectionOverlay))
         return;
 
     painter->fillRect(rect, qnGlobals->selectionColor());

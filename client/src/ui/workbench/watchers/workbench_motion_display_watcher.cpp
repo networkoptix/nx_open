@@ -22,21 +22,21 @@ QnWorkbenchMotionDisplayWatcher::~QnWorkbenchMotionDisplayWatcher() {
 
 
 void QnWorkbenchMotionDisplayWatcher::at_display_widgetAdded(QnResourceWidget *widget) {
-    connect(widget,     SIGNAL(displayFlagsChanged()),                      this,   SLOT(at_widget_displayFlagsChanged()));
+    connect(widget,     SIGNAL(optionsChanged()),                      this,   SLOT(at_widget_optionsChanged()));
 
-    at_widget_displayFlagsChanged(widget, widget->displayFlags());
+    at_widget_optionsChanged(widget, widget->options());
 }
 
 void QnWorkbenchMotionDisplayWatcher::at_display_widgetAboutToBeRemoved(QnResourceWidget *widget) {
     disconnect(widget, NULL, this, NULL);
 
-    at_widget_displayFlagsChanged(widget, 0);
+    at_widget_optionsChanged(widget, 0);
 }
 
-void QnWorkbenchMotionDisplayWatcher::at_widget_displayFlagsChanged(QnResourceWidget *widget, int displayFlags) {
+void QnWorkbenchMotionDisplayWatcher::at_widget_optionsChanged(QnResourceWidget *widget, int options) {
     bool oldDisplayed = isMotionGridDisplayed();
 
-    if(displayFlags & QnResourceWidget::DisplayMotion) {
+    if(options & QnResourceWidget::DisplayMotion) {
         m_widgets.insert(widget);
     } else {
         m_widgets.remove(widget);
@@ -53,8 +53,8 @@ void QnWorkbenchMotionDisplayWatcher::at_widget_displayFlagsChanged(QnResourceWi
     }
 }
 
-void QnWorkbenchMotionDisplayWatcher::at_widget_displayFlagsChanged() {
+void QnWorkbenchMotionDisplayWatcher::at_widget_optionsChanged() {
     QnResourceWidget *widget = checked_cast<QnResourceWidget *>(sender());
-    at_widget_displayFlagsChanged(widget, widget->displayFlags());
+    at_widget_optionsChanged(widget, widget->options());
 }
 

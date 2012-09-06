@@ -19,7 +19,9 @@ class QnMediaResourceWidget: public QnResourceWidget {
 
 public:
     static const Button MotionSearchButton = static_cast<Button>(0x8);
+    static const Button PtzButton = static_cast<Button>(0x10);
 #define MotionSearchButton MotionSearchButton
+#define PtzButton PtzButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -90,11 +92,12 @@ private slots:
     void at_renderer_sourceSizeChanged(const QSize &size);
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
+    void at_ptzButton_toggled(bool checked);
 
 protected:
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
-    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) override;
+    virtual void optionsChangedNotify(Options changedFlags) override;
 
     virtual QString calculateInfoText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
@@ -145,8 +148,6 @@ private:
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;
-
-    QnImageButtonWidget *m_searchButton;
 
     QStaticText m_sensStaticText[10];
 

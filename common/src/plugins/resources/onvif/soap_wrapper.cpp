@@ -110,7 +110,7 @@ void SoapWrapper<T>::beforeMethodInvocation()
         invoked = true;
     }
 
-    if (m_login) {
+    if (m_login && *m_login) {
         soap_wsse_add_Timestamp(m_soapProxy->soap, "Time", DIGEST_TIMEOUT_SEC);
         _wsu__Timestamp* timestamp = soap_wsse_Timestamp(m_soapProxy->soap);
         if (m_timeDrift) {

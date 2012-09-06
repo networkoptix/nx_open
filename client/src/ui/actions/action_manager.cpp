@@ -483,16 +483,14 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
-        text(tr("Maximize")).
-        icon(qnSkin->icon("decorations/maximize.png"));
+        text(tr("Maximize"));
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
         text(tr("System Settings...")).
         //shortcut(tr("Ctrl+P")).
         role(QAction::PreferencesRole).
-        autoRepeat(false).
-        icon(qnSkin->icon("decorations/settings.png"));
+        autoRepeat(false);
 
     factory().
         flags(Qn::Main).

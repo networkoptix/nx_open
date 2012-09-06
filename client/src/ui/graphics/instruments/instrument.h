@@ -568,7 +568,7 @@ protected:
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics item.
      */
-    virtual bool registeredNotify(QGraphicsItem *item) { Q_UNUSED(item); return true; }
+    virtual bool registeredNotify(QGraphicsItem *item) { return satisfiesItemConditions(item); }
 
     /**
      * \param item                     Graphics item that was previously registered with this instrument.
