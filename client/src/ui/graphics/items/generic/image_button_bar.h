@@ -23,28 +23,39 @@ public:
     void removeButton(QnImageButtonWidget *button);
     QnImageButtonWidget *button(int mask) const;
     
-    int buttonsVisibility() const;
-    void setButtonsVisibility(int buttonsVisibility);
-    void setButtonVisible(int mask, bool visible);
+    int visibleButtons() const;
+    void setVisibleButtons(int buttonsVisibility);
+    void setButtonsVisible(int mask, bool visible);
+
+    int checkedButtons() const;
+    void setCheckedButtons(int checkedButtons);
+    void setButtonsChecked(int mask, bool checked);
 
     const QSizeF &uniformButtonSize() const;
     void setUniformButtonSize(const QSizeF &uniformButtonSize);
 
 signals:
-    void buttonsVisibilityChanged();
+    void visibleButtonsChanged();
+    void checkedButtonsChanged();
+
+private slots:
+    void at_button_visibleChanged();
+    void at_button_toggled();
 
 private:
-    void updateButtons();
-    void updateButtonSize(QnImageButtonWidget *button);
+    void submitVisibleButtons();
+    void submitCheckedButtons();
+    void submitButtonSize(QnImageButtonWidget *button);
 
 private:
     QMap<int, QnImageButtonWidget *> m_buttonByMask;
     QHash<QnImageButtonWidget *, int> m_maskByButton;
-    int m_buttonsVisibility;
-
+    int m_visibleButtons;
+    int m_checkedButtons;
     QSizeF m_uniformButtonSize;
-
     QGraphicsLinearLayout *m_layout;
+
+    bool m_updating, m_submitting;
 };
 
 

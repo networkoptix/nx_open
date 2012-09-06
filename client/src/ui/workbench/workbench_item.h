@@ -227,6 +227,21 @@ public:
     QVariant data(int role) const;
 
     /**
+     * \param role                      Role to get data for.
+     * \param defaultValue              Value to return if there is no stored data for the given role.
+     * \returns                         Data for the given role.
+     */
+    template<class T>
+    T data(int role, const T &defaultValue = T()) {
+        QVariant result = data(role);
+        if(result.canConvert<T>()) {
+            return result.value<T>();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
      * \param role                      Role to set data for.
      * \param value                     New value for the given data role.
      * \returns                         Whether the data was successfully set.

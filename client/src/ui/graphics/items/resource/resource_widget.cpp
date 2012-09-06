@@ -65,6 +65,10 @@ namespace {
 
     const QColor overlayTextColor = QColor(255, 255, 255, 160);
 
+    const QColor selectedFrameColor = qnGlobals->selectedFrameColor();
+
+    const QColor frameColor = qnGlobals->frameColor();
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -95,7 +99,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_frameWidth(-1.0),
     m_frameOpacity(1.0),
     m_aboutToBeDestroyedEmitted(false),
-    m_displayFlags(DisplaySelectionOverlay | DisplayButtons)
+    m_options(DisplaySelectionOverlay | DisplayButtons)
 {
     setAcceptHoverEvents(true);
 
@@ -401,6 +405,10 @@ QRectF QnResourceWidget::channelRect(int channel) const {
     );
 }
 
+Qn::RenderStatus QnResourceWidget::channelRenderStatus(int channel) const {
+    return m_channelState[channel].renderStatus;
+}
+
 bool QnResourceWidget::isDecorationsVisible() const {
     return !qFuzzyIsNull(m_headerOverlayWidget->opacity()); /* Note that it's OK to check only header opacity here. */
 }
@@ -456,18 +464,18 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     emit aboutToBeDestroyed();
 }
 
-void QnResourceWidget::setDisplayFlags(DisplayFlags flags) {
-    if(m_displayFlags == flags)
+void QnResourceWidget::setOptions(Options options) {
+    if(m_options == options)
         return;
 
-    DisplayFlags changedFlags = m_displayFlags ^ flags;
-    m_displayFlags = flags;
+    Options changedOptions = m_options ^ options;
+    m_options = options;
 
-    if(changedFlags & DisplayButtons)
-        m_headerOverlayWidget->setVisible(flags & DisplayButtons);
+    if(changedOptions & DisplayButtons)
+        m_headerOverlayWidget->setVisible(options & DisplayButtons);
 
-    displayFlagsChangedNotify(changedFlags);
-    emit displayFlagsChanged();
+    optionsChangedNotify(changedOptions);
+    emit optionsChanged();
 }
 
 const QSize &QnResourceWidget::channelScreenSize() const {
@@ -496,7 +504,7 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setButtonsVisibility(calculateButtonsVisibility());
+    m_buttonBar->setVisibleButtons(calculateButtonsVisibility());
 }
 
 QnResourceWidget::Overlay QnResourceWidget::channelOverlay(int channel) const {
@@ -622,7 +630,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = palette().color(isSelected() ? QPalette::Active : QPalette::Inactive, QPalette::Shadow);
+    QColor color = isSelected() ? selectedFrameColor : frameColor;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -651,7 +659,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
     if(!isSelected())
         return;
 
-    if(!(m_displayFlags & DisplaySelectionOverlay))
+    if(!(m_options & DisplaySelectionOverlay))
         return;
 
     painter->fillRect(rect, qnGlobals->selectionColor());

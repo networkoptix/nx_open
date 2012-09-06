@@ -29,6 +29,7 @@ void QnThumbnailsStreamReader::setQuality(MediaQuality q)
 
 QnThumbnailsStreamReader::~QnThumbnailsStreamReader()
 {
+    stop();
     delete m_delegate;
 }
 

@@ -68,18 +68,18 @@ void CameraSettingsLister::parentOfRootElemFound(const QString& parentId)
 //
 
 CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, ParentOfRootElemFoundAware& obj, QTreeWidget& rootWidget, QStackedLayout& rootLayout,
-        WidgetsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, QObject* handler):
+        TreeWidgetItemsById& widgetsById, LayoutIndById& layoutIndById, SettingsWidgetsById& settingsWidgetsById, EmptyGroupsById& emptyGroupsById, QObject* handler):
     CameraSettingReader(id),
     m_obj(obj),
     m_settings(0),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
-    m_widgetsById(widgetsById),
+    m_treeWidgetsById(widgetsById),
     m_layoutIndById(layoutIndById),
     m_settingsWidgetsById(settingsWidgetsById),
+    m_emptyGroupsById(emptyGroupsById),
     m_handler(handler),
-    m_owner(0),
-    m_emptyGroupsById()
+    m_owner(0)
 {
     connect(&m_rootWidget, SIGNAL(itemPressed(QTreeWidgetItem*, int)), this,   SLOT(treeWidgetItemPressed(QTreeWidgetItem*, int)));
     connect(&m_rootWidget, SIGNAL(itemSelectionChanged()), this,   SLOT(treeWidgetItemSelectionChanged()));
@@ -89,18 +89,7 @@ CameraSettingsWidgetsCreator::CameraSettingsWidgetsCreator(const QString& id, Pa
 
 CameraSettingsWidgetsCreator::~CameraSettingsWidgetsCreator()
 {
-    removeEmptyWidgetGroups();
     removeLayoutItems();
-}
-
-void CameraSettingsWidgetsCreator::removeEmptyWidgetGroups()
-{
-    WidgetsAndParentsById::Iterator it = m_emptyGroupsById.begin();
-    for (; it != m_emptyGroupsById.end(); ++it)
-    {
-        delete it.value();
-    }
-    m_emptyGroupsById.clear();
 }
 
 void CameraSettingsWidgetsCreator::removeLayoutItems()
@@ -110,7 +99,7 @@ void CameraSettingsWidgetsCreator::removeLayoutItems()
         QObjectList children = m_owner->children();
         for (int i = 0; i < children.count(); ++i)
         {
-            m_rootLayout.removeWidget(static_cast<QnAbstractSettingsWidget*>(children[i])->toWidget());
+            m_rootLayout.removeWidget(static_cast<QnSettingsScrollArea*>(children[i]));
         }
         delete m_owner;
         m_owner = 0;
@@ -126,7 +115,7 @@ bool CameraSettingsWidgetsCreator::proceed(CameraSettings& settings)
 
 bool CameraSettingsWidgetsCreator::isGroupEnabled(const QString& id, const QString& parentId, const QString& name)
 {
-    if (m_widgetsById.find(id) != m_widgetsById.end()) {
+    if (m_treeWidgetsById.find(id) != m_treeWidgetsById.end()) {
         return true;
     }
 
@@ -225,7 +214,7 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 {
     CameraSettings::Iterator currIt = m_settings->find(value.getId());
     if (currIt == m_settings->end() && value.getType() != CameraSetting::Button) {
-        //ToDo: uncomment and explore: qDebug() << "CameraSettingsWidgetsCreator::paramFound: didn't disable the following param: " << value.serializeToStr();
+        //ToDo: will be nice to prevent mediaserver send disabled params;
         return;
     }
 
@@ -284,8 +273,8 @@ void CameraSettingsWidgetsCreator::paramFound(const CameraSetting& value, const 
 
 QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString& parentId)
 {
-    WidgetsById::ConstIterator it = m_widgetsById.find(parentId);
-    if (it != m_widgetsById.end()) {
+    TreeWidgetItemsById::ConstIterator it = m_treeWidgetsById.find(parentId);
+    if (it != m_treeWidgetsById.end()) {
         return it.value();
     }
 
@@ -294,7 +283,7 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
     QString grandParentId = parentId;
     while (true)
     {
-        WidgetsAndParentsById::Iterator eGroupsIt = m_emptyGroupsById.find(grandParentId);
+        EmptyGroupsById::Iterator eGroupsIt = m_emptyGroupsById.find(grandParentId);
         if (eGroupsIt == m_emptyGroupsById.end()) {
             break;
         }
@@ -314,16 +303,16 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
 
         QPair<QString, WidgetAndParent*> data = parentsHierarchy.takeFirst();
         m_rootWidget.addTopLevelItem(data.second->get());
-        it = m_widgetsById.insert(data.first, data.second->take());
+        it = m_treeWidgetsById.insert(data.first, data.second->take());
 
         delete data.second;
     }
     else
     {
-        it = m_widgetsById.find(grandParentId);
+        it = m_treeWidgetsById.find(grandParentId);
     }
 
-    if (it == m_widgetsById.end()) {
+    if (it == m_treeWidgetsById.end()) {
         //Grand parent must exist!
         Q_ASSERT(false);
     }
@@ -332,7 +321,7 @@ QTreeWidgetItem* CameraSettingsWidgetsCreator::findParentForParam(const QString&
     {
         QPair<QString, WidgetAndParent*> data = parentsHierarchy.takeFirst();
         it.value()->addChild(data.second->get());
-        it = m_widgetsById.insert(data.first, data.second->take());
+        it = m_treeWidgetsById.insert(data.first, data.second->take());
 
         delete data.second;
     }
@@ -425,7 +414,7 @@ bool CameraSettingTreeReader<T, E>::proceed()
 
         T* nextElem = m_firstTime? m_objList.back(): m_objList.at(i++);
         //ToDo: check impossible situation i > size - 1
-        if (!nextElem->proceed(getCallback())) {
+        if (!nextElem->proceed(getAdditionalInfo())) {
             clean();
             return false;
         }
@@ -460,7 +449,7 @@ CameraSettingsLister* CameraSettingsTreeLister::createElement(const QString& id)
     return new CameraSettingsLister(id, *this);
 }
 
-QSet<QString>& CameraSettingsTreeLister::getCallback()
+QSet<QString>& CameraSettingsTreeLister::getAdditionalInfo()
 {
     return m_params;
 }
@@ -481,7 +470,7 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     CameraSettingTreeReader<CameraSettingsWidgetsCreator, CameraSettings>(id),
     m_rootWidget(rootWidget),
     m_rootLayout(rootLayout),
-    m_widgetsById(),
+    m_treeWidgetsById(),
     m_layoutIndById(),
     m_settingsWidgetsById(),
     m_handler(handler),
@@ -489,24 +478,23 @@ CameraSettingsWidgetsTreeCreator::CameraSettingsWidgetsTreeCreator(const QString
     m_id(id),
     m_cameraId(cameraId)
 {
-    //Default - show empty widget
-    //ToDo: owner?
-    m_rootLayout.addWidget(new QWidget());
+    
 }
 
 CameraSettingsWidgetsTreeCreator::~CameraSettingsWidgetsTreeCreator()
 {
-    m_widgetsById.clear();
+    removeEmptyWidgetGroups();
+    m_treeWidgetsById.clear();
     m_rootWidget.clear();
 }
 
 CameraSettingsWidgetsCreator* CameraSettingsWidgetsTreeCreator::createElement(const QString& id)
 {
-    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_widgetsById,
-        m_layoutIndById, m_settingsWidgetsById, m_handler);
+    return new CameraSettingsWidgetsCreator(id, *this, m_rootWidget, m_rootLayout, m_treeWidgetsById,
+        m_layoutIndById, m_settingsWidgetsById, m_emptyGroupsById, m_handler);
 }
 
-CameraSettings& CameraSettingsWidgetsTreeCreator::getCallback()
+CameraSettings& CameraSettingsWidgetsTreeCreator::getAdditionalInfo()
 {
     //ToDo: check pointer
     return *m_settings;
@@ -537,4 +525,14 @@ QTreeWidget* CameraSettingsWidgetsTreeCreator::getRootWidget()
 QStackedLayout* CameraSettingsWidgetsTreeCreator::getRootLayout()
 {
     return &m_rootLayout;
+}
+
+void CameraSettingsWidgetsTreeCreator::removeEmptyWidgetGroups()
+{
+    EmptyGroupsById::Iterator it = m_emptyGroupsById.begin();
+    for (; it != m_emptyGroupsById.end(); ++it)
+    {
+        delete it.value();
+    }
+    m_emptyGroupsById.clear();
 }

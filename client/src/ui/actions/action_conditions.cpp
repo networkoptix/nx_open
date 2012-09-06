@@ -7,6 +7,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -71,7 +72,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
-            if(static_cast<bool>(widget->displayFlags() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
+            if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
                 return Qn::EnabledAction;
         } else {
             return Qn::EnabledAction;
@@ -88,7 +89,7 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
         if(!widget)
             continue;
 
-        if(widget->displayFlags() & QnResourceWidget::DisplayMotion) {
+        if(widget->options() & QnResourceWidget::DisplayMotion) {
             hasDisplayedGrid = true;
 
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -284,10 +285,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 }
 
 Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
-    foreach(const QnVirtualCameraResourcePtr &camera, resourcePool()->getResources().filtered<QnVirtualCameraResource>())
-        if(!camera->isScheduleDisabled())
-            return Qn::EnabledAction;
-    return Qn::DisabledAction;
+    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
 }
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {

@@ -16,7 +16,7 @@ class DWCameraProxy
     int m_port;
     unsigned int m_timeout;
     const QAuthenticator m_auth;
-    QHash<QString,QString> m_bufferedValues;
+    QHash<QString,QString> m_bufferedValues; //Camera settings values by query (query from camera_settings.xml)
 
 public:
 

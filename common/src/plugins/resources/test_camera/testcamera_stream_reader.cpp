@@ -13,7 +13,7 @@ QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
 
 QnTestCameraStreamReader::~QnTestCameraStreamReader()
 {
-    closeStream();
+    stop();
 }
 
 int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)

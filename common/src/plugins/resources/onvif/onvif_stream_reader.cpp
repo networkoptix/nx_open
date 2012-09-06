@@ -57,7 +57,7 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
 
 QnOnvifStreamReader::~QnOnvifStreamReader()
 {
-
+    stop();
 }
 
 void QnOnvifStreamReader::openStream()
@@ -623,6 +623,34 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
     } else {
         return false;
     }
+
+    if (getRole() == QnResource::Role_LiveVideo && m_onvifRes->getPtzController())
+    {
+        if (profile.PTZConfiguration == 0)
+        {
+            AddPTZConfigReq request;
+            AddPTZConfigResp response;
+
+            request.ProfileToken = profile.token;
+            request.ConfigurationToken = m_onvifRes->getPtzController()->getPtzConfigurationToken().toStdString();
+
+            int soapRes = soapWrapper.addPTZConfiguration(request, response);
+            if (soapRes == SOAP_OK) {
+                m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
+            }
+            else {
+                qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
+                    << soapRes << ", description: " << soapWrapper.getLastError() 
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+
+                return false;
+            }
+        }
+        else {
+            m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
+        }
+    }
+
 
     //Adding audio source
     if (!info.audioSourceId.isEmpty() && (profile.AudioSourceConfiguration == 0 || profile.AudioSourceConfiguration->token != info.audioSourceId.toStdString()))

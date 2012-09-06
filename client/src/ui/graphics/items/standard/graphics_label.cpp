@@ -27,8 +27,8 @@ void GraphicsLabelPrivate::updateCachedData() {
     } else {
         QFontMetricsF metrics(q->font());
 
-        newRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignLeft | Qt::AlignTop, text);
-        newRect.setTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
+        newRect = metrics.boundingRect(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignCenter, text);
+        newRect.moveTopLeft(QPointF(0.0, 0.0)); /* Italicized fonts may result in negative left border. */
     }
     
     if (!qFuzzyCompare(newRect, rect)) {
@@ -121,7 +121,7 @@ void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     QnScopedPainterFontRollback fontRollback(painter, font());
 
     if(d->performanceHint == NoCaching) {
-        painter->drawText(QRectF(0.0, 0.0, 0.0, 0.0), Qt::AlignLeft | Qt::AlignTop | Qt::TextDontClip, d->text);
+        painter->drawText(rect(), Qt::AlignCenter, d->text);
     } else {
         painter->drawStaticText(0.0, 0.0, d->staticText);
     }

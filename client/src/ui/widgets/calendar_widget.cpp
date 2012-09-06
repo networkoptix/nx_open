@@ -84,18 +84,20 @@ void QnCalendarWidget::setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePerio
 }
 
 void QnCalendarWidget::setSelectedWindow(quint64 windowStart, quint64 windowEnd) {
+    m_window = QnTimePeriod(windowStart, windowEnd - windowStart);
 
-    bool modified = false;
-    if (windowStart != (quint64)m_window.startTimeMs)
-        modified = windowStart/DAY != (quint64)m_window.startTimeMs/DAY;
-    if (!modified && windowEnd != (quint64)m_window.endTimeMs())
-        modified = windowEnd/DAY !=(quint64)m_window.endTimeMs()/DAY;
+    if(m_window.startTimeMs >= m_dayWindow.startTimeMs && m_window.startTimeMs < m_dayWindow.startTimeMs + DAY &&
+        m_window.endTimeMs() <= m_dayWindow.endTimeMs() && m_window.endTimeMs() > m_dayWindow.endTimeMs() - DAY)
+        return; /* Ok, no update needed. */
 
-    m_window.startTimeMs = windowStart;
-    m_window.durationMs = windowEnd - windowStart;
+    qint64 dayWindowStart = QDateTime(QDateTime::fromMSecsSinceEpoch(windowStart).date(), QTime()).toMSecsSinceEpoch();
+    qint64 dayWindowEnd = QDateTime(QDateTime::fromMSecsSinceEpoch(windowEnd + DAY - 1).date(), QTime()).toMSecsSinceEpoch();
+    QnTimePeriod dayWindow = QnTimePeriod(dayWindowStart, dayWindowEnd - dayWindowStart);
+    if(m_dayWindow == dayWindow)
+        return;
 
-    if (modified)
-        update();
+    m_dayWindow = dayWindow;
+    update();
 }
 
 void QnCalendarWidget::setCurrentWidgetIsCentral(bool currentWidgetIsCentral){

@@ -68,6 +68,7 @@
 #include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -159,8 +160,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
     connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
 
-    connect(action(Qn::LightMainMenuAction),                    SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
-    connect(action(Qn::DarkMainMenuAction),                     SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
     connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -226,11 +226,13 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
-    connect(context()->instance<QnWorkbenchPanicWatcher>(),      SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
+    connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
+    at_scheduleWatcher_scheduleEnabledChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -517,7 +519,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
-        QString error = QString::fromLatin1("Currently parameters can't be saved. Connection refused.");
+        QString error = QString::fromLatin1("Connection refused");
 
         QString failedParams;
         QList< QPair< QString, QVariant> >::ConstIterator it =
@@ -530,14 +532,11 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         }
 
         if (!failedParams.isEmpty()) {
-            QnResourceListDialog::exec(
+            QMessageBox::warning(
                 widget(),
-                QnResourceList(),
-                tr("Error"),
-                tr(error.toLatin1()),
-                tr("Failed to save the following parameters:\n%1").arg(failedParams),
-                QDialogButtonBox::Ok
-                );
+                tr("Currently parameters can't be saved."),
+                tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
+                1, 0);
 
             cameraSettingsDialog()->widget()->updateFromResources();
         }
@@ -723,8 +722,7 @@ void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
-    action(Qn::LightMainMenuAction)->setMenu(m_mainMenu.data());
-    action(Qn::DarkMainMenuAction)->setMenu(m_mainMenu.data());
+    action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
 }
 
 void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {
@@ -1958,8 +1956,7 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 
 void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult)
 {
-    QString error = QString::fromLatin1("Currently parameters can't be saved. ");
-    error += httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now."):
+    QString error = httpStatusCode == 0? QString::fromLatin1("Possibly, appropriate camera's service is unavailable now"):
         QString::fromLatin1("Mediaserver returned the following error code : ") + httpStatusCode;
 
     QString failedParams;
@@ -1974,16 +1971,13 @@ void QnWorkbenchActionHandler::at_camera_settings_saved(int httpStatusCode, cons
     }
 
     if (!failedParams.isEmpty()) {
-        QnResourceListDialog::exec(
+        QMessageBox::warning(
             widget(),
-            QnResourceList(),
-            tr("Error"),
-            tr(error.toLatin1()),
-            tr("Failed to save the following parameters:\n%1").arg(failedParams),
-            QDialogButtonBox::Ok
-            );
+            tr("Currently parameters can't be saved."),
+            tr("Failed to save the following parameters (%1):\n%2").arg(error, failedParams),
+            1, 0);
 
-        //ToDo: restore old values by invoking smth like updateFromResource();
+        cameraSettingsDialog()->widget()->updateFromResources();
     }
 }
 
@@ -2239,6 +2233,10 @@ void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteA
 
 void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
+}
+
+void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
+    action(Qn::TogglePanicModeAction)->setEnabled(context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled());
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {

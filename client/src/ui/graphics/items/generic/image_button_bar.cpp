@@ -3,13 +3,18 @@
 #include <QtGui/QGraphicsLinearLayout>
 
 #include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
+#include <utils/common/scoped_value_rollback.h>
 
 #include "image_button_widget.h"
 
 
 QnImageButtonBar::QnImageButtonBar(QGraphicsItem *parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),
-    m_buttonsVisibility(0)
+    m_visibleButtons(0),
+    m_checkedButtons(0),
+    m_updating(false),
+    m_submitting(false)
 {
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -29,7 +34,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
         return;
     }
 
-    button->setParent(this); /* We're expected to take ownership, even if button wasn't actually added. */
+    button->setParent(this); /* We're expected to take ownership, even if the button wasn't actually added. */
 
     if(!qIsPower2(mask))
         qnWarning("Given mask '%1' is not a power of 2.", mask);
@@ -47,42 +52,76 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
     m_maskByButton[button] = mask;
     m_buttonByMask[mask] = button;
 
-    updateButtons();
-    updateButtonSize(button);
+    connect(button, SIGNAL(visibleChanged()),   this, SLOT(at_button_visibleChanged()));
+    connect(button, SIGNAL(toggled(bool)),      this, SLOT(at_button_toggled()));
+
+    submitVisibleButtons();
+    submitButtonSize(button);
 }
 
 void QnImageButtonBar::removeButton(QnImageButtonWidget *button) {
     if(!m_maskByButton.contains(button))
         return;
 
+    if(button->parent() == this)
+        button->setParent(NULL); /* Release ownership. */
+
     int mask = m_maskByButton.value(button);
     m_maskByButton.remove(button);
     m_buttonByMask.remove(mask);
 
-    updateButtons();
+    disconnect(button, NULL, this, NULL);
+
+    submitVisibleButtons();
 }
 
 QnImageButtonWidget *QnImageButtonBar::button(int mask) const {
     return m_buttonByMask.value(mask);
 }
 
-int QnImageButtonBar::buttonsVisibility() const {
-    return m_buttonsVisibility;
+int QnImageButtonBar::visibleButtons() const {
+    return m_visibleButtons;
 }
 
-void QnImageButtonBar::setButtonsVisibility(int buttonsVisibility) {
-    if(m_buttonsVisibility == buttonsVisibility)
+void QnImageButtonBar::setVisibleButtons(int visibleButtons) {
+    if(m_visibleButtons == visibleButtons)
         return;
 
-    m_buttonsVisibility = buttonsVisibility;
+    m_visibleButtons = visibleButtons;
 
-    updateButtons();
+    submitVisibleButtons();
 
-    emit buttonsVisibilityChanged();
+    emit visibleButtonsChanged();
 }
 
-void QnImageButtonBar::setButtonVisible(int mask, bool visible) {
-    setButtonsVisibility(visible ? (m_buttonsVisibility | mask) : (m_buttonsVisibility & ~mask));
+void QnImageButtonBar::setButtonsVisible(int mask, bool visible) {
+    setVisibleButtons(visible ? (m_visibleButtons | mask) : (m_visibleButtons & ~mask));
+}
+
+int QnImageButtonBar::checkedButtons() const {
+    return m_checkedButtons;
+}
+
+void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
+    if(m_checkedButtons == checkedButtons)
+        return;
+
+    for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
+        if(!pos.value()->isCheckable())
+            checkedButtons &= ~pos.key();
+
+    if(m_checkedButtons == checkedButtons)
+        return;
+
+    m_checkedButtons = checkedButtons;
+
+    submitCheckedButtons();
+
+    emit checkedButtonsChanged();
+}
+
+void QnImageButtonBar::setButtonsChecked(int mask, bool checked) {
+    setCheckedButtons(checked ? (m_checkedButtons | mask) : (m_checkedButtons & ~mask));
 }
 
 const QSizeF &QnImageButtonBar::uniformButtonSize() const {
@@ -96,10 +135,14 @@ void QnImageButtonBar::setUniformButtonSize(const QSizeF &uniformButtonSize) {
     m_uniformButtonSize = uniformButtonSize;
 
     foreach(QnImageButtonWidget *button, m_buttonByMask) 
-        updateButtonSize(button);
+        submitButtonSize(button);
 }
 
-void QnImageButtonBar::updateButtons() {
+void QnImageButtonBar::submitVisibleButtons() {
+    if(m_updating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_submitting, true);
+
     foreach(QnImageButtonWidget *button, m_buttonByMask) {
         m_layout->removeItem(button);
         button->setVisible(false);
@@ -107,17 +150,46 @@ void QnImageButtonBar::updateButtons() {
 
     foreach(QnImageButtonWidget *button, m_buttonByMask) {
         int mask = m_maskByButton.value(button);
-        if(!(mask & m_buttonsVisibility))
+        if(!(mask & m_visibleButtons))
             continue;
 
         m_layout->insertItem(0, button);
         button->setVisible(true);
     }
-
 }
 
-void QnImageButtonBar::updateButtonSize(QnImageButtonWidget *button) {
+void QnImageButtonBar::submitCheckedButtons() {
+    if(m_updating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_submitting, true);
+
+    for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
+        pos.value()->setChecked(pos.key() & m_checkedButtons);
+}
+
+void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {
     button->setMaximumSize(m_uniformButtonSize);
     button->setMinimumSize(m_uniformButtonSize);
 }
 
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnImageButtonBar::at_button_visibleChanged() {
+    if(m_submitting)
+        return;
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+
+    QnImageButtonWidget *button = checked_cast<QnImageButtonWidget *>(sender());
+    setButtonsVisible(m_maskByButton.value(button), button->isVisible());
+}
+
+void QnImageButtonBar::at_button_toggled() {
+    if(m_submitting)
+        return;
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+
+    QnImageButtonWidget *button = checked_cast<QnImageButtonWidget *>(sender());
+    setButtonsChecked(m_maskByButton.value(button), button->isChecked());
+}

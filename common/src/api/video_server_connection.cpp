@@ -197,13 +197,18 @@ namespace detail
         }
     }
 
-    void VideoServerSetParamReplyProcessor::at_replyReceived( int status, const QByteArray& reply, const QByteArray /* &errorString */ , int /*handle*/ )
+    void VideoServerSetParamReplyProcessor::at_replyReceived(int status, const QByteArray& reply, const QByteArray /* &errorString */ , int /*handle*/)
     {
-        parseResponse( reply );
-        emit finished( status, m_operationResult );
+        parseResponse(reply);
+        emit finished(status, m_operationResult);
         deleteLater();
     }
-}
+
+    void VideoServerSimpleReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
+        emit finished(status, handle);
+    }
+
+} // namespace detail
 
 // ---------------------------------- QnVideoServerConnection ---------------------
 
@@ -216,7 +221,7 @@ QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *paren
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
 
-QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList& list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions)
+QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion>& motionRegions)
 {
     QnRequestParamList result;
 
@@ -234,7 +239,7 @@ QnRequestParamList QnVideoServerConnection::createParamList(const QnNetworkResou
     return result;
 }
 
-QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion>& motionRegions)
+QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions)
 {
     QnTimePeriodList result;
     QByteArray errorString;
@@ -247,7 +252,7 @@ QnTimePeriodList QnVideoServerConnection::recordedTimePeriods(const QnNetworkRes
     return result;
 }
 
-int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList& list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, QList<QRegion> motionRegions, QObject *target, const char *slot) 
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot) 
 {
     detail::QnVideoServerConnectionReplyProcessor *processor = new detail::QnVideoServerConnectionReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList &, int)), target, slot);
@@ -255,7 +260,7 @@ int QnVideoServerConnection::asyncRecordedTimePeriods(const QnNetworkResourceLis
     return asyncRecordedTimePeriods(createParamList(list, startTimeMs, endTimeMs, detail, motionRegions), processor, SLOT(at_replyReceived(int, const QnTimePeriodList&, int)));
 }
 
-int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr camera, const QStringList& params, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QObject *target, const char *slot)
 {
     detail::VideoServerGetParamReplyProcessor* processor = new detail::VideoServerGetParamReplyProcessor();
     connect(
@@ -263,7 +268,7 @@ int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr camera
         SIGNAL(finished( int, const QList< QPair< QString, QVariant> >& )),
         target,
         slot,
-        Qt::QueuedConnection );
+        Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
     requestParams << QnRequestParam( "res_id", camera->getPhysicalId() );
@@ -280,9 +285,9 @@ int QnVideoServerConnection::asyncGetParamList(const QnNetworkResourcePtr camera
 }
 
 int QnVideoServerConnection::getParamList(
-    const QnNetworkResourcePtr camera,
-    const QStringList& params,
-    QList< QPair< QString, QVariant> >* const paramValues )
+    const QnNetworkResourcePtr &camera,
+    const QStringList &params,
+    QList< QPair< QString, QVariant> > *paramValues)
 {
     QByteArray reply;
     QByteArray errorString;
@@ -300,10 +305,10 @@ int QnVideoServerConnection::getParamList(
 }
 
 int QnVideoServerConnection::asyncSetParam(
-    const QnNetworkResourcePtr camera,
-    const QList< QPair< QString, QVariant> >& params,
+    const QnNetworkResourcePtr &camera,
+    const QList< QPair< QString, QVariant> > &params,
     QObject *target,
-    const char* slot )
+    const char* slot)
 {
     detail::VideoServerSetParamReplyProcessor* processor = new detail::VideoServerSetParamReplyProcessor();
     connect(
@@ -331,9 +336,9 @@ int QnVideoServerConnection::asyncSetParam(
 }
 
 int QnVideoServerConnection::setParamList(
-    const QnNetworkResourcePtr camera,
-    const QList<QPair<QString, QVariant> >& params,
-    QList<QPair<QString, bool> >* const operationResult )
+    const QnNetworkResourcePtr &camera,
+    const QList<QPair<QString, QVariant> > &params,
+    QList<QPair<QString, bool> > *operationResult)
 {
     QByteArray reply;
     QByteArray errorString;
@@ -355,7 +360,7 @@ int QnVideoServerConnection::setParamList(
     return status;
 }
 
-int QnVideoServerConnection::asyncGetFreeSpace(const QString& path, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncGetFreeSpace(const QString &path, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor *processor = new detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int, qint64, qint64, int)), target, slot);
@@ -383,8 +388,8 @@ int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
-    {
+void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle) 
+{
     QnTimePeriodList result;
     if(status == 0)
     {
@@ -404,7 +409,7 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
 }
 
 // very simple parser. Used for parsing own created XML
-QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int *from = NULL)
+QByteArray extractXmlBody(const QByteArray &body, const QByteArray &tagName, int *from = NULL)
 {
     QByteArray tagStart = QByteArray("<") + tagName + QByteArray(">");
     int bodyStart = body.indexOf(tagStart, from ? *from : 0);
@@ -421,7 +426,7 @@ QByteArray extractXmlBody(const QByteArray& body, const QByteArray& tagName, int
         return QByteArray();
 }
 
-void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray& /*errorString*/, int handle)
+void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle)
 {
     qint64 freeSpace = -1;
     qint64 usedSpace = -1;
@@ -438,15 +443,14 @@ void detail::VideoServerSessionManagerFreeSpaceRequestReplyProcessor::at_replyRe
     deleteLater();
 }
 
-int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& params, QnTimePeriodList& result, QByteArray& errorString)
+int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &result, QByteArray &errorString)
 {
     QByteArray reply;
 
     if(QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("RecordedTimePeriods"), params, reply, errorString))
         return 1;
 
-    if (reply.startsWith("BIN"))
-    {
+    if (reply.startsWith("BIN")) {
         QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
     } else {
         qWarning() << "VideoServerConnection: unexpected message received.";
@@ -456,7 +460,7 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList& param
     return 0;
 }
 
-int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList& params, QObject *target, const char *slot)
+int QnVideoServerConnection::asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot)
 {
     detail::VideoServerSessionManagerReplyProcessor *processor = new detail::VideoServerSessionManagerReplyProcessor();
     connect(processor, SIGNAL(finished(int, const QnTimePeriodList&, int)), target, slot);
@@ -484,7 +488,7 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
     //QNetworkProxyQuery proxyQuery("http://?/RecordedTimePeriods")
 }
 
-void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
+void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &, int) {
     if(status == 0)
     {
         //QByteArray usagestr = extractXmlBody(reply, "usage"); // usage of the current process
@@ -512,13 +516,27 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     deleteLater();
 }
 
-void TestReceiver::getParamsCompleted( int status, const QList< QPair< QString, QVariant> >& params )
-{
-    Q_UNUSED(status)
-    Q_UNUSED(params)
+int QnVideoServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot) {
+    detail::VideoServerSimpleReplyProcessor* processor = new detail::VideoServerSimpleReplyProcessor();
+    connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+    requestParams << QnRequestParam("xSpeed", QString::number(xSpeed));
+    requestParams << QnRequestParam("ySpeed", QString::number(ySpeed));
+    requestParams << QnRequestParam("zoomSpeed", QString::number(zoomSpeed));
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/move"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
-void TestReceiver::setParamCompleted( int status )
-{
-    Q_UNUSED(status)
+int QnVideoServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
+    detail::VideoServerSimpleReplyProcessor* processor = new detail::VideoServerSimpleReplyProcessor();
+    connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
+
+    QnRequestParamList requestParams;
+    requestParams << QnRequestParam("res_id", camera->getPhysicalId());
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/stop"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
+
+

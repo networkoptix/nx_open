@@ -40,8 +40,6 @@ public:
     QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea& parent, const QString& hint);
     virtual ~QnAbstractSettingsWidget();
 
-    virtual QWidget* toWidget();
-
     const CameraSetting& param() const;
 
     virtual void refresh() = 0;
@@ -56,10 +54,9 @@ protected:
     virtual void setParam(const CameraSettingValue& val);
 
 protected:
-    CameraSetting& mParam;
-    QObject* mHandler;
-    QWidget* mWidget;
-    QHBoxLayout *mlayout;
+    CameraSetting& m_param;
+    QObject* m_handler;
+    QHBoxLayout *m_layout;
     QString m_hint;
 };
 //==============================================
@@ -98,7 +95,7 @@ public slots:
 
 private:
     QnSettingsSlider* m_slider;
-    QGroupBox* groupBox;
+    QGroupBox* m_groupBox;
 };
 //==============================================
 class QnSettingsEnumerationWidget : public QnAbstractSettingsWidget
@@ -137,7 +134,7 @@ private slots:
     void onClicked();
 
 private:
-    CameraSetting dummyVal;
+    CameraSetting m_dummyVal;
 };
 
 //==============================================
@@ -154,6 +151,9 @@ public slots:
 
 private slots:
     void onChange();
+
+private:
+    QLineEdit* m_lineEdit;
 };
 
 //==============================================
@@ -175,8 +175,8 @@ private slots:
     void onMaxReleased();
 
 private:
-    QPushButton* minBtn;
-    QPushButton* maxBtn;
+    QPushButton* m_minBtn;
+    QPushButton* m_maxBtn;
 };
 
 #endif //camera_settings_widgets_h_1214

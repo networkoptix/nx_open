@@ -408,7 +408,7 @@ void QnThumbnailsLoader::process() {
         QnThumbnail thumbnail(QImage(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
-        if (frame) 
+        if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
             CLVideoDecoderOutput outFrame;

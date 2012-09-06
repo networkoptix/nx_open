@@ -160,9 +160,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: check for NULL
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionSensitivity, true);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
 
         /* Find best value for sensitivity. */
         int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];

@@ -571,7 +571,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(newWidget)
             opacityAnimator(newWidget)->animateTo(1.0);
         qreal opacity = newWidget ? 0.0 : 1.0;
-        foreach(QnResourceWidget *widget, m_widgetByRenderer)
+        foreach(QnResourceWidget *widget, m_widgets)
             if(widget != newWidget)
                 opacityAnimator(widget)->animateTo(opacity);
 
@@ -608,7 +608,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets() const {
-    return m_widgetByRenderer.values();
+    return m_widgets;
 }
 
 QList<QnResourceWidget *> QnWorkbenchDisplay::widgets(const QnResourcePtr &resource) const {
@@ -694,7 +694,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgetByRenderer.size() >= 24) { // TODO: item limit must be changeable.
+    if (m_widgets.size() >= 24) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -737,13 +737,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
      * because the latter automatically sets the former. */
     widget->setFlag(QGraphicsItem::ItemIsPanel, false);
 
-    {
-        QPalette palette = widget->palette();
-        palette.setColor(QPalette::Active, QPalette::Shadow, qnGlobals->selectedFrameColor());
-        palette.setColor(QPalette::Inactive, QPalette::Shadow, qnGlobals->frameColor());
-        widget->setPalette(palette);
-    }
-
     m_scene->addItem(widget);
 
     connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_geometryChanged()));
@@ -751,6 +744,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_rotationChanged()));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
+    m_widgets.push_back(widget);
     m_widgetByItem.insert(item, widget);
     m_widgetsByResource[widget->resource()].push_back(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -798,6 +792,7 @@ bool QnWorkbenchDisplay::removeItemInternal(QnWorkbenchItem *item, bool destroyW
 
     emit widgetAboutToBeRemoved(widget);
 
+    m_widgets.removeOne(widget);
     m_widgetByItem.remove(item);
     m_widgetsByResource[widget->resource()].removeOne(widget);
     if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
@@ -882,7 +877,7 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity) {
 
     m_frameOpacity = opacity;
     
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
+    foreach(QnResourceWidget *widget, m_widgets) 
         widget->setFrameOpacity(opacity);
 }
 
@@ -1250,7 +1245,7 @@ void QnWorkbenchDisplay::updateFrameWidths() {
     if(!m_frameWidthsDirty)
         return;
 
-    foreach(QnResourceWidget *widget, m_widgetByRenderer)
+    foreach(QnResourceWidget *widget, this->widgets())
         widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
 }
 
@@ -1301,7 +1296,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->currentTimeUSec() / 1000);
+            qint64 time = mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : mediaWidget->display()->currentTimeUSec() / 1000;
+
+            mediaWidget->item()->setData(Qn::ItemTimeRole, time);
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
     }
@@ -1355,16 +1352,21 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         qint64 time;
         if(thumbnailed) {
             time = searchState.period.startTimeMs + searchState.step * i;
+            widget->item()->setData(Qn::ItemTimeRole, time);
         } else {
-            time = widget->item()->data(Qn::ItemTimeRole).value<qint64>();
+            time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
         }
 
-        if(!thumbnailed)
-            widget->display()->archiveReader()->jumpTo(time * 1000, time * 1000); /* NOTE: non-precise seek doesn't work here. */
+        if(!thumbnailed && time != -1) {
+            qreal timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
+            widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+        }
 
-        bool paused = widget->item()->data(Qn::ItemPausedRole).toBool();
-        if(paused)
+        bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);
+        if(paused) {
             widget->display()->archiveReader()->pauseMedia();
+            widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+        }
 
         // TODO: don't start reader for thumbnails search
         //widget->display()->archiveReader()->pauseMedia();
@@ -1393,8 +1395,20 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
 
     int index = (thumbnail.time() - searchState.period.startTimeMs) / searchState.step;
     QList<QnResourceWidget *> widgets = this->widgets();
-    if(index < 0 || index >= widgets.size())
+    if(index < 0)
         return;
+    if(index >= widgets.size()) {
+        foreach(QnResourceWidget *widget, this->widgets()) {
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
+                if(!mediaWidget->display()->camDisplay()->isRunning()) {
+                    mediaWidget->display()->camDisplay()->setMTDecoding(false);
+                    mediaWidget->display()->camDisplay()->start();
+                    mediaWidget->display()->archiveReader()->startPaused();
+                }
+            }
+        }
+        return;
+    }
 
     qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
 
@@ -1452,13 +1466,13 @@ void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
-        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, true);
+    foreach(QnResourceWidget *widget, m_widgets) 
+        widget->setOption(QnResourceWidget::DisplayActivityOverlay, true);
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
-    foreach(QnResourceWidget *widget, m_widgetByRenderer) 
-        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
+    foreach(QnResourceWidget *widget, m_widgets) 
+        widget->setOption(QnResourceWidget::DisplayActivityOverlay, false);
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {

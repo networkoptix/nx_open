@@ -52,6 +52,6 @@ void SelectionOverlayHackInstrument::showSelectedOverlay(QnResourceWidget *widge
     if(widget == NULL)
         return;
 
-    widget->setDisplayFlag(QnResourceWidget::DisplaySelectionOverlay, show);
+    widget->setOption(QnResourceWidget::DisplaySelectionOverlay, show);
 }
 

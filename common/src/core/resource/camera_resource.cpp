@@ -2,11 +2,18 @@
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
       m_audioEnabled(false),
       m_advancedWorking(false)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnVirtualCameraResourcePtr>();
+        metaTypesInitialized = true;
+    }
 }
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
@@ -128,7 +135,15 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
 
 void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
 {
+    QMutexLocker locker(&m_mutex);
+
+    if(m_scheduleDisabled == disabled)
+        return;
+
     m_scheduleDisabled = disabled;
+
+    locker.unlock();
+    emit scheduleDisabledChanged(::toSharedPointer(this));
 }
 
 bool QnVirtualCameraResource::isScheduleDisabled() const

@@ -58,8 +58,7 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePt
         return;
 
     m_servers.remove(server);
-    if(server->isPanicMode())
-        m_panicServers.remove(server);
+    m_panicServers.remove(server);
 
     disconnect(server.data(), NULL, this, NULL);
 
