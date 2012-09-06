@@ -163,6 +163,12 @@ QString formatGbStr(qint64 value)
 }
 
 bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
+    if(storages.isEmpty()) {
+        if(errorString)
+            *errorString = tr("At least one storage must be specified.");
+        return false;
+    }
+
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
             if(errorString)
@@ -199,16 +205,6 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
         QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
         if (!storage)
             continue;
-
-        /*
-        QMessageBox::warning(this, tr("Not enough disk space"), 
-            tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
-            arg(storage->getUrl()).
-            arg(formatGbStr(needRecordingSpace)).
-            arg(formatGbStr(itr.value().freeSpace)).
-            arg(formatGbStr(itr.value().usedSpace)).
-            arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
-        */
 
         qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
         if (itr.value().errorCode == detail::INVALID_PATH)
