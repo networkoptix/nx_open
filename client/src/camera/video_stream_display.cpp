@@ -8,7 +8,6 @@
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
 
-#include <iostream>
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
@@ -310,7 +309,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
-    bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
+    const bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
@@ -417,17 +416,15 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
         CLVideoDecoderOutput* tmpOutFrame = new CLVideoDecoderOutput();
         while (dec->decode(emptyData, tmpOutFrame)) 
         {
-            {
-                tmpOutFrame->channel = data->channelNumber;
-                tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-                if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
-                    tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
-                //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
-                m_reverseQueue.enqueue(tmpOutFrame);
-                m_realReverseSize++;
-                checkQueueOverflow(dec);
-                tmpOutFrame = new CLVideoDecoderOutput();
-            }
+			tmpOutFrame->channel = data->channelNumber;
+			tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+			if (data->flags & QnAbstractMediaData::MediaFlags_LowQuality)
+				tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
+			//tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
+			m_reverseQueue.enqueue(tmpOutFrame);
+			m_realReverseSize++;
+			checkQueueOverflow(dec);
+			tmpOutFrame = new CLVideoDecoderOutput();
         }
         delete tmpOutFrame;
         m_flushedBeforeReverseStart = true;
@@ -518,7 +515,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
 
     //cl_log.log(QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz"), cl_logALWAYS);
-
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
@@ -532,34 +528,37 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
 
     if( outFrame->data[0] || outFrame->picData.data() )
     {
-    		if (enableFrameQueue)
-    		{
-    			Q_ASSERT(!outFrame->isExternalData());
-    			if (m_bufferedFrameDisplayer)
-    			{
-    				bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
-    				qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
-    				//cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
-    				if (wasWaiting) {
-    					dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
-    					m_queueWasFilled = true;
-    				}
-    				else {
-    					if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
-    						dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
-    				}
-    			}
-    			else
-    				m_drawer->draw(outFrame);
-    			m_lastDisplayedFrame = outFrame;
-    			m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
-    			m_queueUsed = true;
-    		}
-    		else
-    		{
-    			m_drawer->draw(outFrame);
-    			m_drawer->waitForFrameDisplayed(outFrame->channel);
-    		}
+		if (enableFrameQueue)
+		{
+			Q_ASSERT(!outFrame->isExternalData());
+			if (m_bufferedFrameDisplayer)
+			{
+				bool wasWaiting = m_bufferedFrameDisplayer->addFrame(outFrame);
+				qint64 bufferedDuration = m_bufferedFrameDisplayer->bufferedDuration();
+				//cl_log.log("buffered duration=", bufferedDuration, cl_logALWAYS);
+				if (wasWaiting) {
+					dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+					m_queueWasFilled = true;
+				}
+				else {
+					if (m_queueWasFilled && bufferedDuration <= MAX_QUEUE_TIME/4)
+						dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
+				}
+			}
+			else
+			{
+				m_drawer->draw(outFrame);
+			}
+			m_lastDisplayedFrame = outFrame;
+			m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
+			m_queueUsed = true;
+			cl_log.log( QString::fromAscii("Decoded frame has been buffered"), cl_logDEBUG1 );
+		}
+		else
+		{
+			m_drawer->draw(outFrame);
+			m_drawer->waitForFrameDisplayed(outFrame->channel);
+		}
 
         if (m_prevFrameToDelete)
         {
@@ -569,7 +568,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
             delete m_prevFrameToDelete;
             m_prevFrameToDelete = 0;
         }
-        if (reverseMode) 
+        if (reverseMode)
             m_prevFrameToDelete = outFrame;
         return !m_bufferedFrameDisplayer;
     }
