@@ -180,7 +180,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateCalendarFromSlider()));
-    connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
+    connect(m_timeSlider,                       SIGNAL(selectionReleased()),                        this,   SLOT(at_timeSlider_selectionReleased()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
@@ -1152,7 +1152,7 @@ void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {
     m_pausedOverride = true;
 }
 
-void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {
+void QnWorkbenchNavigator::at_timeSlider_selectionReleased() {
     if(!m_timeSlider->isSelectionValid())
         return;
 
