@@ -32,8 +32,12 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     if(!(target->options() & QnResourceWidget::ControlPtz))
         return false;
 
+    if(!target->rect().contains(event->pos()))
+        return false; /* Ignore clicks on widget frame. */
+
     if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
         if(QnVideoServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnVideoServerResource>()) {
+            m_target = target;
             m_camera = camera;
             m_serverSpeed = QVector3D();
             m_localSpeed = QVector3D();
@@ -61,8 +65,10 @@ void PtzInstrument::dragMove(DragInfo *info) {
     m_localSpeed.setY(speed.y());
 
     if((m_localSpeed - m_serverSpeed).lengthSquared() > 0.1 * 0.1) {
-        m_connection->asyncPtzMove(m_camera, m_localSpeed.x(), m_localSpeed.y(), m_localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
+        m_connection->asyncPtzMove(m_camera, m_localSpeed.x(), -m_localSpeed.y(), m_localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
         m_serverSpeed = m_localSpeed;
+
+        qDebug() << "PTZ set speed " << m_localSpeed;
     }
 }
 

@@ -531,5 +531,6 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-
+    setOption(ControlPtz, checked);
 }
+
