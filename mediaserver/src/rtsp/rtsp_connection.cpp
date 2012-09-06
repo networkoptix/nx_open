@@ -721,7 +721,7 @@ void QnRtspConnectionProcessor::connectToLiveDataProviders()
 void QnRtspConnectionProcessor::checkQuality()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->quality == MEDIA_Quality_Low)
+    if (d->liveDpHi && d->quality == MEDIA_Quality_Low)
     {
         if (d->liveDpLow == 0) {
             d->quality = MEDIA_Quality_AlwaysHigh;
