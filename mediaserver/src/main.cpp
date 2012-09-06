@@ -263,6 +263,7 @@ QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
 {
     QnVideoServerResourceList servers;
     QByteArray errorString;
+    serverPtr->setStatus(QnResource::Online);
     if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
@@ -419,7 +420,7 @@ bool checkIfAppServerIsOld()
     QUrl httpUrl;
     httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
     httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme("http");
+    httpUrl.setScheme("https");
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 

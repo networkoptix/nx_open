@@ -84,6 +84,10 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isCamera && resource->getParentId() != ownVideoServer->getId())
             return;
 
+        // We are always online
+        if (isServer)
+            resource->setStatus(QnResource::Online);
+
         QByteArray errorString;
         QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
         if (ownResource)

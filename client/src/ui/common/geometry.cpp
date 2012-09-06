@@ -13,6 +13,14 @@ QPointF QnGeometry::cwiseDiv(const QPointF &l, const QPointF &r) {
     return QPointF(l.x() / r.x(), l.y() / r.y());
 }
 
+QPointF QnGeometry::cwiseMul(const QPointF &l, const QSizeF &r) {
+    return QPointF(l.x() * r.width(), l.y() * r.height());
+}
+
+QPointF QnGeometry::cwiseDiv(const QPointF &l, const QSizeF &r) {
+    return QPointF(l.x() / r.width(), l.y() / r.height());
+}
+
 QSizeF QnGeometry::cwiseMul(const QSizeF &l, const QSizeF &r) {
     return QSizeF(l.width() * r.width(), l.height() * r.height());
 }

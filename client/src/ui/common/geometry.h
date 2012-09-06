@@ -20,6 +20,8 @@ public:
     /* Some coefficient-wise arithmetic functions follow. */
     static QPointF cwiseMul(const QPointF &l, const QPointF &r);
     static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
+    static QPointF cwiseMul(const QPointF &l, const QSizeF &r);
+    static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);

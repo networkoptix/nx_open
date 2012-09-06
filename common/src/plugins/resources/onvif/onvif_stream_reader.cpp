@@ -57,7 +57,7 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
 
 QnOnvifStreamReader::~QnOnvifStreamReader()
 {
-
+    stop();
 }
 
 void QnOnvifStreamReader::openStream()
