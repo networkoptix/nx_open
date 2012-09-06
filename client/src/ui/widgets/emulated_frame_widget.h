@@ -26,10 +26,10 @@ protected:
      */
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const = 0;
 
-    virtual bool event(QEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;

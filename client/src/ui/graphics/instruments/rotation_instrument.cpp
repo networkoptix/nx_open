@@ -13,26 +13,26 @@
 #include <utils/common/warnings.h>
 
 namespace {
-    const QColor defaultColor(255, 0, 0, 96);
+    const QColor arrowColor(255, 0, 0, 96);
 
-    const qreal defaultPenWidth = 10;
+    const qreal arrowWidth = 10;
 
-    const qreal defaultHeadLength = 120;
+    const qreal sidesLength = 120;
 
-    const qreal defaultMinRadius = defaultHeadLength / M_PI;
+    const qreal minRadius = sidesLength / M_PI;
 
-    const qreal defaultIgnoredRadius = defaultPenWidth;
+    const qreal ignoreRadius = arrowWidth;
 
-    const QSizeF defaultArrowSize = QSizeF(20, 35); /* (Side, Front) */
+    const QSizeF headSize = QSizeF(20, 35); /* (Side, Front) */
     
-    const qreal defaultArrowOverlap = 5;
+    const qreal headOverlap = 5;
 
     const qreal snapTo90IntervalSize = 5.0;
 
     inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
-        shape->lineTo(base - defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
-        shape->lineTo(base + defaultArrowSize.height() * frontUnit);
-        shape->lineTo(base + defaultArrowSize.width() / 2 * sideUnit - defaultArrowOverlap * frontUnit);
+        shape->lineTo(base - headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
+        shape->lineTo(base + headSize.height() * frontUnit);
+        shape->lineTo(base + headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
     }
 
     inline QPointF polar(qreal alpha, qreal r) {
@@ -128,32 +128,32 @@ public:
         QPointF viewportOrigin = sceneToViewport.map(m_sceneOrigin);
 
         /* Precalculate shape parameters. */
-        qreal radius = qMax(defaultMinRadius, this->length(viewportOrigin - viewportHead));
+        qreal radius = qMax(minRadius, this->length(viewportOrigin - viewportHead));
 
-        qreal width = defaultPenWidth;
-        qreal halfWidth = defaultPenWidth / 2;
+        qreal width = arrowWidth;
+        qreal halfWidth = arrowWidth / 2;
 
-        qreal headAngle = (defaultHeadLength / 2.0) / radius;
+        qreal sideAngle = (sidesLength / 2.0) / radius;
         qreal lineAngle = halfWidth / radius;
-        qreal headAngleDegrees = headAngle / M_PI * 180.0;
+        qreal sideAngleDegrees = sideAngle / M_PI * 180.0;
         qreal lineAngleDegrees = lineAngle / M_PI * 180.0;
 
         /* Prepare shape. */
         QPainterPath shape;
         shape.moveTo(0, halfWidth);
         shape.arcTo(QRectF(-halfWidth, -halfWidth, width, width), -90.0, -180.0);
-        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), lineAngleDegrees, headAngleDegrees - lineAngleDegrees);
-        addArrowHead(&shape, polar(-headAngle, radius), polar(-headAngle - M_PI / 2, 1), polar(-headAngle, 1));
-        shape.arcTo(QRectF(-radius - halfWidth, -radius - halfWidth, 2 * radius + width, 2 * radius + width), headAngleDegrees, -2.0 * headAngleDegrees);
-        addArrowHead(&shape, polar(headAngle, radius), polar(headAngle + M_PI / 2, 1), -polar(headAngle, 1));
-        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), -headAngleDegrees, headAngleDegrees - lineAngleDegrees);
+        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), lineAngleDegrees, sideAngleDegrees - lineAngleDegrees);
+        addArrowHead(&shape, polar(-sideAngle, radius), polar(-sideAngle - M_PI / 2, 1), polar(-sideAngle, 1));
+        shape.arcTo(QRectF(-radius - halfWidth, -radius - halfWidth, 2 * radius + width, 2 * radius + width), sideAngleDegrees, -2.0 * sideAngleDegrees);
+        addArrowHead(&shape, polar(sideAngle, radius), polar(sideAngle + M_PI / 2, 1), -polar(sideAngle, 1));
+        shape.arcTo(QRectF(-radius + halfWidth, -radius + halfWidth, 2 * radius - width, 2 * radius - width), -sideAngleDegrees, sideAngleDegrees - lineAngleDegrees);
         shape.closeSubpath();
 
         /* Draw! */
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());
         painter->translate(viewportOrigin);
         painter->rotate(atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
-        painter->fillPath(shape, defaultColor);
+        painter->fillPath(shape, arrowColor);
     }
 
     /**
@@ -163,18 +163,15 @@ public:
      * 
      * \param viewport                  Viewport to draw this item on.
      */
-    void start(QWidget *viewport, QGraphicsWidget *target) {
-        m_viewport = viewport;
-        m_target = target;
+    void setViewport(QWidget *viewport) {
+        if(m_viewport != viewport)
+            prepareGeometryChange();
 
-        prepareGeometryChange();
+        m_viewport = viewport;
     }
 
-    void stop() {
-        m_viewport = NULL;
-        m_target.clear();
-
-        prepareGeometryChange();
+    void setTarget(QGraphicsWidget *target) {
+        m_target = target;
     }
 
     void setOrigin(const QPointF &origin) {
@@ -236,7 +233,7 @@ RotationInstrument::~RotationInstrument() {
 void RotationInstrument::setRotationItemZValue(qreal rotationItemZValue) {
     m_rotationItemZValue = rotationItemZValue;
 
-    if(rotationItem() != NULL)
+    if(rotationItem())
         rotationItem()->setZValue(m_rotationItemZValue);
 }
 
@@ -342,7 +339,8 @@ void RotationInstrument::startDrag(DragInfo *info) {
         return;
     }
 
-    rotationItem()->start(info->view()->viewport(), target());
+    rotationItem()->setViewport(info->view()->viewport());
+    rotationItem()->setTarget(target());
     rotationItem()->setVisible(true);
     m_lastRotation = target()->rotation();
 
@@ -362,7 +360,7 @@ void RotationInstrument::dragMove(DragInfo *info) {
 
     QPointF sceneOrigin = calculateOrigin(info->view(), target());
     QPoint viewportOrigin = info->view()->mapFromScene(sceneOrigin);
-    if(length(viewportOrigin - info->mouseViewportPos()) < defaultIgnoredRadius)
+    if(length(viewportOrigin - info->mouseViewportPos()) < ignoreRadius)
         return;
 
     QPointF itemOrigin = target()->mapFromScene(sceneOrigin);
