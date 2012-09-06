@@ -31,7 +31,7 @@ QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
 
 QnByteArray::~QnByteArray()
 {
-    if (m_ownBuffer)
+    if( m_ownBuffer )
         qFreeAligned(m_data);
 }
 

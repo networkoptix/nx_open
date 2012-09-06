@@ -30,8 +30,7 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
     m_prevReverseMode(false),
     m_flushedBeforeReverseStart(false),
     m_lastDisplayedTime(AV_NOPTS_VALUE),
-    m_realReverseSize(0),
-    m_maxReverseQueueSize(-1),
+    m_reverseSizeInBytes(0),
     m_timeChangeEnabled(true),
     m_bufferedFrameDisplayer(0),
     m_canUseBufferedFrameDisplayer(true),
@@ -173,59 +172,55 @@ void QnVideoStreamDisplay::reorderPrevFrames()
 
 void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
 {
-    if (m_maxReverseQueueSize == -1) {
-        int bytesPerPic = avpicture_get_size(dec->GetPixelFormat(), dec->getWidth(), dec->getHeight());
-        m_maxReverseQueueSize = MAX_REVERSE_QUEUE_SIZE / bytesPerPic;
-    }
-    
-    if (m_realReverseSize <= m_maxReverseQueueSize)
-        return;
-    // drop some frame at queue. Find max interval contains non-dropped frames (and drop frame from mid of this interval)
-    int maxInterval = -1;
-    //int prevIndex = -1;
-    int maxStart = 0;
-
-    for (int i = 0; i < m_reverseQueue.size(); ++i) 
+    while (m_reverseSizeInBytes > MAX_REVERSE_QUEUE_SIZE)
     {
-        if (m_reverseQueue[i]->data[0])
+        // drop some frame at queue. Find max interval contains non-dropped frames (and drop frame from mid of this interval)
+        int maxInterval = -1;
+        //int prevIndex = -1;
+        int maxStart = 0;
+
+        for (int i = 0; i < m_reverseQueue.size(); ++i) 
         {
-            int start = i;
-            for(; i < m_reverseQueue.size() && m_reverseQueue[i]->data[0]; ++i);
-
-            if (i - start > maxInterval) {
-                maxInterval = i - start;
-                maxStart = start;
-            }
-        }
-    }
-    int index;
-    if (maxInterval == 1) 
-    {
-        // every 2-nd frame already dropped. Change strategy. Increase min hole interval by 1
-        int minHole = INT_MAX;
-        for (int i = m_reverseQueue.size()-1; i >= 0; --i) {
-            if (!m_reverseQueue[i]->data[0])
+            if (m_reverseQueue[i]->data[0])
             {
                 int start = i;
-                for(; i >= 0 && !m_reverseQueue[i]->data[0]; --i);
+                for(; i < m_reverseQueue.size() && m_reverseQueue[i]->data[0]; ++i);
 
-                if (start - i < minHole) {
-                    minHole = start - i;
-                    maxStart = i+1;
+                if (i - start > maxInterval) {
+                    maxInterval = i - start;
+                    maxStart = start;
                 }
             }
         }
-        if (maxStart + minHole < m_reverseQueue.size())
-            index = maxStart + minHole; // take right frame from the hole
-        else
-            index = maxStart-1; // take left frame
+        int index;
+        if (maxInterval == 1) 
+        {
+            // every 2-nd frame already dropped. Change strategy. Increase min hole interval by 1
+            int minHole = INT_MAX;
+            for (int i = m_reverseQueue.size()-1; i >= 0; --i) {
+                if (!m_reverseQueue[i]->data[0])
+                {
+                    int start = i;
+                    for(; i >= 0 && !m_reverseQueue[i]->data[0]; --i);
+
+                    if (start - i < minHole) {
+                        minHole = start - i;
+                        maxStart = i+1;
+                    }
+                }
+            }
+            if (maxStart + minHole < m_reverseQueue.size())
+                index = maxStart + minHole; // take right frame from the hole
+            else
+                index = maxStart-1; // take left frame
+        }
+        else {
+            index = maxStart + maxInterval/2;
+        }
+        Q_ASSERT(m_reverseQueue[index]->data[0]);
+        m_reverseSizeInBytes -= avpicture_get_size((PixelFormat) m_reverseQueue[index]->format, m_reverseQueue[index]->width, m_reverseQueue[index]->height);
+        m_reverseQueue[index]->reallocate(0,0,0);
     }
-    else {
-        index = maxStart + maxInterval/2;
-    }
-    Q_ASSERT(m_reverseQueue[index]->data[0]);
-    m_reverseQueue[index]->reallocate(0,0,0);
-    m_realReverseSize--;
 }
 
 void QnVideoStreamDisplay::waitForFramesDisplaed()
@@ -418,7 +413,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
                     tmpOutFrame->flags |= QnAbstractMediaData::MediaFlags_LowQuality; // flag unknown. set same flags as input data
                 //tmpOutFrame->pkt_dts = AV_NOPTS_VALUE;
                 m_reverseQueue.enqueue(tmpOutFrame);
-                m_realReverseSize++;
+                m_reverseSizeInBytes += avpicture_get_size((PixelFormat)tmpOutFrame->format, tmpOutFrame->width, tmpOutFrame->height);
                 checkQueueOverflow(dec);
                 tmpOutFrame = new CLVideoDecoderOutput();
             }
@@ -440,7 +435,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
         if (!m_reverseQueue.isEmpty() && (m_reverseQueue.front()->flags & AV_REVERSE_REORDERED)) {
             outFrame = m_reverseQueue.dequeue();
             if (outFrame->data[0])
-                m_realReverseSize--;
+                m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
+
 
             outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
             if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
@@ -499,14 +495,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
             reorderPrevFrames();
         }
         m_reverseQueue.enqueue(outFrame);
-        m_realReverseSize++;
+        m_reverseSizeInBytes += avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
         checkQueueOverflow(dec);
         m_frameQueue[m_frameQueueIndex] = new CLVideoDecoderOutput();
         if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
             return Status_Buffered; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
         if (outFrame->data[0])
-            m_realReverseSize--;
+            m_reverseSizeInBytes -= avpicture_get_size((PixelFormat)outFrame->format, outFrame->width, outFrame->height);
     }
     
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
@@ -698,7 +694,7 @@ void QnVideoStreamDisplay::clearReverseQueue()
     for (int i = 0; i < m_reverseQueue.size(); ++i)
         delete m_reverseQueue[i];
     m_reverseQueue.clear();
-    m_realReverseSize = 0;
+    m_reverseSizeInBytes = 0;
     m_lastDisplayedFrame = 0;
 }
 
