@@ -60,4 +60,4 @@ cp debian/templates $STAGE/DEBIAN
 
 sudo chown -R root:root $STAGEBASE
 
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization})
