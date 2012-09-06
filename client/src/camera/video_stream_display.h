@@ -88,8 +88,7 @@ private:
     QQueue<CLVideoDecoderOutput*> m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
-    int m_realReverseSize;
-    int m_maxReverseQueueSize;
+    qint64 m_reverseSizeInBytes;
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
