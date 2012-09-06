@@ -1,5 +1,7 @@
 #include "ptz_instrument.h"
 
+#include <limits>
+
 #include <QtGui/QGraphicsSceneMouseEvent>
 
 #include <utils/common/checked_cast.h>
@@ -324,6 +326,8 @@ void PtzInstrument::dragMove(DragInfo *info) {
     if((m_localSpeed - m_serverSpeed).lengthSquared() > instantUpdateSpeedThreshold * instantUpdateSpeedThreshold) {
         m_connection->asyncPtzMove(m_camera, m_localSpeed.x(), -m_localSpeed.y(), m_localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
         m_serverSpeed = m_localSpeed;
+
+        // TODO: timeout setter.
 
         qDebug() << "PTZ set speed " << m_localSpeed;
     }
