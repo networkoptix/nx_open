@@ -507,6 +507,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
+    QMutexLocker lock(&m_mutex);
     for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = itr.value()->getUrl();
