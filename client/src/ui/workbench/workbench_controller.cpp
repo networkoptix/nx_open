@@ -242,7 +242,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_itemLeftClickInstrument);
     m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
-    m_manager->installInstrument(ptzInstrument);
 
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, dndEventTypes, this));
@@ -253,7 +252,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
-
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
@@ -261,6 +259,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
+    m_manager->installInstrument(ptzInstrument);
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);

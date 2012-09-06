@@ -11,6 +11,7 @@
 
 class QnMediaResourceWidget;
 
+class VariantAnimator;
 class PtzItem;
 
 class PtzInstrument: public DragProcessingInstrument {
@@ -37,9 +38,13 @@ protected:
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
     virtual bool registeredNotify(QGraphicsItem *item) override;
+    virtual void unregisteredNotify(QGraphicsItem *item) override;
 
-    virtual bool event(QWidget *viewport, QEvent *event);
+    virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
 
+    virtual bool hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
+    virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
+    virtual bool hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
@@ -50,22 +55,22 @@ protected:
 
 private slots:
     void at_replyReceived(int status, int handle);
+    void at_target_optionsChanged();
 
 private:
-    QnMediaResourceWidget *target() const { 
-        return m_target.data(); 
-    }
-
     PtzItem *ptzItem() const {
         return m_ptzItem.data();
     }
 
+    void updateLocalSpeed(const QPointF &pos);
+    void updatePtzItemOpacity();
+
 private:
     QWeakPointer<PtzItem> m_ptzItem;
+    VariantAnimator *m_ptzOpacityAnimator;
+
     qreal m_ptzItemZValue;
 
-    QWeakPointer<QnMediaResourceWidget> m_target;
-    
     QVector3D m_serverSpeed, m_localSpeed;
     QnNetworkResourcePtr m_camera;
     QnVideoServerConnectionPtr m_connection;
