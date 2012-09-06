@@ -69,7 +69,7 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    bool valid = m_hasStorageChanges ? validateStorages(tableStorages(), NULL) : true;
+    bool valid = m_hasStorageChanges ? validateStorages(tableStorages()) : true;
     if (valid) {
         submitToResources(); 
 
@@ -162,23 +162,20 @@ QString formatGbStr(qint64 value)
     return QString::number(value/1000000000.0, 'f', 2);
 }
 
-bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
+bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages) {
     if(storages.isEmpty()) {
-        if(errorString)
-            *errorString = tr("At least one storage must be specified.");
+        QMessageBox::critical(this, tr("No storages specified"), tr("At least one storage must be specified."));
         return false;
     }
 
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
-            if(errorString)
-                *errorString = tr("Storage path must not be empty.");
+            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path must not be empty."));
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
-            if(errorString)
-                *errorString = tr("Space limit must be a non-negative integer.");
+            QMessageBox::critical(this, tr("Invalid space limit"), tr("Space limit must be a non-negative integer."));
             return false;
         }
     }
@@ -209,7 +206,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
         qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
         if (itr.value().errorCode == detail::INVALID_PATH)
         {
-            QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
+            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
             return false;
         }
         if (itr.value().errorCode == detail::SERVER_ERROR)
