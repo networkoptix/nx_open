@@ -490,6 +490,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(m_resource.dynamicCast<QnSecurityCamResource>())
         result |= MotionSearchButton | InfoButton;
 
+    result |= PtzButton;
+
     return result;
 }
 
