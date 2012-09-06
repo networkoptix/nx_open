@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
-    <Product Id="*" Name="${product.name}" Language="1033" Version="${project.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="{CE572797-45BF-4f1c-A783-369EA79C597E}">
+    <Product Id="*" Name="${product.name}" Language="1033" Version="${project.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <!-- Wix Variables -->

@@ -69,7 +69,7 @@ void QnServerSettingsDialog::accept() {
     setEnabled(false);
     setCursor(Qt::WaitCursor);
 
-    bool valid = m_hasStorageChanges ? validateStorages(tableStorages(), NULL) : true;
+    bool valid = m_hasStorageChanges ? validateStorages(tableStorages()) : true;
     if (valid) {
         submitToResources(); 
 
@@ -162,17 +162,20 @@ QString formatGbStr(qint64 value)
     return QString::number(value/1000000000.0, 'f', 2);
 }
 
-bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString) {
+bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceList &storages) {
+    if(storages.isEmpty()) {
+        QMessageBox::critical(this, tr("No storages specified"), tr("At least one storage must be specified."));
+        return false;
+    }
+
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         if (storage->getUrl().isEmpty()) {
-            if(errorString)
-                *errorString = tr("Storage path must not be empty.");
+            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path must not be empty."));
             return false;
         }
 
         if (storage->getSpaceLimit() < 0) {
-            if(errorString)
-                *errorString = tr("Space limit must be a non-negative integer.");
+            QMessageBox::critical(this, tr("Invalid space limit"), tr("Space limit must be a non-negative integer."));
             return false;
         }
     }
@@ -200,20 +203,10 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
         if (!storage)
             continue;
 
-        /*
-        QMessageBox::warning(this, tr("Not enough disk space"), 
-            tr("For storage '%1' required at least %2Gb space. Current disk free space is %3Gb, current video folder size is %4Gb. Required addition %5Gb").
-            arg(storage->getUrl()).
-            arg(formatGbStr(needRecordingSpace)).
-            arg(formatGbStr(itr.value().freeSpace)).
-            arg(formatGbStr(itr.value().usedSpace)).
-            arg(formatGbStr(needRecordingSpace - (itr.value().freeSpace + itr.value().usedSpace))));
-        */
-
         qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
         if (itr.value().errorCode == detail::INVALID_PATH)
         {
-            QMessageBox::warning(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
+            QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
             return false;
         }
         if (itr.value().errorCode == detail::SERVER_ERROR)
