@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>client-deb</artifactId>
 	<packaging>pom</packaging>
-	<name>Media Server Deb Package</name>
+	<name>Client Deb Package</name>
 
 	<build>
 		<directory>${arch}</directory>

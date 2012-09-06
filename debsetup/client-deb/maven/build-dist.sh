@@ -13,7 +13,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
+STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
