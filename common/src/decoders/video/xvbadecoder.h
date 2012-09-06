@@ -5,16 +5,86 @@
 #ifndef XVBADECODER_H
 #define XVBADECODER_H
 
+#include <QGLContext>
+#include <QScopedPointer>
+#include <QSharedPointer>
+#include <QSize>
+#include <QString>
+#include <opengl/qgl_p.h>   //from Qt sources
+
+#ifndef XVBA_TEST
+#include "abstractdecoder.h"
+#include "../../utils/media/nalUnits.h"
+#else
+#include "nalUnits.h"
+#endif
+
+#include <fstream>
+#include <string>
+
 #include <GL/glx.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
-
-#include <fstream>
-
 #include "amdxvba.h"
-#include "abstractdecoder.h"
-#include "../../utils/media/nalUnits.h"
 
+
+#ifdef XVBA_TEST
+class QnAbstractPictureData
+{
+public:
+    enum PicStorageType
+    {
+        pstOpenGL,
+        pstSysMemPic
+    };
+
+    //!Returns pic type
+    virtual PicStorageType type() const = 0;
+};
+
+class QnOpenGLPictureData
+:
+    public QnAbstractPictureData
+{
+public:
+    QnOpenGLPictureData( unsigned int _glTexture );
+
+    virtual PicStorageType type() const;
+    //!Returns OGL texture name
+    virtual unsigned int glTexture() const;
+
+private:
+    unsigned int m_glTexture;
+};
+
+class CompressedVideoDataPtr
+{
+public:
+    std::string data;
+    quint64 timestamp;
+};
+
+typedef QSharedPointer<CompressedVideoDataPtr> QnCompressedVideoDataPtr;
+
+enum PixelFormat
+{
+    PIX_FMT_RGBA,
+    PIX_FMT_NV12
+};
+
+class CLVideoDecoderOutput
+{
+public:
+    int width;
+    int height;
+    QSharedPointer<QnAbstractPictureData> picData;
+    int pts;
+    int pkt_dts;
+    int interlaced_frame;
+    int format;
+};
+
+#endif
 
 namespace H264Profile
 {
@@ -34,22 +104,47 @@ namespace H264Level
     QString toString( const unsigned int level_idc, const int constraint_set3_flag = 0 );
 }
 
+class QGLContextPrivateDuplicate
+{
+public:
+};
+
+//!Duplicates QGLContext to allow access to d_ptr (to access X11 context pointer finally)
+class Q_OPENGL_EXPORT QGLContextDuplicate
+{
+    Q_DECLARE_PRIVATE(QGLContext)
+
+public:
+    virtual ~QGLContextDuplicate();
+
+    enum BindOption
+    {
+        NoBindOption = 0x0000
+    };
+    Q_DECLARE_FLAGS(BindOptions, BindOption)
+
+    QScopedPointer<QGLContextPrivateDuplicate> d_ptr;
+};
+
 //!Uses AMD XVBA API to decode h.264 stream
 /*!
     To use it system MUST have Radeon graphics card installed and AMD proprietary driver.
 
     After object creation, one MUST check \a isHardwareAccelerationEnabled(). If it returns \a false, usage of the \a XVBADecoder object is prohibited (it will trigger an assert in decode)
+
+    \todo Support rendering to memory surface
 */
 class QnXVBADecoder
+#ifndef XVBA_TEST
 :
     public QnAbstractVideoDecoder
-//    ,public QnWorkbenchContextAware
+#endif
 {
 public:
     /*!
         \param data acces unit of media stream. MUST contain sequence header (sps & pps in case of h.264)
     */
-    QnXVBADecoder( const QnCompressedVideoDataPtr& data );
+    QnXVBADecoder( const QGLContext* const glContext, const QnCompressedVideoDataPtr& data );
     virtual ~QnXVBADecoder();
 
     //!Implementation of AbstractDecoder::GetPixelFormat
@@ -62,13 +157,15 @@ public:
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
     //!Implementation of AbstractDecoder::setOutPictureSize
     virtual void setOutPictureSize( const QSize& outSize );
+#ifndef XVBA_TEST
     //!Implementation of AbstractDecoder::setLightCpuMode
     virtual void setLightCpuMode( QnAbstractVideoDecoder::DecodeMode );
+#endif
 
 private:
     typedef void* XVBASurface;
 
-    class GLSurfaceContext
+    class XVBASurfaceContext
     {
     public:
         enum State
@@ -76,27 +173,29 @@ private:
             //!surface is ready to decode to
             ready,
             //!decoder still uses this surface
-            decodingInProcess,
+            decodingInProgress,
             //!contains decoded frame to be rendered to the screen
             readyToRender,
             //!surface is being used by the renderer
-            renderingInProcess
+            renderingInProgress
         };
 
         GLXContext glContext;
         unsigned int glTexture;
         XVBASurface surface;
         State state;
-        //!Pts of a picture. Valid only in states \a decodingInProcess, \a readyToRender and \a renderingInProcess
+        //!Pts of a picture. Valid only in states \a decodingInProgress, \a readyToRender and \a renderingInProgress
         quint64 pts;
         std::vector<XVBABufferDescriptor*> usedDecodeBuffers;
 
-        GLSurfaceContext();
-        GLSurfaceContext(
+        XVBASurfaceContext();
+        XVBASurfaceContext(
         	GLXContext _glContext,
         	unsigned int _glTexture,
         	XVBASurface _surface );
-        ~GLSurfaceContext();
+        ~XVBASurfaceContext();
+
+        static const char* toString( State );
     };
 
     //!Locks GL texture for rendering. While this object is alive, texture cannot be used for decoding
@@ -105,11 +204,46 @@ private:
         public QnOpenGLPictureData
     {
     public:
-        QnXVBAOpenGLPictureData( GLSurfaceContext* ctx );
+        QnXVBAOpenGLPictureData( XVBASurfaceContext* ctx );
         virtual ~QnXVBAOpenGLPictureData();
 
     private:
-        GLSurfaceContext* m_ctx;	//TODO switch to weakpointer
+        XVBASurfaceContext* m_ctx;	//TODO switch to weakpointer
+    };
+
+    class SliceEx
+    :
+        public SliceUnit
+    {
+    public:
+        int toppoc;
+        int bottompoc;
+        int PicOrderCntMsb;
+        int ThisPOC;
+        int framepoc;
+        int AbsFrameNum;
+
+        SliceEx();
+    };
+
+    class H264PPocCalcAuxiliaryData
+    {
+    public:
+        int PrevPicOrderCntMsb;
+        int PrevPicOrderCntLsb;
+        int last_has_mmco_5;
+        int last_pic_bottom_field;
+        int ThisPOC;
+        int PreviousFrameNum;
+        int FrameNumOffset;
+        int ExpectedDeltaPerPicOrderCntCycle;
+        int PicOrderCntCycleCnt;
+        int FrameNumInPicOrderCntCycle;
+        int ExpectedPicOrderCnt;
+        int PreviousFrameNumOffset;
+        int MaxFrameNum;
+
+        H264PPocCalcAuxiliaryData();
     };
 
     Status m_prevOperationStatus;
@@ -118,14 +252,16 @@ private:
     GLXContext m_glContext;
     Display* m_display;
     unsigned int m_getCapDecodeOutputSize;
-    std::list<QSharedPointer<GLSurfaceContext> > m_glSurfaces;
+    std::list<QSharedPointer<XVBASurfaceContext> > m_commonSurfaces;
+    std::list<QSharedPointer<XVBASurfaceContext> > m_glSurfaces;
     XVBAPictureDescriptor m_pictureDescriptor;
     SPSUnit m_sps;
     PPSUnit m_pps;
     QSize m_outPicSize;
 
     XVBABufferDescriptor m_pictureDescriptorBuf;
-    XVBABufferDescriptor* m_pictureDescriptorBufArray[1];
+    //!Holds XVBA_PICTURE_DESCRIPTION_BUFFER and XVBA_QM_BUFFER
+    XVBABufferDescriptor* m_pictureDescriptorBufArray[2];
     XVBA_Decode_Picture_Input m_pictureDescriptorDecodeInput;
 
     XVBADecodeCap m_decodeCap;
@@ -142,13 +278,18 @@ private:
     //!vector<pair<buffer, true if used> >
     std::vector<std::pair<XVBABufferDescriptor*, bool> > m_xvbaDecodeBuffers;
 
-    quint8* m_mediaBuf;
-    size_t m_mediaBufCapacity;
-
     quint8* m_decodedPictureRgbaBuf;
     size_t m_decodedPictureRgbaBufSize;
+    //!number of common surfaces in state decodingInProgress
+    size_t m_totalSurfacesBeingDecoded;
 
     std::ofstream m_inStream;
+
+    H264PPocCalcAuxiliaryData m_h264PocData;
+
+#ifdef XVBA_TEST
+    bool m_hardwareAccelerationEnabled;
+#endif
 
     //!Creates XVBA context
     /*!
@@ -170,6 +311,8 @@ private:
     /*!
         \return true on success
     */
+    bool createGLSurface();
+    //!Creates common XVBA surface
     bool createSurface();
     //!Parses sps & pps from \a data and fills \a m_pictureDescriptor
     bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
@@ -188,16 +331,20 @@ private:
             total surface count is less than \a MAX_SURFACE_COUNT, calls \a createSurface to create new surface and returns the new one
         \param decodedPicSurface A decoded surface with lowest pts is returned here. NULL, if no decoded surfaces
     */
-    void checkSurfaces( GLSurfaceContext** const targetSurfaceCtx, GLSurfaceContext** const decodedPicSurface );
+    void checkSurfaces( XVBASurfaceContext** const targetSurfaceCtx, XVBASurfaceContext** const decodedPicSurface );
     //!Guess what
     QString lastErrorText() const;
     QString decodeErrorToString( XVBA_DECODE_ERROR errorCode ) const;
-	void fillOutputFrame( CLVideoDecoderOutput* const outFrame, GLSurfaceContext* const decodedPicSurface );
+	void fillOutputFrame( CLVideoDecoderOutput* const outFrame, XVBASurfaceContext* const decodedPicSurface );
 	XVBABufferDescriptor* getDecodeBuffer( XVBA_BUFFER bufferType );
 	void ungetBuffer( XVBABufferDescriptor* bufDescriptor );
 	void readSPS( const quint8* curNalu, const quint8* nextNalu );
 	void readPPS( const quint8* curNalu, const quint8* nextNalu );
-	GLSurfaceContext* findUnusedSurface();
+	XVBASurfaceContext* findUnusedGLSurface();
+    //!Caculates h.264 picture order count
+    void calcH264POC( SliceEx* const pSlice );
+
+	static int h264ProfileIdcToXVBAProfile( int profile_idc );
 
     QnXVBADecoder( const QnXVBADecoder& );
     QnXVBADecoder& operator=( const QnXVBADecoder& );
