@@ -460,8 +460,8 @@
                             
                             <Component Id="ServerFFmpegLibraries" Guid="{692DCCAD-138B-4763-822E-8BC8712F5007}">
                                 <File Id="ServerAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
-                                <File Id="ServerAvdeviceDll" Name="avdevice-54.dll" Source="${libdir}/bin/${build.configuration}/avdevice-54.dll"/>
-                                <File Id="ServerAvfilterDll" Name="avfilter-3.dll" Source="${libdir}/bin/${build.configuration}/avfilter-3.dll"/>
+                                <File Id="ServerAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+                                <File Id="ServerAvfilterDll" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
                                 <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
@@ -526,8 +526,8 @@
                             
                             <Component Id="ClientFFmpegLibraries" Guid="{5D256521-DE39-4264-A44F-69728AA650EF}">
                                 <File Id="ClientAvcodecDll" Name="avcodec-54.dll" Source="${libdir}/bin/${build.configuration}/avcodec-54.dll"/>
-                                <File Id="ClientAvdeviceDll" Name="avdevice-54.dll" Source="${libdir}/bin/${build.configuration}/avdevice-54.dll"/>
-                                <File Id="ClientAvfilterDll" Name="avfilter-3.dll" Source="${libdir}/bin/${build.configuration}/avfilter-3.dll"/>
+                                <File Id="ClientAvdeviceDll" Name="avdevice-53.dll" Source="${libdir}/bin/${build.configuration}/avdevice-53.dll"/>
+                                <File Id="ClientAvfilterDll" Name="avfilter-2.dll" Source="${libdir}/bin/${build.configuration}/avfilter-2.dll"/>
                                 <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
