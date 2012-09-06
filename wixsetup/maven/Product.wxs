@@ -18,18 +18,18 @@
         <?define suffix = "" ?>
         <?endif?>
         
-        <?define VmsInstalling=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
-        <?define VmsUpgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
-        <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
-        <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
-        <?define VmsRepairing=" (REINSTALLMODE) " ?>
+        <?define ${customization}Installing=" (NOT Installed AND NOT PREVIOUSVERSIONSINSTALLED) "?>
+        <?define ${customization}Upgrading=" (NOT Installed AND PREVIOUSVERSIONSINSTALLED)" ?>
+        <?define ${customization}Changing=" (Installed AND REMOVE <> "ALL") "?>
+        <?define ${customization}Removing=" (Installed AND REMOVE = "ALL") "?>
+        <?define ${customization}Repairing=" (REINSTALLMODE) " ?>
         
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
-        <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
-        <SetProperty Id="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
+        <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.${customization}Repairing)</SetProperty>
+        <SetProperty Id="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.${customization}Repairing)</SetProperty>
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
@@ -199,7 +199,7 @@
                       Execute="deferred" Return="check" Impersonate="no" />
         
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[VmsTrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
@@ -266,14 +266,14 @@
             
 <!--            <Custom Action="CloseTrayToolAction" Before="RemoveExistingProducts" />-->
 <!--            <RemoveExistingProducts After="InstallInitialize" />-->
-            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
-            <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
+            <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.${customization}Installing) ]]></Custom>
+            <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.${customization}Installing) ]]></Custom>
             
             <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
-            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.${customization}Installing) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.${customization}Installing) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="LaunchTrayTool" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
@@ -298,14 +298,14 @@
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${product.name}">
-                        <Directory Id="VmsAppServerDir" Name="${appserver.name}">
+                        <Directory Id="${customization}AppServerDir" Name="${appserver.name}">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="ecexe" Name="ecs.exe" Source="${AppServerDir}/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="${company.name} ${appserver.name}" Scope="any" IgnoreFailure="yes" />
                                 </File>
                                 
-                                <ServiceInstall Id="VmsAppServerService"
-                                                Name="VmsAppServer"
+                                <ServiceInstall Id="${customization}AppServerService"
+                                                Name="${customization}AppServer"
                                                 DisplayName="${company.name} ${appserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -314,8 +314,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="StartVmsAppServerService" Name="VmsAppServer" Start="install" Wait="no" />
-                                <ServiceControl Id="StopVmsAppServerService" Name="VmsAppServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}AppServerService" Name="${customization}AppServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}AppServerService" Name="${customization}AppServer" Stop="both" Wait="yes" Remove="uninstall" />
                             
                             </Component>
                             
@@ -353,17 +353,17 @@
                            </Component>
                         </Directory>
                         
-                        <Directory Id="VmsTrayToolDir" Name="TrayTool">
+                        <Directory Id="${customization}TrayToolDir" Name="TrayTool">
                             <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
                                 <File Id="traytool.exe" Name="traytool.exe" Source="${libdir}/bin/${build.configuration}/traytool.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallExceptionVmsTrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
-                                              WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                     
                                     <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
-                                              WorkingDirectory='VmsTrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
                             </Component>
@@ -378,14 +378,14 @@
                             </Component>							
                         </Directory>
                         
-                        <Directory Id="VmsProxyServerDir" Name="MediaProxy">
+                        <Directory Id="${customization}ProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
                                 <File Id="ProxyExe" Name="mediaproxy.exe" Source="${libdir}/bin/${build.configuration}/mediaproxy.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
-                                <ServiceInstall Id="VmsMediaProxyService"
-                                                Name="VmsMediaProxy"
+                                <ServiceInstall Id="${customization}MediaProxyService"
+                                                Name="${customization}MediaProxy"
                                                 DisplayName="${mediaproxy.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -394,8 +394,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="StartVmsProxyService" Name="VmsMediaProxy" Start="install" Wait="no" />
-                                <ServiceControl Id="StopVmsProxyService" Name="VmsMediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}ProxyService" Name="${customization}MediaProxy" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}ProxyService" Name="${customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
                             
                             <Component Id="ProxyQTLibraries" Guid="{A49B87BB-ADD9-41CA-87C0-304A8A483427}">
@@ -411,14 +411,14 @@
                             </Component>							
                         </Directory>
                         
-                        <Directory Id="VmsMediaServerDir" Name="MediaServer">
+                        <Directory Id="${customization}MediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
-                                <ServiceInstall Id="VmsMediaServerService"
-                                                Name="VmsMediaServer"
+                                <ServiceInstall Id="${customization}MediaServerService"
+                                                Name="${customization}MediaServer"
                                                 DisplayName="${mediaserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -427,8 +427,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="StartVmsServerService" Name="VmsMediaServer" Start="install" Wait="no" />
-                                <ServiceControl Id="StopVmsServerService" Name="VmsMediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
                             
                             <Component Id="ServerConfigurationGuid" Guid="{A2F8AEC6-3050-4262-BEAF-3645943D932F}" Permanent="yes" NeverOverwrite="yes">
@@ -465,7 +465,7 @@
                                 <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-                                <!-- <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/> -->
+                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -482,16 +482,16 @@
                             </Component>
                         </Directory>
                         
-                        <Directory Id="VmsClientDir" Name="Client">
+                        <Directory Id="${customization}ClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
                                 <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
-                                              WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${customization}ClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                     <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                                              WorkingDirectory='VmsClientDir' Advertise="yes" Icon="icon_desktop.exe">
+                                              WorkingDirectory='${customization}ClientDir' Advertise="yes" Icon="icon_desktop.exe">
                                     </Shortcut>
                                 
                                 </File>
@@ -531,7 +531,7 @@
                                 <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-                                <!-- <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/> -->
+                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
                                 <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
                             </Component>
                             
@@ -600,7 +600,7 @@
         
         <Feature Id="AppServerFeature" Title="${product.name} ${appserver.name}" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="hidden" >
-<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !AppServerFeature <> 3 ]]> </Condition>-->
+<!--            <Condition Level="0"><![CDATA[ $(var.${customization}Upgrading) AND !AppServerFeature <> 3 ]]> </Condition>-->
             
             <ComponentGroupRef Id="AppServerFilesComponent" />
             <ComponentRef Id="AppServerExecutable" />
@@ -615,7 +615,7 @@
         </Feature>
         
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
-<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>-->
+<!--            <Condition Level="0"><![CDATA[ $(var.${customization}Upgrading) AND !TrayToolFeature <> 3 ]]> </Condition>-->
             
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
@@ -625,7 +625,7 @@
         
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
+<!--            <Condition Level="0"><![CDATA[ $(var.${customization}Upgrading) AND !ServerFeature <> 3 ]]> </Condition>-->
             
             <ComponentRef Id='ServerDirectoryComponent'/>
             <ComponentRef Id='ServerConfiguration'/>
@@ -639,7 +639,7 @@
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
                  ConfigurableDirectory="INSTALLDIR" Absent="allow" InstallDefault="local" AllowAdvertise="no" Display="expand">
-<!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
+<!--            <Condition Level="0"><![CDATA[ $(var.${customization}Upgrading) AND !ClientFeature <> 3 ]]> </Condition>-->
             
             <ComponentRef Id="NovFileAssociation"/>
  
@@ -736,20 +736,20 @@
             <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
             <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg"><![CDATA[ NOT $(var.${customization}Changing) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.${customization}Changing) ]]></Publish>
             
             <?define SomeFeaturesSelected="(!ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature=3]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature<>3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.${customization}Installing)]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.${customization}Installing) AND &ServerFeature=3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.${customization}Installing) AND &ServerFeature<>3]]></Publish>
             
             <!-- Reset values in case when user returns to this dialog after AppServerDlg -->
 
-            <?define AppServerInstallingMediaServer="($(var.VmsChanging) AND !AppServerFeature=3 AND &ServerFeature=3)"?>
-            <?define AppServerInstallingClient="($(var.VmsChanging) AND !AppServerFeature=3 AND &ClientFeature=3)"?>
+            <?define AppServerInstallingMediaServer="($(var.${customization}Changing) AND !AppServerFeature=3 AND &ServerFeature=3)"?>
+            <?define AppServerInstallingClient="($(var.${customization}Changing) AND !AppServerFeature=3 AND &ClientFeature=3)"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
@@ -816,9 +816,9 @@
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature=3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature<>3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstalling)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.${customization}Installing) AND &AppServerFeature=3]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.${customization}Installing) AND &AppServerFeature<>3]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.${customization}Installing)]]></Publish>
 
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (&AppServerFeature<>3))" ?>
@@ -851,14 +851,14 @@
             <?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
             <?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 ]]></Publish>          
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.${customization}Installing) AND &ServerFeature<>3 ]]></Publish>          
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.${customization}Installing) AND INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.${customization}Installing) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.${customization}Installing) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.${customization}Installing) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[$(var.VmsChanging)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.${customization}Upgrading)]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[$(var.${customization}Changing)]]></Publish>
             
 <!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
