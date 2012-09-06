@@ -1467,12 +1467,12 @@ void QnWorkbenchDisplay::at_curtainActivityInstrument_activityStarted() {
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStopped() {
     foreach(QnResourceWidget *widget, m_widgets) 
-        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, true);
+        widget->setOption(QnResourceWidget::DisplayActivityOverlay, true);
 }
 
 void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted() {
     foreach(QnResourceWidget *widget, m_widgets) 
-        widget->setDisplayFlag(QnResourceWidget::DisplayActivityOverlay, false);
+        widget->setOption(QnResourceWidget::DisplayActivityOverlay, false);
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed() {

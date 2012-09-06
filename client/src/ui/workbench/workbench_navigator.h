@@ -150,8 +150,8 @@ protected slots:
 
     void at_widget_motionSelectionChanged(QnMediaResourceWidget *widget);
     void at_widget_motionSelectionChanged();
-    void at_widget_displayFlagsChanged(QnResourceWidget *widget);
-    void at_widget_displayFlagsChanged();
+    void at_widget_optionsChanged(QnResourceWidget *widget);
+    void at_widget_optionsChanged();
 
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
@@ -163,7 +163,7 @@ protected slots:
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_selectionPressed();
-    void at_timeSlider_selectionChanged();
+    void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_destroyed();

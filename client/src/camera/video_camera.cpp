@@ -43,7 +43,6 @@ QnVideoCamera::~QnVideoCamera()
 
     stopDisplay();
     delete m_reader;
-    //delete[] m_stat;
 }
 
 QnMediaResourcePtr QnVideoCamera::resource() {

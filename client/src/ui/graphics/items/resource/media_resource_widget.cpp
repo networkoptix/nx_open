@@ -69,13 +69,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
-    m_searchButton = new QnImageButtonWidget();
-    m_searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
-    m_searchButton->setCheckable(true);
-    m_searchButton->setProperty(Qn::NoBlockMotionSelection, true);
-    connect(m_searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
+    QnImageButtonWidget *searchButton = new QnImageButtonWidget();
+    searchButton->setIcon(qnSkin->icon("decorations/item_search.png"));
+    searchButton->setCheckable(true);
+    searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
-    buttonBar()->addButton(MotionSearchButton, m_searchButton);
+    QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
+    ptzButton->setIcon(qnSkin->icon("decorations/item_ptz.png"));
+    ptzButton->setCheckable(true);
+    ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
+
+    buttonBar()->addButton(MotionSearchButton, searchButton);
+    buttonBar()->addButton(PtzButton, ptzButton);
     updateButtonsVisibility();
 }
 
@@ -288,7 +295,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
 }
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) {
-    if (displayFlags() & DisplayMotion) {
+    if (options() & DisplayMotion) {
         paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
         paintMotionSensitivity(painter, channel, rect);
 
@@ -389,7 +396,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
 void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect) {
     ensureMotionSensitivity();
 
-    if (displayFlags() & DisplayMotionSensitivity) {
+    if (options() & DisplayMotionSensitivity) {
         for (int i = 0; i < 10; ++i) {
             QColor color = i > 0 ? QColor(100 +  i * 3, 16 * (10 - i), 0, 96 + i * 2) : qnGlobals->motionMaskColor();
             QRegion region = m_motionSensitivity[channel].getRegionBySens(i);
@@ -430,14 +437,14 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
     m_renderer->setChannelScreenSize(channelScreenSize());
 }
 
-void QnMediaResourceWidget::displayFlagsChangedNotify(DisplayFlags changedFlags) {
+void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & DisplayMotion) {
         if (QnAbstractArchiveReader *reader = m_display->archiveReader())
-            reader->setSendMotion(displayFlags() & DisplayMotion);
+            reader->setSendMotion(options() & DisplayMotion);
 
-        m_searchButton->setChecked(displayFlags() & DisplayMotion);
+        buttonBar()->setButtonsChecked(MotionSearchButton, options() & DisplayMotion);
 
-        if(displayFlags() & DisplayMotion) {
+        if(options() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
         } else {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
@@ -483,13 +490,15 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(m_resource.dynamicCast<QnSecurityCamResource>())
         result |= MotionSearchButton | InfoButton;
 
+    result |= PtzButton;
+
     return result;
 }
 
 QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
     if (m_display->camDisplay()->isStillImage()) {
         return EmptyOverlay;
-    } else if(m_display->isPaused() && (displayFlags() & DisplayActivityOverlay)) {
+    } else if(m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
         return OfflineOverlay;
@@ -518,5 +527,9 @@ void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
 }
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
-    setDisplayFlag(DisplayMotion, checked);
+    setOption(DisplayMotion, checked);
+}
+
+void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
+
 }

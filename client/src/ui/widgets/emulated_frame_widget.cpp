@@ -5,13 +5,8 @@
 #include <ui/common/frame_section.h>
 
 namespace {
-    void setCursorShape(QWidget *widget, Qt::CursorShape shape) {
-        /* There is no equality check in QWidget::setCursor, 
-         * and we don't want to trigger unnecessary change events. */
 
-        if(widget->cursor().shape() != shape)
-            widget->setCursor(shape);
-    }
+    const int cursorUpdateTimeoutMSec = 30;
 
 } // anonymous namespace
 
@@ -34,20 +29,23 @@ bool QnEmulatedFrameWidget::event(QEvent *event) {
 
     switch(event->type()) {
     case QEvent::HoverEnter:
-    case QEvent::HoverMove: {
-        QHoverEvent *e = static_cast<QHoverEvent *>(event);
-        if(childAt(e->pos())) {
-            setCursorShape(this, Qt::ArrowCursor);
-        } else {
-            setCursorShape(this, Qn::calculateHoverCursorShape(windowFrameSectionAt(e->pos())));
-        }
+    case QEvent::HoverMove:
+        updateCursor(static_cast<QHoverEvent *>(event)->pos());
+        event->accept();
+        return true;
+    case QEvent::HoverLeave:
+        updateCursor(QPoint(-1, -1));
+        event->accept();
+        return true;
+    case QEvent::Timer: {
+        QTimerEvent *timerEvent = static_cast<QTimerEvent *>(event);
+        if(timerEvent->timerId() != m_timer.timerId())
+            break;
+
+        updateCursor();
         event->accept();
         return true;
     }
-    case QEvent::HoverLeave:
-        setCursorShape(this, Qt::ArrowCursor);
-        event->accept();
-        return true;
     default:
         break;
     }
@@ -71,17 +69,16 @@ void QnEmulatedFrameWidget::mouseMoveEvent(QMouseEvent *event) {
     base_type::mouseMoveEvent(event);
 
     m_dragProcessor->widgetMouseMoveEvent(this, event);
-
-    if(!m_dragProcessor->isWaiting()) {
-        
-    } else {
-    }
 }
 
 void QnEmulatedFrameWidget::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
 
     m_dragProcessor->widgetMouseReleaseEvent(this, event);
+}
+
+void QnEmulatedFrameWidget::startDragProcess(DragInfo *) {
+    m_timer.stop();
 }
 
 void QnEmulatedFrameWidget::dragMove(DragInfo *info) {
@@ -93,3 +90,30 @@ void QnEmulatedFrameWidget::dragMove(DragInfo *info) {
     }
 }
 
+void QnEmulatedFrameWidget::finishDragProcess(DragInfo *) {
+    updateCursor();
+}
+
+void QnEmulatedFrameWidget::updateCursor() {
+    updateCursor(mapFromGlobal(QCursor::pos()));
+}
+
+void QnEmulatedFrameWidget::updateCursor(const QPoint &mousePos) {
+    if(!m_dragProcessor->isWaiting())
+        return;
+
+    if(mousePos == m_lastMousePos)
+        return;
+
+    Qt::CursorShape shape = childAt(mousePos) ? Qt::ArrowCursor : Qn::calculateHoverCursorShape(windowFrameSectionAt(mousePos));
+    if(shape == Qt::ArrowCursor) {
+        m_timer.stop();
+    } else if(!m_timer.isActive()) {
+        m_timer.start(cursorUpdateTimeoutMSec, this);
+    }
+ 
+    if(cursor().shape() != shape)
+        setCursor(shape);
+
+    m_lastMousePos = mousePos;
+}
