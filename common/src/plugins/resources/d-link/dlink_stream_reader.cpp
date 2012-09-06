@@ -42,7 +42,7 @@ m_mpeg4(false)
 
 PlDlinkStreamReader::~PlDlinkStreamReader()
 {
-
+    stop();
 }
 
 

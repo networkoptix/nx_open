@@ -18,7 +18,7 @@ QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
 
 QnISDStreamReader::~QnISDStreamReader()
 {
-    closeStream();
+    stop();
 }
 
 
