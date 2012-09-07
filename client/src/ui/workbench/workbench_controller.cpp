@@ -227,6 +227,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
+    ptzInstrument->setPtzItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
@@ -241,7 +242,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(m_itemLeftClickInstrument);
     m_manager->installInstrument(m_itemRightClickInstrument);
     m_manager->installInstrument(itemMiddleClickInstrument);
-    m_manager->installInstrument(ptzInstrument);
 
     /* Scene instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, dndEventTypes, this));
@@ -252,7 +252,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
-
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
@@ -260,6 +259,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
+    m_manager->installInstrument(ptzInstrument);
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
@@ -347,6 +347,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_dragInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
+
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_moveInstrument,               SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
 
     /* Connect to display. */
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));

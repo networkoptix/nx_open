@@ -17,40 +17,20 @@ QnEmulatedFrameWidget::QnEmulatedFrameWidget(QWidget *parent, Qt::WindowFlags wi
     m_dragProcessor = new DragProcessor(this);
     m_dragProcessor->setHandler(this);
 
-    setAttribute(Qt::WA_Hover, true);
+    setMouseTracking(true);
 }
 
 QnEmulatedFrameWidget::~QnEmulatedFrameWidget() {
     return;
 }
 
-bool QnEmulatedFrameWidget::event(QEvent *event) {
-    bool result = base_type::event(event);
-
-    switch(event->type()) {
-    case QEvent::HoverEnter:
-    case QEvent::HoverMove:
-        updateCursor(static_cast<QHoverEvent *>(event)->pos());
-        event->accept();
-        return true;
-    case QEvent::HoverLeave:
-        updateCursor(QPoint(-1, -1));
-        event->accept();
-        return true;
-    case QEvent::Timer: {
-        QTimerEvent *timerEvent = static_cast<QTimerEvent *>(event);
-        if(timerEvent->timerId() != m_timer.timerId())
-            break;
-
+void QnEmulatedFrameWidget::timerEvent(QTimerEvent *event) {
+    if(event->timerId() != m_timer.timerId()) {
+        base_type::timerEvent(event);
+    } else {
         updateCursor();
         event->accept();
-        return true;
     }
-    default:
-        break;
-    }
-
-    return result;
 }
 
 void QnEmulatedFrameWidget::mousePressEvent(QMouseEvent *event) {
@@ -69,6 +49,11 @@ void QnEmulatedFrameWidget::mouseMoveEvent(QMouseEvent *event) {
     base_type::mouseMoveEvent(event);
 
     m_dragProcessor->widgetMouseMoveEvent(this, event);
+
+    if(!event->buttons()) {
+        updateCursor(event->pos());
+        event->accept();
+    }
 }
 
 void QnEmulatedFrameWidget::mouseReleaseEvent(QMouseEvent *event) {
@@ -117,3 +102,4 @@ void QnEmulatedFrameWidget::updateCursor(const QPoint &mousePos) {
 
     m_lastMousePos = mousePos;
 }
+
