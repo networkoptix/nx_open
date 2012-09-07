@@ -125,7 +125,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
     if (!suffix.isEmpty()) {
 
         if (suffix.endsWith(QLatin1String("-FOCUS")))
-            addCameraCapabilities(HasPtzZoom);
+            addCameraCapabilities(HasZoom);
 
         if (baseIdStr.endsWith(suffix))
         {

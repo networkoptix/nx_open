@@ -9,7 +9,7 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
-    enum CameraFlag { CFNoFlags = 0, HasPtzMove = 1, HasPtzZoom = 2};
+    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
     Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag)
 
 
