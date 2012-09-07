@@ -38,7 +38,6 @@ public:
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
-    QSize getFrameSize();
     QImage getScreenshot();
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
@@ -100,7 +99,6 @@ private:
     QSize m_imageSize;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
-    QSize m_lastFrameSize;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

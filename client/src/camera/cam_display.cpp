@@ -201,7 +201,7 @@ QImage QnCamDisplay::getScreenshot(int channel)
 }
 
 QSize QnCamDisplay::getFrameSize(int channel) const {
-    return m_display[channel]->getFrameSize();
+    return m_display[channel]->getImageSize();
 }
 
 void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
