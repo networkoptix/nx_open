@@ -454,9 +454,17 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 
         if(options() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
+            setOption(ControlPtz, false);
         } else {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
+    }
+
+    if(changedFlags & ControlPtz) {
+        buttonBar()->setButtonsChecked(PtzButton, options() & ControlPtz);
+
+        if(options() & ControlPtz)
+            setOption(DisplayMotion, false);
     }
 }
 
