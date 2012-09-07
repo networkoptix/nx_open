@@ -574,7 +574,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Navigation slider. */
-    m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
+    //m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
 
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
     m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
@@ -597,8 +597,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerItem->stackBefore(m_sliderShowButton);
     m_sliderItem->stackBefore(m_sliderResizerItem);
-    m_sliderEaterItem->stackBefore(m_calendarShowButton);
-    m_sliderEaterItem->stackBefore(m_calendarItem);
+    //m_sliderEaterItem->stackBefore(m_calendarShowButton);
+    //m_sliderEaterItem->stackBefore(m_calendarItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -941,7 +941,7 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
     }
 
     m_sliderResizerItem->setVisible(!qFuzzyIsNull(opacity));
-    m_sliderEaterItem->setVisible(!qFuzzyIsNull(opacity));
+    //m_sliderEaterItem->setVisible(!qFuzzyIsNull(opacity));
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
@@ -1559,8 +1559,8 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateSliderResizerGeometry();
     updateCalendarGeometry();
 
-    m_sliderEaterItem->resize(m_sliderItem->size().width(), 30);
-    m_sliderEaterItem->setPos(m_sliderItem->pos() + QPointF(0, -30));
+    //m_sliderEaterItem->resize(m_sliderItem->size().width(), 10);
+    //m_sliderEaterItem->setPos(m_sliderItem->pos() + QPointF(0, -10));
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(

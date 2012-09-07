@@ -132,7 +132,13 @@ qint64 QnResourceDisplay::lengthUSec() const {
 }
 
 qint64 QnResourceDisplay::currentTimeUSec() const {
-    return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
+    if (!m_camera)
+        return -1;
+    else if (m_camera->getCamDisplay()->isRealTimeSource())
+        return DATETIME_NOW;
+    else
+        return m_camera->getCamDisplay()->getCurrentTime();
+    //return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
 }
 
 void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {

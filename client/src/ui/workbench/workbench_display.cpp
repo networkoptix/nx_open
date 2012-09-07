@@ -310,9 +310,11 @@ void QnWorkbenchDisplay::initSceneContext() {
         initBoundingInstrument();
     }
 
-    connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
+    /* Note that selection often changes there and back, and we don't want such changes to 
+     * affect our logic, so we use queued connections here. */
     connect(m_scene,                SIGNAL(selectionChanged()),                     context()->action(Qn::SelectionChangeAction), SLOT(trigger()));
-    connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged()));
+    connect(m_scene,                SIGNAL(selectionChanged()),                     this,                   SLOT(at_scene_selectionChanged())); 
+    connect(m_scene,                SIGNAL(destroyed()),                            this,                   SLOT(at_scene_destroyed()));
 
     /* Scene indexing will only slow everything down. */
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
