@@ -62,18 +62,13 @@ void DragProcessor::setStartDragDistance(int startDragDistance) {
 }
 
 void DragProcessor::setStartDragTime(int startDragTime) {
-    if(startDragTime < 0) {
-        qnWarning("Invalid negative start drag time '%1'.", startDragTime);
-        return;
-    }
-
     m_startDragTime = startDragTime;
 }
 
 void DragProcessor::startDragTimer() {
     killDragTimer();
 
-    if(m_startDragTime > 0)
+    if(m_startDragTime >= 0)
         m_dragTimerId = startTimer(m_startDragTime);
 }
 

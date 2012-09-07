@@ -130,6 +130,9 @@ private:
     /** Media resource. */
     QnMediaResourcePtr m_resource;
 
+    /** Camera resource. */
+    QnVirtualCameraResourcePtr m_camera;
+
     /** Display. */
     QnResourceDisplay *m_display;
 

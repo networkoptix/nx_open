@@ -47,6 +47,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
+    m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -182,11 +183,11 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
     if(m_motionSensitivityValid)
         return;
 
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_motionSensitivity = camera->getMotionRegionList();
+    if (m_camera) {
+        m_motionSensitivity = m_camera->getMotionRegionList();
 
         if(m_motionSensitivity.size() != channelCount()) {
-            qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", camera->getName());
+            qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
     } else {
@@ -200,8 +201,8 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
     ensureMotionSensitivity();
 
     bool changed = false;
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+    if (m_camera) {
+        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -226,8 +227,8 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
 
     int channel =0;
     QPoint channelPos = gridPos;
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+    if (m_camera) {
+        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
@@ -454,17 +455,9 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 
         if(options() & DisplayMotion) {
             setProperty(Qn::MotionSelectionModifiers, 0);
-            setOption(ControlPtz, false);
         } else {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
-    }
-
-    if(changedFlags & ControlPtz) {
-        buttonBar()->setButtonsChecked(PtzButton, options() & ControlPtz);
-
-        if(options() & ControlPtz)
-            setOption(DisplayMotion, false);
     }
 }
 
@@ -503,12 +496,12 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
-    if(camera)
+    if(m_camera) {
         result |= MotionSearchButton | InfoButton;
 
-    if(camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))
-        result |= PtzButton;
+        if(m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))
+            result |= PtzButton;
+    }
 
     return result;
 }
@@ -546,9 +539,15 @@ void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
+
+    if(checked)
+        buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    setOption(ControlPtz, checked);
+    setOption(ControlPtz, checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::HasPtz));
+
+    if(checked)
+        buttonBar()->setButtonsChecked(MotionSearchButton, false);
 }
 

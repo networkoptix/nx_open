@@ -41,10 +41,10 @@ namespace {
 
 
     const qreal instantUpdateSpeedThreshold = 0.1;
-    const qreal updateSpeedThreshold = 0.01;
+    const qreal updateSpeedThreshold = 0.001;
     const int updateSpeedInterval = 1000;
 
-    const qreal ptzItemBackgroundOpacity = 0.3;
+    const qreal ptzItemBackgroundOpacity = 0.25;
     const qreal ptzItemOperationalOpacity = 1.0;
     const qreal ptzItemOpacityAnimationSpeed = 2.0;
 
@@ -221,7 +221,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
     m_ptzItemZValue(0.0),
     m_targetUnderMouse(false)
 {
-    dragProcessor()->setStartDragTime(0);
+    // TODO: check validity of isWaiting / isRunning calls in this class.
+    dragProcessor()->setStartDragTime(150); /* Almost instant drag. */
 }
 
 PtzInstrument::~PtzInstrument() {
