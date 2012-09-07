@@ -12,15 +12,15 @@ namespace {
 
 } // anonymous namespace
 
-detail::AnimatedBase::AnimatedBase():
+AnimatedBase::AnimatedBase():
     m_listener(new DummyAnimationTimerListener()) 
 {}
 
-detail::AnimatedBase::~AnimatedBase() {
+AnimatedBase::~AnimatedBase() {
     return;
 }
 
-void detail::AnimatedBase::updateScene(QGraphicsScene *scene) {
+void AnimatedBase::updateScene(QGraphicsScene *scene) {
     AnimationTimer *oldTimer = m_listener->timer();
     AnimationTimer *newTimer = InstrumentManager::animationTimerOf(scene);
     if(newTimer == oldTimer)
@@ -31,7 +31,7 @@ void detail::AnimatedBase::updateScene(QGraphicsScene *scene) {
         listener->setTimer(newTimer);
 }
 
-void detail::AnimatedBase::registerAnimation(AnimationTimerListener *listener) {
+void AnimatedBase::registerAnimation(AnimationTimerListener *listener) {
     if(listener == NULL) {
         qnNullWarning(listener);
         return;
@@ -41,7 +41,7 @@ void detail::AnimatedBase::registerAnimation(AnimationTimerListener *listener) {
     m_listeners.insert(listener);
 }
 
-void detail::AnimatedBase::unregisterAnimation(AnimationTimerListener *listener) {
+void AnimatedBase::unregisterAnimation(AnimationTimerListener *listener) {
     if(listener == NULL) {
         qnNullWarning(listener);
         return;

@@ -11,7 +11,6 @@
 
 class QnMediaResourceWidget;
 
-class VariantAnimator;
 class PtzItem;
 
 class PtzInstrument: public DragProcessingInstrument {
@@ -40,7 +39,7 @@ protected:
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
-    virtual bool mouseMoveEvent(QGraphicsScene *scene, QGraphicsSceneMouseEvent *event) override;
+    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
 
     virtual bool hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
     virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
@@ -58,20 +57,34 @@ private slots:
     void at_target_optionsChanged();
 
 private:
+    friend class PtzItem;
+
     PtzItem *ptzItem() const {
         return m_ptzItem.data();
     }
 
-    void updateLocalSpeed(const QPointF &pos);
+    QnMediaResourceWidget *target() const {
+        return m_target.data();
+    }
+
+    void setTarget(QnMediaResourceWidget *target);
+    
+    bool isTargetUnderMouse() const {
+        return m_targetUnderMouse;
+    }
+    
+    void setTargetUnderMouse(bool underMouse);
+    
     void updatePtzItemOpacity();
 
 private:
     QWeakPointer<PtzItem> m_ptzItem;
-    VariantAnimator *m_ptzOpacityAnimator;
-
     qreal m_ptzItemZValue;
 
-    QVector3D m_serverSpeed, m_localSpeed;
+    QWeakPointer<QnMediaResourceWidget> m_target;
+    bool m_targetUnderMouse;
+
+    QVector3D m_serverSpeed;
     QnNetworkResourcePtr m_camera;
     QnVideoServerConnectionPtr m_connection;
 };
