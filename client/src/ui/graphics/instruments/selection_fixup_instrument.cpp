@@ -112,7 +112,10 @@ bool SelectionFixupInstrument::mouseReleaseEvent(QGraphicsItem *item, QGraphicsS
         return false;
 
     if(!(event->modifiers() & Qt::ControlModifier)) {
-        item->scene()->clearSelection(); /* User may let go of the Ctrl button while mouse button is still pressed. */
+        /* User may let go of the Ctrl button while mouse button is still pressed. */
+        bool signalsBlocked = item->scene()->blockSignals(true); /* Don't emit multiple notifications. */
+        item->scene()->clearSelection(); 
+        item->scene()->blockSignals(signalsBlocked);
         item->setSelected(true);
     } else {
         /* QGraphicsItem processes Ctrl+click as multi-selection only of the mouse didn't move. We work this around. */

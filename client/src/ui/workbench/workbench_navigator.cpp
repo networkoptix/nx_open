@@ -425,7 +425,10 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
 
     if(preferToPreserveWindow && m_timeSlider->value() >= m_timeSlider->windowStart() && m_timeSlider->value() <= m_timeSlider->windowEnd()) {
         /* Just skip window initialization. */
-    } else if(!window.isEmpty()) {
+    } else {
+        if(window.isEmpty())
+            window = QnTimePeriod(0, -1);
+
         qint64 windowStart = window.startTimeMs;
         qint64 windowEnd = window.durationMs == -1 ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
         if(windowStart < m_timeSlider->minimum()) {
