@@ -165,10 +165,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             }
             else {
                 if (recorderLowRes)
-                    recorderLowRes->stop();
-                providerLow->stop();
-                if (recorderLowRes)
-                    recorderLowRes->clearUnprocessedData();
+                    recorderLowRes->pleaseStop();
+                providerLow->pleaseStop();
+                //if (recorderLowRes)
+                //    recorderLowRes->clearUnprocessedData();
             }
         }
     }
@@ -182,15 +182,19 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->pleaseStop();
 
+        /*
         if (needStopHi)
             recorderHiRes->stop();
         if (needStopLow)
             recorderLowRes->stop();
+        */
         camera->stopIfNoActivity();
+        /*
         if (needStopHi)
             recorderHiRes->clearUnprocessedData();
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
+        */
 
         if (needStopHi) {
             cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);

@@ -307,7 +307,6 @@ void QnProgressiveDownloadingConsumer::run()
     }
 
     d->socket->close();
-    m_runing = false;
 }
 
 int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const

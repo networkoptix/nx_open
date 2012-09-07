@@ -1112,7 +1112,6 @@ void QnRtspConnectionProcessor::run()
     d->deleteDP();
     d->socket->close();
     d->trackInfo.clear();
-    m_runing = false;
     //deleteLater(); // does not works for this thread
 }
 
