@@ -94,7 +94,7 @@ private:
 
     Data m_data;
 
-    friend class QnCameraScheduleWidget; // ###
+    friend class QnCameraScheduleWidget; // TODO: what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)

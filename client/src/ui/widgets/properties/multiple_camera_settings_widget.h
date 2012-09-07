@@ -5,12 +5,13 @@
 #include "api/video_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
+#include "ui/workbench/workbench_context_aware.h"
 
 namespace Ui {
     class MultipleCameraSettingsWidget;
 }
 
-class QnMultipleCameraSettingsWidget : public QWidget {
+class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 

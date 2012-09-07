@@ -5,6 +5,8 @@
 
 #include <core/misc/scheduleTask.h>
 
+class QnWorkbenchContext;
+
 namespace Ui {
     class CameraScheduleWidget;
 }
@@ -43,6 +45,10 @@ public:
     int getGridMaxFps();
     bool isSecondaryStreamReserver() const;
 
+    // TODO
+    QnWorkbenchContext *context() const { return m_context; }
+    void setContext(QnWorkbenchContext *context);
+
 signals:
     void scheduleTasksChanged();
     void scheduleEnabledChanged();
@@ -54,6 +60,7 @@ private slots:
     void updateGridEnabledState();
     void updateLicensesLabelText();
     void updateMotionButtons();
+    void updatePanicLabelText();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
@@ -71,6 +78,8 @@ private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)
 
     QScopedPointer<Ui::CameraScheduleWidget> ui;
+    QnWorkbenchContext *m_context;
+
     QnVirtualCameraResourceList m_cameras;
     bool m_disableUpdateGridParams;
     bool m_motionAvailable;

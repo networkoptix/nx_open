@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"
+#include "ui/workbench/workbench_context_aware.h"
 
 
 namespace Ui {
@@ -16,7 +17,7 @@ class QVBoxLayout;
 
 class QnCameraMotionMaskWidget;
 
-class QnSingleCameraSettingsWidget : public QWidget {
+class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
 
