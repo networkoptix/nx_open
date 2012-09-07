@@ -337,7 +337,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     bool singleShotMode = m_singleShot;
 
 begin_label:
-    if (!m_runing)
+    if (m_needStop)
         return QnAbstractMediaDataPtr();
 
     if (mFirstTime)
@@ -709,7 +709,7 @@ begin_label:
 
 
     // ensure Pos At playback mask
-    if (m_runing && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
+    if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
     {
         m_playbackMaskSync.lock();

@@ -45,7 +45,6 @@ void QnUniversalRequestProcessor::run()
             delete d->processor;
         }
     }
-    m_runing = false;
 }
 
 void QnUniversalRequestProcessor::pleaseStop()

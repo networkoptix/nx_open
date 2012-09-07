@@ -346,6 +346,7 @@ void QnServerStreamRecorder::endOfRun()
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
         m_device->setStatus(QnResource::Online);
+    m_dataQueue.clear();
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)
