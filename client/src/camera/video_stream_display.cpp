@@ -452,11 +452,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
         else
             return Status_Skipped;
     }
+    m_mtx.unlock();
     if (decodeToFrame->width) {
         QSize imageSize(decodeToFrame->width*dec->getSampleAspectRatio(), decodeToFrame->height);
+        QMutexLocker lock(&m_imageSizeMtx);
         m_imageSize = imageSize;
     }
-    m_mtx.unlock();
 
     if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 500*1000) {
         // prevent large difference after seek or EOF
@@ -750,6 +751,7 @@ void QnVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
 
 QSize QnVideoStreamDisplay::getImageSize() const
 {
+    QMutexLocker lock(&m_imageSizeMtx);
     return m_imageSize;
 }
 

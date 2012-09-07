@@ -97,6 +97,7 @@ private:
     bool m_needResetDecoder;
     CLVideoDecoderOutput* m_lastDisplayedFrame;
     QSize m_imageSize;
+    mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
 
