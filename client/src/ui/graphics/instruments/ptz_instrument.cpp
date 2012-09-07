@@ -41,11 +41,13 @@ namespace {
 
 
     const qreal instantUpdateSpeedThreshold = 0.1;
-    const qreal delayedUpdateSpeedThreshold = 0.01;
+    const qreal updateSpeedThreshold = 0.01;
+    const int updateSpeedInterval = 1000;
 
     const qreal ptzItemBackgroundOpacity = 0.3;
     const qreal ptzItemOperationalOpacity = 1.0;
     const qreal ptzItemOpacityAnimationSpeed = 2.0;
+
 
 } // anonymous namespace
 
@@ -261,10 +263,52 @@ void PtzInstrument::updatePtzItemOpacity() {
     }
 }
 
+void PtzInstrument::setServerSpeed(const QVector3D &speed, bool force) {
+    m_localSpeed = speed;
+
+    bool instant = false;
+    bool delayed = false;
+    qreal delta = (m_remoteSpeed - m_localSpeed).lengthSquared();
+    if(delta > instantUpdateSpeedThreshold * instantUpdateSpeedThreshold) {
+        instant = true;
+    } else if(delta > updateSpeedThreshold * updateSpeedThreshold || (!qFuzzyIsNull(delta) && m_localSpeed.isNull())) {
+        instant = force;
+        delayed = true;
+    }
+
+    if(instant) {
+        if(m_connection) {
+            if(m_localSpeed.isNull()) {
+                m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
+
+                qDebug() << "PTZ STOP";
+            } else {
+                m_connection->asyncPtzMove(m_camera, m_localSpeed.x(), -m_localSpeed.y(), m_localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
+
+                qDebug() << "PTZ MOVE" << m_localSpeed;
+            }
+        }
+
+        m_remoteSpeed = m_localSpeed;
+        m_timer.stop();
+    } else if(delayed) {
+        if(!m_timer.isActive())
+            m_timer.start(updateSpeedInterval, this);
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void PtzInstrument::timerEvent(QTimerEvent *event) {
+    if(event->timerId() == m_timer.timerId()) {
+        setServerSpeed(m_localSpeed, true);
+    } else {
+        base_type::timerEvent(event);
+    }
+}
+
 void PtzInstrument::installedNotify() {
     assert(ptzItem() == NULL);
 
@@ -342,7 +386,8 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
 
     if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
         if(QnVideoServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnVideoServerResource>()) {
-            m_serverSpeed = QVector3D();
+            setServerSpeed(QVector3D(), true);
+
             m_camera = camera;
             m_connection = server->apiConnection();
             
@@ -367,14 +412,7 @@ void PtzInstrument::startDrag(DragInfo *info) {
 void PtzInstrument::dragMove(DragInfo *info) {
     QVector3D localSpeed = ptzItem()->speed();
 
-    if((localSpeed - m_serverSpeed).lengthSquared() > instantUpdateSpeedThreshold * instantUpdateSpeedThreshold) {
-        m_connection->asyncPtzMove(m_camera, localSpeed.x(), -localSpeed.y(), localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
-        m_serverSpeed = localSpeed;
-
-        // TODO: timeout setter.
-
-        qDebug() << "PTZ set speed " << localSpeed;
-    }
+    setServerSpeed(localSpeed);
 }
 
 void PtzInstrument::finishDrag(DragInfo *) {
@@ -382,11 +420,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
 }
 
 void PtzInstrument::finishDragProcess(DragInfo *) {
-    if(!m_serverSpeed.isNull()) {
-        m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
-        m_serverSpeed = QVector3D();
-    }
-
+    setServerSpeed(QVector3D(), true);
     m_camera = QnNetworkResourcePtr();
     m_connection = QnVideoServerConnectionPtr();
 

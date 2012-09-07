@@ -34,6 +34,8 @@ signals:
     void ptzProcessFinished(QnMediaResourceWidget *widget);
 
 protected:
+    virtual void timerEvent(QTimerEvent *event) override;
+
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
     virtual bool registeredNotify(QGraphicsItem *item) override;
@@ -77,14 +79,22 @@ private:
     
     void updatePtzItemOpacity();
 
+    const QVector3D &serverSpeed() const {
+        return m_localSpeed;
+    }
+
+    void setServerSpeed(const QVector3D &speed, bool force = false);
+
 private:
+    QBasicTimer m_timer;
+
     QWeakPointer<PtzItem> m_ptzItem;
     qreal m_ptzItemZValue;
 
     QWeakPointer<QnMediaResourceWidget> m_target;
     bool m_targetUnderMouse;
 
-    QVector3D m_serverSpeed;
+    QVector3D m_localSpeed, m_remoteSpeed;
     QnNetworkResourcePtr m_camera;
     QnVideoServerConnectionPtr m_connection;
 };
