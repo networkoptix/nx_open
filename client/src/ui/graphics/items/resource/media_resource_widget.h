@@ -95,6 +95,8 @@ private slots:
     void at_ptzButton_toggled(bool checked);
 
 protected:
+    virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
     virtual void optionsChangedNotify(Options changedFlags) override;

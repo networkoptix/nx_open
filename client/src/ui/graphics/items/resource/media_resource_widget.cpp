@@ -415,6 +415,14 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
+    if(options() & ControlPtz) {
+        return Qn::NoSection; /* No resizing when PTZ control is ON. */
+    } else {
+        return base_type::windowFrameSectionsAt(region);
+    }
+}
+
 void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 

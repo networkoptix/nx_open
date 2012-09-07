@@ -214,7 +214,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     base_type(
         makeSet(QEvent::MouseMove),
         makeSet(),
-        makeSet(),
+        makeSet(QEvent::GraphicsSceneWheel),
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneHoverEnter, QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), 
         parent
     ),
@@ -346,6 +346,13 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
+}
+
+bool PtzInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) {
+    bool accepted = !dragProcessor()->isWaiting();
+
+    event->setAccepted(accepted);
+    return accepted;
 }
 
 bool PtzInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *) {
