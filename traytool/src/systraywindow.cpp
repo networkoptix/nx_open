@@ -66,6 +66,9 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerHandle = 0;
     m_skipTicks = 0;
 
+    m_mediaServerServiceName = QString(VER_CUSTOMIZATION) + QString("MediaServer");
+    m_appServerServiceName = QString(VER_CUSTOMIZATION) + QString("AppServer");
+
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
     m_appServerStartAction = 0;
@@ -167,17 +170,17 @@ void QnSystrayWindow::findServiceInfo()
     }
     
     if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_ALL_ACCESS);
+        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_ALL_ACCESS);
     if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_QUERY_STATUS);
+        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_QUERY_STATUS);
 
     if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_ALL_ACCESS);
+        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_ALL_ACCESS);
     if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_QUERY_STATUS);
+        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
     if (!m_mediaServerHandle && !m_appServerHandle)
-        showMessage("No HDWitness servers component installed");
+        showMessage(QString("No %1 services installed").arg(ORGANIZATION_NAME));
 }
 
 void QnSystrayWindow::setVisible(bool visible)

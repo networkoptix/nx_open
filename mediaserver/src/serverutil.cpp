@@ -1,9 +1,38 @@
 #include <QString>
 #include <QUuid>
 #include <QDesktopServices>
+#include <QDir>
 
 #include "serverutil.h"
 #include "settings.h"
+
+QString defaultStoragePath()
+{
+#ifdef Q_OS_WIN
+    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString());
+#else
+    return QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString());
+#endif
+}
+
+void syncStoragesToSettings(QnVideoServerResourcePtr server)
+{
+    const QnAbstractStorageResourceList& storages = server->getStorages();
+
+    qSettings.beginWriteArray(QLatin1String("storages"));
+    qSettings.remove(QLatin1String(""));
+    for (int i = 0; i < storages.size(); i++) {
+        QnAbstractStorageResourcePtr storage = storages.at(i);
+        qSettings.setArrayIndex(i);
+        qSettings.setValue("path", storage->getUrl());
+    }
+
+    qSettings.endArray();
+
+    if (storages.size() == 1) {
+        qSettings.setValue("mediaDir", storages.at(0)->getUrl());
+    }
+}
 
 QString serverGuid()
 {
