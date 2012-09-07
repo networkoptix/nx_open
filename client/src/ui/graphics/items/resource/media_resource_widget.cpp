@@ -8,8 +8,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/media_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -503,10 +503,12 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if(m_resource.dynamicCast<QnSecurityCamResource>())
+    QnVirtualCameraResourcePtr camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+    if(camera)
         result |= MotionSearchButton | InfoButton;
 
-    result |= PtzButton;
+    if(camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))
+        result |= PtzButton;
 
     return result;
 }

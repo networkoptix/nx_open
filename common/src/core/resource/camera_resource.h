@@ -9,6 +9,7 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
+    // TODO: move to QnSecurityCamResource
     enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
     Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag)
 
@@ -17,15 +18,19 @@ public:
 
     virtual void updateInner(QnResourcePtr other) override;
 
+    // TODO: move to QnSecurityCamResource
     void setScheduleDisabled(bool blocked);
     bool isScheduleDisabled() const;
 
+    // TODO: move to QnSecurityCamResource
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+    // TODO: move to QnSecurityCamResource
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
+    // TODO: move to QnSecurityCamResource
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
 
