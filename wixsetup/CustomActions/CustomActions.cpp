@@ -21,25 +21,18 @@ UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
     registryPath = GetProperty(hInstall, L"MEDIASERVER_REGISTRY_PATH");
+    registryPath += L"\\storages";
 
     if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ|KEY_WOW64_32KEY) != ERROR_SUCCESS) {
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
         goto LExit;
     }
 
-    int count = 0;
-
     DWORD dwType;
-    ULONG nBytes;
+    ULONG nBytes = 4;
+    DWORD count = 0;
 
-    for (int index = 1;; index++) {
-        CAtlString indexString;
-        indexString.Format(L"%d", index);
-        if(RegKey.QueryValue(indexString, &dwType, 0, &nBytes) != ERROR_SUCCESS)
-            break;
-
-        count++;
-    }
+    RegKey.QueryValue(L"size", &dwType, &count, &nBytes);
 
     {
         CAtlString countString;

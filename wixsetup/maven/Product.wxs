@@ -114,15 +114,7 @@
                             Win64="no"/>
         </Property>
 
-        <Property Id="NUMBER_OF_STORAGES" Secure="yes">
-            <RegistrySearch Id="ServerStoragesReg"
-                            Root="HKLM"
-                            Key="Software\${company.name}\${mediaserver.name}\storages"
-                            Name="size"
-                            Type="raw"
-                            Win64="no">
-            </RegistrySearch>
-        </Property>
+        <Property Id="NUMBER_OF_STORAGES" Value="0"/>
         
         <Property Id="SERVER_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ServerDirectoryReg"
@@ -168,7 +160,7 @@
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
-<!--        <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>-->
+        <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
@@ -256,8 +248,8 @@
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer"><![CDATA[ $(var.EcsNeedsGuid) ]]></Custom>
-            <Custom Action="SetNewGuidForServer" Before="AssignClientFolder"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
-<!--            <Custom Action="FindConfiguredStorages" Before="AssignClientFolder"></Custom> -->
+            <Custom Action="SetNewGuidForServer" Before="FindConfiguredStorages"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
+            <Custom Action="FindConfiguredStorages" Before="AssignClientFolder"></Custom> 
 
             <Custom Action="FixClientFolder" After="ResetClientFolder"/>
             <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>

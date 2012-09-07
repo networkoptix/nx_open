@@ -59,14 +59,14 @@
                 <Control Id="groupBox2" Type="GroupBox" Height="67" Width="345" X="15" Y="119" Text="Media Server" />
                 <Control Id="warning1label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
                     <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES > 1 OR NOT SERVERDIR_LOWDISKSPACE ]]></Condition>
-                    <Condition Action="show"><![CDATA[ (NOT NUMBER_OF_STORAGES OR NUMBER_OF_STORAGES <= 1) AND SERVERDIR_LOWDISKSPACE AND NOT SERVERDIR_CANT_WRITE ]]></Condition>
+                    <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES <= 1 AND SERVERDIR_LOWDISKSPACE AND NOT SERVERDIR_CANT_WRITE ]]></Condition>
                 </Control>
                 <Control Id="warning2label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
                     <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES > 1 OR NOT SERVERDIR_CANT_WRITE ]]></Condition>
-                    <Condition Action="show"><![CDATA[ (NOT NUMBER_OF_STORAGES OR NUMBER_OF_STORAGES <= 1) AND SERVERDIR_CANT_WRITE ]]></Condition>
+                    <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES <= 1 AND SERVERDIR_CANT_WRITE ]]></Condition>
                 </Control>
-                <Control Id="warning3label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="The storages are already configured">
-                    <Condition Action="hide"><![CDATA[ NOT NUMBER_OF_STORAGES OR NUMBER_OF_STORAGES <= 1 ]]></Condition>
+                <Control Id="warning3label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Recording folder is already configured">
+                    <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES <= 1 ]]></Condition>
                     <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES > 1 ]]></Condition>
                 </Control>
             </Dialog>
