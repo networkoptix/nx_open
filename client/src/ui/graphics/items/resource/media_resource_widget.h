@@ -7,6 +7,7 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 
+#include <api/api_fwd.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -20,8 +21,12 @@ class QnMediaResourceWidget: public QnResourceWidget {
 public:
     static const Button MotionSearchButton = static_cast<Button>(0x8);
     static const Button PtzButton = static_cast<Button>(0x10);
+    static const Button ZoomInButton = static_cast<Button>(0x20);
+    static const Button ZoomOutButton = static_cast<Button>(0x40);
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
+#define ZoomInButton ZoomInButton
+#define ZoomOutButton ZoomOutButton
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();
@@ -93,6 +98,13 @@ private slots:
     void at_resource_resourceChanged();
     void at_searchButton_toggled(bool checked);
     void at_ptzButton_toggled(bool checked);
+    void at_zoomInButton_pressed();
+    void at_zoomInButton_released();
+    void at_zoomOutButton_pressed();
+    void at_zoomOutButton_released();
+
+    void at_replyReceived(int status, int handle);
+    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
@@ -127,11 +139,17 @@ protected:
     Q_SIGNAL void updateInfoTextLater();
 
 private:
+    void sendZoomAsync(qreal zoomSpeed);
+
+private:
     /** Media resource. */
     QnMediaResourcePtr m_resource;
 
     /** Camera resource. */
     QnVirtualCameraResourcePtr m_camera;
+
+    /** Connection for camera's server */
+    QnVideoServerConnectionPtr m_connection; // TODO: move out?
 
     /** Display. */
     QnResourceDisplay *m_display;
