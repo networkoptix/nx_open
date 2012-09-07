@@ -158,7 +158,7 @@ QnCamDisplay::~QnCamDisplay()
             display->resetQualityStatistics();
     }
 
-    Q_ASSERT(!m_runing);
+    Q_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         delete m_display[i];
