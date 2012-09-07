@@ -9,6 +9,10 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
     Q_OBJECT
 
 public:
+    enum CameraFlag { CFNoFlags = 0, HasPtzMove = 1, HasPtzZoom = 2};
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag)
+
+
     QnVirtualCameraResource();
 
     virtual void updateInner(QnResourcePtr other) override;
@@ -22,6 +26,9 @@ public:
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
+    CameraCapabilities getCameraCapabilities();
+    void addCameraCapabilities(CameraCapabilities value);
+
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
 
@@ -30,6 +37,7 @@ private:
     bool m_audioEnabled;
     bool m_advancedWorking;
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
 
 class QN_EXPORT QnPhysicalCameraResource : virtual public QnVirtualCameraResource

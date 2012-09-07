@@ -170,3 +170,17 @@ void QnVirtualCameraResource::setAdvancedWorking(bool value)
 {
     m_advancedWorking = value;
 }
+
+QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCapabilities()
+{
+    QVariant mediaVariant;
+    getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
+    return (CameraCapabilities) mediaVariant.toInt();
+}
+
+void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
+{
+    value |= getCameraCapabilities();
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+}
