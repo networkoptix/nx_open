@@ -220,7 +220,7 @@ bool QnNetworkResource::hasRunningLiveProvider() const
 
 bool QnNetworkResource::shoudResolveConflicts() const
 {
-    return true;
+    return false;
 }
 
 bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )

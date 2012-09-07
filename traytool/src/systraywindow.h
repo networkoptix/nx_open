@@ -142,6 +142,8 @@ private:
     NameActionList m_actionList;
     QTime m_lastMessageTimer;
     QQueue<QString> m_delayedMessages;
+    QString m_mediaServerServiceName;
+    QString m_appServerServiceName;
 };
 
 #endif
