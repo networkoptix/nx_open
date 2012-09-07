@@ -23,11 +23,15 @@ namespace {
 
     const QColor arrowColor(255, 0, 0, 112);
 
-    const qreal arrowWidth = 10;
+    const QColor arrowOutlineColor(0, 0, 0, 128);
 
-    const QSizeF headSize = QSizeF(25, 35); /* (Side, Front) */
+    const qreal arrowWidth = 5;
 
-    const qreal headOverlap = 5;
+    const QSizeF headSize = QSizeF(12.5, 17.5); /* (Side, Front) */
+
+    const qreal headOverlap = 2.5;
+
+    const qreal maximalScale = 6.0;
 
     inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
         shape->lineTo(base - headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
@@ -82,11 +86,11 @@ public:
         updateParameters();
 
         /* Precalculate shape parameters. */
-        qreal scale = 1.0 + m_magnitude * 3.0;
+        qreal scale = 1.0 + m_magnitude * (maximalScale - 1.0);
         qreal width = arrowWidth;
         qreal halfWidth = arrowWidth / 2;
         qreal headDistance = qMax(width, this->length(m_viewportOrigin - m_viewportHead) / scale - headSize.height());
-        qreal baseDistance = headDistance - qMin(headDistance / 3, headSize.height() * 2);
+        qreal baseDistance = headDistance - qMin(headDistance / 4, headSize.height());
 
         /* Prepare shape. */
         QPainterPath shape;
@@ -99,10 +103,12 @@ public:
 
         /* Draw! */
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+        QnScopedPainterPenRollback penRollback(painter, arrowOutlineColor);
+        QnScopedPainterBrushRollback brushRollback(painter, arrowColor);
         painter->translate(m_viewportOrigin);
         painter->scale(scale, scale);
         painter->rotate(atan2(m_viewportHead - m_viewportOrigin) / M_PI * 180.0);
-        painter->fillPath(shape, arrowColor);
+        painter->drawPath(shape);
     }
 
     /**

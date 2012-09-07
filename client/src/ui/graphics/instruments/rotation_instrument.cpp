@@ -15,6 +15,8 @@
 namespace {
     const QColor arrowColor(255, 0, 0, 96);
 
+    const QColor arrowOutlineColor(0, 0, 0, 128);
+
     const qreal arrowWidth = 10;
 
     const qreal sidesLength = 120;
@@ -151,9 +153,11 @@ public:
 
         /* Draw! */
         QnScopedPainterTransformRollback transformRollback(painter, QTransform());
+        QnScopedPainterPenRollback penRollback(painter, arrowOutlineColor);
+        QnScopedPainterBrushRollback brushRollback(painter, arrowColor);
         painter->translate(viewportOrigin);
         painter->rotate(atan2(viewportHead - viewportOrigin) / M_PI * 180.0);
-        painter->fillPath(shape, arrowColor);
+        painter->drawPath(shape);
     }
 
     /**
