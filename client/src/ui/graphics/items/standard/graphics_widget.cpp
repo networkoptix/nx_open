@@ -25,8 +25,6 @@ public:
         scene(scene) 
     {
         assert(scene);
-
-        scene->installEventFilter(this);
     }
 
     virtual bool event(QEvent *event) override {
