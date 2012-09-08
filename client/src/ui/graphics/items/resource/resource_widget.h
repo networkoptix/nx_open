@@ -355,12 +355,12 @@ private:
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
-    QGraphicsWidget *m_headerWidget;
+    GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
     QnImageButtonBar *m_buttonBar;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
-    QGraphicsWidget *m_footerWidget;
+    GraphicsWidget *m_footerWidget;
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
 

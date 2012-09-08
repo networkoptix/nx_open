@@ -1,7 +1,7 @@
 #ifndef QN_VIEWPORT_BOUND_WIDGET_H
 #define QN_VIEWPORT_BOUND_WIDGET_H
 
-#include <QGraphicsWidget>
+#include <ui/graphics/items/standard/graphics_widget.h>
 
 class Instrument;
 
@@ -12,10 +12,10 @@ class Instrument;
  * Items added to this widget will not be scaled when viewport's transformation 
  * changes.
  */
-class QnViewportBoundWidget: public QGraphicsWidget {
+class QnViewportBoundWidget: public GraphicsWidget {
     Q_OBJECT;
 
-    typedef QGraphicsWidget base_type;
+    typedef GraphicsWidget base_type;
 
 public:
     QnViewportBoundWidget(QGraphicsItem *parent = NULL);

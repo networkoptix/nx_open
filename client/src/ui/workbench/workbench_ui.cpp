@@ -105,7 +105,7 @@ namespace {
     }
 
     QGraphicsWidget *newSpacerWidget(qreal w, qreal h) {
-        QGraphicsWidget *result = new QGraphicsWidget();
+        GraphicsWidget *result = new GraphicsWidget();
         result->setMinimumSize(QSizeF(w, h));
         result->setMaximumSize(result->minimumSize());
         return result;
@@ -385,7 +385,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
-    m_windowButtonsWidget = new QGraphicsWidget();
+    m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);

@@ -166,7 +166,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
     headerLayout->addItem(m_buttonBar);
 
-    m_headerWidget = new QGraphicsWidget();
+    m_headerWidget = new GraphicsWidget();
     m_headerWidget->setLayout(headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
@@ -199,7 +199,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     footerLayout->addStretch(0x1000);
     footerLayout->addItem(m_footerRightLabel);
 
-    m_footerWidget = new QGraphicsWidget();
+    m_footerWidget = new GraphicsWidget();
     m_footerWidget->setLayout(footerLayout);
     m_footerWidget->setAcceptedMouseButtons(0);
     m_footerWidget->setAutoFillBackground(true);

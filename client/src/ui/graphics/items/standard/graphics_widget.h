@@ -14,7 +14,8 @@ class GraphicsWidget: public QGraphicsWidget {
 public:
     enum HandlingFlag {
         ItemHandlesMovement = 0x1,
-        ItemHandlesResizing = 0x2
+        ItemHandlesResizing = 0x2,
+        ItemHandlesLayoutRequests = 0x4
     };
     Q_DECLARE_FLAGS(HandlingFlags, HandlingFlag);
 
@@ -26,7 +27,7 @@ public:
 #define ItemHandlingFlagsChange ItemHandlingFlagsChange
 #define ItemHandlingFlagsHaveChanged ItemHandlingFlagsHaveChanged
 
-    GraphicsWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
+    GraphicsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~GraphicsWidget();
 
     HandlingFlags handlingFlags() const;
@@ -37,8 +38,12 @@ public:
     void setStyle(GraphicsStyle *style);
     using base_type::setStyle;
 
+    static void handlePendingLayoutRequests(QGraphicsScene *scene);
+
 protected:
     GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
+
+    virtual void updateGeometry() override;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

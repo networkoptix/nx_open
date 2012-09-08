@@ -36,6 +36,7 @@
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/instruments/tool_tip_instrument.h>
+#include <ui/graphics/instruments/widget_layout_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/server_resource_widget.h>
@@ -179,6 +180,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_afterPaintInstrument);
     m_instrumentManager->installInstrument(m_paintForwardingInstrument);
+    m_instrumentManager->installInstrument(new WidgetLayoutInstrument(this));
     m_instrumentManager->installInstrument(m_beforePaintInstrument);
     m_instrumentManager->installInstrument(m_transformListenerInstrument);
     m_instrumentManager->installInstrument(m_focusListenerInstrument);

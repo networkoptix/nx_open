@@ -9,7 +9,7 @@
 
 
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
-    QGraphicsWidget(parent),
+    base_type(parent),
     m_inUpdateScale(false),
     m_desiredSize(QSizeF(0.0, 0.0))
 {
