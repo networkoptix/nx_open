@@ -289,7 +289,7 @@ Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
 }
 
 Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
-    return context()->workbench()->currentLayout()->items().empty() ? Qn::DisabledAction : Qn::EnabledAction;
+    return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
 }
 
 Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
