@@ -173,10 +173,16 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
         close();
     }
-    else if (m_startDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
-        // if multifile recording allowed, recreate file if recording hole is detected
-        qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
-        close();
+    else if (m_startDateTime != qint64(AV_NOPTS_VALUE)) {
+        if (md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
+            // if multifile recording allowed, recreate file if recording hole is detected
+            qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+            close();
+        }
+        else if (md->timestamp < m_startDateTime - 1000ll*1000) {
+            qDebug() << "Time translated into the past for " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+            close();
+        }
     }
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
