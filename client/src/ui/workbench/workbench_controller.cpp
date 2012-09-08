@@ -1051,6 +1051,9 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if(widget == NULL)
         return;
 
+    if(widget->options() & QnResourceWidget::ControlPtz)
+        return; /* (Un)raising shouldn't work when PTZ is on as it's confusing. */
+
     QnWorkbenchItem *workbenchItem = widget->item();
 
     workbench()->setItem(Qn::RaisedRole, workbench()->item(Qn::RaisedRole) == workbenchItem ? NULL : workbenchItem);
