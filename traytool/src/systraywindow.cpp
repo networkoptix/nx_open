@@ -8,6 +8,9 @@
 #include <shlobj.h>
 #include "version.h"
 
+#pragma comment(lib, "Shell32.lib") /* For IsUserAnAdmin. */
+#pragma comment(lib, "AdvApi32.lib") /* For ControlService and other service-related functions. */
+
 
 #define USE_SINGLE_STREAMING_PORT
 
