@@ -8,8 +8,8 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/media_resource.h>
-#include <core/resource/security_cam_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_resource.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -24,6 +24,11 @@
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
+
+// TODO: remove
+#include <core/resource/video_server_resource.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include "plugins/resources/camera_settings/camera_settings.h"
 
 
 namespace {
@@ -47,6 +52,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_resource = base_type::resource().dynamicCast<QnMediaResource>();
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
+    m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -80,9 +86,24 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     ptzButton->setCheckable(true);
     ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
+    connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
+
+    QnImageButtonWidget *zoomInButton = new QnImageButtonWidget();
+    zoomInButton->setIcon(qnSkin->icon("decorations/item_zoom_in.png"));
+    zoomInButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(zoomInButton, SIGNAL(pressed()), this, SLOT(at_zoomInButton_pressed()));
+    connect(zoomInButton, SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
+
+    QnImageButtonWidget *zoomOutButton = new QnImageButtonWidget();
+    zoomOutButton->setIcon(qnSkin->icon("decorations/item_zoom_out.png"));
+    zoomOutButton->setProperty(Qn::NoBlockMotionSelection, true);
+    connect(zoomOutButton, SIGNAL(pressed()), this, SLOT(at_zoomOutButton_pressed()));
+    connect(zoomOutButton, SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
     buttonBar()->addButton(MotionSearchButton, searchButton);
     buttonBar()->addButton(PtzButton, ptzButton);
+    buttonBar()->addButton(ZoomInButton, zoomInButton);
+    buttonBar()->addButton(ZoomOutButton, zoomOutButton);
     updateButtonsVisibility();
 }
 
@@ -182,11 +203,11 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
     if(m_motionSensitivityValid)
         return;
 
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        m_motionSensitivity = camera->getMotionRegionList();
+    if (m_camera) {
+        m_motionSensitivity = m_camera->getMotionRegionList();
 
         if(m_motionSensitivity.size() != channelCount()) {
-            qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", camera->getName());
+            qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
     } else {
@@ -200,8 +221,8 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
     ensureMotionSensitivity();
 
     bool changed = false;
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+    if (m_camera) {
+        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -226,8 +247,8 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
 
     int channel =0;
     QPoint channelPos = gridPos;
-    if (QnSecurityCamResourcePtr camera = m_resource.dynamicCast<QnSecurityCamResource>()) {
-        const QnVideoResourceLayout* layout = camera->getVideoLayout();
+    if (m_camera) {
+        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
@@ -411,10 +432,65 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
     }
 }
 
+void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
+    if(!m_camera)
+        return;
+
+    if(!m_connection) {
+        QnVideoServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnVideoServerResource>();
+        if(server)
+            m_connection = server->apiConnection();
+    }
+    if(!m_connection)
+        return;
+
+    QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
+    if(capabilities & QnVirtualCameraResource::HasPtz) {
+        if(qFuzzyIsNull(zoomSpeed)) {
+            m_connection->asyncPtzStop(m_camera, this, SLOT(at_ptzReplyReceived(int, int)));
+        } else {
+            m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_ptzReplyReceived(int, int)));
+        }
+    } else if(capabilities & QnVirtualCameraResource::HasZoom) {
+        CameraSetting setting(
+            QLatin1String("%%Lens%%Zoom"),
+            QLatin1String("Zoom"),
+            CameraSetting::ControlButtonsPair,
+            QString(),
+            QString(),
+            QString(),
+            CameraSettingValue(QLatin1String("zoomOut")),
+            CameraSettingValue(QLatin1String("zoomIn")),
+            CameraSettingValue(QLatin1String("stop")),
+            QString()
+        );
+
+        if(qFuzzyIsNull(zoomSpeed)) {
+            setting.setCurrent(setting.getStep());
+        } else if(zoomSpeed < 0.0) {
+            setting.setCurrent(setting.getMin());
+        } else if(zoomSpeed > 0.0) {
+            setting.setCurrent(setting.getMax());
+        }
+
+        QList<QPair<QString, QVariant> > params;
+        params << qMakePair(setting.getId(), QVariant(setting.serializeToStr()));
+
+        m_connection->asyncSetParam(m_camera, params, this, SLOT(at_replyReceived(int, const QList<QPair<QString, bool> > &)));
+    }
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRectF &region) const {
+    if(options() & ControlPtz) {
+        return Qn::NoSection; /* No resizing when PTZ control is ON. */
+    } else {
+        return base_type::windowFrameSectionsAt(region);
+    }
+}
+
 void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 
@@ -487,10 +563,16 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if(m_resource.dynamicCast<QnSecurityCamResource>())
+    if(m_camera) {
         result |= MotionSearchButton | InfoButton;
 
-    result |= PtzButton;
+        if(m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) {
+            result |= PtzButton;
+
+            if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here
+                result |= ZoomInButton | ZoomOutButton;
+        }
+    }
 
     return result;
 }
@@ -528,9 +610,47 @@ void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
     setOption(DisplayMotion, checked);
+
+    if(checked)
+        buttonBar()->setButtonsChecked(PtzButton, false);
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    setOption(ControlPtz, checked);
+    setOption(ControlPtz, checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::HasPtz));
+
+    if(checked)
+        buttonBar()->setButtonsChecked(MotionSearchButton, false);
 }
+
+void QnMediaResourceWidget::at_zoomInButton_pressed() {
+    sendZoomAsync(1.0);
+}
+
+void QnMediaResourceWidget::at_zoomInButton_released() {
+    sendZoomAsync(0.0);
+    m_connection.clear();
+}
+
+void QnMediaResourceWidget::at_zoomOutButton_pressed() {
+    sendZoomAsync(-1.0);
+}
+
+void QnMediaResourceWidget::at_zoomOutButton_released() {
+    sendZoomAsync(0.0);
+    m_connection.clear();
+}
+
+void QnMediaResourceWidget::at_replyReceived(int status, int handle) {
+    Q_UNUSED(status);
+    Q_UNUSED(handle);
+}
+
+void QnMediaResourceWidget::at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult) {
+    Q_UNUSED(status);
+    Q_UNUSED(operationResult);
+}
+
+
+
+
 

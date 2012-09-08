@@ -44,7 +44,7 @@ private slots:
 
 private:
     void submitVisibleButtons();
-    void submitCheckedButtons();
+    void submitCheckedButtons(int mask);
     void submitButtonSize(QnImageButtonWidget *button);
 
 private:

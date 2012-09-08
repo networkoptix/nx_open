@@ -276,7 +276,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    QnImageButtonBar *buttonBar() {
+    QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
 
