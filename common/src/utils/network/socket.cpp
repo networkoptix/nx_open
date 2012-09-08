@@ -671,8 +671,8 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
     bool res = setLocalAddressAndPort(iface.address.toString(), 0);
 #endif
 
-    if (!res)
-        qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
+    //if (!res)
+    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
 }
 
