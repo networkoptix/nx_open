@@ -366,14 +366,14 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, inst2);
+Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance);
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return inst2();
+    return qn_recordingManager_instance();
 }
 
 // --------------------- QnServerDataProviderFactory -------------------
-Q_GLOBAL_STATIC(QnServerDataProviderFactory, inst);
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance);
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
@@ -389,5 +389,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
-    return inst();
+    return qn_serverDataProviderFactory_instance();
 }
+
+

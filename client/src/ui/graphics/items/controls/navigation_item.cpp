@@ -50,49 +50,49 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     /* Create buttons. */
     m_jumpBackwardButton = new QnImageButtonWidget(this);
-    m_jumpBackwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
+    m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));
     m_jumpBackwardButton->setPreferredSize(32, 18);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
-    m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
+    m_stepBackwardButton->setIcon(qnSkin->icon("slider/navigation/step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 18);
 
     m_playButton = new QnImageButtonWidget(this);
     m_playButton->setCheckable(true);
-    m_playButton->setIcon(qnSkin->icon("play.png", "pause.png"));
+    m_playButton->setIcon(qnSkin->icon("slider/navigation/play.png", "slider/navigation/pause.png"));
     m_playButton->setPreferredSize(32, 30);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
-    m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon("slider/navigation/step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 18);
 
     m_jumpForwardButton = new QnImageButtonWidget(this);
-    m_jumpForwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
+    m_jumpForwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_forward.png"));
     m_jumpForwardButton->setPreferredSize(32, 18);
 
     m_muteButton = new QnImageButtonWidget(this);
-    m_muteButton->setIcon(qnSkin->icon("unmute.png", "mute.png"));
+    m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
     m_muteButton->setPreferredSize(20, 20);
     m_muteButton->setCheckable(true);
 
     m_liveButton = new QnImageButtonWidget(this);
-    m_liveButton->setIcon(qnSkin->icon("live.png"));
+    m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setCheckable(true);
 
     m_syncButton = new QnImageButtonWidget(this);
-    m_syncButton->setIcon(qnSkin->icon("sync.png"));
+    m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
     m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setIcon(qnSkin->icon("thumbnails.png"));
+    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_thumbnailsButton->setPreferredSize(48, 24);
 
     m_calendarButton = new QnImageButtonWidget(this);
     m_calendarButton->setDefaultAction(action(Qn::ToggleCalendarAction));
-    m_calendarButton->setIcon(qnSkin->icon("calendar.png"));
+    m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
 
 
@@ -337,8 +337,8 @@ void QnNavigationItem::updatePlaybackButtonsPressed() {
 void QnNavigationItem::updatePlaybackButtonsIcons() {
     bool playing = m_playButton->isChecked();
 
-    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
-    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
+    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/backward.png" : "slider/navigation/step_backward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/forward.png" : "slider/navigation/step_forward.png"));
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {

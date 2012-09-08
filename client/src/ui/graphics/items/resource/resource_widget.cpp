@@ -127,7 +127,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
+    togglePinButton->setIcon(Skin::icon("", ""));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
     togglePinButton->setPreferredSize(headerButtonSize);
@@ -136,19 +136,19 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 #endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
+    closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
-    infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
+    infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
-    rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
+    rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));

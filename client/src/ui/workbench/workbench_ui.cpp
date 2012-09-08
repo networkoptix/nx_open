@@ -99,7 +99,7 @@ namespace {
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
-        button->setIcon(qnSkin->icon("slide_right.png", "slide_left.png"));
+        button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
         button->setCheckable(true);
         return button;
     }
@@ -208,6 +208,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
+    QGraphicsLayout::setInstantInvalidatePropagation(true);
+
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
@@ -291,7 +293,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
     m_treePinButton->resize(24, 24);
-    m_treePinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
+    m_treePinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
     m_treePinButton->setCheckable(true);
     m_treePinButton->setFocusProxy(m_treeItem);
 
@@ -480,7 +482,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
     m_helpPinButton->resize(24, 24);
-    m_helpPinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
+    m_helpPinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
     m_helpPinButton->setCheckable(true);
     m_helpPinButton->setFocusProxy(m_helpItem);
 

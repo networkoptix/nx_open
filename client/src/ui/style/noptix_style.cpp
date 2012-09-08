@@ -54,14 +54,14 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 {
     GraphicsStyle::setBaseStyle(this);
 
-    m_branchClosed = m_skin->icon("branch_closed.png");
-    m_branchOpen = m_skin->icon("branch_open.png");
-    m_closeTab = m_skin->icon("decorations/close_tab.png");
+    m_branchClosed = m_skin->icon("tree/branch_closed.png");
+    m_branchOpen = m_skin->icon("tree/branch_open.png");
+    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 
-    m_grooveBorder = m_skin->pixmap("slider_groove_lborder.png");
-    m_grooveBody = m_skin->pixmap("slider_groove_body.png");
-    m_sliderHandleHovered = m_skin->pixmap("slider_handle_hovered.png");
-    m_sliderHandle = m_skin->pixmap("slider_handle.png");
+    m_grooveBorder = m_skin->pixmap("slider/slider_groove_lborder.png");
+    m_grooveBody = m_skin->pixmap("slider/slider_groove_body.png");
+    m_sliderHandleHovered = m_skin->pixmap("slider/slider_handle_hovered.png");
+    m_sliderHandle = m_skin->pixmap("slider/slider_handle.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {

@@ -53,8 +53,8 @@ public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
     {
-        m_recIcon = qnSkin->icon("decorations/recording.png");
-        m_raisedIcon = qnSkin->icon("decorations/raised.png");
+        m_recIcon = qnSkin->icon("tree/recording.png");
+        m_raisedIcon = qnSkin->icon("tree/raised.png");
     }
 
     QnWorkbench *workbench() const {
@@ -207,7 +207,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(QnResource::still_image));
     ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(QnResource::live));
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("clear.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourcePoolModel(this);
