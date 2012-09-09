@@ -164,6 +164,11 @@ namespace {
         }
 
         void refresh() {
+            // TODO:
+            // This shit may fail.
+            // 
+            // http://knowledgebase.solarwinds.com/kb/questions/633/Error+message+%22Invalid+Class%22+when+using+WMI+monitors
+
             QMutexLocker lk( &m_mutex );
 
             const quint64 PERCENT_CAP = 100;

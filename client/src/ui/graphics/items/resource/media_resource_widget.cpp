@@ -79,24 +79,28 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
     searchButton->setProperty(Qn::NoBlockMotionSelection, true);
+    searchButton->setToolTip(tr("Smart Search"));
     connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
     QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
     ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
     ptzButton->setCheckable(true);
     ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
+    ptzButton->setToolTip(tr("PTZ"));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
 
     QnImageButtonWidget *zoomInButton = new QnImageButtonWidget();
     zoomInButton->setIcon(qnSkin->icon("item/zoom_in.png"));
     zoomInButton->setProperty(Qn::NoBlockMotionSelection, true);
+    zoomInButton->setToolTip(tr("Zoom In"));
     connect(zoomInButton, SIGNAL(pressed()), this, SLOT(at_zoomInButton_pressed()));
     connect(zoomInButton, SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
 
     QnImageButtonWidget *zoomOutButton = new QnImageButtonWidget();
     zoomOutButton->setIcon(qnSkin->icon("item/zoom_out.png"));
     zoomOutButton->setProperty(Qn::NoBlockMotionSelection, true);
+    zoomOutButton->setToolTip(tr("Zoom Out"));
     connect(zoomOutButton, SIGNAL(pressed()), this, SLOT(at_zoomOutButton_pressed()));
     connect(zoomOutButton, SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
