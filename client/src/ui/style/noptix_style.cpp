@@ -454,9 +454,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         grooveBodyPic = m_grooveBody;
         handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
     } else {
-        grooveBorderPic = m_skin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
     int d = grooveRect.height();
