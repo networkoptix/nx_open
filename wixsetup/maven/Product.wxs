@@ -204,7 +204,7 @@
                       Execute="deferred" Return="check" Impersonate="no" />
         
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
-                      Value="&quot;[${customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
+                      Value="&quot;[${installer.customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
       
@@ -304,14 +304,14 @@
             <Directory Id="ProgramFilesFolder">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${product.name}">
-                        <Directory Id="${customization}AppServerDir" Name="${appserver.name}">
+                        <Directory Id="${installer.customization}AppServerDir" Name="${appserver.name}">
                             <Component Id="AppServerExecutable" Guid="{5FB5A627-BB1F-4d82-A06C-7672903DA4C7}">
                                 <File Id="ecexe" Name="ecs.exe" Source="${AppServerDir}/ecs.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionAppServer" Name="${company.name} ${appserver.name}" Scope="any" IgnoreFailure="yes" />
                                 </File>
                                 
-                                <ServiceInstall Id="${customization}AppServerService"
-                                                Name="${customization}AppServer"
+                                <ServiceInstall Id="${installer.customization}AppServerService"
+                                                Name="${installer.customization}AppServer"
                                                 DisplayName="${company.name} ${appserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -320,8 +320,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="Start${customization}AppServerService" Name="${customization}AppServer" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${customization}AppServerService" Name="${customization}AppServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${installer.customization}AppServerService" Name="${installer.customization}AppServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${installer.customization}AppServerService" Name="${installer.customization}AppServer" Stop="both" Wait="yes" Remove="uninstall" />
                             
                             </Component>
                             
@@ -359,17 +359,17 @@
                            </Component>
                         </Directory>
                         
-                        <Directory Id="${customization}TrayToolDir" Name="TrayTool">
+                        <Directory Id="${installer.customization}TrayToolDir" Name="TrayTool">
                             <Component Id="traytool.exe" Guid="{11772981-5229-4D14-B126-66906570AD57}">
                                 <File Id="traytool.exe" Name="traytool.exe" Source="${libdir}/bin/${build.configuration}/traytool.exe" KeyPath="yes">
-                                    <fire:FirewallException Id="FirewallException${customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
+                                    <fire:FirewallException Id="FirewallException${installer.customization}TrayTool" Name="VMS Tray Tool" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuTrayTool" Directory="ProgramMenuDir" Name="${traytool.name}"
-                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                     
                                     <Shortcut Id="StartmenuStartupTrayTool" Directory="StartupFolder" Name="${traytool.name}"
-                                              WorkingDirectory='${customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${installer.customization}TrayToolDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                 </File>
                             </Component>
@@ -384,14 +384,14 @@
                             </Component>							
                         </Directory>
                         
-                        <Directory Id="${customization}ProxyServerDir" Name="MediaProxy">
+                        <Directory Id="${installer.customization}ProxyServerDir" Name="MediaProxy">
                             <Component Id="ProxyExecutable" Guid="{7BD9B32D-BE6E-417F-B301-E07657F09B35}">
                                 <File Id="ProxyExe" Name="mediaproxy.exe" Source="${libdir}/bin/${build.configuration}/mediaproxy.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionProxyServer" Name="${mediaproxy.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
-                                <ServiceInstall Id="${customization}MediaProxyService"
-                                                Name="${customization}MediaProxy"
+                                <ServiceInstall Id="${installer.customization}MediaProxyService"
+                                                Name="${installer.customization}MediaProxy"
                                                 DisplayName="${mediaproxy.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -400,8 +400,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="Start${customization}ProxyService" Name="${customization}MediaProxy" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${customization}ProxyService" Name="${customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${installer.customization}ProxyService" Name="${installer.customization}MediaProxy" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
                             
                             <Component Id="ProxyQTLibraries" Guid="{A49B87BB-ADD9-41CA-87C0-304A8A483427}">
@@ -417,14 +417,14 @@
                             </Component>							
                         </Directory>
                         
-                        <Directory Id="${customization}MediaServerDir" Name="MediaServer">
+                        <Directory Id="${installer.customization}MediaServerDir" Name="MediaServer">
                             <Component Id="ServerExecutable" Guid="06DFA703-0266-4970-BAC1-3730BF7D1C66">
                                 <File Id="ServerExe" Name="mediaserver.exe" Source="${libdir}/bin/${build.configuration}/mediaserver.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionMediaServer" Name="${mediaserver.name}" Scope="any" IgnoreFailure="yes"/>
                                 </File>
                                 
-                                <ServiceInstall Id="${customization}MediaServerService"
-                                                Name="${customization}MediaServer"
+                                <ServiceInstall Id="${installer.customization}MediaServerService"
+                                                Name="${installer.customization}MediaServer"
                                                 DisplayName="${mediaserver.name}"
                                                 Type="ownProcess"
                                                 Start="auto"
@@ -433,8 +433,8 @@
                                     <util:ServiceConfig FirstFailureActionType="restart" SecondFailureActionType="restart" ThirdFailureActionType="restart"/>
                                 </ServiceInstall>
                                 
-                                <ServiceControl Id="Start${customization}ServerService" Name="${customization}MediaServer" Start="install" Wait="no" />
-                                <ServiceControl Id="Stop${customization}ServerService" Name="${customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
+                                <ServiceControl Id="Start${installer.customization}ServerService" Name="${installer.customization}MediaServer" Start="install" Wait="no" />
+                                <ServiceControl Id="Stop${installer.customization}ServerService" Name="${installer.customization}MediaServer" Stop="both" Wait="yes" Remove="uninstall" />
                             </Component>
                             
                             <Component Id="ServerConfigurationGuid" Guid="{A2F8AEC6-3050-4262-BEAF-3645943D932F}" Permanent="yes" NeverOverwrite="yes">
@@ -488,16 +488,16 @@
                             </Component>
                         </Directory>
                         
-                        <Directory Id="${customization}ClientDir" Name="Client">
+                        <Directory Id="${installer.customization}ClientDir" Name="Client">
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
                                 <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
                                     
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
-                                              WorkingDirectory='${customization}ClientDir' Advertise="yes" Icon="icon_menu.exe" >
+                                              WorkingDirectory='${installer.customization}ClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
                                     <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                                              WorkingDirectory='${customization}ClientDir' Advertise="yes" Icon="icon_desktop.exe">
+                                              WorkingDirectory='${installer.customization}ClientDir' Advertise="yes" Icon="icon_desktop.exe">
                                     </Shortcut>
                                 
                                 </File>
