@@ -11,7 +11,7 @@
  * This interval (2T) has the following semantic:
  *   - Server sends us pings every T msecs
  *   - We wake up every 2T msecs
- *   - If T msecs passed sinse last received ping => emit connectionClosed.
+ *   - If 2T msecs passed sinse last received ping => emit connectionClosed.
  */
 static const int PING_INTERVAL = 60000;
 
@@ -196,7 +196,7 @@ void QnMessageSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *
 
 void QnMessageSource::onPingTimer()
 {
-    if (m_eventWaitTimer.elapsed() > PING_INTERVAL)
+    if (m_eventWaitTimer.elapsed() > 2 * PING_INTERVAL)
     {
         doStop();
 
