@@ -60,7 +60,6 @@ QnSettings::QnSettings():
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
-    addArgumentName(FLIP_ICONS,            "--flipped-icons");
 
     /* Load from settings. */
     load();
@@ -121,7 +120,6 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
         return qnGlobals->backgroundGradientColor();
 #endif
     case DEBUG_COUNTER:
-    case FLIP_ICONS:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -163,7 +161,6 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
         break;
 #endif
     case DEBUG_COUNTER:
-    case FLIP_ICONS:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
