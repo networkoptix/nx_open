@@ -350,7 +350,7 @@ bool CameraSetting::deserializeFromStr(const QString& src)
 bool CameraSetting::isDisabled() const
 {
     return static_cast<QString>(m_current).isEmpty() ||
-        m_type != Enumeration && m_min == m_max;
+        (m_type != Enumeration && m_min == m_max);
 }
 
 //
@@ -384,8 +384,8 @@ bool CameraSettingReader::isEnabled(const CameraSetting& val)
 }
 
 CameraSettingReader::CameraSettingReader(const QString& cameraId) :
-    m_cameraId(cameraId),
-    m_filepath(CSR_CAMERA_SETTINGS_FILEPATH)
+    m_filepath(CSR_CAMERA_SETTINGS_FILEPATH),
+    m_cameraId(cameraId)
 {
 }
 

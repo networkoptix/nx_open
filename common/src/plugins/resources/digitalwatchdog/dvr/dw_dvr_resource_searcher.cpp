@@ -105,6 +105,12 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
 
     }
     */
+#else
+    Q_UNUSED(resources)
+    Q_UNUSED(host)
+    Q_UNUSED(port)
+    Q_UNUSED(login)
+    Q_UNUSED(password)
 #endif
 }
 

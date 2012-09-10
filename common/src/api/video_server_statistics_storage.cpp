@@ -20,7 +20,7 @@ QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiCo
 }
 
 void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot){
-    connect(this, SIGNAL(at_statistics_processed()), target, slot);
+    connect(this, SIGNAL(statisticsChanged()), target, slot);
     m_listeners++;
 }
 
@@ -90,7 +90,7 @@ void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data
     }
     m_alreadyUpdating = false;
 
-    emit at_statistics_processed();
+    emit statisticsChanged();
 }
 
 
