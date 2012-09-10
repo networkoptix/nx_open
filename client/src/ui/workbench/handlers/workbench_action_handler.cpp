@@ -158,7 +158,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
+    connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
@@ -709,6 +711,28 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+}
+
+void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged(){
+    qreal value = workbench()->currentLayout()->resource()->cellAspectRatio();
+
+    if (qFuzzyCompare(4.0 / 3.0, value))
+        action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
+    else
+        action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true); //default value
+}
+
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged(){
+    qreal value = workbench()->currentLayout()->resource()->cellSpacing().width();
+
+    if (qFuzzyCompare(0.0, value))
+        action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+    else if (qFuzzyCompare(0.2, value))
+        action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+    else if (qFuzzyCompare(0.3, value))
+        action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+    else
+        action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
@@ -2126,26 +2150,32 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
+    action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
+    action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+    action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+    action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+    action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+    action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){

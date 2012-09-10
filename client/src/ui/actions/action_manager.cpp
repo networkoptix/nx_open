@@ -157,6 +157,18 @@ public:
         return *this;
     }
 
+    QnActionBuilder checkable(bool isCheckable = true){
+        m_action->setCheckable(isCheckable);
+
+        return *this;
+    }
+
+    QnActionBuilder checked(bool isChecked = true){
+        m_action->setChecked(isChecked);
+
+        return *this;
+    }
+
     void showCheckBoxInMenu(bool show) {
         m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
     }
@@ -174,8 +186,8 @@ public:
     }
 
 private:
-    QnAction *m_action;
     QnActionManager *m_manager;
+    QnAction *m_action;
 };
 
 
@@ -186,7 +198,8 @@ class QnActionFactory {
 public:
     QnActionFactory(QnActionManager *menu, QnAction *parent): 
         m_manager(menu),
-        m_lastFreeActionId(Qn::ActionCount)
+        m_lastFreeActionId(Qn::ActionCount),
+        m_currentGroup(0)
     {
         m_actionStack.push_back(parent);
         m_lastAction = parent;
@@ -200,6 +213,14 @@ public:
         m_actionStack.pop_back();
     }
 
+    void beginGroup(){
+        m_currentGroup = new QActionGroup(m_manager);
+    }
+
+    void endGroup(){
+        m_currentGroup = NULL;
+    }
+
     QnActionBuilder operator()(Qn::ActionId id) {
         QnAction *action = m_manager->m_actionById.value(id);
         if(action == NULL) {
@@ -210,6 +231,8 @@ public:
 
         m_actionStack.back()->addChild(action);
         m_lastAction = action;
+        if (m_currentGroup)
+            m_currentGroup->addAction(action);
 
         return QnActionBuilder(m_manager, action);
     }
@@ -219,10 +242,11 @@ public:
     }
 
 private:
-    int m_lastFreeActionId;
     QnActionManager *m_manager;
+    int m_lastFreeActionId;
     QnAction *m_lastAction;
     QList<QnAction *> m_actionStack;
+    QActionGroup* m_currentGroup;
 };
 
 
@@ -770,15 +794,22 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Change Cell Aspect Ratio"));
 
     factory.enterSubMenu(); {
+        factory.beginGroup();
+
         factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("4:3"));
+            text(tr("4:3")).
+            checkable();
 
         factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("16:9"));
+            text(tr("16:9")).
+            checkable().
+            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
+
+        factory.endGroup();
     } factory.leaveSubMenu();
 
     factory().
@@ -786,25 +817,33 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Change Cell Spacing"));
 
     factory.enterSubMenu(); {
+        factory.beginGroup();
+
         factory(Qn::SetCurrentLayoutItemSpacing0Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("None"));
+            text(tr("None")).
+            checkable();
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("Small"));
+            text(tr("Small")).
+            checkable().
+            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_SPACING ?
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("Medium"));
+            text(tr("Medium")).
+            checkable();
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
-            text(tr("Large"));
+            text(tr("Large")).
+            checkable();
+        factory.endGroup();
 
     } factory.leaveSubMenu();
 
