@@ -149,6 +149,7 @@ QString QnPlDroidResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlDroidResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 

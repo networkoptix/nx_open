@@ -30,7 +30,7 @@ public:
      * \param target            Object that will be notified about new data.
      * \param slot              Slot that will be called when new data will be received.
      */
-    void registerServerWidget(QnVideoServerResourcePtr resource, QObject *target, const char *slot);
+    void registerServerWidget(const QnVideoServerResourcePtr &resource, QObject *target, const char *slot);
 
     /**
      *  Unregister the consumer object (usually widget).
@@ -38,7 +38,7 @@ public:
      * \param resource          Server resource whous history we do not want to receive anymore.
      * \param target            Object that will not be notified about new data anymore.
      */
-    void unregisterServerWidget(QnVideoServerResourcePtr resource, QObject *target);
+    void unregisterServerWidget(const QnVideoServerResourcePtr &resource, QObject *target);
 
     /**
      *  Get history data for the selected server resource.
@@ -48,7 +48,7 @@ public:
      * \param history           Field that should be filled with results.
      * \returns                 Id of the last response in history.
      */
-    qint64 getHistory(QnVideoServerResourcePtr resource, qint64 lastId, QnStatisticsHistory *history);
+    qint64 getHistory(const QnVideoServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history);
 
 private slots:
     void at_timer_timeout();

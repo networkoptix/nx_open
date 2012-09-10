@@ -126,20 +126,12 @@ void LoginDialog::updateFocus()
 }
 
 QUrl LoginDialog::currentUrl() const {
-    const int row = ui->connectionsComboBox->currentIndex();
-
     QUrl url;
     url.setScheme(QLatin1String("https"));
     url.setHost(ui->hostnameLineEdit->text());
     url.setPort(ui->portSpinBox->value());
     url.setUserName(ui->loginLineEdit->text());
     url.setPassword(ui->passwordLineEdit->text());
-
-    /*url.setHost(m_connectionsModel->item(row, 1)->text());
-    url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
-    url.setUserName(m_connectionsModel->item(row, 3)->text());
-    url.setPassword(m_connectionsModel->item(row, 4)->text());
-*/
     return url;
 }
 

@@ -205,6 +205,8 @@ namespace detail
     }
 
     void VideoServerSimpleReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
+        Q_UNUSED(reply)
+        Q_UNUSED(errorString)
         emit finished(status, handle);
     }
 

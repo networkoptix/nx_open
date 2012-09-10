@@ -52,7 +52,7 @@ public:
         const CameraSettingValue step = CameraSettingValue(),
         const CameraSettingValue current = CameraSettingValue());
 
-    virtual ~CameraSetting() {};
+    virtual ~CameraSetting() {}
 
     void setId(const QString& id);
     QString getId() const;
@@ -97,11 +97,11 @@ private:
     WIDGET_TYPE m_type;
     QString m_query;
     QString m_method;
+    QString m_description;
     CameraSettingValue m_min;
     CameraSettingValue m_max;
     CameraSettingValue m_step;
     CameraSettingValue m_current;
-    QString m_description;
 };
 
 typedef QHash<QString, CameraSetting> CameraSettingsByIds;
@@ -136,7 +136,7 @@ public:
 
     bool read(); //reads data from xml file
     bool proceed(); //parses data from file
-    QString getCameraId() const { return m_cameraId; };
+    QString getCameraId() const { return m_cameraId; }
 
 protected:
 

@@ -37,14 +37,17 @@ def genqrc(qrcname, qrcprefix, path, extensions, additions=''):
   print >> qrcfile, '</qresource>'
   print >> qrcfile, '</RCC>'
   
-  qrcfile.close()		
+  qrcfile.close()
 
 
 if __name__ == '__main__':
   os.system('mkdir build')
+  
+  os.system('lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
+  
+  genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'])  
   genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'])
   genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''])
   genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''])
   genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''])  
   
-  os.system('${environment.dir}/qt/bin/lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')

@@ -132,10 +132,13 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
     {
         QBrush brush = painter->brush();
 
+        bool containsMotion = m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionRole).intersects(period);
+        bool containsRecording = containsMotion || (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period));
+
         QColor bgcolor;
-        if (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+        if (containsMotion) {
             bgcolor = motionColor;
-        } else if (m_currentWidgetIsCentral && m_currentTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+        } else if (containsRecording) {
             bgcolor = recordingColor;
         } else {
             bgcolor = backgroundColor;
@@ -144,12 +147,11 @@ void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDa
         brush.setStyle(Qt::SolidPattern);
         painter->fillRect(rect, brush);
 
-        // TODO: #GDM logic based on color comparisons is a bad practice. Introduce additional booleans if needed, but don't compare colors.
-        if (bgcolor != motionColor && m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
+        if (!containsMotion && m_syncedTimeStorage.periods(Qn::MotionRole).intersects(period)) {
             brush.setColor(denseMotionColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);
-        } else if (bgcolor != recordingColor && m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
+        } else if (!containsRecording && m_syncedTimeStorage.periods(Qn::RecordingRole).intersects(period)) {
             brush.setColor(denseRecordingColor);
             brush.setStyle(Qt::Dense6Pattern);
             painter->fillRect(rect, brush);

@@ -10,6 +10,7 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}-common.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-custom.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
+RESOURCES += ${project.build.directory}/build/${project.artifactId}-translations.qrc
 
 !contains(BUILDLIB, staticlib) {
   ICON = ${project.build.directory}/hdw_logo.ico

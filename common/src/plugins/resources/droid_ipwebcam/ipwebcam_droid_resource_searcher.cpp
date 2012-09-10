@@ -57,6 +57,7 @@ QString QnPlIpWebCamResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlIpWebCamResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 
