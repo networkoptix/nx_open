@@ -56,6 +56,8 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include "utils/common/module_resources.h"
+
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
@@ -210,12 +212,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
-    /* Init common resources. */
-    Q_INIT_RESOURCE(common_common);
-    Q_INIT_RESOURCE(common_custom);
-    Q_INIT_RESOURCE(common_generated);
-    Q_INIT_RESOURCE(common_translations);
-
+    QN_INIT_MODULE_RESOURCES(common);
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
