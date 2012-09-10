@@ -264,17 +264,17 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            widget->bindTexture(pixmap(endState));
+            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         } else {
-            widget->bindTexture(pixmap(startState));
+            widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
         glDrawTexturedRect(rect, m_flipped);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
-        widget->bindTexture(pixmap(endState));
+        widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_gl->glActiveTexture(GL_TEXTURE0);
-        widget->bindTexture(pixmap(startState));
+        widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
         m_shader->setTexture0(0);
