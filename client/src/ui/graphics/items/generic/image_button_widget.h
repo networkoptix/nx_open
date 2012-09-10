@@ -141,7 +141,6 @@ private:
 
     QAction *m_action;
     bool m_actionIconOverridden;
-    bool m_flipped;
 
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
     QScopedPointer<QnGlFunctions> m_gl;
