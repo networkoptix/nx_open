@@ -145,18 +145,18 @@ namespace {
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_instrumentManager(new InstrumentManager(this)),
     m_scene(NULL),
     m_view(NULL),
-    m_viewportAnimator(NULL),
-    m_frameOpacityAnimator(NULL),
-    m_curtainAnimator(NULL),
     m_frontZ(0.0),
-    m_dummyScene(new QGraphicsScene(this)),
     m_frameOpacity(1.0),
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
+    m_instrumentManager(new InstrumentManager(this)),
+    m_viewportAnimator(NULL),
+    m_curtainAnimator(NULL),
+    m_frameOpacityAnimator(NULL),
+    m_dummyScene(new QGraphicsScene(this)),
     m_loader(NULL)
 {
     std::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
@@ -1101,8 +1101,10 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     if(animate) {
         QEasingCurve easingCurve;
 
+        /*
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
+        */
 
         animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
     } else {

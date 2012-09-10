@@ -1480,7 +1480,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        if(button != QMessageBox::Yes)
+        if(button != QDialogButtonBox::Yes)
             return;
     }
 
@@ -1567,7 +1567,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        okToDelete = button == QMessageBox::Yes;
+        okToDelete = button == QDialogButtonBox::Yes;
     }
 
     if(!okToDelete)
@@ -1922,6 +1922,7 @@ Do you want to continue?"),
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
+    Q_UNUSED(fileName)
     if (m_layoutExportResources.isEmpty()) {
         disconnect(sender(), NULL, this, NULL);
         if(m_exportProgressDialog)
@@ -2286,6 +2287,7 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
+    Q_UNUSED(role)
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
 }

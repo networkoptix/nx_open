@@ -83,10 +83,10 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnResourceList m_resources;
-        int m_handle;
     };
 
     class QnConnectReplyProcessor: public QObject {
@@ -117,10 +117,10 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnConnectInfoPtr m_connectInfo;
-        int m_handle;
     };
 
 } // namespace detail
