@@ -213,6 +213,9 @@ QString findCodecById(int num)
 
 void RTPSession::usePredefinedTracks()
 {
+    if(!m_sdpTracks.isEmpty())
+        return;
+
     static const quint8 FFMPEG_CODE = 102;
     static const QString FFMPEG_STR(QLatin1String("FFMPEG"));
     static const quint8 METADATA_CODE = 126;
