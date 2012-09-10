@@ -101,6 +101,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(int,                     tourStepDuration,       setTourStepDuration,        TOUR_STEP_DURATION,         4000)
+    QN_END_PROPERTY_STORAGE()
+
 private:
     QSettings *m_settings;
     bool m_loading;
