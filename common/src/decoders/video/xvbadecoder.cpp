@@ -18,57 +18,13 @@
 //decode to opengl texture
 #define USE_OPENGL_SURFACE
 //each XVBADecode call gets only one slice of primary coded picture and same surface
-#define DECODE_PIC_SLICES_SEPARATELY
+//#define DECODE_PIC_SLICES_SEPARATELY
 //#define SAVE_DECODED_FRAME_TO_FILE
 #define DUMP_DECODER_INPUT
 #ifdef DUMP_DECODER_INPUT
 //#define DUMP_BY_SLICES
 #endif
 #define DIGITAL_WATCHDOG_DEBUGGING
-
-
-#ifdef XVBA_TEST
-enum Level
-{
-    cl_logERROR,
-    cl_logWARNING,
-    cl_logINFO,
-    cl_logDEBUG1,
-    cl_logDEBUG2,
-};
-
-class CLLog
-{
-public:
-    void log( const QString& str, Level level )
-    {
-        if( level >= cl_logINFO )
-            qDebug() << str;
-        else if( level == cl_logWARNING )
-            qWarning() << str;
-        else if( level == cl_logERROR )
-            qCritical() << str;
-    }
-};
-
-CLLog cl_log;
-
-QnOpenGLPictureData::QnOpenGLPictureData( unsigned int _glTexture )
-:
-    m_glTexture( _glTexture )
-{
-}
-
-QnAbstractPictureData::PicStorageType QnOpenGLPictureData::type() const
-{
-    return QnAbstractPictureData::pstOpenGL;
-}
-
-unsigned int QnOpenGLPictureData::glTexture() const
-{
-    return m_glTexture;
-}
-#endif
 
 
 QGLContextDuplicate::~QGLContextDuplicate()
@@ -246,7 +202,6 @@ QnXVBADecoder::H264PPocCalcAuxiliaryData::H264PPocCalcAuxiliaryData()
 {
 }
 
-
 /////////////////////////////////////////////////////
 //  class QnXVBADecoder
 /////////////////////////////////////////////////////
@@ -289,30 +244,24 @@ QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompres
         return;
     }
 
-    //TODO/IMPL creating OGL context shared with drawing context
-//    static int visualAttribList[] = {
-//        GLX_RGBA,
-//        GLX_RED_SIZE, 4,
-//        GLX_GREEN_SIZE, 4,
-//        GLX_BLUE_SIZE, 4,
-//        None };
-//    XVisualInfo* visualInfo = glXChooseVisual( m_display, QX11Info::appScreen(), visualAttribList );
-//    m_glContext = glXCreateContext(
-//        m_display,
-//        visualInfo,
-//        (GLXContext)(reinterpret_cast<const QGLContextPrivate*>(reinterpret_cast<const QGLContextDuplicate*>(glContext)->d_ptr.data())->cx),
-//        true );
-
-    m_glContext = (GLXContext)(reinterpret_cast<const QGLContextPrivate*>(reinterpret_cast<const QGLContextDuplicate*>(glContext)->d_ptr.data())->cx);
+    //creating OGL context shared with drawing context
+    static int visualAttribList[] = {
+        GLX_RGBA,
+        GLX_RED_SIZE, 4,
+        GLX_GREEN_SIZE, 4,
+        GLX_BLUE_SIZE, 4,
+        None };
+    XVisualInfo* visualInfo = glXChooseVisual( m_display, QX11Info::appScreen(), visualAttribList );
+    m_glContext = glXCreateContext(
+        m_display,
+        visualInfo,
+        glContext ? (GLXContext)(reinterpret_cast<const QGLContextPrivate*>(reinterpret_cast<const QGLContextDuplicate*>(glContext)->d_ptr.data())->cx) : NULL,
+        true );
     if( !m_glContext )
     {
         XVBADestroyContext( m_context );
         m_context = NULL;
         cl_log.log( QString::fromAscii("QnXVBADecoder. Failed to create OpenGL context"), cl_logERROR );
-    }
-    else
-    {
-        //TODO make context current? (assuming we have one QnXVBADecoder object per thread)
     }
 
 #ifdef DUMP_DECODER_INPUT
@@ -323,13 +272,7 @@ QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompres
 
 QnXVBADecoder::~QnXVBADecoder()
 {
-    if( m_decodeSession )
-    {
-        XVBADestroyDecode( m_decodeSession );
-        m_decodeSession = NULL;
-    }
-
-    m_commonSurfaces.clear();
+    destroyXVBASession();
 
     if( m_context )
     {
@@ -337,13 +280,13 @@ QnXVBADecoder::~QnXVBADecoder()
         m_context = NULL;
     }
 
-//    if( m_glContext )
-//        glXDestroyContext( m_display, m_glContext );
+    if( m_glContext )
+        glXDestroyContext( m_display, m_glContext );
 
-    //TODO/IMPL delete decode buffers
-
+#ifdef SAVE_DECODED_FRAME_TO_FILE
     delete[] m_decodedPictureRgbaBuf;
     m_decodedPictureRgbaBuf = NULL;
+#endif
 }
 
 //!Implementation of AbstractDecoder::GetPixelFormat
@@ -367,7 +310,7 @@ QnAbstractPictureData::PicStorageType QnXVBADecoder::targetMemoryType() const
 
 //!Implementation of AbstractDecoder::decode
 bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
-{    
+{
 //#ifdef DUMP_DECODER_INPUT
 //  	m_inStream.write( data->data.data(), data->data.size() );
 //#endif
@@ -430,9 +373,22 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         return decodedPicSurface != NULL;
     }
     XVBAQuantMatrixAvc* quantMatrixAVC = static_cast<XVBAQuantMatrixAvc*>( qmBufferDescriptor->bufferXVBA );
-	memset( quantMatrixAVC->bScalingLists4x4, 16, sizeof(quantMatrixAVC->bScalingLists4x4) );
-	memset( quantMatrixAVC->bScalingLists8x8, 16, sizeof(quantMatrixAVC->bScalingLists8x8) );
-	qmBufferDescriptor->data_size_in_buffer = sizeof(*quantMatrixAVC);
+
+    memset( quantMatrixAVC->bScalingLists4x4, 16, sizeof(quantMatrixAVC->bScalingLists4x4) );
+    memset( quantMatrixAVC->bScalingLists8x8, 16, sizeof(quantMatrixAVC->bScalingLists8x8) );
+
+    unsigned char* quantMatrixStart = (unsigned char*)quantMatrixAVC->bScalingLists4x4;
+    std::copy(
+        (const int*)m_sps.ScalingList4x4,
+        ((const int*)m_sps.ScalingList4x4) + sizeof(m_sps.ScalingList4x4)/sizeof(**m_sps.ScalingList4x4),
+        quantMatrixStart );
+    quantMatrixStart = (unsigned char*)quantMatrixAVC->bScalingLists8x8;
+    std::copy(
+        (const int*)m_sps.ScalingList8x8,
+        ((const int*)m_sps.ScalingList8x8) + sizeof(m_sps.ScalingList8x8)/sizeof(**m_sps.ScalingList8x8),
+        quantMatrixStart );
+
+    qmBufferDescriptor->data_size_in_buffer = sizeof(*quantMatrixAVC);
     targetSurfaceCtx->usedDecodeBuffers.push_back( qmBufferDescriptor );
     m_pictureDescriptorBufArray[1] = qmBufferDescriptor;
     m_pictureDescriptorDecodeInput.num_of_buffers_in_list = 2;
@@ -450,12 +406,10 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     const size_t buffersBeforeDataBuffer = targetSurfaceCtx->usedDecodeBuffers.size();
     targetSurfaceCtx->usedDecodeBuffers.push_back( dataBufferDescriptor );
 
-    size_t firstSliceOffset = 0;
     if( !analyzeInputBufSlices(
     		data,
     		static_cast<XVBAPictureDescriptor*>(pictureDescriptionBufferDescriptor->bufferXVBA),
-    		&targetSurfaceCtx->usedDecodeBuffers,
-    		&firstSliceOffset ) )
+            &targetSurfaceCtx->usedDecodeBuffers ) )
     {
         cl_log.log( QString::fromAscii("QnXVBADecoder. Could not find slice in source data"), cl_logWARNING );
         std::for_each(
@@ -469,17 +423,17 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     if( targetSurfaceCtx->usedDecodeBuffers.size() - (buffersBeforeDataBuffer+1) > 1 )
     {
         //leaving only first slice of picture
-        std::vector<XVBABufferDescriptor*>::iterator firstDataCtrlToEraseIter =
-                targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1+1;
-        std::for_each(
-            firstDataCtrlToEraseIter,
-            targetSurfaceCtx->usedDecodeBuffers.end(),
-            std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
-        targetSurfaceCtx->usedDecodeBuffers.erase( firstDataCtrlToEraseIter, targetSurfaceCtx->usedDecodeBuffers.end() );
+//        std::vector<XVBABufferDescriptor*>::iterator firstDataCtrlToEraseIter =
+//                targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1+1;
+//        std::for_each(
+//            firstDataCtrlToEraseIter,
+//            targetSurfaceCtx->usedDecodeBuffers.end(),
+//            std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+//        targetSurfaceCtx->usedDecodeBuffers.erase( firstDataCtrlToEraseIter, targetSurfaceCtx->usedDecodeBuffers.end() );
 
         //leaving only last slice of picture
-//        ungetBuffer( *(targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1) );
-//        targetSurfaceCtx->usedDecodeBuffers.erase( targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1 );
+        ungetBuffer( *(targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1) );
+        targetSurfaceCtx->usedDecodeBuffers.erase( targetSurfaceCtx->usedDecodeBuffers.begin() + buffersBeforeDataBuffer+1 );
     }
 #endif
 
@@ -493,7 +447,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     }
 
     //giving XVBA_PICTURE_DESCRIPTOR_BUFFER and XVBA_QM_BUFFER
-    m_prevOperationStatus = XVBADecodePicture( &m_pictureDescriptorDecodeInput );
+    m_prevOperationStatus = ::XVBADecodePicture( &m_pictureDescriptorDecodeInput );
     if( m_prevOperationStatus != Success )
     {
         cl_log.log( QString::fromAscii("QnXVBADecoder. Error giving XVBA_PICTURE_DESCRIPTOR_BUFFER and XVBA_QM_BUFFER to decoder. %1").arg(lastErrorText()), cl_logERROR );
@@ -501,6 +455,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         	targetSurfaceCtx->usedDecodeBuffers.begin(),
         	targetSurfaceCtx->usedDecodeBuffers.end(),
         	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+        destroyXVBASession();   //destroying session, since in case of such error usually we
         return decodedPicSurface != NULL;
     }
 
@@ -518,77 +473,79 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         return decodedPicSurface != NULL;
     }
 
-    //char* dataStart = reinterpret_cast<char*>(ALIGN128((size_t)dataBufferDescriptor->bufferXVBA));
+    //at this moment XVBADataCtrl buffers found in targetSurfaceCtx->usedDecodeBuffers point to slices in source buffer (data->data), not in XVBA_DATA_BUFFER
+
+    //copying coded data to data buffer
     char* dataStart = reinterpret_cast<char*>(dataBufferDescriptor->bufferXVBA);
     for( size_t i = buffersBeforeDataBuffer+1; i < targetSurfaceCtx->usedDecodeBuffers.size(); ++i )
     {
-    	XVBADataCtrl* ctrl = ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA);
+#ifdef DECODE_PIC_SLICES_SEPARATELY
+        if( i > buffersBeforeDataBuffer+1 )
+        {
+            dataBufferDescriptor = getDecodeBuffer( XVBA_DATA_BUFFER );
+            if( !dataBufferDescriptor )
+            {
+                cl_log.log( QString::fromAscii("QnXVBADecoder. No XVBA_DATA_BUFFER buffer"), cl_logERROR );
+                std::for_each(
+                    targetSurfaceCtx->usedDecodeBuffers.begin(),
+                    targetSurfaceCtx->usedDecodeBuffers.end(),
+                    std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+                return decodedPicSurface != NULL;
+            }
+            dataStart = reinterpret_cast<char*>(dataBufferDescriptor->bufferXVBA);
+            targetSurfaceCtx->usedDecodeBuffers.insert( targetSurfaceCtx->usedDecodeBuffers.begin()+i, dataBufferDescriptor );
+            ++i;
+        }
+#endif
+
+        XVBADataCtrl* ctrl = ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA);
 
     	memcpy( dataStart + dataBufferDescriptor->data_size_in_buffer,
     			data->data.data() + ctrl->SliceDataLocation,
     			ctrl->SliceBytesInBuffer );
     	ctrl->SliceDataLocation = dataBufferDescriptor->data_size_in_buffer;
     	dataBufferDescriptor->data_size_in_buffer += ctrl->SliceBytesInBuffer;
-    	//adding two trailing zeros, as required by XVBA
-    	memset( dataStart + dataBufferDescriptor->data_size_in_buffer, 0, 2 );
-    	dataBufferDescriptor->data_size_in_buffer += 2;
-    	ctrl->SliceBytesInBuffer += 2;
-    	ctrl->SliceBitsInBuffer += 16;
+
+        //adding two trailing zeros, as required by XVBA
+        static const size_t TRAILING_ZEROS_COUNT = 2;
+        memset( dataStart + dataBufferDescriptor->data_size_in_buffer, 0, TRAILING_ZEROS_COUNT );
+        dataBufferDescriptor->data_size_in_buffer += TRAILING_ZEROS_COUNT;
+        ctrl->SliceBytesInBuffer += TRAILING_ZEROS_COUNT;
+        ctrl->SliceBitsInBuffer += TRAILING_ZEROS_COUNT << 3;
     }
 
-//	dataBufferDescriptor->data_offset = dataStart - static_cast<char*>(dataBufferDescriptor->bufferXVBA);
-//    memcpy( dataStart, data->data.data(), data->data.size() );
-//    dataBufferDescriptor->data_size_in_buffer = ALIGN128(data->data.size());
-//    memset( dataStart + data->data.size(), 0, dataBufferDescriptor->data_size_in_buffer - data->data.size() );
+//#ifndef DECODE_PIC_SLICES_SEPARATELY
+//    size_t data_size_in_buffer_bak = dataBufferDescriptor->data_size_in_buffer;
+//    dataBufferDescriptor->data_size_in_buffer = ALIGN128(dataBufferDescriptor->data_size_in_buffer);
+//    memset( dataStart + bak, 0, dataBufferDescriptor->data_size_in_buffer - bak );
+//#endif
 
-#ifdef DUMP_DECODER_INPUT
-#ifndef DUMP_BY_SLICES
-    for( size_t i = buffersBeforeDataBuffer+1; i < targetSurfaceCtx->usedDecodeBuffers.size(); ++i )
+#ifdef DECODE_PIC_SLICES_SEPARATELY
+    const size_t totalDataBuffers = (targetSurfaceCtx->usedDecodeBuffers.size() - buffersBeforeDataBuffer) / 2;
+    for( size_t i = 0; i < totalDataBuffers; ++i )
     {
-        XVBADataCtrl* ctrl = ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA);
-        m_inStream.write( (const char*)dataBufferDescriptor->bufferXVBA + ctrl->SliceDataLocation, ctrl->SliceBytesInBuffer );
-    }
+        m_srcDataDecodeInput.buffer_list = &targetSurfaceCtx->usedDecodeBuffers[buffersBeforeDataBuffer+i*2];	//index 0 - pictureDescriptionBufferDescriptor, 1 - quantization matrix buffer which is not needed here
+        m_srcDataDecodeInput.num_of_buffers_in_list = 2;
+        dataBufferDescriptor = targetSurfaceCtx->usedDecodeBuffers[buffersBeforeDataBuffer+i*2];
 #else
-    {
-    	static int fileNumber = 1;
-    	char outFilePath[256];
-
-    	for( size_t i = 2; i < targetSurfaceCtx->usedDecodeBuffers.size(); ++i )
-    	{
-    		sprintf( outFilePath, "/home/ak/slices/%d", fileNumber++ );
-    		std::ofstream of( outFilePath, std::ios_base::binary );
-    		of.write(
-    			(const char*)dataBufferDescriptor->bufferXVBA + dataBufferDescriptor->data_offset + ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceDataLocation,
-    			((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceBytesInBuffer );
-//    		m_inStream.write(
-//    			(const char*)dataBufferDescriptor->bufferXVBA + dataBufferDescriptor->data_offset + ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceDataLocation,
-//				((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceBytesInBuffer );
-    	}
-    }
-#endif
+        m_srcDataDecodeInput.buffer_list = &targetSurfaceCtx->usedDecodeBuffers[buffersBeforeDataBuffer];	//index 0 - pictureDescriptionBufferDescriptor, 1 - quantization matrix buffer which is not needed here
+        m_srcDataDecodeInput.num_of_buffers_in_list = targetSurfaceCtx->usedDecodeBuffers.size()-buffersBeforeDataBuffer;
 #endif
 
-//    m_dataBufDescriptor.buffer_size = ALIGN128(data->data.size() /*- firstSliceOffset*/);
-//    m_dataBufDescriptor.bufferXVBA = dataStart;//dataStart /*+ firstSliceOffset*/;
-//    m_dataBufDescriptor.data_size_in_buffer = data->data.size();
-
-//    m_srcDataDecodeBufArray[0] = dataBufferDescriptor;
-//    m_srcDataDecodeBufArray[1] = dataCtrlBufferDescriptor;
-
-    m_srcDataDecodeInput.buffer_list = &targetSurfaceCtx->usedDecodeBuffers[buffersBeforeDataBuffer];	//index 0 - pictureDescriptionBufferDescriptor, 1 - quantization matrix buffer which is not needed here
-    m_srcDataDecodeInput.num_of_buffers_in_list = targetSurfaceCtx->usedDecodeBuffers.size()-buffersBeforeDataBuffer;
-
-    m_prevOperationStatus = XVBADecodePicture( &m_srcDataDecodeInput );
-    if( m_prevOperationStatus != Success )
-    {
-        cl_log.log( QString::fromAscii("QnXVBADecoder. Error giving src data to decoder. %1. buf %2, bufsize %3").
-       		arg(lastErrorText()).arg((size_t)dataStart, 0, 16).arg(dataBufferDescriptor->buffer_size, 0, 16), cl_logERROR );
-        std::for_each(
-        	targetSurfaceCtx->usedDecodeBuffers.begin(),
-        	targetSurfaceCtx->usedDecodeBuffers.end(),
-        	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
-        return decodedPicSurface != NULL;
-    }
+        m_prevOperationStatus = XVBADecodePicture( &m_srcDataDecodeInput );
+        if( m_prevOperationStatus != Success )
+        {
+            cl_log.log( QString::fromAscii("QnXVBADecoder. Error giving src data to decoder. %1. buf %2, bufsize %3").
+                arg(lastErrorText()).arg((size_t)dataStart, 0, 16).arg(dataBufferDescriptor->buffer_size, 0, 16), cl_logERROR );
+            std::for_each(
+                targetSurfaceCtx->usedDecodeBuffers.begin(),
+                targetSurfaceCtx->usedDecodeBuffers.end(),
+                std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+            return decodedPicSurface != NULL;
+        }
+#ifdef DECODE_PIC_SLICES_SEPARATELY
+    }   //for
+#endif
 
     m_prevOperationStatus = XVBAEndDecodePicture( &m_decodeEndInput );
     if( m_prevOperationStatus != Success )
@@ -604,17 +561,6 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     targetSurfaceCtx->pts = data->timestamp;
     targetSurfaceCtx->state = XVBASurfaceContext::decodingInProgress;
     ++m_totalSurfacesBeingDecoded;
-
-//    m_syncIn.surface = targetSurfaceCtx->surface;
-//    m_syncIn.query_status = XVBA_GET_SURFACE_STATUS;	//XVBA_GET_DECODE_ERRORS not supported
-//    memset( &m_syncOut, 0, sizeof(m_syncOut) );
-//    m_syncOut.size = sizeof(m_syncOut);
-//    m_prevOperationStatus = XVBASyncSurface( &m_syncIn, &m_syncOut );
-//    if( m_prevOperationStatus != Success )
-//    {
-//        cl_log.log( QString::fromAscii("QnXVBADecoder. HUY"), cl_logERROR );
-//    }
-//    cl_log.log( QString::fromAscii("QnXVBADecoder. m_syncOut.status_flags = %1").arg(m_syncOut.status_flags), cl_logDEBUG1 );
 
     cl_log.log( QString::fromAscii("QnXVBADecoder. Submitted %1 bytes of data (pts %2) to XVBA decoder (in %3 ms)").arg(data->data.size()).arg(data->timestamp).arg(elapsedTimer.elapsed()), cl_logDEBUG1 );
     return decodedPicSurface != NULL;
@@ -834,6 +780,7 @@ bool QnXVBADecoder::createDecodeSession()
     m_syncIn.size = sizeof(m_syncIn);
     m_syncIn.session = m_decodeSession;
 
+#ifdef SAVE_DECODED_FRAME_TO_FILE
     m_decodedPictureRgbaBufSize = in.width * in.height * 4;
     m_decodedPictureRgbaBuf = new quint8[m_decodedPictureRgbaBufSize];
     memset( m_decodedPictureRgbaBuf, 0xf0, m_decodedPictureRgbaBufSize );
@@ -842,6 +789,7 @@ bool QnXVBADecoder::createDecodeSession()
     	m_decodedPictureRgbaBuf[i] = 0xf8;
     	m_decodedPictureRgbaBuf[i+1] = 0x30;
     }
+#endif
 
     return m_prevOperationStatus == Success;
 }
@@ -891,7 +839,7 @@ bool QnXVBADecoder::createGLSurface()
                   0,
                   GL_BGRA,
                   GL_UNSIGNED_BYTE,  //GL_UNSIGNED_SHORT_4_4_4_4,
-                  m_decodedPictureRgbaBuf );
+                  NULL );
 //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 //    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     glErrorCode = glGetError();
@@ -1027,12 +975,9 @@ bool QnXVBADecoder::readSequenceHeader( const QnCompressedVideoDataPtr& data )
 bool QnXVBADecoder::analyzeInputBufSlices(
     const QnCompressedVideoDataPtr& data,
     XVBAPictureDescriptor* const pictureDescriptor,
-    std::vector<XVBABufferDescriptor*>* const dataCtrlBuffers,
-    size_t* firstSliceOffset )
+    std::vector<XVBABufferDescriptor*>* const dataCtrlBuffers )
 {
     const size_t sizeBak = dataCtrlBuffers->size();
-
-	*firstSliceOffset = 0;
 
     //searching for a first slice
     const quint8* dataEnd = reinterpret_cast<const quint8*>(data->data.data()) + data->data.size();
@@ -1070,6 +1015,8 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 slice.decodeBuffer( curNalu, curNaluEnd );
                 slice.deserialize( &m_sps, &m_pps );
                 calcH264POC( &slice );
+                if( slice.slice_type == SliceUnit::B_TYPE )
+                    break;
 
                 //parsing slice_header
                 pictureDescriptor->picture_structure = pictureDescriptor->sps_info.avc.frame_mbs_only_flag || (slice.m_field_pic_flag == 0)
@@ -1080,8 +1027,8 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 pictureDescriptor->avc_frame_num = slice.frame_num;
                 //std::cout<<"Found slice pic_struct = "<<pictureDescriptor->picture_structure<<", slice.frame_num = "<<slice.frame_num<<"\n";
                 //TODO following values are only suitable in progressive baseline video
-                pictureDescriptor->avc_curr_field_order_cnt_list[0] = slice.toppoc;    //TODO/IMPL TopFieldOrderCnt
-                pictureDescriptor->avc_curr_field_order_cnt_list[1] = slice.bottompoc;    //TODO/IMPL BottomFieldOrderCnt
+                pictureDescriptor->avc_curr_field_order_cnt_list[0] = slice.toppoc;    //TopFieldOrderCnt
+                pictureDescriptor->avc_curr_field_order_cnt_list[1] = slice.bottompoc;    //BottomFieldOrderCnt
                 pictureDescriptor->avc_intra_flag = slice.slice_type == SliceUnit::I_TYPE ? 1 : 0;    //I - frame. Supposing, that only I frames are intra coded
                 pictureDescriptor->avc_reference = slice.nal_ref_idc > 0 ? 1 : 0;
             }
@@ -1090,9 +1037,6 @@ bool QnXVBADecoder::analyzeInputBufSlices(
             case nuSliceC:
             case nuSliceWithoutPartitioning:
             {
-                if( *firstSliceOffset == 0 )
-                    *firstSliceOffset = curNaluWithPrefix - reinterpret_cast<const quint8*>(data->data.data());
-
                 XVBABufferDescriptor* dataCtrlBufferDescriptor = getDecodeBuffer( XVBA_DATA_CTRL_BUFFER );
                 if( !dataCtrlBufferDescriptor )
                 {
@@ -1472,6 +1416,8 @@ XVBABufferDescriptor* QnXVBADecoder::getDecodeBuffer( XVBA_BUFFER bufferType )
 	if( unusedBufIndex < m_xvbaDecodeBuffers.size() )
 	{
 		m_xvbaDecodeBuffers[unusedBufIndex].second = true;
+        if( bufferType == XVBA_DATA_BUFFER )
+            m_xvbaDecodeBuffers[unusedBufIndex].first->data_size_in_buffer = 0;
 		return m_xvbaDecodeBuffers[unusedBufIndex].first;
 	}
 
@@ -1522,6 +1468,8 @@ XVBABufferDescriptor* QnXVBADecoder::getDecodeBuffer( XVBA_BUFFER bufferType )
         m_xvbaDecodeBuffers.push_back( make_pair( new XVBABufferDescriptor(out.buffer_list[i]), false ) );  //TODO get rid of new
     }
 
+    if( bufferType == XVBA_DATA_BUFFER )
+        m_xvbaDecodeBuffers.back().first->data_size_in_buffer = 0;
     m_xvbaDecodeBuffers.back().second = true;
 	return m_xvbaDecodeBuffers.back().first;
 }
@@ -1609,21 +1557,6 @@ QnXVBADecoder::XVBASurfaceContext* QnXVBADecoder::findUnusedGLSurface()
 
     createGLSurface();
     return m_glSurfaces.back().data();
-}
-
-int QnXVBADecoder::h264ProfileIdcToXVBAProfile( int profile_idc )
-{
-	switch( profile_idc )
-	{
-		case 66:
-			return 1;
-		case 77:
-			return 2;
-		case 100:
-			return 3;
-		default:
-			return 3;	//high
-	}
 }
 
 void QnXVBADecoder::calcH264POC( SliceEx* const pSlice )
@@ -1796,7 +1729,6 @@ void QnXVBADecoder::calcH264POC( SliceEx* const pSlice )
             else
                 m_h264PocData.FrameNumOffset = m_h264PocData.PreviousFrameNumOffset;
 
-
             pSlice->AbsFrameNum = m_h264PocData.FrameNumOffset+pSlice->frame_num;
             if(!pSlice->nal_ref_idc)
                 pSlice->ThisPOC = (2*pSlice->AbsFrameNum - 1);
@@ -1811,12 +1743,92 @@ void QnXVBADecoder::calcH264POC( SliceEx* const pSlice )
                 pSlice->bottompoc = pSlice->framepoc = pSlice->ThisPOC;
         }
 
-        m_h264PocData.PreviousFrameNum=pSlice->frame_num;
-        m_h264PocData.PreviousFrameNumOffset=m_h264PocData.FrameNumOffset;
+        m_h264PocData.PreviousFrameNum = pSlice->frame_num;
+        m_h264PocData.PreviousFrameNumOffset = m_h264PocData.FrameNumOffset;
         break;
 
     default:
-        //error must occurs
+        //error must have occured
         break;
+    }
+}
+
+void QnXVBADecoder::destroyXVBASession()
+{
+    if( !m_decodeSession )
+        return;
+
+    m_glSurfaces.clear();
+    m_commonSurfaces.clear();
+
+    //deleting decode buffers
+    XVBA_Destroy_Decode_Buffers_Input in;
+    memset( &in, 0, sizeof(in) );
+    in.size = sizeof(in);
+    in.session = m_decodeSession;
+    in.num_of_buffers_in_list = 1;
+    for( size_t i = 0; i < m_xvbaDecodeBuffers.size(); ++i )
+    {
+        in.buffer_list = m_xvbaDecodeBuffers[i].first;
+        m_prevOperationStatus = XVBADestroyDecodeBuffers( &in );
+        if( m_prevOperationStatus != Success )
+            cl_log.log( QString::fromAscii("QnXVBADecoder. Could not destroy decode buffer. %1").arg(lastErrorText()), cl_logERROR );
+    }
+    m_xvbaDecodeBuffers.clear();
+
+    m_prevOperationStatus = XVBADestroyDecode( m_decodeSession );
+    if( m_prevOperationStatus != Success )
+        cl_log.log( QString::fromAscii("QnXVBADecoder. Could not destroy decode session. %1").arg(lastErrorText()), cl_logERROR );
+    m_decodeSession = NULL;
+}
+
+Status QnXVBADecoder::XVBADecodePicture( XVBA_Decode_Picture_Input* decode_picture_input )
+{
+#ifdef DUMP_DECODER_INPUT
+#ifndef DUMP_BY_SLICES
+    //assuming XVBA_DATA_BUFFER precedes XVBA_DATA_CTRL_BUFFER
+    const XVBABufferDescriptor* dataBufferDescriptor = decode_picture_input->buffer_list[0];
+    Q_ASSERT( decode_picture_input->buffer_list[0]->buffer_type == XVBA_DATA_BUFFER );
+    for( size_t i = 1; i < decode_picture_input->num_of_buffers_in_list; ++i )
+    {
+        Q_ASSERT( decode_picture_input->buffer_list[i]->buffer_type == XVBA_DATA_CTRL_BUFFER );
+        const XVBADataCtrl* ctrl = reinterpret_cast<const XVBADataCtrl*>( decode_picture_input->buffer_list[i]->bufferXVBA );
+        m_inStream.write( (const char*)dataBufferDescriptor->bufferXVBA + ctrl->SliceDataLocation, ctrl->SliceBytesInBuffer );
+    }
+#else
+    {
+        static int fileNumber = 1;
+        char outFilePath[256];
+
+        for( size_t i = 2; i < targetSurfaceCtx->usedDecodeBuffers.size(); ++i )
+        {
+            sprintf( outFilePath, "/home/ak/slices/%d", fileNumber++ );
+            std::ofstream of( outFilePath, std::ios_base::binary );
+            of.write(
+                (const char*)dataBufferDescriptor->bufferXVBA + dataBufferDescriptor->data_offset + ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceDataLocation,
+                ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceBytesInBuffer );
+//    		m_inStream.write(
+//    			(const char*)dataBufferDescriptor->bufferXVBA + dataBufferDescriptor->data_offset + ((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceDataLocation,
+//				((XVBADataCtrl*)targetSurfaceCtx->usedDecodeBuffers[i]->bufferXVBA)->SliceBytesInBuffer );
+        }
+    }
+#endif
+#endif
+
+    return ::XVBADecodePicture( decode_picture_input );
+}
+
+int QnXVBADecoder::h264ProfileIdcToXVBAProfile( int profile_idc )
+{
+    switch( profile_idc )
+    {
+        case 66:
+            return 1;
+        case 77:
+            return 2;
+        case 100:
+            return 3;
+        default:
+            return 3;	//high
     }
 }

@@ -16,6 +16,7 @@
 #include "abstractdecoder.h"
 #include "../../utils/media/nalUnits.h"
 #else
+#include "common.h"
 #include "nalUnits.h"
 #endif
 
@@ -27,64 +28,6 @@
 #include <X11/Xlib.h>
 #include "amdxvba.h"
 
-
-#ifdef XVBA_TEST
-class QnAbstractPictureData
-{
-public:
-    enum PicStorageType
-    {
-        pstOpenGL,
-        pstSysMemPic
-    };
-
-    //!Returns pic type
-    virtual PicStorageType type() const = 0;
-};
-
-class QnOpenGLPictureData
-:
-    public QnAbstractPictureData
-{
-public:
-    QnOpenGLPictureData( unsigned int _glTexture );
-
-    virtual PicStorageType type() const;
-    //!Returns OGL texture name
-    virtual unsigned int glTexture() const;
-
-private:
-    unsigned int m_glTexture;
-};
-
-class CompressedVideoDataPtr
-{
-public:
-    std::string data;
-    quint64 timestamp;
-};
-
-typedef QSharedPointer<CompressedVideoDataPtr> QnCompressedVideoDataPtr;
-
-enum PixelFormat
-{
-    PIX_FMT_RGBA,
-    PIX_FMT_NV12
-};
-
-class CLVideoDecoderOutput
-{
-public:
-    int width;
-    int height;
-    QSharedPointer<QnAbstractPictureData> picData;
-    int pts;
-    int pkt_dts;
-    int interlaced_frame;
-    int format;
-};
-
-#endif
 
 namespace H264Profile
 {
@@ -135,10 +78,8 @@ public:
     \todo Support rendering to memory surface
 */
 class QnXVBADecoder
-#ifndef XVBA_TEST
 :
     public QnAbstractVideoDecoder
-#endif
 {
 public:
     /*!
@@ -323,8 +264,7 @@ private:
     bool analyzeInputBufSlices(
         const QnCompressedVideoDataPtr& data,
         XVBAPictureDescriptor* const pictureDescriptor,
-        std::vector<XVBABufferDescriptor*>* const dataCtrlBuffers,
-        size_t* firstSliceOffset );
+        std::vector<XVBABufferDescriptor*>* const dataCtrlBuffers );
     //!Checks all surfaces and updates state if neccessary
     /*!
         \param targetSurfaceCtx An empty surface is returned here. If there's no unused surface and
@@ -343,6 +283,8 @@ private:
 	XVBASurfaceContext* findUnusedGLSurface();
     //!Caculates h.264 picture order count
     void calcH264POC( SliceEx* const pSlice );
+    void destroyXVBASession();
+    Status XVBADecodePicture( XVBA_Decode_Picture_Input* decode_picture_input );
 
 	static int h264ProfileIdcToXVBAProfile( int profile_idc );
 

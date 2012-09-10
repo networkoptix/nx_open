@@ -28,7 +28,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
         {
             if( data->compressionType == CODEC_ID_H264 )
             {
-                QnAbstractVideoDecoder* decoder = new QnXVBADecoder(data);
+                QnAbstractVideoDecoder* decoder = new QnXVBADecoder( NULL, data );
                 if( decoder->isHardwareAccelerationEnabled() )
                     return decoder;
                 delete decoder;
