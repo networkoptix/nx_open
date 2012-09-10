@@ -2,6 +2,8 @@
 #include <assert.h>
 #include "bitStream.h"
 #include <QString>
+#include <QTextStream>
+#include <QDebug>
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
@@ -241,7 +243,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 
 void NALUnit::decodeBuffer(const quint8* buffer, const quint8* end)
 {
-	delete [] m_nalBuffer;
+    delete [] m_nalBuffer;
 	m_nalBuffer = new quint8[end - buffer + NAL_RESERVED_SPACE];
 	m_nalBufferLen = decodeNAL(buffer, end, m_nalBuffer, end - buffer);
 }
@@ -326,6 +328,20 @@ int NALDelimiter::serialize(quint8* buffer)
 	curBuf +=  NALUnit::serialize(curBuf);
 	*curBuf++ = (primary_pic_type << 5) + 0x10;
 	return (int) (curBuf - buffer);
+}
+
+PPSUnit::PPSUnit()
+:
+    NALUnit(),
+    transform_8x8_mode_flag(0),
+    pic_scaling_matrix_present_flag(0),
+    second_chroma_qp_index_offset(0),
+    m_ready(false)
+{
+    memset( scalingLists4x4, 0x10, sizeof(scalingLists4x4) );
+    memset( useDefaultScalingMatrix4x4Flag, 0, sizeof(useDefaultScalingMatrix4x4Flag) );
+    memset( scalingLists8x8, 0x10, sizeof(scalingLists8x8) );
+    memset( useDefaultScalingMatrix8x8Flag, 0, sizeof(useDefaultScalingMatrix8x8Flag) );
 }
 
 int PPSUnit::deserializeID(quint8* buffer, quint8* end)
@@ -425,17 +441,9 @@ int PPSUnit::deserialize()
                     if( pic_scaling_list_present_flag_i )
                     {
                         if( i < 6 )
-                        {
-                            int scalingList4x4_i[16];
-                            bool useDefaultScalingMatrix4x4Flag_i;
-                            scaling_list( scalingList4x4_i, 16, useDefaultScalingMatrix4x4Flag_i );
-                        }
+                            scaling_list( scalingLists4x4[i], 16, useDefaultScalingMatrix4x4Flag[i] );
                         else
-                        {
-                            int scalingList8x8_i[64];
-                            bool useDefaultScalingMatrix8x8Flag_i;
-                            scaling_list( scalingList8x8_i, 64, useDefaultScalingMatrix8x8Flag_i );
-                        }
+                            scaling_list( scalingLists8x8[i-6], 64, useDefaultScalingMatrix8x8Flag[i-6] );
                     }
                 }
             second_chroma_qp_index_offset = extractSEGolombCode();
