@@ -214,6 +214,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(common_common);
     Q_INIT_RESOURCE(common_custom);
     Q_INIT_RESOURCE(common_generated);
+    Q_INIT_RESOURCE(common_translations);
 
 
     QTextStream out(stdout);

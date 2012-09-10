@@ -17,6 +17,6 @@ pb.CONFIG += target_predeps
 pb.variable_out = GENERATED_SOURCES
 QMAKE_EXTRA_COMPILERS += pb
 
-TRANSLATIONS += ${basedir}/resource/common/translations/common_en.ts \
-				${basedir}/resource/common/translations/common_ru.ts \
-				${basedir}/resource/common/translations/common_zh-CN.ts 
+TRANSLATIONS += ${basedir}/translations/common_en.ts \
+				${basedir}/translations/common_ru.ts \
+				${basedir}/translations/common_zh-CN.ts 
