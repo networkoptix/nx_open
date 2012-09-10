@@ -114,7 +114,6 @@ void QnRestConnectionProcessor::run()
         ready = readRequest();
     }
     d->socket->close();
-    m_runing = false;
 }
 
 void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestRequestHandler* handler)

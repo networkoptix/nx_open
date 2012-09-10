@@ -132,47 +132,36 @@ public:
 
     int asyncRecordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs, qint64 endTimeMs, qint64 detail, const QList<QRegion> &motionRegions, QObject *target, const char *slot);
 
-	//!Get \a camera params
-    /*!
-		Returns immediately. On request completion \a slot of object \a target is called with signature ( int httpStatusCode, const QList<QPair<QString, QVariant> >& params )
-		\a status is 0 in case of success, in other cases it holds error code
-        \return request handle
-	*/
-    int asyncGetParamList(
-        const QnNetworkResourcePtr &camera,
-        const QStringList &params,
-        QObject *target,
-        const char *slot);
+	/** 
+     * Get \a camera params. 
+     * 
+     * Returns immediately. On request completion \a slot of object \a target 
+     * is called with signature <tt>(int httpStatusCode, const QList<QPair<QString, QVariant> > &params)</tt>.
+     * \a status is 0 in case of success, in other cases it holds error code 
+     * 
+     * \returns                         Request handle.
+	 */
+    int asyncGetParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QObject *target, const char *slot);
 
-    //!
-    /*!
-        \return http response status (200 in case of success)
-    */
-    int getParamList(
-        const QnNetworkResourcePtr &camera,
-        const QStringList &params,
-        QList< QPair< QString, QVariant> > *paramValues);
+    /**
+     * \returns                         Http response status (200 in case of success).
+     */
+    int getParamList(const QnNetworkResourcePtr &camera, const QStringList &params, QList<QPair<QString, QVariant> > *paramValues);
 
-	//!Set \a camera params
-    /*!
-		Returns immediately. On request completion \a slot of object \a target is called with signature ( int httpStatusCode, const QList<QPair<QString, bool> >& operationResult )
-		\a status is 0 in case of success, in other cases it holds error code
-        \return request handle
-	*/
-    int asyncSetParam(
-        const QnNetworkResourcePtr &camera,
-        const QList< QPair< QString, QVariant> > &params,
-        QObject *target,
-        const char *slot);
+	/** 
+	 * Set \a camera params.
+	 * Returns immediately. On request completion \a slot of object \a target is 
+	 * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
+	 * \a status is 0 in case of success, in other cases it holds error code
+	 * 
+     * \returns                         Request handle.
+	 */
+    int asyncSetParam(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QObject *target, const char *slot);
 
-    //!
-    /*!
-        \return http response status (200 in case of success)
-    */
-    int setParamList(
-        const QnNetworkResourcePtr &camera,
-        const QList<QPair<QString, QVariant> > &params,
-        QList<QPair<QString, bool> > *operationResult);
+    /**
+     * \returns                         Http response status (200 in case of success).
+     */
+    int setParamList(const QnNetworkResourcePtr &camera, const QList<QPair<QString, QVariant> > &params, QList<QPair<QString, bool> > *operationResult);
 
     int asyncGetFreeSpace(const QString &path, QObject *target, const char *slot);
 

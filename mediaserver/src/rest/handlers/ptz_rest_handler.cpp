@@ -17,7 +17,11 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
     QnAbstractPtzController* ptz = 0;
     QString errStr;
 
-    QString action = path.mid(path.lastIndexOf('/') + 1);
+    QString localPath = path;
+    while(localPath.endsWith('/'))
+        localPath.chop(1);
+
+    QString action = localPath.mid(localPath.lastIndexOf('/') + 1);
     
     qreal xSpeed = 0;
     qreal ySpeed = 0;

@@ -7,6 +7,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsLayout>
 #include <QtGui/QStyleOptionTitleBar>
 #include <QtGui/QApplication>
 
@@ -16,9 +17,28 @@
 
 class GraphicsWidgetSceneData: public QObject {
 public:
-    GraphicsWidgetSceneData(QObject *parent = NULL): QObject(parent) {}
+    /** Event type for scene-wide layout requests. */
+    static const QEvent::Type HandlePendingLayoutRequests = static_cast<QEvent::Type>(QEvent::User + 0x19FA);
 
+    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL): 
+        QObject(parent), 
+        scene(scene) 
+    {
+        assert(scene);
+    }
+
+    virtual bool event(QEvent *event) override {
+        if(event->type() == HandlePendingLayoutRequests) {
+            GraphicsWidget::handlePendingLayoutRequests(scene);
+            return true;
+        } else {
+            return QObject::event(event);
+        }
+    }
+
+    QGraphicsScene *scene;
     QHash<QGraphicsItem *, QPointF> movingItemsInitialPositions;
+    QSet<QGraphicsWidget *> pendingLayoutWidgets;
 };
 
 Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
@@ -137,7 +157,8 @@ GraphicsWidget::GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent,
 }
 
 GraphicsWidget::~GraphicsWidget() {
-    return;
+    if(GraphicsWidgetSceneData *sd = d_func()->ensureSceneData())
+        sd->pendingLayoutWidgets.remove(this);
 }
 
 GraphicsStyle *GraphicsWidget::style() const {
@@ -188,10 +209,62 @@ void GraphicsWidget::setStyle(GraphicsStyle *style) {
     setStyle(style->baseStyle());
 }
 
+void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
+    if(!scene) {
+        qnNullWarning(scene);
+        return;
+    }
+
+    GraphicsWidgetSceneData *sd = scene->property(qn_sceneDataPropertyName).value<GraphicsWidgetSceneData *>();
+    if(!sd)
+        return;
+
+    while(!sd->pendingLayoutWidgets.isEmpty()) {
+        QSet<QGraphicsWidget *> widgets = sd->pendingLayoutWidgets;
+        sd->pendingLayoutWidgets.clear();
+
+        foreach(QGraphicsWidget *widget, widgets) {
+            /* This code is copied from QGraphicsWidgetPrivate::_q_relayout(). */
+            bool wasResized = widget->testAttribute(Qt::WA_Resized);
+            widget->resize(widget->size());
+            widget->setAttribute(Qt::WA_Resized, wasResized);
+        }
+    }
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void GraphicsWidget::updateGeometry() {
+    Q_D(GraphicsWidget);
+
+    /* This code makes some adjustments to how QGraphicsWidget::updateGeometry works.
+     * Check base implementation before trying to understand what is what. */
+
+    if((d->handlingFlags & ItemHandlesLayoutRequests) || !QGraphicsLayout::instantInvalidatePropagation()) {
+        base_type::updateGeometry();
+        return;
+    } 
+    
+    if(!parentLayoutItem()) {
+        if(GraphicsWidgetSceneData *sd = d->ensureSceneData()) {
+            /* Skip QGraphicsWidget's implementation as it will post a relayout request 
+             * (actually a metacall to _q_relayout). */
+            QGraphicsLayoutItem::updateGeometry(); 
+
+            if(sd->pendingLayoutWidgets.empty())
+                QApplication::postEvent(sd, new QEvent(GraphicsWidgetSceneData::HandlePendingLayoutRequests));
+
+            sd->pendingLayoutWidgets.insert(this);
+        } else {
+            base_type::updateGeometry();
+        }
+    } else {
+        base_type::updateGeometry();
+    }
+}
+
 QVariant GraphicsWidget::itemChange(GraphicsItemChange change, const QVariant &value) {
     QVariant result = base_type::itemChange(change, value);
 

@@ -10,6 +10,9 @@
 #include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
 
+#include <ui/workbench/watchers/workbench_panic_watcher.h>
+#include <ui/workbench/workbench_context.h>
+
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
     ui(new Ui::CameraScheduleWidget),
@@ -130,20 +133,33 @@ void QnCameraScheduleWidget::setCameras(const QnVirtualCameraResourceList &camer
         ui->enableRecordingCheckBox->setCheckState(enabledCount > 0 ? Qt::Checked : Qt::Unchecked);
     }
 
-    ui->panicModeLabel->setText(tr("Off"));
-    ui->panicModeLabel->setPalette(this->palette());
-    if(enabledCount > 0) {
-        QnVideoServerResourcePtr server = qnResPool->getResourceById(m_cameras[0]->getParentId()).dynamicCast<QnVideoServerResource>();
-        if(server && server->isPanicMode()) {
-            QPalette palette = this->palette();
-            palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
-            ui->panicModeLabel->setPalette(palette);
-            ui->panicModeLabel->setText(tr("On"));
-        }
-    }
-
+    updatePanicLabelText();
     updateMotionButtons();
     updateLicensesLabelText();
+}
+
+void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) { 
+    m_context = context; 
+
+    if(context) {
+        connect(context->instance<QnWorkbenchPanicWatcher>(), SIGNAL(panicModeChanged()), this, SLOT(updatePanicLabelText()));
+        updatePanicLabelText();
+    }
+}
+
+void QnCameraScheduleWidget::updatePanicLabelText() {
+    ui->panicModeLabel->setText(tr("Off"));
+    ui->panicModeLabel->setPalette(this->palette());
+
+    if(!context())
+        return;
+
+    if(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode()) {
+        QPalette palette = this->palette();
+        palette.setColor(QPalette::WindowText, QColor(255, 0, 0));
+        ui->panicModeLabel->setPalette(palette);
+        ui->panicModeLabel->setText(tr("On"));
+    }
 }
 
 QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const

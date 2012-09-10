@@ -165,10 +165,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             }
             else {
                 if (recorderLowRes)
-                    recorderLowRes->stop();
-                providerLow->stop();
-                if (recorderLowRes)
-                    recorderLowRes->clearUnprocessedData();
+                    recorderLowRes->pleaseStop();
+                providerLow->pleaseStop();
+                //if (recorderLowRes)
+                //    recorderLowRes->clearUnprocessedData();
             }
         }
     }
@@ -182,15 +182,19 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->pleaseStop();
 
+        /*
         if (needStopHi)
             recorderHiRes->stop();
         if (needStopLow)
             recorderLowRes->stop();
+        */
         camera->stopIfNoActivity();
+        /*
         if (needStopHi)
             recorderHiRes->clearUnprocessedData();
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
+        */
 
         if (needStopHi) {
             cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
@@ -362,14 +366,14 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, inst2);
+Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance);
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return inst2();
+    return qn_recordingManager_instance();
 }
 
 // --------------------- QnServerDataProviderFactory -------------------
-Q_GLOBAL_STATIC(QnServerDataProviderFactory, inst);
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance);
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
@@ -385,5 +389,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
-    return inst();
+    return qn_serverDataProviderFactory_instance();
 }
+
+

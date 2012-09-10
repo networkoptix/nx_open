@@ -488,7 +488,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
@@ -507,7 +507,8 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
-    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    QMutexLocker lock(&m_mutex);
+    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = itr.value()->getUrl();
         if (fileName.startsWith(root))

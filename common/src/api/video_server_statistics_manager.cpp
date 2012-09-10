@@ -18,21 +18,21 @@ QnVideoServerStatisticsManager::QnVideoServerStatisticsManager(QObject *parent):
     timer->start(REQUEST_TIME);
 }
 
-void QnVideoServerStatisticsManager::registerServerWidget(QnVideoServerResourcePtr resource, QObject *target, const char *slot){
+void QnVideoServerStatisticsManager::registerServerWidget(const QnVideoServerResourcePtr &resource, QObject *target, const char *slot){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         m_statistics[id] = new QnStatisticsStorage(resource->apiConnection(), this);
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
-void QnVideoServerStatisticsManager::unregisterServerWidget(QnVideoServerResourcePtr resource, QObject *target){
+void QnVideoServerStatisticsManager::unregisterServerWidget(const QnVideoServerResourcePtr &resource, QObject *target){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return;
     m_statistics[id]->unregisterServerWidget(target);
 }
 
-qint64 QnVideoServerStatisticsManager::getHistory(QnVideoServerResourcePtr resource, qint64 lastId, QnStatisticsHistory *history){
+qint64 QnVideoServerStatisticsManager::getHistory(const QnVideoServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return -1;

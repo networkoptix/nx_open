@@ -19,6 +19,7 @@
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
     m_motionWidget(NULL),
     m_hasCameraChanges(false),
@@ -36,6 +37,8 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_motionLayout = new QVBoxLayout(ui->motionWidget);
     m_motionLayout->setContentsMargins(0, 0, 0, 0);
     
+    ui->cameraScheduleWidget->setContext(context());
+
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
 

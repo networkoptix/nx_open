@@ -38,7 +38,6 @@ public:
     qint64 getLastDisplayedTime() const;
     void setLastDisplayedTime(qint64 value);
     void afterJump();
-    QSize getFrameSize() const;
     QImage getScreenshot();
     void blockTimeValue(qint64 time);
     void unblockTimeValue();
@@ -88,8 +87,7 @@ private:
     QQueue<CLVideoDecoderOutput*> m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
-    int m_realReverseSize;
-    int m_maxReverseQueueSize;
+    qint64 m_reverseSizeInBytes;
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
@@ -99,6 +97,7 @@ private:
     bool m_needResetDecoder;
     CLVideoDecoderOutput* m_lastDisplayedFrame;
     QSize m_imageSize;
+    mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
 

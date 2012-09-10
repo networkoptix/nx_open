@@ -347,13 +347,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Main Menu")).
         shortcut(tr("Alt+Space")).
         autoRepeat(false).
-        icon(qnSkin->icon("main_menu.png"));
+        icon(qnSkin->icon("titlebar/main_menu.png"));
 
     factory(Qn::ConnectToServerAction).
         flags(Qn::Main).
         text(tr("Connect to Server...")).
         autoRepeat(false).
-        icon(qnSkin->icon("connected.png"));
+        icon(qnSkin->icon("titlebar/connected.png"));
 
     factory(Qn::TogglePanicModeAction).
         flags(Qn::Main).
@@ -361,7 +361,7 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Stop Panic Recording")).
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
-        icon(qnSkin->icon("panic.png")).
+        icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
 
@@ -388,7 +388,7 @@ QnActionManager::QnActionManager(QObject *parent):
             toolTip(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
             autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
-            icon(qnSkin->icon("decorations/new_layout.png"));
+            icon(qnSkin->icon("titlebar/new_layout.png"));
 
         factory(Qn::OpenNewWindowAction).
             flags(Qn::Main).
@@ -458,7 +458,6 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(tr("Alt+R")).
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
-            icon(qnSkin->icon("decorations/recording.png")).
             autoRepeat(false);
     }
 
@@ -474,12 +473,12 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Alt+Return")).
         shortcut(tr("Esc")).
 #endif
-        icon(qnSkin->icon("decorations/fullscreen.png", "decorations/unfullscreen.png"));
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
-        icon(qnSkin->icon("decorations/minimize.png"));
+        icon(qnSkin->icon("titlebar/minimize.png"));
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
@@ -513,7 +512,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcutContext(Qt::ApplicationShortcut).
         role(QAction::QuitRole).
         autoRepeat(false).
-        icon(qnSkin->icon("decorations/exit.png"));
+        icon(qnSkin->icon("titlebar/exit.png"));
 
 
     /* Tab bar actions. */

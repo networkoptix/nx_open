@@ -97,7 +97,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(QnId resourceTypeId, co
 
 void QnResourceDiscoveryManager::pleaseStop()
 {
-    if (m_runing)
+    if (isRunning())
     {
         QMutexLocker locker(&m_searchersListMutex);
         foreach (QnAbstractResourceSearcher *searcher, m_searchersList)

@@ -180,7 +180,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateScrollBarFromSlider()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateTargetPeriod()));
     connect(m_timeSlider,                       SIGNAL(windowChanged(qint64, qint64)),              this,   SLOT(updateCalendarFromSlider()));
-    connect(m_timeSlider,                       SIGNAL(selectionChanged(qint64, qint64)),           this,   SLOT(at_timeSlider_selectionChanged()));
+    connect(m_timeSlider,                       SIGNAL(selectionReleased()),                        this,   SLOT(at_timeSlider_selectionReleased()));
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
@@ -425,7 +425,10 @@ void QnWorkbenchNavigator::updateSliderFromItemData(QnResourceWidget *widget, bo
 
     if(preferToPreserveWindow && m_timeSlider->value() >= m_timeSlider->windowStart() && m_timeSlider->value() <= m_timeSlider->windowEnd()) {
         /* Just skip window initialization. */
-    } else if(!window.isEmpty()) {
+    } else {
+        if(window.isEmpty())
+            window = QnTimePeriod(0, -1);
+
         qint64 windowStart = window.startTimeMs;
         qint64 windowEnd = window.durationMs == -1 ? m_timeSlider->maximum() : window.startTimeMs + window.durationMs;
         if(windowStart < m_timeSlider->minimum()) {
@@ -1152,7 +1155,7 @@ void QnWorkbenchNavigator::at_timeSlider_selectionPressed() {
     m_pausedOverride = true;
 }
 
-void QnWorkbenchNavigator::at_timeSlider_selectionChanged() {
+void QnWorkbenchNavigator::at_timeSlider_selectionReleased() {
     if(!m_timeSlider->isSelectionValid())
         return;
 

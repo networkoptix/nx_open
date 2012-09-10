@@ -314,6 +314,9 @@ bool QnPlOnvifResource::initInternal()
     //Additional camera settings
     fetchAndSetCameraSettings();
 
+    if (m_ptzController)
+        addCameraCapabilities(HasPtz);
+
     save();
 
     return true;

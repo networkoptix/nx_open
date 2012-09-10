@@ -50,6 +50,7 @@ QString QnPlISDResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(QHostAddress addr)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 

@@ -712,11 +712,11 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
-    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("disconnected.png"));
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
-    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("connected.png"));
+    action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {

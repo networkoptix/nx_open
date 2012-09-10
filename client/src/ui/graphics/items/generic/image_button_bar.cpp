@@ -113,9 +113,10 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     if(m_checkedButtons == checkedButtons)
         return;
 
+    int changedButtons = m_checkedButtons ^ checkedButtons;
     m_checkedButtons = checkedButtons;
 
-    submitCheckedButtons();
+    submitCheckedButtons(changedButtons);
 
     emit checkedButtonsChanged();
 }
@@ -158,13 +159,14 @@ void QnImageButtonBar::submitVisibleButtons() {
     }
 }
 
-void QnImageButtonBar::submitCheckedButtons() {
+void QnImageButtonBar::submitCheckedButtons(int mask) {
     if(m_updating)
         return;
     QnScopedValueRollback<bool> guard(&m_submitting, true);
 
     for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
-        pos.value()->setChecked(pos.key() & m_checkedButtons);
+        if(pos.key() & mask)
+            pos.value()->setChecked(pos.key() & m_checkedButtons);
 }
 
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {

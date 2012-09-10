@@ -11,6 +11,8 @@
 
 class QnMediaResourceWidget;
 
+class PtzItem;
+
 class PtzInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 
@@ -19,6 +21,12 @@ public:
     PtzInstrument(QObject *parent = NULL);
     virtual ~PtzInstrument();
 
+    qreal ptzItemZValue() const {
+        return m_ptzItemZValue;
+    }
+
+    void setPtzItemZValue(qreal ptzItemZValue);
+
 signals:
     void ptzProcessStarted(QnMediaResourceWidget *widget);
     void ptzStarted(QnMediaResourceWidget *widget);
@@ -26,8 +34,20 @@ signals:
     void ptzProcessFinished(QnMediaResourceWidget *widget);
 
 protected:
-    virtual bool registeredNotify(QGraphicsItem *item) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
+    virtual void installedNotify() override;
+    virtual void aboutToBeUninstalledNotify() override;
+    virtual bool registeredNotify(QGraphicsItem *item) override;
+    virtual void unregisteredNotify(QGraphicsItem *item) override;
+
+    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
+
+    virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
+
+    virtual bool hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
+    virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
+    virtual bool hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
@@ -38,16 +58,45 @@ protected:
 
 private slots:
     void at_replyReceived(int status, int handle);
+    void at_target_optionsChanged();
 
 private:
-    QnMediaResourceWidget *target() const { 
-        return m_target.data(); 
+    friend class PtzItem;
+
+    PtzItem *ptzItem() const {
+        return m_ptzItem.data();
     }
 
-private:
-    QWeakPointer<QnMediaResourceWidget> m_target;
-    QVector3D m_serverSpeed, m_localSpeed;
+    QnMediaResourceWidget *target() const {
+        return m_target.data();
+    }
 
+    void setTarget(QnMediaResourceWidget *target);
+    
+    bool isTargetUnderMouse() const {
+        return m_targetUnderMouse;
+    }
+    
+    void setTargetUnderMouse(bool underMouse);
+    
+    void updatePtzItemOpacity();
+
+    const QVector3D &serverSpeed() const {
+        return m_localSpeed;
+    }
+
+    void setServerSpeed(const QVector3D &speed, bool force = false);
+
+private:
+    QBasicTimer m_timer;
+
+    QWeakPointer<PtzItem> m_ptzItem;
+    qreal m_ptzItemZValue;
+
+    QWeakPointer<QnMediaResourceWidget> m_target;
+    bool m_targetUnderMouse;
+
+    QVector3D m_localSpeed, m_remoteSpeed;
     QnNetworkResourcePtr m_camera;
     QnVideoServerConnectionPtr m_connection;
 };

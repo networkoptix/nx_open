@@ -127,7 +127,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
-    togglePinButton->setIcon(Skin::icon("decorations/pin.png", "decorations/unpin.png"));
+    togglePinButton->setIcon(Skin::icon("", ""));
     togglePinButton->setCheckable(true);
     togglePinButton->setChecked(item->isPinned());
     togglePinButton->setPreferredSize(headerButtonSize);
@@ -136,20 +136,23 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 #endif
 
     QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(qnSkin->icon("decorations/item_close.png"));
+    closeButton->setIcon(qnSkin->icon("item/close.png"));
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
+    closeButton->setToolTip(tr("Close"));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(accessController()->notifier(item->layout()->resource()), SIGNAL(permissionsChanged(const QnResourcePtr &)), this, SLOT(updateButtonsVisibility()));
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
-    infoButton->setIcon(qnSkin->icon("decorations/item_info.png"));
+    infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
+    infoButton->setToolTip(tr("Information"));
     connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
-    rotateButton->setIcon(qnSkin->icon("decorations/item_rotate.png"));
+    rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
+    rotateButton->setToolTip(tr("Rotate"));
     connect(rotateButton, SIGNAL(pressed()), this, SIGNAL(rotationStartRequested()));
     connect(rotateButton, SIGNAL(released()), this, SIGNAL(rotationStopRequested()));
 
@@ -166,7 +169,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
     headerLayout->addItem(m_buttonBar);
 
-    m_headerWidget = new QGraphicsWidget();
+    m_headerWidget = new GraphicsWidget();
     m_headerWidget->setLayout(headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
@@ -199,7 +202,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     footerLayout->addStretch(0x1000);
     footerLayout->addItem(m_footerRightLabel);
 
-    m_footerWidget = new QGraphicsWidget();
+    m_footerWidget = new GraphicsWidget();
     m_footerWidget->setLayout(footerLayout);
     m_footerWidget->setAcceptedMouseButtons(0);
     m_footerWidget->setAutoFillBackground(true);

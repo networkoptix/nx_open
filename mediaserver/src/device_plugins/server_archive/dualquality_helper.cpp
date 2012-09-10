@@ -36,13 +36,24 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
 
         if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS) 
         {
-            if (timeDistanceAlt == 0 && altChunk.endTimeMs()-time < SECOND_STREAM_FIND_EPS)
+            if (timeDistanceAlt == 0)
             {
                 // if recording hole, alt quality chunk may be slighthy longer then primary. So, distance to such chunk still 0
                 // prevent change quality, if such chunk rest very low
-                DeviceFileCatalog::Chunk nextAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.endTimeMs(), DeviceFileCatalog::OnRecordHole_NextChunk));
-                if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
-                    return;
+                if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs()-time < SECOND_STREAM_FIND_EPS)
+                {
+                    DeviceFileCatalog::Chunk nextAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.endTimeMs(), findMethod));
+                    //if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
+                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - SECOND_STREAM_FIND_EPS)
+                        return;
+                }
+                else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && time - altChunk.startTimeMs < SECOND_STREAM_FIND_EPS)
+                {
+                    DeviceFileCatalog::Chunk prevAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.startTimeMs-1, findMethod));
+                    //if (prevAltChunk.endTimeMs() != altChunk.startTimeMs)
+                    if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + SECOND_STREAM_FIND_EPS)
+                        return;
+                }
             }
 
             // alternate quality matched better

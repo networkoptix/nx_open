@@ -158,7 +158,7 @@ QnCamDisplay::~QnCamDisplay()
             display->resetQualityStatistics();
     }
 
-    Q_ASSERT(!m_runing);
+    Q_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         delete m_display[i];
@@ -201,7 +201,7 @@ QImage QnCamDisplay::getScreenshot(int channel)
 }
 
 QSize QnCamDisplay::getFrameSize(int channel) const {
-    return m_display[channel]->getFrameSize();
+    return m_display[channel]->getImageSize();
 }
 
 void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)

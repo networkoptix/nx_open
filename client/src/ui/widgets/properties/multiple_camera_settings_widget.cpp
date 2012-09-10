@@ -15,6 +15,7 @@
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
@@ -22,6 +23,8 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
+
+    ui->cameraScheduleWidget->setContext(context());
 
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));

@@ -99,13 +99,13 @@ namespace {
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
-        button->setIcon(qnSkin->icon("slide_right.png", "slide_left.png"));
+        button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
         button->setCheckable(true);
         return button;
     }
 
     QGraphicsWidget *newSpacerWidget(qreal w, qreal h) {
-        QGraphicsWidget *result = new QGraphicsWidget();
+        GraphicsWidget *result = new GraphicsWidget();
         result->setMinimumSize(QSizeF(w, h));
         result->setMaximumSize(result->minimumSize());
         return result;
@@ -208,6 +208,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 {
     memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
+    QGraphicsLayout::setInstantInvalidatePropagation(true);
+
     /* Install and configure instruments. */
     m_fpsCountingInstrument = new FpsCountingInstrument(333, this);
     m_uiElementsInstrument = new UiElementsInstrument(this);
@@ -291,7 +293,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
     m_treePinButton->resize(24, 24);
-    m_treePinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
+    m_treePinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
     m_treePinButton->setCheckable(true);
     m_treePinButton->setFocusProxy(m_treeItem);
 
@@ -383,7 +385,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
-    m_windowButtonsWidget = new QGraphicsWidget();
+    m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -480,7 +482,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
     m_helpPinButton->resize(24, 24);
-    m_helpPinButton->setIcon(qnSkin->icon("decorations/pin.png", "decorations/unpin.png"));
+    m_helpPinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
     m_helpPinButton->setCheckable(true);
     m_helpPinButton->setFocusProxy(m_helpItem);
 
@@ -574,7 +576,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Navigation slider. */
-    m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
+    //m_sliderEaterItem = new QnEventEatingWidget(m_controlsWidget);
 
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
     m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
@@ -597,8 +599,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerItem->stackBefore(m_sliderShowButton);
     m_sliderItem->stackBefore(m_sliderResizerItem);
-    m_sliderEaterItem->stackBefore(m_calendarShowButton);
-    m_sliderEaterItem->stackBefore(m_calendarItem);
+    //m_sliderEaterItem->stackBefore(m_calendarShowButton);
+    //m_sliderEaterItem->stackBefore(m_calendarItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -941,7 +943,7 @@ void QnWorkbenchUi::setSliderOpacity(qreal opacity, bool animate) {
     }
 
     m_sliderResizerItem->setVisible(!qFuzzyIsNull(opacity));
-    m_sliderEaterItem->setVisible(!qFuzzyIsNull(opacity));
+    //m_sliderEaterItem->setVisible(!qFuzzyIsNull(opacity));
 }
 
 void QnWorkbenchUi::setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate) {
@@ -1559,8 +1561,8 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateSliderResizerGeometry();
     updateCalendarGeometry();
 
-    m_sliderEaterItem->resize(m_sliderItem->size().width(), 30);
-    m_sliderEaterItem->setPos(m_sliderItem->pos() + QPointF(0, -30));
+    //m_sliderEaterItem->resize(m_sliderItem->size().width(), 10);
+    //m_sliderEaterItem->setPos(m_sliderItem->pos() + QPointF(0, -10));
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(

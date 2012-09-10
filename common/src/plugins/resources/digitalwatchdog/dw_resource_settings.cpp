@@ -176,7 +176,7 @@ bool DWCameraSetting::setToCamera(DWCameraProxy& proxy)
 
 void DWCameraSetting::initAdditionalValues()
 {
-    if (getType() != CameraSetting::Enumeration && getType() != CameraSetting::OnOff ||
+    if ( (getType() != CameraSetting::Enumeration && getType() != CameraSetting::OnOff) ||
         !m_enumStrToInt.isEmpty())
     {
         return;

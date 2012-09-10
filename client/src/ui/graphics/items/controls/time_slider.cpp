@@ -331,7 +331,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     dragProcessor->setHandler(this);
     dragProcessor->setFlags(DragProcessor::DONT_COMPRESS);
     dragProcessor->setStartDragDistance(startDragDistance);
-    dragProcessor->setStartDragTime(0); /* No drag on timeout. */
+    dragProcessor->setStartDragTime(-1); /* No drag on timeout. */
 
     /* Prepare animation timer listener. */
     startListening();

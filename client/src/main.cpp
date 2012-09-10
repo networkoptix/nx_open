@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
+    application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
     if(singleApplication) {
         QString argsMessage;

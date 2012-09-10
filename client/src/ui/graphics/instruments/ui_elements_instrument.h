@@ -2,7 +2,8 @@
 #define QN_UI_ELEMENTS_INSTRUMENT_H
 
 #include "instrument.h"
-#include <QWeakPointer>
+
+#include <QtCore/QWeakPointer>
 
 class QGraphicsWidget;
 class DestructionGuardItem;

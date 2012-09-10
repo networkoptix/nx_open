@@ -2,7 +2,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 QnSimpleFrameWidget::QnSimpleFrameWidget(QGraphicsItem *parent):
-    QGraphicsWidget(parent),
+    base_type(parent),
     m_frameWidth(1.0),
     m_frameColor(palette().color(QPalette::WindowText))
 {}
@@ -36,7 +36,7 @@ void QnSimpleFrameWidget::setFrameColor(const QColor &frameColor) {
 }
 
 void QnSimpleFrameWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
-    QGraphicsWidget::paint(painter, option, widget);
+    base_type::paint(painter, option, widget);
 
     QnScopedPainterPenRollback penRollback(painter, QPen(m_frameColor, m_frameWidth));
     QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);

@@ -4,6 +4,7 @@
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
+#include <QtGui/QPushButton>
 
 #include <api/session_manager.h>
 #include <utils/common/warnings.h>
@@ -23,6 +24,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *p
 
     ui->setupUi(this);
 
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 
     ui->progressBar->setValue(0);
@@ -51,7 +53,10 @@ void QnConnectionTestingDialog::timeout()
     m_timeoutTimer.stop();
 
     ui->statusLabel->setText(tr("Failed"));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
 }
 
 void QnConnectionTestingDialog::oldHttpTestResults(int status, QByteArray errorString, QByteArray data, int handle)
@@ -96,7 +101,10 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
         ui->statusLabel->setText(tr("Success"));
     }
 
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setEnabled(false);
 }
 
 void QnConnectionTestingDialog::testSettings()

@@ -23,6 +23,7 @@
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
+#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -53,14 +54,14 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 {
     GraphicsStyle::setBaseStyle(this);
 
-    m_branchClosed = m_skin->icon("branch_closed.png");
-    m_branchOpen = m_skin->icon("branch_open.png");
-    m_closeTab = m_skin->icon("decorations/close_tab.png");
+    m_branchClosed = m_skin->icon("tree/branch_closed.png");
+    m_branchOpen = m_skin->icon("tree/branch_open.png");
+    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 
-    m_grooveBorder = m_skin->pixmap("slider_groove_lborder.png");
-    m_grooveBody = m_skin->pixmap("slider_groove_body.png");
-    m_sliderHandleHovered = m_skin->pixmap("slider_handle_hovered.png");
-    m_sliderHandle = m_skin->pixmap("slider_handle.png");
+    m_grooveBorder = m_skin->pixmap("slider/slider_groove_lborder.png");
+    m_grooveBody = m_skin->pixmap("slider/slider_groove_body.png");
+    m_sliderHandleHovered = m_skin->pixmap("slider/slider_handle_hovered.png");
+    m_sliderHandle = m_skin->pixmap("slider/slider_handle.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
@@ -187,6 +188,7 @@ void QnNoptixStyle::polish(QApplication *application) {
 
     QPalette palette = application->palette();
     palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
+    palette.setColor(QPalette::Button, activeColor);
     application->setPalette(palette);
 
     QFont font;
@@ -452,9 +454,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         grooveBodyPic = m_grooveBody;
         handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
     } else {
-        grooveBorderPic = m_skin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
     int d = grooveRect.height();
