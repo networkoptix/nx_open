@@ -62,7 +62,6 @@ public:
 
         EXTRA_TRANSLATIONS_PATH,
         TRANSLATION_PATH,
-        FLIP_ICONS,
 
         TOUR_STEP_DURATION,
 
@@ -102,12 +101,6 @@ private:
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
         QN_DECLARE_RW_PROPERTY(int,                     tourStepDuration,       setTourStepDuration,        TOUR_STEP_DURATION,         4000)
-
-#ifdef Q_WS_X11
-        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 true)
-#else
-        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 false)
-#endif
     QN_END_PROPERTY_STORAGE()
 
 private:

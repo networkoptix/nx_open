@@ -61,6 +61,7 @@
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_rest_handler.h"
+#include "utils/common/module_resources.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -819,10 +820,7 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
-    /* Init common resources. */
-    Q_INIT_RESOURCE(common_common);
-    Q_INIT_RESOURCE(common_custom);
-    Q_INIT_RESOURCE(common_generated);
+    QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);
 
