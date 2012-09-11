@@ -64,6 +64,7 @@ private:
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(QnResourcePtr server);
     qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
+    void updateRtpParam(QnResourcePtr resource);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
