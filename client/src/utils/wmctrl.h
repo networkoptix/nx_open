@@ -3,8 +3,9 @@
 
 #include <qglobal.h>
 
-#ifdef Q_WS_X11
+/**
+ * Executes window manager control command. Supported only in X11 now.
+ */
 int execute_wmctrl(QString cmd);
-#endif
 
 #endif // WMCTRL_H

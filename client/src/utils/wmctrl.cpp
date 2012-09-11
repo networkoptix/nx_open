@@ -1201,5 +1201,9 @@ static Window get_active_window(Display *disp) {/*{{{*/
 
     return(ret);
 }/*}}}*/
+#else
+int execute_wmctrl(QString cmd){
+    return 1;
+}
 
 #endif
