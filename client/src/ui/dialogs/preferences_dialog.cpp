@@ -40,7 +40,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     initColorPicker();
 
 #ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    ui->lookAndFeelGroupBox->hide();
+    ui->animateBackgroundLabel->hide();
+    ui->animateBackgroundCheckBox->hide();
+    ui->backgroundColorLabel->hide();
+    ui->backgroundColorWidget->hide();
 #endif
 
     if (QnScreenRecorder::isSupported()){
@@ -120,6 +123,7 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
+    m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -144,6 +148,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
     ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
+    ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
