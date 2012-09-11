@@ -136,6 +136,9 @@ private:
         	XVBASurface _surface );
         ~XVBASurfaceContext();
 
+        //!Deallocates all surface resources
+        void clear();
+
         static const char* toString( State );
     };
 
@@ -145,11 +148,14 @@ private:
         public QnOpenGLPictureData
     {
     public:
-        QnXVBAOpenGLPictureData( XVBASurfaceContext* ctx );
+        QnXVBAOpenGLPictureData( const QSharedPointer<XVBASurfaceContext>& ctx );
         virtual ~QnXVBAOpenGLPictureData();
 
     private:
-        XVBASurfaceContext* m_ctx;	//TODO switch to weakpointer
+        /*!
+            Holding shared pointer here, since XVBADecoder object can be deallocated earlier, than QnXVBAOpenGLPictureData
+        */
+        QSharedPointer<XVBASurfaceContext> m_ctx;
     };
 
     class SliceEx
@@ -271,11 +277,11 @@ private:
             total surface count is less than \a MAX_SURFACE_COUNT, calls \a createSurface to create new surface and returns the new one
         \param decodedPicSurface A decoded surface with lowest pts is returned here. NULL, if no decoded surfaces
     */
-    void checkSurfaces( XVBASurfaceContext** const targetSurfaceCtx, XVBASurfaceContext** const decodedPicSurface );
+    void checkSurfaces( QSharedPointer<XVBASurfaceContext>* const targetSurfaceCtx, QSharedPointer<XVBASurfaceContext>* const decodedPicSurface );
     //!Guess what
     QString lastErrorText() const;
     QString decodeErrorToString( XVBA_DECODE_ERROR errorCode ) const;
-	void fillOutputFrame( CLVideoDecoderOutput* const outFrame, XVBASurfaceContext* const decodedPicSurface );
+    void fillOutputFrame( CLVideoDecoderOutput* const outFrame, QSharedPointer<XVBASurfaceContext> decodedPicSurface );
 	XVBABufferDescriptor* getDecodeBuffer( XVBA_BUFFER bufferType );
 	void ungetBuffer( XVBABufferDescriptor* bufDescriptor );
 	void readSPS( const quint8* curNalu, const quint8* nextNalu );
@@ -285,6 +291,11 @@ private:
     void calcH264POC( SliceEx* const pSlice );
     void destroyXVBASession();
     Status XVBADecodePicture( XVBA_Decode_Picture_Input* decode_picture_input );
+    /*!
+        \param rightSlice Slice NALU starting with START_CODE_PREFIX
+    */
+    void appendSlice( XVBABufferDescriptor* leftSliceBuffer, const quint8* rightSlice, size_t rightSliceData );
+    void dumpBuffer( const QString& msg, const quint8* buf, size_t bufSize );
 
 	static int h264ProfileIdcToXVBAProfile( int profile_idc );
 
