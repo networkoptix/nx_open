@@ -393,7 +393,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     if(m_context->codec)
     {
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-        if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice))
+        for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
             avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     }
 
