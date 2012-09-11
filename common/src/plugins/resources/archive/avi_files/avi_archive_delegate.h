@@ -72,6 +72,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_eofReached;
     QMutex m_openMutex;
+    QVector<qint64> m_lastPacketTimes;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

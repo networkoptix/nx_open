@@ -46,6 +46,8 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
                     //if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
                     if (nextAltChunk.startTimeMs > chunk.startTimeMs - SECOND_STREAM_FIND_EPS)
                         return;
+                    if (nextAltChunk.startTimeMs == altChunk.startTimeMs)
+                        return; // EOF reached
                 }
                 else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && time - altChunk.startTimeMs < SECOND_STREAM_FIND_EPS)
                 {
