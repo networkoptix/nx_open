@@ -55,6 +55,69 @@
     </message>
 </context>
 <context>
+    <name>CameraAdditionDialog</name>
+    <message>
+        <source>Add cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Address:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>009.009.009.009;_</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Camera schedule editor</source>
@@ -555,6 +618,14 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Language:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tour cycle time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1250,6 +1321,14 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Toggle Sync</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>F1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1273,6 +1352,51 @@ For easy instructions on how to install or update your video driver, follow inst
     <message>
         <source>Test for resource substring &apos;%1&apos; failed.
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdditionDialog</name>
+    <message>
+        <source>Storage path must not be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Space limit must be a non-negative integer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid storage path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t verify storage path</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not enough disk space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage &apos;1&apos;
+You have less storage space available than reserved free space value. Additional 2Gb are required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low space for archive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage &apos;%1&apos;
+You have only 2Gb left for video archive.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
