@@ -63,7 +63,7 @@ public:
         EXTRA_TRANSLATIONS_PATH,
         TRANSLATION_PATH,
 
-        TOUR_STEP_DURATION,
+        TOUR_CYCLE_TIME,
 
         VARIABLE_COUNT
     };
@@ -100,7 +100,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
-        QN_DECLARE_RW_PROPERTY(int,                     tourStepDuration,       setTourStepDuration,        TOUR_STEP_DURATION,         4000)
+        QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
     QN_END_PROPERTY_STORAGE()
 
 private:
