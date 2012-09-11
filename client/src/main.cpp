@@ -67,7 +67,6 @@
 
 #ifdef Q_WS_X11
     #include "utils/app_focus_listener.h"
-    #include "utils/wmctrl.h"
 #endif
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
