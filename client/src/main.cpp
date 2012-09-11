@@ -63,7 +63,7 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
-#include "ui/workbench/workbench_tranlation_manager.h"
+#include "ui/workbench/workbench_translation_manager.h"
 
 #ifdef Q_WS_X11
     #include "utils/app_focus_listener.h"
