@@ -210,21 +210,19 @@ bool QnArchiveStreamReader::init()
     {
         while (1)
         {
-            if (m_delegate->seek(requiredJumpTime, false) > 0) 
-            {
-                m_jumpMtx.lock();
-                if (m_requiredJumpTime == requiredJumpTime) {
-                    m_requiredJumpTime = AV_NOPTS_VALUE;
-                    m_jumpMtx.unlock();
+            bool seekOk = m_delegate->seek(requiredJumpTime, false) > 0;
+            m_jumpMtx.lock();
+            if (m_requiredJumpTime == requiredJumpTime) {
+                m_requiredJumpTime = AV_NOPTS_VALUE;
+                m_jumpMtx.unlock();
+                if (seekOk)
                     emit jumpOccured(requiredJumpTime);
-                }
-                else {
-                    requiredJumpTime = m_requiredJumpTime;
-                    m_jumpMtx.unlock();
-                    continue; // race condition, jump to new position again
-                }
+                else
+                    emit jumpCanceled(requiredJumpTime);
+                break;
             }
-            break;
+            requiredJumpTime = m_requiredJumpTime; // race condition. jump again
+            m_jumpMtx.unlock();
         }
     }
 
@@ -614,7 +612,7 @@ begin_label:
                         m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         internalJumpTo(seekTime);
-                        m_bofReached = seekTime == m_delegate->startTime();
+                        m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
