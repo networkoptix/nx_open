@@ -8,8 +8,13 @@ class QnServerCameraProcessor : public QObject, public QnResourceProcessor
     Q_OBJECT
 public:
     void processResources(const QnResourceList &resources);
+private:
+    void determineOptimalIF(QnVideoServerResourcePtr videoServer);
 private slots:
     void at_serverIfFound(const QString &);
+    void at_serverStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
+
+
 };
 
 class QnServerCamera: public QnVirtualCameraResource

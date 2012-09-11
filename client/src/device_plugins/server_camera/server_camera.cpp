@@ -18,20 +18,40 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
     foreach(QnResourcePtr res, resources)
     {
         QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-        if (videoServer) 
-        {
-            // set proxy. If some media server IF will be found, proxy address will be cleared
-            QString url = QnAppServerConnectionFactory::defaultUrl().host();
-            if (url.isEmpty())
-                url = QLatin1String("127.0.0.1");
-            int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-            QnRtspClientArchiveDelegate::setProxyAddr(url, port);
-            QnVideoServerConnection::setProxyAddr(url, port);
-            connect(videoServer.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
-            videoServer->determineOptimalNetIF();
+        if (videoServer) {
+            determineOptimalIF(videoServer);
+            videoServer->disconnect(this, SLOT(at_serverStatusChanged(QnResource::Status, QnResource::Status)));
+            connect(videoServer.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(at_serverStatusChanged(QnResource::Status, QnResource::Status)));
         }
     }
 }
+
+void QnServerCameraProcessor::determineOptimalIF(QnVideoServerResourcePtr videoServer)
+{
+    // set proxy. If some media server IF will be found, proxy address will be cleared
+    QString url = QnAppServerConnectionFactory::defaultUrl().host();
+    if (url.isEmpty())
+        url = QLatin1String("127.0.0.1");
+    int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
+    QnRtspClientArchiveDelegate::setProxyAddr(url, port);
+    QnVideoServerConnection::setProxyAddr(url, port);
+    connect(videoServer.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
+    videoServer->determineOptimalNetIF();
+}
+
+void QnServerCameraProcessor::at_serverStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
+{
+    if (oldStatus == QnResource::Offline && oldStatus == QnResource::Offline)
+    {
+        if (oldStatus == QnResource::Offline && newStatus == QnResource::Online) 
+        {
+            QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
+            if (videoServer)
+                videoServer->determineOptimalNetIF();
+        }
+    }
+}
+
 
 QnServerCamera::QnServerCamera()
 {

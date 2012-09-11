@@ -154,6 +154,9 @@
                                         <argument>WixUIExtension.dll</argument>
                                         <argument>-ext</argument> 
                                         <argument>WixUtilExtension.dll</argument>
+                                        <argument>-ext</argument> 
+                                        <argument>wixext\WixSystemToolsExtension.dll</argument>
+                                        <argument>UninstallOptionsDlg.wxs</argument> 
                                         <argument>Associations.wxs</argument>
                                         <argument>PasswordShouldMatchDlg.wxs</argument>
                                         <argument>UpgradeDlg.wxs</argument> 
@@ -196,6 +199,8 @@
                                         <argument>WixUIExtension.dll</argument>
                                         <argument>-ext</argument>
                                         <argument>WixUtilExtension.dll</argument>
+                                        <argument>-ext</argument> 
+                                        <argument>wixext\WixSystemToolsExtension.dll</argument>
                                         <argument>-out</argument>
                                         <argument>bin/${project.build.finalName}.msi</argument> 
                                         <argument>-pdbout</argument> 
