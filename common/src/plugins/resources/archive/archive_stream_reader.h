@@ -112,11 +112,9 @@ private:
     bool m_prevReverseMode;
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
-    //QVector<qint64> m_lastPacketTimes;
     QVector<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
     qint64 m_requiredJumpTime;
-    qint64 m_lastFrameDuration;
     QString m_onDestroyFileName;
     bool m_BOF;
     int m_afterBOFCounter;

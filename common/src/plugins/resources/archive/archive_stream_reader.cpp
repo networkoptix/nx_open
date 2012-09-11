@@ -33,7 +33,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
-    m_lastFrameDuration(0),
     m_BOF(false),
     m_afterBOFCounter(-1),
     m_dataMarker(0),
@@ -233,7 +232,6 @@ bool QnArchiveStreamReader::init()
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     // Alloc common resources
-    m_lastFrameDuration = 0;
 
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_SlowSource)
         emit slowSourceHint();
@@ -491,19 +489,6 @@ begin_label:
         setCurrentTime(m_currentData->timestamp);
     }
 
-    /*
-    while (m_currentData->stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << 0;
-    if (m_currentData->timestamp == AV_NOPTS_VALUE) {
-        m_lastPacketTimes[m_currentData->stream_index] += m_lastFrameDuration;
-        m_currentTime = m_lastPacketTimes[m_currentData->stream_index];
-    }
-    else {
-        m_currentTime =  m_currentData->timestamp;
-        if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
-            m_lastFrameDuration = m_currentTime - m_previousTime;
-    }
-    */
 
     if (videoData) // in case of video packet
     {
