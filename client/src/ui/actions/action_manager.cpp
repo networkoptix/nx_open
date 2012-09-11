@@ -522,6 +522,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::AboutAction).
         flags(Qn::Main).
         text(tr("About...")).
+        shortcut(tr("F1")).
         role(QAction::AboutRole).
         autoRepeat(false);
 
