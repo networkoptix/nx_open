@@ -291,8 +291,8 @@ public:
         seq_scaling_matrix_present_flag = 0;
 		//m_pulldown = false;
 
-        memset( ScalingList4x4, 0, sizeof(ScalingList4x4) );
-        memset( ScalingList8x8, 0, sizeof(ScalingList8x8) );
+        memset( ScalingList4x4, 16, sizeof(ScalingList4x4) );
+        memset( ScalingList8x8, 16, sizeof(ScalingList8x8) );
         std::fill( (bool*)UseDefaultScalingMatrix4x4Flag, ((bool*)UseDefaultScalingMatrix4x4Flag)+sizeof(UseDefaultScalingMatrix4x4Flag)/sizeof(*UseDefaultScalingMatrix4x4Flag), true );
         std::fill( (bool*)UseDefaultScalingMatrix8x8Flag, ((bool*)UseDefaultScalingMatrix8x8Flag)+sizeof(UseDefaultScalingMatrix8x8Flag)/sizeof(*UseDefaultScalingMatrix8x8Flag), true );
     }
