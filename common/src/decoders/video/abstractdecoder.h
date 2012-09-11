@@ -85,10 +85,12 @@ public:
     enum CLCodecManufacture
     {
         FFMPEG,
-        INTELIPP
+        INTELIPP,
+        //!select most apropriate decoder (gives preference to hardware one, if available)
+        AUTO
     };
 
-    static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding );
+    static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding, const QGLContext* glContext = NULL );
     static void setCodecManufacture( CLCodecManufacture codecman )
     {
         m_codecManufacture = codecman;

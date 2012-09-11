@@ -5,7 +5,8 @@
 #ifndef ABSTRACTVIDEODECODERPLUGIN_H
 #define ABSTRACTVIDEODECODERPLUGIN_H
 
-#include <list>
+#include <QGLContext>
+#include <QList>
 
 #include <libavcodec/avcodec.h>
 
@@ -20,11 +21,9 @@ class QnAbstractVideoDecoderPlugin
 :
     public QnAbstractClientPlugin
 {
-    Q_OBJECT
-
 public:
     //!Returns list of MIME types of supported formats
-    virtual std::list<CodecID> supportedCodecTypes() const = 0;
+    virtual QList<CodecID> supportedCodecTypes() const = 0;
     //!Returns true, if decoder CAN offer hardware acceleration
     /*!
         \note Actually, ability of hardware acceleration depends on stream parameters: resolution, bitrate, profile/level etc.
@@ -36,7 +35,12 @@ public:
         \param codecID Codec type
         \param data Access unit of media stream. MUST contain sequence header (sps & pps in case of h.264)
     */
-    virtual QnAbstractVideoDecoder* create( CodecID codecID, const QnCompressedVideoDataPtr& data ) const = 0;
+    virtual QnAbstractVideoDecoder* create(
+            CodecID codecID,
+            const QnCompressedVideoDataPtr& data,
+            const QGLContext* const glContext ) const = 0;
 };
+
+Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.Plugin.XVBADecoder/0.1" );
 
 #endif //ABSTRACTVIDEODECODERPLUGIN_H

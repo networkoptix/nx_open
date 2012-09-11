@@ -5,17 +5,13 @@
 #ifndef ABSTRACTCLIENTPLUGIN_H
 #define ABSTRACTCLIENTPLUGIN_H
 
-#include <QObject>
-
 
 //!Base class for all dynamically-linked plugins to client
 class QnAbstractClientPlugin
-:
-    public QObject
 {
-    Q_OBJECT
-
 public:
+    virtual ~QnAbstractClientPlugin() {}
+
     //!Returns minimum client version required for plugin
     /*!
         Returned version is represented as follows:

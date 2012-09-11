@@ -7,9 +7,15 @@
 #include "xvbadecoder.h"
 
 
-std::list<CodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
+quint32 QnXVBADecoderPlugin::minSupportedVersion() const
 {
-    std::list<CodecID> codecList;
+    //TODO/IMPL
+    return 1<<24;   //1.0.0
+}
+
+QList<CodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
+{
+    QList<CodecID> codecList;
     codecList.push_back( CODEC_ID_H264 );
     return codecList;
 }
@@ -19,7 +25,12 @@ bool QnXVBADecoderPlugin::isHardwareAccelerated() const
     return true;
 }
 
-QnAbstractVideoDecoder* QnXVBADecoderPlugin::create( CodecID codecID, const QnCompressedVideoDataPtr& data ) const
+QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
+        CodecID codecID,
+        const QnCompressedVideoDataPtr& data,
+        const QGLContext* const glContext ) const
 {
-    return new QnXVBADecoder( NULL, data );
+    return new QnXVBADecoder( glContext, data );
 }
+
+Q_EXPORT_PLUGIN2( xvbaplugin, QnXVBADecoderPlugin );
