@@ -614,7 +614,7 @@ begin_label:
                         m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         internalJumpTo(seekTime);
-                        m_bofReached = seekTime == m_delegate->startTime();
+                        m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;
