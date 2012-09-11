@@ -1,0 +1,51 @@
+<Include>
+  <Property Id="ARPCOMMENTS" Value="${company.name} ${product.name}" />
+  <Property Id="ARPCONTACT" Value="networkoptix.com" />
+  <Property Id="ARPPRODUCTICON" Value="eve_logo.ico" />
+  <Property Id="ARPHELPLINK" Value="http://networkoptix.com/products/hdwitness/" />
+  <Property Id="ARPREADME" Value="http://networkoptix.com/products/hdwitness/" />
+  <Property Id="ARPURLINFOABOUT" Value="${company.name} ${product.name}" />
+  <Property Id="ARPURLUPDATEINFO" Value="http://networkoptix.com/products/hdwitness/" />
+  <Property Id="ARPHELPTELEPHONE" Value="http://networkoptix.com" />
+  <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="http://networkoptix.com" />
+  <Property Id="ARPSIZE" Value="3" />
+
+<!--  <Property Id="ARPNOMODIFY" Value="1" />
+  <Property Id="ARPNOREPAIR" Value="1" />
+  <Property Id="ARPNOREMOVE" Value="1" />
+-->  <Property Id="ARPSYSTEMCOMPONENT" Value="1" />
+
+  <Icon Id="eve_logo.ico" SourceFile="Binary\eve\eve_logo.ico"/>
+
+
+  <!-- Set up ARPINSTALLLOCATION property -->
+  <CustomAction Id="SetARPINSTALLLOCATION" Property="ARPINSTALLLOCATION" Value="[INSTALLDIR]" />
+
+  <!-- Sequences -->
+  <InstallExecuteSequence>
+    <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
+  </InstallExecuteSequence>
+
+    <DirectoryRef Id="TARGETDIR">
+        <!-- Create alternative ARP entry that lets us launch uninstall with
+            full UI.  Setting ARPSYSTEMCOMPONENT above hides WI generated key
+                    that uses the product GUID.-->
+        <Component Id="ARPAltRegistryEntries" Guid="{397C3DDE-AFF3-45a6-9E6B-5054C7F6B60F}" Win64="no">
+            <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${product.name}" Action="createAndRemoveOnUninstall">
+                <RegistryValue Type="string" Name="DisplayName" Value="[ProductName]"/>
+                <RegistryValue Type="string" Name="UninstallString" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
+                <RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLDIR]traytool\traytool.exe"/>
+                <RegistryValue Type="string" Name="HelpLink" Value="http://networkoptix.com/products/hdwitness/"/>
+                <RegistryValue Type="string" Name="InstallLocation" Value="[INSTALLDIR]"/>
+                <RegistryValue Type="string" Name="Publisher" Value="[Manufacturer]"/>
+                <RegistryValue Type="string" Name="UninstallPath" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
+                <RegistryValue Type="string" Name="DisplayVersion" Value="[ProductVersion]"/>
+                <RegistryValue Type="string" Name="InstallSource" Value="[SourceDir]"/>
+                <RegistryValue Type="string" Name="Language" Value="#[ProductLanguage]"/>
+                <RegistryValue Type="string" Name="URLInfoAbout" Value="http://networkoptix.com/products/hdwitness/"/>
+            </RegistryKey>
+        </Component>
+    </DirectoryRef>
+    
+
+</Include>
