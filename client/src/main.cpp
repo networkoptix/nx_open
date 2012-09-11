@@ -65,6 +65,11 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_tranlation_manager.h"
 
+#ifdef Q_WS_X11
+    #include "utils/app_focus_listener.h"
+    #include "utils/wmctrl.h"
+#endif
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -226,7 +231,6 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
-
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
 
@@ -264,6 +268,12 @@ int main(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+#ifdef Q_WS_X11
+    QnAppFocusListener *appFocusListener = new QnAppFocusListener();
+    application->installEventFilter(appFocusListener);
+    appFocusListener->hideLauncher();
+#endif
 
     if(singleApplication) {
         QString argsMessage;
@@ -449,6 +459,10 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
+
+#ifdef Q_WS_X11
+    delete appFocusListener;
+#endif
 
     return result;
 }

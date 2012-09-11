@@ -16,6 +16,12 @@ win32 {
   QMAKE_LFLAGS += /MACHINE:${arch}
 }
 
+
+unix{
+  CONFIG += link_pkgconfig
+  PKGCONFIG += glib-2.0
+}
+
 mac {
   DEFINES += QN_EXPORT=
 
