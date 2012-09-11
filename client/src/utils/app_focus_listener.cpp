@@ -1,14 +1,14 @@
 #include "app_focus_listener.h"
-#include "wmctrl.h"
+#include "x11_win_control.h"
 
 #include <QEvent>
 
 void QnAppFocusListener::hideLauncher(){
-    execute_wmctrl(QLatin1String("wmctrl -r launcher -b add,below"));
+    x11_hideLauncher();
 }
 
 void QnAppFocusListener::restoreLauncher(){
-    execute_wmctrl(QLatin1String("wmctrl -r launcher -b remove,below"));
+    x11_showLauncher();
 }
 
 bool QnAppFocusListener::eventFilter(QObject *obj, QEvent *event){
