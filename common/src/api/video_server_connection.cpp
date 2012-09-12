@@ -365,11 +365,18 @@ int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-int QnVideoServerConnection::asyncGetCameraAddition(QObject *target, const char *slot){
-    //TODO: #gdm fill params list here instead of QnRequestParamList()
+int QnVideoServerConnection::asyncGetCameraAddition(QObject *target, const char *slot,
+                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password){
+
+    QnRequestParamList params;
+    params.append(QnRequestParam("start", startAddr));
+    params.append(QnRequestParam("end", endAddr));
+    params.append(QnRequestParam("user", username));
+    params.append(QnRequestParam("password", password));
+
     detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor *processor = new detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int, QByteArray /* data */)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualAddcams"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualAddcams"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle) 

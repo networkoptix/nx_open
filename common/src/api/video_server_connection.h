@@ -190,7 +190,8 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    int asyncGetCameraAddition(QObject *target, const char *slot);
+    int asyncGetCameraAddition(QObject *target, const char *slot,
+                               const QString &startAddr, const QString &endAddr, const QString& username, const QString &password);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);

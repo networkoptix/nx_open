@@ -50,7 +50,6 @@ QnCameraAdditionDialog::~QnCameraAdditionDialog() {
 
 int QnCameraAdditionDialog::addTableRow(const QByteArray &data) {
     ui->camerasTable->setRowCount(0);
-    qDebug() << "data received" << data;
 
     int row = ui->camerasTable->rowCount();
     ui->camerasTable->insertRow(row);
@@ -89,6 +88,25 @@ QnCamerasAddInfoList QnCameraAdditionDialog::cameras() const {
 // -------------------------------------------------------------------------- //
 
 void QnCameraAdditionDialog::at_scanButton_clicked(){
+
+    QString startAddr;
+    QString endAddr;
+    QString username(ui->loginLineEdit->text());
+    QString password(ui->passwordLineEdit->text());
+    if (ui->rangeRadioButton->isChecked()){
+        startAddr = ui->startIPLineEdit->text();
+        endAddr = ui->endIPLineEdit->text();
+    }else{
+        startAddr = ui->iPAddressLineEdit->text();
+        endAddr = startAddr;
+    }
+    qDebug() << "start" <<startAddr << "end" << endAddr;
+
+    QHostAddress addr1(ui->iPAddressLineEdit->text());
+    if (addr1.isNull())
+        return;
+
+
     ui->buttonBox->setEnabled(false);
     ui->camerasGroupBox->setVisible(false);
     ui->scanProgressBar->setVisible(true);
@@ -102,7 +120,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)));
+    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)),
+                                                          startAddr, endAddr, username, password);
     Q_UNUSED(handle)
 
     eventLoop->exec();
