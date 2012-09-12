@@ -1266,6 +1266,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
+        1000ll * 60 * 60 * 3,           /* 3 hours. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
         1000ll * 60 * 60 * 24,          /* 1 day. */
         1000ll * 60 * 60 * 24 * 5,      /* 5 days. */
