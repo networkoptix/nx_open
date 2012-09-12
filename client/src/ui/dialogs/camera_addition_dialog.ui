@@ -263,7 +263,7 @@
   <customwidget>
    <class>QnIpLineEdit</class>
    <extends>QLineEdit</extends>
-   <header>qniplineedit.h</header>
+   <header>ui/widgets/ip_line_edit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
