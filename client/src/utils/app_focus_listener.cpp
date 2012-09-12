@@ -3,6 +3,15 @@
 
 #include <QEvent>
 
+QnAppFocusListener::QnAppFocusListener():
+    QObject(){
+    hideLauncher();
+}
+
+QnAppFocusListener::~QnAppFocusListener(){
+    restoreLauncher();
+}
+
 void QnAppFocusListener::hideLauncher(){
     x11_hideLauncher();
 }

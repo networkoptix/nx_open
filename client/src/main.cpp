@@ -269,9 +269,8 @@ int main(int argc, char *argv[])
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
 #ifdef Q_WS_X11
-    QnAppFocusListener *appFocusListener = new QnAppFocusListener();
-    application->installEventFilter(appFocusListener);
-    appFocusListener->hideLauncher();
+    QnAppFocusListener appFocusListener;
+    application->installEventFilter(&appFocusListener);
 #endif
 
     if(singleApplication) {
@@ -458,10 +457,6 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-#ifdef Q_WS_X11
-    delete appFocusListener;
-#endif
 
     return result;
 }
