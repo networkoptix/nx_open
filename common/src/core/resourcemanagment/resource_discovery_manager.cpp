@@ -554,13 +554,11 @@ struct ManualSearcherHelper
     {
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
-            if (result)
-                break;
-
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-
             result = ns->checkHostAddr(addrToCheck, auth);
-
+            if (result) {
+                break;
+            }
         }
     }
 };
@@ -606,11 +604,23 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
         testList.push_back(t);
     }
 
+    /*
     int threads = 4;
     QThreadPool* global = QThreadPool::globalInstance();
-    for (int i = 0; i < threads; ++i ) global->releaseThread();
+    for (int i = 0; i < threads; ++i ) 
+        global->releaseThread();
     QtConcurrent::blockingMap(testList, &ManualSearcherHelper::f);
-    for (int i = 0; i < threads; ++i )global->reserveThread();
+    for (int i = 0; i < threads; ++i )
+        global->reserveThread();
+    */
+    int startIdx = 0;
+    static const int SEARCH_THREAD_AMOUNT = 4;
+    int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+    do {
+        QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearcherHelper::f);
+        startIdx = endIdx;
+        endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
+    } while (startIdx < testList.size());
 
 
     QnResourceList result;
