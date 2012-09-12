@@ -32,8 +32,8 @@ namespace detail {
             m_cancelled(false)
         {}
 
-        CamerasFoundInfoMap freeSpaceInfo() const {
-            return m_freeSpace;
+        CamerasFoundInfoMap camerasFound() const {
+            return m_cameras;
         }
 
         QByteArray getData() const {
@@ -49,7 +49,6 @@ namespace detail {
             if (m_cancelled)
                 return;
 
-            m_data.clear();
             m_data.append(data);
             qDebug() << "reply status" << status;
             qDebug() << "data received" << data;
@@ -62,12 +61,19 @@ namespace detail {
         }
 
     private:
-        CamerasFoundInfoMap m_freeSpace;
+        CamerasFoundInfoMap m_cameras;
         QByteArray m_data;
         bool m_cancelled;
     };
 
 } // namespace detail
+
+struct QnCamerasAddInfo{
+    bool checked;
+    QString address;
+    QString name;
+};
+typedef QList<QnCamerasAddInfo> QnCamerasAddInfoList;
 
 
 class QnCameraAdditionDialog: public QnButtonBoxDialog {
@@ -78,18 +84,14 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
+
+    QnCamerasAddInfoList cameras() const;
 private:
     int addTableRow(const QByteArray &data);
 
-    void setTableStorages(const QnAbstractStorageResourceList &storages);
-    QnAbstractStorageResourceList tableStorages() const;
-
-    bool validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString);
-
-    void updateSpaceLimitCell(int row, bool force = false);
-
 private slots: 
     void at_scanButton_clicked();
+    void at_singleRadioButton_toggled(bool toggled);
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
