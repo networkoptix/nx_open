@@ -50,4 +50,5 @@ message Camera {
     repeated ScheduleTask scheduleTask     = 7;
     optional bool         audioEnabled     = 8;
     optional string       physicalId       = 9;
+    optional bool         manuallyAdded    = 10;
 }
