@@ -13,6 +13,7 @@
 
 #include <utils/common/request_param.h>
 #include <api/video_server_statistics_data.h>
+#include <api/video_server_cameras_data.h>
 
 #include "api_fwd.h"
 
@@ -75,11 +76,13 @@ namespace detail {
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerAddCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) { }
+        VideoServerSessionManagerAddCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+             qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
+        }
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
     signals:
-        void finished(int status, QByteArray/* data */); //TODO: #gdm correct profile
+        void finished(const QnCamerasFoundInfoList &);
     };
 
     //!Handles response on GetParam request

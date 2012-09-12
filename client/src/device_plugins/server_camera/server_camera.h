@@ -12,9 +12,6 @@ private:
     void determineOptimalIF(QnVideoServerResource* videoServer);
 private slots:
     void at_serverIfFound(const QString &);
-    void at_serverStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
-
-
 };
 
 class QnServerCamera: public QnVirtualCameraResource

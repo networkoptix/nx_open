@@ -1,19 +1,11 @@
 #include "camera_addition_dialog.h"
 #include "ui_camera_addition_dialog.h"
 
-#include <functional>
-
-#include <QtCore/QUuid>
-#include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QSpinBox>
 
-#include <utils/common/counter.h>
+#include <ui/style/globals.h>
 
-#include <core/resource/storage_resource.h>
 #include <core/resource/video_server_resource.h>
 
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
@@ -40,47 +32,59 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(false);
     ui->stopScanButton->setVisible(false);
+    ui->validateLabel->setVisible(false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
+    connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
+
+    ui->loginLineEdit->installEventFilter(this);
+    ui->passwordLineEdit->installEventFilter(this);
+    ui->startIPLineEdit->installEventFilter(this);
+    ui->endIPLineEdit->installEventFilter(this);
+    ui->iPAddressLineEdit->installEventFilter(this);
+
+    ui->iPAddressLineEdit->setFocus();
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->validateLabel->setPalette(palette);
 }
 
-QnCameraAdditionDialog::~QnCameraAdditionDialog() {
-    return;
+QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
+
+bool QnCameraAdditionDialog::eventFilter(QObject *object, QEvent *event){
+    if (event->type() == QEvent::KeyPress && ((QKeyEvent*)event)->key() == Qt::Key_Return) {
+        if (object == ui->loginLineEdit ||
+            object == ui->passwordLineEdit ||
+            object == ui->startIPLineEdit ||
+            object == ui->endIPLineEdit ||
+            object == ui->iPAddressLineEdit)
+        ui->scanButton->setFocus();
+        event->ignore();
+        return false;
+    }
+    return QnButtonBoxDialog::eventFilter(object, event);
 }
 
-int QnCameraAdditionDialog::addTableRow(const QByteArray &data) {
+void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+
     ui->camerasTable->setRowCount(0);
 
-    int row = ui->camerasTable->rowCount();
-    ui->camerasTable->insertRow(row);
+    foreach(QnCamerasFoundInfo info, cameras){
+        int row = ui->camerasTable->rowCount();
+        ui->camerasTable->insertRow(row);
 
-    QTableWidgetItem *checkItem = new QTableWidgetItem();
-    checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-    checkItem->setCheckState(Qt::Unchecked);
+        QTableWidgetItem *checkItem = new QTableWidgetItem();
+        checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
+        checkItem->setCheckState(Qt::Unchecked);
 
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QLatin1String("192.168.0.15"));
-    QTableWidgetItem *nameItem = new QTableWidgetItem(QLatin1String("test name"));
+        QTableWidgetItem *addressItem = new QTableWidgetItem(info.address);
+        QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
 
-    ui->camerasTable->setItem(row, 0, checkItem);
-    ui->camerasTable->setItem(row, 1, addressItem);
-    ui->camerasTable->setItem(row, 2, nameItem);
-
-    return row;
-}
-
-QnCamerasAddInfoList QnCameraAdditionDialog::cameras() const {
-    QnCamerasAddInfoList result;
-
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
-        QnCamerasAddInfo info;
-        info.checked = ui->camerasTable->item(row, 0)->checkState() == Qt::Checked;
-        qDebug() << "output info item checked" << info.checked;
-        info.address = ui->camerasTable->item(row, 1)->text();
-        info.name = ui->camerasTable->item(row, 2)->text();
-        result.append(info);
+        ui->camerasTable->setItem(row, 0, checkItem);
+        ui->camerasTable->setItem(row, 1, addressItem);
+        ui->camerasTable->setItem(row, 2, nameItem);
     }
-    return result;
 }
 
 // -------------------------------------------------------------------------- //
@@ -100,12 +104,22 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
         startAddr = ui->iPAddressLineEdit->text();
         endAddr = startAddr;
     }
-    qDebug() << "start" <<startAddr << "end" << endAddr;
 
-    QHostAddress addr1(ui->iPAddressLineEdit->text());
-    if (addr1.isNull())
+
+    // TODO: #gdm move validation to QnIpLineEdit
+    if (QHostAddress(startAddr).isNull()){
+        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(startAddr));
+        ui->validateLabel->setVisible(true);
         return;
+    }
 
+    if (QHostAddress(endAddr).isNull()){
+        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(endAddr));
+        ui->validateLabel->setVisible(true);
+        return;
+    }
+
+    ui->validateLabel->setVisible(false);
 
     ui->buttonBox->setEnabled(false);
     ui->camerasGroupBox->setVisible(false);
@@ -120,7 +134,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)),
+    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(const QnCamerasFoundInfoList &)),
                                                           startAddr, endAddr, username, password);
     Q_UNUSED(handle)
 
@@ -130,7 +144,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(true);
-    addTableRow(processor->getData());
+    fillTable(processor->camerasFound());
 }
 
 void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){
