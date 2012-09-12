@@ -31,18 +31,25 @@ public:
     void setCheckedButtons(int checkedButtons);
     void setButtonsChecked(int mask, bool checked);
 
+    int enabledButtons() const;
+    void setEnabledButtons(int enabledButtons);
+    void setButtonsEnabled(int mask, bool enabled);
+
     const QSizeF &uniformButtonSize() const;
     void setUniformButtonSize(const QSizeF &uniformButtonSize);
 
 signals:
     void visibleButtonsChanged();
     void checkedButtonsChanged();
+    void enabledButtonsChanged();
 
 private slots:
     void at_button_visibleChanged();
     void at_button_toggled();
+    void at_button_enabledChanged();
 
 private:
+    void submitEnabledButtons(int mask);
     void submitVisibleButtons();
     void submitCheckedButtons(int mask);
     void submitButtonSize(QnImageButtonWidget *button);
@@ -52,6 +59,7 @@ private:
     QHash<QnImageButtonWidget *, int> m_maskByButton;
     int m_visibleButtons;
     int m_checkedButtons;
+    int m_enabledButtons;
     QSizeF m_uniformButtonSize;
     QGraphicsLinearLayout *m_layout;
 

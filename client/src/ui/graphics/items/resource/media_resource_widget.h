@@ -106,6 +106,8 @@ private slots:
     void at_replyReceived(int status, int handle);
     void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
 
+    void at_camDisplay_liveChanged();
+
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
 

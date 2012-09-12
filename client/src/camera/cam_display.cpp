@@ -171,6 +171,7 @@ void QnCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
     m_isRealTimeSource = false;
+    emit liveMode(false);
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->suspend();
 }
@@ -701,6 +702,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
     m_singleShotMode = single;
     if (m_singleShotMode) {
         m_isRealTimeSource = false;
+        emit liveMode(false);
         playAudio(false);
     }
 }
