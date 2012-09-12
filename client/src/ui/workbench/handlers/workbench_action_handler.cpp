@@ -1305,8 +1305,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                startDateTime.setTime(msecsToTime(qFloor(timeToMSecs(startDateTime.time()), step)));
-                endDateTime.setTime(msecsToTime(qCeil(timeToMSecs(endDateTime.time()), step)));
+                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
+                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+
+                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
+                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
@@ -1454,11 +1457,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     QScopedPointer<QnCameraAdditionDialog> dialog(new QnCameraAdditionDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    if (dialog->exec() == QDialog::Accepted){
-        QnCamerasAddInfoList cameras = dialog->cameras();
-        Q_UNUSED(cameras)
-        // TODO: here addition should occur
-    }
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {

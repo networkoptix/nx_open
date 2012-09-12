@@ -369,13 +369,13 @@ int QnVideoServerConnection::asyncGetCameraAddition(QObject *target, const char 
                                                     const QString &startAddr, const QString &endAddr, const QString& username, const QString &password){
 
     QnRequestParamList params;
-    params.append(QnRequestParam("start", startAddr));
-    params.append(QnRequestParam("end", endAddr));
-    params.append(QnRequestParam("user", username));
-    params.append(QnRequestParam("password", password));
+    params << QnRequestParam("start", startAddr);
+    params << QnRequestParam("end", endAddr);
+    params << QnRequestParam("user", username);
+    params << QnRequestParam("password", password);
 
     detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor *processor = new detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(int, QByteArray /* data */)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finished(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualAddcams"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
@@ -508,7 +508,25 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
 }
 
 void detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
-    emit finished(status, reply);
+
+    QnCamerasFoundInfoList result;
+    if (status == 0){
+        QByteArray root = extractXmlBody(reply, "root");
+        QByteArray resource;
+        int from = 0;
+        do
+        {
+            resource = extractXmlBody(root, "resource", &from);
+            if (resource.length() == 0)
+                break;
+            QString url = QLatin1String(extractXmlBody(resource, "url"));
+            QString name = QLatin1String(extractXmlBody(resource, "name"));
+            result.append(QnCamerasFoundInfo(url, name));
+
+        } while (resource.length() > 0);
+    }
+
+    emit finished(result);
     deleteLater();
 }
 

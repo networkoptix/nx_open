@@ -79,7 +79,7 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="iPAddressLineEdit">
+      <widget class="QnIpLineEdit" name="iPAddressLineEdit">
        <property name="inputMethodHints">
         <set>Qt::ImhDigitsOnly</set>
        </property>
@@ -102,7 +102,7 @@
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QLineEdit" name="startIPLineEdit">
+      <widget class="QnIpLineEdit" name="startIPLineEdit">
        <property name="inputMethodHints">
         <set>Qt::ImhDigitsOnly</set>
        </property>
@@ -125,7 +125,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLineEdit" name="endIPLineEdit">
+      <widget class="QnIpLineEdit" name="endIPLineEdit">
        <property name="inputMethodHints">
         <set>Qt::ImhDigitsOnly</set>
        </property>
@@ -151,6 +151,13 @@
       <widget class="QLineEdit" name="loginLineEdit"/>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="validateLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QPushButton" name="scanButton">
@@ -196,6 +203,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="autoFillBackground">
          <bool>false</bool>
         </property>
@@ -203,7 +213,7 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>3</number>
+         <number>2</number>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>true</bool>
@@ -225,12 +235,7 @@
         </attribute>
         <column>
          <property name="text">
-          <string>Add</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>IP</string>
+          <string>Id</string>
          </property>
         </column>
         <column>
@@ -252,12 +257,22 @@
       </size>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QnIpLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>ui/widgets/ip_line_edit.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>singleRadioButton</tabstop>
   <tabstop>rangeRadioButton</tabstop>
