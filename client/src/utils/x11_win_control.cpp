@@ -73,7 +73,6 @@ static int action_event(Window win, unsigned long action) {
     event.xclient.data.l[4] = 0;
 
     long mask = SubstructureRedirectMask | SubstructureNotifyMask;
-
     return XSendEvent(QX11Info::display(), DefaultRootWindow(QX11Info::display()), False, mask, &event);
 }
 
@@ -92,13 +91,15 @@ static QString get_window_title (Window win) {
         title = QString::fromLatin1(wm_name);
         XFree(wm_name);
     }
+
+
     return title;
 }
 
 int setLauncherState(int action){
     QList<Window> client_list = get_client_list();
     foreach(Window win, client_list){
-        if (get_window_title(win).compare(QLatin1String("launcher"))){
+        if (get_window_title(win).compare(QLatin1String("launcher")) == 0){
             return action_event(win, action);
         }
     }
@@ -106,11 +107,11 @@ int setLauncherState(int action){
 }
 
 int x11_showLauncher(){
-    return setLauncherState(_NET_WM_STATE_ADD);
+    return setLauncherState(_NET_WM_STATE_REMOVE);
 }
 
 int x11_hideLauncher(){
-    return setLauncherState(_NET_WM_STATE_REMOVE);
+    return setLauncherState(_NET_WM_STATE_ADD);
 }
 #else
 int x11_showLauncher(){
