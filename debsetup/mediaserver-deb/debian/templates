@@ -24,15 +24,10 @@ Type: string
 Default: /opt/networkoptix/mediaserver/var/data
 Description: Storage folder
 
-Template: networkoptix-mediaserver/api_port
-Type: string
-Default: 7101
-Description: Media Server API port:
-
 Template: networkoptix-mediaserver/rtsp_port
 Type: string
-Default: 7201
-Description: Media Server RTSP port:
+Default: 7002
+Description: Media Server port:
 
 Template: networkoptix-mediaserver/ecs_port_invalid
 Type: error
