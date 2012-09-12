@@ -63,6 +63,8 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
+protected:
+    virtual bool eventFilter(QObject *, QEvent *) override;
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
 

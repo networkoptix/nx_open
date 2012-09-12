@@ -1,19 +1,11 @@
 #include "camera_addition_dialog.h"
 #include "ui_camera_addition_dialog.h"
 
-#include <functional>
-
-#include <QtCore/QUuid>
-#include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QtGui/QStyledItemDelegate>
-#include <QtGui/QItemEditorFactory>
-#include <QtGui/QSpinBox>
 
-#include <utils/common/counter.h>
+#include <ui/style/globals.h>
 
-#include <core/resource/storage_resource.h>
 #include <core/resource/video_server_resource.h>
 
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
@@ -40,11 +32,39 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(false);
     ui->stopScanButton->setVisible(false);
+    ui->validateLabel->setVisible(false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
+    connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
+
+    ui->loginLineEdit->installEventFilter(this);
+    ui->passwordLineEdit->installEventFilter(this);
+    ui->startIPLineEdit->installEventFilter(this);
+    ui->endIPLineEdit->installEventFilter(this);
+    ui->iPAddressLineEdit->installEventFilter(this);
+
+    ui->iPAddressLineEdit->setFocus();
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->validateLabel->setPalette(palette);
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
+
+bool QnCameraAdditionDialog::eventFilter(QObject *object, QEvent *event){
+    if (event->type() == QEvent::KeyPress && ((QKeyEvent*)event)->key() == Qt::Key_Return) {
+        if (object == ui->loginLineEdit ||
+            object == ui->passwordLineEdit ||
+            object == ui->startIPLineEdit ||
+            object == ui->endIPLineEdit ||
+            object == ui->iPAddressLineEdit)
+        ui->scanButton->setFocus();
+        event->ignore();
+        return false;
+    }
+    return QnButtonBoxDialog::eventFilter(object, event);
+}
 
 void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
 
@@ -84,13 +104,22 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
         startAddr = ui->iPAddressLineEdit->text();
         endAddr = startAddr;
     }
-    qDebug() << "start" <<startAddr << "end" << endAddr;
 
-    QHostAddress addr1(ui->iPAddressLineEdit->text());
-    if (addr1.isNull())
+
+    // TODO: #gdm move validation to QnIpLineEdit
+    if (QHostAddress(startAddr).isNull()){
+        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(startAddr));
+        ui->validateLabel->setVisible(true);
         return;
-    //TODO: #gdm show message dlg or better write red label
+    }
 
+    if (QHostAddress(endAddr).isNull()){
+        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(endAddr));
+        ui->validateLabel->setVisible(true);
+        return;
+    }
+
+    ui->validateLabel->setVisible(false);
 
     ui->buttonBox->setEnabled(false);
     ui->camerasGroupBox->setVisible(false);

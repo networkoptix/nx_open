@@ -153,6 +153,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QLabel" name="validateLabel">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="scanButton">
      <property name="text">
       <string>Scan</string>
