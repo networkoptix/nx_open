@@ -69,6 +69,7 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
         result.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
         result.append("</resource>\n");
     }
+
     result.append("</root>\n");
 
     resultByteArray = result.toUtf8();

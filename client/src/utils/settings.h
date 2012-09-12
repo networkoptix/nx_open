@@ -49,11 +49,13 @@ public:
         DOWNMIX_AUDIO,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
-        BACKGROUND_ANIMATED,
-        BACKGROUND_COLOR,
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
-        
+
+        BACKGROUND_EDITABLE,
+        BACKGROUND_ANIMATED,
+        BACKGROUND_COLOR,
+
         DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -90,6 +92,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
+        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
         QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)

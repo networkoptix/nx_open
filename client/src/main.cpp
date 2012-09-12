@@ -68,6 +68,8 @@
 #ifdef Q_WS_X11
     #include "utils/app_focus_listener.h"
 #endif
+#include "utils/common/cryptographic_hash.h"
+#include "ui/style/globals.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -235,19 +237,31 @@ int main(int argc, char *argv[])
 
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 
+    QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
+    bool devBackgroundEditable = false;
     
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",  NULL,   QString(),    true);
-    commandLineParser.addParameter(&authenticationString,   "--auth",                   NULL,   QString());
-    commandLineParser.addParameter(&screen,                 "--screen",                 NULL,   QString());
-    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",           NULL,   QString());
-    commandLineParser.addParameter(&logLevel,               "--log-level",              NULL,   QString());
-    commandLineParser.addParameter(&translationPath,        "--translation",            NULL,   QString());
+    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
+    commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
+    commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
+    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
+    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
+
+    /* Dev mode. */
+    if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
+        qnSettings->setBackgroundEditable(devBackgroundEditable);
+    } else {
+        qnSettings->setBackgroundAnimated(true);
+        qnSettings->setBackgroundColor(qnGlobals->backgroundGradientColor());
+    }
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);

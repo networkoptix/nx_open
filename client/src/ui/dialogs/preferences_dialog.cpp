@@ -39,12 +39,12 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->backgroundColorPicker->setAutoFillBackground(false);
     initColorPicker();
 
-#ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    ui->animateBackgroundLabel->hide();
-    ui->animateBackgroundCheckBox->hide();
-    ui->backgroundColorLabel->hide();
-    ui->backgroundColorWidget->hide();
-#endif
+    if(!m_settings->isBackgroundEditable()) {
+        ui->animateBackgroundLabel->hide();
+        ui->animateBackgroundCheckBox->hide();
+        ui->backgroundColorLabel->hide();
+        ui->backgroundColorWidget->hide();
+    }
 
     if (QnScreenRecorder::isSupported()){
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
