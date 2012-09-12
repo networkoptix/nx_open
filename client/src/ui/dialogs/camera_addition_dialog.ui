@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>315</width>
-    <height>480</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -258,6 +258,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>singleRadioButton</tabstop>
+  <tabstop>rangeRadioButton</tabstop>
+  <tabstop>loginLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+  <tabstop>iPAddressLineEdit</tabstop>
+  <tabstop>startIPLineEdit</tabstop>
+  <tabstop>endIPLineEdit</tabstop>
+  <tabstop>scanButton</tabstop>
+  <tabstop>stopScanButton</tabstop>
+  <tabstop>camerasTable</tabstop>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>
