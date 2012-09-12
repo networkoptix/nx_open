@@ -1457,11 +1457,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 
     QScopedPointer<QnCameraAdditionDialog> dialog(new QnCameraAdditionDialog(resources[0], widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
-    if (dialog->exec() == QDialog::Accepted){
-        QnCamerasAddInfoList cameras = dialog->cameras();
-        Q_UNUSED(cameras)
-        // TODO: here addition should occur
-    }
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {

@@ -44,43 +44,27 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
 }
 
-QnCameraAdditionDialog::~QnCameraAdditionDialog() {
-    return;
-}
+QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
 
-int QnCameraAdditionDialog::addTableRow(const QByteArray &data) {
+void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
+
     ui->camerasTable->setRowCount(0);
 
-    int row = ui->camerasTable->rowCount();
-    ui->camerasTable->insertRow(row);
+    foreach(QnCamerasFoundInfo info, cameras){
+        int row = ui->camerasTable->rowCount();
+        ui->camerasTable->insertRow(row);
 
-    QTableWidgetItem *checkItem = new QTableWidgetItem();
-    checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
-    checkItem->setCheckState(Qt::Unchecked);
+        QTableWidgetItem *checkItem = new QTableWidgetItem();
+        checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
+        checkItem->setCheckState(Qt::Unchecked);
 
-    QTableWidgetItem *addressItem = new QTableWidgetItem(QLatin1String("192.168.0.15"));
-    QTableWidgetItem *nameItem = new QTableWidgetItem(QLatin1String("test name"));
+        QTableWidgetItem *addressItem = new QTableWidgetItem(info.address);
+        QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
 
-    ui->camerasTable->setItem(row, 0, checkItem);
-    ui->camerasTable->setItem(row, 1, addressItem);
-    ui->camerasTable->setItem(row, 2, nameItem);
-
-    return row;
-}
-
-QnCamerasAddInfoList QnCameraAdditionDialog::cameras() const {
-    QnCamerasAddInfoList result;
-
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
-        QnCamerasAddInfo info;
-        info.checked = ui->camerasTable->item(row, 0)->checkState() == Qt::Checked;
-        qDebug() << "output info item checked" << info.checked;
-        info.address = ui->camerasTable->item(row, 1)->text();
-        info.name = ui->camerasTable->item(row, 2)->text();
-        result.append(info);
+        ui->camerasTable->setItem(row, 0, checkItem);
+        ui->camerasTable->setItem(row, 1, addressItem);
+        ui->camerasTable->setItem(row, 2, nameItem);
     }
-    return result;
 }
 
 // -------------------------------------------------------------------------- //
@@ -105,6 +89,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     QHostAddress addr1(ui->iPAddressLineEdit->text());
     if (addr1.isNull())
         return;
+    //TODO: #gdm show message dlg or better write red label
 
 
     ui->buttonBox->setEnabled(false);
@@ -120,7 +105,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(int, const QByteArray &)),
+    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(const QnCamerasFoundInfoList &)),
                                                           startAddr, endAddr, username, password);
     Q_UNUSED(handle)
 
@@ -130,7 +115,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
     ui->camerasGroupBox->setVisible(true);
-    addTableRow(processor->getData());
+    fillTable(processor->camerasFound());
 }
 
 void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){

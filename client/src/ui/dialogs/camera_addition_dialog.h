@@ -4,6 +4,7 @@
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
+#include <api/video_server_cameras_data.h>
 
 #include "button_box_dialog.h"
 
@@ -12,15 +13,6 @@ namespace Ui {
 }
 
 namespace detail {
-    struct CamerasFoundInfo
-    {
-        CamerasFoundInfo(): freeSpace(0), usedSpace(0), errorCode(0) {}
-        CamerasFoundInfo(qint64 _freeSpace, qint64 _usedSpace, int _errorCode): freeSpace(_freeSpace), usedSpace(_usedSpace), errorCode(_errorCode) {}
-        qint64 freeSpace;
-        qint64 usedSpace;
-        int errorCode;
-    };
-    typedef QMap<int, CamerasFoundInfo> CamerasFoundInfoMap;
 
     class CheckCamerasFoundReplyProcessor: public QObject
     {
@@ -32,26 +24,21 @@ namespace detail {
             m_cancelled(false)
         {}
 
-        CamerasFoundInfoMap camerasFound() const {
+        QnCamerasFoundInfoList camerasFound() const {
             return m_cameras;
-        }
-
-        QByteArray getData() const {
-            return m_data;
         }
 
     signals:
         void replyReceived();
 
     public slots:
-        void processReply(int status, const QByteArray &data) //TODO: #gdm change profile
+        void processReply(const QnCamerasFoundInfoList &cameras)
         {
             if (m_cancelled)
                 return;
 
-            m_data.append(data);
-            qDebug() << "reply status" << status;
-            qDebug() << "data received" << data;
+            m_cameras = cameras;
+            qDebug() << "data received count" << cameras.count();
             emit replyReceived();
         }
 
@@ -61,19 +48,11 @@ namespace detail {
         }
 
     private:
-        CamerasFoundInfoMap m_cameras;
-        QByteArray m_data;
+        QnCamerasFoundInfoList m_cameras;
         bool m_cancelled;
     };
 
 } // namespace detail
-
-struct QnCamerasAddInfo{
-    bool checked;
-    QString address;
-    QString name;
-};
-typedef QList<QnCamerasAddInfo> QnCamerasAddInfoList;
 
 
 class QnCameraAdditionDialog: public QnButtonBoxDialog {
@@ -84,10 +63,8 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
-
-    QnCamerasAddInfoList cameras() const;
 private:
-    int addTableRow(const QByteArray &data);
+    void fillTable(const QnCamerasFoundInfoList &cameras);
 
 private slots: 
     void at_scanButton_clicked();
