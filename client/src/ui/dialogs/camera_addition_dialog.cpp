@@ -22,11 +22,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     m_server(server)
 {
     ui->setupUi(this);
-/*    ui->storagesTable->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui->storagesTable->horizontalHeader()->setResizeMode(0, QHeaderView::Stretch);
-    ui->storagesTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->storagesTable->horizontalHeader()->setVisible(true); */
-    /* Qt designer does not save this flag (probably a bug in Qt designer). */
 
     setButtonBox(ui->buttonBox);
 
