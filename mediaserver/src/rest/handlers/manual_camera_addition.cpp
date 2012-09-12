@@ -70,13 +70,6 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
         result.append("</resource>\n");
     }
 
-    for (int i = 0; i < 5; i++){
-        result.append("<resource>\n");
-        result.append(QString("<name>%1</name>\n").arg("dummy " + QString::number(i)));
-        result.append(QString("<url>%1</url>\n").arg("dummy ip" + QString::number(i)));
-        result.append("</resource>\n");
-    }
-
     result.append("</root>\n");
 
     resultByteArray = result.toUtf8();
