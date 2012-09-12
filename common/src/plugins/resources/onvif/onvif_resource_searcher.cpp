@@ -35,7 +35,34 @@ QString OnvifResourceSearcher::manufacture() const
 
 QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth)
 {
-    return QnResourcePtr(0);
+    QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
+    if (!typePtr)
+        return QnResourcePtr();
+
+    int onvifPort = 80;
+    QString onvifUrl(QLatin1String("onvif/device_service"));
+
+    QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
+    resource->setTypeId(typePtr->getId());
+    resource->setAuth(auth);
+    resource->setHostAddress(addr, QnDomainMemory);
+    //resource->setDiscoveryAddr(addr);
+    QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(addr.toString()).arg(onvifPort).arg(onvifUrl);
+    resource->setDeviceOnvifUrl(deviceUrl);
+
+    resource->calcTimeDrift();
+    if (resource->fetchAndSetDeviceInformation())
+    {
+        // Clarify resource type
+        QString manufacturer = resource->getName().split(QLatin1String("-"))[0];
+        QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer);
+        if (rt)
+            resource->setTypeId(rt);
+
+        return resource;
+    }
+    else 
+        return QnResourcePtr();
 }
 
 void OnvifResourceSearcher::pleaseStop()

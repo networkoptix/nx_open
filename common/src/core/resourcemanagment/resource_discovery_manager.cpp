@@ -616,16 +616,16 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     int startIdx = 0;
     static const int SEARCH_THREAD_AMOUNT = 4;
     int endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-    do {
+    while (startIdx < testList.size()) {
         QtConcurrent::blockingMap(testList.begin() + startIdx, testList.begin() + endIdx, &ManualSearcherHelper::f);
         startIdx = endIdx;
         endIdx = qMin(testList.size(), startIdx + SEARCH_THREAD_AMOUNT);
-    } while (startIdx < testList.size());
+    }
 
 
     QnResourceList result;
 
-    foreach(ManualSearcherHelper h, testList)
+    foreach(const ManualSearcherHelper& h, testList)
     {
         if (!h.result)
             continue;
