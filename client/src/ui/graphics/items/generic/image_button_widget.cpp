@@ -182,6 +182,9 @@ void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
 }
 
 void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
+    if(isDisabled())
+        return;
+
     QWeakPointer<QObject> self(this);
 
     if(m_action != NULL) {
@@ -276,9 +279,6 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
-    if(isDisabled())
-        return;
-
     clickInternal(event);
 }
 

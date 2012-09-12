@@ -680,6 +680,10 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 
         if(m_currentWidget->resource()->flags() & QnResource::utc)
             flags |= WidgetUsesUTC | WidgetSupportsSync;
+
+        QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
+        if(searchState.step > 0) /* Is a thumbnails search layout. */
+            flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
     } else {
         flags = 0;
     }

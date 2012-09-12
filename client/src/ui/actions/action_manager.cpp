@@ -977,13 +977,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Toggle Mute"));
 
     factory(Qn::JumpToLiveAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("L")).
         text(tr("Jump to Live")).
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::ToggleSyncAction).
-        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::SingleTarget).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("S")).
         text(tr("Toggle Sync")).
         condition(new QnArchiveActionCondition(this));
