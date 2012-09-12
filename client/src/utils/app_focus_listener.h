@@ -7,6 +7,9 @@ class QnAppFocusListener: public QObject{
     Q_OBJECT
 
 public:
+    QnAppFocusListener();
+    virtual ~QnAppFocusListener();
+
     void hideLauncher();
     void restoreLauncher();
 

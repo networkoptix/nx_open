@@ -1,4 +1,4 @@
-#include "workbench_tranlation_manager.h"
+#include "workbench_translation_manager.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QTranslator>

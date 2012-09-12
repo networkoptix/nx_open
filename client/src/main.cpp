@@ -63,7 +63,7 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
-#include "ui/workbench/workbench_tranlation_manager.h"
+#include "ui/workbench/workbench_translation_manager.h"
 
 #ifdef Q_WS_X11
     #include "utils/app_focus_listener.h"
@@ -269,9 +269,8 @@ int main(int argc, char *argv[])
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
 #ifdef Q_WS_X11
-    QnAppFocusListener *appFocusListener = new QnAppFocusListener();
-    application->installEventFilter(appFocusListener);
-    appFocusListener->hideLauncher();
+    QnAppFocusListener appFocusListener;
+    application->installEventFilter(&appFocusListener);
 #endif
 
     if(singleApplication) {
@@ -458,10 +457,6 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-#ifdef Q_WS_X11
-    delete appFocusListener;
-#endif
 
     return result;
 }

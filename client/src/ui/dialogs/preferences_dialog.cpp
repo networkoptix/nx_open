@@ -14,7 +14,7 @@
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
-#include "ui/workbench/workbench_tranlation_manager.h"
+#include "ui/workbench/workbench_translation_manager.h"
 #include "ui/screen_recording/screen_recorder.h"
 
 #include <ui/widgets/settings/license_manager_widget.h>
