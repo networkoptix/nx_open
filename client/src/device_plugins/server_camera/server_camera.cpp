@@ -18,11 +18,8 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
     foreach(QnResourcePtr res, resources)
     {
         QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-        if (videoServer) {
+        if (videoServer)
             determineOptimalIF(videoServer.data());
-            videoServer->disconnect(this, SLOT(at_serverStatusChanged(QnResource::Status, QnResource::Status)));
-            connect(videoServer.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(at_serverStatusChanged(QnResource::Status, QnResource::Status)));
-        }
     }
 }
 
@@ -39,17 +36,6 @@ void QnServerCameraProcessor::determineOptimalIF(QnVideoServerResource* videoSer
     connect(videoServer, SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
     videoServer->determineOptimalNetIF();
 }
-
-void QnServerCameraProcessor::at_serverStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
-{
-    if (oldStatus == QnResource::Offline && newStatus == QnResource::Online) 
-    {
-        QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
-        if (videoServer)
-            determineOptimalIF(videoServer);
-    }
-}
-
 
 QnServerCamera::QnServerCamera()
 {
