@@ -13,25 +13,34 @@
 
 class QTextStream;
 
+struct QnCommandLineDefaultImpliedValue {};
+Q_DECLARE_METATYPE(QnCommandLineDefaultImpliedValue);
+
+namespace detail {
+    inline QVariant defaultImpliedValue() {
+        return QVariant(qMetaTypeId<QnCommandLineDefaultImpliedValue>(), static_cast<const void *>(NULL));
+    }
+}
+
 class QN_EXPORT QnCommandLineParameter {
 public:
     template<class T>
-    QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_target(target), m_targetHandler(new QnTypedMetaHandler<T>()), m_type(qMetaTypeId<T>()), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
-    {}
+    QnCommandLineParameter(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+        init<T>(target, longName, shortName, description, impliedValue);
+    }
 
     template<class T>
-    QnCommandLineParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_target(target), m_targetHandler(new QnTypedMetaHandler<T>()), m_type(qMetaTypeId<T>()), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
-    {}
+    QnCommandLineParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+        init<T>(target, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
+    }
 
-    QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_target(NULL), m_type(type), m_longName(longName), m_shortName(shortName), m_description(description), m_impliedValue(impliedValue)
-    {}
+    QnCommandLineParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+        init(NULL, NULL, type, longName, shortName, description, impliedValue);
+    }
 
-    QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()):
-        m_target(NULL), m_type(type), m_longName(QLatin1String(longName)), m_shortName(QLatin1String(shortName)), m_description(description), m_impliedValue(impliedValue)
-    {}
+    QnCommandLineParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
+        init(NULL, NULL, type, QLatin1String(longName), QLatin1String(shortName), description, impliedValue);
+    }
 
     void *target() const {
         return m_target;
@@ -62,6 +71,14 @@ public:
     }
 
 private:
+    template<class T>
+    void init(T *target, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
+        init(target, new QnTypedMetaHandler<T>(), qMetaTypeId<T>(), longName, shortName, description, impliedValue);
+    }
+
+    void init(void *target, QnMetaHandler *targetHandler, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue);
+
+private:
     void *m_target;
     QSharedPointer<QnMetaHandler> m_targetHandler;
     int m_type;
@@ -78,11 +95,11 @@ public:
     QnCommandLineParser() {}
 
     void addParameter(const QnCommandLineParameter &parameter);
-    void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = QVariant());
-    void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant());
+    void addParameter(int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
+    void addParameter(int type, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue());
 
     template<class T>
-    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = QVariant()) {
+    void addParameter(T *target, const char *longName, const char *shortName, const QString &description, const QVariant &impliedValue = detail::defaultImpliedValue()) {
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }
 
