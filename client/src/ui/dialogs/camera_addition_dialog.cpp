@@ -44,9 +44,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
 }
 
-QnCameraAdditionDialog::~QnCameraAdditionDialog() {
-    return;
-}
+QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
 
 void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
 
@@ -67,21 +65,6 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         ui->camerasTable->setItem(row, 1, addressItem);
         ui->camerasTable->setItem(row, 2, nameItem);
     }
-}
-
-QnCamerasAddInfoList QnCameraAdditionDialog::cameras() const {
-    QnCamerasAddInfoList result;
-
-    int rowCount = ui->camerasTable->rowCount();
-    for (int row = 0; row < rowCount; ++row) {
-        QnCamerasAddInfo info;
-        info.checked = ui->camerasTable->item(row, 0)->checkState() == Qt::Checked;
-        qDebug() << "output info item checked" << info.checked;
-        info.address = ui->camerasTable->item(row, 1)->text();
-        info.name = ui->camerasTable->item(row, 2)->text();
-        result.append(info);
-    }
-    return result;
 }
 
 // -------------------------------------------------------------------------- //

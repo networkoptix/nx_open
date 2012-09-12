@@ -54,13 +54,6 @@ namespace detail {
 
 } // namespace detail
 
-struct QnCamerasAddInfo{
-    bool checked;
-    QString address;
-    QString name;
-};
-typedef QList<QnCamerasAddInfo> QnCamerasAddInfoList;
-
 
 class QnCameraAdditionDialog: public QnButtonBoxDialog {
     Q_OBJECT
@@ -70,8 +63,6 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
-
-    QnCamerasAddInfoList cameras() const;
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
 
