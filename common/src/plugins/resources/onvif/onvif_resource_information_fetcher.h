@@ -14,6 +14,8 @@ struct EndpointAdditionalInfo
     QString uniqId;
     QString discoveryIp;
 
+    EndpointAdditionalInfo() {}
+
     EndpointAdditionalInfo(const QString& newName, const QString& newManufacturer, const QString& newMac, 
             const QString& newUniqId, const QString& newDiscoveryIp):
         name(newName),
@@ -21,6 +23,16 @@ struct EndpointAdditionalInfo
         mac(newMac),
         uniqId(newUniqId),
         discoveryIp(newDiscoveryIp)
+    {
+
+    }
+
+    EndpointAdditionalInfo(const EndpointAdditionalInfo& src) :
+        name(src.name),
+        manufacturer(src.manufacturer),
+        mac(src.mac),
+        uniqId(src.uniqId),
+        discoveryIp(src.discoveryIp)
     {
 
     }

@@ -197,9 +197,6 @@ void printInLogNetResources(const QnResourceList& resources)
 
 QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
 {
-
-    //findResources(QHostAddress(), QHostAddress());
-
     //bool allow_to_change_ip = true;
     static const int  threads = 5;
 
@@ -546,13 +543,97 @@ QnResourceList QnResourceDiscoveryManager::findNewResources(bool *ip_finished)
     return resources;
 }
 
-QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr, QHostAddress endAddr)
+struct ManualSearcherHelper
 {
-    QnResourceList result;
-    // looking for a new resources from this ip range;
+    QHostAddress addrToCheck;
+    QnResourceDiscoveryManager::ResourceSearcherList* plugins;
+    QnResourcePtr result;
+    QAuthenticator auth;
+
+    void f()
+    {
+        foreach(QnAbstractResourceSearcher* as, *plugins)
+        {
+            if (result)
+                break;
+
+            QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
+
+            result = ns->checkHostAddr(addrToCheck, auth);
+
+        }
+    }
+};
+
+
+QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth)
+{
+    
+    {
+        QString str;
+        QTextStream stream(&str);
+
+        stream << "Looking for cameras... StartAddr = " << startAddr.toString() << "  EndAddr = " << endAddr.toString() << "   login/pass = " << auth.user() << "/" << auth.password();
+        cl_log.log(str, cl_logINFO);
+    }
+    
+    //=======================================
     QnIprangeChecker ip_cheker;
 
-    ip_cheker.onlineHosts(QHostAddress(QLatin1String("192.168.0.0")), QHostAddress(QLatin1String("192.168.0.255")));
+    cl_log.log("Checking for online addresses....", cl_logINFO);
+
+    QList<QHostAddress> online = ip_cheker.onlineHosts(startAddr, endAddr);
+
+
+    cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
+
+    foreach(QHostAddress addr, online)
+    {
+        cl_log.log(addr.toString(), cl_logINFO);
+    }
+
+    //=======================================
+
+    //now lets check each one of online machines...
+
+    QList<ManualSearcherHelper> testList;
+    foreach(QHostAddress addr, online)
+    {
+        ManualSearcherHelper t;
+        t.addrToCheck = addr;
+        t.auth = auth;
+        t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
+        testList.push_back(t);
+    }
+
+    int threads = 4;
+    QThreadPool* global = QThreadPool::globalInstance();
+    for (int i = 0; i < threads; ++i ) global->releaseThread();
+    QtConcurrent::blockingMap(testList, &ManualSearcherHelper::f);
+    for (int i = 0; i < threads; ++i )global->reserveThread();
+
+
+    QnResourceList result;
+
+    foreach(ManualSearcherHelper h, testList)
+    {
+        if (!h.result)
+            continue;
+
+        if (qnResPool->hasSuchResouce(h.result->getUniqueId())) // already in resource pool 
+            continue;
+
+        result.push_back(h.result);
+
+        //qnResPool->
+
+    }
+
+    cl_log.log("Found ",  result.size(), " new resources", cl_logINFO);
+    foreach(QnResourcePtr res, result)
+    {
+        cl_log.log(res->toString(), cl_logINFO);
+    }
 
 
     return result;

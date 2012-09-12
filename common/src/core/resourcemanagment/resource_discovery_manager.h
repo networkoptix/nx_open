@@ -17,9 +17,10 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
 {
     Q_OBJECT;
 
+public:
+
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-public:
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager& instance();
@@ -43,7 +44,7 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr);
+    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth);
 
 protected:
     QnResourceDiscoveryManager();

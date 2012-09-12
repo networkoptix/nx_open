@@ -42,7 +42,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
-    m_rtspSession.setSimpleOpenMode(); // ommit DESCRIBE and SETUP requests
 }
 
 void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
@@ -50,6 +49,7 @@ void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
     m_resource = resource;
+    updateRtpParam(resource);
 }
 
 void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
@@ -198,7 +198,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
-
+    updateRtpParam(resource);
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
@@ -842,4 +842,16 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
 {
     m_isMultiserverAllowed = value;
+}
+
+void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
+{
+    int numOfVideoChannels = 1;
+    QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
+    if (mediaRes) {
+        const QnVideoResourceLayout* videoLayout = mediaRes->getVideoLayout(0);
+        if (videoLayout)
+            numOfVideoChannels = videoLayout->numberOfChannels();
+    }
+    m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
 }

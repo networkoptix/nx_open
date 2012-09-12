@@ -62,6 +62,69 @@
     </message>
 </context>
 <context>
+    <name>CameraAdditionDialog</name>
+    <message>
+        <source>Add cameras...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Single Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>IP Range</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password:</source>
+        <translation type="unfinished">密码：</translation>
+    </message>
+    <message>
+        <source>IP Address:</source>
+        <translation type="unfinished">IP地址：</translation>
+    </message>
+    <message>
+        <source>009.009.009.009;_</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login:</source>
+        <translation type="unfinished">登陆：</translation>
+    </message>
+    <message>
+        <source>Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Found cameras:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation type="unfinished">添加</translation>
+    </message>
+    <message>
+        <source>IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CameraScheduleWidget</name>
     <message>
         <source>Camera schedule editor</source>
@@ -638,6 +701,14 @@ For easy instructions on how to install or update your video driver, follow inst
     <message>
         <source>Language:</source>
         <translation type="unfinished">语言:</translation>
+    </message>
+    <message>
+        <source>Tour cycle time:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1336,6 +1407,14 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Toggle Sync</source>
         <translation type="unfinished">切换同步</translation>
     </message>
+    <message>
+        <source>F1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add camera...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnAutoTester</name>
@@ -1360,6 +1439,51 @@ For easy instructions on how to install or update your video driver, follow inst
         <source>Test for resource substring &apos;%1&apos; failed.
 </source>
         <translation type="unfinished">资源子字符串&apos;%1&apos;测试失败</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraAdditionDialog</name>
+    <message>
+        <source>Storage path must not be empty.</source>
+        <translation type="unfinished">存储路径不能为空</translation>
+    </message>
+    <message>
+        <source>Space limit must be a non-negative integer.</source>
+        <translation type="unfinished">空间限制必须是非负整数</translation>
+    </message>
+    <message>
+        <source>Invalid storage path</source>
+        <translation type="unfinished">无效存储路径</translation>
+    </message>
+    <message>
+        <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
+        <translation type="unfinished">存储路径&apos;%1&apos;无效或无法写入</translation>
+    </message>
+    <message>
+        <source>Can&apos;t verify storage path</source>
+        <translation type="unfinished">无法验证存储路径</translation>
+    </message>
+    <message>
+        <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
+        <translation type="unfinished">无法验证存储路径&apos;%1&apos;。无法建立与存储服务器的连接。</translation>
+    </message>
+    <message>
+        <source>Not enough disk space</source>
+        <translation type="unfinished">没有足够的硬盘空间</translation>
+    </message>
+    <message>
+        <source>Storage &apos;1&apos;
+You have less storage space available than reserved free space value. Additional 2Gb are required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low space for archive</source>
+        <translation type="unfinished">存档空间小</translation>
+    </message>
+    <message>
+        <source>Storage &apos;%1&apos;
+You have only 2Gb left for video archive.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2537,7 +2661,6 @@ AVAILABLE</source>
         <source>Are you sure you want to permanently delete these %n file(s)?</source>
         <translation type="unfinished">
             <numerusform>确认要永久删除这些%n文件？</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>
@@ -2548,7 +2671,6 @@ AVAILABLE</source>
         <source>Are you sure you want to remove these %n item(s) from layout?</source>
         <translation type="unfinished">
             <numerusform>确认要从视窗中删除这些%n条目？</numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message>

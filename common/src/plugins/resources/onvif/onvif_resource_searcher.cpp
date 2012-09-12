@@ -33,7 +33,7 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth)
 {
     return QnResourcePtr(0);
 }
