@@ -51,7 +51,7 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
         resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
         resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
         QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resource->getTypeId());
-        resultByteArray.append(QString("<url>%1</manufacture>\n").arg(resourceType->getManufacture()));
+        resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getManufacture()));
         resultByteArray.append("</resource>\n");
     }
     resultByteArray.append("</root>\n");
@@ -80,7 +80,7 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
             auth.setUser(param.second);
         else if (param.first == "password")
             auth.setPassword(param.second);
-        else if (param.first == "manufacture")
+        else if (param.first == "manufacturer")
             resType = param.second;
     }
     if (url.isEmpty())
@@ -113,9 +113,14 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
         return searchAction(params, resultByteArray, contentType);
     else if (action == "add")
         return addAction(params, resultByteArray, contentType);
-
+    else {
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append("Action not found\n");
+        resultByteArray.append("<root>\n");
+        return CODE_NOT_FOUND;
+    }
 }
-
 
 int QnManualCameraAdditionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {

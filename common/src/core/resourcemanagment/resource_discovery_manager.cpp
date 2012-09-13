@@ -655,7 +655,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     foreach(QHostAddress addr, online)
     {
         ManualSearcherHelper t;
-        t.url = QString(QLatin1String("%1:%2")).arg(addr.toString()).arg(port);
+        t.url.setHost(addr.toString());
+        t.url.setPort(port);
         t.auth = auth;
         t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
         testList.push_back(t);
