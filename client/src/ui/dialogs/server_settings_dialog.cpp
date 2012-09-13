@@ -135,8 +135,7 @@ QnAbstractStorageResourceList QnServerSettingsDialog::tableStorages() const {
 void QnServerSettingsDialog::updateFromResources() {
     ui->nameLineEdit->setText(m_server->getName());
     ui->ipAddressLineEdit->setText(QUrl(m_server->getUrl()).host());
-    ui->apiPortLineEdit->setText(QString::number(QUrl(m_server->getApiUrl()).port()));
-    ui->rtspPortLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
+    ui->portLineEdit->setText(QString::number(QUrl(m_server->getUrl()).port()));
 
     bool panicMode = m_server->isPanicMode();
     ui->panicModeLabel->setText(panicMode ? tr("On") : tr("Off"));
