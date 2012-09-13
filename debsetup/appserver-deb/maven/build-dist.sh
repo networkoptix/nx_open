@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #. ../common.sh
-PACKAGENAME=networkoptix-entcontroller
+PACKAGENAME=${deb.customization.company.name}-entcontroller
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/entcontroller
+TARGET=/opt/${deb.customization.company.name}/entcontroller
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
@@ -15,7 +15,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization}
+STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
 PKGSTAGE=$STAGE$TARGET
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
@@ -46,8 +46,8 @@ touch $ETCSTAGE/entcontroller.conf
 
 
 # Copy upstart and sysv scripts
-install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
-install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
+install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE/${deb.customization.company.name}-entcontroller.conf
+install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization.company.name}-entcontroller
 
 
 ################ Media Proxy
@@ -60,8 +60,8 @@ cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
-install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE
-install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE
+install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE/${deb.customization.company.name}-mediaproxy.conf
+install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE/${deb.customization.company.name}-mediaproxy
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
@@ -77,4 +77,4 @@ cp debian/conffiles $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})

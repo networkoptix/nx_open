@@ -77,6 +77,7 @@
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
+#include "utils/common/synctime.h"
 
 
 
@@ -715,8 +716,8 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     menu()->trigger(Qn::OpenNewTabAction);
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged(){
-    qreal value = workbench()->currentLayout()->resource()->cellAspectRatio();
+void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
+    qreal value = workbench()->currentLayout()->cellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -724,8 +725,8 @@ void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged(){
         action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true); //default value
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged(){
-    qreal value = workbench()->currentLayout()->resource()->cellSpacing().width();
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
+    qreal value = workbench()->currentLayout()->cellSpacing().width();
 
     if (qFuzzyCompare(0.0, value))
         action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
@@ -1259,6 +1260,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
@@ -1329,6 +1332,23 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         }
 
         itemCount = period.durationMs / step;
+    }
+
+    /* Adjust for chunks. */
+    if(!periods.isEmpty()) {
+        qint64 startTime = periods[0].startTimeMs;
+
+        while(startTime > period.startTimeMs + step / 2) {
+            period.startTimeMs += step;
+            period.durationMs -= step;
+            itemCount--;
+        }
+
+        /*qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
+        while(endTime < period.startTimeMs + period.durationMs) {
+            period.durationMs -= step;
+            itemCount--
+        }*/
     }
 
     /* Calculate size of the resulting matrix. */

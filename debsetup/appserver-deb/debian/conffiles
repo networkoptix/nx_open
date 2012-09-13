@@ -1,2 +1,2 @@
-/opt/networkoptix/entcontroller/etc/entcontroller.conf
-/etc/init/networkoptix-entcontroller.conf
+/opt/${deb.customization.company.name}/entcontroller/etc/entcontroller.conf
+/etc/init/${deb.customization.company.name}-entcontroller.conf
