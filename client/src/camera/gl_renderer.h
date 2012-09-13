@@ -8,8 +8,10 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <utils/media/frame_info.h>
 #include "render_status.h"
 #include "core/resource/resource_media_layout.h"
+
 
 class CLVideoDecoderOutput;
 class QnGLRendererPrivate;
@@ -47,6 +49,8 @@ public:
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const; 
     void setForceSoftYUV(bool value);
+
+    const QGLContext* context() const;
 
 private:
     //!Draw texture to screen
@@ -135,6 +139,8 @@ private:
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS]; // TODO: get rid of this
     unsigned m_lastDisplayedFlags;
+    //!Picture data of last rendered frame
+    QSharedPointer<QnAbstractPictureData> m_prevFramePicData;
 };
 
 #endif //QN_GL_RENDERER_H

@@ -21,6 +21,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
@@ -60,7 +61,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
     setChannelLayout(m_display->videoLayout());
 
-    m_renderer = new QnResourceWidgetRenderer(channelCount());
+    const QGLWidget* viewPortAsGLWidget = qobject_cast<const QGLWidget*>(QnWorkbenchContextAware::display()->view()->viewport());
+    m_renderer = new QnResourceWidgetRenderer(
+            channelCount(),
+            NULL,
+            viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL );
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 

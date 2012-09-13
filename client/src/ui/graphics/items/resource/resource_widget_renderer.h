@@ -44,6 +44,8 @@ public:
 
     QSize sourceSize() const;
 
+    const QGLContext* glContext() const;
+
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
@@ -64,6 +66,8 @@ private:
 
     /** Current screen size of a single channel, in pixels. */
     QSize m_channelScreenSize;
+
+    const QGLContext* m_glContext;
 };
 
 #endif // QN_DISPLAY_WIDGET_RENDERER_H

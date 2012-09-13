@@ -44,6 +44,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -221,7 +222,6 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(common_custom);
     Q_INIT_RESOURCE(common_generated);
 
-
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -283,6 +283,9 @@ int main(int argc, char *argv[])
                 return 0;
         }
     }
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance( QString::fromAscii("./") );
 
     /* Initialize connections. */
     initAppServerConnection();
@@ -400,8 +403,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    mainWindow->showFullScreen();
+#ifdef Q_WS_X11
     mainWindow->show();
+#else
+    mainWindow->showFullScreen();
+#endif
         
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -462,6 +468,3 @@ int main(int argc, char *argv[])
 }
 #endif // API_TEST_MAIN
 #endif
-
-
-

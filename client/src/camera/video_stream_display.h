@@ -1,9 +1,10 @@
 #ifndef QN_VIDEO_STREAM_DISPLAY_H
 #define QN_VIDEO_STREAM_DISPLAY_H
 
-
 #include "decoders/video/abstractdecoder.h"
 #include "decoders/frame_scaler.h"
+#include "../ui/workbench/workbench_context_aware.h"
+
 
 class QnAbstractVideoDecoder;
 struct QnCompressedVideoData;
@@ -12,7 +13,6 @@ class QnBufferedFrameDisplayer;
 
 static const int MAX_FRAME_QUEUE_SIZE = 12;
 static const int MAX_QUEUE_TIME = 1000 * 200;
-
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -91,6 +91,7 @@ private:
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
+
 private:
     float m_speed;
     bool m_queueWasFilled;

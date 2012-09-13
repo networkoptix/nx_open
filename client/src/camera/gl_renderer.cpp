@@ -1,7 +1,6 @@
 #include "gl_renderer.h"
 
 #include <cassert>
-#include <iostream>
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QScopedPointer>
@@ -417,6 +416,11 @@ void QnGLRenderer::setForceSoftYUV(bool value)
     m_forceSoftYUV = value;
 }
 
+const QGLContext* QnGLRenderer::context() const
+{
+	return m_context;
+}
+
 qreal QnGLRenderer::opacity() const
 {
     return m_painterOpacity;
@@ -555,7 +559,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -569,7 +573,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -583,7 +587,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -632,11 +636,19 @@ void QnGLRenderer::drawVideoTextureDirectly(
 	const QVector2D& tex0Coords,
 	const float* v_array )
 {
+    cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
+
+//    float tx_array[8] = {
+//        0.0f, 0.0f,
+//        tex0Coords.x(), 0.0f,
+//        tex0Coords.x(), tex0Coords.y(),
+//        0.0f, tex0Coords.y()
+//    };
     float tx_array[8] = {
         0.0f, 0.0f,
-        tex0Coords.x(), 0.0f,
-        tex0Coords.x(), tex0Coords.y(),
-        0.0f, tex0Coords.y()
+        1, 0.0f,
+        1, 1,
+        0.0f, 1
     };
 
     glEnable(GL_TEXTURE_2D);
@@ -749,7 +761,7 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
     }
     m_newtexture = false;
 
-    bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
+    const bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
     if( !draw )
     {
         result = Qn::CannotRender;
@@ -758,13 +770,20 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
     {
         QRectF temp(r);
         const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
-        if( m_curImg && m_curImg->picData.data() && (m_curImg->picData.data()->type() == QnAbstractPictureData::pstOpenGL) )
+        if( m_curImg && m_curImg->picData && (m_curImg->picData.data()->type() == QnAbstractPictureData::pstOpenGL) )
         {
-        	std::cout<<"drawVideoTextureDirectly\n";
         	drawVideoTextureDirectly(
            		static_cast<const QnOpenGLPictureData*>(m_curImg->picData.data())->glTexture(),
            		texture(0)->texCoords(),
            		v_array );
+        	m_prevFramePicData = m_curImg->picData;
+        }
+        else if( m_prevFramePicData && (m_prevFramePicData.data()->type() == QnAbstractPictureData::pstOpenGL) )
+        {
+            drawVideoTextureDirectly(
+                static_cast<const QnOpenGLPictureData*>(m_prevFramePicData.data())->glTexture(),
+                texture(0)->texCoords(),
+                v_array );
         }
         else
         {

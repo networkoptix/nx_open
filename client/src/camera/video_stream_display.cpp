@@ -1,3 +1,4 @@
+
 #include "video_stream_display.h"
 #include "decoders/video/abstractdecoder.h"
 #include "utils/common/util.h"
@@ -7,6 +8,7 @@
 #include "gl_renderer.h"
 #include "buffered_frame_displayer.h"
 #include "ui/graphics/opengl/gl_functions.h"
+#include "ui/graphics/items/resource/resource_widget_renderer.h"
 
 
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
@@ -357,7 +359,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     QnAbstractVideoDecoder* dec = m_decoder[data->compressionType];
     if (dec == 0)
     {
-        dec = CLVideoDecoderFactory::createDecoder(data, enableFrameQueue);
+        const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(m_drawer);
+        dec = CLVideoDecoderFactory::createDecoder(
+                data,
+                enableFrameQueue,
+                widgetRenderer ? widgetRenderer->glContext() : NULL );
         dec->setLightCpuMode(m_decodeMode);
         m_decoder.insert(data->compressionType, dec);
     }
