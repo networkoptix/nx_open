@@ -277,7 +277,7 @@ bool QnPlOnvifResource::initInternal()
         return false;
     }
 
-    m_timeDrift = calcTimeDrift();
+    calcTimeDrift();
     /*
     if (!isSoapAuthorized()) 
     {
@@ -527,7 +527,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QString password = auth.password();
     
     //Trying to get name
-    /*
+    if (getName().isEmpty())
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
@@ -543,11 +543,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         } 
         else
         {
-            // TODO: Sergey G. Don't change camera name! User is possible changed it already by hand.
-            // setName((response.Manufacturer + " - " + response.Model).c_str());
+            setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
         }
     }
-    */
 
     //Trying to get onvif URLs
     {
@@ -839,7 +837,7 @@ int QnPlOnvifResource::getTimeDrift() const
     return m_timeDrift;
 }
 
-int QnPlOnvifResource::calcTimeDrift() const 
+void QnPlOnvifResource::calcTimeDrift()
 {
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), "", "", 0);
 
@@ -854,9 +852,8 @@ int QnPlOnvifResource::calcTimeDrift() const
 
         QDateTime datetime(QDate(date->Year, date->Month, date->Day), QTime(time->Hour, time->Minute, time->Second), Qt::UTC);
         int drift = datetime.toMSecsSinceEpoch()/1000 - QDateTime::currentMSecsSinceEpoch()/1000;
-        return drift;
+        m_timeDrift = drift;
     }
-    return 0;
 }
 
 QString QnPlOnvifResource::getMediaUrl() const 

@@ -15,7 +15,7 @@ public:
     // returns all available devices
     virtual QnResourceList findResources();
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth, int port);
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;

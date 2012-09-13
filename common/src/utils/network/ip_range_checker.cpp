@@ -9,6 +9,7 @@ struct QnIprangeCheckerHelper
 
     quint32 ip;
     bool online;
+    QHostAddress discoveryAddress;
 
     void check()
     {
@@ -20,6 +21,8 @@ struct QnIprangeCheckerHelper
         CLHttpStatus status = http.doGET(QByteArray(""));
         if (status != CL_TRANSPORT_ERROR) 
         {
+            discoveryAddress = http.getLocalHost();
+            QString gg = discoveryAddress.toString();
             online = true;
         }
 

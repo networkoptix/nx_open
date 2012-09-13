@@ -547,7 +547,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/manualAddcams", new QnManualCameraAdditionHandler());
+    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);

@@ -26,6 +26,9 @@ public:
     bool isAudioEnabled() const;
     void setAudioEnabled(bool value);
 
+    bool isManuallyAdded() const;
+    void setManuallyAdded(bool value);
+
     // TODO: move to QnSecurityCamResource
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
@@ -40,6 +43,7 @@ signals:
 private:
     bool m_scheduleDisabled;
     bool m_audioEnabled;
+    bool m_manuallyAdded;
     bool m_advancedWorking;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
