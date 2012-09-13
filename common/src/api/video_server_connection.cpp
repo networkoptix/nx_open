@@ -375,10 +375,27 @@ int QnVideoServerConnection::asyncGetManualCameraSearch(QObject *target, const c
     params << QnRequestParam("password", password);
     params << QnRequestParam("port" ,QString::number(port));
 
-    detail::VideoServerSessionManagerSearchCamerasRequestReplyProcessor *processor = new detail::VideoServerSessionManagerSearchCamerasRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    detail::VideoServerManualCameraRequestReplyProcessor *processor = new detail::VideoServerManualCameraRequestReplyProcessor();
+    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), params, processor, SLOT(at_searchReplyReceived(int, QByteArray, QByteArray, int)));
 }
+
+int QnVideoServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
+                                                     const QStringList &urls, const QString &manufacturer, const QString &username, const QString &password){
+    QnRequestParamList params;
+    foreach(QString url, urls){
+        params << QnRequestParam("url", url);
+    }
+    params << QnRequestParam("manufacturer", manufacturer);
+    params << QnRequestParam("user", username);
+    params << QnRequestParam("password", password);
+
+    detail::VideoServerManualCameraRequestReplyProcessor *processor = new detail::VideoServerManualCameraRequestReplyProcessor();
+    connect(processor, SIGNAL(finishedAdd(int)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/add"), params, processor, SLOT(at_addReplyReceived(int, QByteArray, QByteArray, int)));
+}
+
+
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle) 
 {
@@ -508,7 +525,7 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     deleteLater();
 }
 
-void detail::VideoServerSessionManagerSearchCamerasRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+void detail::VideoServerManualCameraRequestReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
     Q_UNUSED(errorString)
     Q_UNUSED(handle)
 
@@ -530,7 +547,15 @@ void detail::VideoServerSessionManagerSearchCamerasRequestReplyProcessor::at_rep
         } while (resource.length() > 0);
     }
 
-    emit finished(result);
+    emit finishedSearch(result);
+    deleteLater();
+}
+
+void detail::VideoServerManualCameraRequestReplyProcessor::at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+    Q_UNUSED(errorString)
+    Q_UNUSED(handle)
+    Q_UNUSED(reply)
+    emit finishedAdd(status);
     deleteLater();
 }
 

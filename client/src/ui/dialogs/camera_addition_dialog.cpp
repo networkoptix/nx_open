@@ -8,6 +8,50 @@
 
 #include <core/resource/video_server_resource.h>
 
+namespace{
+    class ManualCameraReplyProcessor: public QObject
+    {
+        Q_OBJECT
+    public:
+
+        ManualCameraReplyProcessor(QObject *parent = NULL):
+            QObject(parent),
+            m_cancelled(false)
+        {}
+
+        QnCamerasFoundInfoList camerasFound() const {
+            return m_cameras;
+        }
+
+    signals:
+        void replyReceived();
+
+    public slots:
+        void processSearchReply(const QnCamerasFoundInfoList &cameras)
+        {
+            if (m_cancelled)
+                return;
+
+            m_cameras = cameras;
+            qDebug() << "data received count" << cameras.count();
+            emit replyReceived();
+        }
+
+        void processAddReply(int status){
+            emit replyReceived();
+        }
+
+        void cancel(){
+            m_cancelled = true;
+            qDebug() << "request cancelled";
+        }
+
+    private:
+        QnCamerasFoundInfoList m_cameras;
+        bool m_cancelled;
+    };
+}
+
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -140,13 +184,13 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
-    QScopedPointer<detail::CheckCamerasFoundReplyProcessor> processor(new detail::CheckCamerasFoundReplyProcessor());
+    QScopedPointer<ManualCameraReplyProcessor> processor(new ManualCameraReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-    serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processReply(const QnCamerasFoundInfoList &)),
+    serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
                                                  startAddr, endAddr, username, password, port);
 
     eventLoop->exec();
@@ -164,15 +208,18 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
 void QnCameraAdditionDialog::at_addButton_clicked(){
 
+    QString username(ui->loginLineEdit->text());
+    QString password(ui->passwordLineEdit->text());
+
     QStringList urls;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
-        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked);
+        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
             continue;
 
         //QnCamerasFoundInfo info = ui->camerasTable->item(row, 0)->data(Qt::UserRole);
         //qDebug() << "output info item checked" << info.name << info.manufacture << info.url;
-        //urls.append(QString(ui->camerasTable->item(row, 0)->data(Qt::UserRole)));
+        urls.append(QString(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString()));
     }
 
     ui->buttonBox->setEnabled(false);
@@ -182,14 +229,14 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
-  //  QScopedPointer<detail::CheckCamerasFoundReplyProcessor> processor(new detail::CheckCamerasFoundReplyProcessor());
-  //  connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
+    QScopedPointer<ManualCameraReplyProcessor> processor(new ManualCameraReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
     connect(ui->stopAddButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
-  //    connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
+    connect(ui->stopAddButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
- //   QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
- //   serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processReply(const QnCamerasFoundInfoList &)),
- //                                                         startAddr, endAddr, username, password, port);
+    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
+                                              urls, QString(), username, password);
 
     eventLoop->exec();
 
