@@ -716,8 +716,8 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
     menu()->trigger(Qn::OpenNewTabAction);
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged(){
-    qreal value = workbench()->currentLayout()->resource()->cellAspectRatio();
+void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
+    qreal value = workbench()->currentLayout()->cellAspectRatio();
 
     if (qFuzzyCompare(4.0 / 3.0, value))
         action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
@@ -725,8 +725,8 @@ void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged(){
         action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true); //default value
 }
 
-void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged(){
-    qreal value = workbench()->currentLayout()->resource()->cellSpacing().width();
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
+    qreal value = workbench()->currentLayout()->cellSpacing().width();
 
     if (qFuzzyCompare(0.0, value))
         action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
