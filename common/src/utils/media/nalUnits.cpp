@@ -834,6 +834,7 @@ SliceUnit::SliceUnit():NALUnit() {
 #endif
 	memory_management_control_operation = 0;
     m_fullHeaderLen = 0;
+    disable_deblocking_filter_idc = 0;
 }
 
 int SliceUnit::deserialize(const SPSUnit* sps,const PPSUnit* pps)

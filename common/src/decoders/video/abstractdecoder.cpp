@@ -26,7 +26,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
 
 		case AUTO:
 		{
-            //TODO/IMPL searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
+            //searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
             QnAbstractVideoDecoderPlugin* videoDecoderPlugin = NULL;
             const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
             foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
@@ -39,7 +39,6 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
             if( videoDecoderPlugin )
             {
                 QnAbstractVideoDecoder* decoder = videoDecoderPlugin->create( data->compressionType, data, glContext );
-                //QnAbstractVideoDecoder* decoder = new QnXVBADecoder( glContext, data );
                 if( decoder && decoder->isHardwareAccelerationEnabled() )
                     return decoder;
                 delete decoder;
@@ -49,7 +48,12 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
 
         case FFMPEG:
         default:
+        {
+            QnAbstractVideoDecoder* decoder = new QnXVBADecoder( glContext, data );
+            if( decoder && decoder->isHardwareAccelerationEnabled() )
+                return decoder;
             return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding );
+        }
     }
 
     return NULL;

@@ -21,13 +21,18 @@
 //
 #define USE_SOURCE_BUFFER
 //#define SAVE_DECODED_FRAME_TO_FILE
-//#define DUMP_DECODER_INPUT
+#define DUMP_DECODER_INPUT
 #ifdef DUMP_DECODER_INPUT
 //#define DUMP_BY_SLICES
 #endif
 //#define IGNORE_BUT_FIRST_SLICE
 //#define IGNORE_BUT_LAST_SLICE
 //#define JOIN_SLICES
+//!Hack for Digital Watchdog camera. Decoder ignores second slice which 16 pix in height (one macroblock), since this slice is not properly decoded by XVBA
+#define DROP_SMALL_SECOND_SLICE
+#ifdef DROP_SMALL_SECOND_SLICE
+static const int MAX_MACROBLOCK_LINES_TO_IGNORE = 1;
+#endif
 
 #if defined(JOIN_SLICES) && defined(USE_SOURCE_BUFFER)
 #error "JOIN_SLICES and USE_SOURCE_BUFFER cannot be defined at the same time"
@@ -41,6 +46,9 @@
 #error "JOIN_SLICES and IGNORE_BUT_LAST_SLICE cannot be defined at the same time"
 #endif
 
+
+//TODO/IMPL store static information about currently used decoding bandwidth (fps, produced pixels per second)
+//TODO/IMPL make glContext shared between QnXVBADecoder, working in one thread
 
 QGLContextDuplicate::~QGLContextDuplicate()
 {
@@ -239,6 +247,13 @@ QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompres
 #ifdef XVBA_TEST
     ,m_hardwareAccelerationEnabled( false )
 #endif
+#ifdef DROP_SMALL_SECOND_SLICE
+    ,m_checkForDroppableSecondSlice( true )
+    ,m_mbLinesToIgnore(0)
+#else
+    ,m_checkForDroppableSecondSlice( false )
+    ,m_mbLinesToIgnore(0)
+#endif
 {
     cl_log.log( QString::fromAscii("Initializing XVBA decoder"), cl_logDEBUG1 );
 
@@ -350,10 +365,28 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     if( !m_decodeSession && !createDecodeSession() )
         return false;
 
+    XVBABufferDescriptor* pictureDescriptionBufferDescriptor = getDecodeBuffer( XVBA_PICTURE_DESCRIPTION_BUFFER );
+    bool analyzeSrcDataResult = false;
+    std::vector<XVBABufferDescriptor*> decodeCtrlBuffers;
+    if( pictureDescriptionBufferDescriptor )
+    {
+        memcpy( pictureDescriptionBufferDescriptor->bufferXVBA, &m_pictureDescriptor, sizeof(m_pictureDescriptor) );
+        pictureDescriptionBufferDescriptor->data_size_in_buffer = sizeof(m_pictureDescriptor);
+        m_pictureDescriptorBufArray[0] = pictureDescriptionBufferDescriptor;
+        m_pictureDescriptorDecodeInput.num_of_buffers_in_list = 1;
+
+        analyzeSrcDataResult = analyzeInputBufSlices(
+            data,
+            static_cast<XVBAPictureDescriptor*>(pictureDescriptionBufferDescriptor->bufferXVBA),
+            &decodeCtrlBuffers );
+    }
+
     //checking, if one of surfaces is done already
     QSharedPointer<XVBASurfaceContext> targetSurfaceCtx;
     QSharedPointer<XVBASurfaceContext> decodedPicSurface;
-    checkSurfaces( &targetSurfaceCtx, &decodedPicSurface );
+    checkSurfaces(
+        analyzeSrcDataResult ? &targetSurfaceCtx : NULL,    //could not find any slice in input data ? no need to create surface
+        &decodedPicSurface );
     Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
 
     if( decodedPicSurface )
@@ -362,6 +395,23 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         //copying picture to output
     	fillOutputFrame( outFrame, decodedPicSurface );
         decodedPicSurface->state = XVBASurfaceContext::renderingInProgress;
+    }
+
+    if( !pictureDescriptionBufferDescriptor )
+    {
+        cl_log.log( QString::fromAscii("QnXVBADecoder. No XVBA_PICTURE_DESCRIPTION_BUFFER buffer"), cl_logERROR );
+        return decodedPicSurface != NULL;
+    }
+
+    if( !analyzeSrcDataResult )
+    {
+        cl_log.log( QString::fromAscii("QnXVBADecoder. Could not find slice in source data"), cl_logWARNING );
+        std::for_each(
+            decodeCtrlBuffers.begin(),
+            decodeCtrlBuffers.end(),
+            std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+        ungetBuffer( pictureDescriptionBufferDescriptor );
+        return decodedPicSurface != NULL;
     }
 
     if( !targetSurfaceCtx )
@@ -375,17 +425,17 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
 
     //TODO/IMPL in case of interlaced video, possibly we'll have to split incoming frame to two fields
 
-    XVBABufferDescriptor* pictureDescriptionBufferDescriptor = getDecodeBuffer( XVBA_PICTURE_DESCRIPTION_BUFFER );
-    if( !pictureDescriptionBufferDescriptor )
-    {
-        cl_log.log( QString::fromAscii("QnXVBADecoder. No XVBA_PICTURE_DESCRIPTION_BUFFER buffer"), cl_logERROR );
-        return decodedPicSurface != NULL;
-    }
-	memcpy( pictureDescriptionBufferDescriptor->bufferXVBA, &m_pictureDescriptor, sizeof(m_pictureDescriptor) );
-	pictureDescriptionBufferDescriptor->data_size_in_buffer = sizeof(m_pictureDescriptor);
+//    XVBABufferDescriptor* pictureDescriptionBufferDescriptor = getDecodeBuffer( XVBA_PICTURE_DESCRIPTION_BUFFER );
+//    if( !pictureDescriptionBufferDescriptor )
+//    {
+//        cl_log.log( QString::fromAscii("QnXVBADecoder. No XVBA_PICTURE_DESCRIPTION_BUFFER buffer"), cl_logERROR );
+//        return decodedPicSurface != NULL;
+//    }
+//	memcpy( pictureDescriptionBufferDescriptor->bufferXVBA, &m_pictureDescriptor, sizeof(m_pictureDescriptor) );
+//	pictureDescriptionBufferDescriptor->data_size_in_buffer = sizeof(m_pictureDescriptor);
     targetSurfaceCtx->usedDecodeBuffers.push_back( pictureDescriptionBufferDescriptor );
-    m_pictureDescriptorBufArray[0] = pictureDescriptionBufferDescriptor;
-    m_pictureDescriptorDecodeInput.num_of_buffers_in_list = 1;
+//    m_pictureDescriptorBufArray[0] = pictureDescriptionBufferDescriptor;
+//    m_pictureDescriptorDecodeInput.num_of_buffers_in_list = 1;
 
 	XVBABufferDescriptor* qmBufferDescriptor = getDecodeBuffer( XVBA_QM_BUFFER );
     if( !qmBufferDescriptor )
@@ -452,19 +502,20 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     dataBufferDescriptor->data_size_in_buffer += 2;
 #endif
 
-    if( !analyzeInputBufSlices(
-    		data,
-    		static_cast<XVBAPictureDescriptor*>(pictureDescriptionBufferDescriptor->bufferXVBA),
-            &targetSurfaceCtx->usedDecodeBuffers ) )
-    {
-        cl_log.log( QString::fromAscii("QnXVBADecoder. Could not find slice in source data"), cl_logWARNING );
-        std::for_each(
-        	targetSurfaceCtx->usedDecodeBuffers.begin(),
-        	targetSurfaceCtx->usedDecodeBuffers.end(),
-        	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
-        targetSurfaceCtx->usedDecodeBuffers.clear();
-        return decodedPicSurface != NULL;
-    }
+//    if( !analyzeInputBufSlices(
+//    		data,
+//    		static_cast<XVBAPictureDescriptor*>(pictureDescriptionBufferDescriptor->bufferXVBA),
+//            &targetSurfaceCtx->usedDecodeBuffers ) )
+//    {
+//        cl_log.log( QString::fromAscii("QnXVBADecoder. Could not find slice in source data"), cl_logWARNING );
+//        std::for_each(
+//        	targetSurfaceCtx->usedDecodeBuffers.begin(),
+//        	targetSurfaceCtx->usedDecodeBuffers.end(),
+//        	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+//        targetSurfaceCtx->usedDecodeBuffers.clear();
+//        return decodedPicSurface != NULL;
+//    }
+    std::copy( decodeCtrlBuffers.begin(), decodeCtrlBuffers.end(), std::back_inserter(targetSurfaceCtx->usedDecodeBuffers) );
 
 #if defined(IGNORE_BUT_FIRST_SLICE) || defined(IGNORE_BUT_LAST_SLICE)
     if( targetSurfaceCtx->usedDecodeBuffers.size() - (buffersBeforeDataBuffer+1) > 1 )
@@ -492,6 +543,12 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     if( m_prevOperationStatus != Success )
     {
         cl_log.log( QString::fromAscii("QnXVBADecoder. Could not start picture decoding. %1").arg(lastErrorText()), cl_logERROR );
+        std::for_each(
+            targetSurfaceCtx->usedDecodeBuffers.begin(),
+            targetSurfaceCtx->usedDecodeBuffers.end(),
+            std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
+        targetSurfaceCtx->usedDecodeBuffers.clear();
+        destroyXVBASession();   //destroying session, since in case of such error usually we experience system lock-up in video driver
         return decodedPicSurface != NULL;
     }
 
@@ -505,7 +562,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         	targetSurfaceCtx->usedDecodeBuffers.end(),
         	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
         targetSurfaceCtx->usedDecodeBuffers.clear();
-        destroyXVBASession();   //destroying session, since in case of such error usually we
+        destroyXVBASession();   //destroying session, since in case of such error usually we experience system lock-up in video driver
         return decodedPicSurface != NULL;
     }
 
@@ -712,6 +769,7 @@ bool QnXVBADecoder::createDecodeSession()
     {
         in.width = m_sps.pic_width_in_mbs*16;
         in.height = m_sps.pic_height_in_map_units*16;
+        cl_log.log( QString::fromAscii("Creating XVBA decode session for pic %1x%2").arg(in.width).arg(in.height), cl_logDEBUG1 );
     }
     else
     {
@@ -929,7 +987,9 @@ bool QnXVBADecoder::createSurface()
     }
 
     m_commonSurfaces.push_back( QSharedPointer<XVBASurfaceContext>( new XVBASurfaceContext( NULL, 0, out.surface ) ) );
-    cl_log.log( QString::fromAscii("XVBA surface created successfully. Total surface count: %1" ).arg(m_commonSurfaces.size()), cl_logDEBUG1 );
+    cl_log.log( QString::fromAscii("XVBA surface (%1x%2) created successfully. Total surface count: %3" ).
+                arg(in.width).arg(in.height).
+                arg(m_commonSurfaces.size()), cl_logDEBUG1 );
     return true;
 }
 
@@ -990,6 +1050,10 @@ bool QnXVBADecoder::analyzeInputBufSlices(
 {
     const size_t sizeBak = dataCtrlBuffers->size();
 
+#ifdef DROP_SMALL_SECOND_SLICE
+    bool mayEstablishSecondSliceDropping = false;
+#endif
+    int analyzedSliceCount = 0;
     //searching for a first slice
     const quint8* dataEnd = reinterpret_cast<const quint8*>(data->data.data()) + data->data.size();
     for( const quint8
@@ -1011,11 +1075,19 @@ bool QnXVBADecoder::analyzeInputBufSlices(
         switch( *curNalu & 0x1f )
         {
 			case nuSPS:
-				readSPS( curNalu, curNaluEnd );
-				break;
+                readSPS( curNalu, curNaluEnd );
+#ifdef DROP_SMALL_SECOND_SLICE
+                if( mayEstablishSecondSliceDropping )
+                {
+                    //checking here to avoid double decrement (in readSPS() and at the end of this method)
+                    pictureDescriptor->height_in_mb = m_pictureDescriptor.height_in_mb;
+                    mayEstablishSecondSliceDropping = false;
+                }
+#endif
+                break;
 
 			case nuPPS:
-				readPPS( curNalu, curNaluEnd );
+                readPPS( curNalu, curNaluEnd );
 				break;
 
 			case nuSliceNonIDR:
@@ -1027,13 +1099,17 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 slice.deserialize( &m_sps, &m_pps );
                 calcH264POC( &slice );
                 if( slice.slice_type == SliceUnit::B_TYPE )
+                {
+                    ++analyzedSliceCount;
                     break;
+                }
+
+                //cl_log.log( QString::fromAscii("Found slice. disable_deblocking_filter_idc = %1").arg(slice.disable_deblocking_filter_idc), cl_logDEBUG1 );
 
                 //parsing slice_header
                 pictureDescriptor->picture_structure = pictureDescriptor->sps_info.avc.frame_mbs_only_flag || (slice.m_field_pic_flag == 0)
                     ? 3  //3 = Frame
                     : slice.bottom_field_flag;  //1 = Bottom field, 0 = Top field
-//                pictureDescriptor->picture_structure = 3;
 
                 pictureDescriptor->avc_frame_num = slice.frame_num;
                 //std::cout<<"Found slice pic_struct = "<<pictureDescriptor->picture_structure<<", slice.frame_num = "<<slice.frame_num<<"\n";
@@ -1044,12 +1120,28 @@ bool QnXVBADecoder::analyzeInputBufSlices(
 //                pictureDescriptor->avc_curr_field_order_cnt_list[1] = slice.frame_num * 2;    //BottomFieldOrderCnt
                 pictureDescriptor->avc_intra_flag = slice.slice_type == SliceUnit::I_TYPE ? 1 : 0;    //I - frame. Supposing, that only I frames are intra coded
                 pictureDescriptor->avc_reference = slice.nal_ref_idc > 0 ? 1 : 0;
+
+#ifdef DROP_SMALL_SECOND_SLICE
+                if( m_checkForDroppableSecondSlice && (analyzedSliceCount == 1) )
+                {
+                    //assuming source buf contains full AU
+                    if( (slice.first_mb_in_slice % m_sps.pic_width_in_mbs == 0) &&  //slice contains integer number of lines
+                        (m_sps.pic_height_in_map_units - slice.first_mb_in_slice / m_sps.pic_width_in_mbs <= MAX_MACROBLOCK_LINES_TO_IGNORE) )
+                    {
+                        mayEstablishSecondSliceDropping = true;
+                        m_checkForDroppableSecondSlice = false;
+                        m_mbLinesToIgnore = m_sps.pic_height_in_map_units - slice.first_mb_in_slice / m_sps.pic_width_in_mbs;
+                        cl_log.log( QString::fromAscii("QnXVBADecoder. Establishing dropping of %1 bottom mb line(s)").arg(m_mbLinesToIgnore), cl_logDEBUG1 );
+                    }
+                }
+#endif
             }
 
 			case nuSliceB:
             case nuSliceC:
             case nuSliceWithoutPartitioning:
             {
+                ++analyzedSliceCount;
                 XVBABufferDescriptor* dataCtrlBufferDescriptor = getDecodeBuffer( XVBA_DATA_CTRL_BUFFER );
                 if( !dataCtrlBufferDescriptor )
                 {
@@ -1063,7 +1155,7 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 dataCtrlBuffer->SliceBitsInBuffer = dataCtrlBuffer->SliceBytesInBuffer << 3;
 
                 cl_log.log( QString::fromAscii( "Found NAL (%1) at %2, %3 bytes long. Total buffer %4 bytes" ).
-                		arg(*curNalu & 0x1f).arg(dataCtrlBuffer->SliceDataLocation).arg(dataCtrlBuffer->SliceBytesInBuffer).arg(data->data.size()), cl_logDEBUG1 );
+                		arg(*curNalu & 0x1f).arg(dataCtrlBuffer->SliceDataLocation).arg(dataCtrlBuffer->SliceBytesInBuffer).arg(data->data.size()), cl_logDEBUG2 );
 
                 dataCtrlBuffers->push_back( dataCtrlBufferDescriptor );
                 break;
@@ -1073,6 +1165,15 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 continue;
         }
     }
+
+#ifdef DROP_SMALL_SECOND_SLICE
+    if( mayEstablishSecondSliceDropping )
+    {
+        m_sps.pic_height_in_map_units -= m_mbLinesToIgnore;
+        pictureDescriptor->height_in_mb -= m_mbLinesToIgnore;
+        m_pictureDescriptor.height_in_mb -= m_mbLinesToIgnore;
+    }
+#endif
 
     return dataCtrlBuffers->size() > sizeBak;
 }
@@ -1087,7 +1188,7 @@ void QnXVBADecoder::checkSurfaces( QSharedPointer<XVBASurfaceContext>* const tar
         switch( (*it)->state )
         {
             case XVBASurfaceContext::ready:
-                if( !*targetSurfaceCtx )
+                if( targetSurfaceCtx && !*targetSurfaceCtx )
                     *targetSurfaceCtx = *it;
                 break;
 
@@ -1192,7 +1293,7 @@ void QnXVBADecoder::checkSurfaces( QSharedPointer<XVBASurfaceContext>* const tar
     }
 #endif
 
-    if( !*targetSurfaceCtx && (m_commonSurfaces.size() < MAX_SURFACE_COUNT) && createSurface() )
+    if( targetSurfaceCtx && !*targetSurfaceCtx && (m_commonSurfaces.size() < MAX_SURFACE_COUNT) && createSurface() )
         *targetSurfaceCtx = m_commonSurfaces.back();
 }
 
@@ -1450,7 +1551,7 @@ XVBABufferDescriptor* QnXVBADecoder::getDecodeBuffer( XVBA_BUFFER bufferType )
     out.buffer_list->data_offset = 0;
 
     cl_log.log( QString::fromAscii("QnXVBADecoder. Allocated xvba decode buffer of type %1, size %2").
-        arg(bufferType).arg(out.buffer_list->buffer_size), cl_logDEBUG1 );
+        arg(bufferType).arg(out.buffer_list->buffer_size), cl_logDEBUG2 );
 
     m_xvbaDecodeBuffers.push_back( make_pair( out.buffer_list, false ) );
 
@@ -1479,7 +1580,13 @@ void QnXVBADecoder::readSPS( const quint8* curNalu, const quint8* nextNalu )
 	m_sps.decodeBuffer( curNalu, nextNalu );
 	m_sps.deserialize();
 
-	m_pictureDescriptor.profile = h264ProfileIdcToXVBAProfile( m_sps.profile_idc );
+    //--m_sps.pic_height_in_map_units;
+#ifdef DROP_SMALL_SECOND_SLICE
+    cl_log.log( QString::fromAscii("QnXVBADecoder::readSPS. Decreasing sps.pic_height_in_map_units by %1").arg(m_mbLinesToIgnore), cl_logDEBUG1 );
+    m_sps.pic_height_in_map_units -= m_mbLinesToIgnore;
+#endif
+
+    m_pictureDescriptor.profile = h264ProfileIdcToXVBAProfile( m_sps.profile_idc );
 	m_pictureDescriptor.level = m_sps.level_idc;
 	m_pictureDescriptor.width_in_mb = m_sps.pic_width_in_mbs;
 	m_pictureDescriptor.height_in_mb = m_sps.pic_height_in_map_units;

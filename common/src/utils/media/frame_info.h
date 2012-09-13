@@ -48,8 +48,6 @@ public:
 
     virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstOpenGL; }
 
-    //!Returns context of texture
-//    virtual GLXContext glContext() const;
     //!Returns OGL texture name
     virtual unsigned int glTexture() const;
 

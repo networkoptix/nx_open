@@ -34,6 +34,7 @@ public:
     /*!
         \param codecID Codec type
         \param data Access unit of media stream. MUST contain sequence header (sps & pps in case of h.264)
+        \note QnAbstractVideoDecoder::decode method of created object MUST be called from same thread that called this method
     */
     virtual QnAbstractVideoDecoder* create(
             CodecID codecID,

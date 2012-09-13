@@ -74,8 +74,6 @@ public:
     To use it system MUST have Radeon graphics card installed and AMD proprietary driver.
 
     After object creation, one MUST check \a isHardwareAccelerationEnabled(). If it returns \a false, usage of the \a XVBADecoder object is prohibited (it will trigger an assert in decode)
-
-    \todo Support rendering to memory surface
 */
 class QnXVBADecoder
 :
@@ -237,6 +235,9 @@ private:
 #ifdef XVBA_TEST
     bool m_hardwareAccelerationEnabled;
 #endif
+    //!See comment to \a DROP_SMALL_SECOND_SLICE macro
+    bool m_checkForDroppableSecondSlice;
+    int m_mbLinesToIgnore;
 
     //!Creates XVBA context
     /*!

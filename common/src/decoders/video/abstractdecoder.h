@@ -90,7 +90,16 @@ public:
         AUTO
     };
 
-    static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding, const QGLContext* glContext = NULL );
+    /*!
+        \param data Packet of source data. MUST contain media stream sequence header
+        \param mtDecoding This hint tells that decoder is allowed (not have to) to perform multi-threaded decoding
+        \param glContext OpenGL context used to draw to screen. Decoder, that renders pictures directly to opengl texture,
+            MUST be aware of application gl context to create textures shared with this context
+    */
+    static QnAbstractVideoDecoder* createDecoder(
+            const QnCompressedVideoDataPtr data,
+            bool mtDecoding,
+            const QGLContext* glContext = NULL );
     static void setCodecManufacture( CLCodecManufacture codecman )
     {
         m_codecManufacture = codecman;

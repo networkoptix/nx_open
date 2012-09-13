@@ -30,6 +30,9 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
         const QnCompressedVideoDataPtr& data,
         const QGLContext* const glContext ) const
 {
+    //TODO/IMPL check, if can decode new stream with XVBA
+    //max decoded pixel count = 1928*1080*30fps
+
     return new QnXVBADecoder( glContext, data );
 }
 
