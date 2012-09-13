@@ -84,6 +84,7 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         checkItem->setData(Qt::UserRole, info.url);
 
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
+        nameItem->setData(Qt::UserRole, info.manufacturer);
 
         ui->camerasTable->setItem(row, 0, checkItem);
         ui->camerasTable->setItem(row, 1, nameItem);
@@ -168,6 +169,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     QString password(ui->passwordLineEdit->text());
 
     QStringList urls;
+    QStringList manufacturers;
     int rowCount = ui->camerasTable->rowCount();
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
@@ -175,7 +177,8 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
         //QnCamerasFoundInfo info = ui->camerasTable->item(row, 0)->data(Qt::UserRole);
         //qDebug() << "output info item checked" << info.name << info.manufacture << info.url;
-        urls.append(QString(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString()));
+        urls.append(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString());
+        manufacturers.append(ui->camerasTable->item(row, 1)->data(Qt::UserRole).toString());
     }
 
     ui->buttonBox->setEnabled(false);
@@ -192,7 +195,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
-                                              urls, QString(), username, password);
+                                              urls, manufacturers, username, password);
 
     eventLoop->exec();
 
@@ -200,6 +203,12 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
     ui->searchPage->setEnabled(true);
-//    ui->camerasGroupBox->setVisible(true);
+
+    if (!processor->isCancelled()){
+        if (processor->addSuccess())
+            QMessageBox::information(this, tr("Success"), tr("Camera(s) added successfully"), QMessageBox::Ok);
+        else
+            QMessageBox::critical(this, tr("Error"), tr("Error while adding camera(s)"), QMessageBox::Ok);
+    }
 }
 

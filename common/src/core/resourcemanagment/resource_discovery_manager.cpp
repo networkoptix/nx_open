@@ -46,6 +46,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_ready(false)
 
 {
+    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)));
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -286,9 +287,6 @@ QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
 {
-    if (resources.isEmpty())
-        return false;
-
     QMutexLocker lock(&m_searchersListMutex);
 
     CLNetState netState;
@@ -903,6 +901,14 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
     QtConcurrent::blockingMap(checkLst, &check_if_accessible_STRUCT::f);
     for (int i = 0; i < threads; ++i )global->reserveThread();
 #endif //_DEBUG
+}
+
+void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
+{
+    QMutexLocker lock(&m_searchersListMutex);
+    QnManualCamerasMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
+    if (itr != m_manualCameraMap.end() && itr.value().resType->getId() == resource->getTypeId())
+        m_manualCameraMap.erase(itr);
 }
 
 //====================================================================================

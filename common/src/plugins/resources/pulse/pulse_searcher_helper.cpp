@@ -1,7 +1,6 @@
 #include "pulse_searcher_helper.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
-#include "utils/qtsoap/qtsoap.h"
 #include "utils/network/mac_address.h"
 #include "../pulse/pulse_resource.h"
 

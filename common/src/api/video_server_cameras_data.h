@@ -8,14 +8,14 @@
 struct QnCamerasFoundInfo
 {
     QnCamerasFoundInfo(){}
-    QnCamerasFoundInfo(QString _url, QString _name, QString _manufacture):
+    QnCamerasFoundInfo(QString _url, QString _name, QString _manufacturer):
         url(_url),
         name(_name),
-        manufacture(_manufacture)
+        manufacturer(_manufacturer)
     {}
     QString url;
     QString name;
-    QString manufacture;
+    QString manufacturer;
 };
 typedef QList<QnCamerasFoundInfo> QnCamerasFoundInfoList;
 
