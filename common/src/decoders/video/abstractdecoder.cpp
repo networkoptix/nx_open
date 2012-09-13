@@ -38,10 +38,9 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
             }
             if( videoDecoderPlugin )
             {
-                QnAbstractVideoDecoder* decoder = videoDecoderPlugin->create( data->compressionType, data, glContext );
-                if( decoder && decoder->isHardwareAccelerationEnabled() )
-                    return decoder;
-                delete decoder;
+                std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext ) );
+                if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
+                    return decoder.release();
             }
             cl_log.log( QString::fromAscii("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
 		}

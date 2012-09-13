@@ -2,6 +2,8 @@
 // 22 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
+#ifdef Q_OS_LINUX
+
 #include "xvbadecoderplugin.h"
 
 #include "xvbadecoder.h"
@@ -37,3 +39,5 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
 }
 
 Q_EXPORT_PLUGIN2( xvbaplugin, QnXVBADecoderPlugin );
+
+#endif

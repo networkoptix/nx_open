@@ -2,6 +2,8 @@
 // 15 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
+#ifdef Q_OS_LINUX
+
 #include <QDebug>
 
 #include "xvbadecoder.h"
@@ -2022,3 +2024,5 @@ int QnXVBADecoder::h264ProfileIdcToXVBAProfile( int profile_idc )
             return 3;	//high
     }
 }
+
+#endif

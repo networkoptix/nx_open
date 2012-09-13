@@ -2,6 +2,8 @@
 // 22 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
+#ifdef Q_OS_LINUX
+
 #ifndef XVBADECODERPLUGIN_H
 #define XVBADECODERPLUGIN_H
 
@@ -32,3 +34,5 @@ public:
 };
 
 #endif  //XVBADECODERPLUGIN_H
+
+#endif

@@ -1,6 +1,8 @@
 #ifndef clabstractvideodecoder_h_2155
 #define clabstractvideodecoder_h_2155
 
+#include <QGLContext>
+
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/frame_info.h"
 
