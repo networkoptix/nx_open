@@ -21,6 +21,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
         return new IPPH264Decoder();
         break;
 
+#ifndef _DEBUG
     case INTEL_QUICK_SYNC:
     {
         QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder();
@@ -28,13 +29,14 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
         return decoder;
     }
 #endif
+#endif
 
     case FFMPEG:
     default:
-#if defined(_WIN32) && defined(_DEBUG)
+#if defined(_WIN32) && !defined(_DEBUG)
         return new QuickSyncVideoDecoder();
 #else
-        //return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
+        return new CLFFmpegVideoDecoder(data->compressionType, data, mtDecoding);
 #endif
     }
 

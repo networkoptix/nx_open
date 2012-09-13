@@ -5,9 +5,13 @@
 
 #include "quicksyncvideodecoder.h"
 
+#ifndef _DEBUG
+
 //#include <Windows.h>
 
 #include <iostream>
+
+#include "../../utils/media/nalunits.h"
 
 #ifdef _WIN32
 #endif
@@ -218,6 +222,9 @@ static const AVRational INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION = {1, 90000};
 
 bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
 {
+    if( !m_initialized )
+        readSequenceHeader( data );
+
     mfxBitstream inputStream;
     memset( &inputStream, 0, sizeof(inputStream) );
     //inputStream.TimeStamp = av_rescale_q( data->timestamp, SRC_DATA_TMESTAMP_RESOLUTION, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION );
@@ -806,3 +813,101 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, mfxFr
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_BFF || 
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_REPEATED;
 }
+
+
+bool QuickSyncVideoDecoder::readSequenceHeader( const QnCompressedVideoDataPtr& data )
+{
+    SPSUnit m_sps;
+    PPSUnit m_pps;
+
+
+
+    if( data->data.size() <= 4 )
+        return false;
+
+    //memset( &m_pictureDescriptor, 0, sizeof(m_pictureDescriptor) );
+
+    std::cout<<"Parsing seq header "<<data->data.size()<<"\n";
+    
+    bool spsFound = false;
+    bool ppsFound = false;
+    const quint8* dataEnd = reinterpret_cast<const quint8*>(data->data.data()) + data->data.size();
+    for( const quint8
+         *curNalu = NALUnit::findNextNAL( reinterpret_cast<const quint8*>(data->data.data()), dataEnd ),
+         *nextNalu = NULL;
+         curNalu < dataEnd;
+         curNalu = nextNalu )
+    {
+        nextNalu = NALUnit::findNextNAL( curNalu, dataEnd );
+        Q_ASSERT( nextNalu > curNalu );
+        switch( *curNalu & 0x1f )
+        {
+            case nuSPS:
+            {
+                std::cout<<"Parsing sps\n";
+                m_sps.decodeBuffer( curNalu, nextNalu );
+                m_sps.deserialize();
+                spsFound = true;
+
+                //m_pictureDescriptor.profile = m_sps.profile_idc;
+                //m_pictureDescriptor.level = m_sps.level_idc;
+                //m_pictureDescriptor.width_in_mb = m_sps.pic_width_in_mbs;
+                //m_pictureDescriptor.height_in_mb = m_sps.pic_height_in_map_units;
+                //m_pictureDescriptor.sps_info.avc.residual_colour_transform_flag = m_sps.residual_colour_transform_flag;
+                //m_pictureDescriptor.sps_info.avc.delta_pic_always_zero_flag = m_sps.delta_pic_order_always_zero_flag;
+                //m_pictureDescriptor.sps_info.avc.gaps_in_frame_num_value_allowed_flag = m_sps.gaps_in_frame_num_value_allowed_flag;
+                //m_pictureDescriptor.sps_info.avc.frame_mbs_only_flag = m_sps.frame_mbs_only_flag;
+                //m_pictureDescriptor.sps_info.avc.mb_adaptive_frame_field_flag = m_sps.mb_adaptive_frame_field_flag;
+                //m_pictureDescriptor.sps_info.avc.direct_8x8_inference_flag = m_sps.direct_8x8_inference_flag;
+
+                //m_pictureDescriptor.chroma_format = m_sps.chroma_format_idc;
+                //m_pictureDescriptor.avc_bit_depth_luma_minus8 = m_sps.bit_depth_luma - 8;
+                //m_pictureDescriptor.avc_bit_depth_chroma_minus8 = m_sps.bit_depth_chroma - 8;
+                //m_pictureDescriptor.avc_log2_max_frame_num_minus4 = m_sps.log2_max_frame_num - 4;
+
+                //m_pictureDescriptor.avc_pic_order_cnt_type = m_sps.pic_order_cnt_type;
+                //m_pictureDescriptor.avc_log2_max_pic_order_cnt_lsb_minus4 = m_sps.log2_max_pic_order_cnt_lsb;
+                //m_pictureDescriptor.avc_num_ref_frames = m_sps.num_ref_frames;
+                break;
+            }
+
+            case nuPPS:
+            {
+                std::cout<<"Parsing pps\n";
+                m_pps.decodeBuffer( curNalu, nextNalu );
+                m_pps.deserialize();
+                ppsFound = true;
+
+                //m_pictureDescriptor.avc_num_slice_groups_minus1 = m_pps.num_slice_groups_minus1;
+                //m_pictureDescriptor.avc_slice_group_map_type = m_pps.slice_group_map_type;
+                //m_pictureDescriptor.avc_num_ref_idx_l0_active_minus1 = m_pps.num_ref_idx_l0_active_minus1;
+                //m_pictureDescriptor.avc_num_ref_idx_l1_active_minus1 = m_pps.num_ref_idx_l1_active_minus1;
+
+                //m_pictureDescriptor.avc_pic_init_qp_minus26 = m_pps.pic_init_qp_minus26;
+                //m_pictureDescriptor.avc_pic_init_qs_minus26 = m_pps.pic_init_qs_minus26;
+                //m_pictureDescriptor.avc_chroma_qp_index_offset = m_pps.chroma_qp_index_offset;
+                //m_pictureDescriptor.avc_second_chroma_qp_index_offset = m_pps.second_chroma_qp_index_offset;
+
+                //m_pictureDescriptor.avc_slice_group_change_rate_minus1 = m_pps.slice_group_change_rate - 1;
+
+                //m_pictureDescriptor.pps_info.avc.entropy_coding_mode_flag = m_pps.entropy_coding_mode_flag;
+                //m_pictureDescriptor.pps_info.avc.pic_order_present_flag = m_pps.pic_order_present_flag;
+                //m_pictureDescriptor.pps_info.avc.weighted_pred_flag = m_pps.weighted_pred_flag;
+                //m_pictureDescriptor.pps_info.avc.weighted_bipred_idc = m_pps.weighted_bipred_idc;
+                //m_pictureDescriptor.pps_info.avc.deblocking_filter_control_present_flag = m_pps.deblocking_filter_control_present_flag;
+                //m_pictureDescriptor.pps_info.avc.constrained_intra_pred_flag = m_pps.constrained_intra_pred_flag;
+                //m_pictureDescriptor.pps_info.avc.redundant_pic_cnt_present_flag = m_pps.redundant_pic_cnt_present_flag;
+                //m_pictureDescriptor.pps_info.avc.transform_8x8_mode_flag = m_pps.transform_8x8_mode_flag;
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+
+    return spsFound && ppsFound;
+}
+
+
+#endif

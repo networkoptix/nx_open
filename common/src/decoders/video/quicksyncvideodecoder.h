@@ -6,6 +6,8 @@
 #ifndef QUICKSYNCVIDEODECODER_H
 #define QUICKSYNCVIDEODECODER_H
 
+#ifndef _DEBUG
+
 #include <fstream>
 #include <vector>
 
@@ -129,6 +131,9 @@ private:
     mfxFrameSurface1* findUnlockedSurface( std::vector<mfxFrameSurface1>* const surfacePool );
     bool processingNeeded() const;
     void saveToAVFrame( CLVideoDecoderOutput* outFrame, mfxFrameSurface1* decodedFrame );
+    bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
 };
+
+#endif  //_DEBUG
 
 #endif  //QUICKSYNCVIDEODECODER_H

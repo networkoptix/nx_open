@@ -209,6 +209,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 #include <fstream>
 #include "../../common/src/decoders/video/quicksyncvideodecoder.h"
 
+#ifndef _DEBUG
 int testQuickSyncDecoder()
 {
     //static const char* TEST_FILE_NAME = "c:/content/test.mpv";
@@ -244,6 +245,7 @@ int testQuickSyncDecoder()
     }
     return 0;
 }
+#endif
 
 int main(int argc, char *argv[])
 {
