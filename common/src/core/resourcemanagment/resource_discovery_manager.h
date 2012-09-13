@@ -2,11 +2,26 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <QtCore/QThread>
+#include <QAuthenticator>
 #include "utils/common/longrunnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
 
+class QnAbstractResourceSearcher;
+
+struct QnManualCameraInfo
+{
+    QnManualCameraInfo(const QHostAddress& addr, int port, const QAuthenticator& auth, const QString& resType);
+    QnResourcePtr checkHostAddr() const;
+
+    QHostAddress addr;
+    int port;
+    QnResourceTypePtr resType;
+    QAuthenticator auth;
+    QnAbstractResourceSearcher* searcher;
+};
+typedef QMap<quint32, QnManualCameraInfo> QnManualCamerasMap;
 
 class QnAbstractResourceSearcher;
 
@@ -17,9 +32,10 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
 {
     Q_OBJECT;
 
+public:
+
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-public:
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager& instance();
@@ -43,8 +59,8 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr);
-
+    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port);
+    bool registerManualCameras(const QnManualCamerasMap& cameras);
 protected:
     QnResourceDiscoveryManager();
 
@@ -58,7 +74,7 @@ private:
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
-    QnResourceList findNewResources(bool *ip_finished);
+    QnResourceList findNewResources();
 
     void check_if_accessible(QnResourceList& justfoundList, int threads);
 
@@ -72,11 +88,12 @@ private:
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(QnResourcePtr res);
-
+    void appendManualDiscoveredResources(QnResourceList& resources);
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
+    QnManualCamerasMap m_manualCameraMap;
 
     CLNetState m_netState;
 

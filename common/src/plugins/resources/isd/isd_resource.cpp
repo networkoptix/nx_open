@@ -157,7 +157,7 @@ bool QnPlIsdResource::initInternal()
         setStatus(Unauthorized);
         return false;
     }
-    /**/
+    */
 
 
     QByteArray fpses = downloadFile(status, QLatin1String("api/param.cgi?req=VideoInput.1.h264.1.FrameRateList"),  getHostAddress(), 80, 3000, getAuth());

@@ -32,8 +32,15 @@ public slots:
 private:
     void testSettings();
 
+    /**
+     * Updates ui elements depending of the test result
+     *
+     * \param success - Status of the connection test
+     */
+    void updateUi(bool success);
+
 private:
-    Q_DISABLE_COPY(QnConnectionTestingDialog);
+    Q_DISABLE_COPY(QnConnectionTestingDialog)
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
     QTimer m_timeoutTimer;

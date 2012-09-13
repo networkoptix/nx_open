@@ -185,6 +185,16 @@ signals:
      */
     void itemChanged(Qn::ItemRole role);
 
+    /**
+     * This signal is emitted whenever current cell aspect ratio changes.
+     */
+    void cellAspectRatioChanged();
+
+    /**
+     * This signal is emitted whenever current cell spacing changes.
+     */
+    void cellSpacingChanged();
+
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);

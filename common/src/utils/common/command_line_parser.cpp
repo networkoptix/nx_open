@@ -7,6 +7,35 @@
 
 #include <utils/common/warnings.h>
 
+void QnCommandLineParameter::init(void *target, QnMetaHandler *targetHandler, int type, const QString &longName, const QString &shortName, const QString &description, const QVariant &impliedValue) {
+    m_target = target;
+    m_targetHandler = QSharedPointer<QnMetaHandler>(targetHandler);
+    m_type = type;
+    m_longName = longName;
+    m_shortName = shortName;
+    m_description = description;
+
+    if(impliedValue.userType() == qMetaTypeId<QnCommandLineDefaultImpliedValue>()) {
+        if(m_type == QMetaType::Bool) {
+            m_impliedValue = true; /* Default for booleans. */
+        } else {
+            m_impliedValue = QVariant();
+        }
+    } else {
+        m_impliedValue = impliedValue;
+
+        if(m_impliedValue.isValid()) {
+            if(m_impliedValue.canConvert(static_cast<QVariant::Type>(m_type))) {
+                m_impliedValue.convert(static_cast<QVariant::Type>(m_type));
+            } else {
+                qnWarning("Type of the implied value of command line parameter '%1' does not match parameter's type.", longName);
+                m_impliedValue = QVariant();
+            }
+        }
+    }
+}
+
+
 void QnCommandLineParser::addParameter(const QnCommandLineParameter &parameter) {
     int index = m_parameters.size();
     m_parameters.push_back(parameter);

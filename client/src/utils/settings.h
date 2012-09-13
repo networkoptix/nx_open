@@ -49,11 +49,13 @@ public:
         DOWNMIX_AUDIO,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
-        BACKGROUND_ANIMATED,
-        BACKGROUND_COLOR,
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
-        
+
+        BACKGROUND_EDITABLE,
+        BACKGROUND_ANIMATED,
+        BACKGROUND_COLOR,
+
         DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
@@ -62,9 +64,8 @@ public:
 
         EXTRA_TRANSLATIONS_PATH,
         TRANSLATION_PATH,
-        FLIP_ICONS,
 
-        TOUR_STEP_DURATION,
+        TOUR_CYCLE_TIME,
 
         VARIABLE_COUNT
     };
@@ -91,6 +92,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
+        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
         QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
         QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
@@ -101,13 +103,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
-        QN_DECLARE_RW_PROPERTY(int,                     tourStepDuration,       setTourStepDuration,        TOUR_STEP_DURATION,         4000)
-
-#ifdef Q_WS_X11
-        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 true)
-#else
-        QN_DECLARE_RW_PROPERTY(bool,                    isIconsFlipped,         setIconsFlipped,            FLIP_ICONS,                 false)
-#endif
+        QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
     QN_END_PROPERTY_STORAGE()
 
 private:

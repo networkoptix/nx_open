@@ -1140,9 +1140,10 @@ bool MaintenanceHardSystemFactoryDefaultOperation::set(const CameraSetting& /*in
 // class OnvifCameraSetting: public CameraSetting
 // 
 
-OnvifCameraSetting::OnvifCameraSetting(const OnvifCameraSettingOperationAbstract& operation, const QString& id,
-        const QString& name, WIDGET_TYPE type, const QString& query, const QString& description, const CameraSettingValue min,
-        const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
+OnvifCameraSetting::OnvifCameraSetting(
+        const OnvifCameraSettingOperationAbstract& operation, const QString& id, const QString& name, 
+        WIDGET_TYPE type, const QString& query, const QString& description, 
+        const CameraSettingValue min, const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
     CameraSetting(id, name, type, query, description, min, max, step, current),
     m_operation(&operation)
 {
@@ -1206,6 +1207,7 @@ void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QStr
     QString id = value.getId();
     QHash<QString, OnvifCameraSettingOperationAbstract*>::ConstIterator it;
 
+    CameraSetting currentSetting;
     switch(value.getType())
     {
     case CameraSetting::OnOff: case CameraSetting::MinMaxStep: case CameraSetting::Enumeration: case CameraSetting::TextField: case CameraSetting::ControlButtonsPair:
@@ -1214,8 +1216,11 @@ void OnvifCameraSettingReader::paramFound(const CameraSetting& value, const QStr
                 //Operations must be defined for all settings
                 Q_ASSERT(false);
             }
-            m_settings.getCameraSettings().insert(id, OnvifCameraSetting(*(it.value()), id, value.getName(),
-                value.getType(), value.getQuery(), value.getDescription(), value.getMin(), value.getMax(), value.getStep()));
+            it.value()->get(currentSetting, m_settings);
+            m_settings.getCameraSettings().insert(id, 
+                OnvifCameraSetting(*(it.value()), id, value.getName(),
+                value.getType(), value.getQuery(), value.getDescription(), 
+                value.getMin(), value.getMax(), value.getStep(), currentSetting.getCurrent()));
             return;
 
         case CameraSetting::Button:

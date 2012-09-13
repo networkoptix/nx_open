@@ -59,7 +59,7 @@ m_forceSliceDecoding(-1)
     QMutexLocker mutex(&global_ffmpeg_mutex);
     if (data->context)
     {
-        m_passedContext = avcodec_alloc_context3(findCodec(m_codecId));
+        m_passedContext = avcodec_alloc_context3(0);
         avcodec_copy_context(m_passedContext, data->context->ctx());
     }
     
@@ -159,7 +159,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 {
     m_codec = findCodec(m_codecId);
 
-    m_context = avcodec_alloc_context3(m_codec);
+    m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
@@ -230,13 +230,13 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //closeDecoder();
     //openDecoder();
     //return;
-
+    
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     if (m_context->codec)
         avcodec_close(m_context);
 
     av_free(m_context);
-    m_context = avcodec_alloc_context3(m_codec);
+    m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 
     if (m_passedContext) {
         avcodec_copy_context(m_context, m_passedContext);
@@ -246,7 +246,9 @@ void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
     //m_context->thread_type = m_mtDecoding ? FF_THREAD_FRAME : FF_THREAD_SLICE;
     // ensure that it is H.264 with nal prefixes
     m_checkH264ResolutionChange = m_mtDecoding && m_context->codec_id == CODEC_ID_H264 && (!m_context->extradata_size || m_context->extradata[0] == 0); 
+
     avcodec_open2(m_context, m_codec, NULL);
+
     //m_context->debug |= FF_DEBUG_THREADS;
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_motionMap.clear();
@@ -391,7 +393,7 @@ bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDe
     if(m_context->codec)
     {
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-        if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice))
+        for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
             avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
     }
 

@@ -66,8 +66,9 @@ QString QnPlIqResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
+    Q_UNUSED(addr)
     return QnResourcePtr(0);
 }
 

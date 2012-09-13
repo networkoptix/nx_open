@@ -270,10 +270,14 @@ void QnWorkbench::at_layout_cellAspectRatioChanged() {
     qreal unit = qnGlobals->workbenchUnitSize();
 
     m_mapper->setCellSize(unit, unit / m_currentLayout->cellAspectRatio());
+
+    emit cellAspectRatioChanged();
 }
 
 void QnWorkbench::at_layout_cellSpacingChanged() {
     qreal unit = qnGlobals->workbenchUnitSize();
 
     m_mapper->setSpacing(m_currentLayout->cellSpacing() * unit);
+
+    emit cellSpacingChanged();
 }

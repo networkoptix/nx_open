@@ -224,7 +224,12 @@ private:
 
         if (m_headIndex > 0 && m_bufferLen > 0 && newSize > oldSize)
         {
-            int tailIndex = (m_headIndex + m_bufferLen) % oldSize;
+            int tailIndex = m_headIndex + m_bufferLen;
+            if (tailIndex > oldSize)
+                tailIndex -= oldSize;
+            else
+                return; // no correction is needed
+
             int delta = newSize-oldSize;
 
             for (int i = 0; i < delta && i < tailIndex; ++i)

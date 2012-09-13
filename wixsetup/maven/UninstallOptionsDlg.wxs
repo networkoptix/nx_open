@@ -13,7 +13,7 @@
                                                     <Control Id="BannerLine" Type="Line" X="0" Y="44" Width="370" Height="2" />
                                                     <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
                                                     <Control Id="groupBox1" Type="GroupBox" Height="41" Width="346" X="9" Y="61" Text="Uninstall options" />
-                                                    <Control Id="checkBox1" Type="CheckBox" Height="18" Width="326" X="15" Y="75" Text="Remove HD Witness Database" Property="REMOVE_DATABASE" CheckBoxValue="1"/>
+                                                    <Control Id="checkBox1" Type="CheckBox" Height="18" Width="326" X="15" Y="75" Text="Remove ${product.name} Database" Property="REMOVE_DATABASE" CheckBoxValue="1"/>
                                                 </Dialog>
         </UI>
     </Fragment>

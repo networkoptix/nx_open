@@ -31,7 +31,7 @@ public:
 
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth, int port);
 };
 
 #endif // onvif_resource_searcher_h

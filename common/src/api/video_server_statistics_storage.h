@@ -57,14 +57,10 @@ public:
     void update();
 
 signals:
-    // TODO: #GDM rename to statisticsUpdated? Or statisticsChanged?
-    // at_somewhere_somethingHappened() is a name template for signal handlers,
-    // somethingHappened() --- for signals.
-
     /**
      * Signal emitted when new data is received.
      */
-    void at_statistics_processed(); //naming conventions?
+    void statisticsChanged();
 private slots:
 
     /**

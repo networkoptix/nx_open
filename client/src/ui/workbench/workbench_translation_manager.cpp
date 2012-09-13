@@ -1,4 +1,4 @@
-#include "workbench_tranlation_manager.h"
+#include "workbench_translation_manager.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QTranslator>
@@ -40,11 +40,12 @@ void QnWorkbenchTranslationManager::installTranslation(const QString &translatio
         QTranslator *commonTranslator = new QTranslator(qApp);
         if (commonTranslator->load(commonTranslationPath))
             qApp->installTranslator(commonTranslator);
-    }
 
-    if(!localeCode.isEmpty()) {
+        QString qtTranslationPath = translationPath;
+        qtTranslationPath.replace(index, 6, QLatin1String("qt"));
+
         QTranslator *qtTranslator = new QTranslator(qApp);
-        if (qtTranslator->load(QLatin1String("qt_") + localeCode + QLatin1String(".qm"))) // TODO: where should we pick these from?
+        if (qtTranslator->load(qtTranslationPath))
             qApp->installTranslator(qtTranslator);
     }
 }

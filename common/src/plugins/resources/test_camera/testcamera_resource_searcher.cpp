@@ -104,7 +104,7 @@ QString QnTestCameraResourceSearcher::manufacture() const
     return QLatin1String(QnTestCameraResource::MANUFACTURE);
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnTestCameraResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
     return QnResourcePtr(0);
 }

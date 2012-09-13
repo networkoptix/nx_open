@@ -61,6 +61,7 @@
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_rest_handler.h"
+#include "utils/common/module_resources.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -536,6 +537,39 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
         qWarning() << "Error saving server: " << errorString;
 }
 
+void QnMain::initTcpListener()
+{
+    int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+#ifdef USE_SINGLE_STREAMING_PORT
+    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFsHelperHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
+    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
+
+    m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
+    m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
+    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
+    m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    m_universalTcpListener->start();
+#else
+    int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
+    int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
+
+    m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->enableSSLMode();
+    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+    m_restServer->start();
+    m_progressiveDownloadingServer->start();
+    m_rtspListener->start();
+#endif
+}
+
 void QnMain::run()
 {
     // Create SessionManager
@@ -601,6 +635,7 @@ void QnMain::run()
     if (needToStop())
         return;
 
+
     QnResource::startCommandProc();
 
     QnResourcePool::instance(); // to initialize net state;
@@ -612,6 +647,8 @@ void QnMain::run()
     {
         appserverHost = resolveHost(appserverHostString);
     } while (appserverHost.toIPv4Address() == 0);
+
+    initTcpListener();
 
     while (m_videoServer.isNull())
     {
@@ -717,35 +754,6 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().setReady(true);
     QnResourceDiscoveryManager::instance().start();
 
-    QUrl rtspUrl(m_videoServer->getUrl());
-    QUrl apiUrl(m_videoServer->getApiUrl());
-    QUrl streamingUrl(m_videoServer->getStreamingUrl());
-
-#ifdef USE_SINGLE_STREAMING_PORT
-    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFsHelperHandler(true));
-    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
-    QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
-    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
-    QnRestConnectionProcessor::registerHandler("api/manualAddcams", new QnManualCameraAdditionHandler());
-    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
-
-    m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspUrl.port());
-    m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
-    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
-    m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
-    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
-    m_universalTcpListener->start();
-#else
-    m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingUrl.port());
-    m_progressiveDownloadingServer->enableSSLMode();
-    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-    m_restServer->start();
-    m_progressiveDownloadingServer->start();
-    m_rtspListener->start();
-#endif
 
     connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
@@ -819,10 +827,7 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
-    /* Init common resources. */
-    Q_INIT_RESOURCE(common_common);
-    Q_INIT_RESOURCE(common_custom);
-    Q_INIT_RESOURCE(common_generated);
+    QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);
 

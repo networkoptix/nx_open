@@ -360,6 +360,11 @@ namespace Qn {
         ServerSettingsAction,
 
         /**
+         * Opens manual camera addition dialog.
+         */
+        ServerAddCameraManuallyAction,
+
+        /**
          * Opens a YouTube upload dialog.
          */
         YouTubeUploadAction,

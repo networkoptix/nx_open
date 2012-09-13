@@ -33,7 +33,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_lastGopSeekTime(-1),
     m_IFrameAfterJumpFound(false),
     m_requiredJumpTime(AV_NOPTS_VALUE),
-    m_lastFrameDuration(0),
     m_BOF(false),
     m_afterBOFCounter(-1),
     m_dataMarker(0),
@@ -210,21 +209,19 @@ bool QnArchiveStreamReader::init()
     {
         while (1)
         {
-            if (m_delegate->seek(requiredJumpTime, false) > 0) 
-            {
-                m_jumpMtx.lock();
-                if (m_requiredJumpTime == requiredJumpTime) {
-                    m_requiredJumpTime = AV_NOPTS_VALUE;
-                    m_jumpMtx.unlock();
+            bool seekOk = m_delegate->seek(requiredJumpTime, false) > 0;
+            m_jumpMtx.lock();
+            if (m_requiredJumpTime == requiredJumpTime) {
+                m_requiredJumpTime = AV_NOPTS_VALUE;
+                m_jumpMtx.unlock();
+                if (seekOk)
                     emit jumpOccured(requiredJumpTime);
-                }
-                else {
-                    requiredJumpTime = m_requiredJumpTime;
-                    m_jumpMtx.unlock();
-                    continue; // race condition, jump to new position again
-                }
+                else
+                    emit jumpCanceled(requiredJumpTime);
+                break;
             }
-            break;
+            requiredJumpTime = m_requiredJumpTime; // race condition. jump again
+            m_jumpMtx.unlock();
         }
     }
 
@@ -233,7 +230,6 @@ bool QnArchiveStreamReader::init()
     m_delegate->setAudioChannel(m_selectedAudioChannel);
 
     // Alloc common resources
-    m_lastFrameDuration = 0;
 
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_SlowSource)
         emit slowSourceHint();
@@ -491,19 +487,6 @@ begin_label:
         setCurrentTime(m_currentData->timestamp);
     }
 
-    /*
-    while (m_currentData->stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << 0;
-    if (m_currentData->timestamp == AV_NOPTS_VALUE) {
-        m_lastPacketTimes[m_currentData->stream_index] += m_lastFrameDuration;
-        m_currentTime = m_lastPacketTimes[m_currentData->stream_index];
-    }
-    else {
-        m_currentTime =  m_currentData->timestamp;
-        if (m_previousTime != -1 && m_currentTime != -1 && m_currentTime > m_previousTime && m_currentTime - m_previousTime < 100*1000)
-            m_lastFrameDuration = m_currentTime - m_previousTime;
-    }
-    */
 
     if (videoData) // in case of video packet
     {
@@ -614,7 +597,7 @@ begin_label:
                         m_currentData.clear();
                         qint64 tmpVal = m_bottomIFrameTime != -1 ? m_bottomIFrameTime : m_topIFrameTime;
                         internalJumpTo(seekTime);
-                        m_bofReached = seekTime == m_delegate->startTime();
+                        m_bofReached = (seekTime == m_delegate->startTime()) || m_topIFrameTime > seekTime;
                         m_lastGopSeekTime = m_topIFrameTime; //seekTime;
                         //Q_ASSERT(m_lastGopSeekTime < DATETIME_NOW/2000ll);
                         m_topIFrameTime = tmpVal;

@@ -68,7 +68,10 @@ protected slots:
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);
+
     void at_accessRights_changed();
+    void at_advancedButton_toggled();
+
 private:
     void createAccessRightsPresets();
     void createAccessRightsAdvanced();

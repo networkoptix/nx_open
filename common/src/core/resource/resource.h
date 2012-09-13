@@ -200,6 +200,7 @@ public:
     bool isInitialized() const;
 
     virtual QnAbstractPtzController* getPtzController();
+
 signals:
     void parameterValueChanged(const QnParam &param);
     void statusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);

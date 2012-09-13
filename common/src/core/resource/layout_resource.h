@@ -56,12 +56,15 @@ public:
 
     QHash<int, QVariant> data() const;
 
+    void requestStore() { emit storeRequested(); } // TODO: hack
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
     void itemChanged(const QnLayoutItemData &item);
     void cellAspectRatioChanged();
     void cellSpacingChanged();
+    void storeRequested();
 
 protected:
     virtual void updateInner(QnResourcePtr other) override;

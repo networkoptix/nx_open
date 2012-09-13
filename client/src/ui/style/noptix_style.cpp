@@ -2,14 +2,15 @@
 
 #include <cmath> /* For std::fmod. */
 
-#include <QApplication>
-#include <QPainter>
-#include <QStyleOption>
-#include <QMenu>
-#include <QAction>
-#include <QSet>
-#include <QToolBar>
-#include <QAbstractItemView>
+#include <QtCore/QSet>
+#include <QtGui/QApplication>
+#include <QtGui/QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QStyleOption>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/QToolBar>
+#include <QtGui/QAbstractItemView>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
@@ -66,6 +67,22 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
 
 QnNoptixStyle::~QnNoptixStyle() {
     return;
+}
+
+QPixmap	QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const {
+    if(iconMode == QIcon::Disabled) {
+        QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
+        image.fill(qRgba(0, 0, 0, 0));
+
+        QPainter painter(&image);
+        painter.setOpacity(0.3);
+        painter.drawPixmap(0, 0, pixmap);
+        painter.end();
+        
+        return QPixmap::fromImage(image);
+    } else {
+        return base_type::generatedIconPixmap(iconMode, pixmap, option);
+    }
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
@@ -454,9 +471,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         grooveBodyPic = m_grooveBody;
         handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
     } else {
-        grooveBorderPic = m_skin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
     int d = grooveRect.height();

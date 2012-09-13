@@ -190,7 +190,7 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 }
 
 
-QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
     Q_UNUSED(addr)
     return QnResourcePtr(0);

@@ -15,7 +15,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 protected:
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth, int port);
     virtual QnResourceList findResources() override;
     
     void getCamerasFromDvr(QnResourceList& resources, const QString& host, int port, const QString& login, const QString& password);

@@ -14,7 +14,7 @@ public:
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth, int port);
 protected:
     // return the manufacture of the server
     virtual QString manufacture() const;

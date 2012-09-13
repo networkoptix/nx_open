@@ -161,7 +161,7 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
     Q_UNUSED(addr)
     return QnResourcePtr(0);

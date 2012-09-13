@@ -219,8 +219,11 @@ namespace Qn {
         /** Can view archives of available cameras. */
         GlobalViewArchivePermission         = 0x00000040,
 
+        /** Can view live stream of available cameras. */
+        GlobalViewLivePermission            = 0x00000080,
+
         /* Shortcuts. */
-        GlobalLiveViewerPermission          = 0,
+        GlobalLiveViewerPermission          = GlobalViewLivePermission,
         GlobalViewerPermission              = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
         GlobalAdvancedViewerPermission      = GlobalViewerPermission           | GlobalEditCamerasPermission,
         GlobalAdminPermission               = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,

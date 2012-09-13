@@ -11,6 +11,27 @@ struct SOAP_ENV__Header;
 typedef QSharedPointer<QUdpSocket> QUdpSocketPtr;
 
 
+struct CameraInfo: public EndpointAdditionalInfo
+{
+    QString onvifUrl;
+
+    CameraInfo() {}
+
+    CameraInfo(const QString& newOnvifUrl, const EndpointAdditionalInfo& additionalInfo):
+        onvifUrl(newOnvifUrl),
+        EndpointAdditionalInfo(additionalInfo)
+    {
+
+    }
+
+    CameraInfo(const CameraInfo& src) :
+    onvifUrl(src.onvifUrl),
+        EndpointAdditionalInfo(src)
+    {
+
+    }
+};
+
 class OnvifResourceSearcherWsdd
 {
     OnvifResourceSearcherWsdd();
@@ -34,6 +55,8 @@ public:
     void findResources(QnResourceList& result) const;
 
     void pleaseStop();
+
+    CameraInfo findCamera(const QHostAddress& camAddr) const;
 private:
 
     //void updateInterfacesListenSockets() const;
@@ -41,6 +64,10 @@ private:
     void findEndpoints(EndpointInfoHash& result) const;
     QStringList getAddrPrefixes(const QString& host) const;
     void fillWsddStructs(wsdd__ProbeType& probe, wsa__EndpointReferenceType& endpoint) const;
+
+    //If iface is not null, the function will perform multicast search, otherwise - unicast
+    //iface and camAddr MUST NOT be 0 at the same time
+    void findEndpointsImpl(EndpointInfoHash& result, const QnInterfaceAndAddr* iface, const QHostAddress* camAddr = 0) const;
 
     template <class T> QString getAppropriateAddress(const T* source, const QStringList& prefixes) const;
     template <class T> QString getName(const T* source) const;

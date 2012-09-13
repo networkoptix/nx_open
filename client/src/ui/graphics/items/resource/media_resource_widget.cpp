@@ -58,6 +58,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     m_display = new QnResourceDisplay(m_resource, this);
     connect(m_resource.data(), SIGNAL(resourceChanged()), this, SLOT(at_resource_resourceChanged()));
     connect(m_display->camDisplay(), SIGNAL(stillImageChanged()), this, SLOT(updateButtonsVisibility()));
+    connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
     m_renderer = new QnResourceWidgetRenderer(channelCount());
@@ -109,6 +110,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     buttonBar()->addButton(ZoomInButton, zoomInButton);
     buttonBar()->addButton(ZoomOutButton, zoomOutButton);
     updateButtonsVisibility();
+    at_camDisplay_liveChanged();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -451,9 +453,9 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
     QnVirtualCameraResource::CameraCapabilities capabilities = m_camera->getCameraCapabilities();
     if(capabilities & QnVirtualCameraResource::HasPtz) {
         if(qFuzzyIsNull(zoomSpeed)) {
-            m_connection->asyncPtzStop(m_camera, this, SLOT(at_ptzReplyReceived(int, int)));
+            m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
         } else {
-            m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_ptzReplyReceived(int, int)));
+            m_connection->asyncPtzMove(m_camera, 0.0, 0.0, zoomSpeed, this, SLOT(at_replyReceived(int, int)));
         }
     } else if(capabilities & QnVirtualCameraResource::HasZoom) {
         CameraSetting setting(
@@ -483,6 +485,7 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
         m_connection->asyncSetParam(m_camera, params, this, SLOT(at_replyReceived(int, const QList<QPair<QString, bool> > &)));
     }
 }
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -610,6 +613,14 @@ void QnMediaResourceWidget::at_resource_resourceChanged() {
 
 void QnMediaResourceWidget::at_renderer_sourceSizeChanged(const QSize &size) {
     setAspectRatio(static_cast<qreal>(size.width() * channelLayout()->width()) / (size.height() * channelLayout()->height()));
+}
+
+void QnMediaResourceWidget::at_camDisplay_liveChanged() {
+    bool isLive = m_display->camDisplay()->isRealTimeSource();
+
+    if(!isLive)
+        buttonBar()->setButtonsChecked(PtzButton | ZoomInButton | ZoomOutButton, false);
+    buttonBar()->setButtonsEnabled(PtzButton | ZoomInButton | ZoomOutButton, isLive);
 }
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
