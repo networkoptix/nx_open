@@ -64,6 +64,18 @@ QString QnVideoServerResource::getApiUrl() const
     return m_apiUrl;
 }
 
+void QnVideoServerResource::setStreamingUrl(const QString& value)
+{
+    QMutexLocker lock(&m_mutex);
+    m_streamingUrl = value;
+}
+
+QString QnVideoServerResource::getStreamingUrl() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_streamingUrl;
+}
+
 void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
@@ -107,7 +119,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override {
-        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1));
+        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1U));
     }
 };
 
@@ -211,6 +223,7 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         m_reserve = localOther->m_reserve;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
+        m_streamingUrl = localOther->getStreamingUrl();
 
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
         
@@ -227,7 +240,6 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
         }
 
         setStorages(otherStorages);
-        determineOptimalNetIF();
     }
     determineOptimalNetIF();
 }

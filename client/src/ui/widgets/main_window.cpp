@@ -131,7 +131,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up model & control machinery. */
-    display()->setStreamsSynchronized(true, DATETIME_NOW, 1.0);
     display()->setScene(scene);
     display()->setView(m_view);
     display()->setNormalMarginFlags(Qn::MarginsAffectSize | Qn::MarginsAffectPosition);
@@ -142,7 +141,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
 
     /* Set up handlers. */
-    QnWorkbenchActionHandler *actionHandler = context->handler<QnWorkbenchActionHandler>();
+    QnWorkbenchActionHandler *actionHandler = context->instance<QnWorkbenchActionHandler>();
     actionHandler->setWidget(this);
 
 
@@ -174,7 +173,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(Qn::MainMenuAction),     SIGNAL(triggered()),                            this,                                   SLOT(at_mainMenuAction_triggered()));
 
     menu()->setTargetProvider(m_ui);
 
@@ -197,7 +195,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
      * main menu is updated. However, menu buttons do not activate their corresponding 
      * actions as they do not receive release events. We work this around by making
      * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::DarkMainMenuAction), 1.5);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
     m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
 
     disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
@@ -222,6 +220,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addStretch(0x1000);
+    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
+    m_titleLayout->addSpacing(6);
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
@@ -245,9 +245,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Open single tab. */
     action(Qn::OpenNewTabAction)->trigger();
-
-
-    connect(action(Qn::IncrementDebugCounterAction), SIGNAL(triggered()), this, SLOT(test()));
 }
 
 QnMainWindow::~QnMainWindow() {
@@ -520,6 +517,9 @@ bool QnMainWindow::winEvent(MSG *message, long *result)
 #endif
 
 Qt::WindowFrameSection QnMainWindow::windowFrameSectionAt(const QPoint &pos) const {
+    if(isFullScreen())
+        return Qt::NoSection;
+
     Qt::WindowFrameSection result = Qn::toNaturalQtFrameSection(Qn::calculateRectangularFrameSections(rect(), QnGeometry::eroded(rect(), m_frameMargins), QRect(pos, pos)));
     if((m_options & TitleBarDraggable) && result == Qt::NoSection && pos.y() <= m_tabBar->mapTo(const_cast<QnMainWindow *>(this), m_tabBar->rect().bottomRight()).y())
         result = Qt::TitleBarArea;
@@ -559,19 +559,3 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
-void QnMainWindow::at_mainMenuAction_triggered() {
-    if(!m_mainMenuButton->isVisible())
-        return;
-
-    const char *inShowMenuPropertyName = "_qn_inShowMenu";
-
-    QMenu *menu = m_mainMenuButton->defaultAction()->menu();
-    if(m_mainMenuButton->property(inShowMenuPropertyName).toBool()) {
-        if(menu)
-            menu->hide();
-    } else {
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, true);
-        m_mainMenuButton->click(); /* This call starts event loop. */
-        m_mainMenuButton->setProperty(inShowMenuPropertyName, false);
-    }
-}

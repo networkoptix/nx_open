@@ -43,8 +43,8 @@ signals:
 protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
-    void at_widget_displayFlagsChanged(QnResourceWidget *widget, int displayFlags);
-    void at_widget_displayFlagsChanged();
+    void at_widget_optionsChanged(QnResourceWidget *widget, int options);
+    void at_widget_optionsChanged();
 
 private:
     QSet<QnResourceWidget *> m_widgets;

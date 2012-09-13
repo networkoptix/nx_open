@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #. ../common.sh
-PACKAGENAME=networkoptix-mediaserver
+PACKAGENAME=${deb.customization.company.name}-mediaserver
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/mediaserver
+TARGET=/opt/${deb.customization.company.name}/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
@@ -13,15 +13,15 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
+STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 ETCSTAGE=$STAGE$ETCTARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-SERVER_BIN_PATH=${project.build.directory}/bin
-SERVER_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
+SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
+SERVER_LIB_PATH=${libdir}/build/bin/${build.configuration}
 	
 . $SERVER_BIN_PATH/env.sh
 
@@ -40,18 +40,11 @@ install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
 install -m 755 bin/mediaserver $BINSTAGE
 
 # Copy upstart and sysv script
-install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE
-install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
+install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE/${deb.customization.company.name}-mediaserver.conf
+install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE/${deb.customization.company.name}-mediaserver
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
-cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
@@ -67,4 +60,4 @@ cp debian/templates $STAGE/DEBIAN
 
 sudo chown -R root:root $STAGEBASE
 
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization})

@@ -1,20 +1,21 @@
 #include "workbench_context.h"
 
 #include <utils/common/warnings.h>
+#include <utils/settings.h>
+
+#include <api/video_server_statistics_manager.h>
+
 #include <core/resourcemanagment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 
-#include "utils/settings.h"
-
-#include "watchers/workbench_user_watcher.h"
-
-#include "workbench.h"
-#include "workbench_synchronizer.h"
-#include "workbench_layout_snapshot_manager.h"
-#include "workbench_access_controller.h"
-#include "workbench_display.h"
-#include "workbench_navigator.h"
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_synchronizer.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/watchers/workbench_user_watcher.h>
 
 QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent):
     QObject(parent)
@@ -27,7 +28,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     m_resourcePool = resourcePool;
     m_workbench.reset(new QnWorkbench(this));
     
-    m_userWatcher = watcher<QnWorkbenchUserWatcher>();
+    m_userWatcher = instance<QnWorkbenchUserWatcher>();
     connect(m_resourcePool, SIGNAL(aboutToBeDestroyed()),                   this,   SLOT(at_resourcePool_aboutToBeDestroyed()));
     connect(m_userWatcher,    SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SIGNAL(userChanged(const QnUserResourcePtr &)));
 

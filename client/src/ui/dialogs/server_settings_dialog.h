@@ -75,7 +75,7 @@ private:
     void setTableStorages(const QnAbstractStorageResourceList &storages);
     QnAbstractStorageResourceList tableStorages() const;
 
-    bool validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString);
+    bool validateStorages(const QnAbstractStorageResourceList &storages);
 
     void updateSpaceLimitCell(int row, bool force = false);
 

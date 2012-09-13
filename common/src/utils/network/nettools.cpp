@@ -11,20 +11,20 @@
 #include <unistd.h>
 #endif
 
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface)
+bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port)
 {
     int res;
 
 #ifdef Q_OS_LINUX
-    sock.bind(0);
+    sock.bind(port);
     res = setsockopt(sock.socketDescriptor(), SOL_SOCKET, SO_BINDTODEVICE, iface.name.toAscii().constData(), iface.name.length());
 #else
-    res = !sock.bind(iface.address, 0);
+    res = !sock.bind(iface.address, port);
 #endif
 
     if (res)
     {
-        cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toAscii().constData(), strerror(errno));
+        //cl_log.log(cl_logDEBUG1, "bindToInterface(): Can't bind to interface %s: %s", iface.address.toString().toAscii().constData(), strerror(errno));
         return false;
     }
 

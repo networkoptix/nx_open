@@ -277,7 +277,7 @@ void QnMjpegRtpParser::updateHeaderTables(quint8* lummaTable, quint8* chromaTabl
 // -----------------------------------------------------------------------
 
 QnMjpegRtpParser::QnMjpegRtpParser():
-    QnRtpStreamParser(),
+    QnRtpVideoStreamParser(),
     m_frequency(90000),
     m_frameData(CL_MEDIA_ALIGNMENT, 1024*64)
 {
@@ -320,12 +320,10 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
-
-    result.clear();
 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
         m_videoData.clear();
@@ -469,7 +467,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         else
             m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
-        result << m_videoData;
+        result = m_videoData;
         m_videoData.clear();
     }
     return true;

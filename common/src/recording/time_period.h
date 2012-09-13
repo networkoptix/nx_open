@@ -72,7 +72,13 @@ public:
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
+
+    /**
+     * Expand period so it will contain target period.
+     * \param timePeriod                Target time period.
+     */
     void addPeriod(const QnTimePeriod &timePeriod);
+
     QnTimePeriod intersected(const QnTimePeriod &other) const;
     void clear();
 

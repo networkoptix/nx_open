@@ -13,11 +13,11 @@ static const qint64 SYNC_FOR_FRAME_EPS = 1000 * 50;
 
 struct ReaderInfo
 {
-    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam):
+    ReaderInfo(QnAbstractArchiveReader* _reader, QnAbstractArchiveDelegate* _oldDelegate, QnlTimeSource* _cam, bool _enabled):
         reader(_reader),
         oldDelegate(_oldDelegate),
         cam(_cam),
-        enabled(true),
+        enabled(_enabled),
         buffering(false),
         isEOF(false),
         paused(false),
@@ -169,20 +169,6 @@ void QnArchiveSyncPlayWrapper::pauseMedia()
     }
 }
 
-void QnArchiveSyncPlayWrapper::setSingleShotMode(bool value)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-    QMutexLocker lock(&d->timeMutex);
-    foreach(const ReaderInfo& info, d->readers)
-    {
-        info.reader->setNavDelegate(0);
-        info.reader->setSingleShotMode(value);
-        info.reader->setNavDelegate(this);
-    }
-    if (!value)
-        reinitTime(getDisplayedTime());
-}
-
 void QnArchiveSyncPlayWrapper::directJumpToNonKeyFrame(qint64 mksec)
 {
     Q_D(QnArchiveSyncPlayWrapper);
@@ -281,7 +267,7 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
 
     QMutexLocker lock(&d->timeMutex);
 
-    d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam);
+    d->readers << ReaderInfo(reader, reader->getArchiveDelegate(), cam, d->enabled);
     
     reader->setArchiveDelegate(new QnSyncPlayArchiveDelegate(reader, this, reader->getArchiveDelegate()));
     reader->setCycleMode(false);
@@ -303,26 +289,6 @@ void QnArchiveSyncPlayWrapper::addArchiveReader(QnAbstractArchiveReader* reader,
     //connect(reader, SIGNAL(singleShotModeChanged(bool)), this, SLOT(onSingleShotModeChanged(bool)), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamPaused()), this, SLOT(onStreamPaused()), Qt::DirectConnection);
     //connect(reader, SIGNAL(streamResumed()), this, SLOT(onStreamResumed()), Qt::DirectConnection);
-}
-
-void QnArchiveSyncPlayWrapper::setTimeParams(QnAbstractArchiveReader* reader, qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec)
-{
-    Q_D(QnArchiveSyncPlayWrapper);
-
-    QMutexLocker lock(&d->timeMutex);
-
-    for (int i = 0; i < d->readers.size(); ++i)
-    {
-        ReaderInfo& info = d->readers[i];
-        if (info.reader == reader) {
-            info.cam->setTimeParams(timeOffsetUsec, minTimeUsec, maxTimeUsec);
-            info.reader->setTimeParams(timeOffsetUsec, minTimeUsec, maxTimeUsec);
-            info.timeOffsetUsec = timeOffsetUsec;
-            info.minTimeUsec = minTimeUsec;
-            info.maxTimeUsec = maxTimeUsec;
-            break;
-        }
-    }
 }
 
 void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/)
@@ -558,7 +524,7 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     d->bufferingTime = AV_NOPTS_VALUE;
 
     qDebug() << "correctTime after end of buffering=" << (getCurrentTime() - bt)/1000.0;
-    reinitTime(getCurrentTime());
+    reinitTime(getDisplayedTime());
 }
 
 void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)

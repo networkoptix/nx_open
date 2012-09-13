@@ -1,15 +1,18 @@
 #ifndef QN_SIMPLE_FRAME_WIDGET_H
 #define QN_SIMPLE_FRAME_WIDGET_H
 
-#include <QtGui/QGraphicsWidget>
+#include <ui/graphics/items/standard/graphics_widget.h>
 
 /**
  * A graphics frame widget that does not use style for painting.
  * 
  * Frame width and color are configurable.
  */
-class QnSimpleFrameWidget: public QGraphicsWidget {
+class QnSimpleFrameWidget: public GraphicsWidget {
     Q_OBJECT;
+
+    typedef GraphicsWidget base_type;
+
 public:
     QnSimpleFrameWidget(QGraphicsItem *parent = NULL);
     virtual ~QnSimpleFrameWidget();

@@ -49,6 +49,7 @@ void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
     m_resource = resource;
+    updateRtpParam(resource);
 }
 
 void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
@@ -125,7 +126,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         if (firstServer && otherVideoServer == currentVideoServer && m_rtspSession.startTime() != DATETIME_NOW)
             return 0; // archive starts with current server and archive is not empty
         firstServer = false;
-        if (otherVideoServer != currentVideoServer && m_rtspSession.startTime() != AV_NOPTS_VALUE)
+        if (otherVideoServer != currentVideoServer /*&& m_rtspSession.startTime() != AV_NOPTS_VALUE*/)
         {
             if (!checkServers.contains(otherVideoServer))
                 checkServers << otherVideoServer;
@@ -197,7 +198,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 {
     if (m_opened)
         return true;
-
+    updateRtpParam(resource);
     if (m_isMultiserverAllowed)
         resource = getResourceOnTime(resource, m_position != DATETIME_NOW ? m_position/1000 : m_position);
 
@@ -219,14 +220,17 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         m_globalMinArchiveTime = m_rtspSession.startTime(); // block multiserver archive left point as current server left point (zerro velue mean: read value from current server)
         globalTimeBlocked = true;
     }
-    if (m_rtspSession.open(getUrl(resource))) 
-    {
-        qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
-        if (globalMinTime !=AV_NOPTS_VALUE)
-            m_globalMinArchiveTime = globalMinTime;
-        else if (globalTimeBlocked)
-            m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
+    
+    bool isOpened = m_rtspSession.open(getUrl(resource));
 
+    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
+    if (globalMinTime !=AV_NOPTS_VALUE)
+        m_globalMinArchiveTime = globalMinTime;
+    else if (globalTimeBlocked)
+        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
+
+    if (isOpened)
+    {
         qint64 endTime = m_position;
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
@@ -760,7 +764,14 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_quality = quality;
     m_qualityFastSwitch = fastSwitch;
 
-    QByteArray value = quality == MEDIA_Quality_High ? "high" : "low";
+    QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
+    if (quality == MEDIA_Quality_AlwaysHigh)
+        value = "alwaysHigh";
+    else if (quality == MEDIA_Quality_High)
+        value = "high";
+    else
+        value = "low";
+
     QByteArray paramName = "x-media-quality";
     m_rtspSession.setAdditionAttribute(paramName, value);
 
@@ -831,4 +842,16 @@ void QnRtspClientArchiveDelegate::setRange(qint64 startTime, qint64 endTime, qin
 void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
 {
     m_isMultiserverAllowed = value;
+}
+
+void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
+{
+    int numOfVideoChannels = 1;
+    QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
+    if (mediaRes) {
+        const QnVideoResourceLayout* videoLayout = mediaRes->getVideoLayout(0);
+        if (videoLayout)
+            numOfVideoChannels = videoLayout->numberOfChannels();
+    }
+    m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
 }

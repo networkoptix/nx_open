@@ -14,6 +14,7 @@
 #include "param.h"
 #include "resource_type.h"
 #include "shared_resource_pointer.h"
+#include "interface/abstract_ptz_controller.h"
 
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
@@ -197,6 +198,8 @@ public:
     bool hasConsumer(QnResourceConsumer *consumer) const;
     bool hasUnprocessedCommands() const;
     bool isInitialized() const;
+
+    virtual QnAbstractPtzController* getPtzController();
 
 signals:
     void parameterValueChanged(const QnParam &param);

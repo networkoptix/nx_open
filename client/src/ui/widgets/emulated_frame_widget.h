@@ -1,6 +1,7 @@
 #ifndef QN_EMULATED_FRAME_WIDGET_H
 #define QN_EMULATED_FRAME_WIDGET_H
 
+#include <QtCore/QBasicTimer>
 #include <QtGui/QWidget>
 
 #include <ui/processors/drag_processor.h>
@@ -25,12 +26,18 @@ protected:
      */
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPoint &pos) const = 0;
 
-    virtual bool event(QEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
     virtual void mouseMoveEvent(QMouseEvent *event) override;
     virtual void mouseReleaseEvent(QMouseEvent *event) override;
+    virtual void timerEvent(QTimerEvent *event) override;
 
+    virtual void startDragProcess(DragInfo *info) override;
     virtual void dragMove(DragInfo *info) override;
+    virtual void finishDragProcess(DragInfo *info) override;
+
+private:
+    void updateCursor();
+    void updateCursor(const QPoint &mousePos);
 
 private:
     friend class QnEmulatedFrameWidgetDragProcessHandler;
@@ -39,6 +46,9 @@ private:
     Qt::WindowFrameSection m_section;
     QPoint m_startPinPoint;
     QSize m_startSize;
+
+    QPoint m_lastMousePos;
+    QBasicTimer m_timer;
 };
 
 

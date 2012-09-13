@@ -53,8 +53,8 @@ public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
     {
-        m_recIcon = qnSkin->icon("decorations/recording.png");
-        m_raisedIcon = qnSkin->icon("decorations/raised.png");
+        m_recIcon = qnSkin->icon("tree/recording.png");
+        m_raisedIcon = qnSkin->icon("tree/raised.png");
     }
 
     QnWorkbench *workbench() const {
@@ -76,7 +76,7 @@ protected:
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
         QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
 
         /* Bold items of current layout in tree. */
         if(!resource.isNull() && !currentLayoutResource.isNull()) {
@@ -207,7 +207,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(QnResource::still_image));
     ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(QnResource::live));
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("clear.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourcePoolModel(this);
@@ -259,8 +259,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 
     /* Run handlers. */
     updateFilter();
@@ -309,7 +307,7 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
         result->setFilterKeyColumn(0);
-        result->setFilterRole(Qn::SearchStringRole);
+        result->setFilterRole(Qn::ResourceSearchStringRole);
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
@@ -401,7 +399,7 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
         if(uuid.isNull())
             continue;
 
@@ -425,7 +423,7 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
-    if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
     } else {
         return QVariant::fromValue(selectedResources());
@@ -487,6 +485,10 @@ void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
+void QnResourceTreeWidget::mouseReleaseEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
@@ -552,6 +554,8 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
 void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
+    disconnect(layout, NULL, this, NULL);
+
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
         synchronizer->disableUpdates();
@@ -577,6 +581,9 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     /* Bold state has changed. */
     currentItemView()->update();
+
+    connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
 }
 
 void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
@@ -584,12 +591,12 @@ void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     ui->resourceTreeView->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }

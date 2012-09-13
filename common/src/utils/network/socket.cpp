@@ -519,8 +519,8 @@ TCPSocket *TCPServerSocket::accept()  {
     struct timeval timeout;
     FD_ZERO(&read_set);
     FD_SET(sockDesc, &read_set);
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 250 * 1000;
 
     if (::select(sockDesc + 1, &read_set, NULL, NULL, &timeout) <= 0)
         return 0;
@@ -671,8 +671,8 @@ bool Socket::bindToInterface(const QnInterfaceAndAddr& iface)
     bool res = setLocalAddressAndPort(iface.address.toString(), 0);
 #endif
 
-    if (!res)
-        qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
+    //if (!res)
+    //    qnDebug("Can't bind to interface %1. Error code %2.", iface.address.toString(), strerror(errno));
     return res;
 }
 

@@ -1,3 +1,4 @@
+
 #include "frame_info.h"
 #include "../common/util.h"
 
@@ -13,13 +14,45 @@ extern "C" {
 #ifdef WIN32
 #undef AVPixFmtDescriptor
 #endif
-
 };
 
 
+/////////////////////////////////////////////////////
+//  class QnSysMemPictureData
+/////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////
+//  class QnOpenGLPictureData
+/////////////////////////////////////////////////////
+QnOpenGLPictureData::QnOpenGLPictureData(
+//	GLXContext _glContext,
+	unsigned int _glTexture )
+:
+//	m_glContext( _glContext ),
+	m_glTexture( _glTexture )
+{
+}
+
+//!Returns context of texture
+//GLXContext QnOpenGLPictureData::glContext() const
+//{
+//    return m_glContext;
+//}
+
+//!Returns OGL texture name
+unsigned int QnOpenGLPictureData::glTexture() const
+{
+    return m_glTexture;
+}
+
+
+/////////////////////////////////////////////////////
+//  class CLVideoDecoderOutput
+/////////////////////////////////////////////////////
 CLVideoDecoderOutput::CLVideoDecoderOutput()
 {
-    memset(this, 0, sizeof(*this));
+    memset( this, 0, sizeof(*this) );
 }
 
 CLVideoDecoderOutput::~CLVideoDecoderOutput()
@@ -47,7 +80,7 @@ void CLVideoDecoderOutput::copy(const CLVideoDecoderOutput* src, CLVideoDecoderO
 {
     if (src->width != dst->width || src->height != dst->height || src->format != dst->format)
     {
-        // need to realocate dst memory 
+        // need to reallocate dst memory
         dst->setUseExternalData(false);
         int numBytes = avpicture_get_size((PixelFormat) src->format, src->width, src->height);
         avpicture_fill((AVPicture*) dst, (quint8*) av_malloc(numBytes), (PixelFormat) src->format, src->width, src->height);

@@ -357,6 +357,53 @@ public:
     /**
      * This function is to be used in constructors of derived classes.
      * 
+     * \param eventType0               First event type.
+     * \param eventType1               Second event type.
+     * \param eventType2               Third event type.
+     * \param eventType3               Fourth event type.
+     * \param eventType4               Fifth event type.
+     * \param eventType5               Sixth event type.
+     * \returns                        Set constructed from the given event types.
+     */
+    static EventTypeSet makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2, QEvent::Type eventType3, QEvent::Type eventType4, QEvent::Type eventType5) {
+        EventTypeSet result;
+        result.insert(eventType0);
+        result.insert(eventType1);
+        result.insert(eventType2);
+        result.insert(eventType3);
+        result.insert(eventType4);
+        result.insert(eventType5);
+        return result;
+    }
+
+    /**
+     * This function is to be used in constructors of derived classes.
+     * 
+     * \param eventType0               First event type.
+     * \param eventType1               Second event type.
+     * \param eventType2               Third event type.
+     * \param eventType3               Fourth event type.
+     * \param eventType4               Fifth event type.
+     * \param eventType5               Sixth event type.
+     * \param eventType6               Seventh event type.
+     * \returns                        Set constructed from the given event types.
+     */
+    static EventTypeSet makeSet(QEvent::Type eventType0, QEvent::Type eventType1, QEvent::Type eventType2, QEvent::Type eventType3, QEvent::Type eventType4, QEvent::Type eventType5, QEvent::Type eventType6) {
+        EventTypeSet result;
+        result.insert(eventType0);
+        result.insert(eventType1);
+        result.insert(eventType2);
+        result.insert(eventType3);
+        result.insert(eventType4);
+        result.insert(eventType5);
+        result.insert(eventType6);
+        return result;
+    }
+
+
+    /**
+     * This function is to be used in constructors of derived classes.
+     * 
      * \param eventTypes               Array of event types.
      * \returns                        Set constructed from the given event types.
      */
@@ -568,7 +615,7 @@ protected:
      * \returns                        Whether this instrument is willing to watch
      *                                 events of the given graphics item.
      */
-    virtual bool registeredNotify(QGraphicsItem *item) { Q_UNUSED(item); return true; }
+    virtual bool registeredNotify(QGraphicsItem *item) { return satisfiesItemConditions(item); }
 
     /**
      * \param item                     Graphics item that was previously registered with this instrument.

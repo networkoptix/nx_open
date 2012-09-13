@@ -20,6 +20,7 @@
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/widgets/calendar_widget.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
@@ -27,9 +28,9 @@
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 
-QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *context): 
+QnNavigationItem::QnNavigationItem(QGraphicsItem *parent): 
     base_type(parent),
-    QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent->toGraphicsObject()),
+    QnWorkbenchContextAware(parent->toGraphicsObject()),
     m_updatingSpeedSliderFromNavigator(false),
     m_updatingNavigatorFromSpeedSlider(false)
 {
@@ -49,59 +50,50 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
     /* Create buttons. */
     m_jumpBackwardButton = new QnImageButtonWidget(this);
-    m_jumpBackwardButton->setIcon(qnSkin->icon("rewind_backward.png"));
+    m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));
     m_jumpBackwardButton->setPreferredSize(32, 18);
 
     m_stepBackwardButton = new QnImageButtonWidget(this);
-    m_stepBackwardButton->setIcon(qnSkin->icon("step_backward.png"));
+    m_stepBackwardButton->setIcon(qnSkin->icon("slider/navigation/step_backward.png"));
     m_stepBackwardButton->setPreferredSize(32, 18);
 
     m_playButton = new QnImageButtonWidget(this);
     m_playButton->setCheckable(true);
-    m_playButton->setIcon(qnSkin->icon("play.png", "pause.png"));
+    m_playButton->setIcon(qnSkin->icon("slider/navigation/play.png", "slider/navigation/pause.png"));
     m_playButton->setPreferredSize(32, 30);
 
     m_stepForwardButton = new QnImageButtonWidget(this);
-    m_stepForwardButton->setIcon(qnSkin->icon("step_forward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon("slider/navigation/step_forward.png"));
     m_stepForwardButton->setPreferredSize(32, 18);
 
     m_jumpForwardButton = new QnImageButtonWidget(this);
-    m_jumpForwardButton->setIcon(qnSkin->icon("rewind_forward.png"));
+    m_jumpForwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_forward.png"));
     m_jumpForwardButton->setPreferredSize(32, 18);
 
     m_muteButton = new QnImageButtonWidget(this);
-    m_muteButton->setIcon(qnSkin->icon("unmute.png", "mute.png"));
+    m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));
     m_muteButton->setPreferredSize(20, 20);
     m_muteButton->setCheckable(true);
 
     m_liveButton = new QnImageButtonWidget(this);
-    m_liveButton->setIcon(qnSkin->icon("live.png"));
+    m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
     m_liveButton->setCheckable(true);
 
     m_syncButton = new QnImageButtonWidget(this);
-    m_syncButton->setIcon(qnSkin->icon("sync.png"));
+    m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
     m_syncButton->setCheckable(true);
 
     m_thumbnailsButton = new QnImageButtonWidget(this);
     m_thumbnailsButton->setDefaultAction(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setPreferredSize(96, 24);
+    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
+    m_thumbnailsButton->setPreferredSize(48, 24);
 
-
-    /* Time label. */
-#if 0
-    m_timeLabel = new GraphicsLabel(this);
-    m_timeLabel->setObjectName("TimeLabel");
-    m_timeLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::Label);
-    m_timeLabel->setText(QLatin1String(" ")); /* So that it takes some space right away. */
-    {
-        QPalette pal = m_timeLabel->palette();
-        pal.setColor(QPalette::Window, QColor(0, 0, 0, 0));
-        pal.setColor(QPalette::WindowText, QColor(63, 159, 216));
-        m_timeLabel->setPalette(pal);
-    }
-#endif
+    m_calendarButton = new QnImageButtonWidget(this);
+    m_calendarButton->setDefaultAction(action(Qn::ToggleCalendarAction));
+    m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
+    m_calendarButton->setPreferredSize(48, 24);
 
 
     /* Create sliders. */
@@ -147,28 +139,29 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);
     rightLayoutHU->setSpacing(3);
-    rightLayoutHU->addItem(m_liveButton);
-    rightLayoutHU->addItem(m_syncButton);
+    rightLayoutHU->addItem(m_muteButton);
+    rightLayoutHU->addItem(m_volumeSlider);
+
+    QGraphicsLinearLayout *rightLayoutHM = new QGraphicsLinearLayout(Qt::Horizontal);
+    rightLayoutHM->setContentsMargins(0, 0, 0, 0);
+    rightLayoutHM->setSpacing(3);
+    rightLayoutHM->addItem(m_liveButton);
+    rightLayoutHM->addItem(m_syncButton);
 
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_muteButton);
-    rightLayoutHL->addItem(m_volumeSlider);
+    rightLayoutHL->addItem(m_thumbnailsButton);
+    rightLayoutHL->addItem(m_calendarButton);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutV->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
     rightLayoutV->setContentsMargins(0, 3, 0, 3);
     rightLayoutV->setSpacing(0);
     rightLayoutV->setMinimumHeight(87.0);
-    rightLayoutV->addItem(rightLayoutHL);
     rightLayoutV->addItem(rightLayoutHU);
-    rightLayoutV->addItem(m_thumbnailsButton);
-    rightLayoutV->setAlignment(m_thumbnailsButton, Qt::AlignCenter);
-    rightLayoutV->setAlignment(rightLayoutHU, Qt::AlignRight | Qt::AlignVCenter);
-#if 0
-    rightLayoutV->addItem(m_timeLabel);
-#endif
+    rightLayoutV->addItem(rightLayoutHM);
+    rightLayoutV->addItem(rightLayoutHL);
 
     QGraphicsLinearLayout *sliderLayout = new QGraphicsLinearLayout(Qt::Vertical);
     sliderLayout->setContentsMargins(0, 0, 0, 0);
@@ -199,9 +192,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
 
 
     /* Set up handlers. */
-    connect(display(),              SIGNAL(streamsSynchronizedChanged()),       this,           SLOT(updateSyncButtonChecked()));
-    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonChecked()));
-    connect(display(),              SIGNAL(streamsSynchronizationEffectiveChanged()), this,     SLOT(updateSyncButtonEnabled()));
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+    connect(streamSynchronizer,     SIGNAL(runningChanged()),                   this,           SLOT(updateSyncButtonChecked()));
+    connect(streamSynchronizer,     SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonChecked()));
+    connect(streamSynchronizer,     SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonEnabled()));
 
     connect(m_speedSlider,          SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,         SIGNAL(valueChanged(qint64)),               this,           SLOT(updateMuteButtonChecked()));
@@ -229,82 +223,37 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent, QnWorkbenchContext *co
     connect(navigator(),            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
 
     /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
-    connect(navigator(),            SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()));
+    connect(navigator(),            SIGNAL(currentWidgetChanged()),             this,           SLOT(updatePlayButtonChecked()), Qt::QueuedConnection);
 
 
     /* Create actions. */
-    QAction *playAction = new QAction(tr("Play / Pause"), m_playButton);
-    playAction->setShortcut(tr("Space"));
-    playAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(playAction, SIGNAL(triggered()), m_playButton, SLOT(click()));
-    addAction(playAction);
+    addAction(action(Qn::PlayPauseAction));
+    addAction(action(Qn::SpeedDownAction));
+    addAction(action(Qn::SpeedUpAction));
+    addAction(action(Qn::PreviousFrameAction));
+    addAction(action(Qn::NextFrameAction));
+    addAction(action(Qn::JumpToStartAction));
+    addAction(action(Qn::JumpToEndAction));
+    addAction(action(Qn::JumpToLiveAction));
+    addAction(action(Qn::VolumeDownAction));
+    addAction(action(Qn::VolumeUpAction));
+    addAction(action(Qn::ToggleMuteAction));
+    addAction(action(Qn::ToggleSyncAction));
 
-    QAction *speedDownAction = new QAction(tr("Speed Down"), m_speedSlider);
-    speedDownAction->setShortcut(tr("Ctrl+-"));
-    speedDownAction->setShortcutContext(Qt::ApplicationShortcut);
     //connect(speedDownAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepBackward())); // TODO
-    addAction(speedDownAction);
-
-    QAction *speedUpAction = new QAction(tr("Speed Up"), m_speedSlider);
-    speedUpAction->setShortcut(tr("Ctrl++"));
-    speedUpAction->setShortcutContext(Qt::ApplicationShortcut);
     //connect(speedUpAction, SIGNAL(triggered()), m_speedSlider, SLOT(stepForward())); // TODO
-    addAction(speedUpAction);
+    // TODO: handlers must be implemented elsewhere
 
-    QAction *prevFrameAction = new QAction(tr("Previous Frame"), m_stepBackwardButton);
-    prevFrameAction->setShortcut(tr("Ctrl+Left"));
-    prevFrameAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(prevFrameAction, SIGNAL(triggered()), m_stepBackwardButton, SLOT(click()));
-    addAction(prevFrameAction);
-
-    QAction *nextFrameAction = new QAction(tr("Next Frame"), m_stepForwardButton);
-    nextFrameAction->setShortcut(tr("Ctrl+Right"));
-    nextFrameAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(nextFrameAction, SIGNAL(triggered()), m_stepForwardButton, SLOT(click()));
-    addAction(nextFrameAction);
-
-    QAction *toStartAction = new QAction(tr("To Start"), m_jumpBackwardButton);
-    toStartAction->setShortcut(tr("Z"));
-    toStartAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toStartAction, SIGNAL(triggered()), m_jumpBackwardButton, SLOT(click()));
-    addAction(toStartAction);
-
-    QAction *toEndAction = new QAction(tr("To End"), m_jumpForwardButton);
-    toEndAction->setShortcut(tr("X"));
-    toEndAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toEndAction, SIGNAL(triggered()), m_jumpForwardButton, SLOT(click()));
-    addAction(toEndAction);
-
-    QAction *volumeDownAction = new QAction(tr("Volume Down"), m_volumeSlider);
-    volumeDownAction->setShortcut(tr("Ctrl+Down"));
-    volumeDownAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(volumeDownAction, SIGNAL(triggered()), m_volumeSlider, SLOT(stepBackward()));
-    addAction(volumeDownAction);
-
-    QAction *volumeUpAction = new QAction(tr("Volume Up"), m_volumeSlider);
-    volumeUpAction->setShortcut(tr("Ctrl+Up"));
-    volumeUpAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(volumeUpAction, SIGNAL(triggered()), m_volumeSlider, SLOT(stepForward()));
-    addAction(volumeUpAction);
-
-    QAction *toggleMuteAction = new QAction(tr("Toggle Mute"), m_muteButton);
-    toggleMuteAction->setShortcut(tr("M"));
-    toggleMuteAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toggleMuteAction, SIGNAL(triggered()), m_muteButton, SLOT(click()));
-    addAction(toggleMuteAction);
-
-    QAction *liveAction = new QAction(tr("Go To Live"), m_liveButton);
-    liveAction->setShortcut(tr("L"));
-    liveAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(liveAction, SIGNAL(triggered()), m_liveButton, SLOT(click()));
-    addAction(liveAction);
-
-    QAction *toggleSyncAction = new QAction(tr("Toggle Sync"), m_syncButton);
-    toggleSyncAction->setShortcut(tr("S"));
-    toggleSyncAction->setShortcutContext(Qt::ApplicationShortcut);
-    connect(toggleSyncAction, SIGNAL(triggered()), m_syncButton, SLOT(click()));
-    addAction(toggleSyncAction);
-
+    connect(action(Qn::PlayPauseAction),        SIGNAL(triggered()), m_playButton,          SLOT(click()));
+    connect(action(Qn::PreviousFrameAction),    SIGNAL(triggered()), m_stepBackwardButton,  SLOT(click()));
+    connect(action(Qn::NextFrameAction),        SIGNAL(triggered()), m_stepForwardButton,   SLOT(click()));
+    connect(action(Qn::JumpToStartAction),      SIGNAL(triggered()), m_jumpBackwardButton,  SLOT(click()));
+    connect(action(Qn::JumpToEndAction),        SIGNAL(triggered()), m_jumpForwardButton,   SLOT(click()));
+    connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
+    connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
+    connect(action(Qn::ToggleMuteAction),       SIGNAL(triggered()), m_muteButton,          SLOT(click()));
+    connect(action(Qn::JumpToLiveAction),       SIGNAL(triggered()), m_liveButton,          SLOT(click()));
+    connect(action(Qn::ToggleSyncAction),       SIGNAL(triggered()), m_syncButton,          SLOT(click()));
 
     /* Run handlers */
     updateMuteButtonChecked();
@@ -388,8 +337,8 @@ void QnNavigationItem::updatePlaybackButtonsPressed() {
 void QnNavigationItem::updatePlaybackButtonsIcons() {
     bool playing = m_playButton->isChecked();
 
-    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "backward.png" : "step_backward.png"));
-    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "forward.png" : "step_forward.png"));
+    m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/backward.png" : "slider/navigation/step_backward.png"));
+    m_stepForwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/forward.png" : "slider/navigation/step_forward.png"));
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {
@@ -416,13 +365,15 @@ void QnNavigationItem::updateLiveButtonEnabled() {
 }
 
 void QnNavigationItem::updateSyncButtonChecked() {
-    m_syncButton->setChecked(display()->isStreamsSynchronized() && display()->isStreamsSynchronizationEffective());
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    m_syncButton->setChecked(streamSynchronizer->isEffective() && streamSynchronizer->isRunning());
 }
 
 void QnNavigationItem::updateSyncButtonEnabled() {
-    bool enabled = display()->isStreamsSynchronizationEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync);
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
 
-    m_syncButton->setEnabled(enabled);
+    m_syncButton->setEnabled(streamSynchronizer->isEffective() && (navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsSync));
 }
 
 void QnNavigationItem::updatePlayButtonChecked() {
@@ -479,12 +430,14 @@ void QnNavigationItem::at_liveButton_clicked() {
         m_liveButton->setChecked(true); /* Cannot go out of live mode by pressing 'live' button. */
 }
 
-void QnNavigationItem::at_syncButton_clicked() 
-{
-    if (m_syncButton->isChecked())
-        display()->setStreamsSynchronized(navigator()->currentWidget());
-    else
-        display()->setStreamsSynchronized(0);
+void QnNavigationItem::at_syncButton_clicked() {
+    QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
+
+    if (m_syncButton->isChecked()) {
+        streamSynchronizer->setState(navigator()->currentWidget());
+    } else {
+        streamSynchronizer->setState(NULL);
+    }
 }
 
 void QnNavigationItem::at_stepBackwardButton_clicked() {

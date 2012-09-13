@@ -15,7 +15,7 @@
 
 
 //!max time (milliseconds) to wait for async operation completion
-static const unsigned long MAX_WAIT_TIMEOUT_MS = 5000;
+static const unsigned long MAX_WAIT_TIMEOUT_MS = 15000;
 
 namespace HttpStatusCode
 {
@@ -249,7 +249,7 @@ QString QnSetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
 {
     return
         "Sets values of several camera parameters.<BR>"
-        "Request format: GET /api/setCameraParam?res_id=camera_mac&paramName1=paramValue1&paramName2=paramValue2&...<BR>"
+        "Request format: GET /api/setCameraParam?res_id=camera_mac&amp;paramName1=paramValue1&amp;paramName2=paramValue2&amp;...<BR>"
         "Returns OK if all parameters have been set, otherwise returns error 500 (Internal server error) and result of setting every param<BR>";
 }
 
@@ -257,6 +257,6 @@ QString QnGetCameraParamHandler::description( TCPSocket* /*tcpSocket*/ ) const
 {
     return
         "Returns list of camera parameters.<BR>"
-        "Request format: GET /api/getCameraParam?res_id=camera_mac&paramName1&paramName2&...<BR>"
+        "Request format: GET /api/getCameraParam?res_id=camera_mac&amp;paramName1&amp;paramName2&amp;...<BR>"
         "Returns required parameter values in form of paramName=paramValue, each param on new line<BR>";
 }

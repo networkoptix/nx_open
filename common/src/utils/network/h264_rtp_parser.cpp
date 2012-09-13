@@ -9,7 +9,7 @@ static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
 static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
-        QnRtpStreamParser(),
+        QnRtpVideoStreamParser(),
         m_frequency(90000), // default value
         m_rtpChannel(98),
         m_prevSequenceNum(-1),
@@ -191,10 +191,8 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     m_frameExists     |= nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
-    result.clear();
-
     int nalUnitLen;
     //int don;
     quint8 nalUnitType;
@@ -206,6 +204,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     quint8* bufferEnd = rtpBuffer + readed;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
+
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
 
     
     bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
@@ -305,7 +306,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     if (rtpHeader->marker) 
     {   // last packet
         if (m_videoBuffer.size() > 0 && m_frameExists)
-            result << createVideoData(ntohl(rtpHeader->timestamp), statistics);
+            result = createVideoData(ntohl(rtpHeader->timestamp), statistics);
     }
 
     return true;

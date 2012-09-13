@@ -152,8 +152,10 @@ void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayout
         return;
     }
 
-    if(*pos == item)
+    if(*pos == item) {
+        pos->dataByRole = item.dataByRole; // TODO: hack hack hack
         return;
+    }
 
     *pos = item;
 
@@ -173,25 +175,6 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.lock();
     emit itemRemoved(item);
     m_mutex.unlock();
-}
-
-QnTimePeriod QnLayoutResource::timeBounds() const {
-    QMutexLocker locker(&m_mutex);
-
-    return m_timeBounds;
-}
-
-void QnLayoutResource::setTimeBounds(const QnTimePeriod &timeBounds) {
-    {
-        QMutexLocker locker(&m_mutex);
-
-        if(m_timeBounds == timeBounds)
-            return;
-
-        m_timeBounds = timeBounds;
-    }
-
-    emit timeBoundsChanged();
 }
 
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
@@ -247,3 +230,20 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 }
 
 
+void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
+    QMutexLocker locker(&m_mutex);
+
+    m_dataByRole = dataByRole;
+}
+
+void QnLayoutResource::setData(int role, const QVariant &value) {
+    QMutexLocker locker(&m_mutex);
+
+    m_dataByRole[role] = value;
+}
+
+QHash<int, QVariant> QnLayoutResource::data() const {
+    QMutexLocker locker(&m_mutex);
+
+    return m_dataByRole;
+}

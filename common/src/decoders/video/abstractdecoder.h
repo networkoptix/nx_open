@@ -1,5 +1,5 @@
-#ifndef clabstractdecoder_h_2155
-#define clabstractdecoder_h_2155
+#ifndef clabstractvideodecoder_h_2155
+#define clabstractvideodecoder_h_2155
 
 #include "core/datapacket/mediadatapacket.h"
 #include "utils/media/frame_info.h"
@@ -24,6 +24,8 @@ public:
     virtual ~QnAbstractVideoDecoder(){};
 
     virtual PixelFormat GetPixelFormat() const { return PIX_FMT_NONE; }
+    //!Returns memory type to which decoder places decoded frames (system memory or opengl)
+    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const = 0;
 
     /**
       * Decode video frame.
@@ -83,14 +85,21 @@ public:
     enum CLCodecManufacture
     {
         FFMPEG,
-        INTELIPP
-#ifdef _WIN32
-        //!Use Intel media SDK (if available on target platform). Supported only under Microsoft Windows OS
-        , INTEL_QUICK_SYNC
-#endif
+        INTELIPP,
+        //!select most apropriate decoder (gives preference to hardware one, if available)
+        AUTO
     };
 
-    static QnAbstractVideoDecoder* createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding );
+    /*!
+        \param data Packet of source data. MUST contain media stream sequence header
+        \param mtDecoding This hint tells that decoder is allowed (not have to) to perform multi-threaded decoding
+        \param glContext OpenGL context used to draw to screen. Decoder, that renders pictures directly to opengl texture,
+            MUST be aware of application gl context to create textures shared with this context
+    */
+    static QnAbstractVideoDecoder* createDecoder(
+            const QnCompressedVideoDataPtr data,
+            bool mtDecoding,
+            const QGLContext* glContext = NULL );
     static void setCodecManufacture( CLCodecManufacture codecman )
     {
         m_codecManufacture = codecman;
@@ -100,4 +109,4 @@ private:
     static CLCodecManufacture m_codecManufacture;
 };
 
-#endif //clabstractdecoder_h_2155
+#endif //clabstractvideodecoder_h_2155

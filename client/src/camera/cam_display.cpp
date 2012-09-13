@@ -124,10 +124,7 @@ QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal):
     m_lastLiveIsLowQuality(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
-    m_timeMutex(QMutex::Recursive),
-    m_timeOffsetUsec(0),
-    m_minTimeUsec(0),
-    m_maxTimeUsec(0)
+    m_timeMutex(QMutex::Recursive)
 {
     m_storedMaxQueueSize = m_dataQueue.maxSize();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
@@ -161,7 +158,7 @@ QnCamDisplay::~QnCamDisplay()
             display->resetQualityStatistics();
     }
 
-    Q_ASSERT(!m_runing);
+    Q_ASSERT(!isRunning());
     stop();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         delete m_display[i];
@@ -174,6 +171,7 @@ void QnCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
     m_isRealTimeSource = false;
+    emit liveMode(false);
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->suspend();
 }
@@ -204,12 +202,12 @@ QImage QnCamDisplay::getScreenshot(int channel)
 }
 
 QSize QnCamDisplay::getFrameSize(int channel) const {
-    return m_display[channel]->getFrameSize();
+    return m_display[channel]->getImageSize();
 }
 
 void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
-    bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
+    bool isVideoCamera = vd->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(vd->dataProvider->getResource()) != 0;
     if (isVideoCamera)
         hurryUpCheckForCamera(vd, speed, needToSleep, realSleepTime);
     else
@@ -412,7 +410,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (sleep && m_lastFrameDisplayed != QnVideoStreamDisplay::Status_Buffered)
     {
-        qint64 realSleepTime = 0;
+        qint64 realSleepTime = AV_NOPTS_VALUE;
         if (useSync(vd)) 
         {
             qint64 displayedTime = getCurrentTime();
@@ -473,9 +471,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             else
                 realSleepTime = m_delay.addQuant(needToSleep);
         }
-
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
-        hurryUpCheck(vd, speed, needToSleep, realSleepTime);
+        if (realSleepTime != AV_NOPTS_VALUE)
+            hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
     int channel = vd->channelNumber;
@@ -702,8 +700,11 @@ void QnCamDisplay::onNextFrameOccured()
 void QnCamDisplay::setSingleShotMode(bool single)
 {
     m_singleShotMode = single;
-    if (m_singleShotMode)
+    if (m_singleShotMode) {
         m_isRealTimeSource = false;
+        emit liveMode(false);
+        playAudio(false);
+    }
 }
 
 float QnCamDisplay::getSpeed() const
@@ -911,7 +912,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }
@@ -1157,6 +1158,9 @@ void QnCamDisplay::playAudio(bool play)
 {
     if (m_playAudio == play)
         return;
+
+    if (m_singleShotMode && play)
+        return; // ignore audio playing if camDisplay is paused
 
     m_needChangePriority = true;
     m_playAudio = play;
@@ -1405,11 +1409,4 @@ bool QnCamDisplay::isNoData() const
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
     */
-}
-
-void QnCamDisplay::setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec)
-{
-    m_timeOffsetUsec = timeOffsetUsec;
-    m_minTimeUsec = minTimeUsec;
-    m_maxTimeUsec = maxTimeUsec;
 }

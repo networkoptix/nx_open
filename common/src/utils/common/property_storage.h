@@ -69,6 +69,8 @@ public:
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 
+    // TODO: we need a way to make command line parameters not to be saved to settings if they are not changed.
+
     bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
     bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 

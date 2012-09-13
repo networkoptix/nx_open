@@ -12,7 +12,7 @@ class QnWorkbenchLayout;
 class QnLayoutItemData;
 
 /**
- * Layout item. Video, image, folder, or anything else.
+ * Layout item. Video, image, server, or anything else.
  */
 class QnWorkbenchItem : public QObject {
     Q_OBJECT;
@@ -24,7 +24,7 @@ public:
     /**
      * Constructor.
      *
-     * \param resource                  Unique identifier of the resource associated with this item.
+     * \param resourceUid               Unique identifier of the resource associated with this item.
      * \param uuid                      Universally unique identifier of this item.
      * \param parent                    Parent of this object.
      */
@@ -155,7 +155,7 @@ public:
      * \param flag                      Flag to check.
      * \returns                         Whether given flag is set.
      */
-    bool checkFlag(Qn::ItemFlag flag) const {
+    bool hasFlag(Qn::ItemFlag flag) const {
         return m_flags & flag;
     }
 
@@ -173,7 +173,24 @@ public:
      * \returns                         Whether this item is pinned.
      */
     bool isPinned() const {
-        return checkFlag(Qn::Pinned);
+        return hasFlag(Qn::Pinned);
+    }
+
+    /**
+     * \param pinned                    New pinned state for this item.
+     * \returns                         Whether the pinned state was successfully set.
+     */
+    bool setPinned(bool pinned) { 
+        return setFlag(Qn::Pinned, pinned); 
+    }
+
+    /**
+     * Toggles the current pinned state of this item.
+     * 
+     * \returns                         Whether the pinned state was successfully changed.
+     */
+    bool togglePinned() { 
+        return setPinned(!isPinned()); 
     }
 
     /**
@@ -187,14 +204,6 @@ public:
      * \param degrees                   New rotation value for this item, in degrees.
      */
     void setRotation(qreal rotation);
-
-    bool setPinned(bool value) { 
-        return setFlag(Qn::Pinned, value); 
-    }
-
-    bool togglePinned() { 
-        return setPinned(!isPinned()); 
-    }
 
     /**
      * Marks this item as waiting for geometry adjustment. It will be placed
@@ -211,11 +220,40 @@ public:
      */
     void adjustGeometry(const QPointF &desiredPosition);
 
+    /**
+     * \param role                      Role to get data for.
+     * \returns                         Data for the given role.
+     */
+    QVariant data(int role) const;
+
+    /**
+     * \param role                      Role to get data for.
+     * \param defaultValue              Value to return if there is no stored data for the given role.
+     * \returns                         Data for the given role.
+     */
+    template<class T>
+    T data(int role, const T &defaultValue = T()) {
+        QVariant result = data(role);
+        if(result.canConvert<T>()) {
+            return result.value<T>();
+        } else {
+            return defaultValue;
+        }
+    }
+
+    /**
+     * \param role                      Role to set data for.
+     * \param value                     New value for the given data role.
+     * \returns                         Whether the data was successfully set.
+     */
+    bool setData(int role, const QVariant &value);
+
 signals:
     void geometryChanged();
     void geometryDeltaChanged();
     void flagChanged(Qn::ItemFlag flag, bool value);
     void rotationChanged();
+    void dataChanged(int role);
 
 protected:
     void setGeometryInternal(const QRect &geometry);
@@ -245,6 +283,9 @@ private:
 
     /** Rotation, in degrees. */
     qreal m_rotation;
+
+    /** User data by role. */
+    QHash<int, QVariant> m_dataByRole;
 };
 
 #endif // QN_WORKBENCH_ITEM_H

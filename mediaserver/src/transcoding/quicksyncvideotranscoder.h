@@ -6,6 +6,8 @@
 #ifndef QUICK_SYNC_TRANSCODER_H
 #define QUICK_SYNC_TRANSCODER_H
 
+#if 0
+
 #include <vector>
 
 #include <mfxvideo++.h>
@@ -13,7 +15,6 @@
 #include "transcoder.h"
 
 
-#if 0
 
 //!Transcodes video using Intel QuickSync API
 /*!

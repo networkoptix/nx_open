@@ -9,6 +9,8 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include "../workbench_globals.h"
+#include <utils/settings.h>
 
 class QAction;
 class QMenu;
@@ -26,9 +28,21 @@ class QnAction;
 class QnCameraSettingsDialog;
 class QnVideoCamera;
 
+// TODO: move out.
+struct QnThumbnailsSearchState {
+    QnThumbnailsSearchState(): step(0) {}
+    QnThumbnailsSearchState(const QnTimePeriod &period, qint64 step): period(period), step(step) {}
+
+    QnTimePeriod period;
+    qint64 step;
+};
+
+Q_DECLARE_METATYPE(QnThumbnailsSearchState)
+
+
 namespace detail {
     class QnResourceStatusReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceStatusReplyProcessor(QnWorkbenchActionHandler *handler, const QnVirtualCameraResourceList &resources, const QList<int> &oldDisabledFlags);
 
@@ -42,7 +56,7 @@ namespace detail {
     };
 
     class QnResourceReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnResourceReplyProcessor(QObject *parent = NULL);
 
@@ -69,14 +83,14 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnResourceList &resources, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnResourceList m_resources;
-        int m_handle;
     };
 
     class QnConnectReplyProcessor: public QObject {
-        Q_OBJECT;
+        Q_OBJECT
     public:
         QnConnectReplyProcessor(QObject *parent = NULL);
 
@@ -103,10 +117,10 @@ namespace detail {
         void at_replyReceived(int status, const QByteArray &errorString, const QnConnectInfoPtr &connectInfo, int handle);
 
     private:
+        int m_handle;
         int m_status;
         QByteArray m_errorString;
         QnConnectInfoPtr m_connectInfo;
-        int m_handle;
     };
 
 } // namespace detail
@@ -117,7 +131,7 @@ namespace detail {
  * This class implements logic for client actions.
  */
 class QnWorkbenchActionHandler: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchActionHandler(QObject *parent = NULL);
     virtual ~QnWorkbenchActionHandler();
@@ -173,6 +187,9 @@ protected slots:
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
+    void at_workbench_cellAspectRatioChanged();
+    void at_workbench_cellSpacingChanged();
+
     void at_eventManager_connectionClosed();
     void at_eventManager_connectionOpened();
 
@@ -217,11 +234,13 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_rejected();
+    void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
+    void at_serverAddCameraManuallyAction_triggered();
     void at_serverSettingsAction_triggered();
     void at_youtubeUploadAction_triggered();
     void at_editTagsAction_triggered();
-    void at_quickSearchAction_triggered();
+    void at_thumbnailsSearchAction_triggered();
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
@@ -257,10 +276,22 @@ protected slots:
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
-    void at_togglePanicModeAction_toggled(bool);
+    void at_scheduleWatcher_scheduleEnabledChanged();
+    void at_togglePanicModeAction_toggled(bool checked);
+
+    void at_toggleTourAction_toggled(bool checked);
+    void at_tourTimer_timeout();
+    void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_cameraCamera_exportFailed(QString errorMessage);
+
+
+    void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
+
+private:
+    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    void updateStoredConnections(QnConnectionData connectionData);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -287,6 +318,9 @@ private:
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;
+
+
+    QTimer *m_tourTimer;
 };
 
 #endif // QN_WORKBENCH_ACTION_HANDLER_H

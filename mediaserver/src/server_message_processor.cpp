@@ -84,6 +84,10 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (isCamera && resource->getParentId() != ownVideoServer->getId())
             return;
 
+        // We are always online
+        if (isServer)
+            resource->setStatus(QnResource::Online);
+
         QByteArray errorString;
         QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
         if (ownResource)
@@ -95,6 +99,10 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
             qnResPool->addResource(resource);
             ownResource = resource;
         }
+
+        if (isServer)
+            syncStoragesToSettings(ownVideoServer);
+
     } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
     {
         QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);

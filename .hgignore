@@ -11,21 +11,22 @@ syntax: glob
 *.sln
 *.suo
 *.user
+*.orig
 *.vcproj.filters
 *.vcxproj
 *.vcxproj.filters
 *.xcodeproj
 *.qm
+*.vcproj
+compatibility_info.cpp
 
 .DS_Store
 .idea
 Debug
 Release
 
-contrib/maven-artifacts-deploy/include
-contrib/maven-artifacts-deploy/linux
-contrib/maven-artifacts-deploy/target
-contrib/maven-artifacts-deploy/windows
+build-environment/x86
+build-environment/x64
 
 appserver/gen
 appserver/db/ecs.db
@@ -42,15 +43,11 @@ appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
 
-build
-
-client/bin
+client/build
 client/src/Info.plist
 client/src/client.pro
 client/src/common.pro
 client/src/version.h
-client/src/Makefile
-client/src/client.mak*
 client/src/ipch
 client/src/client.vcproj
 client/client.mak*
@@ -60,7 +57,8 @@ client/x64
 client/contrib/bespin/debug
 client/contrib/bespin/release
 client/contrib/bespin/Makefile*
-
+client/contrib/bespin/x86*
+client/contrib/bespin/x64*
 client/contrib/qtcolorpicker/Makefile*
 client/contrib/qtcolorpicker/buildlib
 client/contrib/qtcolorpicker/examples/Makefile*
@@ -70,11 +68,9 @@ client/contrib/qtcolorpicker/examples/simple/Makefile*
 client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
 
-common/bin
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
-common/src/common.mak*
 common/src/common.vcproj
 common/src/common.pri
 common/common.mak*
@@ -82,11 +78,20 @@ common/x86
 common/x64
 common/src/version.h
 
-mediaserver/bin
+cpp/x86
+cpp/x64
+
+debsetup/mediaserver-deb/package
+debsetup/mediaserver-deb/x86
+debsetup/mediaserver-deb/x64
+debsetup/client-deb/x86
+debsetup/client-deb/x64
+debsetup/appserver-deb/package
+debsetup/appserver-deb/x86
+debsetup/appserver-deb/x64
+
 mediaserver/src/server.pro
 mediaserver/src/version.h
-mediaserver/src/Makefile
-mediaserver/src/server.mak*
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 mediaserver/x86
@@ -94,23 +99,25 @@ mediaserver/x64
 
 mediaproxy/src/version.h
 mediaproxy/src/mediaproxy.vcproj
-mediaproxy/bin/debug
-mediaproxy/bin/release
 mediaproxy/src/mediaproxy.pro
 mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
 
+testcamera/src/version.h
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj
-testcamera/bin/debug
-testcamera/bin/release
 testcamera/testcamera.mak*
+testcamera/build
 testcamera/x86
 testcamera/x64
-testcamera/src/version.h
 
-winbuild/msvc2010/setup.bat
+traytool/src/traytool.pro
+traytool/src/version.h
+traytool/src/traytool.vcproj
+traytool/traytool.mak*
+traytool/x86
+traytool/x64
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
@@ -122,21 +129,3 @@ wixsetup/x64
 My Amplifier XE Results*
 My Inspector XE Results*
 
-traytool/bin
-traytool/src/traytool.pro
-traytool/src/version.h
-traytool/src/traytool.vcproj
-traytool/x86
-traytool/x64
-
-debsetup/mediaserver/package
-debsetup/mediaserver/x86
-debsetup/mediaserver/x64
-debsetup/appserver/package
-debsetup/appserver/x86
-debsetup/appserver/x64
-cpp/x86/version.h
-common/compatibility_info.cpp
-client/src/compatibility_info.cpp
-mediaserver/src/compatibility_info.cpp
-*.vcproj

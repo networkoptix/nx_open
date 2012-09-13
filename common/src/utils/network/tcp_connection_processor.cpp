@@ -1,6 +1,8 @@
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
+#include "ssl.h"
+#include "err.h"
 
 #ifndef Q_OS_WIN
 #include <netinet/tcp.h>
@@ -15,6 +17,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListe
     d->socket = socket;
     d->owner = _owner;
     d->chunkedMode = false;
+    d->ssl = 0;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
@@ -25,12 +28,15 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     //d->socket->setNoDelay(true);
     d->owner = _owner;
     d->chunkedMode = false;
+    d->ssl = 0;
 }
 
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
+    if (d_ptr->ssl)
+        SSL_free(d_ptr->ssl);
     delete d_ptr;
 }
 
@@ -128,6 +134,7 @@ void QnTCPConnectionProcessor::parseRequest()
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 }
 
+/*
 void QnTCPConnectionProcessor::bufferData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -151,6 +158,12 @@ void QnTCPConnectionProcessor::clearBuffer()
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.clear();
 }
+*/
+void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+{
+    Q_D(QnTCPConnectionProcessor);
+    sendData(sendBuffer.data(), sendBuffer.size());
+}
 
 void QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
@@ -158,7 +171,11 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
     QMutexLocker lock(&d->sockMutex);
     while (!m_needStop && size > 0 && d->socket->isConnected())
     {
-        int sended = d->socket->send(data, size);
+        int sended;
+        if (d->ssl)
+            sended = SSL_write(d->ssl, data, size);
+        else
+            sended = d->socket->send(data, size);
         if (sended > 0) {
 #ifdef DEBUG_RTSP
             dumpRtspData(data, sended);
@@ -169,17 +186,22 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
     }
 }
 
+
 QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    QString path = d->requestHeaders.path();
-    int pos = path.indexOf(QLatin1String("://"));
+    return extractPath(d->requestHeaders.path());
+}
+
+QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
+{
+    int pos = fullUrl.indexOf(QLatin1String("://"));
+    if (pos == -1)
+        return fullUrl;
+    pos = fullUrl.indexOf(QLatin1Char('/'), pos+3);
     if (pos == -1)
         return QString();
-    pos = path.indexOf(QLatin1Char('/'), pos+3);
-    if (pos == -1)
-        return QString();
-    return path.mid(pos+1);
+    return fullUrl.mid(pos+1);
 }
 
 void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType)
@@ -193,8 +215,10 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     }
     if (!d->responseBody.isEmpty())
     {
-        d->responseHeaders.setContentLength(d->responseBody.length());
-        d->responseHeaders.setContentType(QLatin1String(contentType));
+        //d->responseHeaders.setContentLength(d->responseBody.length());
+        //d->responseHeaders.setContentType(QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
     }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
@@ -208,22 +232,26 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     qDebug() << "\n" << response;
 
     QMutexLocker lock(&d->sockMutex);
-    d->socket->send(response.data(), response.size());
+    if (d->ssl)
+        SSL_write(d->ssl, response.data(), response.size());
+    else
+        d->socket->send(response.data(), response.size());
 }
 
 bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
 {
     Q_D(QnTCPConnectionProcessor);
-    if (d->socket->send(QByteArray::number(chunk.size(),16)) < 1)
-        return false;
-    if (d->socket->send("\r\n") < 1)
-        return false;
-    if (d->socket->send(chunk) < 1)
-        return false;
-    if (d->socket->send("\r\n") < 1)
-        return false;
+    QByteArray result = QByteArray::number(chunk.size(),16);
+    result.append("\r\n");
+    result.append(chunk.data(), chunk.size());
+    result.append("\r\n");
 
-    return true;
+    int sended;
+    if (d->ssl)
+        sended = SSL_write(d->ssl, result.data(), result.size());
+    else
+        sended = d->socket->send(result);
+    return sended == result.size();
 }
 
 QString QnTCPConnectionProcessor::codeToMessage(int code)
@@ -269,9 +297,23 @@ bool QnTCPConnectionProcessor::readRequest()
     d->requestBody.clear();
     d->responseBody.clear();
 
+    if (d->owner->getOpenSSLContext() && !d->ssl)
+    {
+        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
+        if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
+            return false;
+        if (SSL_accept(d->ssl) != 1) 
+            return false; // ssl error
+        
+    }
+
     while (!m_needStop && d->socket->isConnected())
     {
-        int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        int readed;
+        if (d->ssl) 
+            readed = SSL_read(d->ssl, d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        else
+            readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
         if (readed > 0) 
         {
             globalTimeout.restart();
@@ -294,6 +336,13 @@ bool QnTCPConnectionProcessor::readRequest()
     return false;
 }
 
+void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& other)
+{
+    Q_D(const QnTCPConnectionProcessor);
+    other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->ssl = d->ssl;
+}
+
 QUrl QnTCPConnectionProcessor::getDecodedUrl() const
 {
     Q_D(const QnTCPConnectionProcessor);
@@ -301,4 +350,12 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
     data = data.replace("+", "%20");
     return QUrl::fromEncoded(data);
 
+}
+
+void QnTCPConnectionProcessor::execute(QMutex& mutex)
+{
+    m_needStop = false;
+    mutex.unlock();
+    run();
+    mutex.lock();
 }

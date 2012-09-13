@@ -13,26 +13,39 @@
 template<class Base, bool baseIsAnimated>
 class Animated;
 
+/**
+ * Support class for <tt>Animated</tt> template. In most cases there is no
+ * need to use this class directly. The only possible use is to 
+ * <tt>dynamic_cast</tt> to it.
+ */
+class AnimatedBase {
+public:
+    void registerAnimation(AnimationTimerListener *listener);
+
+    void unregisterAnimation(AnimationTimerListener *listener);
+
+private:
+    AnimatedBase();
+    virtual ~AnimatedBase();
+
+    void updateScene(QGraphicsScene *scene);
+
+    template<class Base, bool baseIsAnimated>
+    friend class ::Animated; /* So that only this class can access our methods. */
+
+private:
+    /** A 'smart pointer' to current animation timer. 
+     * <tt>AnimationTimer<tt> is not a <tt>QObject</tt>, this is why in case
+     * we want to know of its destruction, we need to store a listener instead 
+     * of a pointer here. */
+    QScopedPointer<AnimationTimerListener> m_listener;
+
+    /** Set of animations registered with an animated item. */
+    QSet<AnimationTimerListener *> m_listeners;
+};
+
+
 namespace detail {
-    class AnimatedBase {
-    private:
-        AnimatedBase();
-        virtual ~AnimatedBase();
-
-        void updateScene(QGraphicsScene *scene);
-
-        void registerAnimation(AnimationTimerListener *listener);
-
-        void unregisterAnimation(AnimationTimerListener *listener);
-
-        template<class Base, bool baseIsAnimated>
-        friend class ::Animated; /* So that only this class can access our methods. */
-
-    private:
-        QScopedPointer<AnimationTimerListener> m_listener;
-        QSet<AnimationTimerListener *> m_listeners;
-    };
-
     template<class Base>
     struct base_is_animated {
         typedef char true_type;
@@ -45,7 +58,6 @@ namespace detail {
             value = (sizeof(check(static_cast<Base *>(NULL))) == sizeof(true_type))
         };
     };
-
 } // namespace detail
 
 
@@ -60,12 +72,12 @@ namespace detail {
  * changed.
  */
 template<class Base, bool baseIsAnimated = detail::base_is_animated<Base>::value>
-class Animated: public Base, public detail::AnimatedBase {
+class Animated: public Base, public AnimatedBase {
 public:
     QN_FORWARD_CONSTRUCTOR(Animated, Base, { updateScene(this->scene()); });
 
-    using detail::AnimatedBase::registerAnimation;
-    using detail::AnimatedBase::unregisterAnimation;
+    using AnimatedBase::registerAnimation;
+    using AnimatedBase::unregisterAnimation;
 
 protected:
     virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override {

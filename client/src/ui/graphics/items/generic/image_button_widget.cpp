@@ -11,6 +11,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/settings.h>
 
 #include <ui/animation/variant_animator.h>
 #include <ui/style/skin.h>
@@ -40,33 +41,20 @@ namespace {
     }
 
     void glDrawTexturedRect(const QRectF &rect) {
-        /* For reasons unknown, default code path produces upside-down quads on X11,
-         * so we work this around by supplying mirrored texture coordinates. */
         glBegin(GL_QUADS);
-#ifdef Q_WS_X11
-        glTexCoord(0.0, 0.0);
-        glVertex(rect.topLeft());
-        glTexCoord(1.0, 0.0);
-        glVertex(rect.topRight());
-        glTexCoord(1.0, 1.0);
-        glVertex(rect.bottomRight());
-        glTexCoord(0.0, 1.0);
-        glVertex(rect.bottomLeft());
-#else
-        glTexCoord(0.0, 1.0);
-        glVertex(rect.topLeft());
-        glTexCoord(1.0, 1.0);
-        glVertex(rect.topRight());
-        glTexCoord(1.0, 0.0);
-        glVertex(rect.bottomRight());
-        glTexCoord(0.0, 0.0);
-        glVertex(rect.bottomLeft());
-#endif //Q_WS_X11
+            glTexCoord(0.0, 0.0);
+            glVertex(rect.topLeft());
+            glTexCoord(1.0, 0.0);
+            glVertex(rect.topRight());
+            glTexCoord(1.0, 1.0);
+            glVertex(rect.bottomRight());
+            glTexCoord(0.0, 1.0);
+            glVertex(rect.bottomLeft());
         glEnd();
     }
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;
-    Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage);
+    Q_GLOBAL_STATIC(QnTextureTransitionShaderProgramStorage, qn_textureTransitionShaderProgramStorage)
 
 } // anonymous namespace
 
@@ -93,7 +81,8 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     m_skipNextHoverEvents(false),
     m_state(0),
     m_hoverProgress(0.0),
-    m_action(NULL)
+    m_action(NULL),
+    m_actionIconOverridden(false)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
     setClickableButtons(Qt::LeftButton);
@@ -150,6 +139,8 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(CHECKED | HOVERED,            bestPixmap(icon, QIcon::Active, QIcon::On));
     setPixmap(CHECKED | DISABLED,           bestPixmap(icon, QIcon::Disabled, QIcon::On));
     setPixmap(CHECKED | PRESSED,            bestPixmap(icon, QnSkin::Pressed, QIcon::On));
+
+    m_actionIconOverridden = true;
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
@@ -191,6 +182,9 @@ void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
 }
 
 void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
+    if(isDisabled())
+        return;
+
     QWeakPointer<QObject> self(this);
 
     if(m_action != NULL) {
@@ -258,17 +252,17 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            widget->bindTexture(pixmap(endState));
+            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         } else {
-            widget->bindTexture(pixmap(startState));
+            widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
         glDrawTexturedRect(rect);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
-        widget->bindTexture(pixmap(endState));
+        widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_gl->glActiveTexture(GL_TEXTURE0);
-        widget->bindTexture(pixmap(startState));
+        widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
         m_shader->setTexture0(0);
@@ -285,9 +279,6 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
-    if(isDisabled())
-        return;
-
     clickInternal(event);
 }
 
@@ -418,7 +409,7 @@ bool QnImageButtonWidget::event(QEvent *event) {
         return event->isAccepted();
     case QEvent::ActionChanged:
         if (actionEvent->action() == m_action)
-            setDefaultAction(actionEvent->action()); /** Update button state. */
+            updateFromDefaultAction();
         break;
     case QEvent::ActionAdded:
         break;
@@ -542,8 +533,13 @@ void QnImageButtonWidget::updateState(StateFlags state) {
             m_action->setChecked(isChecked());
     }
 
-    if((oldState ^ m_state) & DISABLED) /* DISABLED has changed, perform back-sync. */
-        setDisabled(m_state & DISABLED);
+    if((oldState ^ m_state) & DISABLED) { /* DISABLED has changed, perform back-sync. */
+        /* Disabled state change may have been propagated from parent item,
+         * and in this case we shouldn't do any back-sync. */
+        bool newDisabled = m_state & DISABLED;
+        if(newDisabled != isDisabled())
+            setDisabled(newDisabled); 
+    }
 
     if(m_action != NULL && !(oldState & HOVERED) && (m_state & HOVERED)) /* !HOVERED -> HOVERED transition */
         m_action->hover();
@@ -572,12 +568,20 @@ void QnImageButtonWidget::setDefaultAction(QAction *action) {
     if (!this->actions().contains(action))
         addAction(action); /* This way we will receive action-related events and thus will track changes in action state. */
 
-    setIcon(action->icon());
-    setToolTip(action->toolTip());
+    m_actionIconOverridden = false;
+    updateFromDefaultAction();
+}
 
-    setCheckable(action->isCheckable());
-    setChecked(action->isChecked());
-    setEnabled(action->isEnabled());
+void QnImageButtonWidget::updateFromDefaultAction() {
+    if(!m_actionIconOverridden) {
+        setIcon(m_action->icon());
+        m_actionIconOverridden = false;
+    }
+
+    setToolTip(m_action->toolTip());
+    setCheckable(m_action->isCheckable());
+    setChecked(m_action->isChecked());
+    setEnabled(m_action->isEnabled());
 }
 
 bool QnImageButtonWidget::isCached() const {

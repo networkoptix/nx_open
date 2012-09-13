@@ -27,6 +27,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(m_buttonBox,        SIGNAL(clicked(QAbstractButton *)), this,   SLOT(at_buttonBox_clicked(QAbstractButton *)));
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
+    connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -40,11 +41,15 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
-    m_applyButton->setEnabled(m_settingsWidget->hasChanges());
+    m_applyButton->setEnabled(m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges());
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {
     m_okButton->setEnabled(m_settingsWidget->mode() == QnCameraSettingsWidget::SingleMode || m_settingsWidget->mode() == QnCameraSettingsWidget::MultiMode);
+}
+
+void QnCameraSettingsDialog::at_advancedSettingChanged() {
+    emit advancedSettingChanged();
 }
 
 void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {

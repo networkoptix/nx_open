@@ -383,14 +383,13 @@ void QnGLRenderer::beforeDestroy()
 
 void QnGLRenderer::draw(CLVideoDecoderOutput *img)
 {
-    QMutexLocker locker(&m_displaySync);
+	 QMutexLocker locker(&m_displaySync);
 
     //m_imageList.enqueue(img);
     if (m_curImg) 
         m_curImg->setDisplaying(false);
     m_curImg = img;
     m_format = m_curImg->format;
-
 
     m_curImg->setDisplaying(true);
     if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
@@ -399,7 +398,6 @@ void QnGLRenderer::draw(CLVideoDecoderOutput *img)
         m_height_old = m_curImg->height;
         m_color_old = (PixelFormat) m_curImg->format;
     }
-
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -416,6 +414,11 @@ void QnGLRenderer::waitForFrameDisplayed(int channel)
 void QnGLRenderer::setForceSoftYUV(bool value)
 {
     m_forceSoftYUV = value;
+}
+
+const QGLContext* QnGLRenderer::context() const
+{
+	return m_context;
 }
 
 qreal QnGLRenderer::opacity() const
@@ -460,6 +463,9 @@ bool QnGLRenderer::isYuvFormat() const
 
 void QnGLRenderer::updateTexture()
 {
+	 if( m_curImg->picData.data() && (m_curImg->picData->type() == QnAbstractPictureData::pstOpenGL) )
+		 return;	//decoded picture is already in OpenGL texture
+
     unsigned int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
     unsigned int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visible
     unsigned int h[3] = { m_curImg->height, m_curImg->height / 2, m_curImg->height / 2 };
@@ -553,7 +559,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -567,7 +573,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -581,7 +587,7 @@ void QnGLRenderer::updateTexture()
                     m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
             }
             else {
-                cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
             }
             break;
 
@@ -612,44 +618,91 @@ void QnGLRenderer::updateTexture()
     }
 }
 
-void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float* v_array)
+void QnGLRenderer::drawVideoTexture( QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float* v_array )
 {
+	if( usingShaderYuvToRgb() )
+		drawVideoTextureWithShader(
+			tex0->id(),
+			tex0->texCoords(),
+			tex1->id(),
+			tex2->id(),
+			v_array );
+	else
+		drawVideoTextureDirectly( tex0->id(), tex0->texCoords(), v_array );
+}
+
+void QnGLRenderer::drawVideoTextureDirectly(
+	unsigned int tex0ID,
+	const QVector2D& tex0Coords,
+	const float* v_array )
+{
+    cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
+
+//    float tx_array[8] = {
+//        0.0f, 0.0f,
+//        tex0Coords.x(), 0.0f,
+//        tex0Coords.x(), tex0Coords.y(),
+//        0.0f, tex0Coords.y()
+//    };
     float tx_array[8] = {
         0.0f, 0.0f,
-        tex0->texCoords().x(), 0.0f,
-        tex0->texCoords().x(), tex0->texCoords().y(),
-        0.0f, tex0->texCoords().y()
+        1, 0.0f,
+        1, 1,
+        0.0f, 1
     };
 
     glEnable(GL_TEXTURE_2D);
     glCheckError("glEnable");
 
-    QnYv12ToRgbShaderProgram *prog = NULL;
-    if (usingShaderYuvToRgb()) {
-        prog = d->m_yv12ToRgbShaderProgram.data();
+    glBindTexture(GL_TEXTURE_2D, tex0ID);
+    glCheckError("glBindTexture");
 
-        prog->bind();
-        prog->setParameters(m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_painterOpacity);
+    drawBindedTexture( v_array, tx_array );
+}
 
-        d->glActiveTexture(GL_TEXTURE2);
-        glCheckError("glActiveTexture");
-        glBindTexture(GL_TEXTURE_2D, tex2->id());
-        glCheckError("glBindTexture");
+void QnGLRenderer::drawVideoTextureWithShader(
+	unsigned int tex0ID,
+	const QVector2D& tex0Coords,
+	unsigned int tex1ID,
+	unsigned int tex2ID,
+	const float* v_array )
+{
+    float tx_array[8] = {
+        0.0f, 0.0f,
+        tex0Coords.x(), 0.0f,
+        tex0Coords.x(), tex0Coords.y(),
+        0.0f, tex0Coords.y()
+    };
 
-        d->glActiveTexture(GL_TEXTURE1);
-        glCheckError("glActiveTexture");
-        glBindTexture(GL_TEXTURE_2D, tex1->id());
-        glCheckError("glBindTexture");
+    glEnable(GL_TEXTURE_2D);
+    glCheckError("glEnable");
 
-        d->glActiveTexture(GL_TEXTURE0);
-        glCheckError("glActiveTexture");
-        glBindTexture(GL_TEXTURE_2D, tex0->id());
-        glCheckError("glBindTexture");
-    } else {
-        glBindTexture(GL_TEXTURE_2D, tex0->id());
-        glCheckError("glBindTexture");
-    }
+    QnYv12ToRgbShaderProgram* prog = d->m_yv12ToRgbShaderProgram.data();
+	prog->bind();
+	prog->setParameters(m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_painterOpacity);
 
+	d->glActiveTexture(GL_TEXTURE2);
+	glCheckError("glActiveTexture");
+	glBindTexture(GL_TEXTURE_2D, tex2ID);
+	glCheckError("glBindTexture");
+
+	d->glActiveTexture(GL_TEXTURE1);
+	glCheckError("glActiveTexture");
+	glBindTexture(GL_TEXTURE_2D, tex1ID);
+	glCheckError("glBindTexture");
+
+	d->glActiveTexture(GL_TEXTURE0);
+	glCheckError("glActiveTexture");
+	glBindTexture(GL_TEXTURE_2D, tex0ID);
+	glCheckError("glBindTexture");
+
+    drawBindedTexture( v_array, tx_array );
+
+    prog->release();
+}
+
+void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
+{
     glVertexPointer(2, GL_FLOAT, 0, v_array);
     glCheckError("glVertexPointer");
     glTexCoordPointer(2, GL_FLOAT, 0, tx_array);
@@ -664,16 +717,14 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
     glCheckError("glDisableClientState");
     glDisableClientState(GL_VERTEX_ARRAY);
     glCheckError("glDisableClientState");
-
-    if (prog != NULL)
-        prog->release();
 }
 
 CLVideoDecoderOutput *QnGLRenderer::update()
 {
     QMutexLocker locker(&m_displaySync);
 
-    if (m_curImg && m_curImg->linesize[0]) {
+    if (m_curImg && (m_curImg->linesize[0] || m_curImg->picData.data()))
+    {
         m_videoWidth = m_curImg->width;
         m_videoHeight = m_curImg->height;
         updateTexture();
@@ -686,6 +737,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
 
     return m_curImg;
 }
+
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
 {
@@ -709,23 +761,41 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
     }
     m_newtexture = false;
 
-    bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
-    if(!draw) 
+    const bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
+    if( !draw )
     {
         result = Qn::CannotRender;
     } 
-    else if(m_videoWidth > 0 && m_videoHeight > 0)
+    else if( m_videoWidth > 0 && m_videoHeight > 0 )
     {
         QRectF temp(r);
         const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
-        drawVideoTexture(texture(0), texture(1), texture(2), v_array);
+        if( m_curImg && m_curImg->picData && (m_curImg->picData.data()->type() == QnAbstractPictureData::pstOpenGL) )
+        {
+        	drawVideoTextureDirectly(
+           		static_cast<const QnOpenGLPictureData*>(m_curImg->picData.data())->glTexture(),
+           		texture(0)->texCoords(),
+           		v_array );
+        	m_prevFramePicData = m_curImg->picData;
+        }
+        else if( m_prevFramePicData && (m_prevFramePicData.data()->type() == QnAbstractPictureData::pstOpenGL) )
+        {
+            drawVideoTextureDirectly(
+                static_cast<const QnOpenGLPictureData*>(m_prevFramePicData.data())->glTexture(),
+                texture(0)->texCoords(),
+                v_array );
+        }
+        else
+        {
+        	drawVideoTexture( texture(0), texture(1), texture(2), v_array );
+        }
     }
     else
     {
         result = Qn::NothingRendered;
     }
 
-    QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker( &m_displaySync );
     if (curImg && curImg == m_curImg && curImg->isDisplaying()) {
         curImg->setDisplaying(false);
         m_curImg = 0;

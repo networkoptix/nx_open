@@ -91,9 +91,10 @@ void QnResource::update(QnResourcePtr other)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        QMutexLocker mutexLocker2(&other->m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
+        // TODO: use ordered mutex locker here to avoid deadlocks.
+        QMutexLocker mutexLocker(&m_mutex); 
+        QMutexLocker mutexLocker2(&other->m_mutex); 
+        updateInner(other); 
     }
     setStatus(other->m_status);
     setDisabled(other->m_disabled);
@@ -558,8 +559,8 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
 
-        if (oldStatus == Unauthorized && newStatus == Offline)
-            return; 
+        //if (oldStatus == Unauthorized && newStatus == Offline)
+        //    return; 
 
         m_status = newStatus;
 
@@ -820,4 +821,9 @@ void QnResource::initAsync()
 bool QnResource::isInitialized() const
 {
     return m_initialized;
+}
+
+QnAbstractPtzController* QnResource::getPtzController()
+{
+    return 0;
 }

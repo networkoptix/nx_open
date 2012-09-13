@@ -2,14 +2,15 @@
 
 #include <cmath> /* For std::fmod. */
 
-#include <QApplication>
-#include <QPainter>
-#include <QStyleOption>
-#include <QMenu>
-#include <QAction>
-#include <QSet>
-#include <QToolBar>
-#include <QAbstractItemView>
+#include <QtCore/QSet>
+#include <QtGui/QApplication>
+#include <QtGui/QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QStyleOption>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/QToolBar>
+#include <QtGui/QAbstractItemView>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
@@ -23,6 +24,7 @@
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
+#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -48,22 +50,39 @@ namespace {
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
     m_skin(qnSkin),
+    m_globals(qnGlobals),
     m_animator(new QnNoptixStyleAnimator(this))
 {
     GraphicsStyle::setBaseStyle(this);
 
-    m_branchClosed = m_skin->icon("branch_closed.png");
-    m_branchOpen = m_skin->icon("branch_open.png");
-    m_closeTab = m_skin->icon("decorations/close_tab.png");
+    m_branchClosed = m_skin->icon("tree/branch_closed.png");
+    m_branchOpen = m_skin->icon("tree/branch_open.png");
+    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 
-    m_grooveBorder = m_skin->pixmap("slider_groove_lborder.png");
-    m_grooveBody = m_skin->pixmap("slider_groove_body.png");
-    m_sliderHandleHovered = m_skin->pixmap("slider_handle_hovered.png");
-    m_sliderHandle = m_skin->pixmap("slider_handle.png");
+    m_grooveBorder = m_skin->pixmap("slider/slider_groove_lborder.png");
+    m_grooveBody = m_skin->pixmap("slider/slider_groove_body.png");
+    m_sliderHandleHovered = m_skin->pixmap("slider/slider_handle_hovered.png");
+    m_sliderHandle = m_skin->pixmap("slider/slider_handle.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
     return;
+}
+
+QPixmap	QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const {
+    if(iconMode == QIcon::Disabled) {
+        QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
+        image.fill(qRgba(0, 0, 0, 0));
+
+        QPainter painter(&image);
+        painter.setOpacity(0.3);
+        painter.drawPixmap(0, 0, pixmap);
+        painter.end();
+        
+        return QPixmap::fromImage(image);
+    } else {
+        return base_type::generatedIconPixmap(iconMode, pixmap, option);
+    }
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
@@ -182,6 +201,19 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
+    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
+
+    QPalette palette = application->palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
+    palette.setColor(QPalette::Button, activeColor);
+    application->setPalette(palette);
+
+    QFont font;
+    font.setPixelSize(12);
+    font.setStyle(QFont::StyleNormal);
+    font.setWeight(QFont::Normal);
+    application->setFont(font);
+
     QFont menuFont;
     menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
@@ -199,16 +231,6 @@ void QnNoptixStyle::polish(QWidget *widget) {
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
         itemView->setIconSize(QSize(18, 18));
-        
-        QFont font = itemView->font();
-        font.setPointSize(10);
-        itemView->setFont(font);
-    } else if(QTabBar *tabBar = qobject_cast<QTabBar *>(widget)) {
-        if(tabBar->inherits("QnLayoutTabBar")) {
-            QFont font = tabBar->font();
-            font.setPointSize(10);
-            tabBar->setFont(font);
-        }
     }
 }
 
@@ -449,9 +471,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         grooveBodyPic = m_grooveBody;
         handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
     } else {
-        grooveBorderPic = m_skin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
     int d = grooveRect.height();

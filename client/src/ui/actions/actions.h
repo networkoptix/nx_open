@@ -123,8 +123,6 @@ namespace Qn {
          * Opens the main menu.
          */
         MainMenuAction,
-        LightMainMenuAction,
-        DarkMainMenuAction,
 
         /**
          * Opens a new tab (layout).
@@ -167,7 +165,7 @@ namespace Qn {
         /**
          * Starts / stops screen recording.
          */
-        ScreenRecordingAction,
+        ToggleScreenRecordingAction,
 
         /**
          * Toggles client's fullscreen state.
@@ -268,7 +266,6 @@ namespace Qn {
          */
         OpenAnyNumberOfLayoutsAction,
 
-
         /**
          * Opens selected layouts in a new window.
          */
@@ -361,6 +358,11 @@ namespace Qn {
          * Opens server settings dialog.
          */
         ServerSettingsAction,
+
+        /**
+         * Opens manual camera addition dialog.
+         */
+        ServerAddCameraManuallyAction,
 
         /**
          * Opens a YouTube upload dialog.
@@ -469,6 +471,11 @@ namespace Qn {
          */
         TogglePanicModeAction,
 
+        /**
+         * Toggles tour mode.
+         */
+        ToggleTourModeAction,
+
 
 
         /* Slider actions. */
@@ -510,12 +517,27 @@ namespace Qn {
          * 
          * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
          */
-        QuickSearchAction,
+        ThumbnailsSearchAction,
 
         /**
          * Shows/hides calendar.
          */
         ToggleCalendarAction,
+
+
+        /* Playback actions. */
+        PlayPauseAction,
+        SpeedDownAction,
+        SpeedUpAction,
+        PreviousFrameAction,
+        NextFrameAction,
+        JumpToStartAction,
+        JumpToEndAction,
+        VolumeUpAction,
+        VolumeDownAction,
+        ToggleMuteAction,
+        JumpToLiveAction,
+        ToggleSyncAction,
 
 
         /* Debug actions. */

@@ -9,6 +9,7 @@
 #include "utils/media/ffmpeg_helper.h"
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
+#include "utils/media/nalUnits.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -182,8 +183,13 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
         if (av_read_frame(m_formatContext, &packet) < 0)
             return QnAbstractMediaDataPtr();
-
         stream= m_formatContext->streams[packet.stream_index];
+        if (stream->codec->codec_id == CODEC_ID_H264 && packet.size == 6)
+        {
+            // may be H264 delimiter as separate packet. remove it
+            if (packet.data[0] == 0x00 && packet.data[1] == 0x00 && packet.data[2] == 0x00 && packet.data[3] == 0x01 && packet.data[4] == nuDelimiter)
+                continue; // skip delimiter
+        }
 
         if (m_indexToChannel.isEmpty())
             initLayoutStreams();
@@ -223,6 +229,22 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->compressionType = stream->codec->codec_id;
     data->flags = packet.flags;
     data->timestamp = packetTimestamp(packet);
+
+    while (packet.stream_index >= m_lastPacketTimes.size())
+        m_lastPacketTimes << 0;
+    if (data->timestamp == AV_NOPTS_VALUE) {
+        /*
+        AVStream* stream = m_formatContext->streams[packet.stream_index];
+        if (stream->r_frame_rate.num)
+            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->r_frame_rate.den / stream->r_frame_rate.num;
+        else if (stream->time_base.den)
+            m_lastPacketTimes[packet.stream_index] += 1000000ll * stream->time_base.num / stream->time_base.den;
+        */
+        data->timestamp = m_lastPacketTimes[packet.stream_index];
+    }
+    else {
+        m_lastPacketTimes[packet.stream_index] = data->timestamp;
+    }
 
     av_free_packet(&packet);
 

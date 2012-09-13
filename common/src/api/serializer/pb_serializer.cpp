@@ -77,6 +77,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_audioenabled())
         camera->setAudioEnabled(pb_camera.audioenabled());
 
+    if (pb_camera.has_manuallyadded())
+        camera->setManuallyAdded(pb_camera.manuallyadded());
+
     if (pb_camera.has_physicalid())
         camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
@@ -146,6 +149,8 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
     server->setGuid(QString::fromStdString(pb_serverResource.guid()));
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
+    if (pb_server.has_streamingurl())
+        server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -280,7 +285,8 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
 
     user->setName(QString::fromUtf8(pb_userResource.name().c_str()));
     user->setAdmin(pb_user.isadmin());
-    user->setGuid(QString::fromStdString(pb_userResource.guid()));
+    user->setPermissions(pb_user.rights());
+    user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
@@ -477,6 +483,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_region(serializeMotionRegionList(cameraPtr->getMotionRegionList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
+    pb_camera.set_manuallyadded(cameraPtr->isManuallyAdded());
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     QnParamList params = cameraPtr->getResourceParamList();
@@ -728,6 +735,7 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
     pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
+    pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
 
     if (!serverPtr->getNetAddrList().isEmpty())
@@ -765,8 +773,9 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     pb_userResource.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
+    pb_user.set_rights(userPtr->getPermissions());
     pb_user.set_isadmin(userPtr->isAdmin());
-    pb_userResource.set_guid(userPtr->getGuid().toAscii().constData());
+    pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
 
     std::string str;
     pb_users.SerializeToString(&str);

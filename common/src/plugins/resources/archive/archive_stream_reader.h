@@ -26,7 +26,6 @@ public:
     virtual bool setAudioChannel(unsigned int num);
     virtual bool isReverseMode() const { return m_reverseMode;}
     virtual bool isNegativeSpeedSupported() const;
-    virtual void setSingleShotMode(bool single);
     virtual bool isSingleShotMode() const;
 
 
@@ -54,7 +53,7 @@ public:
 
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
-    virtual bool getQuality() const override;
+    virtual MediaQuality getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
 
@@ -70,7 +69,7 @@ public:
 
     virtual QnMediaContextPtr getCodecContext() const override;
 
-    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) override;
+    virtual void startPaused() override;
 protected:
     virtual bool init();
 
@@ -113,11 +112,9 @@ private:
     bool m_prevReverseMode;
     FrameTypeExtractor* m_frameTypeExtractor;
     qint64 m_lastGopSeekTime;
-    //QVector<qint64> m_lastPacketTimes;
     QVector<int> m_audioCodecs;
     bool m_IFrameAfterJumpFound;
     qint64 m_requiredJumpTime;
-    qint64 m_lastFrameDuration;
     QString m_onDestroyFileName;
     bool m_BOF;
     int m_afterBOFCounter;
@@ -153,10 +150,7 @@ private:
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
-
-    qint64 m_timeOffsetUsec;
-    qint64 m_minTimeUsec;
-    qint64 m_maxTimeUsec;
+    bool m_pausedStart;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

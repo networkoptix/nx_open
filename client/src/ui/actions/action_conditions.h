@@ -223,10 +223,11 @@ public:
  */
 class QnTimePeriodActionCondition: public QnActionCondition {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, QObject *parent = NULL):
+    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, bool centralItemRequired, QObject *parent = NULL):
         QnActionCondition(parent),
         m_periodTypes(periodTypes),
-        m_nonMatchingVisibility(nonMatchingVisibility)
+        m_nonMatchingVisibility(nonMatchingVisibility),
+        m_centralItemRequired(centralItemRequired)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
@@ -234,6 +235,7 @@ public:
 private:
     Qn::TimePeriodTypes m_periodTypes;
     Qn::ActionVisibility m_nonMatchingVisibility;
+    bool m_centralItemRequired;
 };
 
 class QnExportActionCondition: public QnActionCondition {
@@ -245,6 +247,27 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnPanicActionCondition: public QnActionCondition {
+public:
+    QnPanicActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent)
+    {}
 
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnToggleTourActionCondition: public QnActionCondition {
+public:
+    QnToggleTourActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnArchiveActionCondition: public QnActionCondition {
+public:
+    QnArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
 
 #endif // QN_ACTION_CONDITIONS_H

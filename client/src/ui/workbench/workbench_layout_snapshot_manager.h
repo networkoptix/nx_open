@@ -49,6 +49,7 @@ public:
     void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
     void save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
 
+    void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
     Qn::ResourceSavingFlags flags(const QnLayoutResourcePtr &resource) const;
@@ -99,7 +100,7 @@ protected slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layouts_saved(const QnLayoutResourceList &resources);
     void at_layouts_saveFailed(const QnLayoutResourceList &resources);
-    void at_layout_changed(const QnLayoutResourcePtr &resource);
+    void at_layout_storeRequested();
     void at_layout_changed();
 
 private:

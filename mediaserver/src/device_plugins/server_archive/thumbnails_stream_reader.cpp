@@ -21,8 +21,15 @@ QnThumbnailsStreamReader::QnThumbnailsStreamReader(QnResourcePtr dev ) :
     m_cseq = 0;
 }
 
+void QnThumbnailsStreamReader::setQuality(MediaQuality q)
+{
+    m_archiveDelegate->setQuality(q, true);
+}
+
+
 QnThumbnailsStreamReader::~QnThumbnailsStreamReader()
 {
+    stop();
     delete m_delegate;
 }
 

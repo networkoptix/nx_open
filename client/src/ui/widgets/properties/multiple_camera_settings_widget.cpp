@@ -15,18 +15,21 @@
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::MultipleCameraSettingsWidget),
-    m_hasChanges(false),
+    m_hasDbChanges(false),
     m_hasScheduleChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false)
 {
     ui->setupUi(this);
 
-    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
-    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dataChanged()));
+    ui->cameraScheduleWidget->setContext(context());
+
+    connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
+    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->checkBoxEnableAudio,    SIGNAL(clicked()),                  this,       SLOT(at_enableAudioCheckBox_clicked()));
-    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dataChanged()));
+    connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
@@ -123,7 +126,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
             camera->setScheduleTasks(scheduleTasks);
     }
 
-    setHasChanges(false);
+    setHasDbChanges(false);
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
@@ -216,7 +219,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
     ui->cameraScheduleWidget->setCameras(m_cameras);
 
-    setHasChanges(false);
+    setHasDbChanges(false);
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -235,12 +238,12 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
     m_readOnly = readOnly;
 }
 
-void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
-    if(m_hasChanges == hasChanges)
+void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
+    if(m_hasDbChanges == hasChanges)
         return;
 
-    m_hasChanges = hasChanges;
-    if(!m_hasChanges) {
+    m_hasDbChanges = hasChanges;
+    if(!m_hasDbChanges) {
         m_hasScheduleChanges = false;
         m_hasScheduleEnabledChanges = false;
     }
@@ -248,22 +251,21 @@ void QnMultipleCameraSettingsWidget::setHasChanges(bool hasChanges) {
     emit hasChangesChanged();
 }
 
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnMultipleCameraSettingsWidget::at_dataChanged() {
-    setHasChanges(true);
+void QnMultipleCameraSettingsWidget::at_dbDataChanged() {
+    setHasDbChanges(true);
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged() {
-    at_dataChanged();
+    at_dbDataChanged();
 
     m_hasScheduleChanges = true;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
-    at_dataChanged();
+    at_dbDataChanged();
 
     m_hasScheduleEnabledChanges = true;
 }

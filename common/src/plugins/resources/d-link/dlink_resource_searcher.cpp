@@ -57,6 +57,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+
+        if (shouldStop())
+            return QnResourceList();
+
         QUdpSocket sock;
 
         if (!bindToInterface(sock, iface))
@@ -157,9 +161,9 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
-    Q_UNUSED(addr)
+    Q_UNUSED(url)
     return QnResourcePtr(0);
 }
 

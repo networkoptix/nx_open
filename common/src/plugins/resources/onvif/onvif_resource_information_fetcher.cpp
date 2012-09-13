@@ -3,13 +3,15 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
+#include "core/resourcemanagment/resource_pool.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
 
 OnvifResourceInformationFetcher::OnvifResourceInformationFetcher():
     /*passwordsData(PasswordHelper::instance()),*/
-    camersNamesData(NameHelper::instance())
+    camersNamesData(NameHelper::instance()),
+    m_shouldStop(false)
 {
     QnResourceTypePtr typePtr(qnResTypePool->getResourceTypeByName(QLatin1String(ONVIF_RT)));
     if (!typePtr.isNull()) {
@@ -29,7 +31,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 {
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
-    while(iter != endpointInfo.end()) {
+    while(iter != endpointInfo.end() && !m_shouldStop) {
         findResources(iter.key(), iter.value(), result);
 
         ++iter;
@@ -57,9 +59,13 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     QString name = info.name;
     QHostAddress sender(QUrl(endpoint).host());
     //TODO:UTF unuse std::string
-    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string());
+    DeviceSoapWrapper soapWrapper(endpoint.toStdString(), std::string(), std::string(), 0);
 
-    soapWrapper.fetchLoginPassword(info.manufacturer);
+    QnNetworkResourcePtr existResource = qnResPool->getNetResourceByPhysicalId(info.uniqId);
+    if (existResource)
+        soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
+    else
+        soapWrapper.fetchLoginPassword(info.manufacturer);
     qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
@@ -212,4 +218,9 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
     return resource;
+}
+
+void OnvifResourceInformationFetcher::pleaseStop()
+{
+    m_shouldStop = true;
 }

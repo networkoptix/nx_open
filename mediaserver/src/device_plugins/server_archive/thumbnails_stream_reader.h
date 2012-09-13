@@ -24,6 +24,8 @@ public:
     * Frame step in mks
     */
     void setRange(qint64 startTime, qint64 endTime, qint64 frameStep, int cseq);
+
+    void setQuality(MediaQuality q);
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void run();

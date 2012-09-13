@@ -19,34 +19,33 @@
                     <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
                 </Control>
-            	
                 <Control Type="Text" Id="PortLabel" Width="21" Height="17" X="269" Y="68" Text="Port" />
                 <Control Type="Edit" Id="Port" Width="55" Height="15" X="296" Y="67" Property="SERVER_APPSERVER_PORT">
                     <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
                 </Control>
-            	
                 <Control Type="Text" Id="LoginLabel" Width="32" Height="17" X="25" Y="92" Text="Login" />
                 <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_APPSERVER_LOGIN">
                     <Condition Action="disable"><![CDATA[(!AppServerFeature=3 OR &AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(!AppServerFeature<>3 AND &AppServerFeature<>3)]]></Condition>
                 </Control>
-            	
                 <Control Type="Text" Id="PasswordLabel" Width="46" Height="15" X="190" Y="92" Text="Password" />
                 <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_APPSERVER_PASSWORD">
                     <Condition Action="disable"><![CDATA[(&AppServerFeature=3)]]></Condition>
                     <Condition Action="enable"><![CDATA[(&AppServerFeature<>3)]]></Condition>
                 </Control>
-            	
-                <Control Id="label1" Type="Text" Height="17" Width="70" X="25" Y="131" Text="RTSP Port" />
-                <Control Id="textBox1" Type="Edit" Height="15" Width="105" X="93" Y="129" Property="SERVER_RTSP_PORT" />
-                <Control Id="label2" Type="Text" Height="17" Width="34" X="233" Y="130" Text="API Port" />
-                <Control Id="textBox2" Type="Edit" Height="15" Width="80" X="273" Y="128" Property="SERVER_API_PORT" />
+                <Control Id="label1" Type="Text" Height="17" Width="70" X="25" Y="131" Text="Port" />
+                <Control Id="textBox1" Type="Edit" Height="15" Width="83" X="93" Y="129" Property="SERVER_PORT" />
                 <Control Id="label3" Type="Text" Height="17" Width="70" X="25" Y="161" Text="Recording Folder" />
-                <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" />
+                <Control Id="ServerMediaDir" Type="PathEdit" Height="15" Width="197" X="93" Y="158" Property="WIXUI_SERVER_DIRECTORY" Indirect="yes" >
+                    <Condition Action="disable"><![CDATA[ NUMBER_OF_STORAGES > 1 ]]></Condition>
+                    <Condition Action="enable"><![CDATA[ NOT NUMBER_OF_STORAGES OR NUMBER_OF_STORAGES <= 1 ]]></Condition>                
+                </Control>
                 <Control Id="groupBox1" Type="GroupBox" Height="66" Width="345" X="15" Y="49" Text="Enterprise Controller" />
-                <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" />
-            	
+                <Control Id="ChangeServerMediaDir" Type="PushButton" Height="17" Width="56" X="296" Y="158" Text="Browse" >
+                    <Condition Action="disable"><![CDATA[ NUMBER_OF_STORAGES > 1 ]]></Condition>
+                    <Condition Action="enable"><![CDATA[ NOT NUMBER_OF_STORAGES OR NUMBER_OF_STORAGES <= 1 ]]></Condition>                
+                </Control>
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
                 <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
                 <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
@@ -59,14 +58,17 @@
                 <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
                 <Control Id="groupBox2" Type="GroupBox" Height="67" Width="345" X="15" Y="119" Text="Media Server" />
                 <Control Id="warning1label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
-                    <Condition Action="hide">NOT SERVERDIR_LOWDISKSPACE</Condition>
-                    <Condition Action="show">SERVERDIR_LOWDISKSPACE AND NOT SERVERDIR_CANT_WRITE</Condition>
+                    <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES > 1 OR NOT SERVERDIR_LOWDISKSPACE ]]></Condition>
+                    <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES <= 1 AND SERVERDIR_LOWDISKSPACE AND NOT SERVERDIR_CANT_WRITE ]]></Condition>
                 </Control>
                 <Control Id="warning2label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Warning: The selected volume has less than 10 GB of free size">
-                    <Condition Action="hide">NOT SERVERDIR_CANT_WRITE</Condition>
-                    <Condition Action="show">SERVERDIR_CANT_WRITE</Condition>
+                    <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES > 1 OR NOT SERVERDIR_CANT_WRITE ]]></Condition>
+                    <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES <= 1 AND SERVERDIR_CANT_WRITE ]]></Condition>
                 </Control>
-            
+                <Control Id="warning3label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Recording folder is already configured">
+                    <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES <= 1 ]]></Condition>
+                    <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES > 1 ]]></Condition>
+                </Control>
             </Dialog>
         </UI>
     </Fragment>

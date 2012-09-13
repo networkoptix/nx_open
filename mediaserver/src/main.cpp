@@ -56,6 +56,14 @@
 #include "rest/handlers/fs_checker.h"
 #include "rest/handlers/get_statistics.h"
 #include "rest/handlers/cameraparamshttphandler.h"
+#include "rest/handlers/manual_camera_addition.h"
+#include "rest/server/rest_connection_processor.h"
+#include "rtsp/rtsp_connection.h"
+#include "network/default_tcp_connection_processor.h"
+#include "rest/handlers/ptz_rest_handler.h"
+#include "utils/common/module_resources.h"
+
+#define USE_SINGLE_STREAMING_PORT
 
 //#include "plugins/resources/digitalwatchdog/dvr/dw_dvr_resource_searcher.h"
 
@@ -74,6 +82,7 @@ void stopServer(int signal);
 //#define TEST_RTSP_SERVER
 
 static const int DEFAUT_RTSP_PORT = 50000;
+static const int DEFAULT_STREAMING_PORT = 50000;
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -186,11 +195,7 @@ QnAbstractStorageResourcePtr createDefaultStorage()
     //QnStorageResourcePtr storage(new QnStorageResource());
     QnAbstractStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
     storage->setName("Initial");
-#ifdef Q_OS_WIN
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "c:/records").toString()));
-#else
-    storage->setUrl(QDir::fromNativeSeparators(qSettings.value("mediaDir", "/tmp/vmsrecords").toString()));
-#endif
+    storage->setUrl(defaultStoragePath());
     storage->setSpaceLimit(5ll * 1000000000);
 
     cl_log.log("Creating new storage", cl_logINFO);
@@ -208,7 +213,13 @@ void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddr
     server->setApiUrl(QString("http://") + myAddress + QString(':') + QString::number(55002));
 #else
     server->setUrl(QString("rtsp://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+#ifdef USE_SINGLE_STREAMING_PORT
+    server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+    server->setStreamingUrl(QString("http://") + myAddress + QString(':') + qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toString());
+#else
     server->setApiUrl(QString("http://") + myAddress + QString(':') + qSettings.value("apiPort", DEFAULT_REST_PORT).toString());
+    server->setStreamingUrl(QString("https://") + myAddress + QString(':') + qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toString());
+#endif
 #endif
 }
 
@@ -249,6 +260,7 @@ QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
 {
     QnVideoServerResourceList servers;
     QByteArray errorString;
+    serverPtr->setStatus(QnResource::Online);
     if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
@@ -327,6 +339,24 @@ int serverMain(int argc, char *argv[])
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
 
+#ifdef Q_OS_WIN
+    int priority = ABOVE_NORMAL_PRIORITY_CLASS;
+    int hrez = SetPriorityClass(GetCurrentProcess(), priority);
+    if (hrez == 0)
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << priority;
+#endif
+#ifdef Q_OS_LINUX
+    errno = 0;
+    int newNiceVal = nice( -10 );
+    if( newNiceVal == -1 && errno != 0 )
+        qWarning() << "Error increasing process priority. " << strerror(errno);
+    else
+        qDebug() << "Successfully increasing process priority to" << newNiceVal;
+#endif
+
+
     ffmpegInit();
 
     // ------------------------------------------
@@ -371,7 +401,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnVideoServer
     appServerEventsUrl.setUserName(settings.value("appserverLogin", QLatin1String("admin")).toString());
     appServerEventsUrl.setPassword(settings.value("appserverPassword", QLatin1String("123")).toString());
     appServerEventsUrl.setPath("/events/");
-    appServerEventsUrl.addQueryItem("id", mediaServer->getId().toString());
+    appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
     appServerEventsUrl.addQueryItem("format", "pb");
 
@@ -387,7 +417,7 @@ bool checkIfAppServerIsOld()
     QUrl httpUrl;
     httpUrl.setHost(QnAppServerConnectionFactory::defaultUrl().host());
     httpUrl.setPort(QnAppServerConnectionFactory::defaultUrl().port());
-    httpUrl.setScheme("http");
+    httpUrl.setScheme("https");
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 
@@ -407,7 +437,8 @@ QnMain::QnMain(int argc, char* argv[])
     m_processor(0),
     m_rtspListener(0),
     m_restServer(0),
-    m_progressiveDownloadingServer(0)
+    m_progressiveDownloadingServer(0),
+    m_universalTcpListener(0)
 {
     serviceMainInstance = this;
 }
@@ -421,6 +452,18 @@ QnMain::~QnMain()
 
 void QnMain::stopObjects()
 {
+    if (m_restServer)
+        m_restServer->pleaseStop();
+    if (m_progressiveDownloadingServer)
+        m_progressiveDownloadingServer->pleaseStop();
+    if (m_rtspListener)
+        m_rtspListener->pleaseStop();
+    if (m_universalTcpListener) {
+        m_universalTcpListener->pleaseStop();
+        delete m_universalTcpListener;
+        m_universalTcpListener = 0;
+    }
+
     if (m_restServer)
     {
         delete m_restServer;
@@ -457,14 +500,24 @@ void QnMain::loadResourcesFromECS()
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
         QnSleep::msleep(10000);
     }
+
+    QnManualCamerasMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
-        if (ownResource)
+        if (ownResource) {
             ownResource->update(camera);
-        else
+        }
+        else {
             qnResPool->addResource(camera);
+            QnVirtualCameraResourcePtr virtualCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(camera);
+            if (virtualCamera->isManuallyAdded()) {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(virtualCamera->getTypeId());
+                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getManufacture()));
+            }
+        }
     }
+    QnResourceDiscoveryManager::instance().registerManualCameras(manualCameras);
 
     QnCameraHistoryList cameraHistoryList;
     while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
@@ -492,6 +545,39 @@ void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnR
 {
     if (status != 0)
         qWarning() << "Error saving server: " << errorString;
+}
+
+void QnMain::initTcpListener()
+{
+    int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
+#ifdef USE_SINGLE_STREAMING_PORT
+    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFsHelperHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
+    QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
+    QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
+
+    m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
+    m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
+    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
+    m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    m_universalTcpListener->start();
+#else
+    int apiPort = qSettings.value("apiPort", DEFAULT_REST_PORT).toInt();
+    int streamingPort = qSettings.value("streamingPort", DEFAULT_STREAMING_PORT).toInt();
+
+    m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
+    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->enableSSLMode();
+    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
+    m_restServer->start();
+    m_progressiveDownloadingServer->start();
+    m_rtspListener->start();
+#endif
 }
 
 void QnMain::run()
@@ -559,6 +645,7 @@ void QnMain::run()
     if (needToStop())
         return;
 
+
     QnResource::startCommandProc();
 
     QnResourcePool::instance(); // to initialize net state;
@@ -571,6 +658,8 @@ void QnMain::run()
         appserverHost = resolveHost(appserverHostString);
     } while (appserverHost.toIPv4Address() == 0);
 
+    initTcpListener();
+
     while (m_videoServer.isNull())
     {
         QnVideoServerResourcePtr server = findServer(appServerConnection);
@@ -581,13 +670,16 @@ void QnMain::run()
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
         server->setNetAddrList(allLocalAddresses());
 
-        if (server->getStorages().isEmpty())
+        QnAbstractStorageResourceList storages = server->getStorages();
+        if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
             server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
         m_videoServer = registerServer(appServerConnection, server);
         if (m_videoServer.isNull())
             QnSleep::msleep(1000);
     }
+
+    syncStoragesToSettings(m_videoServer);
 
     int status;
     do
@@ -600,19 +692,6 @@ void QnMain::run()
     eventManager->run();
 
     m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
-
-    QUrl rtspUrl(m_videoServer->getUrl());
-    QUrl apiUrl(m_videoServer->getApiUrl());
-
-    m_restServer = new QnRestServer(QHostAddress::Any, apiUrl.port());
-    m_restServer->registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-    m_restServer->registerHandler("api/CheckPath", new QnFsHelperHandler(true));
-    m_restServer->registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
-    m_restServer->registerHandler("api/statistics", new QnGetStatisticsHandler());
-    m_restServer->registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
-    m_restServer->registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
-
-    m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, 8890);
 
     foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
     {
@@ -685,8 +764,6 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().setReady(true);
     QnResourceDiscoveryManager::instance().start();
 
-    m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
-    m_rtspListener->start();
 
     connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
@@ -742,6 +819,17 @@ private:
 void stopServer(int signal)
 {
     Q_UNUSED(signal)
+
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+    QnRecordingManager::instance()->stop();
+    QnVideoCameraPool::instance()->stop();
+    if (serviceMainInstance)
+    {
+        serviceMainInstance->stopObjects();
+        serviceMainInstance = 0;
+    }
+
     qApp->quit();
 }
 
@@ -749,22 +837,11 @@ void stopServer(int signal)
 
 int main(int argc, char* argv[])
 {
+    QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);
 
     int result = service.exec();
-
-    QnResource::stopCommandProc();
-    QnResourceDiscoveryManager::instance().stop();
-    QnRecordingManager::instance()->stop();
-
-    QnVideoCameraPool::instance()->stop();
-
-    if (serviceMainInstance)
-    {
-        serviceMainInstance->stopObjects();
-        serviceMainInstance = 0;
-    }
 
     return result;
 }

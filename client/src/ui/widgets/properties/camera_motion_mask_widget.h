@@ -19,17 +19,17 @@ class QnMediaResourceWidget;
 
 class QnCameraMotionMaskWidget: public QWidget
 {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
         
 public:
     QnCameraMotionMaskWidget(QWidget *parent = 0);
     virtual ~QnCameraMotionMaskWidget();
 
-    const QnResourcePtr &camera() const;
+    QnResourcePtr camera() const;
     void setCamera(const QnResourcePtr &resource);
 
-    const QList<QnMotionRegion> &motionRegionList() const;
+    QList<QnMotionRegion> motionRegionList() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);

@@ -113,7 +113,7 @@ public:
     qint64 windowEnd() const;
     void setWindowEnd(qint64 windowEnd);
 
-    void setWindow(qint64 start, qint64 end);
+    void setWindow(qint64 start, qint64 end, bool animate = false);
 
     bool windowContains(qint64 position);
     void ensureWindowContains(qint64 position);
@@ -139,7 +139,6 @@ public:
     void setToolTipFormat(const QString &format);
 
     Q_SLOT void finishAnimations();
-    Q_SLOT void animatedUnzoom();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -309,7 +308,8 @@ private:
     QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
-    bool m_unzooming;
+    bool m_animating;
+    qint64 m_animationStart, m_animationEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;

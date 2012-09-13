@@ -7,8 +7,10 @@
 #include <utils/common/performance.h>
 #include <utils/settings.h>
 
+
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(int channelCount, QObject *parent, const QGLContext *context):
-    QObject(parent)
+    QObject(parent),
+    m_glContext( context )
 {
     for(int i = 0; i < channelCount; i++) {
         QnGLRenderer* renderer = new QnGLRenderer(context);
@@ -92,3 +94,7 @@ QSize QnResourceWidgetRenderer::sourceSize() const {
     return m_sourceSize;
 }
 
+const QGLContext* QnResourceWidgetRenderer::glContext() const
+{
+    return m_glContext;
+}

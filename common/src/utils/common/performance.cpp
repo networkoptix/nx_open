@@ -1,5 +1,9 @@
 #include "performance.h"
 
+#include <map>
+#include <set>
+#include <string>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QThread>
@@ -24,7 +28,9 @@
 
 
 /** statistics usage update timer, in seconds. */
-#define STATISTICS_USAGE_REFRESH 1
+#define STATISTICS_USAGE_REFRESH 2
+
+using namespace std;
 
 // -------------------------------------------------------------------------- //
 // CPU Usage
@@ -66,11 +72,20 @@ namespace {
             return m_totalUsage;
         }
 
-        bool hddUsage(QList<int> *output){
+        bool hddUsage(QList<QnPerformance::QnHddData> *output){
+            QMutexLocker lk( &m_mutex );
+
             output->clear();
-            foreach(int item, m_hddUsage)
-                output->append(item);
-            return !m_hddUsage.isEmpty();
+
+            for (int i = 0; i < qMin(m_hddUsage.size(), m_hddNames.size()); i++){
+                QString hddName = m_hddNames[i];
+                int delimiter = hddName.indexOf(QLatin1Char(' '));
+                if (delimiter <= 0)
+                    continue;
+                output->append(QnPerformance::QnHddData(m_hddUsage.at(i), hddName.mid(delimiter + 1)));
+            }
+
+            return !(output->isEmpty());
         }
 
     private:
@@ -129,7 +144,7 @@ namespace {
             return result;
         }
 
-        QList<quint64> *enumerateWbemSeparate(QString queryStr, LPCWSTR value, QList<quint64> *dataList){
+        void enumerateWbemHdds(QString queryStr, LPCWSTR value, LPCWSTR nameValue, QList<quint64> &dataList, QList<QString> &nameList){
             IEnumWbemClassObject* pEnumerator = query(queryStr.toLocal8Bit().data());
             if (pEnumerator){
                 IWbemClassObject *pclsObj;
@@ -138,16 +153,24 @@ namespace {
                 while (uReturn != 0)
                 {
                     quint64 data = getWbemLongLong(pclsObj, value);
-                    dataList->append(data);
+                    dataList.append(data);
+                    QString name = getWbemString(pclsObj, nameValue);
+                    nameList.append(name);
                     pclsObj->Release();
                     pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
                 }
                 pEnumerator->Release();
             }
-            return dataList;
         }
 
         void refresh() {
+            // TODO:
+            // This shit may fail.
+            // 
+            // http://knowledgebase.solarwinds.com/kb/questions/633/Error+message+%22Invalid+Class%22+when+using+WMI+monitors
+
+            QMutexLocker lk( &m_mutex );
+
             const quint64 PERCENT_CAP = 100;
 
             quint64 cpu = enumerateWbem(
@@ -159,16 +182,22 @@ namespace {
             quint64 idle = enumerateWbem(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfProc_Process WHERE Name = \"Idle\""),
                 L"PercentProcessorTime");
-             QList<quint64> *hdds = enumerateWbemSeparate(
+            QList<quint64> hdds;
+            QList<QString> hddnames;
+            enumerateWbemHdds(
                 QString::fromLatin1("SELECT * FROM Win32_PerfRawData_PerfDisk_PhysicalDisk WHERE Name !=\"_Total\" AND PercentDiskTime > 0"),
-                L"PercentIdleTime",
-                new QList<quint64>);
+                    L"PercentIdleTime", L"Name",
+                    hdds, hddnames);
 
             if (m_timeStamp && timeStamp){
                 qulonglong timespan = (timeStamp - m_timeStamp);
                 m_hddUsage.clear();
-                for (int i = 0; i < qMin(hdds->count(), m_rawHddUsageIdle.count()); i++){
-                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds->at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                for (int i = 0; i < qMin(hdds.count(), m_rawHddUsageIdle.count()); i++){
+                    m_hddUsage.append(PERCENT_CAP - qMin(PERCENT_CAP, (hdds.at(i) - m_rawHddUsageIdle.at(i)) * PERCENT_CAP / timespan ));
+                }
+                m_hddNames.clear();
+                for (int i = 0; i < hddnames.count(); i++){
+                    m_hddNames.append(hddnames.at(i));
                 }
 
                 timespan *= QnPerformance::cpuCoreCount(); // cpu counters are relayed on this coeff
@@ -177,9 +206,8 @@ namespace {
             }
 
             m_rawHddUsageIdle.clear();
-            for(int i = 0; i < hdds->count(); i++)
-                m_rawHddUsageIdle.append(hdds->at(i));
-            delete hdds;
+            for(int i = 0; i < hdds.count(); i++)
+                m_rawHddUsageIdle.append(hdds.at(i));
 
             m_totalIdle = idle;
             m_processCpu = cpu;
@@ -310,6 +338,8 @@ namespace {
         }
 
     private:
+        QMutex m_mutex;
+
         /** Flag of successful initialization. */
         bool m_initialized;
 
@@ -339,6 +369,9 @@ namespace {
 
         /** Total hdd usage percent for all drives for the last STATISTICS_USAGE_REFRESH seconds. */
         QList<int> m_hddUsage;
+
+        /** Hdd names for all drives existing STATISTICS_USAGE_REFRESH seconds ago. */
+        QList<QString> m_hddNames;
 
         /** System timer for processor usage calculating. */
         UINT_PTR m_timer;
@@ -399,6 +432,8 @@ namespace{
             m_totalUsage = 0;
             m_timer = 0;
             m_initialized = init();
+            memset( &m_prevClock, 0, sizeof(m_prevClock) );
+            m_prevPartitionListReadTime = 0;
         }
 
         ~CpuUsageRefresher() {
@@ -406,11 +441,11 @@ namespace{
                 timer_delete(m_timer);
         }
 
-        uint usage() {
+        uint usage() const {
             return m_usage;
         }
 
-        uint totalUsage() {
+        uint totalUsage() const {
             return m_totalUsage;
         }
 
@@ -431,9 +466,30 @@ namespace{
             m_cpu = cpu;
             m_processCpu = process_cpu;
             m_busyCpu = busy;
+
+            calcDiskUsage();
+        }
+
+        bool hddUsage( QList<QnPerformance::QnHddData>* output ) const
+        {
+            QMutexLocker lk( &m_mutex );
+
+            output->clear();
+            for( map<pair<int, int>, DiskStatContext>::const_iterator
+                 it = m_devNameToStat.begin();
+                 it != m_devNameToStat.end();
+                 ++it )
+            {
+                output->append( QnPerformance::QnHddData(
+					it->second.prevStat.diskUtilizationPercent,
+					QString::fromStdString(it->second.prevStat.deviceName) ) );
+            }
+            return !output->isEmpty();
         }
 
     private:
+        mutable QMutex m_mutex;
+
         bool init() {
             /* Establish handler for timer signal */
             struct sigaction sa;
@@ -501,6 +557,203 @@ namespace{
             }
         }
 
+        //!This structure is read from /proc/diskstat
+        struct DiskStatSys
+        {
+            int major_num;
+            int minor_num;
+            char device_name[FILENAME_MAX];
+            unsigned int num_reads;
+            unsigned int reads_merged;
+            unsigned int sectors_read;
+            unsigned int tot_read_ms;
+            unsigned int num_writes;
+            unsigned int writes_merged;
+            unsigned int sectors_written;
+            unsigned int tot_write_ms;
+            unsigned int cur_io_cnt;
+            unsigned int tot_io_ms;
+            unsigned int io_weighted_ms;
+        };
+
+        class DiskStat
+        {
+        public:
+            int major_num;
+            int minor_num;
+            std::string deviceName;
+            unsigned int diskUtilizationPercent;
+
+            DiskStat()
+            :
+                major_num(0),
+                minor_num(0),
+                diskUtilizationPercent(0)
+            {
+            }
+        };
+
+        class DiskStatContext
+        {
+        public:
+            DiskStatSys prevSysStat;
+            DiskStat prevStat;
+            bool initialized;
+
+            DiskStatContext()
+            :
+                initialized( false )
+            {
+                memset( &prevSysStat, 0, sizeof(prevSysStat) );
+            }
+        };
+
+        //!Timeout (in seconds) during which partition list expires (needed to detect mounts/umounts)
+        static const time_t PARTITION_LIST_EXPIRE_TIMEOUT_SEC = 60;
+        //!Disk usage is evaluated as average on \a APPROXIMATION_VALUES_NUMBER prev values
+        static const unsigned int APPROXIMATION_VALUES_NUMBER = 3;
+
+        void calcDiskUsage()
+        {
+            static const size_t MAX_LINE_LENGTH = 256;
+            char line[MAX_LINE_LENGTH];
+
+            char devName[MAX_LINE_LENGTH];
+            memset( devName, 0, sizeof(devName) );
+            const time_t curTime = ::time( NULL );
+            if( m_partitions.empty() || curTime - m_prevPartitionListReadTime > PARTITION_LIST_EXPIRE_TIMEOUT_SEC )
+            {
+//                //using all mount points
+//                FILE* mntF = popen( "mount | grep ^/dev/", "r" );
+//                if( mntF == NULL )
+//                {
+//                    //failed to get partition list
+//                }
+//                else
+//                {
+//                    m_partitions.clear();
+//                    char PARTITION_NAME[1024];
+//                    while( fgets(PARTITION_NAME, sizeof(PARTITION_NAME)-1, mntF) != NULL)
+//                    {
+//                        char* sepPos = strchr( PARTITION_NAME, ' ' );
+//                        if( sepPos == NULL || sepPos == PARTITION_NAME )
+//                            continue;
+//                        //searching device name
+//                        const char* shortNameStart = PARTITION_NAME;
+//                        for( const char*
+//                             curPos = PARTITION_NAME;
+//                             curPos < sepPos && curPos != NULL;
+//                             curPos = strchr( curPos+1, '/' ) )
+//                        {
+//                            shortNameStart = curPos;
+//                        }
+
+//                        m_partitions.insert( string( shortNameStart+1, sepPos-shortNameStart-1 ) );
+//                    }
+
+//                    pclose( mntF );
+//                    m_prevPartitionListReadTime = curTime;
+//                }
+
+
+                //using all disk drives
+                unsigned int majorNumber = 0, minorNumber = 0, numBlocks = 0;
+                //reading partition names
+                FILE* partitionsFile = fopen( "/proc/partitions", "r" );
+                if( !partitionsFile )
+                    return;
+                for( int i = 0; fgets( line, MAX_LINE_LENGTH, partitionsFile ) != NULL; ++i )
+                {
+                    if( i == 0 ||   //skipping header
+                            sscanf( line, "%u %u %u %s", &majorNumber, &minorNumber, &numBlocks, devName ) != 4 )  //skipping unrecognized line
+                        continue;
+                    string devNameStr( devName );
+                    if( devNameStr.empty() || isdigit(devNameStr[devNameStr.size()-1]) )
+                        continue;   //not a physical drive
+                    m_partitions.insert( devNameStr );
+                }
+                fclose( partitionsFile );
+
+                //TODO/IMPL read network drives
+            }
+
+            DiskStatSys curDiskStat;
+            memset( &curDiskStat, 0, sizeof(curDiskStat) );
+
+            struct timespec curClock;
+            memset( &curClock, 0, sizeof(curClock) );
+            clock_gettime( CLOCK_MONOTONIC, &curClock );
+            if( !m_prevClock.tv_sec )   //m_prevClock can overflow and become 0. In this case we will skip one calculation. Nothing serious...
+            {
+                m_prevClock = curClock;
+                return; //first time doing nothing
+            }
+
+            //reading current disk statistics
+            FILE* diskstatFile = fopen( "/proc/diskstats", "r" );
+            if( !diskstatFile )
+                return;
+
+            unsigned int clockElapsed = (curClock.tv_sec - m_prevClock.tv_sec) * 1000;
+            if( curClock.tv_nsec >= m_prevClock.tv_nsec )
+                clockElapsed += (curClock.tv_nsec - m_prevClock.tv_nsec) / 1000000;
+            else
+                clockElapsed -= (m_prevClock.tv_nsec - curClock.tv_nsec) / 1000000;
+            if( clockElapsed == 0 )
+                return; //there's no sense to calculate anything
+            m_prevClock = curClock;
+
+            while( fgets( line, MAX_LINE_LENGTH, diskstatFile ) != NULL )
+            {
+                memset( curDiskStat.device_name, 0, sizeof(curDiskStat.device_name) );
+                if( sscanf( line, "%u %u %s %u %u %u %u %u %u %u %u %u %u %u",
+                        &curDiskStat.major_num,
+                        &curDiskStat.minor_num,
+                        curDiskStat.device_name,
+                        &curDiskStat.num_reads,
+                        &curDiskStat.reads_merged,
+                        &curDiskStat.sectors_read,
+                        &curDiskStat.tot_read_ms,
+                        &curDiskStat.num_writes,
+                        &curDiskStat.writes_merged,
+                        &curDiskStat.sectors_written,
+                        &curDiskStat.tot_write_ms,
+                        &curDiskStat.cur_io_cnt,
+                        &curDiskStat.tot_io_ms,
+                        &curDiskStat.io_weighted_ms ) != 14 )
+                {
+                    continue;
+                }
+
+                if( m_partitions.find( curDiskStat.device_name ) == m_partitions.end() )
+                    continue;   //not a partition
+
+                QMutexLocker lk( &m_mutex );
+
+                pair<map<pair<int, int>, DiskStatContext>::iterator, bool> p = m_devNameToStat.insert( make_pair(
+                    make_pair(curDiskStat.major_num, curDiskStat.minor_num),
+                    DiskStatContext() ) );
+
+                DiskStatContext& ctx = p.first->second;
+                if( p.second )
+                {
+                    //initializing...
+                    ctx.prevStat.major_num = curDiskStat.major_num;
+                    ctx.prevStat.minor_num = curDiskStat.minor_num;
+                    ctx.prevStat.deviceName = curDiskStat.device_name;
+                }
+                else
+                {
+                    //calculating disk utilization
+                    ctx.prevStat.diskUtilizationPercent = (curDiskStat.tot_io_ms - ctx.prevSysStat.tot_io_ms) * 100 / clockElapsed;
+                    //std::cout<<ctx.prevStat.deviceName<<": "<<ctx.prevStat.diskUtilizationPercent<<"%\n";
+                }
+                ctx.prevSysStat = curDiskStat;
+            }
+
+            fclose( diskstatFile );
+        }
+
         bool m_initialized;
         quint64 m_cpu;
         quint64 m_processCpu;
@@ -508,6 +761,11 @@ namespace{
         uint m_usage;
         uint m_totalUsage;
         timer_t m_timer;
+        struct timespec m_prevClock;
+        //!map<pair<majorNumber, minorNumber>, statistics calculation context>
+        map<pair<int, int>, DiskStatContext> m_devNameToStat;
+        set<string> m_partitions;
+        time_t m_prevPartitionListReadTime;
     };
 
     Q_GLOBAL_STATIC(CpuUsageRefresher, refresherInstance);
@@ -674,12 +932,7 @@ int QnPerformance::cpuCoreCount() {
     return QThread::idealThreadCount();
 }
 
-bool QnPerformance::currentHddUsage(QList<int> *output){
-#if defined(Q_OS_WIN)
+bool QnPerformance::currentHddUsage(QList<QnHddData> *output){
     return refresherInstance()->hddUsage(output);
-#else
-    return false;
-#endif
 }
-
 

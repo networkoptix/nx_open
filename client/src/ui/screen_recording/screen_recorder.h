@@ -25,7 +25,7 @@ public:
     /**
      * \returns                         Whether screen recording is supported. 
      */
-    bool isSupported() const;
+    static bool isSupported();
 
     /**
      * \returns                         Whether recording is in progress.

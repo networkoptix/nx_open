@@ -5,6 +5,8 @@
 #include "workbench_layout.h"
 #include "core/resourcemanagment/resource_pool.h"
 
+Q_DECLARE_METATYPE(QUuid); // TODO: move to global metatype initializer in core
+
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),
     m_layout(NULL),
@@ -34,6 +36,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
     setCombinedGeometry(data.combinedGeometry);
+
+    m_dataByRole = data.dataByRole; // TODO
 }
 
 QnWorkbenchItem::~QnWorkbenchItem() {
@@ -52,6 +56,7 @@ QnLayoutItemData QnWorkbenchItem::data() const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 
     return data;
 }
@@ -75,6 +80,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data) {
     setRotation(data.rotation);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
+    m_dataByRole = data.dataByRole; // TODO
+
     return result;
 }
 
@@ -91,6 +98,7 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const {
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
+    data.dataByRole = m_dataByRole;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry) {
@@ -108,6 +116,8 @@ void QnWorkbenchItem::setGeometryInternal(const QRect &geometry) {
     m_geometry = geometry;
 
     emit geometryChanged();
+    emit dataChanged(Qn::ItemGeometryRole);
+    emit dataChanged(Qn::ItemCombinedGeometryRole);
 }
 
 bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
@@ -120,6 +130,8 @@ bool QnWorkbenchItem::setGeometryDelta(const QRectF &geometryDelta) {
     m_geometryDelta = geometryDelta;
 
     emit geometryDeltaChanged();
+    emit dataChanged(Qn::ItemGeometryDeltaRole);
+    emit dataChanged(Qn::ItemCombinedGeometryRole);
     return true;
 }
 
@@ -152,7 +164,7 @@ QRectF QnWorkbenchItem::combinedGeometry() const {
 }
 
 bool QnWorkbenchItem::setFlag(Qn::ItemFlag flag, bool value) {
-    if(checkFlag(flag) == value)
+    if(hasFlag(flag) == value)
         return true;
 
     if(m_layout != NULL) {
@@ -177,12 +189,11 @@ bool QnWorkbenchItem::setFlags(Qn::ItemFlags flags) {
     if((m_flags ^ flags) & Qn::PendingGeometryAdjustment)
         result &= setFlag(Qn::PendingGeometryAdjustment, flags & Qn::PendingGeometryAdjustment);
 
-
     return result;
 }
 
 void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
-    if(checkFlag(flag) == value)
+    if(hasFlag(flag) == value)
         return;
 
     if(flag == Qn::Pinned && value)
@@ -191,6 +202,7 @@ void QnWorkbenchItem::setFlagInternal(Qn::ItemFlag flag, bool value) {
     m_flags = value ? (m_flags | flag) : (m_flags & ~flag);
 
     emit flagChanged(flag, value);
+    emit dataChanged(Qn::ItemFlagsRole);
 }
 
 void QnWorkbenchItem::setRotation(qreal rotation) {
@@ -200,6 +212,7 @@ void QnWorkbenchItem::setRotation(qreal rotation) {
     m_rotation = rotation;
 
     emit rotationChanged();
+    emit dataChanged(Qn::ItemRotationRole);
 }
 
 void QnWorkbenchItem::adjustGeometry() {
@@ -224,4 +237,94 @@ void QnWorkbenchItem::adjustGeometry(const QPointF &desiredPosition) {
 
     /* Set geometry adjustment flag. */
     setFlag(Qn::PendingGeometryAdjustment, true);
+}
+
+QVariant QnWorkbenchItem::data(int role) const {
+    switch(role) {
+    case Qn::ResourceUidRole:
+        return m_resourceUid;
+    case Qn::ItemUuidRole:
+        return QVariant::fromValue<QUuid>(m_uuid);
+    case Qn::ItemGeometryRole:
+        return m_geometry;
+    case Qn::ItemGeometryDeltaRole:
+        return m_geometryDelta;
+    case Qn::ItemCombinedGeometryRole:
+        return combinedGeometry();
+    case Qn::ItemFlagsRole:
+        return static_cast<int>(m_flags);
+    case Qn::ItemRotationRole:
+        return m_rotation;
+    default:
+        return m_dataByRole.value(role);
+    }
+}
+
+bool QnWorkbenchItem::setData(int role, const QVariant &value) {
+    switch(role) {
+    case Qn::ResourceUidRole:
+        if(value.toString() == m_resourceUid) {
+            return true;
+        } else {
+            qnWarning("Changing resource unique id of a workbench item is not supported.");
+            return false;
+        }
+    case Qn::ItemUuidRole:
+        if(value.value<QUuid>() == m_uuid) {
+            return true;
+        } else {
+            qnWarning("Changing UUID of a workbench item is not supported.");
+            return false;
+        }
+        break;
+    case Qn::ItemGeometryRole:
+        if(value.canConvert<QRect>()) {
+            return setGeometry(value.toRect());
+        } else {
+            qnWarning("Provided geometry value '%1' is not convertible to QRect.", value);
+            return false;
+        }
+    case Qn::ItemGeometryDeltaRole:
+        if(value.canConvert<QRectF>()) {
+            return setGeometryDelta(value.toRectF());
+        } else {
+            qnWarning("Provided geometry delta value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    case Qn::ItemCombinedGeometryRole:
+        if(value.canConvert<QRectF>()) {
+            return setCombinedGeometry(value.toRectF());
+        } else {
+            qnWarning("Provided combined geometry value '%1' is not convertible to QRectF.", value);
+            return false;
+        }
+    case Qn::ItemFlagsRole: {
+        bool ok;
+        int flags = value.toInt(&ok);
+        if(ok) {
+            return setFlags(static_cast<Qn::ItemFlags>(flags));
+        } else {
+            qnWarning("Provided flags value '%1' is not convertible to int.", value);
+            return false;
+        }
+    }
+    case Qn::ItemRotationRole: {
+        bool ok;
+        qreal rotation = value.toReal(&ok);
+        if(ok) {
+            setRotation(rotation);
+            return true;
+        } else {
+            qnWarning("Provided rotation value '%1' must be convertible to qreal.", value);
+            return false;
+        }
+    }
+    default:
+        QVariant &localValue = m_dataByRole[role];
+        if(localValue != value) {
+            localValue = value;
+            emit dataChanged(role);
+        }
+        return true;
+    }
 }

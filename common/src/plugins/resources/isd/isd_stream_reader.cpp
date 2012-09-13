@@ -18,7 +18,7 @@ QnISDStreamReader::QnISDStreamReader(QnResourcePtr res):
 
 QnISDStreamReader::~QnISDStreamReader()
 {
-    closeStream();
+    stop();
 }
 
 
@@ -53,7 +53,7 @@ void QnISDStreamReader::openStream()
     
     request.append(result.toLatin1());
     CLHttpStatus status = http.doPOST(QByteArray("/api/param.cgi"), QLatin1String(request));
-    QnSleep::msleep(3000);
+    QnSleep::msleep(100);
 
     QString urlrequest = (role == QnResource::Role_SecondaryLiveVideo)
         ? QLatin1String("api/param.cgi?req=VideoInput.1.h264.2.Rtsp.AbsolutePath")
@@ -103,7 +103,7 @@ QnMetaDataV1Ptr QnISDStreamReader::getCameraMetadata()
 void QnISDStreamReader::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
-    m_rtpStreamParser.closeStream();
+    m_rtpStreamParser.pleaseStop();
 }
 
 QnAbstractMediaDataPtr QnISDStreamReader::getNextData()

@@ -57,7 +57,7 @@ QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
 
 QnOnvifStreamReader::~QnOnvifStreamReader()
 {
-
+    stop();
 }
 
 void QnOnvifStreamReader::openStream()
@@ -65,10 +65,12 @@ void QnOnvifStreamReader::openStream()
     if (isStreamOpened())
         return;
 
+    /*
     if (!m_onvifRes->isSoapAuthorized()) {
         m_onvifRes->setStatus(QnResource::Unauthorized);
         return;
     }
+    */
 
     QString streamUrl = updateCameraAndFetchStreamUrl();
 
@@ -107,7 +109,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl() const
 const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
     CameraInfo info;
 
     if (!fetchUpdateVideoEncoder(soapWrapper, info, isPrimary)) {
@@ -227,7 +229,7 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
 
 void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary) const
 {
-    encoder.Encoding = m_onvifRes->getCodec() == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
+    encoder.Encoding = m_onvifRes->getCodec(isPrimary) == QnPlOnvifResource::H264? onvifXsd__VideoEncoding__H264: onvifXsd__VideoEncoding__JPEG;
     encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
     QnStreamQuality quality = getQuality();
@@ -235,14 +237,17 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 
     if (!encoder.H264)
     {
-        qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: H264 object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
+        //qWarning() << "QnOnvifStreamReader::updateVideoEncoderParams: H264 object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
     } else 
     {
         encoder.H264->GovLength = m_onvifRes->getGovLength();
         int profile = isPrimary? m_onvifRes->getPrimaryH264Profile(): m_onvifRes->getSecondaryH264Profile();
         if (profile != -1)
             encoder.H264->H264Profile = onvifXsd__H264Profile(profile);
+        if (encoder.RateControl)
+            encoder.RateControl->EncodingInterval = 1;
     }
+
 
     if (!encoder.RateControl) 
     {
@@ -337,6 +342,9 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
         qCritical() << "QnOnvifStreamReader::fetchUpdateVideoEncoder: can't get video encoders from camera (" 
             << (isPrimary? "primary": "secondary") << ") Gsoap error: " << soapRes << ". Description: " << soapWrapper.getLastError()
             << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+        if (soapWrapper.isNotAuthenticated()) {
+            m_onvifRes->setStatus(QnResource::Unauthorized);
+        }
         return false;
     }
 
@@ -554,7 +562,7 @@ void QnOnvifStreamReader::updateVideoSource(VideoSource& source, bool /*isPrimar
 bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile, bool create) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
 
     if (create) {
         CreateProfileReq request;
@@ -616,6 +624,34 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
         return false;
     }
 
+    if (getRole() == QnResource::Role_LiveVideo && m_onvifRes->getPtzController())
+    {
+        if (profile.PTZConfiguration == 0)
+        {
+            AddPTZConfigReq request;
+            AddPTZConfigResp response;
+
+            request.ProfileToken = profile.token;
+            request.ConfigurationToken = m_onvifRes->getPtzController()->getPtzConfigurationToken().toStdString();
+
+            int soapRes = soapWrapper.addPTZConfiguration(request, response);
+            if (soapRes == SOAP_OK) {
+                m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
+            }
+            else {
+                qCritical() << "QnOnvifStreamReader::addPTZConfiguration: can't add ptz configuration to profile. Gsoap error: " 
+                    << soapRes << ", description: " << soapWrapper.getLastError() 
+                    << ". URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
+
+                return false;
+            }
+        }
+        else {
+            m_onvifRes->getPtzController()->setMediaProfileToken(QString::fromStdString(profile.token));
+        }
+    }
+
+
     //Adding audio source
     if (!info.audioSourceId.isEmpty() && (profile.AudioSourceConfiguration == 0 || profile.AudioSourceConfiguration->token != info.audioSourceId.toStdString()))
     {
@@ -670,7 +706,7 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfo& info, Profile& profile
 bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
 
     SetVideoConfigReq request;
     SetVideoConfigResp response;
@@ -691,7 +727,7 @@ bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 bool QnOnvifStreamReader::sendVideoSourceToCamera(VideoSource& source) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
 
     SetVideoSrcConfigReq request;
     SetVideoSrcConfigResp response;
@@ -797,7 +833,7 @@ void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrima
 bool QnOnvifStreamReader::sendAudioEncoderToCamera(AudioEncoder& encoder) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
 
     SetAudioConfigReq request;
     SetAudioConfigResp response;
@@ -867,7 +903,7 @@ void QnOnvifStreamReader::updateAudioSource(AudioSource& source, bool /*isPrimar
 bool QnOnvifStreamReader::sendAudioSourceToCamera(AudioSource& source) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString());
+    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
 
     SetAudioSrcConfigReq request;
     SetAudioSrcConfigResp response;
@@ -889,6 +925,13 @@ const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
 {
     return m_multiCodec.getAudioLayout();
 }
+
+void QnOnvifStreamReader::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    m_multiCodec.pleaseStop();
+}
+
 
 /*
 for (;it != response.Configurations.end(); ++it) 

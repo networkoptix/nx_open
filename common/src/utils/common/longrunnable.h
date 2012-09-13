@@ -8,17 +8,19 @@
 class QN_EXPORT QnLongRunnable : public QThread
 {
     Q_OBJECT
+
 signals:
     void threadPaused();
+
 public slots:
     void start ( Priority priority = InheritPriority )
     {
-        if (m_runing) // already runing;
+        if (isRunning()) // already runing;
             return;
 
-        m_runing = true;
         m_needStop = false;
         QThread::start(priority);
+        Q_ASSERT(isRunning());
     }
 
     virtual void pleaseStop()
@@ -32,15 +34,14 @@ public slots:
     {
         pleaseStop();
         wait();
-        m_runing = false;
     }
 
 public:
-    QnLongRunnable() : m_runing(false), m_onPause(false) {}
+    QnLongRunnable() : m_onPause(false) {}
     
     virtual ~QnLongRunnable() 
     {
-        if(m_runing)
+        if(isRunning())
             qnCritical("Runnable instance was destroyed without a call to stop().");
     }
 
@@ -86,11 +87,10 @@ public:
             msleep(ms%100);
         }
     }
+
     bool onPause() const { return m_onPause; }
-protected:
 
 protected:
-    bool m_runing;
     volatile bool m_needStop;
 
     volatile bool m_onPause;

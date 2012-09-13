@@ -43,6 +43,7 @@ TagsEditDialog::TagsEditDialog(const QStringList &objectIds, QWidget *parent) :
 
     ui->clearFilterButton->setVisible(!ui->tagsFilterLineEdit->text().isEmpty());
 
+    // TODO
     ui->addTagsButton->setIcon(qnSkin->icon("left-arrow.png"));
     ui->removeTagsButton->setIcon(qnSkin->icon("right-arrow.png"));
     ui->addTagButton->setIcon(qnSkin->icon("plus.png"));

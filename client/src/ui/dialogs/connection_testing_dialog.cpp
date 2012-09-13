@@ -4,6 +4,7 @@
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
+#include <QtGui/QPushButton>
 
 #include <api/session_manager.h>
 #include <utils/common/warnings.h>
@@ -23,7 +24,7 @@ QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *p
 
     ui->setupUi(this);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(false);
 
     ui->progressBar->setValue(0);
     ui->progressBar->setMaximum(100);
@@ -40,6 +41,18 @@ QnConnectionTestingDialog::~QnConnectionTestingDialog()
 {
 }
 
+void QnConnectionTestingDialog::accept()
+{
+    QDialog::accept();
+}
+
+
+void QnConnectionTestingDialog::reject()
+{
+    QDialog::reject();
+}
+
+
 void QnConnectionTestingDialog::timeout()
 {
     if (ui->progressBar->value() != ui->progressBar->maximum())
@@ -49,23 +62,19 @@ void QnConnectionTestingDialog::timeout()
     }
 
     m_timeoutTimer.stop();
-
-    ui->statusLabel->setText(tr("Failed"));
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+    updateUi(false);
 }
 
 void QnConnectionTestingDialog::oldHttpTestResults(int status, QByteArray errorString, QByteArray data, int handle)
 {
-    Q_UNUSED(handle);
+    Q_UNUSED(errorString)
+    Q_UNUSED(data)
+    Q_UNUSED(handle)
 
-    if (status == 204)
+    if (status == 204 && m_timeoutTimer.isActive())
     {
-        if (m_timeoutTimer.isActive())
-            m_timeoutTimer.stop();
-        else
-            return;
-
-        ui->statusLabel->setText(tr("Failed"));
+        m_timeoutTimer.stop();
+        updateUi(false);
     }
 }
 
@@ -74,11 +83,10 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
     Q_UNUSED(requestHandle)
     Q_UNUSED(errorString)
 
-    if (m_timeoutTimer.isActive()) {
-        m_timeoutTimer.stop();
-    } else {
+    if (!m_timeoutTimer.isActive())
         return;
-    }
+
+    m_timeoutTimer.stop();
 
     QnCompatibilityChecker remoteChecker(connectInfo->compatibilityItems);
     QnCompatibilityChecker localChecker(localCompatibilityItems());
@@ -90,13 +98,7 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
         compatibilityChecker = &localChecker;
 
     ui->progressBar->setValue(ui->progressBar->maximum());
-    if (status || !compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version)) {
-        ui->statusLabel->setText(tr("Failed"));
-    } else {
-        ui->statusLabel->setText(tr("Success"));
-    }
-
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+    updateUi(!status && compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version));
 }
 
 void QnConnectionTestingDialog::testSettings()
@@ -113,14 +115,11 @@ void QnConnectionTestingDialog::testSettings()
     QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(int,QByteArray,QByteArray,int)));
 }
 
-void QnConnectionTestingDialog::accept()
-{
-    QDialog::accept();
+void QnConnectionTestingDialog::updateUi(bool success){
+    ui->statusLabel->setText(success ? tr("Success") : tr("Failed"));
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setVisible(true);
+    ui->buttonBox->button(QDialogButtonBox::Cancel)->setVisible(false);
 }
 
-
-void QnConnectionTestingDialog::reject()
-{
-    QDialog::reject();
-}
 

@@ -2,11 +2,25 @@
 #define QN_RESOURCE_DISCOVERY_MANAGER_H
 
 #include <QtCore/QThread>
+#include <QAuthenticator>
 #include "utils/common/longrunnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"
 
+class QnAbstractResourceSearcher;
+
+struct QnManualCameraInfo
+{
+    QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType);
+    QnResourcePtr checkHostAddr() const;
+
+    QUrl url;
+    QnResourceTypePtr resType;
+    QAuthenticator auth;
+    QnAbstractResourceSearcher* searcher;
+};
+typedef QMap<QString, QnManualCameraInfo> QnManualCamerasMap;
 
 class QnAbstractResourceSearcher;
 
@@ -17,9 +31,10 @@ class QnResourceDiscoveryManager : public QnLongRunnable, public QnResourceFacto
 {
     Q_OBJECT;
 
+public:
+
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-public:
     ~QnResourceDiscoveryManager();
 
     static QnResourceDiscoveryManager& instance();
@@ -36,13 +51,11 @@ public:
 
     virtual void pleaseStop();
 
-    CLNetState& getNetState()
-    {
-        return m_netState;
-    }
-
     void setReady(bool ready);
 
+    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port);
+    bool registerManualCameras(const QnManualCamerasMap& cameras);
+    QnResourceList processManualAddedResources();
 protected:
     QnResourceDiscoveryManager();
 
@@ -56,27 +69,27 @@ private:
     void updateLocalNetworkInterfaces();
 
     // returns new resources( not from pool) or updates some in resource pool
-    QnResourceList findNewResources(bool *ip_finished);
+    QnResourceList findNewResources();
 
-    void check_if_accessible(QnResourceList& justfoundList, int threads);
+    void check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState);
 
-    void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished);
+    void resovle_conflicts(QnResourceList& device_list, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState);
 
     
-    void markOfflineIfNeeded();
+    void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
-    void updateResourceStatus(QnResourcePtr res);
+    void updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources);
 
 
     // ping resources from time to time to keep OS ARP table updated; speeds up resource (start) time in case if not recorded
     void pingResources(QnResourcePtr res);
-
+    void appendManualDiscoveredResources(QnResourceList& resources);
+    bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 private:
     QMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
-
-    CLNetState m_netState;
+    QnManualCamerasMap m_manualCameraMap;
 
     bool m_server;
     bool m_foundSmth; // minor just to minimize lof output
@@ -87,7 +100,6 @@ private:
     QList<QHostAddress> m_allLocalAddresses;
 
 
-    QSet<QString> m_discoveredResources;
     QMap<QString, int> m_resourceDiscoveryCounter;
 
 };

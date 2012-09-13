@@ -2,6 +2,8 @@
 #include <assert.h>
 #include "bitStream.h"
 #include <QString>
+#include <QTextStream>
+#include <QDebug>
 
 #ifdef _MSC_VER
 #    pragma warning(disable: 4189) /* C4189: '?' : local variable is initialized but not referenced. */
@@ -241,7 +243,7 @@ int NALUnit::deserialize(quint8* buffer, quint8* end)
 
 void NALUnit::decodeBuffer(const quint8* buffer, const quint8* end)
 {
-	delete [] m_nalBuffer;
+    delete [] m_nalBuffer;
 	m_nalBuffer = new quint8[end - buffer + NAL_RESERVED_SPACE];
 	m_nalBufferLen = decodeNAL(buffer, end, m_nalBuffer, end - buffer);
 }
@@ -273,6 +275,22 @@ int NALUnit::serialize(quint8* dstBuffer)
 	*dstBuffer++ = 1;
 	*dstBuffer = ((nal_ref_idc & 3) << 5) + (nal_unit_type & 0x1f);
 	return 4;
+}
+
+void NALUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag)
+{
+    int lastScale = 8;
+    int nextScale = 8;
+    for(int j = 0; j < sizeOfScalingList; j++ )
+    {
+        if( nextScale != 0 ) {
+            int delta_scale = extractSEGolombCode();
+            nextScale = ( lastScale + delta_scale + 256 ) % 256;
+            useDefaultScalingMatrixFlag = ( j  ==  0 && nextScale  ==  0 );
+        }
+        scalingList[j] = ( nextScale  ==  0 ) ? lastScale : nextScale;
+        lastScale = scalingList[ j ];
+    }
 }
 
 
@@ -310,6 +328,20 @@ int NALDelimiter::serialize(quint8* buffer)
 	curBuf +=  NALUnit::serialize(curBuf);
 	*curBuf++ = (primary_pic_type << 5) + 0x10;
 	return (int) (curBuf - buffer);
+}
+
+PPSUnit::PPSUnit()
+:
+    NALUnit(),
+    transform_8x8_mode_flag(0),
+    pic_scaling_matrix_present_flag(0),
+    second_chroma_qp_index_offset(0),
+    m_ready(false)
+{
+    memset( scalingLists4x4, 0x10, sizeof(scalingLists4x4) );
+    memset( useDefaultScalingMatrix4x4Flag, 0, sizeof(useDefaultScalingMatrix4x4Flag) );
+    memset( scalingLists8x8, 0x10, sizeof(scalingLists8x8) );
+    memset( useDefaultScalingMatrix8x8Flag, 0, sizeof(useDefaultScalingMatrix8x8Flag) );
 }
 
 int PPSUnit::deserializeID(quint8* buffer, quint8* end)
@@ -401,7 +433,22 @@ int PPSUnit::deserialize()
         {
             transform_8x8_mode_flag = bitReader.getBit();
             pic_scaling_matrix_present_flag = bitReader.getBit();
+
+            if( pic_scaling_matrix_present_flag )
+                for( int i = 0; i < 6 + 2* transform_8x8_mode_flag; ++i )
+                {
+                    int pic_scaling_list_present_flag_i = bitReader.getBit();
+                    if( pic_scaling_list_present_flag_i )
+                    {
+                        if( i < 6 )
+                            scaling_list( scalingLists4x4[i], 16, useDefaultScalingMatrix4x4Flag[i] );
+                        else
+                            scaling_list( scalingLists8x8[i-6], 64, useDefaultScalingMatrix8x8Flag[i-6] );
+                    }
+                }
+            second_chroma_qp_index_offset = extractSEGolombCode();
         }
+
 		m_ready = true;
 		return 0;
 	} catch (BitStreamException) {
@@ -441,22 +488,6 @@ void PPSUnit::duplicatePPS(PPSUnit& oldPPS, int ppsID, bool cabac)
 		bitWriter.putBits(8 - bitWriter.getBitsCount() % 8, 0);
 	m_nalBufferLen = bitWriter.getBitsCount() / 8 + 1;
 	assert(m_nalBufferLen <= oldPPS.m_nalBufferLen + 4);
-}
-
-void SPSUnit::scaling_list(int* scalingList, int sizeOfScalingList, bool& useDefaultScalingMatrixFlag) 
-{
-	int lastScale = 8;
-	int nextScale = 8;
-	for(int j = 0; j < sizeOfScalingList; j++ ) 
-	{
-		if( nextScale != 0 ) {
-			int delta_scale = extractSEGolombCode();
-			nextScale = ( lastScale + delta_scale + 256 ) % 256;
-			useDefaultScalingMatrixFlag = ( j  ==  0 && nextScale  ==  0 );
-		}
-		scalingList[j] = ( nextScale  ==  0 ) ? lastScale : nextScale;
-		lastScale = scalingList[ j ];
-	}
 }
 
 
@@ -803,6 +834,7 @@ SliceUnit::SliceUnit():NALUnit() {
 #endif
 	memory_management_control_operation = 0;
     m_fullHeaderLen = 0;
+    disable_deblocking_filter_idc = 0;
 }
 
 int SliceUnit::deserialize(const SPSUnit* sps,const PPSUnit* pps)
@@ -1032,7 +1064,7 @@ int SliceUnit::deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMa
 		m_frameNumBits = sps->log2_max_frame_num;
 		frame_num = bitReader.getBits( m_frameNumBits);
 		bottom_field_flag = 0;
-		m_field_pic_flag = 0;
+        m_field_pic_flag = 0;
 		if( sps->frame_mbs_only_flag == 0) {
 			m_field_pic_flag = bitReader.getBits( 1);
 			if( m_field_pic_flag )

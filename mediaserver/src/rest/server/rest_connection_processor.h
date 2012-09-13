@@ -3,20 +3,22 @@
 
 #include <QVariantList>
 #include "utils/network/tcp_connection_processor.h"
-
-class QnTcpListener;
+#include "request_handler.h"
 
 class QnRestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
+    typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
+
     QnRestConnectionProcessor(TCPSocket* socket, QnTcpListener* owner);
     virtual ~QnRestConnectionProcessor();
-    
-protected:
-    void run();
-    virtual void parseRequest() override;
 
+    static void registerHandler(const QString& path, QnRestRequestHandler* handler);
+    static QnRestRequestHandlerPtr findHandler(QString path);
+protected:
+    virtual void run() override;
 private:
+    static Handlers m_handlers;
     QN_DECLARE_PRIVATE_DERIVED(QnRestConnectionProcessor);
 };
 

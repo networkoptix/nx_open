@@ -5,14 +5,15 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QMetaType>
 
-#include <api/video_server_statistics.h>
+#include <api/video_server_statistics_data.h>
 
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
+class QnVideoServerStatisticsManager;
 
 class QnServerResourceWidget: public QnResourceWidget {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnResourceWidget base_type;
 
@@ -40,37 +41,47 @@ protected:
     virtual Buttons calculateButtonsVisibility() const override;
 
 private slots:
-    void at_statisticsReceived(const QnStatisticsDataVector &data);
-    void at_timer_timeout();
+    void at_statistics_received();
 
 private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-private:
-    struct QnStatisticsHistoryData {
-        QString id;
-        QString description;
-        QList<int> history;
+    /**
+     * Util function that add new values to the statistics storage and mantain its number.
+     *
+     * \param key                       Id of the corresponding history item.
+     * \param newValues                 Updated values.
+     */
+    void updateValues(QString key, QnStatisticsData newValues);
 
-        QnStatisticsHistoryData(QString id, QString description);
-        void append(int value);
-    };
+private:
+    QnVideoServerStatisticsManager *m_manager;
 
     /** Video server resource. */
     QnVideoServerResourcePtr m_resource;
 
     /** History of last usage responses. */
-    QList<QnStatisticsHistoryData> m_history;
+    QnStatisticsHistory m_history;
 
-    /** Total number of responses received. */ 
-    uint m_counter;
+    /** Sorted keys of history data. */
+    QStringList m_sortedKeys;
 
-    /** Status of the frame history. */
+    /** Id of the last received response. */
+    qint64 m_lastHistoryId;
+
+    // TODO: #GDM uncomment when will implement time labels
+    // /** Timestamp of the last received response in msecs since epoch */
+    //qint64 m_lastTimeStamp;
+
+    /** Id of the our widget in the statistics manager. */
+    int m_statisticsId;
+
+    /** Number of successfull responces received, required to smooth scroll. */
+    int m_counter;
+
+    /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
-
-    /** Status of the update request. */
-    bool m_alreadyUpdating;
 
     /** Elapsed timer for smooth scroll. */
     QElapsedTimer m_elapsedTimer;

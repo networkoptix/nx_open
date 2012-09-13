@@ -8,8 +8,10 @@
 #include <QScopedPointer>
 #include <QSharedPointer>
 #include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <utils/media/frame_info.h>
 #include "render_status.h"
 #include "core/resource/resource_media_layout.h"
+
 
 class CLVideoDecoderOutput;
 class QnGLRendererPrivate;
@@ -48,8 +50,36 @@ public:
     QnMetaDataV1Ptr lastFrameMetadata(int channel) const; 
     void setForceSoftYUV(bool value);
 
+    const QGLContext* context() const;
+
 private:
-    void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
+    //!Draw texture to screen
+    /*!
+     * 	If not using shader than calls \a drawVideoTextureDirectly with texture \a tex0, otherwise calls \a drawVideoTextureWithShader
+     * */
+    void drawVideoTexture(
+    	QnGlRendererTexture* tex0,
+    	QnGlRendererTexture* tex1,
+    	QnGlRendererTexture* tex2,
+    	const float* v_array );
+    //!Draws texture \a tex0ID to the screen
+    void drawVideoTextureDirectly(
+    	unsigned int tex0ID,
+    	const QVector2D& tex0Coords,
+    	const float* v_array );
+    //!Draws to the screen image represented with three textures (one for each plane YUV) using shader which mixes all three planes to RGB
+    void drawVideoTextureWithShader(
+    	unsigned int tex0ID,
+    	const QVector2D& tex0Coords,
+    	unsigned int tex1ID,
+    	unsigned int tex2ID,
+    	const float* v_array );
+    //!Draws currently binded texturere
+    /*!
+     * 	\param v_array
+     * 	\param tx_array texture vertexes array
+     * */
+    void drawBindedTexture( const float* v_array, const float* tx_array );
     void updateTexture();
     bool isYuvFormat() const;
     int glRGBFormat() const;
@@ -109,6 +139,8 @@ private:
     qint64 m_lastDisplayedTime;
     QnMetaDataV1Ptr m_lastDisplayedMetadata[CL_MAX_CHANNELS]; // TODO: get rid of this
     unsigned m_lastDisplayedFlags;
+    //!Picture data of last rendered frame
+    QSharedPointer<QnAbstractPictureData> m_prevFramePicData;
 };
 
 #endif //QN_GL_RENDERER_H

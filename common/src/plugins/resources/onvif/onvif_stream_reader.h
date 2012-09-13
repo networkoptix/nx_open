@@ -16,22 +16,22 @@ class onvifXsd__AudioEncoderConfiguration;
 class onvifXsd__AudioSourceConfiguration;
 
 typedef onvifXsd__Profile Profile;
-typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
+public:
     static const char* NETOPTIX_PRIMARY_NAME;
     static const char* NETOPTIX_SECONDARY_NAME;
     static const char* NETOPTIX_PRIMARY_TOKEN;
     static const char* NETOPTIX_SECONDARY_TOKEN;
 
-public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
     const QnResourceAudioLayout* getDPAudioLayout() const;
+    virtual void pleaseStop() override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;

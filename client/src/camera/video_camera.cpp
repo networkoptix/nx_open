@@ -43,7 +43,6 @@ QnVideoCamera::~QnVideoCamera()
 
     stopDisplay();
     delete m_reader;
-    //delete[] m_stat;
 }
 
 QnMediaResourcePtr QnVideoCamera::resource() {
@@ -76,8 +75,8 @@ void QnVideoCamera::startDisplay()
 
 void QnVideoCamera::stopDisplay()
 {
-    CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
-    CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
+    //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
+    //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
 
     stopRecording();
 

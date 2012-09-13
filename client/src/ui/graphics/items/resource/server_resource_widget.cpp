@@ -6,7 +6,10 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/video_server_resource.h>
+
 #include <api/video_server_connection.h>
+#include <api/video_server_statistics_manager.h>
+#include <api/video_server_statistics_data.h>
 
 #include <ui/style/globals.h>
 
@@ -16,10 +19,14 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
 
+#include <ui/workbench/workbench_context.h>
+
+#include <QtCore/QHash>
+
 /** How many points of the chart are shown on the screen simultaneously */
 #define CHART_POINTS_LIMIT 60
 
-/** Data update period. For the best result should be equal to server's */
+/** Data update period. For the best result should be equal to videoServerStatisticsManager's */
 #define REQUEST_TIME 2000
 
 namespace {
@@ -35,7 +42,7 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(QList<int> *values, qreal x_step, const qreal scale, qreal &current_value, const qreal elapsed_step) {
+    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
         QPainterPath path;
         int max_value = -1;
         int prev_value = 0;
@@ -51,7 +58,7 @@ namespace {
 
         bool first(true);
 
-        QListIterator<int> iter(*values);
+        QnStatisticsDataIterator iter(values);
         bool last = !iter.hasNext();
         while (!last){
             int i_value = iter.next();
@@ -70,7 +77,14 @@ namespace {
 
             qreal y2 = i_value * scale * 0.01;
 
-            /** Drawing only second part of the arc, cut at the beginning */
+            /* Note that we're using 89 degrees for arc length for a reason.
+             * When using full 90 degrees, arcs are connected, but Qt still
+             * inserts an empty line segment to join consecutive arcs. 
+             * Path triangulator then chokes when trying to calculate a normal
+             * for this line segment, producing NaNs in its output.
+             * These NaNs are then fed to GPU, resulting in artifacts. */
+
+            /* Drawing only second part of the arc, cut at the beginning */
             if (x1 + x_step2 < 0.0) {
                 if (y2 > y1) {
                     path.arcMoveTo(x1 + x_step2, y1, x_step, (y2 - y1), 180 + angle);
@@ -83,46 +97,46 @@ namespace {
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc, cut at the beginning */
+            /* Drawing both parts of the arc, cut at the beginning */
             else if (x1 < 0.0) {
                 if (y2 > y1) {
                     path.arcMoveTo(x1 - x_step2, y1, x_step, (y2 - y1), angle);
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), angle, -angle);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
                 } else if (y2 < y1) {
                     path.arcMoveTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle);
                     path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -angle, angle);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
                 } else { // y2 == y1
                     path.moveTo(0.0, y1);
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc as usual */
+            /* Drawing both parts of the arc as usual */
             else if (!last) { 
                 if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
-                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 90);
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
+                    path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, 89);
                 } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
-                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -90);
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
+                    path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -89);
                 } else { // y2 == y1
                     path.lineTo(x1 + x_step, y2);
                 }
             }
-            /** Drawing both part of the arc, cut at the end */
+            /* Drawing both parts of the arc, cut at the end */
             else if (elapsed_step >= 0.5) {
                 if (y2 > y1) {
-                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90);
+                    path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
                     path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
                 } else if (y2 < y1) {
-                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90);
+                    path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
                     path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
                 } else { // y2 == y1
                     path.lineTo(x1 + x_step * elapsed_step, y2);
                 }
             } 
-            /** Drawing only first part of the arc, cut at the end */
+            /* Drawing only first part of the arc, cut at the end */
             else {
                 if (y2 > y1) {
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -90 + angle);
@@ -136,7 +150,7 @@ namespace {
             y1 = y2;
         }
         /** value that will be shown */
-        current_value = ((last_value - prev_value)*elapsed_step + prev_value);
+        *current_value = ((last_value - prev_value)*elapsed_step + prev_value);
         return path;
     }
 
@@ -148,43 +162,31 @@ namespace {
     };
 
     typedef QnGlContextData<QnRadialGradientPainter, QnBackgroundGradientPainterFactory> QnBackgroundGradientPainterStorage;
-    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage);
+    Q_GLOBAL_STATIC(QnBackgroundGradientPainterStorage, qn_serverResourceWidget_backgroundGradientPainterStorage)
 
 } // anonymous namespace
 
-QnServerResourceWidget::QnStatisticsHistoryData::QnStatisticsHistoryData(QString id, QString description)
-{
-    this->id = id;
-    this->description = description;
-    for (int i = 0; i < CHART_POINTS_LIMIT; i++)
-        history.append(0);
-}
-
-void QnServerResourceWidget::QnStatisticsHistoryData::append(int value) {
-    history.append(value);
-    if (history.count() > CHART_POINTS_LIMIT)
-        history.pop_front();
-}
-
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
+    m_manager(context->instance<QnVideoServerStatisticsManager>()),
+    m_lastHistoryId(-1),
     m_counter(0),
-    m_renderStatus(Qn::NothingRendered),
-    m_alreadyUpdating(false)
+    m_renderStatus(Qn::NothingRendered)
 {
     m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
-    QTimer *timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
-    timer->start(REQUEST_TIME);
+    m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     /* Run handlers. */
     updateButtonsVisibility();
+    at_statistics_received();
 }
 
 QnServerResourceWidget::~QnServerResourceWidget() {
+    m_manager->unregisterServerWidget(m_resource, this);
+
     ensureAboutToBeDestroyedEmitted();
 }
 
@@ -226,7 +228,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glColor4f(0.0, 0.0, 0.0, 1.0);
+        glColor4f(0.0, 0.0, 0.0, painter->opacity());
         glBegin(GL_QUADS);
         glVertices(rect);
         glEnd();
@@ -235,7 +237,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         glTranslatef(inner.center().x(), inner.center().y(), 1.0);
         qreal radius = min * 0.5 - offset;
         glScale(radius, radius);
-        m_backgroundGradientPainter->paint(qnGlobals->backgroundGradientColor());
+        m_backgroundGradientPainter->paint(toTransparent(qnGlobals->backgroundGradientColor(), painter->opacity()));
         glPopMatrix();
 
         glDisable(GL_BLEND);
@@ -243,12 +245,13 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     painter->endNativePainting();
 
     const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
-    qreal elapsed_step = (qreal)qMin(m_elapsedTimer.elapsed(), (qint64)REQUEST_TIME) / (qreal)REQUEST_TIME;
+
+    qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
+            (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
     /** Draw grid */
     {
         QPen grid;
-        QVector<QPoint> pointPairs;
         grid.setColor(qnGlobals->systemHealthColorGrid());
         grid.setWidthF(pen_width);
 
@@ -257,7 +260,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             grid_path.moveTo(i, offset);
             grid_path.lineTo(i, oh + offset);
         }
-        for (qreal i = x_step*2 + offset; i < oh; i += x_step*4){
+        for (qreal i = x_step*2 + offset; i < oh + offset; i += x_step*4){
             grid_path.moveTo(offset, i);
             grid_path.lineTo(ow + offset, i);
         }
@@ -265,41 +268,49 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
 
     QList<qreal> values;
+
     /** Draw graph lines */
     {
         QnScopedPainterTransformRollback transformRollback(painter);
+        Q_UNUSED(transformRollback)
+
         QTransform graphTransform = painter->transform();
         graphTransform.translate(offset, oh + offset);
         painter->setTransform(graphTransform);
 
         QPen graphPen;
         graphPen.setWidthF(pen_width * 2);
-        graphPen.setJoinStyle(Qt::RoundJoin);
-        graphPen.setCapStyle(Qt::RoundCap);
+        graphPen.setCapStyle(Qt::FlatCap);
 
-        for (int i = 0; i < m_history.length(); i++){
+        int counter = 0;
+
+        foreach(QString key, m_sortedKeys){
+            QnStatisticsData &stats = m_history[key];
             qreal current_value = 0;
-            QPainterPath path = createChartPath(&(m_history[i].history), x_step, -1.0 * oh, current_value, elapsed_step);
+            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &current_value);
             values.append(current_value);
-
-            graphPen.setColor(getColorById(i));
+            graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);
+
         }
     }
 
     /** Draw frame and legend */
     {
         QnScopedPainterPenRollback penRollback(painter);
-        QPen main_pen;{
-            main_pen.setColor(getColorById(0));
-            main_pen.setWidthF(pen_width * 2);
-            main_pen.setJoinStyle(Qt::RoundJoin);
-            main_pen.setCapStyle(Qt::RoundCap);
-        }
+        Q_UNUSED(penRollback)
+
+        QPen main_pen;
+        main_pen.setColor(getColorById(0));
+        main_pen.setWidthF(pen_width * 2);
+        main_pen.setJoinStyle(Qt::MiterJoin);
+
         painter->setPen(main_pen);
         painter->drawRect(inner);
 
         QnScopedPainterFontRollback fontRollback(painter);
+        Q_UNUSED(fontRollback)
+
         QFont font(this->font());
 
 #ifndef Q_WS_X11
@@ -320,20 +331,28 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         /** Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
-            Q_UNUSED(transformRollback) //ugly hack to prevent warning
+            Q_UNUSED(transformRollback)
+
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
-
             legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
 
-            legendTransform.translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
+            legendTransform.translate(width * 0.5, oh + offset * 1.5);
+
+            qreal legendOffset = 0.0;
+            int space = offset; // space for the square drawing and between legend elements
+            foreach(QString key, m_sortedKeys)
+                legendOffset += painter->fontMetrics().width(key) + space;
+            legendTransform.translate(-legendOffset * 0.5, 0.0);
             painter->setTransform(legendTransform);
-            for (int i = 0; i < m_history.length(); i++){
-                main_pen.setColor(getColorById(i));
+
+            int counter = 0;
+            foreach(QString key, m_sortedKeys){
+                main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, m_history[i].id);
-                legendTransform.translate(offset * 2, 0.0);
+                painter->drawText(offset*0.1, offset*0.1, key);
+                legendTransform.translate(painter->fontMetrics().width(key) + space, 0.0);
                 painter->setTransform(legendTransform);
             }
         }
@@ -359,26 +378,35 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         /** Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
+            Q_UNUSED(transformRollback)
+            painter->translate(width * 0.5, oh + offset * 1.5);
 
-            painter->translate(width * 0.5 - offset * m_history.length(), oh + offset * 1.5);
             qreal c = offset*0.02;
             painter->scale(c, c);
-            c = 1/c;
+
+            qreal legendOffset = 0.0;
+            int space = 50; // space for the square drawing and between legend elements
+            foreach(QString key, m_sortedKeys)
+                legendOffset += painter->fontMetrics().width(key) + space;
+            painter->translate(-legendOffset * 0.5, 0.0);
+
+            c = 1/c; // 50 / offset
 
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset*0.2*c, -offset*0.2*c);
+            legend.addRect(0.0, 0.0, -10, -10);
             main_pen.setWidthF(pen_width * 2 * c);
 
-            for (int i = 0; i < m_history.length(); i++){
-                main_pen.setColor(getColorById(i));
+            int counter = 0;
+            foreach(QString key, m_sortedKeys){
+                main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1*c, offset*0.1*c, m_history[i].id);
-                painter->translate(offset * 2*c, 0.0);
+                painter->drawText(5, 5, key);
+                painter->translate(painter->fontMetrics().width(key) + space, 0.0);
             }
             painter->scale(c, c);
         }
-    #endif //Q_WS_X11
+#endif //Q_WS_X11
     }
 }
 
@@ -390,37 +418,67 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
 
-void QnServerResourceWidget::at_timer_timeout() {
-    if (m_alreadyUpdating) {
-        if (m_renderStatus != Qn::CannotRender)
-            m_renderStatus = Qn::OldFrameRendered;
+void QnServerResourceWidget::at_statistics_received() {
+    QnStatisticsHistory history_update;
+    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
+    if (id < 0){
+        m_renderStatus = Qn::CannotRender;
+        return;
     }
 
-    m_alreadyUpdating = true;
-    m_resource->apiConnection()->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataVector &)));
-}
+    if (id == m_lastHistoryId){
+        m_renderStatus = Qn::OldFrameRendered;
+        return;
+    }
 
-void QnServerResourceWidget::at_statisticsReceived(const QnStatisticsDataVector &data) {
-    m_alreadyUpdating = false;
-    m_renderStatus = Qn::NewFrameRendered;
+    bool reSort = false;
 
-    int cpuCounter = 0;
-    int hddCounter = 0;
-    
-    for (int i = 0; i < data.size(); i++) {
-        QnStatisticsData next_data = data[i];
+    // remove charts that are no exist anymore
+    QnStatisticsCleaner cleaner(m_history);
+    while (cleaner.hasNext()) {
+         cleaner.next();
+         if (!(history_update.contains(cleaner.key()))){
+            cleaner.remove();
+            reSort = true;
+         }
+    }
 
-        if (m_history.length() < i + 1) {
-            QString id = next_data.device == QnStatisticsData::CPU 
-                ? tr("CPU") + QString::number(cpuCounter++)
-                : tr("HDD") + QString::number(hddCounter++);
-            m_history.append(QnStatisticsHistoryData(id, next_data.description));
+    // update existsing charts
+    QnStatisticsIterator updater(history_update);
+    while (updater.hasNext()) {
+         updater.next();
+         reSort = reSort | !m_history.contains(updater.key());
+         updateValues(updater.key(), updater.value());
+    }
+
+    if (reSort){
+        m_sortedKeys.clear();
+        foreach(QString key, m_history.keys())
+            m_sortedKeys.append(key);
+        m_sortedKeys.sort();
+
+        // ugly hack
+        // TODO: #gdm Think about it. Later.
+        if (m_sortedKeys.contains(tr("CPU"))){
+            m_sortedKeys.removeOne(tr("CPU"));
+            m_sortedKeys.prepend(tr("CPU"));
         }
-
-        QnStatisticsHistoryData *item = &(m_history[i]);
-        item->append(next_data.value);
     }
+
+    m_lastHistoryId = id;
+    m_renderStatus = Qn::NewFrameRendered;
 
     m_elapsedTimer.restart();
     m_counter++;
+}
+
+void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues){
+    QnStatisticsData &oldValues = m_history[key];
+
+    while (!newValues.isEmpty())
+        oldValues.append(newValues.takeFirst());
+    while (oldValues.size() > CHART_POINTS_LIMIT)
+        oldValues.removeFirst();
+    while (oldValues.size() < CHART_POINTS_LIMIT)
+        oldValues.prepend(0);
 }

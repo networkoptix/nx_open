@@ -2,10 +2,19 @@
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
-      m_audioEnabled(false)
+      m_audioEnabled(false),
+      m_manuallyAdded(false),
+      m_advancedWorking(false)
 {
+    static volatile bool metaTypesInitialized = false;
+    if (!metaTypesInitialized) {
+        qRegisterMetaType<QnVirtualCameraResourcePtr>();
+        metaTypesInitialized = true;
+    }
 }
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
@@ -122,12 +131,21 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
     {
         m_scheduleDisabled = camera->isScheduleDisabled();
         m_audioEnabled = camera->isAudioEnabled();
+        m_manuallyAdded = camera->isManuallyAdded();
     }
 }
 
 void QnVirtualCameraResource::setScheduleDisabled(bool disabled)
 {
+    QMutexLocker locker(&m_mutex);
+
+    if(m_scheduleDisabled == disabled)
+        return;
+
     m_scheduleDisabled = disabled;
+
+    locker.unlock();
+    emit scheduleDisabledChanged(::toSharedPointer(this));
 }
 
 bool QnVirtualCameraResource::isScheduleDisabled() const
@@ -143,4 +161,38 @@ void QnVirtualCameraResource::setAudioEnabled(bool enabled)
 bool QnVirtualCameraResource::isAudioEnabled() const
 {
     return m_audioEnabled;
+}
+
+bool QnVirtualCameraResource::isManuallyAdded() const
+{
+    return m_manuallyAdded;
+}
+void QnVirtualCameraResource::setManuallyAdded(bool value)
+{
+    m_manuallyAdded = value;
+}
+
+
+bool QnVirtualCameraResource::isAdvancedWorking() const
+{
+    return m_advancedWorking;
+}
+
+void QnVirtualCameraResource::setAdvancedWorking(bool value)
+{
+    m_advancedWorking = value;
+}
+
+QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCapabilities()
+{
+    QVariant mediaVariant;
+    getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
+    return (CameraCapabilities) mediaVariant.toInt();
+}
+
+void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
+{
+    value |= getCameraCapabilities();
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }

@@ -19,12 +19,12 @@ class QnGlFunctions;
  * A lightweight button widget that does not use styles for painting. 
  */
 class QnImageButtonWidget: public Animated<Clickable<GraphicsWidget> > {
-    Q_OBJECT;
-    Q_FLAGS(StateFlags StateFlag);
-    Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable);
-    Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true);
-    Q_PROPERTY(bool cached READ isCached WRITE setCached);
-    Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed);
+    Q_OBJECT
+    Q_FLAGS(StateFlags StateFlag)
+    Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable)
+    Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY toggled USER true)
+    Q_PROPERTY(bool cached READ isCached WRITE setCached)
+    Q_PROPERTY(qreal animationSpeed READ animationSpeed WRITE setAnimationSpeed)
 
     typedef Animated<Clickable<GraphicsWidget> > base_type;
 
@@ -37,7 +37,7 @@ public:
         DISABLED = 0x8,     /**< Button is disabled. */
         FLAGS_MAX = 0xF
     };
-    Q_DECLARE_FLAGS(StateFlags, StateFlag);
+    Q_DECLARE_FLAGS(StateFlags, StateFlag)
 
     QnImageButtonWidget(QGraphicsItem *parent = NULL);
 
@@ -110,6 +110,7 @@ protected:
 
 protected:
     void updateState(StateFlags state);
+    void updateFromDefaultAction();
 
     void ensurePixmapCache() const;
     void invalidatePixmapCache();
@@ -139,18 +140,20 @@ private:
     qreal m_hoverProgress;
 
     QAction *m_action;
+    bool m_actionIconOverridden;
+
     QSharedPointer<QnTextureTransitionShaderProgram> m_shader;
     QScopedPointer<QnGlFunctions> m_gl;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
 
 
 /**
  * An image button widget that "raises" when hovered.
  */
 class QnZoomingImageButtonWidget: public QnImageButtonWidget {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnImageButtonWidget base_type;
 

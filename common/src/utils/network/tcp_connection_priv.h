@@ -1,3 +1,5 @@
+#include <QByteArray>
+
 static const int TCP_READ_BUFFER_SIZE = 65536;
 static const QByteArray ENDL("\r\n");
 
@@ -23,14 +25,15 @@ static const int CODE_INVALID_PARAMETER = 451;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 
+#include "ssl.h"
+
 class QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
-        socket(0),
-        sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256)
+        socket(0)
     {
         tcpReadBuffer = new quint8[TCP_READ_BUFFER_SIZE];
         socketTimeout = 5000 * 1000;
@@ -55,7 +58,8 @@ public:
     QMutex sockMutex;
     quint8* tcpReadBuffer;
     QnTcpListener* owner;
-    QnByteArray sendBuffer;
     int socketTimeout;
     bool chunkedMode;
+    SSL* ssl;
+
 };

@@ -77,8 +77,8 @@ struct FffmpegLog
     static void av_log_default_callback_impl(void* ptr, int level, const char* fmt, va_list vl)
     {
         Q_UNUSED(level)
-            Q_UNUSED(ptr)
-            Q_ASSERT(fmt && "NULL Pointer");
+        Q_UNUSED(ptr)
+        Q_ASSERT(fmt && "NULL Pointer");
 
         if (!fmt) {
             return;
@@ -627,13 +627,6 @@ bool QnDesktopFileEncoder::init()
             m_lastErrorStr = QLatin1String("Can't initialize audio encoder");
             return false;
         }
-        m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate;
-        m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
-
-
-        // 50 ms as max jitter
-        // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
-        m_maxAudioJitter = m_audioOutStream->time_base.den / m_audioOutStream->time_base.num / 20;
 
         foreach(EncodedAudioInfo* audioChannel, m_audioInfo)
         {
@@ -647,6 +640,16 @@ bool QnDesktopFileEncoder::init()
     }
 
     avformat_write_header(m_formatCtx, 0);
+
+    if (m_audioCodecCtx)
+        m_audioFrameDuration = m_audioCodecCtx->frame_size / (double) m_audioCodecCtx->sample_rate * 1000; // keep in ms
+    //m_audioFrameDuration *= m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num;
+
+    // 50 ms as max jitter
+    // QT uses 25fps timer for audio grabbing, so jitter 40ms + 10ms reserved.
+    m_maxAudioJitter = 1000 / 20; // keep in ms
+    //m_maxAudioJitter = m_audioOutStream->time_base.den / (double) m_audioOutStream->time_base.num / 20;
+
 
     m_grabber->start(QThread::HighestPriority);
     foreach(EncodedAudioInfo* info, m_audioInfo)
@@ -670,6 +673,9 @@ int QnDesktopFileEncoder::processData(bool flush)
     if (out_size < 1 && !flush)
         return out_size;
 
+    AVRational timeBaseMs;
+    timeBaseMs.num = 1;
+    timeBaseMs.den = 1000;
 
     AVPacket videoPkt;
     if (out_size > 0)
@@ -692,16 +698,13 @@ int QnDesktopFileEncoder::processData(bool flush)
     EncodedAudioInfo* ai2 = m_audioInfo.size() > 1 ? m_audioInfo[1] : 0;
     while (ai && ai->m_audioQueue.size() > 0 && (ai2 == 0 || ai2->m_audioQueue.size() > 0))
     {
-        AVRational r;
-        r.num = 1;
-        r.den = 1000;
         QnAbstractMediaDataPtr audioData = ai->m_audioQueue.front();
 
-        qint64 audioPts =  av_rescale_q(audioData->timestamp, r, m_audioOutStream->time_base) - m_audioFrameDuration;
+        qint64 audioPts = audioData->timestamp - m_audioFrameDuration;
         qint64 expectedAudioPts = m_storedAudioPts + m_audioFramesCount * m_audioFrameDuration;
         int audioJitter = qAbs(audioPts - expectedAudioPts);
 
-        //cl_log.log("audio jitter=", audioJitter/90.0, cl_logALWAYS);
+        //cl_log.log("audio jitter=", audioJitter, cl_logALWAYS); // all in ms
 
         if (audioJitter < m_maxAudioJitter)
         {
@@ -709,11 +712,9 @@ int QnDesktopFileEncoder::processData(bool flush)
         }
         else {
             m_storedAudioPts = audioPts;
-            m_audioFramesCount = 1;
+            m_audioFramesCount = 0;
         }
 
-        if (out_size > 0 && audioPts > videoPkt.pts)
-            break;
 
         m_audioFramesCount++;
 
@@ -762,7 +763,7 @@ int QnDesktopFileEncoder::processData(bool flush)
         if (aEncoded > 0)
         {
             av_init_packet(&audioPacket);
-            audioPacket.pts = audioPts;
+            audioPacket.pts = av_rescale_q(audioPts, timeBaseMs, m_audioOutStream->time_base);
             audioPacket.data = m_encodedAudioBuf;
             audioPacket.size = aEncoded;
             audioPacket.stream_index = m_audioOutStream->index;

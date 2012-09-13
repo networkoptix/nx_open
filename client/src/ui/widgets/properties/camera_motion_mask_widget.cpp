@@ -56,6 +56,7 @@ void QnCameraMotionMaskWidget::init() {
 
     /* Set up model & control machinery. */
     m_context.reset(new QnWorkbenchContext(NULL, this));
+    m_context->workbench()->setCurrentLayout(new QnWorkbenchLayout(this));
     
     QnWorkbenchDisplay *display = m_context->display();
     display->setScene(m_scene.data());
@@ -116,23 +117,25 @@ void QnCameraMotionMaskWidget::setReadOnly(bool readOnly) {
 
     if(readOnly) {
         m_motionSelectionInstrument->disable();
+        m_clickInstrument->disable();
+
     } else {
         m_motionSelectionInstrument->enable();
+        m_clickInstrument->enable();
     }
 
     m_readOnly = readOnly;
 }
 
-const QList<QnMotionRegion> &QnCameraMotionMaskWidget::motionRegionList() const {
+QList<QnMotionRegion> QnCameraMotionMaskWidget::motionRegionList() const {
     if (m_resourceWidget)
         return m_resourceWidget->motionSensitivity();
     else
-        // TODO: returning temporary here.
         return QList<QnMotionRegion>();
 }
 
-const QnResourcePtr &QnCameraMotionMaskWidget::camera() const {
-    return m_camera; // TODO: returning temporary here.
+QnResourcePtr QnCameraMotionMaskWidget::camera() const {
+    return m_camera;
 }
 
 void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
@@ -157,9 +160,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
         /* Set up the corresponding widget. */
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: check for NULL
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotionSensitivity, true);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayButtons, false);
-        m_resourceWidget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
+        m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
 
         /* Find best value for sensitivity. */
         int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];

@@ -28,6 +28,8 @@ public:
 
     void setSpeed(qreal speed);
 
+    bool isCurtained() const;
+
 signals:
     void curtained();
     void uncurtained();

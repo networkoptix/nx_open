@@ -2,7 +2,7 @@
 #define QN_ROTATION_INSTRUMENT_H
 
 #include "drag_processing_instrument.h"
-#include <QWeakPointer>
+#include <QtCore/QWeakPointer>
 
 class QGraphicsWidget;
 

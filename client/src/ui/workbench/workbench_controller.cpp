@@ -63,6 +63,7 @@
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
+#include <ui/graphics/instruments/ptz_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -80,6 +81,8 @@
 #include "workbench_context.h"
 #include "workbench.h"
 #include "workbench_display.h"
+#include "workbench_access_controller.h"
+
 #include "help/context_help.h"
 
 
@@ -172,7 +175,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager(display()->instrumentManager()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_cursorPos(invalidCursorPos())
+    m_cursorPos(invalidCursorPos()),
+    m_screenRecorder(0)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));
 
@@ -212,6 +216,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_motionSelectionInstrument = new MotionSelectionInstrument(this);
     GridAdjustmentInstrument *gridAdjustmentInstrument = new GridAdjustmentInstrument(workbench(), this);
     SignalingInstrument *sceneKeySignalingInstrument = new SignalingInstrument(Instrument::Scene, Instrument::makeSet(QEvent::KeyPress), this);
+    PtzInstrument *ptzInstrument = new PtzInstrument(this);
 
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
@@ -222,6 +227,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
+    ptzInstrument->setPtzItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
@@ -246,7 +252,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(m_wheelZoomInstrument);
     m_manager->installInstrument(gridAdjustmentInstrument);
-
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, wheelEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
@@ -254,6 +259,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
+    m_manager->installInstrument(ptzInstrument);
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, keyEventTypes, this));
     m_manager->installInstrument(sceneKeySignalingInstrument);
@@ -342,10 +348,18 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_resizingInstrument,           SLOT(recursiveEnable()));
 
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_moveInstrument,               SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_moveInstrument,               SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_resizingInstrument,           SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
+    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
+
     /* Connect to display. */
     connect(display(),                  SIGNAL(widgetChanged(Qn::ItemRole)),                                                        this,                           SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                  SIGNAL(widgetAdded(QnResourceWidget *)),                                                    this,                           SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                  SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)),                                         this,                           SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
+    connect(workbench(),                SIGNAL(currentLayoutChanged()),                                                             this,                           SLOT(at_workbench_currentLayoutChanged()));
 
     /* Set up zoom toggle. */
     m_zoomedToggle = new QnToggle(false, this);
@@ -357,7 +371,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     /* Set up context menu. */
     QWidget *window = display()->view()->window();
-    window->addAction(action(Qn::ScreenRecordingAction));
+    if (QnScreenRecorder::isSupported())
+        window->addAction(action(Qn::ToggleScreenRecordingAction));
     window->addAction(action(Qn::ToggleSmartSearchAction));
 
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
@@ -368,12 +383,13 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
-    connect(action(Qn::ScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
+    if (QnScreenRecorder::isSupported())
+        connect(action(Qn::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
 
     /* Init screen recorder. */
-    m_screenRecorder = new QnScreenRecorder(this);
-    if (m_screenRecorder->isSupported()) {
+    if (QnScreenRecorder::isSupported()){
+        m_screenRecorder = new QnScreenRecorder(this);
         connect(m_screenRecorder,       SIGNAL(recordingStarted()),                                                                 this,                           SLOT(at_screenRecorder_recordingStarted()));
         connect(m_screenRecorder,       SIGNAL(recordingFinished(QString)),                                                         this,                           SLOT(at_screenRecorder_recordingFinished(QString)));
         connect(m_screenRecorder,       SIGNAL(error(QString)),                                                                     this,                           SLOT(at_screenRecorder_error(QString)));
@@ -384,8 +400,10 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 }
 
 QnWorkbenchController::~QnWorkbenchController() {
-    disconnect(m_screenRecorder, NULL, this, NULL);
-    m_screenRecorder->stopRecording();
+    if (m_screenRecorder){
+        disconnect(m_screenRecorder, NULL, this, NULL);
+        m_screenRecorder->stopRecording();
+    }
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -403,7 +421,7 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
                 widget->setSelected(true);
             }
 
-            menu()->trigger(Qn::RemoveLayoutItemAction, display()->scene()->selectedItems());
+            menu()->trigger(Qn::RemoveLayoutItemAction, widget);
             event->ignore();
             return true;
         }
@@ -436,7 +454,7 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
         if(!(widget->resource()->flags() & QnResource::network))
             continue;
 
-        widget->setDisplayFlag(QnResourceWidget::DisplayMotion, display);
+        widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
 }
 
@@ -525,12 +543,11 @@ void QnWorkbenchController::showContextMenuAt(const QPoint &pos){
 // -------------------------------------------------------------------------- //
 void QnWorkbenchController::startRecording()
 {
-    if (!m_screenRecorder->isSupported()) {
-        stopRecording();
+    if (!m_screenRecorder) {
         return;
     }
 
-    action(Qn::ScreenRecordingAction)->setChecked(true);
+    action(Qn::ToggleScreenRecordingAction)->setChecked(true);
 
     if(m_screenRecorder->isRecording() || (m_recordingAnimation && m_recordingAnimation->state() == QAbstractAnimation::Running))
         return;
@@ -573,10 +590,10 @@ void QnWorkbenchController::startRecording()
 
 void QnWorkbenchController::stopRecording()
 {
-    action(Qn::ScreenRecordingAction)->setChecked(false);
-
-    if (!m_screenRecorder->isSupported())
+    if (!m_screenRecorder)
         return;
+
+    action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
     if (!m_screenRecorder->isRecording()) {
         m_countdownCanceled = true;
@@ -591,7 +608,8 @@ void QnWorkbenchController::at_recordingAnimation_finished()
     m_recordingLabel->hide();
     if (!m_countdownCanceled) {
         if (QGLWidget *widget = qobject_cast<QGLWidget *>(display()->view()->viewport()))
-            m_screenRecorder->startRecording(widget);
+            if (m_screenRecorder) // just in case =)
+                m_screenRecorder->startRecording(widget);
     }
     m_countdownCanceled = false;
 }
@@ -627,7 +645,8 @@ void QnWorkbenchController::at_screenRecorder_recordingStarted() {
 }
 
 void QnWorkbenchController::at_screenRecorder_error(const QString &errorMessage) {
-    action(Qn::ScreenRecordingAction)->setChecked(false);
+    if (QnScreenRecorder::isSupported())
+        action(Qn::ToggleScreenRecordingAction)->setChecked(false);
 
     QMessageBox::warning(display()->view(), tr("Warning"), tr("Can't start recording due to the following error: %1").arg(errorMessage));
 }
@@ -654,7 +673,7 @@ void QnWorkbenchController::at_screenRecorder_recordingFinished(const QString &r
 
         if (!filePath.isEmpty()) {
             if (!filePath.endsWith(QLatin1String(".avi"), Qt::CaseInsensitive))
-                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 3);
+                filePath += selectedFilter.mid(selectedFilter.indexOf(QLatin1Char('.')), 4);
 
             QFile::remove(filePath);
             if (!QFile::rename(recordedFileName, filePath)) {
@@ -1002,7 +1021,7 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
         return;
     }
 
-    widget->setDisplayFlag(QnResourceWidget::DisplayMotion, true);
+    widget->setOption(QnResourceWidget::DisplayMotion, true);
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             if(QnMediaResourceWidget *otherMediaWidget = dynamic_cast<QnMediaResourceWidget *>(otherWidget))
@@ -1031,6 +1050,9 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
     if(widget == NULL)
         return;
+
+    if(widget->options() & QnResourceWidget::ControlPtz)
+        return; /* (Un)raising shouldn't work when PTZ is on as it's confusing. */
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
@@ -1229,7 +1251,7 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->displayFlags() & QnResourceWidget::DisplayMotion))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->options() & QnResourceWidget::DisplayMotion))
             hidden = true;
 
     if(hidden) {
@@ -1272,4 +1294,12 @@ void QnWorkbenchController::at_fitInViewAction_triggered() {
     display()->fitInView();
 }
 
+void QnWorkbenchController::at_workbench_currentLayoutChanged() {
+    // TODO: subscribe to permission changes.
 
+    Qn::Permissions permissions = accessController()->permissions(workbench()->currentLayout()->resource());
+    bool writable = permissions & Qn::WritePermission;
+
+    m_moveInstrument->setEnabled(writable);
+    m_resizingInstrument->setEnabled(writable);
+}

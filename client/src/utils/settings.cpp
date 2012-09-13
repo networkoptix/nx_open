@@ -115,10 +115,7 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
 
         return QVariant::fromValue<QnConnectionDataList>(result);
     }
-#ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    case BACKGROUND_COLOR:
-        return qnGlobals->backgroundGradientColor();
-#endif
+    case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
         return defaultValue; /* Not to be read from settings. */
     default:
@@ -156,10 +153,7 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
         writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
         break;
     }
-#ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    case BACKGROUND_COLOR:
-        break;
-#endif
+    case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
         break; /* Not to be saved to settings. */
     default:

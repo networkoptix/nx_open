@@ -7,13 +7,14 @@
 #include <core/resource/resource_fwd.h>
 
 class QnWorkbenchContext;
+class QCheckBox;
 
 namespace Ui {
     class UserSettingsDialog;
 }
 
 class QnUserSettingsDialog: public QDialog {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     enum Element {
         Login,
@@ -41,6 +42,8 @@ public:
     void setElementFlags(Element element, ElementFlags flags);
     ElementFlags elementFlags(Element element) const;
 
+    void setEditorPermissions(quint64 rights);
+
     bool hasChanges() const {
         return m_hasChanges;
     }
@@ -61,11 +64,22 @@ protected slots:
     void updateCurrentPassword() { updateElement(CurrentPassword); }
     void updatePassword() { updateElement(Password); }
     void updateAccessRights() { updateElement(AccessRights); }
+    void loadAccessRightsToUi(quint64 rights);
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);
 
+    void at_accessRights_changed();
+    void at_advancedButton_toggled();
+
 private:
+    void createAccessRightsPresets();
+    void createAccessRightsAdvanced();
+    void createAccessRightCheckBox(QString text, quint64 right);
+    void selectAccessRightsPreset(quint64 rights);
+    void fillAccessRightsAdvanced(quint64 rights);
+    quint64 readAccessRightsAdvanced();
+
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QWeakPointer<QnWorkbenchContext> m_context;
     QString m_currentPassword;
@@ -75,8 +89,10 @@ private:
     QString m_hints[ElementCount];
     ElementFlags m_flags[ElementCount];
     bool m_hasChanges;
+    QHash<quint64, QCheckBox*> m_advancedRights;
+    quint64 m_editorRights;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)
 
 #endif // QN_NEW_USER_DIALOG_H

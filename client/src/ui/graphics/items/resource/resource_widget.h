@@ -38,19 +38,21 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
-    Q_FLAGS(DisplayFlags DisplayFlag);
+    Q_FLAGS(Options Option);
 
     typedef Shaded<Instrumented<GraphicsWidget> > base_type;
 
 public:
-    enum DisplayFlag {
+    enum Option {
         DisplayActivityOverlay      = 0x1,  /**< Whether the paused overlay icon should be displayed. */
         DisplaySelectionOverlay     = 0x2,  /**< Whether selected / not selected state should be displayed. */
         DisplayMotion               = 0x4,  /**< Whether motion is to be displayed. */                              // TODO: this flag also handles smart search, separate!
         DisplayButtons              = 0x8,  /**< Whether item buttons are to be displayed. */
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x20, // TODO
+        ControlPtz                  = 0x40, // TODO
     };
-    Q_DECLARE_FLAGS(DisplayFlags, DisplayFlag)
+    Q_DECLARE_FLAGS(Options, Option)
 
     enum Button {
         CloseButton                 = 0x1,
@@ -162,24 +164,24 @@ public:
     void setEnclosingGeometry(const QRectF &enclosingGeometry);
 
     /**
-     * \returns                         Display flags for this widget.
+     * \returns                         Options for this widget.
      */
-    DisplayFlags displayFlags() const {
-        return m_displayFlags;
+    Options options() const {
+        return m_options;
     }
 
     /**
-     * \param flag                      Affected flag.
-     * \param value                     New value for the affected flag.
+     * \param option                    Affected option.
+     * \param value                     New value for the affected option.
      */
-    void setDisplayFlag(DisplayFlag flag, bool value = true) {
-        setDisplayFlags(value ? m_displayFlags | flag : m_displayFlags & ~flag);
+    void setOption(Option option, bool value = true) {
+        setOptions(value ? m_options | option : m_options & ~option);
     }
 
     /**
-     * \param flags                     New display flags for this widget.
+     * \param options                   New options for this widget.
      */
-    void setDisplayFlags(DisplayFlags flags);
+    void setOptions(Options options);
 
     /**
      * \returns                         Status of the last rendering operation.
@@ -192,6 +194,8 @@ public:
      * \returns                         Text of this window's title.
      */
     QString titleText() const;
+
+    // TODO: write sane comments for these functions.
 
     /**
      * \param titleText                 New title text for this window.
@@ -210,7 +214,7 @@ public:
      *                                  and these parts will be aligned to the sides of the footer.
      */
     void setInfoText(const QString &infoText);
-
+    
     bool isDecorationsVisible() const;
     Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
 
@@ -222,7 +226,7 @@ public:
 signals:
     void aspectRatioChanged();
     void aboutToBeDestroyed();
-    void displayFlagsChanged();
+    void optionsChanged();
     void rotationStartRequested();
     void rotationStopRequested();
 
@@ -262,6 +266,7 @@ protected:
 
     Overlay channelOverlay(int channel) const;
     void setChannelOverlay(int channel, Overlay overlay);
+    Overlay calculateChannelOverlay(int channel, int resourceStatus) const;
     virtual Overlay calculateChannelOverlay(int channel) const;
     Q_SLOT void updateChannelOverlay(int channel);
 
@@ -271,7 +276,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    QnImageButtonBar *buttonBar() {
+    QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
     }
 
@@ -281,14 +286,18 @@ protected:
     void setChannelLayout(const QnVideoResourceLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
-    virtual void displayFlagsChangedNotify(DisplayFlags changedFlags) { Q_UNUSED(changedFlags); }
+    virtual void optionsChangedNotify(Options changedFlags) { Q_UNUSED(changedFlags); }
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
+    Qn::RenderStatus channelRenderStatus(int channel) const;
 
     void ensureAboutToBeDestroyedEmitted();
 
 private:
+    void setTitleTextInternal(const QString &titleText);
+    void setInfoTextInternal(const QString &infoText);
+
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
 
@@ -322,7 +331,7 @@ private:
     QnResourcePtr m_resource;
 
     /* Display flags. */
-    DisplayFlags m_displayFlags;
+    Options m_options;
 
     /** Layout of this widget's channels. */
     const QnVideoResourceLayout *m_channelsLayout;
@@ -342,14 +351,16 @@ private:
     /** Frame width. */
     qreal m_frameWidth;
 
+    QString m_titleText, m_infoText;
+
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
-    QGraphicsWidget *m_headerWidget;
+    GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
     QnImageButtonBar *m_buttonBar;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
-    QGraphicsWidget *m_footerWidget;
+    GraphicsWidget *m_footerWidget;
     GraphicsLabel *m_footerLeftLabel;
     GraphicsLabel *m_footerRightLabel;
 
@@ -365,7 +376,7 @@ private:
     QStaticText m_unauthorizedStaticText2;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::DisplayFlags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options);
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons);
 Q_DECLARE_METATYPE(QnResourceWidget *)
 

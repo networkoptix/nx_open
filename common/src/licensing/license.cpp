@@ -241,6 +241,8 @@ void QnLicensePool::addLicense(const QnLicensePtr &license)
     QMutexLocker locker(&m_mutex);
 
     m_licenses.append(license);
+
+    emit licensesChanged();
 }
 
 void QnLicensePool::reset()

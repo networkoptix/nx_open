@@ -51,8 +51,6 @@ public:
 
     void setMTDecoding(bool value);
 
-    void setSingleShotMode(bool single);
-
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
     bool isRealTimeSource() const;
@@ -63,8 +61,6 @@ public:
     bool isNoData() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
-
-    virtual void setTimeParams(qint64 timeOffsetUsec, qint64 minTimeUsec, qint64 maxTimeUsec) override;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -82,6 +78,8 @@ signals:
     void stillImageChanged();
 
 protected:
+    void setSingleShotMode(bool single);
+
     bool haveAudio(float speed) const;
 
     // puts in in queue and returns first in queue
@@ -201,9 +199,6 @@ protected:
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
 
-    qint64 m_timeOffsetUsec;
-    qint64 m_minTimeUsec;
-    qint64 m_maxTimeUsec;
     int m_fczFrames;
     bool m_useMTRealTimeDecode;
 };

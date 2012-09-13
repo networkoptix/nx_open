@@ -23,7 +23,7 @@ QnAxisStreamReader::QnAxisStreamReader(QnResourcePtr res):
 
 QnAxisStreamReader::~QnAxisStreamReader()
 {
-
+    stop();
 }
 
 int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
@@ -314,7 +314,7 @@ bool QnAxisStreamReader::isGotFrame(QnCompressedVideoDataPtr videoData)
 void QnAxisStreamReader::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
-    m_rtpStreamParser.closeStream();
+    m_rtpStreamParser.pleaseStop();
 }
 
 QnAbstractMediaDataPtr QnAxisStreamReader::getNextData()

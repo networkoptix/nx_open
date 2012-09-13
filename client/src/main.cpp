@@ -11,6 +11,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
+#include <QtCore/QTranslator>
+#include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 
 #include <QtSingleApplication>
@@ -42,6 +44,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -49,17 +52,25 @@
 #include "api/session_manager.h"
 #include "plugins/resources/droid/droid_resource_searcher.h"
 #include "ui/actions/action_manager.h"
-#include "ui/tooltips/tool_tip.h"
 #include "plugins/resources/iqinvision/iqinvision_resource_searcher.h"
 #include "plugins/resources/droid_ipwebcam/ipwebcam_droid_resource_searcher.h"
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include "utils/common/module_resources.h"
+
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
+#include "ui/workbench/workbench_translation_manager.h"
+
+#ifdef Q_WS_X11
+    #include "utils/app_focus_listener.h"
+#endif
+#include "utils/common/cryptographic_hash.h"
+#include "ui/style/globals.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -204,53 +215,17 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#include <X11/Xlib.h>
+
 #ifndef API_TEST_MAIN
-
-#include <fstream>
-#include "../../common/src/decoders/video/quicksyncvideodecoder.h"
-
-#ifndef _DEBUG
-int testQuickSyncDecoder()
-{
-    //static const char* TEST_FILE_NAME = "c:/content/test.mpv";
-    static const char* TEST_FILE_NAME = "c:/content/test.264";
-
-    std::auto_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder() );
-    std::ifstream inputFile( TEST_FILE_NAME, std::ios::binary );
-
-    static const int BUF_SIZE = 64*1024;
-    char buf[BUF_SIZE];
-    mfxBitstream inputStream;
-    memset( &inputStream, 0, sizeof(inputStream) );
-    inputStream.TimeStamp = MFX_TIMESTAMP_UNKNOWN;
-    inputStream.Data = (mfxU8*)buf;
-    inputStream.DataLength = 0;
-    inputStream.MaxLength = BUF_SIZE;
-    //for( int i = 0; !inputFile.eof() && i < 20; ++i )
-    while( !inputFile.eof() )
-    {
-        inputFile.read( (char*)(inputStream.Data + inputStream.DataOffset), inputStream.MaxLength - inputStream.DataOffset );
-        inputStream.DataLength += inputFile.gcount();
-        inputStream.DataOffset = 0;
-        decoder->decode( MFX_CODEC_AVC, &inputStream, NULL );
-        if( inputStream.DataLength > 0 )
-        {
-            memmove( inputStream.Data, inputStream.Data + inputStream.DataOffset, inputStream.DataLength );
-            inputStream.DataOffset = inputStream.DataLength;
-        }
-        else
-        {
-            inputStream.DataOffset = 0;
-        }
-    }
-    return 0;
-}
-#endif
 
 int main(int argc, char *argv[])
 {
-    //return testQuickSyncDecoder();
+    QN_INIT_MODULE_RESOURCES(common);
 
+#ifdef Q_WS_X11
+	XInitThreads();
+#endif
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -264,23 +239,36 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
-
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
 
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 
+    QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, logLevel;
+    QString translationPath = qnSettings->translationPath();
+    bool devBackgroundEditable = false;
     
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&noSingleApplication,     "--no-single-application",  NULL, QString(),    true);
-    commandLineParser.addParameter(&authenticationString,    "--auth",                   NULL, QString());
-    commandLineParser.addParameter(&screen,                  "--screen",                 NULL, QString());
-    commandLineParser.addParameter(&delayedDrop,             "--delayed-drop",           NULL, QString());
-    commandLineParser.addParameter(&logLevel,                "--log-level",              NULL, QString());
+    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
+    commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
+    commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
+    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
+    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
+
+    /* Dev mode. */
+    if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
+        qnSettings->setBackgroundEditable(devBackgroundEditable);
+    } else {
+        qnSettings->setBackgroundAnimated(true);
+        qnSettings->setBackgroundColor(qnGlobals->backgroundGradientColor());
+    }
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -299,7 +287,12 @@ int main(int argc, char *argv[])
         application.reset(singleApplication);
     }
     application->setQuitOnLastWindowClosed(true);
-    application->setWindowIcon(qnSkin->icon("logo_tray.png"));
+    application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+#ifdef Q_WS_X11
+    QnAppFocusListener appFocusListener;
+    application->installEventFilter(&appFocusListener);
+#endif
 
     if(singleApplication) {
         QString argsMessage;
@@ -312,6 +305,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance( QString::fromAscii("./") );
+
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
@@ -320,27 +316,7 @@ int main(int argc, char *argv[])
 
     /* Initialize application instance. */
     application->setStartDragDistance(20);
-
-    /* Support old straight build scripts. */
-#ifndef NO_TRANSLATIONS
-    Q_INIT_RESOURCE(common_translations);
-#endif
-
-    QString language = qnSettings->language();
-    QTranslator appTranslator;
-    if (appTranslator.load(QLatin1String(":/translations/client_") + language + QLatin1String(".qm")))
-        application->installTranslator(&appTranslator);
-
-    QTranslator commonTranslator;
-    if (commonTranslator.load(QLatin1String(":/translations/common_") + language + QLatin1String(".qm")))
-        application->installTranslator(&commonTranslator);
-
-    QTranslator qtTranslator;
-    if (qtTranslator.load(QLatin1String("qt_") + language + QLatin1String(".qm"), QLibraryInfo::location(QLibraryInfo::TranslationsPath)))
-        application->installTranslator(&qtTranslator);
-    
-    QnToolTip::instance();
-
+    QnWorkbenchTranslationManager::installTranslation(translationPath);
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     const QString dataLocation = getDataDirectory();
@@ -372,11 +348,7 @@ int main(int argc, char *argv[])
 
     //===========================================================================
 
-//#ifdef _WIN32
-//    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::INTEL_QUICK_SYNC );
-//#else
     CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
-//#endif
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
@@ -452,8 +424,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    mainWindow->showFullScreen();
+#ifdef Q_WS_X11
     mainWindow->show();
+#else
+    mainWindow->showFullScreen();
+#endif
         
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -514,6 +489,3 @@ int main(int argc, char *argv[])
 }
 #endif // API_TEST_MAIN
 #endif
-
-
-

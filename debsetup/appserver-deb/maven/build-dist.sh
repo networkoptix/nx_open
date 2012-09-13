@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #. ../common.sh
-PACKAGENAME=networkoptix-entcontroller
+PACKAGENAME=${deb.customization.company.name}-entcontroller
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/entcontroller
+TARGET=/opt/${deb.customization.company.name}/entcontroller
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
@@ -25,9 +25,9 @@ SHARESTAGE=$STAGE$SHARETARGET
 INITSTAGE=$STAGE$INITTARGET
 INITDSTAGE=$STAGE$INITDTARGET
 
-PROXY_BIN_PATH=${project.build.directory}/bin
-PROXY_LIB_PATH=${project.build.directory}/build/bin/${build.configuration}
-ECS_PRESTAGE_PATH=${project.build.directory}/appserver/*
+PROXY_BIN_PATH=${libdir}/bin/${build.configuration}
+PROXY_LIB_PATH=${libdir}/build/bin/${build.configuration}
+ECS_PRESTAGE_PATH=${libdir}/../../appserver/setup/build/stage
 	
 #. $SERVER_BIN_PATH/env.sh
 
@@ -40,16 +40,14 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 ############### Enterprise Controller
-cp -r $ECS_PRESTAGE_PATH $PKGSTAGE
-cp ${qt.dir}/libssl.so.1.0.0 $LIBSTAGE
-cp ${qt.dir}/libcrypto.so.1.0.0 $LIBSTAGE
+cp -r $ECS_PRESTAGE_PATH/* $PKGSTAGE
 
 touch $ETCSTAGE/entcontroller.conf
 
 
 # Copy upstart and sysv scripts
-install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
-install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
+install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE/${deb.customization.company.name}-entcontroller.conf
+install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization.company.name}-entcontroller
 
 
 ################ Media Proxy
@@ -59,18 +57,11 @@ install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy libraries
 cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
-cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
-cp -P ${qt.dir}/libXi.so* $LIBSTAGE
-cp -P ${qt.dir}/libXt.so* $LIBSTAGE
-cp -P ${qt.dir}/libXrender.so* $LIBSTAGE
-cp -P ${qt.dir}/libfontconfig.so* $LIBSTAGE
-cp -P ${qt.dir}/libICE.so* $LIBSTAGE
-cp -P ${qt.dir}/libSM.so* $LIBSTAGE
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
-install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE
-install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE
+install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE/${deb.customization.company.name}-mediaproxy.conf
+install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE/${deb.customization.company.name}-mediaproxy
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
