@@ -72,15 +72,15 @@ namespace detail {
         void finished(const QnStatisticsDataList &/* usage data */);
     };
 
-    class VideoServerSessionManagerAddCamerasRequestReplyProcessor: public QObject
+    class VideoServerSessionManagerSearchCamerasRequestReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerAddCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+        VideoServerSessionManagerSearchCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
              qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
         }
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
     signals:
         void finished(const QnCamerasFoundInfoList &);
     };
@@ -193,8 +193,8 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    int asyncGetCameraAddition(QObject *target, const char *slot,
-                               const QString &startAddr, const QString &endAddr, const QString& username, const QString &password);
+    int asyncGetManualCameraSearch(QObject *target, const char *slot,
+                               const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
