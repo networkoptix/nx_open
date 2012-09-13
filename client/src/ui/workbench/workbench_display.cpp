@@ -1403,10 +1403,16 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QList<QnResourceWidget *> widgets = this->widgets();
     if(index < 0)
         return;
+
+    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
+
     if(index >= widgets.size()) {
+        int i = 0;
         foreach(QnResourceWidget *widget, this->widgets()) {
+            i++;
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
                 if(!mediaWidget->display()->camDisplay()->isRunning()) {
+                    mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i)*1000, 0);
                     mediaWidget->display()->camDisplay()->setMTDecoding(false);
                     mediaWidget->display()->camDisplay()->start();
                     mediaWidget->display()->archiveReader()->startPaused();
@@ -1416,8 +1422,6 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
         return;
     }
 
-    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
-
     QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
     if(!mediaWidget)
         return;
@@ -1426,8 +1430,6 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     mediaWidget->display()->camDisplay()->setMTDecoding(false);
     mediaWidget->display()->camDisplay()->putData(thumbnail.data());
     mediaWidget->display()->camDisplay()->start();
-    //widget->display()->archiveReader()->pauseMedia();
-    //widget->display()->archiveReader()->setSingleShotMode(true);
     mediaWidget->display()->archiveReader()->startPaused();
 }
 
