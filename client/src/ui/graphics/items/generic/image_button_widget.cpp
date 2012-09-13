@@ -76,10 +76,10 @@ class QnImageButtonHoverProgressAccessor: public AbstractAccessor {
 QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
     base_type(parent),
     m_pixmapCacheValid(false),
+    m_state(0),
     m_checkable(false),
     m_cached(false),
     m_skipNextHoverEvents(false),
-    m_state(0),
     m_hoverProgress(0.0),
     m_action(NULL),
     m_actionIconOverridden(false)
