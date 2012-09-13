@@ -49,9 +49,6 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
         case FFMPEG:
         default:
         {
-            QnAbstractVideoDecoder* decoder = new QnXVBADecoder( glContext, data );
-            if( decoder && decoder->isHardwareAccelerationEnabled() )
-                return decoder;
             return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding );
         }
     }
