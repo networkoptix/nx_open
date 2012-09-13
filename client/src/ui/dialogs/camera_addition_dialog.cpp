@@ -8,50 +8,6 @@
 
 #include <core/resource/video_server_resource.h>
 
-namespace{
-    class ManualCameraReplyProcessor: public QObject
-    {
-        Q_OBJECT
-    public:
-
-        ManualCameraReplyProcessor(QObject *parent = NULL):
-            QObject(parent),
-            m_cancelled(false)
-        {}
-
-        QnCamerasFoundInfoList camerasFound() const {
-            return m_cameras;
-        }
-
-    signals:
-        void replyReceived();
-
-    public slots:
-        void processSearchReply(const QnCamerasFoundInfoList &cameras)
-        {
-            if (m_cancelled)
-                return;
-
-            m_cameras = cameras;
-            qDebug() << "data received count" << cameras.count();
-            emit replyReceived();
-        }
-
-        void processAddReply(int status){
-            emit replyReceived();
-        }
-
-        void cancel(){
-            m_cancelled = true;
-            qDebug() << "request cancelled";
-        }
-
-    private:
-        QnCamerasFoundInfoList m_cameras;
-        bool m_cancelled;
-    };
-}
-
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -184,7 +140,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
-    QScopedPointer<ManualCameraReplyProcessor> processor(new ManualCameraReplyProcessor());
+    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
@@ -229,7 +185,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
-    QScopedPointer<ManualCameraReplyProcessor> processor(new ManualCameraReplyProcessor());
+    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
     connect(ui->stopAddButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopAddButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
