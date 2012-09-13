@@ -381,12 +381,14 @@ int QnVideoServerConnection::asyncGetManualCameraSearch(QObject *target, const c
 }
 
 int QnVideoServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                                     const QStringList &urls, const QString &manufacturer, const QString &username, const QString &password){
+                                                     const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password){
     QnRequestParamList params;
-    foreach(QString url, urls){
-        params << QnRequestParam("url", url);
+
+    for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
+        params << QnRequestParam("url", urls[i]);
+        params << QnRequestParam("manufacturer", manufacturers[i]);
     }
-    params << QnRequestParam("manufacturer", manufacturer);
+
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
 

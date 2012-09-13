@@ -15,7 +15,6 @@
 
 #include "utils/network/nettools.h"
 //#include "utils/common/sleep.h"
-//#include "utils/qtsoap/qtsoap.h"
 //#include "utils/network/mac_address.h"
 //#include "../digitalwatchdog/digital_watchdog_resource.h"
 //#include "../brickcom/brickcom_resource.h"

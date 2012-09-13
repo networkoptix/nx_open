@@ -27,6 +27,14 @@ namespace detail{
             return m_cameras;
         }
 
+        bool addSuccess(){
+            return (m_addStatus == 0);
+        }
+
+        bool isCancelled(){
+            return m_cancelled;
+        }
+
     signals:
         void replyReceived();
 
@@ -44,7 +52,7 @@ namespace detail{
             if (m_cancelled)
                 return;
 
-            m_AddStatus = status;
+            m_addStatus = status;
             emit replyReceived();
         }
 
@@ -54,7 +62,7 @@ namespace detail{
 
     private:
         QnCamerasFoundInfoList m_cameras;
-        int m_AddStatus;
+        int m_addStatus;
         bool m_cancelled;
     };
 }
