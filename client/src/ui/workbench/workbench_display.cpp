@@ -1408,8 +1408,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
 
     if(index >= widgets.size()) {
         int i = 0;
-        foreach(QnResourceWidget *widget, this->widgets()) {
-            i++;
+        foreach(QnResourceWidget *widget, widgets) {
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
                 if(!mediaWidget->display()->camDisplay()->isRunning()) {
                     mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i) * 1000, 0);
@@ -1418,6 +1417,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
                     mediaWidget->display()->archiveReader()->startPaused();
                 }
             }
+            i++;
         }
         return;
     }
