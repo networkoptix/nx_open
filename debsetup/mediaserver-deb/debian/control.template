@@ -14,4 +14,4 @@ Provides: ${deb.customization.company.name}-mediaserver
 Section: database
 Priority: optional
 Homepage: http://${company.url}/
-Description: ${company.name} {$product.name} Media Server
+Description: ${company.name} ${product.name} Media Server
