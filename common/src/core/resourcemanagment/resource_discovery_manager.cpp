@@ -21,10 +21,9 @@ namespace {
 
 // ------------------------------------ QnManualCameraInfo -----------------------------
 
-QnManualCameraInfo::QnManualCameraInfo(const QHostAddress& addr, int port, const QAuthenticator& auth, const QString& resType)
+QnManualCameraInfo::QnManualCameraInfo(const QUrl& url, const QAuthenticator& auth, const QString& resType)
 {
-    this->addr = addr;
-    this->port = port;
+    this->url = url;
     this->auth = auth;
     this->resType = qnResTypePool->getResourceTypeByName(resType);
     this->searcher = 0;
@@ -34,7 +33,7 @@ QnResourcePtr QnManualCameraInfo::checkHostAddr() const
 {
     QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(searcher);
     if (ns)
-        return ns->checkHostAddr(addr, auth, port);
+        return ns->checkHostAddr(url, auth);
     else
         return QnResourcePtr();
 }
@@ -234,20 +233,17 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
 
 QnResourceList QnResourceDiscoveryManager::findNewResources()
 {
-    //bool allow_to_change_ip = true;
-    static const int  threads = 5;
-
     QTime time;
     time.start();
 
     if (m_foundSmth)
         cl_log.log("looking for resources ===========...", cl_logINFO);
 
+    QnResourceList resources;
     m_searchersListMutex.lock();
     ResourceSearcherList searchersList = m_searchersList;
     m_searchersListMutex.unlock();
 
-    QnResourceList resources;
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
         if (searcher->shouldBeUsed() && !needToStop())
@@ -266,10 +262,39 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             resources.append(lst);
         }
     }
+
     appendManualDiscoveredResources(resources);
+    if (processDiscoveredResources(resources, true)) {
+        cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+        return resources;
+    }
+    else {
+        return QnResourceList();
+    }
+}
 
-    m_discoveredResources.clear();
+QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
+{
+    QnResourceList resources;
+    appendManualDiscoveredResources(resources);
+    if (processDiscoveredResources(resources, false))
+        return resources;
+    else
+        return QnResourceList();
+}
 
+
+bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
+{
+    if (resources.isEmpty())
+        return false;
+
+    QMutexLocker lock(&m_searchersListMutex);
+
+    CLNetState netState;
+    netState.updateNetState(); // update net state before working with discovered resources
+
+    QSet<QString> discoveredResources;
 
     //assemble list of existing ip
     QMap<quint32, int> ipsList;
@@ -280,7 +305,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     while (it != resources.end())
     {
         if (needToStop())
-            return QnResourceList();
+            return false;
 
         QnResourcePtr rpResource = qnResPool->getResourceByUniqId((*it)->getUniqueId());
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
@@ -302,11 +327,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                 }
 
 
-                
+
                 bool diffAddr = rpNetRes && rpNetRes->getHostAddress() != newNetRes->getHostAddress(); //if such network resource is in pool and has diff IP 
                 bool diffNet = false;
                 if (newNetRes->getDiscoveryAddr().toIPv4Address() != 0)
-                    diffNet = !m_netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
+                    diffNet = !netState.isResourceInMachineSubnet(newNetRes->getHostAddress(), newNetRes->getDiscoveryAddr()); // or is diff subnet NET
 
                 // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
                 // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
@@ -345,7 +370,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
             }
 
             // seems like resource is in the pool and has OK ip
-            updateResourceStatus(rpNetRes);
+            updateResourceStatus(rpNetRes, discoveredResources);
             pingResources(rpNetRes);
 
             it = resources.erase(it); // do not need to investigate OK resources
@@ -357,7 +382,8 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
-    markOfflineIfNeeded();
+    if (doOfflineCheck)
+        markOfflineIfNeeded(discoveredResources);
     //======================
 
     if (resources.size())
@@ -369,11 +395,11 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     {
         m_foundSmth = false;
     }
-    
+
     printInLogNetResources(resources);
 
     if (resources.size()==0)
-        return resources;
+        return true;
 
 
     // now let's mark conflicting resources( just new )
@@ -395,13 +421,10 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         }
     }
 
-    if (resources.size()) {
-        m_netState.updateNetState(); // update net state before working with discovered resources
-    }
-
     //marks all new network resources as badip if: 1) not in the same subnet and not accesible or 2) same subnet and conflicting
     cl_log.log("Discovery---- Checking if resources are accessible...", cl_logINFO);
-    check_if_accessible(resources, threads);
+    static const int  threads = 5;
+    check_if_accessible(resources, threads, netState);
 
 
     //========================================================
@@ -436,22 +459,18 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
 
     cl_log.log("Discovery---- After check_if_accessible conflicting List: ", cl_logINFO);
     printInLogNetResources(resources);
-    
+
 
     //======================================
 
-    time.restart();
     if (resources.size())
         cl_log.log("Discovery---- Changing IP addresses... ", cl_logDEBUG1);
 
     bool ip_finished = false;
-    resovle_conflicts(resources, ipsList.keys(), &ip_finished);
+    resovle_conflicts(resources, ipsList.keys(), &ip_finished, netState);
 
     if (ip_finished)
         cl_log.log(QLatin1String("Cannot get available IP address."), cl_logWARNING);
-
-    if (resources.size())
-        cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
 
 
 
@@ -547,7 +566,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                         // still could be a different sub_net
                         bool inSameSubnet = true;
                         if (rpNetRes->getDiscoveryAddr().toIPv4Address() != 0)
-                            inSameSubnet = m_netState.isResourceInMachineSubnet(rpNetRes->getHostAddress(), rpNetRes->getDiscoveryAddr());
+                            inSameSubnet = netState.isResourceInMachineSubnet(rpNetRes->getHostAddress(), rpNetRes->getDiscoveryAddr());
                         if (!inSameSubnet)
                         {
                             it = resources.erase(it);
@@ -555,7 +574,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
                             continue;
                         }
 
-                        updateResourceStatus(rpNetRes);
+                        updateResourceStatus(rpNetRes, discoveredResources);
                     }
 
                     //Q_ASSERT(false);
@@ -577,27 +596,23 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
         cl_log.log("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
-    
-
-    return resources;
 }
 
 struct ManualSearcherHelper
 {
-    ManualSearcherHelper(): plugins(0), port(0) {}
+    ManualSearcherHelper(): plugins(0) {}
 
-    QHostAddress addrToCheck;
+    QUrl url;
     QnResourceDiscoveryManager::ResourceSearcherList* plugins;
     QnResourcePtr result;
     QAuthenticator auth;
-    int port;
 
     void f()
     {
         foreach(QnAbstractResourceSearcher* as, *plugins)
         {
             QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);
-            result = ns->checkHostAddr(addrToCheck, auth, port);
+            result = ns->checkHostAddr(url, auth);
             if (result) {
                 break;
             }
@@ -640,9 +655,9 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     foreach(QHostAddress addr, online)
     {
         ManualSearcherHelper t;
-        t.addrToCheck = addr;
+        t.url.setHost(addr.toString());
+        t.url.setPort(port);
         t.auth = auth;
-        t.port = port;
         t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
         testList.push_back(t);
     }
@@ -748,7 +763,7 @@ struct check_if_accessible_STRUCT
 };
 
 
-void QnResourceDiscoveryManager::markOfflineIfNeeded()
+void QnResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
     QnResourceList resources = qnResPool->getResources();
 
@@ -769,7 +784,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
 
         //check if resource was discovered
         QString uniqId = res->getUniqueId();
-        if (!m_discoveredResources.contains(uniqId))
+        if (!discoveredResources.contains(uniqId))
         {
             // resource is not found
             m_resourceDiscoveryCounter[uniqId]++;
@@ -797,7 +812,7 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded()
     
 }
 
-void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
+void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, QSet<QString>& discoveredResources)
 {
     // seems like resource is in the pool and has OK ip
     QnNetworkResourcePtr rpNetRes = res.dynamicCast<QnNetworkResource>();
@@ -823,7 +838,7 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res)
             //    rpNetRes->setStatus(QnResource::Online);
         }
 
-        m_discoveredResources.insert(rpNetRes->getUniqueId());
+        discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
 
@@ -856,7 +871,7 @@ void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)
     }
 }
 
-void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundList, int threads)
+void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundList, int threads, CLNetState& netState)
 {
     QList<check_if_accessible_STRUCT> checkLst;
 
@@ -869,7 +884,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
         if (!nr || !nr->shoudResolveConflicts())
             continue;
 
-        bool inSameSubnet = nr->getDiscoveryAddr().toIPv4Address() == 0 || m_netState.isResourceInMachineSubnet(nr->getHostAddress(), nr->getDiscoveryAddr());
+        bool inSameSubnet = nr->getDiscoveryAddr().toIPv4Address() == 0 || netState.isResourceInMachineSubnet(nr->getHostAddress(), nr->getDiscoveryAddr());
 
         check_if_accessible_STRUCT t(nr, inSameSubnet );
         checkLst.push_back(t);
@@ -892,16 +907,16 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
 
 //====================================================================================
 
-void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, const CLIPList& busy_list, bool *ip_finished)
+void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState)
 {
     foreach (const QnResourcePtr &res, resourceList)
     {
         QnNetworkResourcePtr resource = res.dynamicCast<QnNetworkResource>();
 
-        if (resource->getDiscoveryAddr().toIPv4Address() == 0 || !m_netState.existsSubnet(resource->getDiscoveryAddr())) // very strange
+        if (resource->getDiscoveryAddr().toIPv4Address() == 0 || !netState.existsSubnet(resource->getDiscoveryAddr())) // very strange
             continue;
 
-        CLSubNetState& subnet = m_netState.getSubNetState(resource->getDiscoveryAddr());
+        CLSubNetState& subnet = netState.getSubNetState(resource->getDiscoveryAddr());
 
         cl_log.log("Looking for next addr...", cl_logINFO);
 

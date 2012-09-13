@@ -171,6 +171,10 @@ void QnClientMessageProcessor::at_messageReceived(QnMessage message)
             qnResPool->addResource(message.resource);
         else
             ownResource->update(message.resource);
+
+        if(QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
+            layout->requestStore();
+
     } else if (message.eventType == Qn::Message_Type_ResourceDelete)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(message.resourceId);

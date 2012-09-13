@@ -96,37 +96,38 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
 
     QAuthenticator auth;
     QString resType;
-    QHostAddress addr;
-    int port = 0;
+    QUrl url;
 
     QnManualCamerasMap cameras;
 
     for (int i = 0; i < params.size(); ++i)
     {
         QPair<QString, QString> param = params[i];
-        if (param.first == "ip") {
-            if (!addr.isNull())
-                cameras.insert(addr.toIPv4Address(), QnManualCameraInfo(addr, port, auth, resType));
-            addr = param.second;
+        if (param.first == "url") 
+        {
+            if (!url.isEmpty())
+                cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+            url = param.second;
         }
+
         else if (param.first == "user")
             auth.setUser(param.second);
         else if (param.first == "password")
             auth.setPassword(param.second);
-        else if (param.first == "manufacture")
+        else if (param.first == "manufacturer")
             resType = param.second;
-        else if (param.first == "port")
-            port = param.second.toInt();
     }
-    if (addr.toIPv4Address() != 0)
-        cameras.insert(addr.toIPv4Address(), QnManualCameraInfo(addr, port, auth, resType));
+    if (url.isEmpty())
+        cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
 
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
     resultByteArray.append("<root>\n");
     bool registered = QnResourceDiscoveryManager::instance().registerManualCameras(cameras);
-    if (registered)
+    if (registered) {
+        QnResourceDiscoveryManager::instance().processManualAddedResources();
         resultByteArray.append("<OK>\n");
+    }
     else
         resultByteArray.append("<FAILED>\n");
     resultByteArray.append("</root>\n");
@@ -146,9 +147,14 @@ int QnManualCameraAdditionHandler::executeGet(const QString& path, const QnReque
         return searchAction(params, resultByteArray, contentType);
     else if (action == "add")
         return addAction(params, resultByteArray, contentType);
-
+    else {
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append("Action not found\n");
+        resultByteArray.append("<root>\n");
+        return CODE_NOT_FOUND;
+    }
 }
-
 
 int QnManualCameraAdditionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
@@ -172,8 +178,7 @@ QString QnManualCameraAdditionHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>";
 
     rez += "<BR><b>api/manualCamera/add</b> - manual add camera(s). If several cameras are added, parameters 'ip' and 'manufacturer' must be defined several times";
-    rez += "<BR>Param <b>ip</b> - camera ip address to add.";
-    rez += "<BR>Param <b>port</b> - port where camera has been found. Can be omitted";
+    rez += "<BR>Param <b>url</b> - camera url returned by scan request.";
     rez += "<BR>Param <b>manufacturer</b> - camera manufacturer.</i>";
     rez += "<BR>Param <b>user</b> - username for the cameras. Can be omitted.</i>";
     rez += "<BR>Param <b>password</b> - password for the cameras. Can be omitted.";
