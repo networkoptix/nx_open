@@ -77,6 +77,7 @@
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
+#include "utils/common/synctime.h"
 
 
 
@@ -1259,6 +1260,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
@@ -1329,6 +1332,23 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         }
 
         itemCount = period.durationMs / step;
+    }
+
+    /* Adjust for chunks. */
+    if(!periods.isEmpty()) {
+        qint64 startTime = periods[0].startTimeMs;
+
+        while(startTime > period.startTimeMs + step / 2) {
+            period.startTimeMs += step;
+            period.durationMs -= step;
+            itemCount--;
+        }
+
+        /*qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
+        while(endTime < period.startTimeMs + period.durationMs) {
+            period.durationMs -= step;
+            itemCount--
+        }*/
     }
 
     /* Calculate size of the resulting matrix. */
