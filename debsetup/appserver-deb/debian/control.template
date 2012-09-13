@@ -13,5 +13,5 @@ Replaces: ${deb.customization.company.name}-entcontroller-1.1 (<< VERSION)
 Provides: ${deb.customization.company.name}-entcontroller
 Section: database
 Priority: optional
-Homepage: http://${company.url}/
+Homepage: http://${company.url}
 Description: ${company.name} Enterprise Controller

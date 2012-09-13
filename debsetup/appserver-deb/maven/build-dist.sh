@@ -39,15 +39,22 @@ mkdir -p $ETCSTAGE
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
+chmod -R 755 $STAGEBASE
+
 ############### Enterprise Controller
 cp -r $ECS_PRESTAGE_PATH/* $PKGSTAGE
 
+# Fix permissions after Boris
+find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
+find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
+chmod -R 755 $BINSTAGE
+chmod 644 $BINSTAGE/library.zip
+
 touch $ETCSTAGE/entcontroller.conf
 
-
 # Copy upstart and sysv scripts
-install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE/${deb.customization.company.name}-entcontroller.conf
-install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization.company.name}-entcontroller
+install -m 644 init/networkoptix-entcontroller.conf $INITSTAGE/${deb.customization.company.name}-entcontroller.conf
+install -m 644 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization.company.name}-entcontroller
 
 
 ################ Media Proxy
@@ -56,12 +63,21 @@ install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization
 install -m 755 $PROXY_BIN_PATH/mediaproxy-bin $BINSTAGE
 
 # Copy libraries
-cp -P $PROXY_LIB_PATH/*.so* $LIBSTAGE
+install -m 644 $PROXY_LIB_PATH/*.so* $LIBSTAGE
+
+# Strip and remove rpath
+for f in `find $LIBSTAGE -type f`
+do
+    strip $f
+    chrpath -d $f
+done
+
+find $SHARESTAGE -name \*.pyc -delete
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
-install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE/${deb.customization.company.name}-mediaproxy.conf
-install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE/${deb.customization.company.name}-mediaproxy
+install -m 644 init/networkoptix-mediaproxy.conf $INITSTAGE/${deb.customization.company.name}-mediaproxy.conf
+install -m 644 init.d/networkoptix-mediaproxy $INITDSTAGE/${deb.customization.company.name}-mediaproxy
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
@@ -69,12 +85,12 @@ mkdir -p $STAGE/DEBIAN
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
-cp debian/postinst $STAGE/DEBIAN
-cp debian/prerm $STAGE/DEBIAN
-cp debian/templates $STAGE/DEBIAN
-cp debian/conffiles $STAGE/DEBIAN
+install -m 755 debian/postinst $STAGE/DEBIAN
+install -m 755  debian/prerm $STAGE/DEBIAN
+install -m 644 debian/templates $STAGE/DEBIAN
+install -m 644 debian/conffiles $STAGE/DEBIAN
 
-(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
+(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
 (cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})

@@ -51,8 +51,8 @@ mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 
 # Copy upstart and sysv scripts
-install -m 755 init/networkoptix-entcontroller.conf $INITSTAGE
-install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE
+install -m 644 init/networkoptix-entcontroller.conf $INITSTAGE
+install -m 644 init.d/networkoptix-entcontroller $INITDSTAGE
 
 
 ################ Media Proxy
@@ -71,8 +71,9 @@ do
     install -m 644  $QT_LIB_PATH/$file $LIBSTAGE
 done
 
-install -m 755 init/networkoptix-mediaproxy.conf $INITSTAGE
-install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE
+# Mediaproxy upstart and sysv scripts
+install -m 644 init/networkoptix-mediaproxy.conf $INITSTAGE
+install -m 644 init.d/networkoptix-mediaproxy $INITDSTAGE
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

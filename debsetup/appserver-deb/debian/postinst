@@ -2,17 +2,19 @@
 
 . /usr/share/debconf/confmodule
 
+COMPANY_NAME="${deb.customization.company.name}"
+
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
 ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-CONFIG_FILE="/opt/${deb.customization.company.name}/entcontroller/etc/entcontroller.conf"
+CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
-if status ${deb.customization.company.name}-entcontroller | grep "start/running" > /dev/null; then
-  stop ${deb.customization.company.name}-entcontroller
+if status $COMPANY_NAME-entcontroller | grep "start/running" > /dev/null; then
+  stop $COMPANY_NAME-entcontroller
 fi
     
 function read_config {
@@ -55,74 +57,66 @@ function create_dir {
     mkdir -p "$dir"
 }
 
+function validate_password {
+    [ -n "$1" ]
+}
+
+function validate_ecsPort {
+    port_is_ok $1
+}
+
+function valide_ecsProxyPort {
+    port_is_ok $1
+}
+
+function ask_for_value {
+    local varname="$1"
+    local default="$2"
+    local full_name="$COMPANY_NAME-entcontroller/$varname"
+    local error_message="${varname}_invalid"
+
+    [ -n "$default" ] && db_set $full_name $default 
+    db_input high $full_name || true
+    db_go
+
+    while :
+    do
+        db_get $full_name
+        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true        
+        [ $STATUS -eq 0 ] && break # validation passes
+        [ $STATUS -ne 1 ] && break # no validation function or invalid
+
+        db_input high $error_message
+        db_go
+
+        { db_input high $full_name; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+        db_go
+    done
+
+    RESULT="$RET"
+    db_unregister $full_name
+    echo $RESULT
+}
+
 case "$1" in
   configure)
       read_config
 
-      # Simple port validation
-      db_input high ${deb.customization.company.name}-entcontroller/ecs_port || true
-      db_go
-      db_get ${deb.customization.company.name}-entcontroller/ecs_port
-      until port_is_ok "$RET"
-      do
-        db_input high ${deb.customization.company.name}-entcontroller/ecs_port_invalid || true
-        db_go
-
-        { db_input high ${deb.customization.company.name}-entcontroller/ecs_port; STATUS=$?; } || true
-        [ $STATUS -eq 30 ] && break
-
-        db_go
-        db_get ${deb.customization.company.name}-entcontroller/ecs_port
-      done
-
-      # Proxy port
-      db_input high ${deb.customization.company.name}-entcontroller/ecs_proxy_port || true
-      db_go
-      db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port
-      until port_is_ok "$RET"
-      do
-        db_input high ${deb.customization.company.name}-entcontroller/ecs_port_invalid || true
-        db_go
-
-        { db_input high ${deb.customization.company.name}-entcontroller/ecs_proxy_port; STATUS=$?; } || true
-        [ $STATUS -eq 30 ] && break
-
-        db_go
-        db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port
-      done
-
-      # Password should not be empty
-      db_reset ${deb.customization.company.name}-entcontroller/ecs_password
-      db_input high ${deb.customization.company.name}-entcontroller/ecs_password || true
-      db_go
-      db_get ${deb.customization.company.name}-entcontroller/ecs_password
-      until [ ! -z "$RET" ]
-      do
-        db_input high ${deb.customization.company.name}-entcontroller/ecs_pass_empty || true
-        db_go
-
-        { db_input high ${deb.customization.company.name}-entcontroller/ecs_password; STATUS=$?; } || true
-        [ $STATUS -eq 30 ] && break
-
-        db_go
-        db_get ${deb.customization.company.name}-entcontroller/ecs_password 
-      done
-
-      db_get ${deb.customization.company.name}-entcontroller/ecs_port && ECS_PORT=$RET
-      db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port && ECS_PROXY_PORT=$RET
-      db_get ${deb.customization.company.name}-entcontroller/ecs_password && ECS_PASSWORD=$RET
+      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
+      ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
+      ECS_PASSWORD=$(ask_for_value ecsPassword "$ECS_PASSWORD")
 
       write_config
 
-      /opt/${deb.customization.company.name}/entcontroller/bin/dbsync
+      /opt/$COMPANY_NAME/entcontroller/bin/dbsync
 
-      if [ ! -z "$ECS_PASSWORD" ]
+      if [ -n "$ECS_PASSWORD" ]
       then
-        /opt/${deb.customization.company.name}/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
-        db_set ${deb.customization.company.name}-entcontroller/ecs_password ""
+        /opt/$COMPANY_NAME/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
       fi
 
-      chmod 600 /opt/${deb.customization.company.name}/entcontroller/var/db/ecs.db
+      chmod 600 /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
@@ -134,13 +128,13 @@ case "$1" in
   ;;
 esac
 
-if [ -e "/etc/init/${deb.customization.company.name}-entcontroller.conf" ]; then
-	invoke-rc.d ${deb.customization.company.name}-entcontroller start || exit $?
+if [ -e "/etc/init/$COMPANY_NAME-entcontroller.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-entcontroller start || exit $?
 fi
-update-rc.d -f ${deb.customization.company.name}-entcontroller remove >/dev/null || exit $?
+update-rc.d -f $COMPANY_NAME-entcontroller remove >/dev/null || exit $?
 
-if [ -e "/etc/init/${deb.customization.company.name}-mediaproxy.conf" ]; then
-	invoke-rc.d ${deb.customization.company.name}-mediaproxy start || exit $?
+if [ -e "/etc/init/$COMPANY_NAME-mediaproxy.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-mediaproxy start || exit $?
 fi
-update-rc.d -f ${deb.customization.company.name}-mediaproxy remove >/dev/null || exit $?
+update-rc.d -f $COMPANY_NAME-mediaproxy remove >/dev/null || exit $?
 exit 0
