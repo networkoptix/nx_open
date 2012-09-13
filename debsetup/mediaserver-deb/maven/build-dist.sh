@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #. ../common.sh
-PACKAGENAME=networkoptix-mediaserver
+PACKAGENAME=${deb.customization.company.name}-mediaserver
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/mediaserver
+TARGET=/opt/${deb.customization.company.name}/mediaserver
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
@@ -40,8 +40,8 @@ install -m 755 $SERVER_BIN_PATH/mediaserver* $BINSTAGE
 install -m 755 bin/mediaserver $BINSTAGE
 
 # Copy upstart and sysv script
-install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE
-install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE
+install -m 755 init/networkoptix-mediaserver.conf $INITSTAGE/${deb.customization.company.name}-mediaserver.conf
+install -m 755 init.d/networkoptix-mediaserver $INITDSTAGE/${deb.customization.company.name}-mediaserver
 
 # Copy libraries
 cp -P $SERVER_LIB_PATH/*.so* $LIBSTAGE
