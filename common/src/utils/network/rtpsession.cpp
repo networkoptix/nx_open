@@ -179,7 +179,7 @@ RTPSession::RTPSession():
     m_responseCode(CODE_OK),
     m_isAudioEnabled(true),
     m_useDigestAuth(false),
-    m_useSimpleOpen(false),
+    m_numOfPredefinedChannels(0),
     m_TimeOut(0)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
@@ -213,13 +213,21 @@ QString findCodecById(int num)
 
 void RTPSession::usePredefinedTracks()
 {
+    if(!m_sdpTracks.isEmpty())
+        return;
+
     static const quint8 FFMPEG_CODE = 102;
     static const QString FFMPEG_STR(QLatin1String("FFMPEG"));
     static const quint8 METADATA_CODE = 126;
     static const QString METADATA_STR(QLatin1String("ffmpeg-metadata"));
 
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("video"), QLatin1String("trackID=0"), FFMPEG_CODE, 0, this, true));
-    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("audio"), QLatin1String("trackID=1"), FFMPEG_CODE, 1, this, true));
+    int trackNum = 0;
+    for (; trackNum < m_numOfPredefinedChannels; ++trackNum)
+    {
+        m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("video"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
+    }
+
+    m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(FFMPEG_STR, QLatin1String("audio"), QString(QLatin1String("trackID=%1")).arg(trackNum), FFMPEG_CODE, trackNum, this, true));
     m_sdpTracks << QSharedPointer<SDPTrackInfo> (new SDPTrackInfo(METADATA_STR, QLatin1String("metadata"), QLatin1String("trackID=7"), METADATA_CODE, METADATA_TRACK_NUM, this, true));
 }
 
@@ -399,7 +407,7 @@ bool RTPSession::open(const QString& url)
     m_tcpSock.setReadTimeOut(m_tcpTimeout);
     m_tcpSock.setWriteTimeOut(m_tcpTimeout);
 
-    if (m_useSimpleOpen) {
+    if (m_numOfPredefinedChannels) {
         usePredefinedTracks();
         return true;
     }
@@ -472,7 +480,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
     if (m_prefferedTransport == QLatin1String("AUTO"))
         m_prefferedTransport = QLatin1String("TCP");
     m_TimeOut = 0; // default timeout 0 ( do not send keep alive )
-    if (!m_useSimpleOpen) {
+    if (!m_numOfPredefinedChannels) {
         if (!sendSetup() || m_sdpTracks.isEmpty())
             return TrackMap();
     }
@@ -833,7 +841,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     }
 
     request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
-    if (m_useSimpleOpen)
+    if (m_numOfPredefinedChannels)
         request += "x-play-now: true\r\n";
     addAdditionAttrs(request);
     
@@ -1357,7 +1365,7 @@ QString RTPSession::mediaTypeToStr(TrackType trackType)
         return QLatin1String("TT_UNKNOWN");
 }
 
-void RTPSession::setSimpleOpenMode()
+void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
 {
-    m_useSimpleOpen = true;
+    m_numOfPredefinedChannels = numOfVideoChannel;
 }

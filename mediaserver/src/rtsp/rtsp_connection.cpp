@@ -738,17 +738,22 @@ void QnRtspConnectionProcessor::createPredefinedTracks()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
-    vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
-    vTrack->clientPort = 0;
-    vTrack->clientRtcpPort = 1;
-    d->trackInfo.insert(0, vTrack);
+    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    int trackNum = 0;
+    for (; trackNum < videoLayout->numberOfChannels(); ++trackNum)
+    {
+        RtspServerTrackInfoPtr vTrack(new RtspServerTrackInfo());
+        vTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+        vTrack->clientPort = trackNum*2;
+        vTrack->clientRtcpPort = trackNum*2 + 1;
+        d->trackInfo.insert(trackNum, vTrack);
+    }
 
     RtspServerTrackInfoPtr aTrack(new RtspServerTrackInfo());
     aTrack->encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
-    aTrack->clientPort = 2;
-    aTrack->clientRtcpPort = 3;
-    d->trackInfo.insert(1, aTrack);
+    aTrack->clientPort = trackNum*2;
+    aTrack->clientRtcpPort = trackNum*2+1;
+    d->trackInfo.insert(trackNum, aTrack);
 
     RtspServerTrackInfoPtr metaTrack(new RtspServerTrackInfo());
     metaTrack->clientPort = d->metadataChannelNum*2;

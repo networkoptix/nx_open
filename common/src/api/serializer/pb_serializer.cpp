@@ -77,6 +77,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_audioenabled())
         camera->setAudioEnabled(pb_camera.audioenabled());
 
+    if (pb_camera.has_manuallyadded())
+        camera->setManuallyAdded(pb_camera.manuallyadded());
+
     if (pb_camera.has_physicalid())
         camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
@@ -480,6 +483,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_region(serializeMotionRegionList(cameraPtr->getMotionRegionList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
+    pb_camera.set_manuallyadded(cameraPtr->isManuallyAdded());
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     QnParamList params = cameraPtr->getResourceParamList();

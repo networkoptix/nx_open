@@ -54,7 +54,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     connect(ui->confirmPasswordEdit,    SIGNAL(textChanged(const QString &)),   this,   SLOT(setHasChanges()));
     connect(ui->accessRightsComboBox,   SIGNAL(currentIndexChanged(int)),       this,   SLOT(setHasChanges()));
 
-    connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
+    //connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  ui->accessRightsGroupbox,   SLOT(setVisible(bool)));
+    connect(ui->advancedButton,         SIGNAL(toggled(bool)),                  this,   SLOT(at_advancedButton_toggled()));
 
     {
         QPalette palette = ui->hintLabel->palette();
@@ -129,9 +130,9 @@ void QnUserSettingsDialog::setElementFlags(Element element, ElementFlags flags) 
     updateElement(element);
 }
 
-void QnUserSettingsDialog::setEditorPermissions(quint64 rights){
+void QnUserSettingsDialog::setEditorPermissions(quint64 rights) {
     m_editorRights = rights;
-    if (m_user){
+    if (m_user) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
@@ -322,7 +323,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
     setHint(element, hint);
 }
 
-void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights){
+void QnUserSettingsDialog::loadAccessRightsToUi(quint64 rights) {
     selectAccessRightsPreset(rights);
     fillAccessRightsAdvanced(rights);
 }
@@ -334,13 +335,13 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
-void QnUserSettingsDialog::at_accessRights_changed(){
+void QnUserSettingsDialog::at_accessRights_changed() {
     setHasChanges(true);
     selectAccessRightsPreset(readAccessRightsAdvanced());
 }
 
 
-void QnUserSettingsDialog::createAccessRightsPresets(){
+void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
@@ -361,7 +362,7 @@ void QnUserSettingsDialog::createAccessRightsPresets(){
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }
 
-void QnUserSettingsDialog::createAccessRightsAdvanced(){
+void QnUserSettingsDialog::createAccessRightsAdvanced() {
     if (!m_user)
         return;
 
@@ -375,7 +376,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced(){
     createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission);
 }
 
-void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right){
+void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right) {
     QCheckBox *checkBox = new QCheckBox(text, this);
     ui->accessRightsGroupbox->layout()->addWidget(checkBox);
     m_advancedRights.insert(right, checkBox);
@@ -386,10 +387,10 @@ void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right
         connect(checkBox, SIGNAL(clicked()), this, SLOT(at_accessRights_changed()));
 }
 
-void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights){
+void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
     bool custom = true;
     for (int i = 0; i < ui->accessRightsComboBox->count(); i++){
-        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights){
+        if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights) {
             ui->accessRightsComboBox->setCurrentIndex(i);
             custom = false;
             break;
@@ -402,7 +403,7 @@ void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights){
     }
 }
 
-void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights){
+void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
     QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
     while (i.hasNext()) {
         i.next();
@@ -410,7 +411,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights){
     }
 }
 
-quint64 QnUserSettingsDialog::readAccessRightsAdvanced(){
+quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
     quint64 rights = 0;
     QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
     while (i.hasNext()) {
@@ -419,4 +420,20 @@ quint64 QnUserSettingsDialog::readAccessRightsAdvanced(){
             rights |= i.key();
     }
     return rights;
+}
+
+void QnUserSettingsDialog::at_advancedButton_toggled() {
+    ui->accessRightsGroupbox->setVisible(ui->advancedButton->isChecked());
+
+    /* Do forced activation of all layouts in the chain to avoid flicker.
+     * Note that this is an awful hack. It would be nice to find a better solution. */
+    QWidget *widget = ui->accessRightsGroupbox;
+    while(widget) {
+        if(widget->layout()) {
+            widget->layout()->update();
+            widget->layout()->activate();
+        }
+        
+        widget = widget->parentWidget();
+    }
 }

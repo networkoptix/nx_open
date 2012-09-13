@@ -183,7 +183,7 @@ public:
     RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
     int buildClientRTCPReport(quint8 *dstBuffer);
 
-    void setSimpleOpenMode();
+    void setUsePredefinedTracks(int numOfVideoChannel);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -254,7 +254,7 @@ private:
 
     QString m_realm;
     QString m_nonce;
-    bool m_useSimpleOpen;
+    int m_numOfPredefinedChannels;
 };
 
 #endif //rtp_session_h_1935_h

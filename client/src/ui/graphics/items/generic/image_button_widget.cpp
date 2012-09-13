@@ -40,11 +40,8 @@ namespace {
         return qnSkin->pixmap(icon, QSize(1024, 1024), mode, state);
     }
 
-    void glDrawTexturedRect(const QRectF &rect, bool flipped) {
-        /* For reasons unknown, default code path produces upside-down quads on X11,
-         * so we work this around by supplying mirrored texture coordinates. */
+    void glDrawTexturedRect(const QRectF &rect) {
         glBegin(GL_QUADS);
-        if (flipped){
             glTexCoord(0.0, 0.0);
             glVertex(rect.topLeft());
             glTexCoord(1.0, 0.0);
@@ -53,16 +50,6 @@ namespace {
             glVertex(rect.bottomRight());
             glTexCoord(0.0, 1.0);
             glVertex(rect.bottomLeft());
-        } else {
-            glTexCoord(0.0, 1.0);
-            glVertex(rect.topLeft());
-            glTexCoord(1.0, 1.0);
-            glVertex(rect.topRight());
-            glTexCoord(1.0, 0.0);
-            glVertex(rect.bottomRight());
-            glTexCoord(0.0, 0.0);
-            glVertex(rect.bottomLeft());
-        }
         glEnd();
     }
 
@@ -113,8 +100,6 @@ QnImageButtonWidget::QnImageButtonWidget(QGraphicsItem *parent):
 
     QEvent styleChange(QEvent::StyleChange);
     event(&styleChange);
-
-    m_flipped = QnSettings::instance()->isIconsFlipped();
 }
 
 QnImageButtonWidget::~QnImageButtonWidget() {
@@ -197,6 +182,9 @@ void QnImageButtonWidget::setAnimationSpeed(qreal animationSpeed) {
 }
 
 void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
+    if(isDisabled())
+        return;
+
     QWeakPointer<QObject> self(this);
 
     if(m_action != NULL) {
@@ -264,23 +252,23 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
     bool isOne = qFuzzyCompare(progress, 1.0);
     if (isOne || isZero) {
         if (isZero) {
-            widget->bindTexture(pixmap(endState));
+            widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         } else {
-            widget->bindTexture(pixmap(startState));
+            widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         }
 
-        glDrawTexturedRect(rect, m_flipped);
+        glDrawTexturedRect(rect);
     } else {
         m_gl->glActiveTexture(GL_TEXTURE1);
-        widget->bindTexture(pixmap(endState));
+        widget->bindTexture(pixmap(endState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_gl->glActiveTexture(GL_TEXTURE0);
-        widget->bindTexture(pixmap(startState));
+        widget->bindTexture(pixmap(startState), GL_TEXTURE_2D, GL_RGBA, QGLContext::LinearFilteringBindOption);
         m_shader->bind();
         m_shader->setProgress(progress);
         m_shader->setTexture0(0);
         m_shader->setTexture1(1);
 
-        glDrawTexturedRect(rect, m_flipped);
+        glDrawTexturedRect(rect);
 
         m_shader->release();
     }
@@ -291,9 +279,6 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
 }
 
 void QnImageButtonWidget::clickedNotify(QGraphicsSceneMouseEvent *event) {
-    if(isDisabled())
-        return;
-
     clickInternal(event);
 }
 

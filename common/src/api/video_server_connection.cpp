@@ -353,16 +353,30 @@ int QnVideoServerConnection::asyncGetStatistics(QObject *target, const char *slo
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("statistics"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
-int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot){
+int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot) {
     QByteArray reply;
     QByteArray errorString;
     int status = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("statistics"), reply, errorString);
-
+    
     detail::VideoServerSessionManagerStatisticsRequestReplyProcessor *processor = new detail::VideoServerSessionManagerStatisticsRequestReplyProcessor();
     connect(processor, SIGNAL(finished(int)), target, slot, Qt::DirectConnection);
     processor->at_replyReceived(status, reply, errorString, 0);
-
+    
     return status;
+}
+
+int QnVideoServerConnection::asyncGetCameraAddition(QObject *target, const char *slot,
+                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password){
+
+    QnRequestParamList params;
+    params << QnRequestParam("start", startAddr);
+    params << QnRequestParam("end", endAddr);
+    params << QnRequestParam("user", username);
+    params << QnRequestParam("password", password);
+
+    detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor *processor = new detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor();
+    connect(processor, SIGNAL(finished(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualAddcams"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle) 
@@ -490,6 +504,29 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
         } while (storage.length() > 0);
         emit finished(data); 
     }
+    deleteLater();
+}
+
+void detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
+
+    QnCamerasFoundInfoList result;
+    if (status == 0){
+        QByteArray root = extractXmlBody(reply, "root");
+        QByteArray resource;
+        int from = 0;
+        do
+        {
+            resource = extractXmlBody(root, "resource", &from);
+            if (resource.length() == 0)
+                break;
+            QString url = QLatin1String(extractXmlBody(resource, "url"));
+            QString name = QLatin1String(extractXmlBody(resource, "name"));
+            result.append(QnCamerasFoundInfo(url, name));
+
+        } while (resource.length() > 0);
+    }
+
+    emit finished(result);
     deleteLater();
 }
 

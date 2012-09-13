@@ -51,6 +51,7 @@
 #include <ui/dialogs/user_settings_dialog.h>
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
+#include <ui/dialogs/camera_addition_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -76,6 +77,7 @@
 // TODO: remove this include
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
+#include "utils/common/synctime.h"
 
 
 
@@ -158,7 +160,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(QnClientMessageProcessor::instance(),               SIGNAL(connectionOpened()),                     this,   SLOT(at_eventManager_connectionOpened()));
 
     /* We're using queued connection here as modifying a field in its change notification handler may lead to problems. */
-    connect(workbench(),                                        SIGNAL(layoutsChanged()), this, SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(layoutsChanged()),                       this,   SLOT(at_workbench_layoutsChanged()), Qt::QueuedConnection);
+    connect(workbench(),                                        SIGNAL(cellAspectRatioChanged()),               this,   SLOT(at_workbench_cellAspectRatioChanged()));
+    connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
@@ -194,6 +198,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
+    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
     connect(action(Qn::YouTubeUploadAction),                    SIGNAL(triggered()),    this,   SLOT(at_youtubeUploadAction_triggered()));
     connect(action(Qn::EditTagsAction),                         SIGNAL(triggered()),    this,   SLOT(at_editTagsAction_triggered()));
@@ -709,6 +714,28 @@ void QnWorkbenchActionHandler::at_workbench_layoutsChanged() {
         return;
 
     menu()->trigger(Qn::OpenNewTabAction);
+}
+
+void QnWorkbenchActionHandler::at_workbench_cellAspectRatioChanged() {
+    qreal value = workbench()->currentLayout()->cellAspectRatio();
+
+    if (qFuzzyCompare(4.0 / 3.0, value))
+        action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
+    else
+        action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true); //default value
+}
+
+void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
+    qreal value = workbench()->currentLayout()->cellSpacing().width();
+
+    if (qFuzzyCompare(0.0, value))
+        action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
+    else if (qFuzzyCompare(0.2, value))
+        action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
+    else if (qFuzzyCompare(0.3, value))
+        action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+    else
+        action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
@@ -1233,6 +1260,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if(period.isEmpty())
         return;
 
+    QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+
     /* List of possible time steps, in milliseconds. */
     const qint64 steps[] = {
         1000ll * 10,                    /* 10 seconds. */
@@ -1240,6 +1269,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         1000ll * 60 * 5,                /* 5 minutes. */
         1000ll * 60 * 10,               /* 10 minutes. */
         1000ll * 60 * 60,               /* 1 hour. */
+        1000ll * 60 * 60 * 3,           /* 3 hours. */
         1000ll * 60 * 60 * 6,           /* 6 hours. */
         1000ll * 60 * 60 * 24,          /* 1 day. */
         1000ll * 60 * 60 * 24 * 5,      /* 5 days. */
@@ -1279,8 +1309,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                startDateTime.setTime(msecsToTime(qFloor(timeToMSecs(startDateTime.time()), step)));
-                endDateTime.setTime(msecsToTime(qCeil(timeToMSecs(endDateTime.time()), step)));
+                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
+                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+
+                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
+                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
@@ -1299,6 +1332,23 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         }
 
         itemCount = period.durationMs / step;
+    }
+
+    /* Adjust for chunks. */
+    if(!periods.isEmpty()) {
+        qint64 startTime = periods[0].startTimeMs;
+
+        while(startTime > period.startTimeMs + step / 2) {
+            period.startTimeMs += step;
+            period.durationMs -= step;
+            itemCount--;
+        }
+
+        /*qint64 endTime = qnSyncTime->currentMSecsSinceEpoch();
+        while(endTime < period.startTimeMs + period.durationMs) {
+            period.durationMs -= step;
+            itemCount--
+        }*/
     }
 
     /* Calculate size of the resulting matrix. */
@@ -1421,6 +1471,16 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
     QTimer::singleShot(50, this, SLOT(updateCameraSettingsFromSelection()));
 }
 
+void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
+    QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
+    if(resources.size() != 1)
+        return;
+
+    QScopedPointer<QnCameraAdditionDialog> dialog(new QnCameraAdditionDialog(resources[0], widget()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
     QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
     if(resources.size() != 1)
@@ -1480,7 +1540,7 @@ void QnWorkbenchActionHandler::at_removeLayoutItemAction_triggered() {
             tr("Are you sure you want to remove these %n item(s) from layout?", 0, items.size()),
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        if(button != QMessageBox::Yes)
+        if(button != QDialogButtonBox::Yes)
             return;
     }
 
@@ -1567,7 +1627,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             tr("Do you really want to delete the following %n item(s)?", NULL, resources.size()), 
             QDialogButtonBox::Yes | QDialogButtonBox::No
         );
-        okToDelete = button == QMessageBox::Yes;
+        okToDelete = button == QDialogButtonBox::Yes;
     }
 
     if(!okToDelete)
@@ -1922,6 +1982,7 @@ Do you want to continue?"),
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
+    Q_UNUSED(fileName)
     if (m_layoutExportResources.isEmpty()) {
         disconnect(sender(), NULL, this, NULL);
         if(m_exportProgressDialog)
@@ -2125,26 +2186,32 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio4x3Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(4.0 / 3.0);
+    action(Qn::SetCurrentLayoutAspectRatio4x3Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutAspectRatio16x9Action_triggered() {
     workbench()->currentLayout()->resource()->setCellAspectRatio(16.0 / 9.0);
+    action(Qn::SetCurrentLayoutAspectRatio16x9Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.0, 0.0));
+    action(Qn::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.1, 0.1));
+    action(Qn::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.2, 0.2));
+    action(Qn::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered() {
     workbench()->currentLayout()->resource()->setCellSpacing(QSizeF(0.3, 0.3));
+    action(Qn::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
 }
 
 void QnWorkbenchActionHandler::at_rotate0Action_triggered(){
@@ -2254,7 +2321,7 @@ void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     if(!checked) {
         m_tourTimer->stop();
     } else {
-        m_tourTimer->start(qnSettings->tourStepDuration());
+        m_tourTimer->start(qnSettings->tourCycleTime());
         at_tourTimer_timeout();
     }
 }
@@ -2286,6 +2353,7 @@ void QnWorkbenchActionHandler::at_tourTimer_timeout() {
 }
 
 void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
+    Q_UNUSED(role)
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
 }

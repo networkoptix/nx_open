@@ -54,6 +54,7 @@ void QnImageButtonBar::addButton(int mask, QnImageButtonWidget *button) {
 
     connect(button, SIGNAL(visibleChanged()),   this, SLOT(at_button_visibleChanged()));
     connect(button, SIGNAL(toggled(bool)),      this, SLOT(at_button_toggled()));
+    connect(button, SIGNAL(enabledChanged()),   this, SLOT(at_button_enabledChanged()));
 
     submitVisibleButtons();
     submitButtonSize(button);
@@ -116,6 +117,8 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
     int changedButtons = m_checkedButtons ^ checkedButtons;
     m_checkedButtons = checkedButtons;
 
+    // TODO: We have a problem here.
+    // if checked state changes during submit, we won't catch it.
     submitCheckedButtons(changedButtons);
 
     emit checkedButtonsChanged();
@@ -123,6 +126,26 @@ void QnImageButtonBar::setCheckedButtons(int checkedButtons) {
 
 void QnImageButtonBar::setButtonsChecked(int mask, bool checked) {
     setCheckedButtons(checked ? (m_checkedButtons | mask) : (m_checkedButtons & ~mask));
+}
+
+int QnImageButtonBar::enabledButtons() const {
+    return m_enabledButtons;
+}
+
+void QnImageButtonBar::setEnabledButtons(int enabledButtons) {
+    if(m_enabledButtons == enabledButtons)
+        return;
+
+    int changedButtons = m_enabledButtons ^ enabledButtons;
+    m_enabledButtons = enabledButtons;
+
+    submitEnabledButtons(changedButtons);
+
+    emit enabledButtonsChanged();
+}
+
+void QnImageButtonBar::setButtonsEnabled(int mask, bool enabled) {
+    setEnabledButtons(enabled ? (m_enabledButtons | mask) : (m_enabledButtons & ~mask));
 }
 
 const QSizeF &QnImageButtonBar::uniformButtonSize() const {
@@ -169,6 +192,16 @@ void QnImageButtonBar::submitCheckedButtons(int mask) {
             pos.value()->setChecked(pos.key() & m_checkedButtons);
 }
 
+void QnImageButtonBar::submitEnabledButtons(int mask) {
+    if(m_updating)
+        return;
+    QnScopedValueRollback<bool> guard(&m_submitting, true);
+
+    for(QMap<int, QnImageButtonWidget *>::const_iterator pos = m_buttonByMask.begin(); pos != m_buttonByMask.end(); pos++)
+        if(pos.key() & mask)
+            pos.value()->setEnabled(pos.key() & m_enabledButtons);
+}
+
 void QnImageButtonBar::submitButtonSize(QnImageButtonWidget *button) {
     button->setMaximumSize(m_uniformButtonSize);
     button->setMinimumSize(m_uniformButtonSize);
@@ -194,4 +227,13 @@ void QnImageButtonBar::at_button_toggled() {
 
     QnImageButtonWidget *button = checked_cast<QnImageButtonWidget *>(sender());
     setButtonsChecked(m_maskByButton.value(button), button->isChecked());
+}
+
+void QnImageButtonBar::at_button_enabledChanged() {
+    if(m_submitting)
+        return;
+    QnScopedValueRollback<bool> guard(&m_updating, true);
+
+    QnImageButtonWidget *button = checked_cast<QnImageButtonWidget *>(sender());
+    setButtonsEnabled(m_maskByButton.value(button), button->isEnabled());
 }

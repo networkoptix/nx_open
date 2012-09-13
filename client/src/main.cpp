@@ -57,12 +57,20 @@
 #include "plugins/resources/isd/isd_resource_searcher.h"
 //#include "plugins/resources/onvif/onvif_ws_searcher.h"
 #include "utils/network/socket.h"
+#include "utils/common/module_resources.h"
+
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "core/resource/camera_history.h"
 #include "client_message_processor.h"
-#include "ui/workbench/workbench_tranlation_manager.h"
+#include "ui/workbench/workbench_translation_manager.h"
+
+#ifdef Q_WS_X11
+    #include "utils/app_focus_listener.h"
+#endif
+#include "utils/common/cryptographic_hash.h"
+#include "ui/style/globals.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -213,14 +221,11 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int main(int argc, char *argv[])
 {
+    QN_INIT_MODULE_RESOURCES(common);
+
 #ifdef Q_WS_X11
 	XInitThreads();
 #endif
-
-    /* Init common resources. */
-    Q_INIT_RESOURCE(common_common);
-    Q_INIT_RESOURCE(common_custom);
-    Q_INIT_RESOURCE(common_generated);
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -234,25 +239,36 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
 
-
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
 
     qnSettings->updateFromCommandLine(argc, argv, stderr);
 
+    QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
     QString authenticationString, delayedDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
+    bool devBackgroundEditable = false;
     
     QnCommandLineParser commandLineParser;
-    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",  NULL,   QString(),    true);
-    commandLineParser.addParameter(&authenticationString,   "--auth",                   NULL,   QString());
-    commandLineParser.addParameter(&screen,                 "--screen",                 NULL,   QString());
-    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",           NULL,   QString());
-    commandLineParser.addParameter(&logLevel,               "--log-level",              NULL,   QString());
-    commandLineParser.addParameter(&translationPath,        "--translation",            NULL,   QString());
+    commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
+    commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
+    commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
+    commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
+    commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
+    commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
+    commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
+
+    /* Dev mode. */
+    if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
+        qnSettings->setBackgroundEditable(devBackgroundEditable);
+    } else {
+        qnSettings->setBackgroundAnimated(true);
+        qnSettings->setBackgroundColor(qnGlobals->backgroundGradientColor());
+    }
 
     /* Set authentication parameters from command line. */
     QUrl authentication = QUrl::fromUserInput(authenticationString);
@@ -272,6 +288,11 @@ int main(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+#ifdef Q_WS_X11
+    QnAppFocusListener appFocusListener;
+    application->installEventFilter(&appFocusListener);
+#endif
 
     if(singleApplication) {
         QString argsMessage;

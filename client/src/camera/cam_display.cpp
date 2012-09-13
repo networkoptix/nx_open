@@ -171,6 +171,7 @@ void QnCamDisplay::pause()
 {
     QnAbstractDataConsumer::pause();
     m_isRealTimeSource = false;
+    emit liveMode(false);
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->suspend();
 }
@@ -701,6 +702,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
     m_singleShotMode = single;
     if (m_singleShotMode) {
         m_isRealTimeSource = false;
+        emit liveMode(false);
         playAudio(false);
     }
 }
@@ -910,7 +912,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
-            if (m_extTimeSrc && !isLive && isVideoCamera) {
+            if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;
             }

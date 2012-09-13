@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-	Q_INIT_RESOURCE(traytool);
+	Q_INIT_RESOURCE(traytool); // TODO: I bet this is not needed here.
 	
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(0, QObject::tr("Systray"),

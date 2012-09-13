@@ -51,14 +51,13 @@ public:
      */
     virtual bool isResourceTypeSupported(QnId resourceTypeId) const;
 
-protected:
-
     /**
      * \returns                         Name of the manufacturer for the resources this searcher adds. 
      *                                  For example, 'AreconVision' or 'IQInVision'.
      */ 
     virtual QString manufacture() const = 0;
 
+protected:
     /**
      * This is the actual function that searches for resources. 
      * To be implemented in derived classes.
@@ -93,7 +92,7 @@ public:
 
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr) = 0;
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth) = 0;
 };
 
 //=====================================================================

@@ -141,9 +141,10 @@ public:
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
     bool forcePrimaryEncoderCodec() const;
-    int calcTimeDrift() const; // return clock diff between camera and local clock at seconds
+    void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
 
     virtual QnOnvifPtzController* getPtzController() override;
+    bool fetchAndSetDeviceInformation();
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -164,7 +165,6 @@ protected:
 private:
     void setMaxFps(int f);
 
-    bool fetchAndSetDeviceInformation();
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
