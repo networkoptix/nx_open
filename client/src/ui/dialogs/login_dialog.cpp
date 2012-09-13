@@ -208,6 +208,7 @@ void LoginDialog::resetConnectionsModel() {
     }
 
     ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
+    ui->passwordLineEdit->clear();
 }
 
 void LoginDialog::updateAcceptibility() {
