@@ -130,6 +130,23 @@ void QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resource
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);
 }
 
+void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource) {
+    if(!resource) {
+        qnNullWarning(resource);
+        return;
+    }
+
+    /* We don't want to get queued layout change signals that are not yet delivered, 
+     * so there are no options but to disconnect. */
+    disconnectFrom(resource);
+    {
+        m_storage->store(resource);
+    }
+    connectTo(resource);
+
+    setFlags(resource, flags(resource) & ~Qn::ResourceIsChanged);
+}
+
 void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource) {
     if(!resource) {
         qnNullWarning(resource);
@@ -156,6 +173,7 @@ void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &reso
     connect(resource.data(),  SIGNAL(nameChanged()),                            this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(cellAspectRatioChanged()),                 this,   SLOT(at_layout_changed()));
     connect(resource.data(),  SIGNAL(cellSpacingChanged()),                     this,   SLOT(at_layout_changed()));
+    connect(resource.data(),  SIGNAL(storeRequested()),                         this,   SLOT(at_layout_storeRequested()));
 }
 
 void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource) {
@@ -216,13 +234,19 @@ void QnWorkbenchLayoutSnapshotManager::at_layouts_saveFailed(const QnLayoutResou
         setFlags(resource, flags(resource) & ~Qn::ResourceIsBeingSaved);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
-    setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
+void QnWorkbenchLayoutSnapshotManager::at_layout_storeRequested() {
+    if(!sender())
+        return; /* Already disconnected. */
+
+    store(toSharedPointer(checked_cast<QnLayoutResource *>(sender())));
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed() {
+    if(!sender())
+        return; /* Already disconnected. */
+
     QnLayoutResourcePtr resource = toSharedPointer(checked_cast<QnLayoutResource *>(sender()));
-    at_layout_changed(resource);
+    setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
 
