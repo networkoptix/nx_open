@@ -689,6 +689,11 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
         if (qnResPool->hasSuchResouce(h.result->getUniqueId())) // already in resource pool 
             continue;
 
+        // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+        QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
+        if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
+            continue;
+
         result.push_back(h.result);
 
         //qnResPool->
