@@ -2,7 +2,8 @@
 #include "version.h"
 
 #if defined(Q_OS_LINUX)
-QSettings qSettings("/opt/networkoptix/mediaserver/etc/mediaserver.conf", QSettings::IniFormat);
+QString configFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf").arg(VER_LINUX_ORGANIZATION_NAME);
+QSettings qSettings(configFileName, QSettings::IniFormat);
 #else
 QSettings qSettings(QSettings::SystemScope, ORGANIZATION_NAME, APPLICATION_NAME);
 #endif
