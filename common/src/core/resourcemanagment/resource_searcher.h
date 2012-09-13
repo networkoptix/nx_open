@@ -92,7 +92,7 @@ public:
 
     // checks this QHostAddress and creates a QnResource in case of success
     // this function is designed for manual resource addition
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr, QAuthenticator auth, int port) = 0;
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth) = 0;
 };
 
 //=====================================================================

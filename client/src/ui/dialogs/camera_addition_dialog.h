@@ -69,8 +69,10 @@ private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
 
 private slots: 
-    void at_scanButton_clicked();
     void at_singleRadioButton_toggled(bool toggled);
+
+    void at_scanButton_clicked();
+    void at_addButton_clicked();
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)

@@ -40,8 +40,8 @@ namespace {
 QnCalendarWidget::QnCalendarWidget():
     m_tableView(0),
     m_empty(true),
-    m_currentTime(0),
-    m_currentWidgetIsCentral(false)
+    m_currentWidgetIsCentral(false),
+    m_currentTime(0)
 {
     /* Month button's drop-down menu doesn't work well with graphics scene, so we simply remove it. */
     QToolButton *monthButton = findChild<QToolButton *>(QLatin1String("qt_calendar_monthbutton"));

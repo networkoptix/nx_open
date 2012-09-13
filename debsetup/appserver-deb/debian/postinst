@@ -7,12 +7,12 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-CONFIG_FILE="/opt/networkoptix/entcontroller/etc/entcontroller.conf"
+CONFIG_FILE="/opt/${deb.customization.company.name}/entcontroller/etc/entcontroller.conf"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
-if status networkoptix-entcontroller | grep "start/running" > /dev/null; then
-  stop networkoptix-entcontroller
+if status ${deb.customization.company.name}-entcontroller | grep "start/running" > /dev/null; then
+  stop ${deb.customization.company.name}-entcontroller
 fi
     
 function read_config {
@@ -60,69 +60,69 @@ case "$1" in
       read_config
 
       # Simple port validation
-      db_input high networkoptix-entcontroller/ecs_port || true
+      db_input high ${deb.customization.company.name}-entcontroller/ecs_port || true
       db_go
-      db_get networkoptix-entcontroller/ecs_port
+      db_get ${deb.customization.company.name}-entcontroller/ecs_port
       until port_is_ok "$RET"
       do
-        db_input high networkoptix-entcontroller/ecs_port_invalid || true
+        db_input high ${deb.customization.company.name}-entcontroller/ecs_port_invalid || true
         db_go
 
-        { db_input high networkoptix-entcontroller/ecs_port; STATUS=$?; } || true
+        { db_input high ${deb.customization.company.name}-entcontroller/ecs_port; STATUS=$?; } || true
         [ $STATUS -eq 30 ] && break
 
         db_go
-        db_get networkoptix-entcontroller/ecs_port
+        db_get ${deb.customization.company.name}-entcontroller/ecs_port
       done
 
       # Proxy port
-      db_input high networkoptix-entcontroller/ecs_proxy_port || true
+      db_input high ${deb.customization.company.name}-entcontroller/ecs_proxy_port || true
       db_go
-      db_get networkoptix-entcontroller/ecs_proxy_port
+      db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port
       until port_is_ok "$RET"
       do
-        db_input high networkoptix-entcontroller/ecs_port_invalid || true
+        db_input high ${deb.customization.company.name}-entcontroller/ecs_port_invalid || true
         db_go
 
-        { db_input high networkoptix-entcontroller/ecs_proxy_port; STATUS=$?; } || true
+        { db_input high ${deb.customization.company.name}-entcontroller/ecs_proxy_port; STATUS=$?; } || true
         [ $STATUS -eq 30 ] && break
 
         db_go
-        db_get networkoptix-entcontroller/ecs_proxy_port
+        db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port
       done
 
       # Password should not be empty
-      db_reset networkoptix-entcontroller/ecs_password
-      db_input high networkoptix-entcontroller/ecs_password || true
+      db_reset ${deb.customization.company.name}-entcontroller/ecs_password
+      db_input high ${deb.customization.company.name}-entcontroller/ecs_password || true
       db_go
-      db_get networkoptix-entcontroller/ecs_password
+      db_get ${deb.customization.company.name}-entcontroller/ecs_password
       until [ ! -z "$RET" ]
       do
-        db_input high networkoptix-entcontroller/ecs_pass_empty || true
+        db_input high ${deb.customization.company.name}-entcontroller/ecs_pass_empty || true
         db_go
 
-        { db_input high networkoptix-entcontroller/ecs_password; STATUS=$?; } || true
+        { db_input high ${deb.customization.company.name}-entcontroller/ecs_password; STATUS=$?; } || true
         [ $STATUS -eq 30 ] && break
 
         db_go
-        db_get networkoptix-entcontroller/ecs_password 
+        db_get ${deb.customization.company.name}-entcontroller/ecs_password 
       done
 
-      db_get networkoptix-entcontroller/ecs_port && ECS_PORT=$RET
-      db_get networkoptix-entcontroller/ecs_proxy_port && ECS_PROXY_PORT=$RET
-      db_get networkoptix-entcontroller/ecs_password && ECS_PASSWORD=$RET
+      db_get ${deb.customization.company.name}-entcontroller/ecs_port && ECS_PORT=$RET
+      db_get ${deb.customization.company.name}-entcontroller/ecs_proxy_port && ECS_PROXY_PORT=$RET
+      db_get ${deb.customization.company.name}-entcontroller/ecs_password && ECS_PASSWORD=$RET
 
       write_config
 
-      /opt/networkoptix/entcontroller/bin/dbsync
+      /opt/${deb.customization.company.name}/entcontroller/bin/dbsync
 
       if [ ! -z "$ECS_PASSWORD" ]
       then
-        /opt/networkoptix/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
-        db_set networkoptix-entcontroller/ecs_password ""
+        /opt/${deb.customization.company.name}/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
+        db_set ${deb.customization.company.name}-entcontroller/ecs_password ""
       fi
 
-      chmod 600 /opt/networkoptix/entcontroller/var/db/ecs.db
+      chmod 600 /opt/${deb.customization.company.name}/entcontroller/var/db/ecs.db
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
@@ -134,13 +134,13 @@ case "$1" in
   ;;
 esac
 
-if [ -e "/etc/init/networkoptix-entcontroller.conf" ]; then
-	invoke-rc.d networkoptix-entcontroller start || exit $?
+if [ -e "/etc/init/${deb.customization.company.name}-entcontroller.conf" ]; then
+	invoke-rc.d ${deb.customization.company.name}-entcontroller start || exit $?
 fi
-update-rc.d -f networkoptix-entcontroller remove >/dev/null || exit $?
+update-rc.d -f ${deb.customization.company.name}-entcontroller remove >/dev/null || exit $?
 
-if [ -e "/etc/init/networkoptix-mediaproxy.conf" ]; then
-	invoke-rc.d networkoptix-mediaproxy start || exit $?
+if [ -e "/etc/init/${deb.customization.company.name}-mediaproxy.conf" ]; then
+	invoke-rc.d ${deb.customization.company.name}-mediaproxy start || exit $?
 fi
-update-rc.d -f networkoptix-mediaproxy remove >/dev/null || exit $?
+update-rc.d -f ${deb.customization.company.name}-mediaproxy remove >/dev/null || exit $?
 exit 0
