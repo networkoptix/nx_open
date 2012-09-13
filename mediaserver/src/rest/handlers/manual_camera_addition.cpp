@@ -39,7 +39,10 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
     }
 
     if (addr1.isNull()) {
-        resultByteArray.append(QByteArray("Invalid start parameter" + addr1.toString().toUtf8()));
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append(QByteArray("Parameter 'start_ip' missed" + addr1.toString().toUtf8()));
+        resultByteArray.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
     if (addr2.isNull())
@@ -70,7 +73,7 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
                 resultByteArray.append("<resource>\n");
                 resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
                 resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
-                resultByteArray.append(QString("<manufacture>%1</manufacture>\n").arg(resourceType->getManufacture()));
+                resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getManufacture()));
                 resultByteArray.append("</resource>\n");
             }
         }
@@ -90,14 +93,20 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     QUrl url;
 
     QnManualCamerasMap cameras;
+    QString errStr;
 
     for (int i = 0; i < params.size(); ++i)
     {
         QPair<QString, QString> param = params[i];
         if (param.first == "url") 
         {
-            if (!url.isEmpty())
-                cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+            if (!url.isEmpty()) {
+                QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+                if (itr.value().resType == 0) {
+                    errStr = QString("Unknown resource type %1").arg(resType);
+                    break;
+                }
+            }
             url = param.second;
         }
         else if (param.first == "user")
@@ -107,8 +116,21 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
         else if (param.first == "manufacturer")
             resType = param.second;
     }
-    if (!url.isEmpty())
-        cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+    if (!url.isEmpty()) {
+        QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+        if (itr.value().resType == 0) {
+            errStr = QString("Unknown resource type %1").arg(resType);
+        }
+    }
+    
+    if (!errStr.isEmpty())
+    {
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append(errStr).append("\n");
+        resultByteArray.append("</root>\n");
+        return CODE_INVALID_PARAMETER;
+    }
 
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
@@ -116,10 +138,10 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     bool registered = QnResourceDiscoveryManager::instance().registerManualCameras(cameras);
     if (registered) {
         QnResourceDiscoveryManager::instance().processManualAddedResources();
-        resultByteArray.append("<OK>\n");
+        resultByteArray.append("OK\n");
     }
     else
-        resultByteArray.append("<FAILED>\n");
+        resultByteArray.append("FAILED\n");
     resultByteArray.append("</root>\n");
 
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;
