@@ -276,7 +276,7 @@ void QnProgressiveDownloadingConsumer::run()
         d->responseHeaders.setValue("Cache-Control", "no-cache");
         sendResponse("HTTP", CODE_OK, mimeType);
         dataConsumer.sendResponse();
-        QnByteArray emptyChunk(0,0);
+        QnByteArray emptyChunk(0U,0);
         sendChunk(emptyChunk);
         dataProvider->removeDataProcessor(&dataConsumer);
     }

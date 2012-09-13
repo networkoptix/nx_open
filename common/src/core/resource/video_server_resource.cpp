@@ -107,7 +107,7 @@ public:
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override {
-        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0, 1));
+        return QnAbstractMediaDataPtr(new QnAbstractMediaData(0U, 1));
     }
 };
 
