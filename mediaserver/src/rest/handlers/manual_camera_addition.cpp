@@ -73,15 +73,6 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
                 resultByteArray.append(QString("<manufacture>%1</manufacture>\n").arg(resourceType->getManufacture()));
                 resultByteArray.append("</resource>\n");
             }
-
-            for(int i = 0; i < 5; i++){
-                resultByteArray.append("<resource>\n");
-                resultByteArray.append(QString("<name>%1</name>\n").arg("dummy name"));
-                resultByteArray.append(QString("<url>%1</url>\n").arg(addr1.toString()));
-                resultByteArray.append(QString("<manufacture>%1</manufacture>\n").arg("AXIS"));
-                resultByteArray.append("</resource>\n");
-            }
-
         }
         resultByteArray.append("</reply>\n");
     }
@@ -109,7 +100,6 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
                 cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
             url = param.second;
         }
-
         else if (param.first == "user")
             auth.setUser(param.second);
         else if (param.first == "password")
@@ -117,7 +107,7 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
         else if (param.first == "manufacturer")
             resType = param.second;
     }
-    if (url.isEmpty())
+    if (!url.isEmpty())
         cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
 
 

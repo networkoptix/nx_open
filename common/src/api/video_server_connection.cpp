@@ -524,7 +524,7 @@ void detail::VideoServerSessionManagerSearchCamerasRequestReplyProcessor::at_rep
                 break;
             QString url = QLatin1String(extractXmlBody(resource, "url"));
             QString name = QLatin1String(extractXmlBody(resource, "name"));
-            QString manufacture = QLatin1String(extractXmlBody(resource, "manufacture"));
+            QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
             result.append(QnCamerasFoundInfo(url, name, manufacture));
 
         } while (resource.length() > 0);
