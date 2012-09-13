@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #. ../common.sh
-PACKAGENAME=networkoptix-client
+PACKAGENAME=${deb.customization.company.name}-client
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/networkoptix/client
+TARGET=/opt/${deb.customization.company.name}/client
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 USRTARGET=/usr
