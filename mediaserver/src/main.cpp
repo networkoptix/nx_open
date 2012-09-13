@@ -71,7 +71,7 @@
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
+static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -500,14 +500,24 @@ void QnMain::loadResourcesFromECS()
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
         QnSleep::msleep(10000);
     }
+
+    QnManualCamerasMap manualCameras;
     foreach(const QnSecurityCamResourcePtr &camera, cameras)
     {
         QnResourcePtr ownResource = qnResPool->getResourceById(camera->getId());
-        if (ownResource)
+        if (ownResource) {
             ownResource->update(camera);
-        else
+        }
+        else {
             qnResPool->addResource(camera);
+            QnVirtualCameraResourcePtr virtualCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(camera);
+            if (virtualCamera->isManuallyAdded()) {
+                QnResourceTypePtr resType = qnResTypePool->getResourceType(virtualCamera->getTypeId());
+                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getName()));
+            }
+        }
     }
+    QnResourceDiscoveryManager::instance().registerManualCameras(manualCameras);
 
     QnCameraHistoryList cameraHistoryList;
     while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)

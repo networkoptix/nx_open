@@ -12,14 +12,13 @@ namespace Ui {
     class CameraAdditionDialog;
 }
 
-namespace detail {
-
-    class CheckCamerasFoundReplyProcessor: public QObject
+namespace detail{
+    class ManualCameraReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
 
-        CheckCamerasFoundReplyProcessor(QObject *parent = NULL):
+        ManualCameraReplyProcessor(QObject *parent = NULL):
             QObject(parent),
             m_cancelled(false)
         {}
@@ -28,32 +27,45 @@ namespace detail {
             return m_cameras;
         }
 
+        bool addSuccess(){
+            return (m_addStatus == 0);
+        }
+
+        bool isCancelled(){
+            return m_cancelled;
+        }
+
     signals:
         void replyReceived();
 
     public slots:
-        void processReply(const QnCamerasFoundInfoList &cameras)
+        void processSearchReply(const QnCamerasFoundInfoList &cameras)
         {
             if (m_cancelled)
                 return;
 
             m_cameras = cameras;
-            qDebug() << "data received count" << cameras.count();
+            emit replyReceived();
+        }
+
+        void processAddReply(int status){
+            if (m_cancelled)
+                return;
+
+            m_addStatus = status;
             emit replyReceived();
         }
 
         void cancel(){
             m_cancelled = true;
-            qDebug() << "request cancelled";
         }
 
     private:
         QnCamerasFoundInfoList m_cameras;
+        int m_addStatus;
         bool m_cancelled;
     };
-
-} // namespace detail
-
+}
 
 class QnCameraAdditionDialog: public QnButtonBoxDialog {
     Q_OBJECT
@@ -69,8 +81,10 @@ private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
 
 private slots: 
-    void at_scanButton_clicked();
     void at_singleRadioButton_toggled(bool toggled);
+
+    void at_scanButton_clicked();
+    void at_addButton_clicked();
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)

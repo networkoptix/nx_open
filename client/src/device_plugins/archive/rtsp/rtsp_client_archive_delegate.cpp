@@ -19,22 +19,21 @@ int QnRtspClientArchiveDelegate::m_proxyPort = 0;
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     QnAbstractArchiveDelegate(),
-    m_tcpMode(true),
     m_rtpData(0),
+    m_tcpMode(true),
     m_position(DATETIME_NOW),
     m_opened(false),
-    //m_waitBOF(false),
     m_lastPacketFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
+    m_sendedCSec(0),
+    m_lastSeekTime(AV_NOPTS_VALUE),
     m_lastReceivedTime(AV_NOPTS_VALUE),
     m_blockReopening(false),
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
-    m_lastSeekTime(AV_NOPTS_VALUE),
-    m_sendedCSec(0),
-    m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_lastMinTimeTime(0),
+    m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true)
 {
@@ -310,8 +309,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     
     // Check if archive moved to other video server
     qint64 timeMs = result ? result->timestamp/1000 : 0;
-    bool outOfRange = m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs() || 
-                      m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
+    bool outOfRange = (m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
+                      (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs);
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
@@ -815,7 +814,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
-    if ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250 || diff > 1000*10)
+    if (((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10)
     {
         m_blockReopening = true;
         close();

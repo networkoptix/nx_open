@@ -1,12 +1,75 @@
 #include "ip_line_edit.h"
 
-class IpAddressValidator: QValidator{
+#include <QtGui/QValidator>
+
+class IpAddressValidator: public QValidator{
+    virtual QValidator::State validate(QString &input, int &pos) const override{
+
+        QStringList sections = input.split(QLatin1Char('.'));
+        int s = sections.size();
+        if(s > 4){
+            qDebug() << "invalid on sections size" << pos << input;
+            return Invalid;
+        }
+
+        bool emptyGroup = false;
+        foreach(QString section, sections){
+            bool ok;
+            if(section.isEmpty()){
+                emptyGroup = true;
+                continue;
+            }
+            int val = section.toInt(&ok);
+            if(!ok || val<0 || val>255){
+                qDebug() << "invalid on number" << pos << input;
+                return Invalid;
+            }
+        }
+
+        if (s < 4 || emptyGroup){
+            qDebug() << "Intermediate" << pos << input;
+            return Intermediate;
+        }
+
+        qDebug() << "Acceptable" << pos << input;
+        return Acceptable;
+    }
+
+    virtual void fixup(QString &input) const override{
+        qDebug() << "fixup called on" <<input;
+        QStringList sections = input.split(QLatin1Char('.'));
+        while(sections.size() > 4)
+            sections.removeLast();
+        while (sections.size() < 4)
+            sections.append(QLatin1String("0"));
+
+        for (int i = 0; i < 4; i++){
+            if (sections[i].isEmpty()){
+                sections[i] = QLatin1String("0");
+            } else {
+                bool ok;
+                int val = sections[i].toInt(&ok);
+                if(!ok || val<0)
+                    sections[i] = QLatin1String("0");
+                else if (val>255)
+                    sections[i] = QLatin1String("255");
+            }
+        }
+        input.clear();
+        for (int i = 0; i < 3; i++){
+            input.append(sections[i]);
+            input.append(QLatin1Char('.'));
+        }
+        input.append(sections[3]);
+        qDebug() << "fixup result" <<input;
+    }
 
 };
 
 
 QnIpLineEdit::QnIpLineEdit(QWidget *parent):
     QLineEdit(parent){
-    setInputMask(QLatin1String("009.009.009.009;_"));
-  //  setValidator(new IpAddressValidator());
+    setInputMask(QLatin1String("009.009.009.009;"));
+    setValidator(new IpAddressValidator());
+    setText(QLatin1String("127.0.0.1"));
 }
