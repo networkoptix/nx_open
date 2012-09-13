@@ -30,6 +30,7 @@
 #include <core/resourcemanagment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
+#include "version.h" // TODO: remove
 
 namespace {
     template<class T>
@@ -565,6 +566,9 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
+    struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
+    int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
+
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
     if(!(resource()->flags() & QnResource::still_image))
@@ -573,7 +577,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(m_camera) {
         result |= MotionSearchButton | InfoButton;
 
-        if(m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) {
+        if(version >= 103010 && (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))) {
             result |= PtzButton;
 
             if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here

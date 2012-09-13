@@ -33,21 +33,21 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
+QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
     QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
     if (!typePtr)
         return QnResourcePtr();
 
-    int onvifPort = port ? port : 80;
+    int onvifPort = url.port(80);
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
     resource->setTypeId(typePtr->getId());
     resource->setAuth(auth);
-    resource->setHostAddress(addr, QnDomainMemory);
     //resource->setDiscoveryAddr(addr);
-    QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(addr.toString()).arg(onvifPort).arg(onvifUrl);
+    QString deviceUrl = QString(QLatin1String("http://%1:%2/%3")).arg(url.host()).arg(onvifPort).arg(onvifUrl);
+    resource->setUrl(deviceUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     resource->calcTimeDrift();

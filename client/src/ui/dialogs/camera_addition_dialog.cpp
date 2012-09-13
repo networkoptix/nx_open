@@ -30,9 +30,12 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->endIPLabel->setVisible(false);
     ui->endIPLineEdit->setVisible(false);
     ui->scanProgressBar->setVisible(false);
-    ui->camerasGroupBox->setVisible(false);
     ui->stopScanButton->setVisible(false);
-    ui->validateLabel->setVisible(false);
+    ui->validateLabelSearch->setVisible(false);
+
+    ui->addProgressBar->setVisible(false);
+    ui->stopAddButton->setVisible(false);
+    ui->addPage->setVisible(false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
     connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
@@ -42,12 +45,13 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->startIPLineEdit->installEventFilter(this);
     ui->endIPLineEdit->installEventFilter(this);
     ui->iPAddressLineEdit->installEventFilter(this);
-
     ui->iPAddressLineEdit->setFocus();
+
+    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->validateLabel->setPalette(palette);
+    ui->validateLabelSearch->setPalette(palette);
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -77,13 +81,12 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
         checkItem->setCheckState(Qt::Unchecked);
+        checkItem->setData(Qt::UserRole, info.url);
 
-        QTableWidgetItem *addressItem = new QTableWidgetItem(info.address);
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
 
         ui->camerasTable->setItem(row, 0, checkItem);
-        ui->camerasTable->setItem(row, 1, addressItem);
-        ui->camerasTable->setItem(row, 2, nameItem);
+        ui->camerasTable->setItem(row, 1, nameItem);
     }
 }
 
@@ -91,12 +94,21 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnCameraAdditionDialog::at_scanButton_clicked(){
 
+void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){
+    if (toggled)
+        ui->iPAddressLineEdit->setText(ui->startIPLineEdit->text());
+    else
+        ui->startIPLineEdit->setText(ui->iPAddressLineEdit->text());
+}
+
+void QnCameraAdditionDialog::at_scanButton_clicked(){
     QString startAddr;
     QString endAddr;
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
+    int port = ui->portSpinBox->value();
+
     if (ui->rangeRadioButton->isChecked()){
         startAddr = ui->startIPLineEdit->text();
         endAddr = ui->endIPLineEdit->text();
@@ -108,48 +120,86 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     // TODO: #gdm move validation to QnIpLineEdit
     if (QHostAddress(startAddr).isNull()){
-        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(startAddr));
-        ui->validateLabel->setVisible(true);
+        ui->validateLabelSearch->setText(tr("Ip address \"%1\" is invalid").arg(startAddr));
+        ui->validateLabelSearch->setVisible(true);
         return;
     }
 
     if (QHostAddress(endAddr).isNull()){
-        ui->validateLabel->setText(tr("Ip address \"%1\" is invalid").arg(endAddr));
-        ui->validateLabel->setVisible(true);
+        ui->validateLabelSearch->setText(tr("Ip address \"%1\" is invalid").arg(endAddr));
+        ui->validateLabelSearch->setVisible(true);
         return;
     }
 
-    ui->validateLabel->setVisible(false);
+    ui->validateLabelSearch->setVisible(false);
 
     ui->buttonBox->setEnabled(false);
-    ui->camerasGroupBox->setVisible(false);
+//    ui->camerasGroupBox->setVisible(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
-    QScopedPointer<detail::CheckCamerasFoundReplyProcessor> processor(new detail::CheckCamerasFoundReplyProcessor());
+    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
-    int handle = serverConnection->asyncGetCameraAddition(processor.data(), SLOT(processReply(const QnCamerasFoundInfoList &)),
-                                                          startAddr, endAddr, username, password);
-    Q_UNUSED(handle)
+    serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
+                                                 startAddr, endAddr, username, password, port);
 
     eventLoop->exec();
 
     ui->stopScanButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
-    ui->camerasGroupBox->setVisible(true);
+//    ui->camerasGroupBox->setVisible(true);
+    // if (processor->camerasFound().count() > 0){
+    //
+    ui->addPage->setVisible(true);
+    ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
     fillTable(processor->camerasFound());
 }
 
-void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){
-    if (toggled)
-        ui->iPAddressLineEdit->setText(ui->startIPLineEdit->text());
-    else
-        ui->startIPLineEdit->setText(ui->iPAddressLineEdit->text());
+void QnCameraAdditionDialog::at_addButton_clicked(){
+
+    QString username(ui->loginLineEdit->text());
+    QString password(ui->passwordLineEdit->text());
+
+    QStringList urls;
+    int rowCount = ui->camerasTable->rowCount();
+    for (int row = 0; row < rowCount; ++row) {
+        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
+            continue;
+
+        //QnCamerasFoundInfo info = ui->camerasTable->item(row, 0)->data(Qt::UserRole);
+        //qDebug() << "output info item checked" << info.name << info.manufacture << info.url;
+        urls.append(QString(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString()));
+    }
+
+    ui->buttonBox->setEnabled(false);
+    ui->addProgressBar->setVisible(true);
+    ui->stopAddButton->setVisible(true);
+    ui->searchPage->setEnabled(false);
+
+    QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
+
+    QScopedPointer<detail::ManualCameraReplyProcessor> processor(new detail::ManualCameraReplyProcessor());
+    connect(processor.data(), SIGNAL(replyReceived()),  eventLoop.data(), SLOT(quit()));
+    connect(ui->stopAddButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
+    connect(ui->stopAddButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
+
+    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
+                                              urls, QString(), username, password);
+
+    eventLoop->exec();
+
+    ui->stopScanButton->setVisible(false);
+    ui->buttonBox->setEnabled(true);
+    ui->scanProgressBar->setVisible(false);
+    ui->searchPage->setEnabled(true);
+//    ui->camerasGroupBox->setVisible(true);
 }
+

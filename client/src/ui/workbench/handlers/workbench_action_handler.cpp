@@ -597,21 +597,21 @@ void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connecti
             if (*iter == compared)
                 continue;
 
-            if ((*iter).url.host() != compared.url.host())
+            if (iter->url.host() != compared.url.host())
                 continue;
 
-            if ((*iter).url.port() != compared.url.port())
+            if (iter->url.port() != compared.url.port())
                 otherPort = true;
             else
                 samePort = true;
         }
 
-        (*iter).name = (*iter).url.host();
+        iter->name = iter->url.host();
         if (samePort)
-            (*iter).name.prepend((*iter).url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
+            iter->name.prepend(iter->url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
 
         if (otherPort)
-            (*iter).name.append(QLatin1Char(':') + QString::number((*iter).url.port()));
+            iter->name.append(QLatin1Char(':') + QString::number(iter->url.port()));
     }
     qnSettings->setCustomConnections(connections);
 }
