@@ -73,7 +73,7 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
                 resultByteArray.append("<resource>\n");
                 resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
                 resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
-                resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getManufacture()));
+                resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getName()));
                 resultByteArray.append("</resource>\n");
             }
         }

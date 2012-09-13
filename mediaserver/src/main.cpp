@@ -513,7 +513,7 @@ void QnMain::loadResourcesFromECS()
             QnVirtualCameraResourcePtr virtualCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(camera);
             if (virtualCamera->isManuallyAdded()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(virtualCamera->getTypeId());
-                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getManufacture()));
+                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getName()));
             }
         }
     }
