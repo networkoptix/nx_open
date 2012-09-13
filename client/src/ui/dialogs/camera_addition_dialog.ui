@@ -35,7 +35,7 @@
       </sizepolicy>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="searchPage">
       <property name="geometry">
@@ -294,7 +294,7 @@
         <x>0</x>
         <y>0</y>
         <width>269</width>
-        <height>335</height>
+        <height>312</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -341,7 +341,7 @@
           <number>0</number>
          </property>
          <property name="columnCount">
-          <number>4</number>
+          <number>2</number>
          </property>
          <attribute name="horizontalHeaderVisible">
           <bool>false</bool>
@@ -371,16 +371,6 @@
            <string>Name</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>Manuf.</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Url</string>
-          </property>
-         </column>
         </widget>
        </item>
        <item>
@@ -404,19 +394,6 @@
         <widget class="QPushButton" name="stopAddButton">
          <property name="text">
           <string>Cancel adding</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="validateLabelAdd">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string/>
          </property>
         </widget>
        </item>
