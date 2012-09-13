@@ -1412,7 +1412,7 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
             i++;
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
                 if(!mediaWidget->display()->camDisplay()->isRunning()) {
-                    mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i)*1000, 0);
+                    mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i) * 1000, 0);
                     mediaWidget->display()->camDisplay()->setMTDecoding(false);
                     mediaWidget->display()->camDisplay()->start();
                     mediaWidget->display()->archiveReader()->startPaused();
