@@ -70,7 +70,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth)
+QnResourcePtr QnPlPulseSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
     return QnResourcePtr(0);
 }

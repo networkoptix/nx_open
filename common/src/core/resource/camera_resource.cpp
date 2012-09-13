@@ -7,6 +7,7 @@ Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
       m_audioEnabled(false),
+      m_manuallyAdded(false),
       m_advancedWorking(false)
 {
     static volatile bool metaTypesInitialized = false;
@@ -130,6 +131,7 @@ void QnVirtualCameraResource::updateInner(QnResourcePtr other)
     {
         m_scheduleDisabled = camera->isScheduleDisabled();
         m_audioEnabled = camera->isAudioEnabled();
+        m_manuallyAdded = camera->isManuallyAdded();
     }
 }
 
@@ -160,6 +162,16 @@ bool QnVirtualCameraResource::isAudioEnabled() const
 {
     return m_audioEnabled;
 }
+
+bool QnVirtualCameraResource::isManuallyAdded() const
+{
+    return m_manuallyAdded;
+}
+void QnVirtualCameraResource::setManuallyAdded(bool value)
+{
+    m_manuallyAdded = value;
+}
+
 
 bool QnVirtualCameraResource::isAdvancedWorking() const
 {

@@ -176,9 +176,6 @@ QPixmap QnSkin::pixmap(const QIcon &icon, int extent, QIcon::Mode mode, QIcon::S
 QStyle *QnSkin::style() {
     QString baseStyleName;
 #ifndef Q_OS_DARWIN
-#   ifdef CL_CUSTOMIZATION_PRESET
-    qputenv("BESPIN_PRESET", CL_CUSTOMIZATION_PRESET);
-#   endif
     baseStyleName = QLatin1String("Bespin");
 #else
     baseStyleName = QLatin1String("cleanlooks");

@@ -33,13 +33,13 @@ QString OnvifResourceSearcher::manufacture() const
 }
 
 
-QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth)
+QnResourcePtr OnvifResourceSearcher::checkHostAddr(QHostAddress addr, QAuthenticator auth, int port)
 {
     QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
     if (!typePtr)
         return QnResourcePtr();
 
-    int onvifPort = 80;
+    int onvifPort = port ? port : 80;
     QString onvifUrl(QLatin1String("onvif/device_service"));
 
     QnPlOnvifResourcePtr resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
