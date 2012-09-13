@@ -12,14 +12,13 @@ namespace Ui {
     class CameraAdditionDialog;
 }
 
-namespace detail {
-
-    class CheckCamerasFoundReplyProcessor: public QObject
+namespace detail{
+    class ManualCameraReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
 
-        CheckCamerasFoundReplyProcessor(QObject *parent = NULL):
+        ManualCameraReplyProcessor(QObject *parent = NULL):
             QObject(parent),
             m_cancelled(false)
         {}
@@ -32,28 +31,33 @@ namespace detail {
         void replyReceived();
 
     public slots:
-        void processReply(const QnCamerasFoundInfoList &cameras)
+        void processSearchReply(const QnCamerasFoundInfoList &cameras)
         {
             if (m_cancelled)
                 return;
 
             m_cameras = cameras;
-            qDebug() << "data received count" << cameras.count();
+            emit replyReceived();
+        }
+
+        void processAddReply(int status){
+            if (m_cancelled)
+                return;
+
+            m_AddStatus = status;
             emit replyReceived();
         }
 
         void cancel(){
             m_cancelled = true;
-            qDebug() << "request cancelled";
         }
 
     private:
         QnCamerasFoundInfoList m_cameras;
+        int m_AddStatus;
         bool m_cancelled;
     };
-
-} // namespace detail
-
+}
 
 class QnCameraAdditionDialog: public QnButtonBoxDialog {
     Q_OBJECT
