@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>287</width>
+    <width>302</width>
     <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -29,7 +29,7 @@
    <item>
     <widget class="QToolBox" name="stagesToolBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -42,7 +42,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>269</width>
+        <width>284</width>
         <height>344</height>
        </rect>
       </property>
@@ -164,9 +164,6 @@
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
-           <property name="inputMask">
-            <string>009.009.009.009;_</string>
-           </property>
           </widget>
          </item>
          <item row="3" column="0">
@@ -193,9 +190,6 @@
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
            </property>
-           <property name="inputMask">
-            <string>009.009.009.009;_</string>
-           </property>
           </widget>
          </item>
          <item row="4" column="0">
@@ -221,9 +215,6 @@
           <widget class="QnIpLineEdit" name="endIPLineEdit">
            <property name="inputMethodHints">
             <set>Qt::ImhDigitsOnly</set>
-           </property>
-           <property name="inputMask">
-            <string>009.009.009.009;_</string>
            </property>
           </widget>
          </item>
@@ -304,7 +295,7 @@
        </sizepolicy>
       </property>
       <attribute name="label">
-       <string>Add found cameras</string>
+       <string>Add discovered cameras</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <property name="margin">

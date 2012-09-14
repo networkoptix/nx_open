@@ -35,10 +35,60 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
 
     ui->addProgressBar->setVisible(false);
     ui->stopAddButton->setVisible(false);
-    ui->addPage->setVisible(false);
+
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
     connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
+
+    ui->loginLineEdit->installEventFilter(this);
+    ui->passwordLineEdit->installEventFilter(this);
+    ui->startIPLineEdit->installEventFilter(this);
+    ui->endIPLineEdit->installEventFilter(this);
+    ui->iPAddressLineEdit->installEventFilter(this);
+    ui->iPAddressLineEdit->setFocus();
+
+    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->validateLabelSearch->setPalette(palette);
+}
+
+QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
+    base_type(parent),
+    ui(new Ui::CameraAdditionDialog),
+    m_server(0)
+{
+    qDebug() << "REMOVE DIALOG CONSTRUCTOR!!!";
+
+    ui->setupUi(this);
+
+    setButtonBox(ui->buttonBox);
+
+    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLabel, SLOT(setVisible(bool)));
+    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLineEdit, SLOT(setVisible(bool)));
+    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), this, SLOT(at_singleRadioButton_toggled(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLabel, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLineEdit, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLabel, SLOT(setVisible(bool)));
+    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLineEdit, SLOT(setVisible(bool)));
+    connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
+
+    ui->startIPLabel->setVisible(false);
+    ui->startIPLineEdit->setVisible(false);
+    ui->endIPLabel->setVisible(false);
+    ui->endIPLineEdit->setVisible(false);
+    ui->scanProgressBar->setVisible(false);
+    ui->stopScanButton->setVisible(false);
+    ui->validateLabelSearch->setVisible(false);
+
+    ui->addProgressBar->setVisible(false);
+    ui->stopAddButton->setVisible(false);
+
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
+
+    connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
 
     ui->loginLineEdit->installEventFilter(this);
     ui->passwordLineEdit->installEventFilter(this);
@@ -63,9 +113,12 @@ bool QnCameraAdditionDialog::eventFilter(QObject *object, QEvent *event){
             object == ui->startIPLineEdit ||
             object == ui->endIPLineEdit ||
             object == ui->iPAddressLineEdit)
-        ui->scanButton->setFocus();
-        event->ignore();
-        return false;
+        {
+            ui->scanButton->setFocus();
+            qDebug() << "scan button focused";
+            event->ignore();
+            return false;
+        }
     }
     return QnButtonBoxDialog::eventFilter(object, event);
 }
@@ -103,41 +156,51 @@ void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){
         ui->startIPLineEdit->setText(ui->iPAddressLineEdit->text());
 }
 
+void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
+    QString endValue = ui->endIPLineEdit->text();
+    if (QHostAddress(value).toIPv4Address() > QHostAddress(endValue).toIPv4Address())
+        ui->endIPLineEdit->setText(value);
+    else
+        ui->endIPLineEdit->setText(value.mid(0, 7) + endValue.mid(7));
+}
+
 void QnCameraAdditionDialog::at_scanButton_clicked(){
-    QString startAddr;
-    QString endAddr;
+    QString startAddrStr;
+    QString endAddrStr;
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
     int port = ui->portSpinBox->value();
 
     if (ui->rangeRadioButton->isChecked()){
-        startAddr = ui->startIPLineEdit->text();
-        endAddr = ui->endIPLineEdit->text();
+        startAddrStr = ui->startIPLineEdit->text();
+        endAddrStr = ui->endIPLineEdit->text();
     }else{
-        startAddr = ui->iPAddressLineEdit->text();
-        endAddr = startAddr;
+        startAddrStr = ui->iPAddressLineEdit->text();
+        endAddrStr = startAddrStr;
     }
 
+    QHostAddress startAddr(startAddrStr);
+    QHostAddress endAddr(endAddrStr);
 
-    // TODO: #gdm move validation to QnIpLineEdit
-    if (QHostAddress(startAddr).isNull()){
-        ui->validateLabelSearch->setText(tr("Ip address \"%1\" is invalid").arg(startAddr));
+    if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
+        ui->validateLabelSearch->setText(tr("First address in range is greater than last"));
         ui->validateLabelSearch->setVisible(true);
         return;
     }
 
-    if (QHostAddress(endAddr).isNull()){
-        ui->validateLabelSearch->setText(tr("Ip address \"%1\" is invalid").arg(endAddr));
+    if (!endAddr.isInSubnet(startAddr, 16)){
+        ui->validateLabelSearch->setText(tr("Ip address range is too big"));
         ui->validateLabelSearch->setVisible(true);
         return;
     }
+
 
     ui->validateLabelSearch->setVisible(false);
 
     ui->buttonBox->setEnabled(false);
-//    ui->camerasGroupBox->setVisible(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
+    ui->scanButton->setEnabled(false);
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
@@ -146,21 +209,24 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
+    if (m_server){
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
-                                                 startAddr, endAddr, username, password, port);
+                                                 startAddrStr, endAddrStr, username, password, port);
+    }
 
     eventLoop->exec();
 
+    ui->scanButton->setEnabled(true);
     ui->stopScanButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
-//    ui->camerasGroupBox->setVisible(true);
+//TODO: #gdm - uncomment
     // if (processor->camerasFound().count() > 0){
-    //
-    ui->addPage->setVisible(true);
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), true);
     ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
     fillTable(processor->camerasFound());
+    //}
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked(){
@@ -184,7 +250,9 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     ui->buttonBox->setEnabled(false);
     ui->addProgressBar->setVisible(true);
     ui->stopAddButton->setVisible(true);
-    ui->searchPage->setEnabled(false);
+    ui->addButton->setEnabled(false);
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->searchPage), false);
+
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
@@ -193,16 +261,19 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     connect(ui->stopAddButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopAddButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
+    if (m_server){
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
                                               urls, manufacturers, username, password);
+    }
 
     eventLoop->exec();
 
-    ui->stopScanButton->setVisible(false);
+    ui->stopAddButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
-    ui->scanProgressBar->setVisible(false);
-    ui->searchPage->setEnabled(true);
+    ui->addProgressBar->setVisible(false);
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->searchPage), true);
+    ui->addButton->setEnabled(true);
 
     if (!processor->isCancelled()){
         if (processor->addSuccess())

@@ -74,6 +74,7 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
+    explicit QnCameraAdditionDialog(QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
 protected:
     virtual bool eventFilter(QObject *, QEvent *) override;
@@ -82,6 +83,7 @@ private:
 
 private slots: 
     void at_singleRadioButton_toggled(bool toggled);
+    void at_startIPLineEdit_textChanged(QString value);
 
     void at_scanButton_clicked();
     void at_addButton_clicked();

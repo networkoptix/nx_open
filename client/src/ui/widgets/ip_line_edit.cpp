@@ -8,7 +8,6 @@ class IpAddressValidator: public QValidator{
         QStringList sections = input.split(QLatin1Char('.'));
         int s = sections.size();
         if(s > 4){
-            qDebug() << "invalid on sections size" << pos << input;
             return Invalid;
         }
 
@@ -21,22 +20,18 @@ class IpAddressValidator: public QValidator{
             }
             int val = section.toInt(&ok);
             if(!ok || val<0 || val>255){
-                qDebug() << "invalid on number" << pos << input;
                 return Invalid;
             }
         }
 
         if (s < 4 || emptyGroup){
-            qDebug() << "Intermediate" << pos << input;
             return Intermediate;
         }
 
-        qDebug() << "Acceptable" << pos << input;
         return Acceptable;
     }
 
     virtual void fixup(QString &input) const override{
-        qDebug() << "fixup called on" <<input;
         QStringList sections = input.split(QLatin1Char('.'));
         while(sections.size() > 4)
             sections.removeLast();
@@ -61,7 +56,6 @@ class IpAddressValidator: public QValidator{
             input.append(QLatin1Char('.'));
         }
         input.append(sections[3]);
-        qDebug() << "fixup result" <<input;
     }
 
 };
@@ -69,7 +63,7 @@ class IpAddressValidator: public QValidator{
 
 QnIpLineEdit::QnIpLineEdit(QWidget *parent):
     QLineEdit(parent){
-    setInputMask(QLatin1String("009.009.009.009;"));
+    setInputMask(QLatin1String("900.900.900.900;"));
     setValidator(new IpAddressValidator());
     setText(QLatin1String("127.0.0.1"));
 }
