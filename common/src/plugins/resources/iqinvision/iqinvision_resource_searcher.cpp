@@ -69,6 +69,7 @@ QString QnPlIqResourceSearcher::manufacture() const
 QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
     Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 
@@ -232,7 +233,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
         if (!bindToInterface(receiveSock, iface, NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
-        for (int i = 0; i < sizeof(requests)/sizeof(char*); ++i)
+        for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
         {
             // sending broadcast
             QByteArray datagram(requests[i], REQUEST_SIZE);

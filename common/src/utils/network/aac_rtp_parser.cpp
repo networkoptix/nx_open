@@ -90,14 +90,14 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspSt
     QVector<int> auIndex;
     QVector<int> auCtsDelta;
     QVector<int> auDtsDelta;
-    bool rapFlag = false;
-    int streamStateValue = 0;
+    //bool rapFlag = false;
+    //int streamStateValue = 0;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     quint8* end = rtpBuffer + bufferSize;
 
-    bool isLastPacket = rtpHeader->marker;
+    //bool isLastPacket = rtpHeader->marker;
     try 
     {
         if (m_auHeaderExists)
@@ -130,9 +130,11 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspSt
                         auDtsDelta << 0;
                 }
                 if (m_randomAccessIndication)
-                    rapFlag = reader.getBit();
+                    //rapFlag = reader.getBit();
+                    reader.skipBit();
                 if (m_streamStateIndication)
-                    streamStateValue = reader.getBits(m_streamStateIndication);
+                    //streamStateValue = reader.getBits(m_streamStateIndication);
+                    reader.skipBits(m_streamStateIndication);
             }
             curPtr += qPower2Ceil(auHeaderLen, 8)/8;
         }

@@ -135,6 +135,8 @@ unsigned short checksum(const struct icmp& packet)
 
 bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetSize)
 {
+    Q_UNUSED(packetSize)
+
     long rnd;
 
 #ifdef Q_OS_MAC

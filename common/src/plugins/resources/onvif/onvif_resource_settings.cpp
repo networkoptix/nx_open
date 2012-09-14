@@ -552,7 +552,7 @@ bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSet
 
     output.setMin(ALL_VALUES_STR);
     output.setMax(ALL_VALUES_STR);
-    output.setCurrent(valsResp.ImagingSettings->WhiteBalance->Mode == onvifXsd__ExposurePriority__LowNoise? LOW_NOISE_STR : FRAME_RATE_STR);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->Priority) == onvifXsd__ExposurePriority__LowNoise ? LOW_NOISE_STR : FRAME_RATE_STR);//
 
     return true;
 }

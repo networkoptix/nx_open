@@ -224,7 +224,7 @@ public:
 
 class VC1Frame: public VC1Unit {
 public:
-	VC1Frame(): VC1Unit(), rptfrm(0), fcm(0), rff(0), rptfrmBitPos(0) {}
+    VC1Frame(): VC1Unit(), fcm(0), rptfrm(0), rff(0), rptfrmBitPos(0) {}
 	int fcm;
 	int interpfrm;
 	int framecnt;

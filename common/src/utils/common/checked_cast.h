@@ -7,34 +7,34 @@
 template<class Target, class Source>
 Target checked_cast(Source *source) {
     // static_assert(boost::is_pointer<Target>::value, "Target type must be a pointer");
-#ifndef NDEBUG
+#ifdef _DEBUG
     Target result = dynamic_cast<Target>(source);
     assert(source == NULL || result != NULL);
     return result;
 #else
     return static_cast<Target>(source);
-#endif // NDEBUG
+#endif // _DEBUG
 }
 
 template<class Target, class Source>
 Target checked_cast(Source &source) {
     // static_assert(boost::is_reference<Target>::value, "Target type must be a reference");
-#ifndef NDEBUG
+#ifdef _DEBUG
     return dynamic_cast<Target>(source);
 #else
     return static_cast<Target>(source);
-#endif // NDEBUG
+#endif // _DEBUG
 }
 
 template<class Target, class Source>
 QSharedPointer<Target> checked_cast(const QSharedPointer<Source> &source) {
-#ifndef NDEBUG
+#ifdef _DEBUG
     QSharedPointer<Target> result = source.template dynamicCast<Target>();
     assert(source.isNull() || !result.isNull());
     return result;
 #else
-    return source.staticCast<Target>();
-#endif // NDEBUG
+    return source.template staticCast<Target>();
+#endif // _DEBUG
 }
 
 /**

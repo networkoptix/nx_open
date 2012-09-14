@@ -1,11 +1,13 @@
 #!/bin/bash
 
+COMPANY_NAME=${deb.customization.company.name}
+
 #. ../common.sh
-PACKAGENAME=${deb.customization.company.name}-entcontroller
+PACKAGENAME=${COMPANY_NAME}-entcontroller
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/${deb.customization.company.name}/entcontroller
+TARGET=/opt/${COMPANY_NAME}/entcontroller
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 ETCTARGET=$TARGET/etc
@@ -53,8 +55,8 @@ chmod 644 $BINSTAGE/library.zip
 touch $ETCSTAGE/entcontroller.conf
 
 # Copy upstart and sysv scripts
-install -m 644 init/networkoptix-entcontroller.conf $INITSTAGE/${deb.customization.company.name}-entcontroller.conf
-install -m 644 init.d/networkoptix-entcontroller $INITDSTAGE/${deb.customization.company.name}-entcontroller
+install -m 644 init/networkoptix-entcontroller.conf $INITSTAGE/${COMPANY_NAME}-entcontroller.conf
+install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${COMPANY_NAME}-entcontroller
 
 
 ################ Media Proxy
@@ -76,8 +78,8 @@ find $SHARESTAGE -name \*.pyc -delete
 
 # Copy mediaproxy startup script
 install -m 755 bin/mediaproxy $BINSTAGE
-install -m 644 init/networkoptix-mediaproxy.conf $INITSTAGE/${deb.customization.company.name}-mediaproxy.conf
-install -m 644 init.d/networkoptix-mediaproxy $INITDSTAGE/${deb.customization.company.name}-mediaproxy
+install -m 644 init/networkoptix-mediaproxy.conf $INITSTAGE/${COMPANY_NAME}-mediaproxy.conf
+install -m 755 init.d/networkoptix-mediaproxy $INITDSTAGE/${COMPANY_NAME}-mediaproxy
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN

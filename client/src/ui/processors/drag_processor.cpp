@@ -22,8 +22,8 @@ DragProcessor::DragProcessor(QObject *parent):
     m_startDragTime(QApplication::startDragTime()),
     m_handler(NULL),
     m_state(Waiting),
-    m_dragTimerId(0),
     m_transitionCounter(0),
+    m_dragTimerId(0),
     m_firstDragSent(false)
 {}
 
@@ -91,6 +91,8 @@ void DragProcessor::checkThread(QObject *object) {
         qnCritical("Processing an event for an object from another thread.");
         return;
     }
+#else
+    Q_UNUSED(object)
 #endif
 }
 
@@ -104,6 +106,8 @@ void DragProcessor::checkThread(QGraphicsItem *item) {
     QGraphicsObject *object = item->toGraphicsObject();
     if(object != NULL)
         checkThread(static_cast<QObject *>(object));
+#else
+    Q_UNUSED(item)
 #endif
 }
 

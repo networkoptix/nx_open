@@ -18,15 +18,15 @@ struct CameraInfo: public EndpointAdditionalInfo
     CameraInfo() {}
 
     CameraInfo(const QString& newOnvifUrl, const EndpointAdditionalInfo& additionalInfo):
-        onvifUrl(newOnvifUrl),
-        EndpointAdditionalInfo(additionalInfo)
+        EndpointAdditionalInfo(additionalInfo),
+        onvifUrl(newOnvifUrl)
     {
 
     }
 
     CameraInfo(const CameraInfo& src) :
-    onvifUrl(src.onvifUrl),
-        EndpointAdditionalInfo(src)
+        EndpointAdditionalInfo(src),
+        onvifUrl(src.onvifUrl)
     {
 
     }

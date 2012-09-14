@@ -137,4 +137,5 @@ if [ -e "/etc/init/$COMPANY_NAME-mediaproxy.conf" ]; then
 	invoke-rc.d $COMPANY_NAME-mediaproxy start || exit $?
 fi
 update-rc.d -f $COMPANY_NAME-mediaproxy remove >/dev/null || exit $?
+
 exit 0
