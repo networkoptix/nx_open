@@ -594,6 +594,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         cl_log.log("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
+    return true;
 }
 
 struct ManualSearcherHelper
