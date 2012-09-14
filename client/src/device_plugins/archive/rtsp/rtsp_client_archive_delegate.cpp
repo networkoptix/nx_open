@@ -139,7 +139,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
         if (otherCamera && otherRtspSession.open(getUrl(otherCamera)))
         {
-            if (otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+            if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
             {
                 return otherRtspSession.startTime();
             }
@@ -215,7 +215,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
-    if (m_globalMinArchiveTime == 0 && m_rtspSession.startTime() != AV_NOPTS_VALUE) {
+    if (m_globalMinArchiveTime == 0 && (quint64)m_rtspSession.startTime() != AV_NOPTS_VALUE) {
         m_globalMinArchiveTime = m_rtspSession.startTime(); // block multiserver archive left point as current server left point (zerro velue mean: read value from current server)
         globalTimeBlocked = true;
     }
@@ -223,7 +223,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     bool isOpened = m_rtspSession.open(getUrl(resource));
 
     qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
-    if (globalMinTime !=AV_NOPTS_VALUE)
+    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
         m_globalMinArchiveTime = globalMinTime;
     else if (globalTimeBlocked)
         m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
@@ -272,7 +272,7 @@ qint64 QnRtspClientArchiveDelegate::startTime()
     //qint64 minTime = QnCameraHistoryPool::instance()->getMinTime(qSharedPointerDynamicCast<QnNetworkResource> (m_resource));
     //if (minTime != AV_NOPTS_VALUE)
     //    return minTime*1000;
-    if (m_globalMinArchiveTime == AV_NOPTS_VALUE)
+    if ((quint64)m_globalMinArchiveTime == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
 
     if (m_globalMinArchiveTime != 0)
@@ -317,7 +317,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                     "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
                     QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
 
-        if (m_lastSeekTime == AV_NOPTS_VALUE)
+        if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
         if (newResource) {

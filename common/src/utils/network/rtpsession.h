@@ -224,6 +224,8 @@ private:
     int m_responseCode;
     bool m_isAudioEnabled;
     bool m_useDigestAuth;
+    int m_numOfPredefinedChannels;
+    unsigned int m_TimeOut;
     // end of initialized fields
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
@@ -241,8 +243,6 @@ private:
     // format: key - track number, value - codec name
     TrackMap m_sdpTracks;
 
-    unsigned int m_TimeOut;
-
     QTime m_keepAliveTime;
 
     friend class RTPIODevice;
@@ -254,7 +254,6 @@ private:
 
     QString m_realm;
     QString m_nonce;
-    int m_numOfPredefinedChannels;
 };
 
 #endif //rtp_session_h_1935_h

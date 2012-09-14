@@ -37,7 +37,7 @@ void MDNSPacket::fromDatagram(QByteArray& datagram)
                 break;
             }
         }
-        query.queryData;
+        //query.queryData;
     }
 
     for (int i = 0; i < authorityRRs; i++)

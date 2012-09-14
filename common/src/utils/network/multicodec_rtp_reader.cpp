@@ -15,12 +15,12 @@ extern QSettings qSettings;
 static const int RTSP_RETRY_COUNT = 6;
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
-QnResourceConsumer(res),
-m_videoParser(0),
-m_audioParser(0),
-m_videoIO(0),
-m_audioIO(0),
-m_pleaseStop(false)
+    QnResourceConsumer(res),
+    m_videoIO(0),
+    m_audioIO(0),
+    m_videoParser(0),
+    m_audioParser(0),
+    m_pleaseStop(false)
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
