@@ -116,5 +116,7 @@ void DwDvrResourceSearcher::getCamerasFromDvr(QnResourceList& resources, const Q
 
 QnResourcePtr DwDvrResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr();
 }

@@ -218,7 +218,7 @@ void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
 bool QnCamDisplay::canSwitchToHighQuality()
 {
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return true;
+        return false;
 
     QMutexLocker lock(&m_qualityMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();

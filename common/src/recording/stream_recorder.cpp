@@ -18,21 +18,22 @@ extern QMutex global_ffmpeg_mutex;
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+
     m_device(dev),
     m_firstTime(true),
-    m_packetWrited(false),
-    m_formatCtx(0),
     m_truncateInterval(0),
-    m_startDateTime(AV_NOPTS_VALUE),
     m_endDateTime(AV_NOPTS_VALUE),
-    m_startOffset(0),
-    m_forceDefaultCtx(true),
-    m_prebufferingUsec(0),
+    m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
     m_waitEOF(false),
+    m_forceDefaultCtx(true),
+    m_formatCtx(0),
+    m_packetWrited(false),
+    m_startOffset(0),
+    m_prebufferingUsec(0),
+    m_EofDateTime(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
-    m_EofDateTime(AV_NOPTS_VALUE),
     m_needCalcSignature(false),
     m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
@@ -463,11 +464,13 @@ int QnStreamRecorder::getPrebufferingUsec() const
 
 bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
+    Q_UNUSED(media)
     return true;
 }
 
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 {
+    Q_UNUSED(media)
     return true;
 }
 

@@ -23,13 +23,15 @@ namespace {
 */
 static void
 calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
-{ int i;
-  time_t r = time(NULL);
-  memcpy(nonce, &r, 4);
-  for (i = 4; i < SOAP_WSSE_NONCELEN; i += 4)
-  { r = soap_random;
-    memcpy(nonce + i, &r, 4);
-  }
+{
+    Q_UNUSED(soap)
+    int i;
+    time_t r = time(NULL);
+    memcpy(nonce, &r, 4);
+    for (i = 4; i < SOAP_WSSE_NONCELEN; i += 4){
+        r = soap_random;
+        memcpy(nonce + i, &r, 4);
+    }
 }
 
 /**

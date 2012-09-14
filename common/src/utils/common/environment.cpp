@@ -66,6 +66,8 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
         << QLatin1String("tell application \"Finder\" to activate");
     QProcess::execute("/usr/bin/osascript", scriptArgs);
 #else
+    Q_UNUSED(parent)
+    Q_UNUSED(path)
     /* We cannot select a file here, because no file browser really supports it... */
     // TODO: implement as in Qt Creator.
 #endif

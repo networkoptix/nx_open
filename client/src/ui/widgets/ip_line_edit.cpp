@@ -1,9 +1,13 @@
 #include "ip_line_edit.h"
 
 #include <QtGui/QValidator>
+#include <QtGui/QKeyEvent>
+
+#define DOT QLatin1Char('.')
 
 class IpAddressValidator: public QValidator{
     virtual QValidator::State validate(QString &input, int &pos) const override{
+        Q_UNUSED(pos)
 
         QStringList sections = input.split(QLatin1Char('.'));
         int s = sections.size();
@@ -32,7 +36,7 @@ class IpAddressValidator: public QValidator{
     }
 
     virtual void fixup(QString &input) const override{
-        QStringList sections = input.split(QLatin1Char('.'));
+        QStringList sections = input.split(DOT);
         while(sections.size() > 4)
             sections.removeLast();
         while (sections.size() < 4)
@@ -53,7 +57,7 @@ class IpAddressValidator: public QValidator{
         input.clear();
         for (int i = 0; i < 3; i++){
             input.append(sections[i]);
-            input.append(QLatin1Char('.'));
+            input.append(DOT);
         }
         input.append(sections[3]);
     }
@@ -63,7 +67,29 @@ class IpAddressValidator: public QValidator{
 
 QnIpLineEdit::QnIpLineEdit(QWidget *parent):
     QLineEdit(parent){
-    setInputMask(QLatin1String("900.900.900.900;"));
     setValidator(new IpAddressValidator());
     setText(QLatin1String("127.0.0.1"));
+}
+
+void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
+    if (event->key() >= QLatin1Char('0') && event->key() <= QLatin1Char('9')){
+        QLineEdit::keyPressEvent(event);
+
+        QString input = text();
+        QStringList sections = input.split(DOT);
+        QString last = sections.last();
+
+        bool ok;
+        int val = last.toInt(&ok);
+        if (sections.count() < 4  && ok && val*10 > 255)
+            setText(input + DOT);
+    }else if (event->key() == 32){
+
+        QString input = text();
+        QStringList sections = input.split(DOT);
+        if (sections.count() < 4)
+            setText(input + DOT);
+        event->setAccepted(true);
+    } else
+        QLineEdit::keyPressEvent(event);
 }

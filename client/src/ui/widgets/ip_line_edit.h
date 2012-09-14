@@ -8,7 +8,8 @@ class QnIpLineEdit: public QLineEdit{
 
 public:
     explicit QnIpLineEdit(QWidget* parent=0);
-
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // IP_LINE_EDIT_H

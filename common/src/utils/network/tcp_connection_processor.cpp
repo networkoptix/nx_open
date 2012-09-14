@@ -161,7 +161,7 @@ void QnTCPConnectionProcessor::clearBuffer()
 */
 void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
-    Q_D(QnTCPConnectionProcessor);
+    //Q_D(QnTCPConnectionProcessor);
     sendData(sendBuffer.data(), sendBuffer.size());
 }
 

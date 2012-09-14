@@ -232,7 +232,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 
     while (packet.stream_index >= m_lastPacketTimes.size())
         m_lastPacketTimes << 0;
-    if (data->timestamp == AV_NOPTS_VALUE) {
+    if ((quint64)data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
         if (stream->r_frame_rate.num)
