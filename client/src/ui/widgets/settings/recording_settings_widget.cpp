@@ -293,6 +293,8 @@ void QnRecordingSettingsWidget::onMonitorChanged(int index)
     {
         ui->disableAeroCheckBox->setEnabled(true);
     }
+#else
+    Q_UNUSED(index)
 #endif
 }
 
@@ -308,6 +310,8 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
         l->setPixmap(icon.scaled(ICON_SIZE, ICON_SIZE));
     else
         setDefaultSoundIcon(l);
+#else
+    Q_UNUSED(index)
 #endif
 }
 

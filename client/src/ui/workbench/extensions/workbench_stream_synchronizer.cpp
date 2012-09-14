@@ -24,8 +24,8 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_widgetCount(0),
-    m_syncPlay(NULL),
-    m_counter(NULL)
+    m_counter(NULL),
+    m_syncPlay(NULL)
 {
     /* Prepare syncplay. */
     m_syncPlay = new QnArchiveSyncPlayWrapper(); // TODO: QnArchiveSyncPlayWrapper destructor doesn't get called, investigate.

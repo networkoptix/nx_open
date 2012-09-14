@@ -197,8 +197,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     QWidget(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::ResourceTreeWidget()),
-    m_filterTimerId(0),
-    m_ignoreFilterChanges(false)
+    m_ignoreFilterChanges(false),
+    m_filterTimerId(0)
 {
     ui->setupUi(this);
 

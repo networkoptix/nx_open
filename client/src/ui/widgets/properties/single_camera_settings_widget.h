@@ -107,7 +107,7 @@ private:
     void cleanAdvancedSettings();
 
 private:
-    Q_DISABLE_COPY(QnSingleCameraSettingsWidget);
+    Q_DISABLE_COPY(QnSingleCameraSettingsWidget)
 
     QScopedPointer<Ui::SingleCameraSettingsWidget> ui;
     QnVirtualCameraResourcePtr m_camera;
