@@ -552,7 +552,7 @@ bool ImagingExposurePriorityOperation::get(CameraSetting& output, OnvifCameraSet
 
     output.setMin(ALL_VALUES_STR);
     output.setMax(ALL_VALUES_STR);
-    output.setCurrent(valsResp.ImagingSettings->WhiteBalance->Mode == onvifXsd__ExposurePriority__LowNoise? LOW_NOISE_STR : FRAME_RATE_STR);
+    output.setCurrent(*(valsResp.ImagingSettings->Exposure->Priority) == onvifXsd__ExposurePriority__LowNoise ? LOW_NOISE_STR : FRAME_RATE_STR);//
 
     return true;
 }
@@ -1144,7 +1144,7 @@ OnvifCameraSetting::OnvifCameraSetting(
         const OnvifCameraSettingOperationAbstract& operation, const QString& id, const QString& name, 
         WIDGET_TYPE type, const QString& query, const QString& description, 
         const CameraSettingValue min, const CameraSettingValue max, const CameraSettingValue step, const CameraSettingValue current) :
-    CameraSetting(id, name, type, query, description, min, max, step, current),
+    CameraSetting(id, name, type, QLatin1String(""), query, description, min, max, step, current),
     m_operation(&operation)
 {
 

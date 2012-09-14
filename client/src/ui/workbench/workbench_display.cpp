@@ -1374,15 +1374,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
         }
 
-        // TODO: don't start reader for thumbnails search
-        //widget->display()->archiveReader()->pauseMedia();
-        //widget->display()->camDisplay()->playAudio(false);
-        //widget->display()->archiveReader()->setSingleShotMode(true);
-
         if(hasTimeLabels) {
             widget->setDecorationsVisible(true, false);
             widget->setInfoVisible(true, false);
-            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
+            
+            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(time).toString(tr("hh:mm:ss"));
+            widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
     }
 
