@@ -3,9 +3,9 @@
 
 KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),
+    mState(Measuring),
     mType(type),
     mFlags(0),
-    mState(Measuring),
     mHandler(NULL),
     mMaxShiftCount(DEFAULT_MAX_SHIFT_COUNT),
     mMaxShiftInterval(DEFAULT_MAX_SHIFT_INTERVAL_MSEC / 1000.0),

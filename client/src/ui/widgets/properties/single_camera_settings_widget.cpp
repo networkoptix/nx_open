@@ -21,14 +21,14 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::SingleCameraSettingsWidget),
-    m_motionWidget(NULL),
+    m_cameraSupportsMotion(false),
     m_hasCameraChanges(false),
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
     m_readOnly(false),
+    m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
-    m_cameraSupportsMotion(false),
     m_widgetsRecreator(0),
     m_serverConnection(0)
 {
@@ -529,12 +529,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
         return;
     }
 
-    bool changesFound = false;
+   // bool changesFound = false;
     QList<QPair<QString, QVariant> >::ConstIterator it = params.begin();
 
     for (; it != params.end(); ++it)
     {
-        QString key = it->first;
+  //      QString key = it->first;
         QString val = it->second.toString();
 
         if (!val.isEmpty())
@@ -544,7 +544,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
 
             CameraSettings::Iterator sIt = m_cameraSettings.find(tmp->getId());
             if (sIt == m_cameraSettings.end()) {
-                changesFound = true;
+             //   changesFound = true;
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;
             }
@@ -553,14 +553,14 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
             if (CameraSettingReader::isEnabled(savedVal)) {
                 CameraSettingValue newVal = tmp->getCurrent();
                 if (savedVal.getCurrent() != newVal) {
-                    changesFound = true;
+                //    changesFound = true;
                     savedVal.setCurrent(newVal);
                 }
                 continue;
             }
 
             if (CameraSettingReader::isEnabled(*tmp)) {
-                changesFound = true;
+               // changesFound = true;
                 m_cameraSettings.erase(sIt);
                 m_cameraSettings.insert(tmp->getId(), tmp);
                 continue;

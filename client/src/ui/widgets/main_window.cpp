@@ -82,9 +82,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     base_type(parent, flags | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
-    m_drawCustomFrame(false),
     m_titleVisible(true),
-    m_dwm(NULL)
+    m_dwm(NULL),
+    m_drawCustomFrame(false)
 {
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();

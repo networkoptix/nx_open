@@ -46,8 +46,8 @@ void QnSettingsSlider::keyReleaseEvent(QKeyEvent *event)
 
 QnAbstractSettingsWidget::QnAbstractSettingsWidget(QObject* handler, CameraSetting& obj, QnSettingsScrollArea &parent, const QString& hint)
     : QWidget(0),
-      m_handler(handler),
       m_param(obj),
+      m_handler(handler),
       m_layout(new QHBoxLayout()),
       m_hint(hint)
 {
@@ -305,7 +305,7 @@ void QnSettingsTextFieldWidget::refresh()
 
 void QnSettingsTextFieldWidget::updateParam(QString val)
 {
-
+    Q_UNUSED(val)
 }
 
 //==============================================
@@ -360,5 +360,5 @@ void QnSettingsControlButtonsPairWidget::refresh()
 
 void QnSettingsControlButtonsPairWidget::updateParam(QString val)
 {
-    
+    Q_UNUSED(val)
 }

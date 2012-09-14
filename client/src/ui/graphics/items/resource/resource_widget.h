@@ -392,8 +392,8 @@ private:
     QStaticText m_unauthorizedStaticText2;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options);
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
 Q_DECLARE_METATYPE(QnResourceWidget *)
 
 #endif // QN_RESOURCE_WIDGET_H
