@@ -40,7 +40,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
-    connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
 
     ui->loginLineEdit->installEventFilter(this);
     ui->passwordLineEdit->installEventFilter(this);
