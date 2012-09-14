@@ -147,11 +147,11 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
 
     ui->validateLabelSearch->setVisible(false);
-
     ui->buttonBox->setEnabled(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
     ui->scanButton->setVisible(false);
+    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
@@ -170,12 +170,14 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->stopScanButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
-//TODO: #gdm - uncomment
-    // if (processor->camerasFound().count() > 0){
-    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), true);
-    ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
-    fillTable(processor->camerasFound());
-    //}
+
+    if (processor->camerasFound().count() > 0){
+        ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), true);
+        ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
+        fillTable(processor->camerasFound());
+    } else {
+        QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
+    }
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked(){
@@ -195,6 +197,11 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
         urls.append(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString());
         manufacturers.append(ui->camerasTable->item(row, 1)->data(Qt::UserRole).toString());
     }
+    if (urls.empty()){
+        QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"), QMessageBox::Ok);
+        return;
+    }
+
 
     ui->buttonBox->setEnabled(false);
     ui->addProgressBar->setVisible(true);
