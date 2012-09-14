@@ -16,6 +16,12 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
 {
     ui->setupUi(this);
 
+    ui->camerasTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->camerasTable->horizontalHeader()->setResizeMode(0, QHeaderView::ResizeToContents);
+    ui->camerasTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
+    ui->camerasTable->horizontalHeader()->setResizeMode(2, QHeaderView::Stretch);
+    ui->camerasTable->horizontalHeader()->setVisible(true); /* Qt designer does not save this flag (probably a bug in Qt designer). */
+
     setButtonBox(ui->buttonBox);
 
     connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLabel, SLOT(setVisible(bool)));
@@ -89,11 +95,17 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
         checkItem->setCheckState(Qt::Unchecked);
         checkItem->setData(Qt::UserRole, info.url);
 
+        QTableWidgetItem *manufItem = new QTableWidgetItem(info.manufacturer);
+        manufItem->setToolTip(info.url);
+        manufItem->setFlags(manufItem->flags() &~ Qt::ItemIsEditable);
+
         QTableWidgetItem *nameItem = new QTableWidgetItem(info.name);
-        nameItem->setData(Qt::UserRole, info.manufacturer);
+        nameItem->setToolTip(info.url);
+        nameItem->setFlags(nameItem->flags() &~ Qt::ItemIsEditable);
 
         ui->camerasTable->setItem(row, 0, checkItem);
-        ui->camerasTable->setItem(row, 1, nameItem);
+        ui->camerasTable->setItem(row, 1, manufItem);
+        ui->camerasTable->setItem(row, 2, nameItem);
     }
 }
 
@@ -114,7 +126,11 @@ void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
         return;
 
     m_inIpRangeEdit = true;
-    QHostAddress startAddr(value);
+
+    QString fixed(value);
+    ui->startIPLineEdit->validator()->fixup(fixed);
+
+    QHostAddress startAddr(fixed);
     QHostAddress endAddr(ui->endIPLineEdit->text());
 
     if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
@@ -122,7 +138,6 @@ void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
         endAddr = QHostAddress::parseSubnet(startAddr.toString() + QLatin1String("/24")).first;
         endAddr = QHostAddress(endAddr.toIPv4Address() + 255);
 
-        qDebug() << "end addr" << endAddr.toString();
         ui->endIPLineEdit->setText(endAddr.toString());
     }
     m_inIpRangeEdit = false;
@@ -134,12 +149,14 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
 
     m_inIpRangeEdit = true;
     QHostAddress startAddr(ui->startIPLineEdit->text());
-    QHostAddress endAddr(value);
 
-    if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
+    QString fixed(value);
+    ui->endIPLineEdit->validator()->fixup(fixed);
+    QHostAddress endAddr(fixed);
+
+    if (endAddr.toIPv4Address() > startAddr.toIPv4Address() &&
         endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
         startAddr = QHostAddress::parseSubnet(endAddr.toString() + QLatin1String("/24")).first;
-
         ui->startIPLineEdit->setText(startAddr.toString());
     }
     m_inIpRangeEdit = false;
@@ -229,7 +246,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
         //QnCamerasFoundInfo info = ui->camerasTable->item(row, 0)->data(Qt::UserRole);
         //qDebug() << "output info item checked" << info.name << info.manufacture << info.url;
         urls.append(ui->camerasTable->item(row, 0)->data(Qt::UserRole).toString());
-        manufacturers.append(ui->camerasTable->item(row, 1)->data(Qt::UserRole).toString());
+        manufacturers.append(ui->camerasTable->item(row, 1)->text());
     }
     if (urls.empty()){
         QMessageBox::information(this, tr("No cameras selected"), tr("Please select at least one camera"), QMessageBox::Ok);

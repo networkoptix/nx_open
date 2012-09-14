@@ -108,17 +108,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
+    m_options(DisplaySelectionOverlay | DisplayButtons),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
-    m_frameWidth(-1.0),
     m_frameOpacity(1.0),
-    m_aboutToBeDestroyedEmitted(false),
-    m_options(DisplaySelectionOverlay | DisplayButtons),
+    m_frameWidth(-1.0),
     m_titleTextFormat(QLatin1String("%1")),
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
-    m_infoTextFormatHasPlaceholder(true)
+    m_infoTextFormatHasPlaceholder(true),
+    m_aboutToBeDestroyedEmitted(false)
 {
     setAcceptHoverEvents(true);
 

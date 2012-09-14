@@ -34,11 +34,11 @@ namespace {
 
 QnSpeedSlider::QnSpeedSlider(QGraphicsItem *parent): 
     base_type(parent),
-    m_wheelStuck(false),
     m_roundedSpeed(0.0),
     m_minimalSpeedStep(1.0),
     m_defaultSpeed(1.0),
-    m_animator(new VariantAnimator(this))
+    m_animator(new VariantAnimator(this)),
+    m_wheelStuck(false)
 {
     setTickPosition(GraphicsSlider::NoTicks);
     setSpeedRange(-16.0, 16.0);

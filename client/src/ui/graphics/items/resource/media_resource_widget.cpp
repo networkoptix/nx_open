@@ -372,7 +372,7 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->setPen(QPen(QColor(255, 255, 255, 16)));
     painter->drawLines(gridLines);
 
-    if (motion && motion->channelNumber == channel) {
+    if (motion && motion->channelNumber == (quint32)channel) {
         ensureBinaryMotionMask();
 
         QPainterPath motionPath;
@@ -564,8 +564,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
-    int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
+    //struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
+    //int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
 
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
