@@ -88,7 +88,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
     m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
     m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
-    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
     resetConnectionsModel();
     updateFocus();
@@ -202,8 +201,7 @@ void LoginDialog::resetConnectionsModel() {
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
             << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
+            << new QStandardItem(connection.url.userName());
         m_connectionsModel->appendRow(row);
     }
 

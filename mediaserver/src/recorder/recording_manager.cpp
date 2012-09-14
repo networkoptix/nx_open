@@ -262,7 +262,7 @@ void QnRecordingManager::at_cameraUpdated()
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
-        if (!camera->isInitialized()) {
+        if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->init();
             if (camera->isInitialized() && camera->getStatus() == QnResource::Unauthorized)
                 camera->setStatus(QnResource::Online);
