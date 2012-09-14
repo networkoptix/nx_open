@@ -108,7 +108,6 @@ void QnPreferencesDialog::initLanguages() {
 
     foreach(const QnTranslationInfo &translation, translationManager->translations()){
         QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
-        qDebug() << translation.localeCode;
         ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
     }
 }
