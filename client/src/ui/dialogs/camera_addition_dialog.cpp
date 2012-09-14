@@ -126,7 +126,11 @@ void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
         return;
 
     m_inIpRangeEdit = true;
-    QHostAddress startAddr(value);
+
+    QString fixed(value);
+    ui->startIPLineEdit->validator()->fixup(fixed);
+
+    QHostAddress startAddr(fixed);
     QHostAddress endAddr(ui->endIPLineEdit->text());
 
     if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
@@ -145,12 +149,14 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
 
     m_inIpRangeEdit = true;
     QHostAddress startAddr(ui->startIPLineEdit->text());
-    QHostAddress endAddr(value);
 
-    if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
+    QString fixed(value);
+    ui->endIPLineEdit->validator()->fixup(fixed);
+    QHostAddress endAddr(fixed);
+
+    if (endAddr.toIPv4Address() > startAddr.toIPv4Address() &&
         endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
         startAddr = QHostAddress::parseSubnet(endAddr.toString() + QLatin1String("/24")).first;
-
         ui->startIPLineEdit->setText(startAddr.toString());
     }
     m_inIpRangeEdit = false;
