@@ -11,7 +11,8 @@
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::CameraAdditionDialog),
-    m_server(server)
+    m_server(server),
+    m_inIpRangeEdit(false)
 {
     ui->setupUi(this);
 
@@ -25,6 +26,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLabel, SLOT(setVisible(bool)));
     connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLineEdit, SLOT(setVisible(bool)));
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
+    connect(ui->endIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_endIPLineEdit_textChanged(QString)));
 
     ui->startIPLabel->setVisible(false);
     ui->startIPLineEdit->setVisible(false);
@@ -108,11 +110,39 @@ void QnCameraAdditionDialog::at_singleRadioButton_toggled(bool toggled){
 }
 
 void QnCameraAdditionDialog::at_startIPLineEdit_textChanged(QString value){
-    QString endValue = ui->endIPLineEdit->text();
-    if (QHostAddress(value).toIPv4Address() > QHostAddress(endValue).toIPv4Address())
-        ui->endIPLineEdit->setText(value);
-    else
-        ui->endIPLineEdit->setText(value.mid(0, 7) + endValue.mid(7));
+    if (m_inIpRangeEdit)
+        return;
+
+    m_inIpRangeEdit = true;
+    QHostAddress startAddr(value);
+    QHostAddress endAddr(ui->endIPLineEdit->text());
+
+    if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
+        endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
+        endAddr = QHostAddress::parseSubnet(startAddr.toString() + QLatin1String("/24")).first;
+        endAddr = QHostAddress(endAddr.toIPv4Address() + 255);
+
+        qDebug() << "end addr" << endAddr.toString();
+        ui->endIPLineEdit->setText(endAddr.toString());
+    }
+    m_inIpRangeEdit = false;
+}
+
+void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
+    if (m_inIpRangeEdit)
+        return;
+
+    m_inIpRangeEdit = true;
+    QHostAddress startAddr(ui->startIPLineEdit->text());
+    QHostAddress endAddr(value);
+
+    if (startAddr.toIPv4Address() > endAddr.toIPv4Address() ||
+        endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
+        startAddr = QHostAddress::parseSubnet(endAddr.toString() + QLatin1String("/24")).first;
+
+        ui->startIPLineEdit->setText(startAddr.toString());
+    }
+    m_inIpRangeEdit = false;
 }
 
 void QnCameraAdditionDialog::at_scanButton_clicked(){
@@ -133,13 +163,15 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     QHostAddress startAddr(startAddrStr);
     QHostAddress endAddr(endAddrStr);
 
+
+    //TODO: #gdm: not used anymore
     if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
-        ui->validateLabelSearch->setText(tr("First address in range is greater than last"));
+        ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
         ui->validateLabelSearch->setVisible(true);
         return;
     }
 
-    if (!endAddr.isInSubnet(startAddr, 16)){
+    if (!endAddr.isInSubnet(startAddr, 8)){
         ui->validateLabelSearch->setText(tr("Ip address range is too big"));
         ui->validateLabelSearch->setVisible(true);
         return;
@@ -171,12 +203,14 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
 
-    if (processor->camerasFound().count() > 0){
-        ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), true);
-        ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
-        fillTable(processor->camerasFound());
-    } else {
-        QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
+    if (!processor->isCancelled()){
+        if (processor->camerasFound().count() > 0){
+            ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), true);
+            ui->stagesToolBox->setCurrentIndex(ui->stagesToolBox->indexOf(ui->addPage));
+            fillTable(processor->camerasFound());
+        } else {
+            QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
+        }
     }
 }
 
