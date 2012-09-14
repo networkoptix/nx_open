@@ -51,6 +51,7 @@ QString QnPlISDResourceSearcher::manufacture() const
 QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
     Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 

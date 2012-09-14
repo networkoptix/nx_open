@@ -83,6 +83,7 @@ private:
 private slots: 
     void at_singleRadioButton_toggled(bool toggled);
     void at_startIPLineEdit_textChanged(QString value);
+    void at_endIPLineEdit_textChanged(QString value);
 
     void at_scanButton_clicked();
     void at_addButton_clicked();
@@ -92,6 +93,8 @@ private:
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
     QnVideoServerResourcePtr m_server;
+
+    bool m_inIpRangeEdit;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

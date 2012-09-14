@@ -23,9 +23,9 @@ protected:
     virtual bool isStreamOpened() const override;
 
 
-    void updateStreamParamsBasedOnQuality() override {};
+    void updateStreamParamsBasedOnQuality() override {}
 
-    void updateStreamParamsBasedOnFps() override {};
+    void updateStreamParamsBasedOnFps() override {}
 private:
     QnMulticodecRtpReader m_rtpReader;
     QString m_request;
