@@ -1196,7 +1196,6 @@ EXPORT void speex_echo_cancellation(SpeexEchoState *st, const spx_int16_t *in, c
 /* Compute spectrum of estimated echo for use in an echo post-filter */
 void speex_echo_get_residual(SpeexEchoState *st, spx_word32_t *residual_echo, int len)
 {
-   (void)len;
    int i;
    spx_word16_t leak2;
    int N;
