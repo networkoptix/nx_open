@@ -170,6 +170,19 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         CameraSettingsTreeLister lister(id.toString());
         QStringList settings = lister.proceed();
 
+#if 0
+        if(m_widgetsRecreator) {
+            m_cameraSettings.clear();
+            foreach(const QString &setting, settings) {
+                CameraSettingPtr tmp(new CameraSetting());
+                tmp->deserializeFromStr(setting);
+                m_cameraSettings.insert(tmp->getId(), tmp);
+            }
+            
+            m_widgetsRecreator->proceed(&m_cameraSettings);
+        }
+#endif
+
         qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
         serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
     }
