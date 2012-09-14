@@ -99,6 +99,7 @@ unix {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
   QMAKE_CXXFLAGS += -msse2
+  QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
   DEFINES += ${linux.defines}
 }
 

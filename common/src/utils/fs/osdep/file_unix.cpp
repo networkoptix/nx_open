@@ -4,6 +4,8 @@
 *	Date: 13 oct 2006
 ***********************************************************************/
 
+#include <qglobal.h>
+
 #if defined(Q_OS_DARWIN) || defined(Q_OS_LINUX)
 
 #include <QDebug>
@@ -112,8 +114,6 @@ bool QnFile::isOpen() const
 
 qint64 QnFile::size() const
 {
-    bool res = false;
-
     struct stat64 buf;
 
     if( isOpen() &&  ( fstat64( (long)m_impl, &buf ) == 0 ) )
