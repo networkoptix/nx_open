@@ -253,7 +253,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
         {
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
-            if (m_delayedFrameCount > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
+            if ((m_delayedFrameCount > 10 || realSleepTime < -DEFAULT_DELAY_OVERDRAFT) && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
             {
                 bool fastSwitch = false; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
