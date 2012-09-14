@@ -69,12 +69,12 @@ static const int MAX_VALID_SLEEP_LIVE_TIME = 1000 * 500; // 5 seconds as most lo
 static const int SLOW_COUNTER_THRESHOLD = 24;
 static const double FPS_EPS = 0.0001;
 
-static const int DEFAULT_DELAY_OVERDRAFT = 100 * 1000;
+static const int DEFAULT_DELAY_OVERDRAFT = 5000 * 1000;
 
 QnCamDisplay::QnCamDisplay(bool generateEndOfStreamSignal): 
     QnAbstractDataConsumer(CL_MAX_DISPLAY_QUEUE_SIZE),
     m_audioDisplay(0),
-    m_delay(DEFAULT_DELAY_OVERDRAFT), // do not put a big value here to avoid cpu usage in case of zoom out
+    m_delay(DEFAULT_DELAY_OVERDRAFT), 
     m_speed(1.0),
     m_prevSpeed(1.0),
     m_playAudio(false),
