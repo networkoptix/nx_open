@@ -24,55 +24,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLineEdit, SLOT(setVisible(bool)));
     connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLabel, SLOT(setVisible(bool)));
     connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLineEdit, SLOT(setVisible(bool)));
-
-    ui->startIPLabel->setVisible(false);
-    ui->startIPLineEdit->setVisible(false);
-    ui->endIPLabel->setVisible(false);
-    ui->endIPLineEdit->setVisible(false);
-    ui->scanProgressBar->setVisible(false);
-    ui->stopScanButton->setVisible(false);
-    ui->validateLabelSearch->setVisible(false);
-
-    ui->addProgressBar->setVisible(false);
-    ui->stopAddButton->setVisible(false);
-
-    ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
-
-    connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
-    connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
-
-    ui->loginLineEdit->installEventFilter(this);
-    ui->passwordLineEdit->installEventFilter(this);
-    ui->startIPLineEdit->installEventFilter(this);
-    ui->endIPLineEdit->installEventFilter(this);
-    ui->iPAddressLineEdit->installEventFilter(this);
-    ui->iPAddressLineEdit->setFocus();
-
-    connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
-
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
-    ui->validateLabelSearch->setPalette(palette);
-}
-
-QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
-    base_type(parent),
-    ui(new Ui::CameraAdditionDialog),
-    m_server(0)
-{
-    qDebug() << "REMOVE DIALOG CONSTRUCTOR!!!";
-
-    ui->setupUi(this);
-
-    setButtonBox(ui->buttonBox);
-
-    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLabel, SLOT(setVisible(bool)));
-    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), ui->iPAddressLineEdit, SLOT(setVisible(bool)));
-    connect(ui->singleRadioButton,  SIGNAL(toggled(bool)), this, SLOT(at_singleRadioButton_toggled(bool)));
-    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLabel, SLOT(setVisible(bool)));
-    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->startIPLineEdit, SLOT(setVisible(bool)));
-    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLabel, SLOT(setVisible(bool)));
-    connect(ui->rangeRadioButton,   SIGNAL(toggled(bool)), ui->endIPLineEdit, SLOT(setVisible(bool)));
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
 
     ui->startIPLabel->setVisible(false);
@@ -89,6 +40,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->addPage), false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
+    connect(ui->iPAddressLineEdit, SIGNAL(editingFinished()), this, SLOT(at_scanButton_clicked()));
 
     ui->loginLineEdit->installEventFilter(this);
     ui->passwordLineEdit->installEventFilter(this);
@@ -209,11 +161,9 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->stopScanButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopScanButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
-    if (m_server){
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
                                                  startAddrStr, endAddrStr, username, password, port);
-    }
 
     eventLoop->exec();
 
@@ -261,11 +211,9 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     connect(ui->stopAddButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->stopAddButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
-    if (m_server){
     QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
                                               urls, manufacturers, username, password);
-    }
 
     eventLoop->exec();
 

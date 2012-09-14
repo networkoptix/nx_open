@@ -74,7 +74,6 @@ class QnCameraAdditionDialog: public QnButtonBoxDialog {
 
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
-    explicit QnCameraAdditionDialog(QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
 protected:
     virtual bool eventFilter(QObject *, QEvent *) override;
