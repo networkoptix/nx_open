@@ -287,7 +287,7 @@ QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
 {
-    QMutexLocker lock(&m_searchersListMutex);
+    QMutexLocker lock(&m_discoveryMutex);
 
     CLNetState netState;
     netState.updateNetState(); // update net state before working with discovered resources
