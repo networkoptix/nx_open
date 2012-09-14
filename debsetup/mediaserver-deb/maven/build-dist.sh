@@ -2,7 +2,6 @@
 
 COMPANY_NAME=${deb.customization.company.name}
 
-#. ../common.sh
 PACKAGENAME=$COMPANY_NAME-mediaserver
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
