@@ -1,46 +1,49 @@
 
-Template: ${deb.customization.company.name}-mediaserver/ecs_host
+Template: ${deb.customization.company.name}-mediaserver/ecsHost
 Type: string
 Default: localhost
 Description: Enterprise Controller host:
 
-Template: ${deb.customization.company.name}-mediaserver/ecs_port
+Template: ${deb.customization.company.name}-mediaserver/ecsPort
 Type: string
 Default: 7001
 Description: Enterprise Controller port:
 
-Template: ${deb.customization.company.name}-mediaserver/ecs_login
+Template: ${deb.customization.company.name}-mediaserver/ecsPort_invalid
+Type: error
+Description: Enterprise Controller port is invalid. Please try again.
+
+Template: ${deb.customization.company.name}-mediaserver/ecsLogin
 Type: string
 Default: admin
 Description: Enterprise Controller login:
 
-Template: ${deb.customization.company.name}-mediaserver/ecs_password
+Template: ${deb.customization.company.name}-mediaserver/ecsPassword
 Type: string
 Default: 
 Description: Enterprise Controller password:
+
+Template: ${deb.customization.company.name}-mediaserver/ecsPassword_invalid
+Type: error
+Description: Enterprise Controller can't be empty
 
 Template: ${deb.customization.company.name}-mediaserver/storage
 Type: string
 Default: /opt/${deb.customization.company.name}/mediaserver/var/data
 Description: Storage folder
 
-Template: ${deb.customization.company.name}-mediaserver/api_port
-Type: string
-Default: 7002
-Description: Media Server API port:
-
-Template: ${deb.customization.company.name}-mediaserver/rtsp_port
-Type: string
-Default: 7201
-Description: Media Server RTSP port:
-
-Template: ${deb.customization.company.name}-mediaserver/ecs_port_invalid
-Type: error
-Description: The port is invalid. Please try again.
-
-Template: ${deb.customization.company.name}-mediaserver/storage_abspath
+Template: ${deb.customization.company.name}-mediaserver/storage_invalid
 Type: error
 Description: Please specify an absolute path (starting with /)
+
+Template: ${deb.customization.company.name}-mediaserver/port
+Type: string
+Default: 7002
+Description: Media Server port:
+
+Template: ${deb.customization.company.name}-mediaserver/port_invalid
+Type: error
+Description: Media Server port is invalid. Please try again.
 
 Template: ${deb.customization.company.name}-mediaserver/storage_cant_create
 Type: error

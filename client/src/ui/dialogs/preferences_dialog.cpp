@@ -104,8 +104,10 @@ void QnPreferencesDialog::initColorPicker() {
 void QnPreferencesDialog::initLanguages() {
     QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
 
-    foreach(const QnTranslationInfo &translation, translationManager->translations())
-        ui->languageComboBox->addItem(translation.languageName, translation.translationPath);
+    foreach(const QnTranslationInfo &translation, translationManager->translations()){
+        QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
+        ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
+    }
 }
 
 void QnPreferencesDialog::accept() {

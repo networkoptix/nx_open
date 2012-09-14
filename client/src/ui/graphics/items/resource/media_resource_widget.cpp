@@ -372,7 +372,7 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->setPen(QPen(QColor(255, 255, 255, 16)));
     painter->drawLines(gridLines);
 
-    if (motion && motion->channelNumber == channel) {
+    if (motion && motion->channelNumber == (quint32)channel) {
         ensureBinaryMotionMask();
 
         QPainterPath motionPath;
@@ -549,25 +549,23 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if(size.isEmpty())
         size = QSize(0, 0);
 
-    QString codecName;
-    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
-        codecName = codecContext->codecName();
-    
-    QString result = tr("%1x%2 %3fps @ %4Mbps (%5)").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecName);
-
-    if (m_resource->flags() & QnResource::utc) {
-        /* Do not show time for regular media files. */
-        result.
-            append(QLatin1Char('\t')).
-            append(QDateTime::fromMSecsSinceEpoch(m_renderer->lastDisplayedTime(0) / 1000).toString(tr("hh:mm:ss.zzz")));
+    QString codecString;
+    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
+        codecString = codecContext->codecName();
+        if(!codecString.isEmpty())
+            codecString = tr(" (%1)").arg(codecString);
     }
 
-    return result;
+    QString timeString;
+    if (m_resource->flags() & QnResource::utc) /* Do not show time for regular media files. */
+        timeString = tr("\t%1").arg(QDateTime::fromMSecsSinceEpoch(m_renderer->lastDisplayedTime(0) / 1000).toString(tr("hh:mm:ss.zzz")));
+    
+    return tr("%1x%2 %3fps @ %4Mbps%5%6").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
-    int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
+    //struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
+    //int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
 
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 

@@ -128,7 +128,7 @@
          <item row="0" column="1">
           <widget class="QLineEdit" name="loginLineEdit">
            <property name="placeholderText">
-            <string>admin</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -154,7 +154,7 @@
          <item row="1" column="1">
           <widget class="QLineEdit" name="passwordLineEdit">
            <property name="placeholderText">
-            <string>admin</string>
+            <string/>
            </property>
           </widget>
          </item>
@@ -334,7 +334,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>&lt;b&gt;Found Cameras:&lt;/b&gt;</string>
+          <string>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</string>
          </property>
         </widget>
        </item>
@@ -356,7 +356,7 @@
           <number>0</number>
          </property>
          <property name="columnCount">
-          <number>2</number>
+          <number>3</number>
          </property>
          <attribute name="horizontalHeaderVisible">
           <bool>false</bool>
@@ -379,6 +379,11 @@
          <column>
           <property name="text">
            <string>Add</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Manuf.</string>
           </property>
          </column>
          <column>

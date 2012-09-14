@@ -1665,7 +1665,7 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
         if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
             vEncoder = response.Configurations[i];
     }
-    if (!vEncoder)    
+    if (!vEncoder || !vEncoder->RateControl)
         return;
 
     int maxFpsOrig = getMaxFps();

@@ -655,7 +655,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     {
         ManualSearcherHelper t;
         t.url.setHost(addr.toString());
-        t.url.setPort(port);
+        if (port)
+            t.url.setPort(port);
         t.auth = auth;
         t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
         testList.push_back(t);
@@ -826,22 +827,24 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, QSet<QS
         disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
         connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
 
-        if (rpNetRes->getStatus() == QnResource::Offline) 
+        if (!rpNetRes->isDisabled())
         {
-            if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+            if (rpNetRes->getStatus() == QnResource::Offline) 
             {
-                rpNetRes->initAsync();
-                //rpNetRes->setStatus(QnResource::Online);
+                if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+                {
+                    rpNetRes->initAsync();
+                    //rpNetRes->setStatus(QnResource::Online);
+                }
+
             }
-
+            else if (!rpNetRes->isInitialized())
+            {
+                rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+                //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
+                //    rpNetRes->setStatus(QnResource::Online);
+            }
         }
-        else if (!rpNetRes->isInitialized())
-        {
-            rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
-            //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
-            //    rpNetRes->setStatus(QnResource::Online);
-        }
-
         discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }

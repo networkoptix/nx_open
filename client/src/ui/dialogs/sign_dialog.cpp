@@ -186,6 +186,7 @@ void SignDialog::changeEvent(QEvent *event)
 
 void SignDialog::at_calcSignInProgress(QByteArray sign, int progress)
 {
+    Q_UNUSED(sign)
     ui->progressBar->setValue(progress);
 }
 

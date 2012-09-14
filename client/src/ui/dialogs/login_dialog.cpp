@@ -88,7 +88,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
     m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
     m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
-    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
     resetConnectionsModel();
     updateFocus();
@@ -100,7 +99,7 @@ LoginDialog::~LoginDialog() {
 
 void LoginDialog::updateFocus() 
 {
-    int size = m_dataWidgetMapper->model()->columnCount();
+  /*  int size = m_dataWidgetMapper->model()->columnCount();
 
     QWidget *widget = NULL;
     for(int i = 0; i < size; i++) {
@@ -118,11 +117,10 @@ void LoginDialog::updateFocus()
 
         if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
             break;
-    }
-    
-    /* Set focus on the last widget in list if every widget is filled. */
-    if(widget)
-        widget->setFocus();
+    }*/
+
+    qDebug() << "update focus";
+    ui->passwordLineEdit->setFocus();
 }
 
 QUrl LoginDialog::currentUrl() const {
@@ -202,8 +200,7 @@ void LoginDialog::resetConnectionsModel() {
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
             << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
+            << new QStandardItem(connection.url.userName());
         m_connectionsModel->appendRow(row);
     }
 
@@ -299,6 +296,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    updateFocus();
 }
 
 void LoginDialog::at_testButton_clicked() {

@@ -65,7 +65,7 @@ Qn::Permissions QnWorkbenchAccessController::calculateGlobalPermissions(const Qn
     if(!user) {
         return static_cast<Qn::Permissions>(0);
     } else {
-        return static_cast<Qn::Permissions>(user->getPermissions() | (user->isAdmin() ? Qn::GlobalOwnerPermission : 0));
+        return static_cast<Qn::Permissions>(user->getPermissions() | (user->isAdmin() ? (quint32)Qn::GlobalOwnerPermission : 0));
     }
 }
 
