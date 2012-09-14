@@ -200,7 +200,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->buttonBox->setEnabled(false);
     ui->scanProgressBar->setVisible(true);
     ui->stopScanButton->setVisible(true);
-    ui->scanButton->setEnabled(false);
+    ui->scanButton->setVisible(false);
 
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
 
@@ -217,7 +217,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     eventLoop->exec();
 
-    ui->scanButton->setEnabled(true);
+    ui->scanButton->setVisible(true);
     ui->stopScanButton->setVisible(false);
     ui->buttonBox->setEnabled(true);
     ui->scanProgressBar->setVisible(false);
@@ -250,7 +250,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     ui->buttonBox->setEnabled(false);
     ui->addProgressBar->setVisible(true);
     ui->stopAddButton->setVisible(true);
-    ui->addButton->setEnabled(false);
+    ui->addButton->setVisible(false);
     ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->searchPage), false);
 
 
@@ -273,7 +273,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     ui->buttonBox->setEnabled(true);
     ui->addProgressBar->setVisible(false);
     ui->stagesToolBox->setItemEnabled(ui->stagesToolBox->indexOf(ui->searchPage), true);
-    ui->addButton->setEnabled(true);
+    ui->addButton->setVisible(true);
 
     if (!processor->isCancelled()){
         if (processor->addSuccess())
