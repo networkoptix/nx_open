@@ -79,10 +79,9 @@ static void ifoFree_PGC_COMMAND_TBL(pgc_command_tbl_t *cmd_tbl);
 static void ifoFree_PGCIT_internal(pgcit_t *pgcit);
 
 static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title, 
-                                  char *suffix);
-static ifo_handle_t *ifoOpenVMGI_File(ifo_handle_t *ifofile, char *suffix);
-static ifo_handle_t *ifoOpenVTSI_File(ifo_handle_t *ifofile, int title,
-                                      char *suffix);
+                                  QString suffix);
+static ifo_handle_t *ifoOpenVMGI_File(ifo_handle_t *ifofile, QString suffix);
+static ifo_handle_t *ifoOpenVTSI_File(ifo_handle_t *ifofile, int title, QString suffix);
 
 static inline int DVDFileSeek_( dvd_file_t *dvd_file, quint32 offset ) {
   return (DVDFileSeek(dvd_file, (int)offset) == (int)offset);
@@ -99,7 +98,7 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
   memset(ifofile, 0, sizeof(ifo_handle_t));
 
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
-  if(!ifoOpen_File(ifofile, title, "IFO")) {
+  if(!ifoOpen_File(ifofile, title, QLatin1String("IFO"))) {
     if(title) {
       //if(dvdread_verbose(dvd) >= 1) 
       {
@@ -118,7 +117,7 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
     memset(ifofile, 0, sizeof(ifo_handle_t));
 
     ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-    if(!ifoOpen_File(ifofile, title, "BUP")) {
+    if(!ifoOpen_File(ifofile, title, QLatin1String("BUP"))) {
       if(title) {
         if(dvdread_verbose(dvd) >= 1) {
             qWarning() << QString(QLatin1String("libdvdread: Can't open file VTS_%1_0.BUP.")).arg(title);
@@ -222,7 +221,7 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
   memset(ifofile, 0, sizeof(ifo_handle_t));
 
   ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_FILE);
-  if(!ifoOpenVMGI_File(ifofile, "IFO")) {
+  if(!ifoOpenVMGI_File(ifofile, QLatin1String("IFO"))) {
     if(dvdread_verbose(dvd) >= 1) {
       fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.IFO: %s\n",
               strerror(errno));
@@ -236,7 +235,7 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
     memset(ifofile, 0, sizeof(ifo_handle_t));
 
     ifofile->file = DVDOpenFile(dvd, 0, DVD_READ_INFO_BACKUP_FILE);
-    if(!ifoOpenVMGI_File(ifofile, "BUP"))
+    if(!ifoOpenVMGI_File(ifofile, QLatin1String("BUP")))
       if(dvdread_verbose(dvd) >= 1) {
         fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.BUP: %s\n",
                 strerror(errno));
@@ -282,7 +281,7 @@ ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
   }
     
   ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_FILE);
-  if(!ifoOpenVTSI_File(ifofile, title, "IFO")) {
+  if(!ifoOpenVTSI_File(ifofile, title, QLatin1String("IFO"))) {
     if(dvdread_verbose(dvd) >= 1) {
       fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.%s.\n", title, "IFO");
     }
@@ -294,7 +293,7 @@ ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
     memset(ifofile, 0, sizeof(ifo_handle_t));
 
     ifofile->file = DVDOpenFile(dvd, title, DVD_READ_INFO_BACKUP_FILE);
-    if(!ifoOpenVTSI_File(ifofile, title, "BUP"))
+    if(!ifoOpenVTSI_File(ifofile, title, QLatin1String("BUP")))
       if(dvdread_verbose(dvd) >= 1) {
         fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.%s.\n", title, "BUP");
       }
@@ -303,7 +302,7 @@ ifo_handle_t *ifoOpenVTSI(dvd_reader_t *dvd, int title) {
   return ifofile;
 }
 
-static ifo_handle_t *ifoOpenVTSI_File(ifo_handle_t* ifofile, int title, char *suffix) {
+static ifo_handle_t *ifoOpenVTSI_File(ifo_handle_t* ifofile, int title, QString suffix) {
   if(!ifofile->file) {
     free(ifofile);
     return NULL;
@@ -314,8 +313,7 @@ static ifo_handle_t *ifoOpenVTSI_File(ifo_handle_t* ifofile, int title, char *su
     return ifofile;
 
   if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-    fprintf(stderr, "libdvdread: Invalid IFO for title %d (VTS_%02d_0.%s).\n",
-            title, title, suffix);
+      qWarning() << QString(QLatin1String( "libdvdread: Invalid IFO for title %1 (VTS_%2_0.%3)")).arg(title).arg(title).arg(suffix);
   }
   ifoClose(ifofile);
   return NULL;
@@ -916,7 +914,7 @@ int ifoRead_TT_SRPT(ifo_handle_t *ifofile) {
   
   if(!(DVDReadBytes(ifofile->file, tt_srpt, TT_SRPT_SIZE))) {
     if(dvdread_verbose(device_of_file(ifofile->file)) >= 1) {
-      fprintf(stderr, "libdvdread: Unable to read read TT_SRPT.\n");
+        qWarning() << "libdvdread: Unable to read read TT_SRPT.";
     }
     free(tt_srpt);
     return 0;

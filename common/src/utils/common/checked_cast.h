@@ -33,7 +33,7 @@ QSharedPointer<Target> checked_cast(const QSharedPointer<Source> &source) {
     assert(source.isNull() || !result.isNull());
     return result;
 #else
-    return source.staticCast<Target>();
+    return source.template staticCast<Target>();
 #endif // _DEBUG
 }
 

@@ -49,9 +49,9 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
+    m_animator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_globals(qnGlobals),
-    m_animator(new QnNoptixStyleAnimator(this))
+    m_globals(qnGlobals)
 {
     GraphicsStyle::setBaseStyle(this);
 
@@ -407,7 +407,7 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
         const qreal radius = 0.1;
         const qreal center = animationProgress * (1.0 + radius * 2) - radius;
         const qreal points[] = {0.0, center - radius, center, center + radius, 1.0};
-        for(int i = 0; i < arraysize(points); i++) {
+        for(uint i = 0; i < arraysize(points); i++) {
             qreal position = points[i];
             if(position < 0.0 || position > 1.0)
                 continue;
