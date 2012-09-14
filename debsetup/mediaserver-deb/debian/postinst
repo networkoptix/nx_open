@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+COMPANY_NAME=${deb.customization.company.name}
+
 . /usr/share/debconf/confmodule
 
 if [ -n "$DEBIAN_SCRIPT_DEBUG" ]; then set -v -x; DEBIAN_SCRIPT_TRACE=1; fi
@@ -7,12 +9,12 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
  
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
-CONFIG_FILE="/opt/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf"
+CONFIG_FILE="/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
-if status ${deb.customization.company.name}-mediaserver | grep "start/running" > /dev/null; then
-  stop ${deb.customization.company.name}-mediaserver
+if status $COMPANY_NAME-mediaserver | grep "start/running" > /dev/null; then
+  stop $COMPANY_NAME-mediaserver
 fi
     
 function read_config {
@@ -50,7 +52,7 @@ function to_int {
     local -i num="10#${1}"
     echo "${num}"
 }
- 
+
 function port_is_ok {
     local port="$1"
     local -i port_num=$(to_int "${port}" 2>/dev/null)
@@ -68,76 +70,69 @@ function create_dir {
     mkdir -p "$dir"
 }
 
+function ask_for_value {
+    local varname="$1"
+    local default="$2"
+    local full_name="$COMPANY_NAME-mediaserver/$varname"
+    local error_message="${full_name}_invalid"
+
+    [ -n "$default" ] && db_set $full_name $default 
+    db_input high $full_name || true
+    db_go
+
+    while :
+    do
+        db_get $full_name
+        { validate_$varname $RET 2> /dev/null; STATUS=$?; } || true        
+        [ $STATUS -eq 0 ] && break # validation passes
+        [ $STATUS -ne 1 ] && break # no validation function or invalid
+
+        db_input high $error_message
+        db_go
+
+        { db_input high $full_name; STATUS=$?; } || true
+        [ $STATUS -eq 30 ] && break
+        db_go
+    done
+
+    RESULT="$RET"
+    db_unregister $full_name
+    echo $RESULT
+}
+
+function validate_ecsPassword {
+    [ -n "$1" ]
+}
+
+function validate_port {
+    port_is_ok $1
+}
+
+function validate_storage {
+  [[ "$1" == /* ]]
+}
+
 case "$1" in
   configure)
       read_config
 
-      # Do we need to validate host?
-      db_input high ${deb.customization.company.name}-mediaserver/ecs_host || true
-      db_go
+      ECS_HOST=$(ask_for_value ecsHost "$ECS_HOST")
+      ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
+      ECS_LOGIN=$(ask_for_value ecsLogin "$ECS_LOGIN")
+      ECS_PASSWORD=$(ask_for_value ecsPassword "$ECS_PASSWORD")
 
-      # Simple port validation
-      db_input high ${deb.customization.company.name}-mediaserver/ecs_port || true
-      db_go
-      db_get ${deb.customization.company.name}-mediaserver/ecs_port
-      until port_is_ok "$RET"
+      STORAGE=$(ask_for_value storage "$STORAGE")
+      create_dir "$STORAGE"
+      while [ $? -ne 0 ]
       do
-        db_input high ${deb.customization.company.name}-mediaserver/ecs_port_invalid || true
-        db_go
-
-        { db_input high ${deb.customization.company.name}-mediaserver/ecs_port; STATUS=$?; } || true
-        [ $STATUS -eq 30 ] && break
-
-        db_go
-        db_get ${deb.customization.company.name}-mediaserver/ecs_port
-      done
-
-      # Login and password are up to user
-      db_input high ${deb.customization.company.name}-mediaserver/ecs_login || true
-      db_go
-
-      db_input high ${deb.customization.company.name}-mediaserver/ecs_password || true
-      db_go
-
-      # Create storage directory if doesn't exist
-      while :
-      do
-          { db_input high ${deb.customization.company.name}-mediaserver/storage; STATUS=$?; } || true
-          [ $STATUS -eq 30 ] && break
-
+          db_input high $COMPANY_NAME-mediaserver/storage_cant_create || true
           db_go
-          db_get ${deb.customization.company.name}-mediaserver/storage
 
-          if [[ "$RET" != /* ]]
-          then
-              db_input high ${deb.customization.company.name}-mediaserver/storage_abspath || true
-              db_go
-              continue
-          fi
-
-          create_dir "$RET"
-          if [ $? -ne 0 ]
-          then
-              db_input high ${deb.customization.company.name}-mediaserver/storage_cant_create || true
-              db_go
-              continue
-          fi
-
-          break
+          STORAGE=$(ask_for_value storage "$STORAGE")
+          create_dir "$STORAGE"
       done
 
-      db_input high ${deb.customization.company.name}-mediaserver/api_port || true
-      db_go
-
-      db_input high ${deb.customization.company.name}-mediaserver/rtsp_port || true
-      db_go
-
-      db_get ${deb.customization.company.name}-mediaserver/ecs_host && ECS_HOST=$RET
-      db_get ${deb.customization.company.name}-mediaserver/ecs_port && ECS_PORT=$RET
-      db_get ${deb.customization.company.name}-mediaserver/ecs_login && ECS_LOGIN=$RET
-      db_get ${deb.customization.company.name}-mediaserver/ecs_password && ECS_PASSWORD=$RET
-      db_get ${deb.customization.company.name}-mediaserver/storage && STORAGE=$RET
-      db_get ${deb.customization.company.name}-mediaserver/port && PORT=$RET
+      PORT=$(ask_for_value port "$PORT")
 
       write_config
   ;;
@@ -151,9 +146,9 @@ case "$1" in
   ;;
 esac
 
-if [ -e "/etc/init/${deb.customization.company.name}-mediaserver.conf" ]; then
-	invoke-rc.d ${deb.customization.company.name}-mediaserver start || exit $?
+if [ -e "/etc/init/$COMPANY_NAME-mediaserver.conf" ]; then
+	invoke-rc.d $COMPANY_NAME-mediaserver start || exit $?
 fi
-update-rc.d -f ${deb.customization.company.name}-mediaserver remove >/dev/null || exit $?
+update-rc.d -f $COMPANY_NAME-mediaserver remove >/dev/null || exit $?
 
 exit 0

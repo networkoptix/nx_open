@@ -73,7 +73,7 @@ function ask_for_value {
     local varname="$1"
     local default="$2"
     local full_name="$COMPANY_NAME-entcontroller/$varname"
-    local error_message="${varname}_invalid"
+    local error_message="${full_name}_invalid"
 
     [ -n "$default" ] && db_set $full_name $default 
     db_input high $full_name || true

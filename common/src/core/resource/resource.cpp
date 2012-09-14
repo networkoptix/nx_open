@@ -578,7 +578,7 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
     if (newStatus == Offline || newStatus == Unauthorized)
         m_initialized = false;
 
-    if (oldStatus == Offline && newStatus == Online)
+    if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
     emit statusChanged(oldStatus, m_status);
@@ -785,13 +785,13 @@ void QnResource::setDisabled(bool disabled)
 
 void QnResource::init()
 {
-        QMutexLocker lock(&m_initMutex);
-        if (!m_initialized) 
-        {
-            m_initialized = initInternal();
-            if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
-                setStatus(Offline);
-        }
+    QMutexLocker lock(&m_initMutex);
+    if (!m_initialized) 
+    {
+        m_initialized = initInternal();
+        if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
+            setStatus(Offline);
+    }
 }
 
 void QnResource::initAndEmit()
