@@ -57,7 +57,7 @@ namespace {
 
         quint64 pid;
         stream >> pid;
-        if(pid != QApplication::applicationPid())
+        if(pid != (quint64)QApplication::applicationPid())
             fromOtherApp = true;
 
         quint64 magic;

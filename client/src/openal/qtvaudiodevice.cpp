@@ -28,6 +28,7 @@ QtvAudioDevice *QtvAudioDevice::instance()
 QtvAudioDevice::QtvAudioDevice(QObject *parent)
     : m_device(0), m_context(0), m_volume(1.0)
 {
+    Q_UNUSED(parent)
 #ifdef OPENAL_STATIC
     alc_init();
     qDebug("OpenAL init");

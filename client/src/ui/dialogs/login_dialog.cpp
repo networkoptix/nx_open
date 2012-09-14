@@ -99,7 +99,7 @@ LoginDialog::~LoginDialog() {
 
 void LoginDialog::updateFocus() 
 {
-    int size = m_dataWidgetMapper->model()->columnCount();
+  /*  int size = m_dataWidgetMapper->model()->columnCount();
 
     QWidget *widget = NULL;
     for(int i = 0; i < size; i++) {
@@ -117,11 +117,10 @@ void LoginDialog::updateFocus()
 
         if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
             break;
-    }
-    
-    /* Set focus on the last widget in list if every widget is filled. */
-    if(widget)
-        widget->setFocus();
+    }*/
+
+    qDebug() << "update focus";
+    ui->passwordLineEdit->setFocus();
 }
 
 QUrl LoginDialog::currentUrl() const {
@@ -297,6 +296,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    updateFocus();
 }
 
 void LoginDialog::at_testButton_clicked() {

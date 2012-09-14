@@ -685,6 +685,7 @@ EXPORT void speex_echo_playback(SpeexEchoState *st, const spx_int16_t *play)
 /** Performs echo cancellation on a frame (deprecated, last arg now ignored) */
 EXPORT void speex_echo_cancel(SpeexEchoState *st, const spx_int16_t *in, const spx_int16_t *far_end, spx_int16_t *out, spx_int32_t *Yout)
 {
+    (void)Yout;
    speex_echo_cancellation(st, in, far_end, out);
 }
 

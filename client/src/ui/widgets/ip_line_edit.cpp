@@ -83,12 +83,13 @@ void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
         int val = last.toInt(&ok);
         if (sections.count() < 4  && ok && val*10 > 255)
             setText(input + DOT);
-    }else if (event->key() == 32){
-
+    }else if (event->key() == 32 || event->key() == DOT){
         QString input = text();
-        QStringList sections = input.split(DOT);
-        if (sections.count() < 4)
-            setText(input + DOT);
+        if (input.at(input.size() - 1) != DOT){
+            QStringList sections = input.split(DOT);
+            if (sections.count() < 4)
+                setText(input + DOT);
+        }
         event->setAccepted(true);
     } else
         QLineEdit::keyPressEvent(event);

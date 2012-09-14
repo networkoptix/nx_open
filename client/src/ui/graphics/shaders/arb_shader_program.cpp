@@ -6,12 +6,14 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 
+#define UNINITIALIZED GLuint(-1)
+
 class QnArbShaderProgramPrivate: public QnGlFunctions {
 public:
     QnArbShaderProgramPrivate(const QGLContext *context): 
         QnGlFunctions(context),
         valid(false),
-        fragmentProgram(-1)
+        fragmentProgram(UNINITIALIZED)
     {}
 
     virtual ~QnArbShaderProgramPrivate() {}
@@ -26,7 +28,7 @@ QnArbShaderProgram::QnArbShaderProgram(const QGLContext *context, QObject *paren
 {}
 
 QnArbShaderProgram::~QnArbShaderProgram() {
-    if(d->fragmentProgram != -1)
+    if(d->fragmentProgram != UNINITIALIZED)
         d->glDeleteProgramsARB(1, &d->fragmentProgram);
 }
 
@@ -40,7 +42,7 @@ bool QnArbShaderProgram::hasArbShaderPrograms(const QGLContext *context) {
 
 bool QnArbShaderProgram::bind() {
     glEnable(GL_FRAGMENT_PROGRAM_ARB);
-    if(d->fragmentProgram != -1)
+    if(d->fragmentProgram != UNINITIALIZED)
         d->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, d->fragmentProgram);
     return true;
 }
@@ -55,7 +57,7 @@ bool QnArbShaderProgram::addShaderFromSourceCode(QGLShader::ShaderType type, con
         return false;
     }
 
-    if(d->fragmentProgram == -1)
+    if(d->fragmentProgram == UNINITIALIZED)
         d->glGenProgramsARB(1, &d->fragmentProgram);
 
     d->glBindProgramARB(GL_FRAGMENT_PROGRAM_ARB, d->fragmentProgram);

@@ -218,6 +218,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(),            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
     connect(navigator(),            SIGNAL(liveChanged()),                      this,           SLOT(updateLiveButtonChecked()));
     connect(navigator(),            SIGNAL(liveSupportedChanged()),             this,           SLOT(updateLiveButtonEnabled()));
+    connect(navigator(),            SIGNAL(liveChanged()),                      this,           SLOT(updatePlaybackButtonsEnabled()));
     connect(navigator(),            SIGNAL(playingSupportedChanged()),          this,           SLOT(updatePlaybackButtonsEnabled()));
     connect(navigator(),            SIGNAL(speedChanged()),                     this,           SLOT(updateSpeedSliderSpeedFromNavigator()));
     connect(navigator(),            SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
@@ -342,12 +343,16 @@ void QnNavigationItem::updatePlaybackButtonsIcons() {
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {
-    bool enabled = navigator()->isPlayingSupported();
+    bool playable = navigator()->isPlayingSupported();
+    bool forwardable = !navigator()->isLive();
 
-    m_playButton->setEnabled(enabled);
-    m_stepBackwardButton->setEnabled(enabled);
-    m_stepForwardButton->setEnabled(enabled);
-    m_speedSlider->setEnabled(enabled);
+    m_jumpBackwardButton->setEnabled(playable);
+    m_stepBackwardButton->setEnabled(playable);
+    m_playButton->setEnabled(playable);
+    m_stepForwardButton->setEnabled(playable && forwardable);
+    m_jumpForwardButton->setEnabled(playable && forwardable);
+    
+    m_speedSlider->setEnabled(playable);
 }
 
 void QnNavigationItem::updateMuteButtonChecked() {

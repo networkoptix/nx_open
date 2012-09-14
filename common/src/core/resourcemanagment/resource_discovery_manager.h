@@ -88,6 +88,7 @@ private:
     bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 private:
     QMutex m_searchersListMutex;
+    QMutex m_discoveryMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCamerasMap m_manualCameraMap;

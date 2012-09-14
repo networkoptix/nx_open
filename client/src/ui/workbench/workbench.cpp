@@ -251,6 +251,7 @@ void QnWorkbench::updateSingleRoleItem() {
 }
 
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
+    Q_UNUSED(item)
     updateSingleRoleItem();
 }
 
