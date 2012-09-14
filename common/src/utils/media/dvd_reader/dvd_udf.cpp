@@ -119,7 +119,7 @@ static void *dvdalign_lbmalloc(dvd_reader_t *device, quint32 num_lbs)
   */
   if(a->ptrs_in_use > 50) {
     if(dvdread_verbose(device) >= 0) {
-      fprintf(stderr, "libdvdread: dvdalign_lbmalloc(), more allocs than supposed: %u\n", a->ptrs_in_use);
+      qWarning() << "libdvdread: dvdalign_lbmalloc(), more allocs than supposed:" << a->ptrs_in_use;
     }
   }
 
@@ -156,7 +156,7 @@ static void dvdalign_lbfree(dvd_reader_t *device, void *ptr)
     }
   }
   if(dvdread_verbose(device) >= 0) {
-    fprintf(stderr, "libdvdread: dvdalign_lbfree(), error trying to free mem: %08lx (%u)\n", (unsigned long)ptr, a ? a->ptrs_in_use : 0);
+        qWarning() << "libdvdread: dvdalign_lbfree(), error trying to free mem";
   }
 }
 
@@ -375,7 +375,6 @@ static int SetUDFCache(dvd_reader_t *device, UDFCacheType type,
   
   if(c == NULL) {
     c = (udf_cache*) calloc(1, sizeof(struct udf_cache));    
-    //    fprintf(stderr, "calloc: %d\n", sizeof(struct udf_cache));    
     if(c == NULL) {
       return 0;
     }
@@ -411,11 +410,6 @@ static int SetUDFCache(dvd_reader_t *device, UDFCacheType type,
     }
     c->lb_num++;
     c->lbs = (lbudf*) realloc(c->lbs, c->lb_num * sizeof(struct lbudf));
-    /*
-      fprintf(stderr, "realloc lb: %d * %d = %d\n",
-      c->lb_num, sizeof(struct lbudf),
-      c->lb_num * sizeof(struct lbudf));
-    */
     if(c->lbs == NULL) {
       c->lb_num = 0;
       return 0;
@@ -434,11 +428,6 @@ static int SetUDFCache(dvd_reader_t *device, UDFCacheType type,
     }
     c->map_num++;
     c->maps = (icbmap*) realloc(c->maps, c->map_num * sizeof(struct icbmap));
-    /*
-      fprintf(stderr, "realloc maps: %d * %d = %d\n",
-      c->map_num, sizeof(struct icbmap),
-      c->map_num * sizeof(struct icbmap));
-    */
     if(c->maps == NULL) {
       c->map_num = 0;
       return 0;
@@ -553,11 +542,11 @@ static int UDFPartition( quint8 *data, quint16 *Flags, quint16 *Number,
  */
 static int UDFLogVolume( quint8 *data, char *VolumeDescriptor )
 {
-  quint32 lbsize, MT_L, N_PM;
+  quint32 lbsize;
   Unicodedecode(&data[84], 128, VolumeDescriptor);
   lbsize = GETN4(212);  // should be 2048
-  MT_L = GETN4(264);    // should be 6
-  N_PM = GETN4(268);    // should be 1
+  /*MT_L =*/ GETN4(264);    // should be 6
+  /*N_PM =*/ GETN4(268);    // should be 1
   if (lbsize != DVD_VIDEO_LB_LEN) return 1;
   return 0;
 }
@@ -1053,13 +1042,10 @@ static int UDFGetDescriptor( dvd_reader_t *device, int id,
   quint32 lbnum, MVDS_location, MVDS_length;
   struct avdp_t avdp;
   quint16 TagID;
-  quint32 lastsector;
-  int i, terminate;
+  int i;
   int desc_found = 0;
   /* Find Anchor */
-  lastsector = 0;
   lbnum = 256;   /* Try #1, prime anchor */
-  terminate = 0;
   if(bufsize < DVD_VIDEO_LB_LEN) {
     return 0;
   }

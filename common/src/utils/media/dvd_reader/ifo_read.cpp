@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <QByteArray>
+#include <QString>
+
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
 #elif defined(HAVE_STDINT_H)
@@ -22,7 +25,7 @@
 #define DVD_BLOCK_LEN 2048
 #endif
 
-#ifndef NDEBUG
+#ifdef DVD_DEBUG
 #define CHECK_ZERO0(arg)                                                \
   if(arg != 0) {                                                        \
     fprintf(stderr, "*** Zero check failed in %s:%i\n    for %s = 0x%x\n", \
@@ -100,12 +103,11 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
     if(title) {
       //if(dvdread_verbose(dvd) >= 1) 
       {
-        fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.%s.\n", 
-                title, "IFO");
+        qWarning() << QString(QLatin1String("libdvdread: Can't open file VTS_%1_0.IFO.")).arg(title);
       }
     } else {
       if(dvdread_verbose(dvd) >= 1) {
-        fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.%s.\n", "IFO");
+        qWarning() << "libdvdread: Can't open file VIDEO_TS.IFO.";
       }
     }
     /* lower functions free the pointer, reallocate */
@@ -119,12 +121,11 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
     if(!ifoOpen_File(ifofile, title, "BUP")) {
       if(title) {
         if(dvdread_verbose(dvd) >= 1) {
-          fprintf(stderr, "libdvdread: Can't open file VTS_%02d_0.%s.\n", 
-                  title, "BUP");
+            qWarning() << QString(QLatin1String("libdvdread: Can't open file VTS_%1_0.BUP.")).arg(title);
         }
       } else {
         if(dvdread_verbose(dvd) >= 1) {
-          fprintf(stderr, "libdvdread: Can't open file VIDEO_TS.%s.\n", "BUP");
+            qWarning() << "libdvdread: Can't open file VIDEO_TS.BUP.";
         }
       }
       return NULL;
@@ -134,7 +135,7 @@ ifo_handle_t *ifoOpen(dvd_reader_t *dvd, int title) {
 }
 
 static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title, 
-                                  char *suffix) {
+                                  QString suffix) {
   if(!ifofile->file) {
     free(ifofile);
     return NULL;
@@ -146,8 +147,7 @@ static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title,
     /* These are both mandatory. */
     if(!ifoRead_FP_PGC(ifofile) || !ifoRead_TT_SRPT(ifofile)) {
       if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-        fprintf(stderr, "libdvdread: Invalid main menu IFO (VIDEO_TS.%s).\n",
-                suffix);
+          qWarning() << "libdvdread: Invalid main menu IFO at VIDEO_TS." << suffix;
       }
       ifoClose(ifofile);
       return NULL;
@@ -159,8 +159,7 @@ static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title,
     /* This is also mandatory. */
     if(!ifoRead_VTS_ATRT(ifofile)) {
       if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-        fprintf(stderr, "libdvdread: Invalid main menu IFO (VIDEO_TS.%s).\n",
-                suffix);
+        qWarning() << "libdvdread: Invalid main menu IFO at VIDEO_TS." << suffix;
       }
       ifoClose(ifofile);
       return NULL;
@@ -177,8 +176,7 @@ static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title,
 
     if(!ifoRead_VTS_PTT_SRPT(ifofile) || !ifoRead_PGCIT(ifofile)) {
       if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-        fprintf(stderr, "libdvdread: Invalid title IFO (VTS_%02d_0.%s).\n",
-                title, suffix);
+        qWarning() << QString(QLatin1String("libdvdread: Invalid title IFO (VTS_%1_0.%2)")).arg(title).arg(suffix);
       }
       ifoClose(ifofile);
       return NULL;
@@ -191,8 +189,7 @@ static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title,
 
     if(!ifoRead_TITLE_C_ADT(ifofile) || !ifoRead_TITLE_VOBU_ADMAP(ifofile)) {
       if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-        fprintf(stderr, "libdvdread: Invalid title IFO (VTS_%02d_0.%s).\n",
-                title, suffix);
+        qWarning() << QString(QLatin1String("libdvdread: Invalid title IFO (VTS_%1_0.%2)")).arg(title).arg(suffix);
       }
       ifoClose(ifofile);
       return NULL;
@@ -203,13 +200,11 @@ static ifo_handle_t *ifoOpen_File(ifo_handle_t *ifofile, int title,
 
   if(title) {
     if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-      fprintf(stderr, "libdvdread: Invalid IFO for title %d (VTS_%02d_0.%s).\n",
-              title, title, suffix);
+      qWarning() << QString(QLatin1String( "libdvdread: Invalid IFO for title %1 (VTS_%2_0.%3)")).arg(title).arg(title).arg(suffix);
     }
   } else {
     if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-      fprintf(stderr, "libdvdread: Invalid IFO for VMGM (VIDEO_TS.%s).\n", 
-              suffix);
+      qWarning() << QString(QLatin1String("libdvdread: Invalid IFO for VMGM (VTS_%1_0.%2)")).arg(suffix);
     }
   }
   ifoClose(ifofile);
@@ -251,7 +246,7 @@ ifo_handle_t *ifoOpenVMGI(dvd_reader_t *dvd) {
   return ifofile;
 }
 
-static ifo_handle_t *ifoOpenVMGI_File(ifo_handle_t *ifofile, char *suffix) {
+static ifo_handle_t *ifoOpenVMGI_File(ifo_handle_t *ifofile, QString suffix) {
   if(!ifofile->file) {
     free(ifofile);
     return NULL;
@@ -261,8 +256,7 @@ static ifo_handle_t *ifoOpenVMGI_File(ifo_handle_t *ifofile, char *suffix) {
     return ifofile;
 
   if(dvdread_verbose(device_of_file(ifofile->file)) >= 0) {
-    fprintf(stderr, "libdvdread: Invalid main menu IFO (VIDEO_TS.%s).\n", 
-            suffix);
+      qWarning() << QString(QLatin1String("libdvdread: Invalid main menu IFO (VIDEO_TS.%1")).arg(suffix);
   }
   ifoClose(ifofile);
   return NULL;
