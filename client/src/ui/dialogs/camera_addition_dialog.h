@@ -79,11 +79,14 @@ protected:
     virtual bool eventFilter(QObject *, QEvent *) override;
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
+    void removeAddedCameras();
 
 private slots: 
-    void at_singleRadioButton_toggled(bool toggled);
     void at_startIPLineEdit_textChanged(QString value);
+    void at_startIPLineEdit_editingFinished();
     void at_endIPLineEdit_textChanged(QString value);
+    void at_camerasTable_cellChanged(int row, int column);
+    void at_camerasTable_cellClicked(int row, int column);
 
     void at_scanButton_clicked();
     void at_addButton_clicked();
