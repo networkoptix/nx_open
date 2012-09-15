@@ -216,7 +216,7 @@ QRectF GraphicsWidget::contentsRect() const {
     QRectF result = rect();
     result.setLeft(result.left() + left);
     result.setTop(result.top() + top);
-    result.setRect(result.right() - right);
+    result.setRight(result.right() - right);
     result.setBottom(result.bottom() - bottom);
     return result;
 }
