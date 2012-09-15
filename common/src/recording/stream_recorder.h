@@ -113,7 +113,7 @@ private:
     QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
-    QQueue<QnAbstractMediaDataPtr> m_prebuffer;
+    QnUnsafeQueue<QnAbstractMediaDataPtr> m_prebuffer;
 
     qint64 m_EofDateTime;
     bool m_endOfData;

@@ -101,7 +101,8 @@ void QnStreamRecorder::flushPrebuffer()
 {
     while (!m_prebuffer.isEmpty())
     {
-        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        QnAbstractMediaDataPtr d;
+        m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
         else
@@ -140,10 +141,11 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         return true;
     }
 
-    m_prebuffer << md;
-    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
+    m_prebuffer.push(md);
+    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.front()->timestamp >= m_prebufferingUsec)
     {
-        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        QnAbstractMediaDataPtr d;
+        m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
         else
