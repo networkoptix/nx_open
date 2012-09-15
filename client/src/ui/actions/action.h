@@ -156,6 +156,9 @@ public:
 
     void removeChild(QnAction *action);
 
+    QString toolTipFormat() const;
+    void setToolTipFormat(const QString &toolTipFormat);
+
     /**
      * \param scope                     Scope in which action is to be executed.
      * \param parameters                Parameters for action execution.
@@ -184,7 +187,10 @@ protected:
 
 private slots:
     void updateText();
-    void updateToolTip();
+    void updateToolTip(bool notify = false);
+
+private:
+    QString defaultToolTipFormat() const;
 
 private:
     struct Permissions {
@@ -198,6 +204,7 @@ private:
     Qn::ActionFlags m_flags;
     QHash<QString, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
+    QString m_toolTipFormat, m_toolTipMarker;
     QWeakPointer<QnActionCondition> m_condition;
 
     QList<QnAction *> m_children;
