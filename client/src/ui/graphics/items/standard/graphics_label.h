@@ -23,14 +23,14 @@ public:
     ~GraphicsLabel();
 
     QString text() const;
+    Q_SLOT void setText(const QString &text);
 
     QStaticText::PerformanceHint performanceHint() const;
     void setPerformanceHint(QStaticText::PerformanceHint performanceHint);
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-public Q_SLOTS:
-    void setText(const QString &text);
+public slots:
     inline void setNum(int num) { setText(QString::number(num)); }
     inline void setNum(double num) { setText(QString::number(num)); }
     void clear();

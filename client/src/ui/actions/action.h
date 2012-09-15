@@ -184,6 +184,7 @@ protected:
 
 private slots:
     void updateText();
+    void updateToolTip();
 
 private:
     struct Permissions {

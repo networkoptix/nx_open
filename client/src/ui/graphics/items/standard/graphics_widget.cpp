@@ -209,6 +209,18 @@ void GraphicsWidget::setStyle(GraphicsStyle *style) {
     setStyle(style->baseStyle());
 }
 
+QRectF GraphicsWidget::contentsRect() const {
+    qreal left, top, right, bottom;
+    getContentsMargins(&left, &top, &right, &bottom);
+
+    QRectF result = rect();
+    result.setLeft(result.left() + left);
+    result.setTop(result.top() + top);
+    result.setRect(result.right() - right);
+    result.setBottom(result.bottom() - bottom);
+    return result;
+}
+
 void GraphicsWidget::handlePendingLayoutRequests(QGraphicsScene *scene) {
     if(!scene) {
         qnNullWarning(scene);
