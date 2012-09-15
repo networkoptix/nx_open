@@ -6,7 +6,9 @@
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 
 mkdir -p ${project.build.directory}/usr/share/icons/hicolor
+
 cp -Rf ${basedir}/../../cpp/shared-resources/icons/${custom.skin}/hicolor/* ${project.build.directory}/usr/share/icons/hicolor
+for f in ${project.build.directory}/usr/share/icons/hicolor/*/*/vmsclient.png; do mv "$f" "${f%.png}-${customization}.png"; done
 
 sudo chown -R $USER:sudo ${project.build.directory}
 

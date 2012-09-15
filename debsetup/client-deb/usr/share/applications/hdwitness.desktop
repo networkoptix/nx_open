@@ -2,7 +2,7 @@
 Name=${product.name}
 Comment=${product.name} Client
 Exec=/opt/${deb.customization.company.name}/client/bin/client
-Icon=vmsclient
+Icon=${product.name}client
 Terminal=false
 Type=Application
 StartupNotify=true
