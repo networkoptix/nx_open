@@ -99,27 +99,6 @@ LoginDialog::~LoginDialog() {
 
 void LoginDialog::updateFocus() 
 {
-  /*  int size = m_dataWidgetMapper->model()->columnCount();
-
-    QWidget *widget = NULL;
-    for(int i = 0; i < size; i++) {
-        widget = m_dataWidgetMapper->mappedWidgetAt(i);
-        if(!widget)
-            continue;
-
-        QByteArray propertyName = m_dataWidgetMapper->mappedPropertyName(widget);
-        QVariant value = widget->property(propertyName.constData());
-        if(!value.isValid())
-            continue;
-
-        if(value.toString().isEmpty())
-            break;
-
-        if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
-            break;
-    }*/
-
-    qDebug() << "update focus";
     ui->passwordLineEdit->setFocus();
 }
 
