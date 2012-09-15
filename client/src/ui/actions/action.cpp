@@ -19,17 +19,23 @@
 #include "action_conditions.h"
 #include "action_parameter_types.h"
 
+namespace {
+    const char *const toolTipMarker = "<b></b>";
+}
 
 QnAction::QnAction(Qn::ActionId id, QObject *parent): 
     QAction(parent), 
     QnWorkbenchContextAware(parent),
     m_id(id),
     m_flags(0)
-{}
+{
+    setToolTip(QLatin1String(toolTipMarker));
+
+    connect(this, SIGNAL(changed()), this, SLOT(updateToolTip()));
+}
 
 QnAction::~QnAction() {
-    foreach (QnActionCondition *condition, m_textConditions.uniqueKeys())
-        delete condition;
+    qDeleteAll(m_textConditions.uniqueKeys());
 }
 
 
@@ -199,15 +205,32 @@ void QnAction::updateText() {
     }
 }
 
-void QnAction::addConditionalText(QnActionCondition *condition, const QString &text){
+void QnAction::updateToolTip() {
+    if(!toolTip().endsWith(QLatin1String(toolTipMarker)))
+        return; /* We have an explicitly set tooltip. */
+
+    /* This is the first handler in a chain, 
+     * so we don't need to emit additional changed signal. */
+    bool signalsBlocked = blockSignals(true);
+
+    if(shortcuts().isEmpty()) {
+        setToolTip(tr("%1%2").arg(text()).arg(QLatin1String(toolTipMarker))); 
+    } else {
+        setToolTip(tr("%1 (<b>%2</b>)%3").arg(text()).arg(shortcut().toString(QKeySequence::NativeText)).arg(QLatin1String(toolTipMarker)));
+    }
+
+    blockSignals(signalsBlocked);
+}
+
+void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {
     m_textConditions[condition] = text;
 }
 
-bool QnAction::hasConditionalTexts(){
+bool QnAction::hasConditionalTexts() {
     return !m_textConditions.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const QnActionParameters &parameters) const{
+QString QnAction::checkConditionalText(const QnActionParameters &parameters) const {
     foreach (QnActionCondition *condition, m_textConditions.uniqueKeys()){
         if (condition->check(parameters))
             return m_textConditions[condition];
