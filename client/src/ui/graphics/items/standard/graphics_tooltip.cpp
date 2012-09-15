@@ -8,6 +8,7 @@
 #include <QtGui/QPainter>
 #include <QtGui/QToolTip>
 #include <QtGui/QGraphicsScene>
+#include <QtGui/QTextDocument>
 
 #define NOPARENT
 
@@ -57,7 +58,7 @@ GraphicsTooltipLabel::GraphicsTooltipLabel(const QString & text, QGraphicsItem *
     reuseTip(text, newItem);
 }
 
-GraphicsTooltipLabel::~GraphicsTooltipLabel(){
+GraphicsTooltipLabel::~GraphicsTooltipLabel() {
     instance = 0;
 }
 
@@ -187,6 +188,10 @@ bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *even
 }
 
 void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, QRectF viewport) {
+    QScopedPointer<QTextDocument> document(new QTextDocument());
+    document->setHtml(text);
+    text = document->toPlainText(); /* GraphicsLabel currently doesn't support rich text. */
+
     if (GraphicsTooltipLabel::instance && GraphicsTooltipLabel::instance->isVisible()) { // a tip does already exist
         if (text.isEmpty()) { // empty text means hide current tip
             GraphicsTooltipLabel::instance->hideTip();

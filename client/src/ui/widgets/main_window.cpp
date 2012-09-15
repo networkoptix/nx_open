@@ -429,8 +429,13 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu)
-        menu()->trigger(Qn::MainMenuAction);
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        if(m_mainMenuButton->isVisible())
+            m_mainMenuButton->click();
+            
+        QApplication::sendEvent(m_ui, event);
+        result = true;
+    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);
