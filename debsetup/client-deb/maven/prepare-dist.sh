@@ -8,9 +8,10 @@
 mkdir -p ${project.build.directory}/usr/share/icons/hicolor
 
 cp -Rf ${basedir}/../../cpp/shared-resources/icons/${custom.skin}/hicolor/* ${project.build.directory}/usr/share/icons/hicolor
+
 for f in ${project.build.directory}/usr/share/icons/hicolor/*/*/vmsclient.png; do mv "$f" "${f%.png}-${customization}.png"; done
 
-sudo chown -R $USER:sudo ${project.build.directory}
+sudo chown -R `whoami`:sudo ${project.build.directory}
 
 chmod 775 ./bin/client*
 chmod 775 ./build-dist.sh
