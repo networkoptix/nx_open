@@ -279,7 +279,6 @@ public:
 
     void removeFirst(int count)
     {
-        QMutexLocker mutex(&m_cs);
         for (int i = 0; i < count; ++i)
         {
             m_buffer[m_headIndex++] = T();
