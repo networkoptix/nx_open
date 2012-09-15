@@ -46,7 +46,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_ready(false)
 
 {
-    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)));
+    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -375,8 +375,15 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
 
         }
-        else
-            ++it; // new resource => shouls keep it
+        else 
+        {
+            QnPhysicalCameraResourcePtr camRes = qSharedPointerDynamicCast<QnPhysicalCameraResource>(*it);
+            QMutexLocker lock(&m_searchersListMutex);
+            if (camRes && camRes->isManuallyAdded() && !m_manualCameraMap.contains(camRes->getUrl()))
+                it = resources.erase(it); // race condition: manual resource just deleted.
+            else
+                ++it; // new resource => shouls keep it
+        }
     }
 
     //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
