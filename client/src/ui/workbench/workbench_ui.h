@@ -47,6 +47,8 @@ class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnAc
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
+    typedef QObject base_type;
+
 public:
     enum Flag {
         /** Whether controls should be hidden after a period without activity in zoomed mode. */
@@ -163,6 +165,8 @@ public slots:
     }
 
 protected:
+    virtual bool event(QEvent *event) override;
+
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();
 

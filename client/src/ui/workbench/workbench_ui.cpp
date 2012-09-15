@@ -58,6 +58,7 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
+#include <ui/events/system_menu_event.h>
 
 #include <help/context_help.h>
 
@@ -1437,6 +1438,19 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnWorkbenchUi::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        if(m_mainMenuButton->isVisible())
+            m_mainMenuButton->click();
+
+        result = true;
+    }
+
+    return result;
+}
+
 void QnWorkbenchUi::at_freespaceAction_triggered() {
     bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
 

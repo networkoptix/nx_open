@@ -44,7 +44,7 @@ class QnActionBuilder {
 public:
     QnActionBuilder(QnActionManager *manager, QnAction *action): 
         m_manager(manager), 
-        m_action(action) 
+        m_action(action)
     {
         action->setShortcutContext(Qt::WindowShortcut);
     }
