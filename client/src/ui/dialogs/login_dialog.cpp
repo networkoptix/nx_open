@@ -275,6 +275,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    ui->passwordLineEdit->clear();
     updateFocus();
 }
 
