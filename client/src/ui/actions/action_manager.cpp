@@ -907,11 +907,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
 
-    factory(Qn::ToggleCalendarAction).
-        flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Show Calendar")).
-        toggledText(tr("Hide Calendar"));
-
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
         shortcut(tr("Ctrl+Alt+Shift++")).
@@ -927,7 +922,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PlayPauseAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("Space")).
-        text(tr("Play / Pause")).
+        text(tr("Play")).
+        toggledText(tr("Pause")).
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::SpeedDownAction).
@@ -968,30 +964,38 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VolumeUpAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+Down")).
+        shortcut(tr("Ctrl+Up")).
         text(tr("Volume Down"));
 
     factory(Qn::VolumeDownAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+Up")).
+        shortcut(tr("Ctrl+Down")).
         text(tr("Volume Up"));
 
     factory(Qn::ToggleMuteAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("M")).
-        text(tr("Toggle Mute"));
+        text(tr("Toggle Mute")).
+        checkable();
 
     factory(Qn::JumpToLiveAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("L")).
         text(tr("Jump to Live")).
+        checkable().
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::ToggleSyncAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("S")).
-        text(tr("Toggle Sync")).
+        text(tr("Synchronize Streams")).
+        toggledText(tr("Disable Stream Synchronization")).
         condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::ToggleCalendarAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Calendar")).
+        toggledText(tr("Hide Calendar"));
 }
 
 QnActionManager::~QnActionManager() {
