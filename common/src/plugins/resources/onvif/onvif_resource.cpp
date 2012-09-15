@@ -525,6 +525,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 
     QString user = auth.user();
     QString password = auth.password();
+    QString hardwareId;
     
     //Trying to get name
     if (getName().isEmpty())
@@ -544,6 +545,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         else
         {
             setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            hardwareId = QString::fromStdString(response.HardwareId);
         }
     }
 
@@ -602,6 +604,11 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         if (!mac.isEmpty()) 
             setMAC(mac);
 
+        if (getPhysicalId().isEmpty())
+        {
+            setPhysicalId(hardwareId);
+        }
+            
     }
 
     return result;
