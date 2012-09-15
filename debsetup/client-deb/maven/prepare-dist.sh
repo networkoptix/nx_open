@@ -10,7 +10,7 @@ mkdir -p ${project.build.directory}/usr/share/icons/hicolor
 cp -Rf ${basedir}/../../cpp/shared-resources/icons/${custom.skin}/hicolor/* ${project.build.directory}/usr/share/icons/hicolor
 
 for f in ${project.build.directory}/usr/share/icons/hicolor/*/*/vmsclient.png; do mv "$f" "${f%.png}-${customization}.png"; done
-mv ${project.build.directory}/usr/share/applications/hdwitness.desktop ${project.build.directory}/usr/share/applications/${customization}.desktop
+mv ${project.build.directory}/usr/share/applications/hdwitness.desktop ${project.build.directory}/usr/share/applications/vmsclient-${customization}.desktop
 
 
 sudo chown -R `whoami`:sudo ${project.build.directory}
