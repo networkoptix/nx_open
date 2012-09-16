@@ -1,8 +1,41 @@
 #include "tool_tip_instrument.h"
 
 #include <QtGui/QHelpEvent>
-#include <ui/graphics/items/generic/tool_tip_slider.h>
+#include <QtGui/QGraphicsProxyWidget>
+
 #include <ui/graphics/items/standard/graphics_tooltip.h>
+#include <ui/common/tool_tip_queryable.h>
+
+namespace {
+    QString widgetToolTip(QWidget *widget, const QPoint &pos) {
+        QWidget *childWidget = widget->childAt(pos);
+        if(!childWidget)
+            childWidget = widget;
+
+        while(true) {
+            if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(childWidget))
+                return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
+
+            if(!childWidget->toolTip().isEmpty() || childWidget == widget)
+                return childWidget->toolTip();
+
+            childWidget = childWidget->parentWidget();
+        }
+    }
+
+    QString itemToolTip(QGraphicsItem *item, const QPointF &pos) {
+        if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(item))
+            return queryable->toolTipAt(pos);
+
+        if(QGraphicsProxyWidget *proxyWidget = dynamic_cast<QGraphicsProxyWidget *>(item))
+            if(QWidget *widget = proxyWidget->widget())
+                return widgetToolTip(widget, pos.toPoint());
+        
+        return item->toolTip();
+    }
+
+} // anonymous namespace
+
 
 ToolTipInstrument::ToolTipInstrument(QObject *parent):
     Instrument(Viewport, makeSet(QEvent::ToolTip), parent)
@@ -20,23 +53,29 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
     QPointF scenePos = view->mapToScene(helpEvent->pos());
 
+    // TODO: too many dynamic_casts here. Implement hash-based solution?
+
     QGraphicsItem *targetItem = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
-        /* Note that we don't handle proxy widgets separately. */
-        if (!item->toolTip().isEmpty()) {
-            if (dynamic_cast<QnToolTipSlider* >(item)) //TODO: #gdm Bug #1072, fix later
-                continue;
+        if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item)) {
             targetItem = item;
             break;
         }
     }
 
-    if(targetItem) {
-        QRectF vprect(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()));
-        GraphicsTooltip::showText(targetItem->toolTip(), targetItem, scenePos, vprect);
+    if(!targetItem) {
+        helpEvent->ignore();
+        return true; /* Eat it anyway. */
     }
 
-    helpEvent->setAccepted(targetItem != NULL);
+    GraphicsTooltip::showText(
+        itemToolTip(targetItem, targetItem->mapFromScene(scenePos)), 
+        targetItem, 
+        scenePos, 
+        QRectF(view->mapToScene(viewport->geometry().topLeft()), view->mapToScene(viewport->geometry().bottomRight()))
+    );
+
+    helpEvent->accept();
     return true;
 }
 

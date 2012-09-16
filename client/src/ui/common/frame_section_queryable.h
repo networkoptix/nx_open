@@ -19,6 +19,11 @@
 class FrameSectionQuearyable {
 public:
     /**
+     * Virtual destructor.
+     */
+    virtual ~FrameSectionQuearyable() {}
+
+    /**
      * \param region                    Region to get frame sections for, in widget coordinates.
      * \returns                         Window frame sections that intersect the given region. 
      */
