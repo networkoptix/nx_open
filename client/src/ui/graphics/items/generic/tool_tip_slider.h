@@ -13,6 +13,9 @@ class VariantAnimator;
 class QnToolTipItem;
 class QnToolTipSliderAnimationListener;
 
+/**
+ * Graphics slider that shows a balloon-shaped tooltip on top of its handle.
+ */
 class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable {
     Q_OBJECT;
 

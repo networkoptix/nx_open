@@ -53,7 +53,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
     QHelpEvent *helpEvent = static_cast<QHelpEvent *>(event);
     QPointF scenePos = view->mapToScene(helpEvent->pos());
 
-    // TODO: too many dynamic_casts here. Implement hash-based solution?
+    /* Note that tooltip is a rare event, so having a lot of dynamic_casts here is OK. */
 
     QGraphicsItem *targetItem = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
