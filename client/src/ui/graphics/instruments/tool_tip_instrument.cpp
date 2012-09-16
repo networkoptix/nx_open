@@ -3,7 +3,6 @@
 #include <QtGui/QHelpEvent>
 #include <QtGui/QGraphicsProxyWidget>
 
-#include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/graphics/items/standard/graphics_tooltip.h>
 #include <ui/common/tool_tip_queryable.h>
 
@@ -14,7 +13,7 @@ namespace {
             childWidget = widget;
 
         while(true) {
-            if(QnToolTipQueryable *queryable = dynamic_cast<QnToolTipQueryable *>(childWidget))
+            if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(childWidget))
                 return queryable->toolTipAt(childWidget->mapFrom(widget, pos));
 
             if(!childWidget->toolTip().isEmpty() || childWidget == widget)
@@ -25,7 +24,7 @@ namespace {
     }
 
     QString itemToolTip(QGraphicsItem *item, const QPointF &pos) {
-        if(QnToolTipQueryable *queryable = dynamic_cast<QnToolTipQueryable *>(item))
+        if(ToolTipQueryable *queryable = dynamic_cast<ToolTipQueryable *>(item))
             return queryable->toolTipAt(pos);
 
         if(QGraphicsProxyWidget *proxyWidget = dynamic_cast<QGraphicsProxyWidget *>(item))
@@ -58,10 +57,7 @@ bool ToolTipInstrument::event(QWidget *viewport, QEvent *event) {
 
     QGraphicsItem *targetItem = NULL;
     foreach(QGraphicsItem *item, scene()->items(scenePos, Qt::IntersectsItemShape, Qt::DescendingOrder, view->viewportTransform())) {
-        if(dynamic_cast<QnToolTipSlider *>(item)) //TODO: #gdm Bug #1072, fix later
-            continue;
-
-        if(!item->toolTip().isEmpty() || dynamic_cast<QnToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item)) {
+        if(!item->toolTip().isEmpty() || dynamic_cast<ToolTipQueryable *>(item) || dynamic_cast<QGraphicsProxyWidget *>(item)) {
             targetItem = item;
             break;
         }

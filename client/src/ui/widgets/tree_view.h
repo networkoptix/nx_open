@@ -12,7 +12,7 @@
  * 
  * It also adds several features that the QTreeView is lacking.
  */
-class QnTreeView: public QTreeView, public QnToolTipQueryable {
+class QnTreeView: public QTreeView, public ToolTipQueryable {
     Q_OBJECT;
 public:
     QnTreeView(QWidget *parent = NULL);

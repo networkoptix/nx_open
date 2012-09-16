@@ -3,7 +3,7 @@
 
 #include <QtCore/QString>
 
-class QnToolTipQueryable {
+class ToolTipQueryable {
 public:
     virtual QString toolTipAt(const QPointF &pos) const = 0;
 };

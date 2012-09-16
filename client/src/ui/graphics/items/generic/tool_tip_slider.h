@@ -4,6 +4,7 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QScopedPointer>
 
+#include <ui/common/tool_tip_queryable.h>
 #include <ui/animation/animated.h>
 #include <ui/graphics/items/standard/graphics_slider.h>
 
@@ -12,7 +13,7 @@ class VariantAnimator;
 class QnToolTipItem;
 class QnToolTipSliderAnimationListener;
 
-class QnToolTipSlider: public Animated<GraphicsSlider> {
+class QnToolTipSlider: public Animated<GraphicsSlider>, public ToolTipQueryable {
     Q_OBJECT;
 
     typedef Animated<GraphicsSlider> base_type;
@@ -38,6 +39,8 @@ protected:
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
+
+    virtual QString toolTipAt(const QPointF &pos) const override;
 
 private:
     void init();
