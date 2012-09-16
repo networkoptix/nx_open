@@ -37,6 +37,14 @@ public:
     QnWorkbenchContextAware(QnWorkbenchContext *context);
 
     /**
+     * Virtual destructor.
+     * 
+     * We do <tt>dynamic_cast</tt>s to <tt>QnWorkbenchContextAware</tt>, so this
+     * class better have a vtable.
+     */
+    virtual ~QnWorkbenchContextAware() {}
+
+    /**
      * \returns                         Context associated with this context-aware object.
      */
     QnWorkbenchContext *context() const {

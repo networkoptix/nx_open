@@ -429,7 +429,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
+    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: why height is zero here?
+    m_titleYAnimator->setSpeed(32.0 * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -613,7 +614,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
+    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: why height is zero at this point?
+    m_sliderYAnimator->setSpeed(70.0 * 2.0); 
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
