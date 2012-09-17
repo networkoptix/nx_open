@@ -149,8 +149,8 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
     if (event->button() == Qt::MiddleButton)
         m_midClickedTab = tabAt(event->pos());
-
-    QTabBar::mousePressEvent(event);
+    else // QTabBar ignores event if MiddleButton was clicked
+        QTabBar::mousePressEvent(event);
 }
 
 void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
