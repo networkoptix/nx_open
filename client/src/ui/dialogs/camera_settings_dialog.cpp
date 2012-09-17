@@ -11,6 +11,8 @@
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
     QDialog(parent, windowFlags)
 {
+    setWindowTitle(tr("Camera settings"));
+
     m_settingsWidget = new QnCameraSettingsWidget(this);
 
     m_buttonBox = new QDialogButtonBox(this);

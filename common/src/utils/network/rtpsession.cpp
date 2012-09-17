@@ -1087,9 +1087,22 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
             break;
 
         // have text response or part of text response.
-        QByteArray textResponse;
-        if (readTextResponce(textResponse))
+        if (m_responseBufferLen <= 4)
         {
+            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 1024);
+            if (readed <= 0)
+                return readed;
+            m_responseBufferLen += readed;
+        }
+        quint8* curPtr = m_responseBuffer;
+        quint8* bEnd = m_responseBuffer+m_responseBufferLen;
+        for(; curPtr < bEnd && *curPtr != '$'; curPtr++);
+        if (*curPtr == '$')
+        {
+            QByteArray textResponse;
+            textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
+            memmove(m_responseBuffer, curPtr, bEnd - curPtr);
+            m_responseBufferLen = bEnd - curPtr;
             QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
             if (!tmp.isEmpty())
                 parseRangeHeader(tmp);
