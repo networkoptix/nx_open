@@ -926,7 +926,8 @@ bool RTPSession::sendTeardown()
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
 
-    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
+    return true;
+    //return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 static const int RTCP_SENDER_REPORT = 200;
@@ -1052,8 +1053,8 @@ bool RTPSession::sendKeepAlive()
 
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
-
-    return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
+    return true;
+    //return (readTextResponce(responce) && responce.startsWith("RTSP/1.0 200"));
 }
 
 // read RAW: combination of text and binary data
@@ -1073,6 +1074,7 @@ void RTPSession::sendBynaryResponse(quint8* buffer, int size)
     m_tcpSock.send(buffer, size);
 }
 
+
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
     while (m_tcpSock.isConnected())
@@ -1087,17 +1089,15 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
             break;
 
         // have text response or part of text response.
-        if (m_responseBufferLen <= 4)
-        {
-            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 1024);
-            if (readed <= 0)
-                return readed;
-            m_responseBufferLen += readed;
-        }
+        int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+        if (readed <= 0)
+            return readed;
+        m_responseBufferLen += readed;
+        
         quint8* curPtr = m_responseBuffer;
         quint8* bEnd = m_responseBuffer+m_responseBufferLen;
         for(; curPtr < bEnd && *curPtr != '$'; curPtr++);
-        if (*curPtr == '$')
+        if (curPtr < bEnd || QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen)))
         {
             QByteArray textResponse;
             textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
