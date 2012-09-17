@@ -129,3 +129,7 @@ wixsetup/x64
 My Amplifier XE Results*
 My Inspector XE Results*
 
+android-client/.metadata/*
+android-client/**/bin/**
+android-client/**/*.prefs
+android-client/**/gen/*
