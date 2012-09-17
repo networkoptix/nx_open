@@ -1073,6 +1073,50 @@ void RTPSession::sendBynaryResponse(quint8* buffer, int size)
     m_tcpSock.send(buffer, size);
 }
 
+int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
+{
+    while (m_tcpSock.isConnected())
+    {
+        while (m_responseBufferLen < 4) {
+            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 4 - m_responseBufferLen);
+            if (readed <= 0)
+                return readed;
+            m_responseBufferLen += readed;
+        }
+        if (m_responseBuffer[0] == '$')
+            break;
+
+        // have text response or part of text response.
+        QByteArray textResponse;
+        if (readTextResponce(textResponse))
+        {
+            QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
+            if (!tmp.isEmpty())
+                parseRangeHeader(tmp);
+            emit gotTextResponse(textResponse);
+        }
+    }
+    int dataLen = (m_responseBuffer[2]<<8) + m_responseBuffer[3] + 4;
+    if (maxDataSize < dataLen)
+        return -2; // not enough buffer
+    int copyLen = qMin(dataLen, m_responseBufferLen);
+    memcpy(data, m_responseBuffer, copyLen);
+    if (m_responseBufferLen > copyLen)
+        memmove(m_responseBuffer, m_responseBuffer + copyLen, m_responseBufferLen - copyLen);
+    data += copyLen;
+    m_responseBufferLen -= copyLen;
+    for (int dataRestLen = dataLen - copyLen; dataRestLen > 0;)
+    {
+        int readed = m_tcpSock.recv(data, dataRestLen);
+        if (readed <= 0)
+            return readed;
+        dataRestLen -= readed;
+        data += readed;
+    }
+    return dataLen;
+}
+
+/*
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 {
@@ -1131,6 +1175,7 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     }
     return -1;
 }
+*/
 
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
