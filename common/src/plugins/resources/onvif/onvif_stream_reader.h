@@ -7,7 +7,7 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
 
-struct CameraInfo;
+struct CameraInfoParams;
 struct ProfilePair;
 class onvifXsd__Profile;
 class onvifXsd__VideoEncoderConfiguration;
@@ -56,11 +56,11 @@ private:
     const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
@@ -75,7 +75,7 @@ private:
     void updateVideoSource(VideoSource& source, bool isPrimary) const;
     void updateAudioSource(AudioSource& source, bool isPrimary) const;
 
-    bool sendProfileToCamera(CameraInfo& info, Profile& profile, bool create = false) const;
+    bool sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
     bool sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool sendVideoSourceToCamera(VideoSource& source) const;
     bool sendAudioEncoderToCamera(AudioEncoder& encoder) const;
