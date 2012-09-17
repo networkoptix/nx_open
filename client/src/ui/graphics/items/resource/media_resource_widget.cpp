@@ -575,7 +575,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(m_camera) {
         result |= MotionSearchButton | InfoButton;
 
-        if(version >= 103010 && (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))) {
+        if(/*version >= 103010 && */(m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))) {
             result |= PtzButton;
 
             if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here
