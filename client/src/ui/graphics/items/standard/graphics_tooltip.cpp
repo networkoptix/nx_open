@@ -13,6 +13,7 @@
 #include <QtGui/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
+#include <ui/common/weak_graphics_item_pointer.h>
 
 #define NOPARENT
 
@@ -40,12 +41,18 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
+
 protected:
-    void timerEvent(QTimerEvent *e);
+    virtual void timerEvent(QTimerEvent *e) override;
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
 private:
-    QGraphicsItem *m_item; // TODO: #GDM what happens if item is suddenly deleted?
+    QGraphicsItem *item() const {
+        return m_item.data();
+    }
+
+private:
+    WeakGraphicsItemPointer m_item;
 };
 
 GraphicsTooltipLabel *GraphicsTooltipLabel::instance = 0;
@@ -82,8 +89,8 @@ void GraphicsTooltipLabel::restartExpireTimer()
 
 void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newItem)
 {
-    if (m_item)
-        m_item->removeSceneEventFilter(this);
+    if (item())
+        item()->removeSceneEventFilter(this);
 #ifdef NOPARENT
     if (scene() != newItem->scene()) {
         if (scene())
@@ -138,17 +145,20 @@ bool GraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
 
 void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 {
+    if(!item())
+        return;
+
     QPointF p = pos;
 
     // default pos - below the button and below the cursor
-    QRectF cursorRect = m_item->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
+    QRectF cursorRect = item()->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
 
     // TODO: doesn't work well with tree tooltips
-    //p.setY(qMax(p.y() + cursorRect.height(), m_item->sceneBoundingRect().y() + m_item->sceneBoundingRect().height()));
+    //p.setY(qMax(p.y() + cursorRect.height(), item()->sceneBoundingRect().y() + item()->sceneBoundingRect().height()));
     p.setY(p.y() + cursorRect.height());
 
 #ifdef NOPARENT
-    QRectF self = m_item->sceneTransform().mapRect(this->boundingRect());
+    QRectF self = item()->sceneTransform().mapRect(this->boundingRect());
 #else
     QRectF self = this->sceneBoundingRect();
 #endif
@@ -161,21 +171,21 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
 
     // if cursor is too high (o_O), place tip below the button
     if (p.y() < viewport.y())
-        p.setY(m_item->sceneBoundingRect().y() + m_item->sceneBoundingRect().height());
+        p.setY(item()->sceneBoundingRect().y() + item()->sceneBoundingRect().height());
 
     // if cursor is too low, place tip over the button
     if (p.y() + self.height() > viewport.y() + viewport.height())
-        p.setY(m_item->sceneBoundingRect().y() - self.height());
+        p.setY(item()->sceneBoundingRect().y() - self.height());
 
 #ifdef NOPARENT
     this->setPos(p);
 #else
-    this->setPos(m_item->mapFromScene(p));
+    this->setPos(item()->mapFromScene(p));
 #endif
 }
 
 bool GraphicsTooltipLabel::tipChanged(const QString &newText, QGraphicsItem *parent) {
-    return (newText != this->text() || parent != this->m_item);
+    return (newText != this->text() || parent != this->item());
 }
 
 void GraphicsTooltipLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -196,7 +206,7 @@ void GraphicsTooltipLabel::timerEvent(QTimerEvent *e)
 }
 
 bool GraphicsTooltipLabel::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
-    if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == m_item)
+    if (event->type() == QEvent::GraphicsSceneHoverLeave && watched == item())
         hideTip();
     return base_type::sceneEventFilter(watched, event);
 }
