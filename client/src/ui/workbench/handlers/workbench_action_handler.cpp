@@ -2162,6 +2162,8 @@ Do you want to continue?"),
     connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
     camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+
+    exportProgressDialog->exec();
 }
 
 
