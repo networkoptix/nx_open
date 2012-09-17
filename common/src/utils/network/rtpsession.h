@@ -189,7 +189,7 @@ signals:
 private:
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
-    int readRAWData();
+    //int readRAWData();
     bool sendDescribe();
     bool sendOptions();
     bool sendSetup();
@@ -210,7 +210,7 @@ private:
     bool checkIfDigestAuthIsneeded(const QByteArray& response);
     void usePredefinedTracks();
 private:
-    enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
+    enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
     // 'initialization in order' block
     unsigned int m_csec;
