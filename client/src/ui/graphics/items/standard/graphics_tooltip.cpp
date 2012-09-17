@@ -10,6 +10,7 @@
 #include <QtGui/QToolTip>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QTextDocument>
+#include <QtGui/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
 
@@ -57,6 +58,13 @@ GraphicsTooltipLabel::GraphicsTooltipLabel(const QString & text, QGraphicsItem *
     instance = this;
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     setPalette(QToolTip::palette());
+
+    QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
+    shadow->setXOffset(toolTipMargin);
+    shadow->setYOffset(toolTipMargin);
+    shadow->setBlurRadius(toolTipMargin * .5);
+    setGraphicsEffect(shadow);
+
     qApp->installEventFilter(this);
     reuseTip(text, newItem);
 }
@@ -90,11 +98,6 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
 
     setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
-#ifdef Q_OS_LINUX
-    // QTextEngine on linux draws text as it was left-top-aligned inside its rect.
-    // This small hack sets the text in the center.
-    setContentsMargins(toolTipMargin, toolTipMargin, 0, 0);
-#endif
     resize(sizeHint(Qt::PreferredSize) + QSize(2 * toolTipMargin, 2 * toolTipMargin));
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); // this won't be undone, can be stored in inner field
