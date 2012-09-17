@@ -86,6 +86,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_dwm(NULL),
     m_drawCustomFrame(false)
 {
+    setAttribute(Qt::WA_AlwaysShowToolTips);
+
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();
 

@@ -10,6 +10,7 @@
 #include <QtGui/QToolTip>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QTextDocument>
+#include <QtGui/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
 
@@ -57,6 +58,13 @@ GraphicsTooltipLabel::GraphicsTooltipLabel(const QString & text, QGraphicsItem *
     instance = this;
     setFlag(QGraphicsItem::ItemIgnoresTransformations, true);
     setPalette(QToolTip::palette());
+
+    QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
+    shadow->setXOffset(toolTipMargin);
+    shadow->setYOffset(toolTipMargin);
+    shadow->setBlurRadius(toolTipMargin * .5);
+    setGraphicsEffect(shadow);
+
     qApp->installEventFilter(this);
     reuseTip(text, newItem);
 }
@@ -208,9 +216,9 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
             if (GraphicsTooltipLabel::instance->tipChanged(text, item)){
                 GraphicsTooltipLabel::instance->reuseTip(text, item);
                 GraphicsTooltipLabel::instance->placeTip(pos, viewport);
-
-                opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
             }
+            
+            opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
             return;
         }
     }
