@@ -355,6 +355,8 @@ void QnNavigationItem::updatePlaybackButtonsIcons() {
 
     m_stepBackwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/backward.png" : "slider/navigation/step_backward.png"));
     m_stepForwardButton->setIcon(qnSkin->icon(playing ? "slider/navigation/forward.png" : "slider/navigation/step_forward.png"));
+
+    updatePlaybackButtonsEnabled(); // TODO: remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
 
 void QnNavigationItem::updateJumpButtonsTooltips() {
@@ -363,6 +365,8 @@ void QnNavigationItem::updateJumpButtonsTooltips() {
     // TODO: this is cheating!
     action(Qn::JumpToStartAction)->setText(hasPeriods ? tr("Previuos Chunk") : tr("To Start"));
     action(Qn::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
+
+    updatePlaybackButtonsEnabled(); // TODO: remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {
