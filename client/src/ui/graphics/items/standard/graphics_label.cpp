@@ -121,7 +121,9 @@ void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
     QnScopedPainterFontRollback fontRollback(painter, font());
 
     if(d->performanceHint == NoCaching) {
-        painter->drawText(rect(), Qt::AlignCenter, d->text);
+        qreal left, top, right, bottom;
+        getContentsMargins(&left, &top, &right, &bottom);
+        painter->drawText(rect().adjusted(left, top, right, bottom), Qt::AlignCenter, d->text);
     } else {
         painter->drawStaticText(0.0, 0.0, d->staticText);
     }

@@ -90,7 +90,11 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
 
     setZValue(std::numeric_limits<qreal>::max());
     setText(newText);
+#ifdef Q_OS_LINUX
+    setContentsMargins(toolTipMargin, toolTipMargin, 0, 0);
+#endif
     resize(sizeHint(Qt::PreferredSize) + QSize(2 * toolTipMargin, 2 * toolTipMargin));
+    //resize(sizeHint(Qt::PreferredSize));
     newItem->installSceneEventFilter(this);
     newItem->setAcceptHoverEvents(true); // this won't be undone, can be stored in inner field
     restartExpireTimer();
