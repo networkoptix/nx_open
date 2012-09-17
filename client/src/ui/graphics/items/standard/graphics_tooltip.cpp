@@ -208,9 +208,9 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
             if (GraphicsTooltipLabel::instance->tipChanged(text, item)){
                 GraphicsTooltipLabel::instance->reuseTip(text, item);
                 GraphicsTooltipLabel::instance->placeTip(pos, viewport);
-
-                opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
             }
+            
+            opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
             return;
         }
     }
