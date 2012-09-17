@@ -5,8 +5,8 @@
 static const int TESTCAM_TIMEOUT = 1 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
-    QnLiveStreamProvider(res),
-    CLServerPushStreamreader(res)
+    CLServerPushStreamreader(res),
+    QnLiveStreamProvider(res)
 {
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
 }

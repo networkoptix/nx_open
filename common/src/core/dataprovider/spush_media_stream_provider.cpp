@@ -54,6 +54,7 @@ void CLServerPushStreamreader::run()
                     if (canChangeStatus())
                         getResource()->setStatus(QnResource::Offline);
                     m_stat[0].onLostConnection();
+                    mFramesLost = 0;
                 }
 
                 continue;

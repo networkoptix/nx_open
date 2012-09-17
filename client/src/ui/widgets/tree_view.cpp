@@ -52,3 +52,12 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
 
     QTreeView::timerEvent(event);
 }
+
+QString QnTreeView::toolTipAt(const QPointF &pos) const {
+    QVariant toolTip = indexAt(pos.toPoint()).data(Qt::ToolTipRole);
+    if (toolTip.canConvert<QString>()) {
+        return toolTip.toString();
+    } else {
+        return QString();
+    }
+}

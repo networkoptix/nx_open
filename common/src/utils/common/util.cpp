@@ -147,9 +147,9 @@ qint64 getDiskFreeSpace(const QString& root) {
     struct statvfs buf;
     if (statvfs(root.toUtf8().data(), &buf) == 0)
     {
-        qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
         qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        qint64 used = disk_size - free;
+        //qint64 used = disk_size - free;
 
         return free;
     }

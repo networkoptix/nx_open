@@ -46,6 +46,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager():
     m_ready(false)
 
 {
+    connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -286,10 +287,7 @@ QnResourceList QnResourceDiscoveryManager::processManualAddedResources()
 
 bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck)
 {
-    if (resources.isEmpty())
-        return false;
-
-    QMutexLocker lock(&m_searchersListMutex);
+    QMutexLocker lock(&m_discoveryMutex);
 
     CLNetState netState;
     netState.updateNetState(); // update net state before working with discovered resources
@@ -377,8 +375,15 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
 
         }
-        else
-            ++it; // new resource => shouls keep it
+        else 
+        {
+            QnPhysicalCameraResourcePtr camRes = qSharedPointerDynamicCast<QnPhysicalCameraResource>(*it);
+            QMutexLocker lock(&m_searchersListMutex);
+            if (camRes && camRes->isManuallyAdded() && !m_manualCameraMap.contains(camRes->getUrl()))
+                it = resources.erase(it); // race condition: manual resource just deleted.
+            else
+                ++it; // new resource => shouls keep it
+        }
     }
 
     //==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
@@ -596,6 +601,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         cl_log.log("Discovery---- Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
+    return true;
 }
 
 struct ManualSearcherHelper
@@ -656,7 +662,8 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     {
         ManualSearcherHelper t;
         t.url.setHost(addr.toString());
-        t.url.setPort(port);
+        if (port)
+            t.url.setPort(port);
         t.auth = auth;
         t.plugins = &m_searchersList; // I assume m_searchersList is constatnt during server life cycle 
         testList.push_back(t);
@@ -689,6 +696,11 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
             continue;
 
         if (qnResPool->hasSuchResouce(h.result->getUniqueId())) // already in resource pool 
+            continue;
+
+        // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
+        QnResourcePtr existRes = qnResPool->getResourceByUrl(h.url.host());
+        if (existRes && (existRes->getStatus() == QnResource::Online || existRes->getStatus() == QnResource::Recording))
             continue;
 
         result.push_back(h.result);
@@ -822,22 +834,24 @@ void QnResourceDiscoveryManager::updateResourceStatus(QnResourcePtr res, QSet<QS
         disconnect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
         connect(rpNetRes.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)), this, SLOT(onInitAsyncFinished(QnResourcePtr, bool)));
 
-        if (rpNetRes->getStatus() == QnResource::Offline) 
+        if (!rpNetRes->isDisabled())
         {
-            if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+            if (rpNetRes->getStatus() == QnResource::Offline) 
             {
-                rpNetRes->initAsync();
-                //rpNetRes->setStatus(QnResource::Online);
+                if (rpNetRes->getLastStatusUpdateTime().msecsTo(qnSyncTime->currentDateTime()) > 30) // if resource with OK ip seems to be found; I do it coz if there is no readers and camera was offline and now online => status needs to be changed
+                {
+                    rpNetRes->initAsync();
+                    //rpNetRes->setStatus(QnResource::Online);
+                }
+
             }
-
+            else if (!rpNetRes->isInitialized())
+            {
+                rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
+                //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
+                //    rpNetRes->setStatus(QnResource::Online);
+            }
         }
-        else if (!rpNetRes->isInitialized())
-        {
-            rpNetRes->initAsync(); // Resource already in resource pool. Try to init resource if resource is not authorized or not initialized by other reason
-            //if (rpNetRes->isInitialized() && rpNetRes->getStatus() == QnResource::Unauthorized)
-            //    rpNetRes->setStatus(QnResource::Online);
-        }
-
         discoveredResources.insert(rpNetRes->getUniqueId());
         rpNetRes->setLastDiscoveredTime(qnSyncTime->currentDateTime());
     }
@@ -903,6 +917,14 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
     QtConcurrent::blockingMap(checkLst, &check_if_accessible_STRUCT::f);
     for (int i = 0; i < threads; ++i )global->reserveThread();
 #endif //_DEBUG
+}
+
+void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)
+{
+    QMutexLocker lock(&m_searchersListMutex);
+    QnManualCamerasMap::Iterator itr = m_manualCameraMap.find(resource->getUrl());
+    if (itr != m_manualCameraMap.end() && itr.value().resType->getId() == resource->getTypeId())
+        m_manualCameraMap.erase(itr);
 }
 
 //====================================================================================

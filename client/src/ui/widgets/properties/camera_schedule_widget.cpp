@@ -17,9 +17,9 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
     ui(new Ui::CameraScheduleWidget),
     m_disableUpdateGridParams(false),
+    m_motionAvailable(true),
     m_changesDisabled(false),
-    m_readOnly(false),
-    m_motionAvailable(true)
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -199,7 +199,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                 else
                     qWarning("SecondParam wasn't acknowledged. fallback to 'Highest'");
             }
-            int fps = fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
+            int fps = ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toInt();
             if (fps == 0 && recordType != QnScheduleTask::RecordingType_Never)
                 fps = 10;
 

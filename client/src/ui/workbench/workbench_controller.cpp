@@ -173,9 +173,9 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent),
     m_manager(display()->instrumentManager()),
+    m_cursorPos(invalidCursorPos()),
     m_resizedWidget(NULL),
     m_dragDelta(invalidDragDelta()),
-    m_cursorPos(invalidCursorPos()),
     m_screenRecorder(0)
 {
     ::memset(m_widgetByRole, 0, sizeof(m_widgetByRole));

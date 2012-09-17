@@ -65,6 +65,7 @@ signals:
     void localInterfacesChanged();
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
+    void at_resourceDeleted(const QnResourcePtr& resource);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -87,6 +88,7 @@ private:
     bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
 private:
     QMutex m_searchersListMutex;
+    QMutex m_discoveryMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCamerasMap m_manualCameraMap;

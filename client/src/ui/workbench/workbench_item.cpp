@@ -5,7 +5,7 @@
 #include "workbench_layout.h"
 #include "core/resourcemanagment/resource_pool.h"
 
-Q_DECLARE_METATYPE(QUuid); // TODO: move to global metatype initializer in core
+Q_DECLARE_METATYPE(QUuid) // TODO: move to global metatype initializer in core
 
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),
@@ -18,9 +18,9 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, 
 
 QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     QObject(parent),
+    m_layout(NULL),
     m_resourceUid(data.resource.path),
     m_uuid(data.uuid),
-    m_layout(NULL),
     m_flags(0),
     m_rotation(0.0)
 {

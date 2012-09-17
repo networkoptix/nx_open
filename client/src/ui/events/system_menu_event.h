@@ -22,4 +22,4 @@ public:
     static void initialize();
 };
 
-#endif QN_SYSTEM_MENU_HOTKEY_H
+#endif //QN_SYSTEM_MENU_HOTKEY_H

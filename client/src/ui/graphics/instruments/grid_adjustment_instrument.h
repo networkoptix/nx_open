@@ -38,10 +38,10 @@ private:
     }
 
 private:
-    QSizeF m_speed;
-    QSizeF m_maxSpacing;
     QWeakPointer<QWidget> m_currentViewport;
     QWeakPointer<QnWorkbench> m_workbench;
+    QSizeF m_speed;
+    QSizeF m_maxSpacing;
 };
 
 

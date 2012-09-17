@@ -45,6 +45,7 @@ private slots:
     void updateSpeedSliderParametersFromNavigator();
     void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
+    void updateJumpButtonsTooltips();
     
 
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
@@ -79,8 +80,6 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
-
-    QnWorkbenchNavigator *m_navigator;
 };
 
 #endif // NAVIGATIONITEM_H

@@ -13,19 +13,21 @@ QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 
 int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
+    Q_UNUSED(contentType)
+
     int port = 0;
     QAuthenticator auth;
+    auth.setUser("admin");
+    auth.setPassword("admin"); // default values
+
     QHostAddress addr1;
     QHostAddress addr2;
 
     for (int i = 0; i < params.size(); ++i)
     {
         QPair<QString, QString> param = params[i];
-        if (param.first == "start_ip") {
+        if (param.first == "start_ip")
             addr1 = param.second;
-            if (addr2.toIPv4Address() == 0)
-                addr2 = addr1;
-        }
         else if (param.first == "end_ip")
             addr2 = param.second;
         else if (param.first == "user")
@@ -36,23 +38,46 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
             port = param.second.toInt();
     }
 
-    if (addr1.toIPv4Address() == 0) {
-        resultByteArray.append(QByteArray("Invalid start parameter" + addr1.toString().toUtf8()));
+    if (addr1.isNull()) {
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append(QByteArray("Parameter 'start_ip' missed" + addr1.toString().toUtf8()));
+        resultByteArray.append("</root>\n");
         return CODE_INVALID_PARAMETER;
     }
+    if (addr2.isNull())
+        addr2 = addr1;
 
     QnResourceList resources = QnResourceDiscoveryManager::instance().findResources(addr1, addr2, auth, port);
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
-    resultByteArray.append("<root>\n");
+    // TODO #gdm implement simple XML-builder, will be quite useful
 
-    foreach(const QnResourcePtr &resource, resources){
-        resultByteArray.append("<resource>\n");
-        resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
-        resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
-        QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resource->getTypeId());
-        resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getManufacture()));
-        resultByteArray.append("</resource>\n");
+    resultByteArray.append("<root>\n");
+    {
+        resultByteArray.append("<query>\n");
+        {
+            resultByteArray.append(QString("<start_ip>%1</start_ip>\n").arg(addr1.toString()));
+            resultByteArray.append(QString("<end_ip>%1</end_ip>\n").arg(addr2.toString()));
+            resultByteArray.append(QString("<port>%1</port>\n").arg(port));
+            resultByteArray.append(QString("<user>%1</user>\n").arg(auth.user()));
+            resultByteArray.append(QString("<password>%1</password>\n").arg(auth.password()));
+        }
+        resultByteArray.append("</query>\n");
+
+        resultByteArray.append("<reply>\n");
+        {
+            foreach(const QnResourcePtr &resource, resources){
+                QnResourceTypePtr resourceType = qnResTypePool->getResourceType(resource->getTypeId());
+
+                resultByteArray.append("<resource>\n");
+                resultByteArray.append(QString("<name>%1</name>\n").arg(resource->getName()));
+                resultByteArray.append(QString("<url>%1</url>\n").arg(resource->getUrl()));
+                resultByteArray.append(QString("<manufacturer>%1</manufacturer>\n").arg(resourceType->getName()));
+                resultByteArray.append("</resource>\n");
+            }
+        }
+        resultByteArray.append("</reply>\n");
     }
     resultByteArray.append("</root>\n");
 
@@ -61,19 +86,27 @@ int QnManualCameraAdditionHandler::searchAction(const QnRequestParamList& params
 
 int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
+    Q_UNUSED(contentType)
+
     QAuthenticator auth;
     QString resType;
     QUrl url;
 
     QnManualCamerasMap cameras;
+    QString errStr;
 
     for (int i = 0; i < params.size(); ++i)
     {
         QPair<QString, QString> param = params[i];
         if (param.first == "url") 
         {
-            if (!url.isEmpty())
-                cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+            if (!url.isEmpty()) {
+                QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+                if (itr.value().resType == 0) {
+                    errStr = QString("Unknown resource type %1").arg(resType);
+                    break;
+                }
+            }
             url = param.second;
         }
         else if (param.first == "user")
@@ -83,8 +116,21 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
         else if (param.first == "manufacturer")
             resType = param.second;
     }
-    if (url.isEmpty())
-        cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+    if (!url.isEmpty()) {
+        QnManualCamerasMap::iterator itr = cameras.insert(url.toString(), QnManualCameraInfo(url, auth, resType));
+        if (itr.value().resType == 0) {
+            errStr = QString("Unknown resource type %1").arg(resType);
+        }
+    }
+    
+    if (!errStr.isEmpty())
+    {
+        resultByteArray.append("<?xml version=\"1.0\"?>\n");
+        resultByteArray.append("<root>\n");
+        resultByteArray.append(errStr).append("\n");
+        resultByteArray.append("</root>\n");
+        return CODE_INVALID_PARAMETER;
+    }
 
 
     resultByteArray.append("<?xml version=\"1.0\"?>\n");
@@ -92,10 +138,10 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     bool registered = QnResourceDiscoveryManager::instance().registerManualCameras(cameras);
     if (registered) {
         QnResourceDiscoveryManager::instance().processManualAddedResources();
-        resultByteArray.append("<OK>\n");
+        resultByteArray.append("OK\n");
     }
     else
-        resultByteArray.append("<FAILED>\n");
+        resultByteArray.append("FAILED\n");
     resultByteArray.append("</root>\n");
 
     return registered ? CODE_OK : CODE_INTERNAL_ERROR;

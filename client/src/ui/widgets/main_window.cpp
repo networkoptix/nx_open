@@ -82,10 +82,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     base_type(parent, flags | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
-    m_drawCustomFrame(false),
     m_titleVisible(true),
-    m_dwm(NULL)
+    m_dwm(NULL),
+    m_drawCustomFrame(false)
 {
+    setAttribute(Qt::WA_AlwaysShowToolTips);
+
     /* We want to receive system menu event on Windows. */
     QnSystemMenuEvent::initialize();
 
@@ -429,8 +431,13 @@ void QnMainWindow::updateDwmState() {
 bool QnMainWindow::event(QEvent *event) {
     bool result = base_type::event(event);
 
-    if(event->type() == QnSystemMenuEvent::SystemMenu)
-        menu()->trigger(Qn::MainMenuAction);
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        if(m_mainMenuButton->isVisible())
+            m_mainMenuButton->click();
+            
+        QApplication::sendEvent(m_ui, event);
+        result = true;
+    }
 
     if(m_dwm != NULL)
         result |= m_dwm->widgetEvent(event);

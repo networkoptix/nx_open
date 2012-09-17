@@ -19,17 +19,20 @@
 #include "action_conditions.h"
 #include "action_parameter_types.h"
 
-
 QnAction::QnAction(Qn::ActionId id, QObject *parent): 
     QAction(parent), 
     QnWorkbenchContextAware(parent),
     m_id(id),
-    m_flags(0)
-{}
+    m_flags(0),
+    m_toolTipMarker(QLatin1String("<b></b>"))
+{
+    setToolTip(m_toolTipMarker);
+
+    connect(this, SIGNAL(changed()), this, SLOT(updateToolTip()));
+}
 
 QnAction::~QnAction() {
-    foreach (QnActionCondition *condition, m_textConditions.uniqueKeys())
-        delete condition;
+    qDeleteAll(m_textConditions.uniqueKeys());
 }
 
 
@@ -91,6 +94,27 @@ void QnAction::addChild(QnAction *action) {
 
 void QnAction::removeChild(QnAction *action) {
     m_children.removeOne(action);
+}
+
+QString QnAction::defaultToolTipFormat() const {
+    if(shortcuts().empty()) {
+        return tr("%n");
+    } else {
+        return tr("%n (<b>%s</b>)");
+    }
+}
+
+QString QnAction::toolTipFormat() const {
+    return m_toolTipFormat.isEmpty() ? defaultToolTipFormat() : m_toolTipFormat;
+}
+
+void QnAction::setToolTipFormat(const QString &toolTipFormat) {
+    if(m_toolTipFormat == toolTipFormat)
+        return;
+
+    m_toolTipFormat = toolTipFormat;
+
+    updateToolTip(true);
 }
 
 Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
@@ -199,15 +223,43 @@ void QnAction::updateText() {
     }
 }
 
-void QnAction::addConditionalText(QnActionCondition *condition, const QString &text){
+void QnAction::updateToolTip(bool notify) {
+    if(!toolTip().endsWith(m_toolTipMarker))
+        return; /* We have an explicitly set tooltip. */
+
+    /* This slot is the first to be invoked from changed() signal,
+     * so we don't want to emit additional changed() signals if we were called from it. */
+    bool signalsBlocked = false;
+    if(notify)
+        signalsBlocked = blockSignals(true);
+
+    QString toolTip = toolTipFormat();
+
+    int nameIndex = toolTip.indexOf(QLatin1String("%n"));
+    if(nameIndex != -1) {
+        QString name = !m_pulledText.isEmpty() ? m_pulledText : text();
+        toolTip.replace(nameIndex, 2, name);
+    }
+
+    int shortcutIndex = toolTip.indexOf(QLatin1String("%s"));
+    if(shortcutIndex != -1)
+        toolTip.replace(shortcutIndex, 2, shortcut().toString(QKeySequence::NativeText));
+
+    setToolTip(toolTip + m_toolTipMarker);
+
+    if(notify)
+        blockSignals(signalsBlocked);
+}
+
+void QnAction::addConditionalText(QnActionCondition *condition, const QString &text) {
     m_textConditions[condition] = text;
 }
 
-bool QnAction::hasConditionalTexts(){
+bool QnAction::hasConditionalTexts() {
     return !m_textConditions.isEmpty();
 }
 
-QString QnAction::checkConditionalText(const QnActionParameters &parameters) const{
+QString QnAction::checkConditionalText(const QnActionParameters &parameters) const {
     foreach (QnActionCondition *condition, m_textConditions.uniqueKeys()){
         if (condition->check(parameters))
             return m_textConditions[condition];
