@@ -14,36 +14,10 @@
 #include <mfxvideo++.h>
 
 #include "abstractdecoder.h"
+#include "mfxallocator.h"
 
+#define USE_D3D
 //#define WRITE_INPUT_STREAM_TO_FILE
-
-
-class MyBufferAllocator
-:
-    public mfxBufferAllocator
-{
-public:
-    MyBufferAllocator();
-
-    static mfxStatus ba_alloc( mfxHDL /*pthis*/, mfxU32 nbytes, mfxU16 /*type*/, mfxMemId* mid );
-    static mfxStatus ba_lock( mfxHDL /*pthis*/, mfxMemId mid, mfxU8 **ptr );
-    static mfxStatus ba_unlock(mfxHDL /*pthis*/, mfxMemId /*mid*/);
-    static mfxStatus ba_free( mfxHDL /*pthis*/, mfxMemId mid );
-};
-
-class MyFrameAllocator
-:
-    public mfxFrameAllocator
-{
-public:
-    MyFrameAllocator();
-
-    static mfxStatus fa_alloc( mfxHDL /*pthis*/, mfxFrameAllocRequest* request, mfxFrameAllocResponse* response );
-    static mfxStatus fa_lock( mfxHDL /*pthis*/, mfxMemId mid, mfxFrameData* ptr );
-    static mfxStatus fa_unlock( mfxHDL /*pthis*/, mfxMemId /*mid*/, mfxFrameData* ptr );
-    static mfxStatus fa_gethdl( mfxHDL /*pthis*/, mfxMemId /*mid*/, mfxHDL* /*handle*/ );
-    static mfxStatus fa_free( mfxHDL /*pthis*/, mfxFrameAllocResponse* response );
-};
 
 
 //!Uses Intel Media SDK to provide hardware-accelerated video decoding
@@ -58,7 +32,7 @@ class QuickSyncVideoDecoder
     public QnAbstractVideoDecoder
 {
 public:
-    QuickSyncVideoDecoder();
+    QuickSyncVideoDecoder( const QnCompressedVideoDataPtr data );
     virtual ~QuickSyncVideoDecoder();
 
     virtual PixelFormat GetPixelFormat() const;
@@ -73,7 +47,7 @@ public:
     virtual int getHeight() const;
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const;
-    //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only untile next \a decode call
+    //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
     virtual const AVFrame* lastFrame() const;
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
@@ -82,12 +56,14 @@ public:
         \note \a outSize.width is aligned to 16, \a outSize.height is aligned to 32 because of limitation of underlying API
     */
     virtual void setOutPictureSize( const QSize& outSize );
+    //!Implementation of QnAbstractVideoDecoder::targetMemoryType
+    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
 
     //!introduced for test purposes
     bool decode( mfxU32 codecID, mfxBitstream* inputStream, CLVideoDecoderOutput* outFrame );
 
 private:
-    enum ProcessingState
+    enum SurfaceState
     {
         decoding,
         processing,
@@ -95,7 +71,7 @@ private:
     };
 
     MFXVideoSession m_mfxSession;
-    ProcessingState m_state;
+    SurfaceState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
     std::auto_ptr<MFXVideoVPP> m_processor;
     mfxVideoParam m_srcStreamParam;
@@ -108,8 +84,12 @@ private:
     mfxU64 m_prevTimestamp;
     AVFrame* m_lastAVFrame;
 
-    MyBufferAllocator m_bufAllocator;
-    MyFrameAllocator m_frameAllocator;
+    MFXBufferAllocator m_bufAllocator;
+#ifdef USE_D3D
+    MFXDirect3DSurfaceAllocator m_frameAllocator;
+#else
+    MFXFrameAllocator m_frameAllocator;
+#endif
     std::vector<mfxFrameSurface1> m_decoderSurfacePool;
     std::vector<mfxFrameSurface1> m_processingSurfacePool;
     mfxFrameAllocResponse m_decodingAllocResponse;
@@ -132,6 +112,7 @@ private:
     bool processingNeeded() const;
     void saveToAVFrame( CLVideoDecoderOutput* outFrame, mfxFrameSurface1* decodedFrame );
     bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
+    QString mfxStatusCodeToString( mfxStatus status ) const;
 };
 
 #endif  //_DEBUG
