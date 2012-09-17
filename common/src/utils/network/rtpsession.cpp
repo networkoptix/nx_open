@@ -1146,10 +1146,11 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
 {
+    bool readMoreData = m_responseBufferLen == 0;
     for (int i = 0; i < 40 && m_tcpSock.isConnected(); ++i)
     {
-        if (m_responseBufferLen == 0) {
-            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, 1024);
+        if (readMoreData) {
+            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
             if (readed <= 0)
                 return readed;
             m_responseBufferLen += readed;
@@ -1171,6 +1172,9 @@ bool RTPSession::readTextResponce(QByteArray& response)
                 return true;
             }
         }
+        readMoreData = true;
+        if (m_responseBufferLen == RTSP_BUFFER_LEN)
+            return false;
     }
     return false;
 }
