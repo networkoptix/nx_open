@@ -18,6 +18,7 @@ protected:
 
     virtual ~OnvifResourceSearcher();
 
+    virtual void pleaseStop() override;
 public:
 
     static OnvifResourceSearcher& instance();
@@ -30,7 +31,7 @@ public:
 
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
 };
 
 #endif // onvif_resource_searcher_h

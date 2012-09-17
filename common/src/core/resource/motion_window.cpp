@@ -44,7 +44,6 @@ QVector<QRect> QnMotionRegion::getRectsBySens(int value) const
     // simplify rects
     for (int i = 0; i < rects.size(); ++i)
     {
-        bool foundUnion = false;
         for (int j = 0; j < i; ++j)
         {
             if (rects[i].x() == rects[j].x() && rects[i].width() == rects[j].width() && rects[i].y() == rects[j].bottom()+1)
@@ -110,7 +109,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
         {
             if (sens == newSens)
                 return false;
-            QVector<QRect>	rects = m_data[sens].rects();
+            QVector<QRect> rects = m_data[sens].rects();
             QRegion linkedRects;
             for (int i = 0; i < rects.size(); ++i)
             {

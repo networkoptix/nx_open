@@ -10,25 +10,26 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
+#include "utils/settings.h"
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
+#include "ui/workbench/workbench_translation_manager.h"
+#include "ui/screen_recording/screen_recorder.h"
 
-#include <ui/widgets/settings/connections_settings_widget.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
-
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     QnWorkbenchContextAware(context),
     ui(new Ui::PreferencesDialog()),
-    m_connectionsSettingsWidget(NULL), 
     m_recordingSettingsWidget(NULL), 
     m_youTubeSettingsWidget(NULL), 
     m_licenseManagerWidget(NULL),
-    m_settings(qnSettings)
+    m_settings(qnSettings),
+    m_licenseTabIndex(0)
 {
     ui->setupUi(this);
 
@@ -38,24 +39,26 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->backgroundColorPicker->setAutoFillBackground(false);
     initColorPicker();
 
-#ifndef QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
-    ui->lookAndFeelGroupBox->hide();
-#endif
+    if(!m_settings->isBackgroundEditable()) {
+        ui->animateBackgroundLabel->hide();
+        ui->animateBackgroundCheckBox->hide();
+        ui->backgroundColorLabel->hide();
+        ui->backgroundColorWidget->hide();
+    }
 
-    m_connectionsSettingsWidget = new QnConnectionsSettingsWidget(this);
-    ui->tabWidget->insertTab(PageConnections, m_connectionsSettingsWidget, tr("Connections"));
-
-    m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
-    ui->tabWidget->insertTab(PageRecordingSettings, m_recordingSettingsWidget, tr("Screen Recorder"));
+    if (QnScreenRecorder::isSupported()){
+        m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
+        ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
+    }
 
 #if 0
     youTubeSettingsWidget = new YouTubeSettingsWidget(this);
-    tabWidget->insertTab(PageYouTubeSettings, youTubeSettingsWidget, tr("YouTube"));
+    tabWidget->addTab(youTubeSettingsWidget, tr("YouTube"));
 #endif
 
 #ifndef CL_TRIAL_MODE
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
-    ui->tabWidget->insertTab(PageLicense, m_licenseManagerWidget, tr("Licenses"));
+    m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -66,6 +69,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this, SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
+
+    initLanguages();
 
     updateFromSettings();
 }
@@ -96,14 +101,21 @@ void QnPreferencesDialog::initColorPicker() {
     w->insertColor(Qt::lightGray,     tr("Light gray"));
 }
 
+void QnPreferencesDialog::initLanguages() {
+    QnWorkbenchTranslationManager *translationManager = context()->instance<QnWorkbenchTranslationManager>();
+
+    foreach(const QnTranslationInfo &translation, translationManager->translations()){
+        QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
+        ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
+    }
+}
+
 void QnPreferencesDialog::accept() {
+    QString oldLanguage = m_settings->translationPath();
     submitToSettings();
-
-    if (m_recordingSettingsWidget && m_recordingSettingsWidget->decoderQuality() == Qn::BestQuality && m_recordingSettingsWidget->resolution() == Qn::NativeResolution)
-        QMessageBox::information(this, tr("Information"), tr("Very powerful machine is required for BestQuality and Native resolution."));
-
+    if (oldLanguage != m_settings->translationPath())
+        QMessageBox::information(this, tr("Information"), tr("The language change will take effect after application restart."));
     //m_youTubeSettingsWidget->accept();
-
     base_type::accept();
 }
 
@@ -113,21 +125,12 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setMediaFolder(ui->mainMediaFolderLabel->text());
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
+    m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
         extraMediaFolders.push_back(ui->extraMediaFoldersList->item(i)->text());
     m_settings->setExtraMediaFolders(extraMediaFolders);
-
-    if (m_connectionsSettingsWidget) {
-        QnConnectionData defaultConnection = qnSettings->defaultConnection();
-
-        QnConnectionDataList connections;
-        foreach (const QnConnectionData &connection, m_connectionsSettingsWidget->connections())
-            if (connection != defaultConnection)
-                connections.append(connection);
-        m_settings->setCustomConnections(connections);
-    }
 
     if (m_recordingSettingsWidget)
         m_recordingSettingsWidget->submitToSettings();
@@ -135,6 +138,8 @@ void QnPreferencesDialog::submitToSettings() {
     QStringList checkLst(m_settings->extraMediaFolders());
     checkLst.push_back(QDir::toNativeSeparators(m_settings->mediaFolder()));
     QnResourceDirectoryBrowser::instance().setPathCheckList(checkLst); // TODO: re-check if it is needed here.
+
+    m_settings->setLanguage(ui->languageComboBox->itemData(ui->languageComboBox->currentIndex()).toString());
 
     m_settings->save();
 }
@@ -145,6 +150,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->mainMediaFolderLabel->setText(QDir::toNativeSeparators(m_settings->mediaFolder()));
     ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
+    ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
@@ -154,17 +160,17 @@ void QnPreferencesDialog::updateFromSettings() {
     foreach (const QNetworkAddressEntry &entry, getAllIPv4AddressEntries())
         ui->networkInterfacesList->addItem(tr("IP Address: %1, Network Mask: %2").arg(entry.ip().toString()).arg(entry.netmask().toString()));
 
-    QnConnectionDataList connections = qnSettings->customConnections();
-    connections.push_front(qnSettings->defaultConnection());
-    m_connectionsSettingsWidget->setConnections(connections);
-
     if(m_recordingSettingsWidget)
         m_recordingSettingsWidget->updateFromSettings();
+
+    int id = ui->languageComboBox->findData(m_settings->translationPath());
+    if (id >= 0)
+        ui->languageComboBox->setCurrentIndex(id);
 }
 
-void QnPreferencesDialog::setCurrentPage(QnPreferencesDialog::SettingsPage page)
+void QnPreferencesDialog::openLicensesPage()
 {
-    ui->tabWidget->setCurrentIndex(int(page));
+    ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
 }
 
 

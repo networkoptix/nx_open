@@ -2,9 +2,12 @@
 
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_criterion.h>
-#include <recording/time_period.h>
+#include <core/resourcemanagment/resource_pool.h>
+#include <recording/time_period_list.h>
 
-#include <ui/graphics/items/resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -69,7 +72,7 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
             continue;
 
         if(m_hasRequiredGridDisplayValue) {
-            if(widget->isMotionGridDisplayed() == m_requiredGridDisplayValue)
+            if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
                 return Qn::EnabledAction;
         } else {
             return Qn::EnabledAction;
@@ -86,12 +89,13 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
         if(!widget)
             continue;
 
-        if(widget->isMotionGridDisplayed()) {
+        if(widget->options() & QnResourceWidget::DisplayMotion) {
             hasDisplayedGrid = true;
 
-            foreach(const QRegion &region, widget->motionSelection())
-                if(!region.isEmpty())
-                    return Qn::EnabledAction;
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                foreach(const QRegion &region, mediaWidget->motionSelection())
+                    if(!region.isEmpty())
+                        return Qn::EnabledAction;
         }
     }
 
@@ -104,7 +108,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image);
+        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server);
         if(isUnsupported)
             return Qn::InvisibleAction;
     }
@@ -173,13 +177,13 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::layout))
+        if(resource->hasFlags(QnResource::layout))
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::user))
+        if(resource->hasFlags(QnResource::user))
             continue; /* OK to remove. */
 
-        if(resource->checkFlags(QnResource::remote_server) || resource->checkFlags(QnResource::live_cam)) // TODO: move this to permissions.
+        if(resource->hasFlags(QnResource::remote_server) || resource->hasFlags(QnResource::live_cam)) // TODO: move this to permissions.
             if(resource->getStatus() == QnResource::Offline)
                 continue; /* Can remove only if offline. */
 
@@ -234,7 +238,7 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & QnResource::still_image)
+    if(widget->resource()->flags() & (QnResource::still_image | QnResource::server))
         return Qn::InvisibleAction;
 
     Qn::RenderStatus renderStatus = widget->currentRenderStatus();
@@ -247,6 +251,9 @@ Qn::ActionVisibility QnTakeScreenshotActionCondition::check(const QnResourceWidg
 Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters &parameters) {
     if(!parameters.hasArgument(Qn::TimePeriodParameter))
         return Qn::InvisibleAction;
+
+    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
+        return m_nonMatchingVisibility;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
     if(!(m_periodTypes & period.type())) {
@@ -264,12 +271,34 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
+    if(!context()->workbench()->item(Qn::CentralRole))
+        return Qn::DisabledAction;
+
     QnResourcePtr resource = parameters.resource();
     if(resource->flags() & QnResource::utc) {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-        if(!periods.intersectPeriod(period))
+        if(!periods.intersects(period))
             return Qn::DisabledAction;
     }
     
     return Qn::EnabledAction;
 }
+
+Qn::ActionVisibility QnPanicActionCondition::check(const QnActionParameters &) {
+    return context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() ? Qn::EnabledAction : Qn::DisabledAction;
+}
+
+Qn::ActionVisibility QnToggleTourActionCondition::check(const QnActionParameters &) {
+    return context()->workbench()->currentLayout()->items().size() <= 1 ? Qn::DisabledAction : Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    bool watchable = !(resources[0]->flags() & QnResource::live) || (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission);
+    return watchable ? Qn::EnabledAction : Qn::InvisibleAction;
+
+    // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
+}
+

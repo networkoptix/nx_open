@@ -1,10 +1,14 @@
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
+#include "ssl.h"
+#include "err.h"
 
 #ifndef Q_OS_WIN
 #include <netinet/tcp.h>
 #endif
+
+static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListener* _owner):
     d_ptr(new QnTCPConnectionProcessorPrivate)
@@ -12,6 +16,8 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(TCPSocket* socket, QnTcpListe
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
     d->owner = _owner;
+    d->chunkedMode = false;
+    d->ssl = 0;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, TCPSocket* socket, QnTcpListener* _owner):
@@ -21,12 +27,16 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPriva
     d->socket = socket;
     //d->socket->setNoDelay(true);
     d->owner = _owner;
+    d->chunkedMode = false;
+    d->ssl = 0;
 }
 
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
     stop();
+    if (d_ptr->ssl)
+        SSL_free(d_ptr->ssl);
     delete d_ptr;
 }
 
@@ -102,14 +112,14 @@ void QnTCPConnectionProcessor::parseRequest()
                 if (v.length() > 1)
                     minor = v[1].toInt();
             }
-            d->requestHeaders = QHttpRequestHeader(params[0], params[1], major, minor);
+            d->requestHeaders = QHttpRequestHeader(QLatin1String(params[0]), QLatin1String(params[1]), major, minor);
             firstLine = false;
         }
         else
         {
             QList<QByteArray> params = line.split(':');
             if (params.size() > 1)
-                d->requestHeaders.addValue(params[0].trimmed(), params[1].trimmed());
+                d->requestHeaders.addValue(QLatin1String(params[0].trimmed()), QLatin1String(params[1].trimmed()));
         }
     }
     QByteArray delimiter = "\n";
@@ -120,14 +130,21 @@ void QnTCPConnectionProcessor::parseRequest()
         delimiter = "\r\n";
     QByteArray dblDelim = delimiter + delimiter;
     int bodyStart = d->clientRequest.indexOf(dblDelim);
-    if (bodyStart >= 0 && d->requestHeaders.value("content-length").toInt() > 0)
+    if (bodyStart >= 0 && d->requestHeaders.value(QLatin1String("content-length")).toInt() > 0)
         d->requestBody = d->clientRequest.mid(bodyStart + dblDelim.length());
 }
 
+/*
 void QnTCPConnectionProcessor::bufferData(const char* data, int size)
 {
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.write(data, size);
+}
+
+QnByteArray& QnTCPConnectionProcessor::getSendBuffer()
+{
+    Q_D(QnTCPConnectionProcessor);
+    return d->sendBuffer;
 }
 
 void QnTCPConnectionProcessor::sendBuffer()
@@ -141,6 +158,12 @@ void QnTCPConnectionProcessor::clearBuffer()
     Q_D(QnTCPConnectionProcessor);
     d->sendBuffer.clear();
 }
+*/
+void QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
+{
+    //Q_D(QnTCPConnectionProcessor);
+    sendData(sendBuffer.data(), sendBuffer.size());
+}
 
 void QnTCPConnectionProcessor::sendData(const char* data, int size)
 {
@@ -148,7 +171,11 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
     QMutexLocker lock(&d->sockMutex);
     while (!m_needStop && size > 0 && d->socket->isConnected())
     {
-        int sended = d->socket->send(data, size);
+        int sended;
+        if (d->ssl)
+            sended = SSL_write(d->ssl, data, size);
+        else
+            sended = d->socket->send(data, size);
         if (sended > 0) {
 #ifdef DEBUG_RTSP
             dumpRtspData(data, sended);
@@ -159,28 +186,39 @@ void QnTCPConnectionProcessor::sendData(const char* data, int size)
     }
 }
 
+
 QString QnTCPConnectionProcessor::extractPath() const
 {
     Q_D(const QnTCPConnectionProcessor);
-    QString path = d->requestHeaders.path();
-    int pos = path.indexOf("://");
+    return extractPath(d->requestHeaders.path());
+}
+
+QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
+{
+    int pos = fullUrl.indexOf(QLatin1String("://"));
+    if (pos == -1)
+        return fullUrl;
+    pos = fullUrl.indexOf(QLatin1Char('/'), pos+3);
     if (pos == -1)
         return QString();
-    pos = path.indexOf('/', pos+3);
-    if (pos == -1)
-        return QString();
-    return path.mid(pos+1);
+    return fullUrl.mid(pos+1);
 }
 
 void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType)
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
+    if (d->chunkedMode)
+    {
+        d->responseHeaders.setValue(QLatin1String("Transfer-Encoding"), QLatin1String("chunked"));
+        d->responseHeaders.setContentType(QLatin1String(contentType));
+    }
     if (!d->responseBody.isEmpty())
     {
-        d->responseHeaders.setContentLength(d->responseBody.length());
-        //d->responseHeaders.setContentType("application/sdp");
-        d->responseHeaders.setContentType(contentType);
+        //d->responseHeaders.setContentLength(d->responseBody.length());
+        //d->responseHeaders.setContentType(QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Type"), QLatin1String(contentType));
+        d->responseHeaders.setValue(QLatin1String("Content-Length"), QString::number(d->responseBody.length()));
     }
 
     QByteArray response = d->responseHeaders.toString().toUtf8();
@@ -194,7 +232,26 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
     qDebug() << "\n" << response;
 
     QMutexLocker lock(&d->sockMutex);
-    d->socket->send(response.data(), response.size());
+    if (d->ssl)
+        SSL_write(d->ssl, response.data(), response.size());
+    else
+        d->socket->send(response.data(), response.size());
+}
+
+bool QnTCPConnectionProcessor::sendChunk(const QnByteArray& chunk)
+{
+    Q_D(QnTCPConnectionProcessor);
+    QByteArray result = QByteArray::number(chunk.size(),16);
+    result.append("\r\n");
+    result.append(chunk.data(), chunk.size());
+    result.append("\r\n");
+
+    int sended;
+    if (d->ssl)
+        sended = SSL_write(d->ssl, result.data(), result.size());
+    else
+        sended = d->socket->send(result);
+    return sended == result.size();
 }
 
 QString QnTCPConnectionProcessor::codeToMessage(int code)
@@ -202,15 +259,15 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
     switch(code)
     {
     case CODE_OK:
-        return "OK";
+        return tr("OK");
     case CODE_NOT_FOUND:
-        return "Not Found";
+        return tr("Not Found");
     case CODE_NOT_IMPLEMETED:
-        return "Not Implemented";
+        return tr("Not Implemented");
     case CODE_INTERNAL_ERROR:
-        return "Internal Server Error";
+        return tr("Internal Server Error");
     case CODE_INVALID_PARAMETER:
-        return "Invalid Parameter";
+        return tr("Invalid Parameter");
     }
     return QString ();
 }
@@ -220,11 +277,85 @@ void QnTCPConnectionProcessor::pleaseStop()
     Q_D(QnTCPConnectionProcessor);
     if (d->socket)
         d->socket->close();
-    CLLongRunnable::pleaseStop();
+    QnLongRunnable::pleaseStop();
 }
 
 int QnTCPConnectionProcessor::getSocketTimeout()
 {
     Q_D(QnTCPConnectionProcessor);
     return d->socketTimeout;
+}
+
+bool QnTCPConnectionProcessor::readRequest()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    QTime globalTimeout;
+    d->requestHeaders = QHttpRequestHeader();
+    d->clientRequest.clear();
+    d->responseHeaders = QHttpResponseHeader();
+    d->requestBody.clear();
+    d->responseBody.clear();
+
+    if (d->owner->getOpenSSLContext() && !d->ssl)
+    {
+        d->ssl = SSL_new((SSL_CTX*) d->owner->getOpenSSLContext());  // get new SSL state with context 
+        if (!SSL_set_fd(d->ssl, d->socket->handle()))    // set connection to SSL state 
+            return false;
+        if (SSL_accept(d->ssl) != 1) 
+            return false; // ssl error
+        
+    }
+
+    while (!m_needStop && d->socket->isConnected())
+    {
+        int readed;
+        if (d->ssl) 
+            readed = SSL_read(d->ssl, d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        else
+            readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
+        if (readed > 0) 
+        {
+            globalTimeout.restart();
+            d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
+            if (isFullMessage(d->clientRequest))
+            {
+                return true;
+            }
+            else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
+            {
+                qWarning() << "Too large HTTP client request. Ignoring";
+                return false;
+            }
+        }
+        else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
+        {
+            break;
+        }
+    }
+    return false;
+}
+
+void QnTCPConnectionProcessor::copyClientRequestTo(QnTCPConnectionProcessor& other)
+{
+    Q_D(const QnTCPConnectionProcessor);
+    other.d_ptr->clientRequest = d->clientRequest;
+    other.d_ptr->ssl = d->ssl;
+}
+
+QUrl QnTCPConnectionProcessor::getDecodedUrl() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    QByteArray data = d->requestHeaders.path().toUtf8();
+    data = data.replace("+", "%20");
+    return QUrl::fromEncoded(data);
+
+}
+
+void QnTCPConnectionProcessor::execute(QMutex& mutex)
+{
+    m_needStop = false;
+    mutex.unlock();
+    run();
+    mutex.lock();
 }

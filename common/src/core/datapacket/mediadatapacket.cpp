@@ -14,7 +14,7 @@ extern QMutex global_ffmpeg_mutex;
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
     QMutexLocker mutex(&global_ffmpeg_mutex);
-    m_ctx = avcodec_alloc_context();
+    m_ctx = avcodec_alloc_context3(NULL);
     avcodec_copy_context(m_ctx, ctx);
 }
 
@@ -23,9 +23,9 @@ QnMediaContext::QnMediaContext(CodecID codecId)
     if (codecId != CODEC_ID_NONE)
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
-        m_ctx = avcodec_alloc_context();
         AVCodec* codec = avcodec_find_decoder(codecId);
-        avcodec_open(m_ctx, codec);
+        m_ctx = avcodec_alloc_context3(codec);
+        avcodec_open2(m_ctx, codec, NULL);
     } else {
         m_ctx = 0;
     }
@@ -52,10 +52,56 @@ AVCodecContext* QnMediaContext::ctx() const
     return m_ctx;
 }
 
-bool QnMediaContext::equalTo(QnMediaContext* other) const
+QString QnMediaContext::codecName() const 
+{
+    return m_ctx ? codecIDToString(m_ctx->codec_id) : QString();
+}
+
+bool QnMediaContext::equalTo(QnMediaContext *other) const
 {
     // I've add new condition bits_per_coded_sample for G726 audio codec
     return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
+}
+
+
+void QnAbstractMediaData::assign(QnAbstractMediaData* other)
+{
+    dataProvider = other->dataProvider;
+    timestamp = other->timestamp;
+
+    data.write(other->data.data(), other->data.size());
+    dataType = other->dataType;
+    compressionType = other->compressionType;
+    flags = other->flags;
+    channelNumber = other->channelNumber;
+    subChannelNumber = other->subChannelNumber;
+    context = other->context;
+    opaque = other->opaque;
+}
+
+// ----------------------------------- QnAbstractMediaData -----------------------------------------
+
+QnAbstractMediaData* QnAbstractMediaData::clone()
+{
+    QnAbstractMediaData* rez = new QnAbstractMediaData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
+}
+
+// ----------------------------------- QnCompressedVideoData -----------------------------------------
+void QnCompressedVideoData::assign(QnCompressedVideoData* other)
+{
+    QnAbstractMediaData::assign(other);
+    width = other->width;
+    height = other->height;
+    motion = other->motion;
+}
+
+QnCompressedVideoData* QnCompressedVideoData::clone()
+{
+    QnCompressedVideoData* rez = new QnCompressedVideoData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
 }
 
 // ----------------------------------- QnMetaDataV1 -----------------------------------------
@@ -73,9 +119,24 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
     m_firstTimestamp = AV_NOPTS_VALUE;
     timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (initialValue)
-        data.fill(0xff, data.capacity());
+        data.writeFiller(0xff, data.capacity());
     else
-        data.fill(0, data.capacity());
+        data.writeFiller(0, data.capacity());
+}
+
+void QnMetaDataV1::assign(QnMetaDataV1* other)
+{
+    QnAbstractMediaData::assign(other);
+    i_mask = other->i_mask;
+    m_input = other->m_input;
+    m_duration = other->m_duration;
+}
+
+QnMetaDataV1* QnMetaDataV1::clone()
+{
+    QnMetaDataV1* rez = new QnMetaDataV1();
+    rez->assign(this);
+    return rez;
 }
 
 void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
@@ -128,7 +189,7 @@ bool QnMetaDataV1::isEmpty() const
 
 void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
 {
-    if (m_firstTimestamp == AV_NOPTS_VALUE)
+    if ((quint64)m_firstTimestamp == AV_NOPTS_VALUE)
         m_firstTimestamp = timestamp;
     else 
         m_duration = qMax(m_duration, timestamp - m_firstTimestamp);
@@ -248,3 +309,17 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
 
 }
 
+// ----------------------------------- QnCompressedAudioData -----------------------------------------
+
+void QnCompressedAudioData::assign(QnCompressedAudioData* other)
+{
+    QnAbstractMediaData::assign(other);
+    duration = other->duration;
+}
+
+QnCompressedAudioData* QnCompressedAudioData::clone()
+{
+    QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
+    rez->assign(this);
+    return rez;
+}

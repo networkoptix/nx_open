@@ -3,19 +3,17 @@
 
 #include "core/resource/resource.h"
 
-class CLDesktopDevice: public QnResource
-{
+class QnDesktopDevice: public QnResource { // TODO: rename to resource
+    Q_OBJECT;
 public:
-    CLDesktopDevice(int index);
+    QnDesktopDevice(int index);
 
-    QString toString() const;
+    virtual QString toString() const override;
 
-    virtual bool unknownDevice() const;
-
-    virtual QString getUniqueId() const;
+    virtual QString getUniqueId() const override;
 
 protected:
-    virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
+    virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
 };
 
 #endif //__DESKTOP_DEVICE_H

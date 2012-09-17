@@ -2,6 +2,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <ui/graphics/items/resource/resource_widget.h>
+
 #include "action_parameter_types.h"
 
 namespace {
@@ -27,22 +29,14 @@ QnActionParameters::QnActionParameters(const QVariant &items, const QVariantMap 
     setItems(items);
 }
 
-QnActionParameters::QnActionParameters(const QnResourcePtr &resource, const QVariantMap &arguments) {
-    setArguments(arguments);
-
-    QnResourceList resources;
-    resources.push_back(resource);
-    setItems(QVariant::fromValue<QnResourceList>(resources));
-}
-
-QnActionParameters::QnActionParameters(const QnResourceList &resources, const QVariantMap &arguments) {
-    setArguments(arguments);
-    setItems(QVariant::fromValue<QnResourceList>(resources));
-}
-
 QnActionParameters::QnActionParameters(const QList<QGraphicsItem *> &items, const QVariantMap &arguments) {
     setArguments(arguments);
     setItems(QVariant::fromValue<QnResourceWidgetList>(QnActionParameterTypes::widgets(items)));
+}
+
+QnActionParameters::QnActionParameters(QnResourceWidget *widget, const QVariantMap &arguments) {
+    setArguments(arguments);
+    setItems(QVariant::fromValue<QnResourceWidget *>(widget));
 }
 
 QnActionParameters::QnActionParameters(const QnResourceWidgetList &widgets, const QVariantMap &arguments) {
@@ -81,6 +75,7 @@ Qn::ActionParameterType QnActionParameters::type(const QString &key) const {
 }
 
 int QnActionParameters::size(const QString &key) const {
+    Q_UNUSED(key)
     return QnActionParameterTypes::size(items());
 }
 
@@ -89,6 +84,7 @@ QnResourceList QnActionParameters::resources(const QString &key) const {
 }
 
 QnResourcePtr QnActionParameters::resource(const QString &key) const {
+    Q_UNUSED(key)
     QnResourceList resources = this->resources();
 
     if(resources.size() != 1)
@@ -106,6 +102,7 @@ QnWorkbenchLayoutList QnActionParameters::layouts(const QString &key) const {
 }
 
 QnResourceWidget *QnActionParameters::widget(const QString &key) const {
+    Q_UNUSED(key)
     QnResourceWidgetList widgets = this->widgets();
 
     if(widgets.size() != 1)

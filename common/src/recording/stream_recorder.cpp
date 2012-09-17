@@ -18,49 +18,49 @@ extern QMutex global_ffmpeg_mutex;
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+
     m_device(dev),
     m_firstTime(true),
-    m_packetWrited(false),
-    m_formatCtx(0),
     m_truncateInterval(0),
-    m_startDateTime(AV_NOPTS_VALUE),
     m_endDateTime(AV_NOPTS_VALUE),
-    m_startOffset(0),
-    m_forceDefaultCtx(true),
-    m_prebufferingUsec(0),
+    m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
     m_waitEOF(false),
+    m_forceDefaultCtx(true),
+    m_formatCtx(0),
+    m_packetWrited(false),
+    m_startOffset(0),
+    m_prebufferingUsec(0),
+    m_EofDateTime(AV_NOPTS_VALUE),
     m_endOfData(false),
     m_lastProgress(-1),
-    m_EofDateTime(AV_NOPTS_VALUE),
     m_needCalcSignature(false),
-    m_mdctx(0),
-    m_container("matroska"),
+    m_mdctx(EXPORT_SIGN_METHOD),
+    m_container(QLatin1String("matroska")),
     m_videoChannels(0),
     m_ioContext(0),
     m_needReopen(false),
     m_isAudioPresent(false)
 {
-	memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
+    memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
 
 QnStreamRecorder::~QnStreamRecorder()
 {
     stop();
-	close();
-    delete m_mdctx;
+    close();
 }
 
 void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
     {
-		if (m_packetWrited)
-			av_write_trailer(m_formatCtx);
+        if (m_packetWrited)
+            av_write_trailer(m_formatCtx);
 
-        if (m_startDateTime != AV_NOPTS_VALUE)
+        if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
-            qint64 fileDuration = m_startDateTime != AV_NOPTS_VALUE  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? (m_endDateTime - m_startDateTime)/1000 : 0;
             fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
         }
 
@@ -88,7 +88,7 @@ void QnStreamRecorder::close()
     m_endDateTime = m_startDateTime = AV_NOPTS_VALUE;
 
     markNeedKeyData();
-	m_firstTime = true;
+    m_firstTime = true;
 }
 
 void QnStreamRecorder::markNeedKeyData()
@@ -101,7 +101,8 @@ void QnStreamRecorder::flushPrebuffer()
 {
     while (!m_prebuffer.isEmpty())
     {
-        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        QnAbstractMediaDataPtr d;
+        m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
         else
@@ -121,7 +122,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (!md)
         return true; // skip unknown data
 
-    if (m_EofDateTime != AV_NOPTS_VALUE && md->timestamp > m_EofDateTime)
+    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp > m_EofDateTime)
     {
         if (!m_endOfData) 
         {
@@ -140,10 +141,11 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         return true;
     }
 
-    m_prebuffer << md;
-    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.first()->timestamp >= m_prebufferingUsec)
+    m_prebuffer.push(md);
+    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.front()->timestamp >= m_prebufferingUsec)
     {
-        QnAbstractMediaDataPtr d = m_prebuffer.dequeue();
+        QnAbstractMediaDataPtr d;
+        m_prebuffer.pop(d);
         if (needSaveData(d))
             saveData(d);
         else
@@ -155,7 +157,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         m_waitEOF = false;
     }
 
-    if (m_EofDateTime != AV_NOPTS_VALUE && m_EofDateTime > m_startDateTime)
+    if (m_EofDateTime != qint64(AV_NOPTS_VALUE) && m_EofDateTime > m_startDateTime)
     {
         int progress = ((md->timestamp - m_startDateTime)*100ll) /(m_EofDateTime - m_startDateTime);
         if (progress != m_lastProgress) {
@@ -169,15 +171,21 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
-    if (m_endDateTime != AV_NOPTS_VALUE && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
+    if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
         qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
         close();
     }
-    else if (m_startDateTime != AV_NOPTS_VALUE && md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
-        // if multifile recording allowed, recreate file if recording hole is detected
-        qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
-        close();
+    else if (m_startDateTime != qint64(AV_NOPTS_VALUE)) {
+        if (md->timestamp - m_startDateTime > m_truncateInterval*3 && m_truncateInterval > 0) {
+            // if multifile recording allowed, recreate file if recording hole is detected
+            qDebug() << "Too long time when no I-frame detected (file length exceed " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+            close();
+        }
+        else if (md->timestamp < m_startDateTime - 1000ll*1000) {
+            qDebug() << "Time translated into the past for " << (md->timestamp - m_startDateTime)/1000000 << "sec. Close file";
+            close();
+        }
     }
 
     if (md->dataType == QnAbstractMediaData::AUDIO && m_truncateInterval > 0)
@@ -241,7 +249,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     //if (md->dataType == QnAbstractMediaData::AUDIO)
     //    streamIndex += m_videoChannels;
 
-    if (streamIndex >= m_formatCtx->nb_streams)
+    if ((uint)streamIndex >= m_formatCtx->nb_streams)
         return true; // skip packet
 
     AVPacket avPkt;
@@ -279,7 +287,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 
 void QnStreamRecorder::endOfRun()
 {
-	close();
+    close();
 }
 
 bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
@@ -294,17 +302,17 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastErrMessage = QString("No %1 container in FFMPEG library").arg(m_container);
+        m_lastErrMessage = tr("No %1 container in FFMPEG library.").arg(m_container);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
 
-    QString fileExt = QString(outputCtx->extensions).split(',')[0];
+    QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
     m_fileName = fillFileName(m_mediaProvider);
     if (m_fileName.isEmpty()) 
         return false;
 
-    QString dFileExt = QString(".") + fileExt;
+    QString dFileExt = QLatin1Char('.') + fileExt;
     if (!m_fileName.endsWith(dFileExt, Qt::CaseInsensitive))
         m_fileName += dFileExt;
     QString url = m_fileName; 
@@ -314,7 +322,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     global_ffmpeg_mutex.unlock();
 
     if (err < 0) {
-        m_lastErrMessage = QString("Can't create output file '") + m_fileName + QString("' for video recording.");
+        m_lastErrMessage = tr("Can't create output file '%1' for video recording.").arg(m_fileName);
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return false;
     }
@@ -335,12 +343,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         m_videoChannels = layout->numberOfChannels();
 
-        for (unsigned int i = 0; i < m_videoChannels; ++i) 
+        for (int i = 0; i < m_videoChannels; ++i) 
         {
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0)
             {
-                m_lastErrMessage = "Can't allocate output stream for recording.";
+                m_lastErrMessage = tr("Can't allocate output stream for recording.");
                 cl_log.log(m_lastErrMessage, cl_logERROR);
                 return false;
             }
@@ -376,7 +384,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             }
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-            AVRational defaultFrameRate = {1, 30};
+            AVRational defaultFrameRate = {1, 60};
             videoCodecCtx->time_base = defaultFrameRate;
 
             videoCodecCtx->sample_aspect_ratio.num = 1;
@@ -388,13 +396,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         const QnResourceAudioLayout* audioLayout = mediaDev->getAudioLayout(m_mediaProvider);
         m_isAudioPresent = false;
-        for (unsigned int i = 0; i < audioLayout->numberOfChannels(); ++i) 
+        for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             m_isAudioPresent = true;
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
-                m_lastErrMessage = "Can't allocate output audio stream";
+                m_lastErrMessage = tr("Can't allocate output audio stream.");
                 cl_log.log(m_lastErrMessage, cl_logERROR);
                 return false;
             }
@@ -408,15 +416,19 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         if (m_ioContext == 0)
         {
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = QString("Can't create output file '%1'").arg(url);
+            m_lastErrMessage = tr("Can't create output file '%1'.").arg(url);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
 
         int rez = avformat_write_header(m_formatCtx, 0);
-        if (rez < 0) {
+        if (rez < 0) 
+        {
+            m_storage->closeFfmpegIOContext(m_ioContext);
+            m_ioContext = 0;
+            m_formatCtx->pb = 0;
             avformat_close_input(&m_formatCtx);
-            m_lastErrMessage = QString("Video or audio codec is incompatible with %1 format. Try other format").arg(m_container);
+            m_lastErrMessage = tr("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container);
             cl_log.log(m_lastErrMessage, cl_logERROR);
             return false;
         }
@@ -454,11 +466,13 @@ int QnStreamRecorder::getPrebufferingUsec() const
 
 bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
+    Q_UNUSED(media)
     return true;
 }
 
 bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
 {
+    Q_UNUSED(media)
     return true;
 }
 
@@ -486,34 +500,18 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
 {
     if (m_needCalcSignature == value)
         return;
-    if (value)
-    {
-        const EVP_MD *md = EVP_get_digestbyname(EXPORT_SIGN_METHOD);
-        if (md)
-        {
-            m_needCalcSignature = value;
-            m_mdctx = new EVP_MD_CTX;
-            EVP_MD_CTX_init(m_mdctx);
-            EVP_DigestInit_ex(m_mdctx, md, NULL);
 
-            EVP_DigestUpdate(m_mdctx, EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
-        }
-        else {
-            qCritical() << "Can't sign file because of '" << EXPORT_SIGN_METHOD << "' not found";
-        }
-    }
-    else {
-        delete m_mdctx;
-        m_mdctx = 0;
+    m_needCalcSignature = value;
+
+    if (value) {
+        m_mdctx.reset();
+        m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
     }
 }
 
 QByteArray QnStreamRecorder::getSignature() const
 {
-    quint8 md_value[EVP_MAX_MD_SIZE];
-    quint32 md_len = 0;
-    EVP_DigestFinal_ex(m_mdctx, md_value, &md_len);
-    return QByteArray((const char*)md_value, md_len);
+    return m_mdctx.result();
 }
 
 bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
@@ -527,7 +525,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 
     if (generatedFrame == 0)
     {
-        m_lastErrMessage = QString("Error during generate watermark for file ") + m_fileName;
+        m_lastErrMessage = tr("Error during watermark generation for file '%1'.").arg(m_fileName);
         qWarning() << m_lastErrMessage;
         return false;
     }
@@ -565,8 +563,8 @@ void QnStreamRecorder::setContainer(const QString& container)
 {
     m_container = container;
     // convert short file ext to ffmpeg container name
-    if (m_container == QString("mkv"))
-        m_container = "matroska";
+    if (m_container == QLatin1String("mkv"))
+        m_container = QLatin1String("matroska");
 }
 
 void QnStreamRecorder::setNeedReopen()

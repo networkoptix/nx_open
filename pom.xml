@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.2.1</version>
+	<version>1.3.0</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -13,21 +13,88 @@
 	</scm>	
 
 	<properties>
+		<ffmpeg.version>N-39672-g40b7a27-SNAPSHOT</ffmpeg.version>
+		<openssl.version>1.0.0j-custom</openssl.version>
+		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
+		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
-		<environment.dir>${env.ENVIRONMENT}</environment.dir>
 		<customization>default</customization>
+		<!--QT libs used--> 
+		<qtlib1>core</qtlib1>
+		<qtlib2>gui</qtlib2>
+		<qtlib3>network</qtlib3>
+		<qtlib4>opengl</qtlib4>
+		<qtlib5>xml</qtlib5>
+		<qtlib6>multimedia</qtlib6>
+		<qtlib7/>
+		<qtlib8/>
+		<qtlib9/>
+		<!--QT plugins used-->      
+		<qtplugin1>imageformats</qtplugin1>
+		<qtplugin2>enter its name here...</qtplugin2>
+		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
 	<modules>
+		<module>build-environment</module>
 		<module>appserver</module>
 		<module>common</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
+		<module>client</module>
 		<module>testcamera</module>
 	</modules>
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<plugins>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>released-version</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>released-version</goal>
+							<goal>parse-version</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>hgchangeset</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>update</doUpdate>
+				</configuration>
+			</plugin>		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -64,11 +131,12 @@
 				</os>
 			</activation>
 			<modules>
-				<module>client</module>
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
 			<properties>
+				<environment.dir>${env.ENVIRONMENT}</environment.dir>
+				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
 			</properties>
@@ -102,11 +170,14 @@
 				</os> 
 			</activation>
 			<modules>
+				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
 			</modules>
 			<properties>
+				<environment.dir>${env.environment}</environment.dir>
 				<platform>linux</platform>
+				<compiler>gcc</compiler>
 			</properties>
 		</profile>	
 		<profile>
@@ -134,53 +205,6 @@
 				<qt.dir>/usr/lib/i386-linux-gnu</qt.dir>			
 				<arch>x86</arch>
 			</properties>
-		</profile>
-
-		<profile>
-			<id>convert-clean</id>
-			<activation>				
-				<activeByDefault>true</activeByDefault>
-				<file>
-					<missing>${project.build.directory}/build/include</missing>
-				</file> 
-			</activation>				
-			<build>
-				<plugins>    
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>released-version</id>
-								<phase>validate</phase>
-								<goals>
-									<goal>released-version</goal>
-									<goal>parse-version</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>buildnumber-maven-plugin</artifactId>
-						<version>1.0-beta-4</version>
-						<executions>
-							<execution>
-								<phase>validate</phase>
-								<goals>
-									<goal>hgchangeset</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<doCheck>false</doCheck>
-							<doUpdate>update</doUpdate>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
 		</profile>	
 	</profiles>	
 </project>

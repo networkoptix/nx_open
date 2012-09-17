@@ -1,5 +1,7 @@
 #include "ui_elements_instrument.h"
-#include <QGraphicsWidget>
+
+#include <ui/graphics/items/standard/graphics_widget.h>
+
 #include "destruction_guard_item.h"
 
 UiElementsInstrument::UiElementsInstrument(QObject *parent):
@@ -12,7 +14,7 @@ UiElementsInstrument::UiElementsInstrument(QObject *parent):
      * QGraphicsItem::isUnderMouse returning wrong result.
      * QGraphicsItem::mapToScene returning wrong result.
      * I'm sure there are more. */
-    QGraphicsWidget *widget = new QGraphicsWidget();
+    QGraphicsWidget *widget = new GraphicsWidget();
     widget->setParent(this);
     widget->setAcceptedMouseButtons(0);
     m_widget = widget;

@@ -7,7 +7,8 @@ namespace Qn {
         GeneralSettingsTab,
         NetworkSettingsTab,
         RecordingSettingsTab,
-        MotionSettingsTab
+        MotionSettingsTab,
+        AdvancedSettingsTab
     };
 
 } // namespace Qn

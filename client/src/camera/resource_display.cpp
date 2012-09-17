@@ -3,10 +3,11 @@
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
+#include <core/resource/video_server_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
-#include <camera/camdisplay.h>
-#include <camera/camera.h>
-#include <camera/abstractrenderer.h>
+#include <camera/cam_display.h>
+#include <camera/video_camera.h>
+#include <camera/abstract_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/counter.h>
 
@@ -29,14 +30,13 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     m_dataProvider = resource->createDataProvider(QnResource::Role_Default);
 
-
     if(m_dataProvider != NULL) {
         m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
 
         if(m_mediaProvider != NULL) {
             /* Camera will free media provider in its destructor. */
-            m_camera = new CLVideoCamera(m_mediaResource, false, m_mediaProvider);
+            m_camera = new QnVideoCamera(m_mediaResource, false, m_mediaProvider);
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
 
@@ -60,18 +60,21 @@ QnResourceDisplay::~QnResourceDisplay() {
     disconnectFromResource();
 }
 
-void QnResourceDisplay::cleanUp(CLLongRunnable *runnable) const {
+void QnResourceDisplay::cleanUp(QnLongRunnable *runnable) const {
     if(runnable == NULL)
         return;
 
+#if 0
     if(m_started) {
         runnable->pleaseStop();
     } else {
         runnable->deleteLater();
     }
+#endif
+    runnable->pleaseStop();
 }
 
-CLCamDisplay *QnResourceDisplay::camDisplay() const {
+QnCamDisplay *QnResourceDisplay::camDisplay() const {
     if(m_camera == NULL)
         return NULL;
 
@@ -99,9 +102,11 @@ void QnResourceDisplay::disconnectFromResource() {
     foreach(detail::QnRendererGuard *guard, m_guards)
         guard->renderer()->beforeDestroy();
 
+#if 0
     if(!m_started)
         foreach(detail::QnRendererGuard *guard, m_guards)
             delete guard;
+#endif
 
     m_mediaResource.clear();
     m_dataProvider = NULL;
@@ -127,7 +132,13 @@ qint64 QnResourceDisplay::lengthUSec() const {
 }
 
 qint64 QnResourceDisplay::currentTimeUSec() const {
-    return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
+    if (!m_camera)
+        return -1;
+    else if (m_camera->getCamDisplay()->isRealTimeSource())
+        return DATETIME_NOW;
+    else
+        return m_camera->getCamDisplay()->getCurrentTime();
+    //return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
 }
 
 void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {
@@ -161,7 +172,7 @@ void QnResourceDisplay::pause() {
         return;
 
     m_archiveReader->pause();
-    m_archiveReader->setSingleShotMode(true);
+    m_archiveReader->pauseMedia();
     m_archiveReader->pauseDataProcessors();
 
 }
@@ -170,12 +181,11 @@ bool QnResourceDisplay::isPaused() {
     if(m_archiveReader == NULL)
         return false;
 
-
     return m_archiveReader->isMediaPaused();
 }
 
 bool QnResourceDisplay::isStillImage() const {
-    return m_camera->getCamDisplay()->isStillImage();
+    return m_resource->flags() & QnResource::still_image;
 }
 
 void QnResourceDisplay::addRenderer(QnAbstractRenderer *renderer) {

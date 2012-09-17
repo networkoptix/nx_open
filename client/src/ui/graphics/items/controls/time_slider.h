@@ -1,11 +1,11 @@
 #ifndef QN_TIME_SLIDER_H
 #define QN_TIME_SLIDER_H
 
-#include "tool_tip_slider.h"
-
-#include <recording/time_period.h>
+#include <recording/time_period_list.h>
+#include <recording/time_period_storage.h>
 
 #include <ui/common/functors.h>
+#include <ui/graphics/items/generic/tool_tip_slider.h>
 #include <ui/processors/kinetic_process_handler.h>
 #include <ui/processors/drag_process_handler.h>
 #include <ui/animation/animation_timer_listener.h>
@@ -18,7 +18,6 @@ class QTimer;
 
 class QnThumbnailsLoader;
 class QnTimeSliderPixmapCache;
-
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT;
@@ -114,7 +113,7 @@ public:
     qint64 windowEnd() const;
     void setWindowEnd(qint64 windowEnd);
 
-    void setWindow(qint64 start, qint64 end);
+    void setWindow(qint64 start, qint64 end, bool animate = false);
 
     bool windowContains(qint64 position);
     void ensureWindowContains(qint64 position);
@@ -140,7 +139,6 @@ public:
     void setToolTipFormat(const QString &format);
 
     Q_SLOT void finishAnimations();
-    Q_SLOT void animatedUnzoom();
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
@@ -154,6 +152,9 @@ public:
 
     QnThumbnailsLoader *thumbnailsLoader() const;
     void setThumbnailsLoader(QnThumbnailsLoader *value);
+
+    const QVector<qint64> &indicators() const;
+    void setIndicators(const QVector<qint64> &indicators);
 
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -217,8 +218,7 @@ private:
     struct LineData {
         LineData(): visible(true), stretch(1.0) {}
 
-        QnTimePeriodList normalPeriods[Qn::TimePeriodRoleCount];
-        QnTimePeriodList aggregatedPeriods[Qn::TimePeriodRoleCount];
+        QnTimePeriodStorage timeStorage;
         QString comment;
         QPixmap commentPixmap;
         bool visible;
@@ -226,8 +226,8 @@ private:
     };
 
     struct ThumbnailData {
-        ThumbnailData(): pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
-        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), hiding(false), selection(0.0), selecting(false) {}
+        ThumbnailData(): pos(0.0), opacity(0.0), selection(0.0), hiding(false), selecting(false) {}
+        ThumbnailData(const QnThumbnail &thumbnail): thumbnail(thumbnail), pos(0.0), opacity(0.0), selection(0.0), hiding(false), selecting(false) {}
 
         QnThumbnail thumbnail;
         qreal pos;
@@ -253,7 +253,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, QnTimePeriodList &recorded, QnTimePeriodList &motion, const QRectF &rect);
+    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
@@ -273,7 +273,6 @@ private:
     void updateLineCommentPixmap(int line);
     void updateLineCommentPixmaps();
     void updateAggregationValue();
-    void updateAggregatedPeriods(int line, Qn::TimePeriodRole type);
     void updateTotalLineStretch();
     void updateThumbnailsStepSize(bool instant, bool forced = false);
     void updateThumbnailsPeriod();
@@ -309,7 +308,8 @@ private:
     QnBoundedLinearFunction m_boundMapper;
 
     qint64 m_zoomAnchor;
-    bool m_unzooming;
+    bool m_animating;
+    qint64 m_animationStart, m_animationEnd;
     Marker m_dragMarker;
     QPointF m_dragDelta;
     bool m_dragIsClick;
@@ -318,7 +318,6 @@ private:
     int m_lineCount;
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
-    qreal m_aggregationMSecs;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
@@ -341,6 +340,8 @@ private:
     qreal m_prefferedHeight;
 
     QnTimeSliderPixmapCache *m_pixmapCache;
+
+    QVector<qint64> m_indicators;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

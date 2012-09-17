@@ -12,6 +12,7 @@ namespace Qn {
     inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
+    inline QLatin1String qn_allVideoServersParameter()      { return QLatin1String("_qn_allVideoServers"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
     inline QLatin1String qn_timePeriodsParameter()          { return QLatin1String("_qn_timePeriodsParameter"); }
@@ -24,6 +25,7 @@ namespace Qn {
 #define LayoutParameter qn_layoutParameter()
 #define CurrentLayoutParameter qn_currentLayoutParameter()
 #define CurrentUserParameter qn_currentUserParameter()
+#define AllVideoServersParameter qn_allVideoServersParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 #define TimePeriodParameter qn_timePeriodParameter()
 #define TimePeriodsParameter qn_timePeriodsParameter()
@@ -121,8 +123,6 @@ namespace Qn {
          * Opens the main menu.
          */
         MainMenuAction,
-        LightMainMenuAction,
-        DarkMainMenuAction,
 
         /**
          * Opens a new tab (layout).
@@ -165,7 +165,7 @@ namespace Qn {
         /**
          * Starts / stops screen recording.
          */
-        ScreenRecordingAction,
+        ToggleScreenRecordingAction,
 
         /**
          * Toggles client's fullscreen state.
@@ -252,19 +252,24 @@ namespace Qn {
         OpenInNewWindowAction,
 
         /**
-         * Opens selected layout.
+         * Opens a single layout.
          */
         OpenSingleLayoutAction,
 
         /**
-         * Opens selected layouts.
+         * Opens multiple layouts.
          */
         OpenMultipleLayoutsAction,
 
         /**
-         * Opens selected layouts.
+         * Opens given layouts.
          */
         OpenAnyNumberOfLayoutsAction,
+
+        /**
+         * Opens selected layouts in a new window.
+         */
+        OpenNewWindowLayoutsAction,
 
         /**
          * Saves selected layout.
@@ -355,6 +360,11 @@ namespace Qn {
         ServerSettingsAction,
 
         /**
+         * Opens manual camera addition dialog.
+         */
+        ServerAddCameraManuallyAction,
+
+        /**
          * Opens a YouTube upload dialog.
          */
         YouTubeUploadAction,
@@ -369,7 +379,25 @@ namespace Qn {
          */
         OpenInFolderAction,
 
+        /**
+         * Rotates item to normal orientation
+         */
+        Rotate0Action,
 
+        /**
+         * Rotates item to 90 degrees clockwise
+         */
+        Rotate90Action,
+
+        /**
+         * Rotates item to 180 degrees clockwise
+         */
+        Rotate180Action,
+
+        /**
+         * Rotates item to 270 degrees clockwise
+         */
+        Rotate270Action,
 
         /* Layout actions. */
 
@@ -392,6 +420,7 @@ namespace Qn {
          * Changes resource name.
          * 
          * Parameters:
+         * 
          * <tt>QString NameParameter</tt> --- new name for the resource. If not
          * supplied, name dialog will pop up.
          */
@@ -437,6 +466,16 @@ namespace Qn {
          */
         SetCurrentLayoutItemSpacing30Action,
 
+        /**
+         * Toggles panic recording.
+         */
+        TogglePanicModeAction,
+
+        /**
+         * Toggles tour mode.
+         */
+        ToggleTourModeAction,
+
 
 
         /* Slider actions. */
@@ -471,6 +510,34 @@ namespace Qn {
          */
         ToggleThumbnailsAction,
 
+        /**
+         * Opens new layout for Quick Search.
+         * 
+         * Parameters:
+         * 
+         * <tt>QnTimePeriod TimePeriodParameter</tt> --- time period for quick search.
+         */
+        ThumbnailsSearchAction,
+
+        /**
+         * Shows/hides calendar.
+         */
+        ToggleCalendarAction,
+
+
+        /* Playback actions. */
+        PlayPauseAction,
+        SpeedDownAction,
+        SpeedUpAction,
+        PreviousFrameAction,
+        NextFrameAction,
+        JumpToStartAction,
+        JumpToEndAction,
+        VolumeUpAction,
+        VolumeDownAction,
+        ToggleMuteAction,
+        JumpToLiveAction,
+        ToggleSyncAction,
 
 
         /* Debug actions. */

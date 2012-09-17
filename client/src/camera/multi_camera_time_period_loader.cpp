@@ -1,6 +1,6 @@
 #include "multi_camera_time_period_loader.h"
 #include "utils/common/warnings.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resourcemanagment/resource_pool.h"
 #include "core/resource/camera_history.h"
 
@@ -106,19 +106,19 @@ void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
             {
                 multiHandle = itr.key();
                 itr.value().removeOne(handle);
-				if (itr.value().isEmpty()) 
-				{
-					if (!m_multiLoadPeriod[multiHandle].isEmpty())
-					{
-						QnTimePeriodList result = QnTimePeriod::mergeTimePeriods(m_multiLoadPeriod[multiHandle]);
-						m_multiLoadPeriod.remove(multiHandle);
-						m_multiLoadProgress.erase(itr);
-						emit ready(result, multiHandle);
-					}
-					else {
-						emit failed(status, multiHandle);
-					}
-				}
+                if (itr.value().isEmpty()) 
+                {
+                    if (!m_multiLoadPeriod[multiHandle].isEmpty())
+                    {
+                        QnTimePeriodList result = QnTimePeriod::mergeTimePeriods(m_multiLoadPeriod[multiHandle]);
+                        m_multiLoadPeriod.remove(multiHandle);
+                        m_multiLoadProgress.erase(itr);
+                        emit ready(result, multiHandle);
+                    }
+                    else {
+                        emit failed(status, multiHandle);
+                    }
+                }
                 break;
             }
         }

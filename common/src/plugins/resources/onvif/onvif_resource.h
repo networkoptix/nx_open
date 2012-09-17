@@ -1,6 +1,7 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#include <QDateTime>
 #include <QList>
 #include <QMap>
 #include <QPair>
@@ -10,14 +11,18 @@
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/mediadatapacket.h"
 #include "soap_wrapper.h"
-
+#include "onvif_resource_settings.h"
+#include "core/resource/interface/abstract_ptz_controller.h"
+#include "onvif_ptz_controller.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
+class onvifXsd__VideoEncoderConfiguration;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
+typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -25,6 +30,8 @@ const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
 const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
 const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
 
+
+class QDomElement;
 
 struct CameraPhysicalWindowSize
 {
@@ -65,16 +72,18 @@ public:
     static QString MAX_FPS_PARAM_NAME;
     static QString AUDIO_SUPPORTED_PARAM_NAME;
     static QString DUAL_STREAMING_PARAM_NAME;
-	static const float QUALITY_COEF;
+    static const float QUALITY_COEF;
     static const double MAX_SECONDARY_RESOLUTION_SQUARE;
     static const char* PROFILE_NAME_PRIMARY;
     static const char* PROFILE_NAME_SECONDARY;
     static const int MAX_AUDIO_BITRATE;
     static const int MAX_AUDIO_SAMPLERATE;
+    static const int ADVANCED_SETTINGS_VALID_TIME; //Time, during which adv settings will not be obtained from camera (in milliseconds)
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
     QnPlOnvifResource();
+    virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
@@ -105,7 +114,8 @@ public:
     int getPrimaryH264Profile() const;
     int getSecondaryH264Profile() const;
     ResolutionPair getMaxResolution() const;
-    bool isSoapAuthorized() const;
+    int getTimeDrift() const; // return clock diff between camera and local clock at seconds
+    //bool isSoapAuthorized() const;
     const CameraPhysicalWindowSize getPhysicalWindowSize() const;
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
@@ -117,17 +127,26 @@ public:
     QString getMediaUrl() const;
     void setMediaUrl(const QString& src);
 
+    QString getImagingUrl() const;
+    void setImagingUrl(const QString& src);
+
+    void setPtzfUrl(const QString& src);
+    QString getPtzfUrl() const;
+
     void setDeviceOnvifUrl(const QString& src);
 
-    CODECS getCodec() const;
+    CODECS getCodec(bool isPrimary) const;
     AUDIO_CODECS getAudioCodec() const;
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
     bool forcePrimaryEncoderCodec() const;
-protected:
+    void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
 
-    void setCodec(CODECS c);
+    virtual QnOnvifPtzController* getPtzController() override;
+    bool fetchAndSetDeviceInformation();
+protected:
+    void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
 
     bool initInternal() override;
@@ -137,17 +156,19 @@ protected:
 
     virtual bool updateResourceCapabilities();
 
-private:
+    virtual bool getParamPhysical(const QnParam &param, QVariant &val);
+    virtual bool setParamPhysical(const QnParam &param, const QVariant& val);
+
+    virtual void fetchAndSetCameraSettings();
 
     QString getDeviceOnvifUrl() const;
-    
-
+private:
     void setMaxFps(int f);
 
-    bool fetchAndSetDeviceInformation();
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
+    void updateSecondaryResolutionList(const VideoOptionsResp& response);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
@@ -163,15 +184,23 @@ private:
     void setMinMaxQuality(int min, int max);
 
     void save();
-	
-	int round(float value);
+
+    int round(float value);
     ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare) const;
-    float getResolutionAspectRatio(const ResolutionPair& resolution) const;
+    static ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare, const QList<ResolutionPair>& resolutionList);
+    static float getResolutionAspectRatio(const ResolutionPair& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
     int getH264StreamProfile(const VideoOptionsResp& response);
+    void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
+    int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
+    void readPtzInfo();
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
+    QList<ResolutionPair> m_secondaryResolutionList;
+    OnvifCameraSettingsResp* m_onvifAdditionalSettings;
+
+    mutable QMutex m_physicalParamsMutex;
+    QDateTime m_advSettingsLastUpdated;
 
 private:
     static const char* ONVIF_PROTOCOL_PREFIX;
@@ -181,14 +210,16 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
 
-
     int m_iframeDistance;
     int m_minQuality;
     int m_maxQuality;
-    CODECS m_codec;
+    CODECS m_primaryCodec;
+    CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
     ResolutionPair m_primaryResolution;
     ResolutionPair m_secondaryResolution;
+    int m_primaryH264Profile;
+    int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
     CameraPhysicalWindowSize m_physicalWindowSize;
@@ -197,11 +228,15 @@ private:
     QString m_audioEncoderId;
     QString m_videoSourceId;
     QString m_audioSourceId;
+    QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
     bool m_forceCodecFromPrimaryEncoder;
-    int  m_primaryH264Profile;
-    int m_secondaryH264Profile;
+    QnOnvifPtzController* m_ptzController;
+
+    QString m_imagingUrl;
+    QString m_ptzUrl;
+    int m_timeDrift;
 };
 
 #endif //onvif_resource_h

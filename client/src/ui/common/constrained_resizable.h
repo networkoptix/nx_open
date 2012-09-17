@@ -19,6 +19,11 @@
 class ConstrainedResizable {
 public:
     /**
+     * Virtual destructor.
+     */
+    virtual ~ConstrainedResizable() {}
+
+    /**
      * This function is to be called just before the derived class's geometry
      * is to be changed.
      *

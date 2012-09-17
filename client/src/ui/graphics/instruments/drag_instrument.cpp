@@ -3,7 +3,9 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QDrag>
 
-#include <ui/graphics/items/resource_widget.h>
+#include <core/resource/resource.h>
+
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_resource.h>
 
 DragInstrument::DragInstrument(QObject *parent):

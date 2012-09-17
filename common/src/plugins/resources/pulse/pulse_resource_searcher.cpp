@@ -53,7 +53,7 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
         return result;
     }
 
-    if (resourceType->getManufacture() == QnPlPulseResource::MANUFACTURE)
+    if (resourceType->getManufacture() == QLatin1String(QnPlPulseResource::MANUFACTURE))
     {
         result = QnVirtualCameraResourcePtr( new QnPlPulseResource() );
     }
@@ -70,14 +70,16 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
     return result;
 }
 
-QnResourcePtr QnPlPulseSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 
 QString QnPlPulseSearcher::manufacture() const
 {
-    return "";
+    return QString();
 }
 
 
@@ -90,7 +92,7 @@ QnNetworkResourcePtr QnPlPulseSearcher::createResource(const QString& manufactur
     if (!rt.isValid())
         return result;
 
-    if (manufacture == QnPlPulseResource::MANUFACTURE)
+    if (manufacture == QLatin1String(QnPlPulseResource::MANUFACTURE))
     {
         result = QnNetworkResourcePtr(new QnPlPulseResource());
     }

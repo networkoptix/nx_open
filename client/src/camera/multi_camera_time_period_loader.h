@@ -1,8 +1,9 @@
 #ifndef QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H
 #define QN_MULTI_CAMERA_TIME_PERIOD_LOADER_H
 
-#include <QMap>
-#include <QMutex>
+#include <QtCore/QMap>
+#include <QtCore/QMutex>
+
 #include "time_period_loader.h"
 
 /**

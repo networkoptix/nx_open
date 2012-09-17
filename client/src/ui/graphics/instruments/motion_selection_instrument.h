@@ -5,7 +5,7 @@
 
 #include <QtCore/QWeakPointer>
 
-class QnResourceWidget;
+class QnMediaResourceWidget;
 class MotionSelectionItem;
 
 class MotionSelectionInstrument: public DragProcessingInstrument {
@@ -43,12 +43,12 @@ public:
     Qt::KeyboardModifiers multiSelectionModifiers() const;
 
 signals:
-    void selectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void selectionStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
-    void motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &rect);
-    void selectionFinished(QGraphicsView *view, QnResourceWidget *widget);
-    void selectionProcessFinished(QGraphicsView *view, QnResourceWidget *widget);
+    void selectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void selectionStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &rect);
+    void selectionFinished(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void selectionProcessFinished(QGraphicsView *view, QnMediaResourceWidget *widget);
 
 protected:
     virtual void installedNotify() override;
@@ -68,18 +68,18 @@ protected:
         return m_selectionItem.data();
     }
 
-    QnResourceWidget *target() const {
+    QnMediaResourceWidget *target() const {
         return m_target.data();
     }
 
-    Qt::KeyboardModifiers selectionModifiers(QnResourceWidget *target) const;
+    Qt::KeyboardModifiers selectionModifiers(QnMediaResourceWidget *target) const;
 
     void ensureSelectionItem();
 
 private:
     QColor m_colors[RoleCount];
     QWeakPointer<MotionSelectionItem> m_selectionItem;
-    QWeakPointer<QnResourceWidget> m_target;
+    QWeakPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;
     bool m_clearingBlocked;

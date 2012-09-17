@@ -1,5 +1,6 @@
 #include "gl_hardware_checker.h"
 
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/log.h>
@@ -11,6 +12,7 @@
 namespace {
 
     class OpenGlDriversErrorMessageDisplay: public QObject {
+        Q_DECLARE_TR_FUNCTIONS(OpenGlDriversErrorMessageDisplay);
     public:
         virtual ~OpenGlDriversErrorMessageDisplay() {
             const QString message = tr("We have detected that your video card drivers may be not installed or are out of date.\n"
@@ -21,6 +23,7 @@ namespace {
     };
 
     class OpenGlHardwareErrorMessageDisplay: public QObject {
+        Q_DECLARE_TR_FUNCTIONS(OpenGlHardwareErrorMessageDisplay);
     public:
         virtual ~OpenGlHardwareErrorMessageDisplay() {
             const QString message = tr("We have detected that your video card is not supported. You can proceed at your own risk.\n"
@@ -114,7 +117,7 @@ QnGlHardwareChecker::~QnGlHardwareChecker() {
     qn_hardwareCheckerPrivate_instance()->check(m_context);
 }
 
-bool QnGlHardwareChecker::eventFilter(QObject *watched, QEvent *event) {
+bool QnGlHardwareChecker::eventFilter(QObject *, QEvent *event) {
     if (event->type() == QEvent::Paint || event->type() == QEvent::UpdateRequest)
         qnDeleteLater(this);
     return false;

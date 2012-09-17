@@ -50,7 +50,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
+            if (!m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -74,7 +74,7 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(request));
+            request.append(digestAccess(QLatin1String(request)));
         }
 
         request.append("Content-Length: ");
@@ -167,7 +167,7 @@ int CLSimpleHTTPClient::readHeaders()
     for (int i = 1; i < lines.size(); ++i)
     {
         QByteArray& line = lines[i];
-        int delimPos = line.indexOf('=');
+        int delimPos = line.indexOf(':');
         if (delimPos == -1)
             m_header.insert(line.trimmed(), QByteArray());
         else 
@@ -198,7 +198,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
     {
         if (!m_connected)
         {
-            if (!m_sock->connect(m_host.toString().toLatin1().data(), m_port))
+            if (!m_sock->connect(m_host.toString(), m_port))
             {
                 return CL_TRANSPORT_ERROR;
             }
@@ -220,7 +220,7 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& requestStr, bool recurs
         }
         else if (m_auth.password().length()>0 && !mNonce.isEmpty())
         {
-            request.append(digestAccess(request));
+            request.append(digestAccess(QLatin1String(requestStr)));
         }
 
         request.append("\r\n");
@@ -337,9 +337,29 @@ int CLSimpleHTTPClient::read(char* data, int max_len)
 //===================================================================================
 void CLSimpleHTTPClient::getAuthInfo()
 {
-    mRealm = m_header.value("realm");
-    mNonce = m_header.value("nonce");
-    mQop = m_header.value("qop");
+    QByteArray wwwAuth = m_header.value("WWW-Authenticate");
+    if (!wwwAuth.toLower().startsWith("digest"))
+        return;
+    wwwAuth = wwwAuth.mid(QByteArray("digest").length());
+
+    QList<QByteArray> authParams = wwwAuth.split(',');
+    for (int i = 0; i < authParams.size(); ++i)
+    {
+        QList<QByteArray> param = authParams[i].split('=');
+        if (param.size() > 1) 
+        {
+            param[0] = param[0].trimmed();
+            param[1] = param[1].trimmed();
+            param[1] = param[1].mid(1, param[1].length()-2);
+            if (param[0] == QByteArray("realm"))
+                mRealm = QLatin1String(param[1]);
+            else if (param[0] == QByteArray("nonce"))
+                mNonce = QLatin1String(param[1]);
+            else if (param[0] == QByteArray("qop"))
+                mQop = QLatin1String(param[1]);
+        }
+       // if (param.startsWith("digest")); /** Empty statement? */
+    }
 }
 
 QByteArray CLSimpleHTTPClient::basicAuth(const QAuthenticator& auth) 
@@ -364,7 +384,7 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
     QString HA1= auth.user() + QLatin1Char(':') + realm + QLatin1Char(':') + auth.password();
     HA1 = QString::fromAscii(QCryptographicHash::hash(HA1.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
-    QString HA2 = method + QString(':') + url;
+    QString HA2 = method + QLatin1Char(':') + url;
     HA2 = QString::fromAscii(QCryptographicHash::hash(HA2.toAscii(), QCryptographicHash::Md5).toHex().constData());
 
     QString response = HA1 + QLatin1Char(':') + nonce + QLatin1Char(':') + HA2;
@@ -383,7 +403,7 @@ QString CLSimpleHTTPClient::digestAccess(const QAuthenticator& auth, const QStri
 
 QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 {
-    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QString('/') + request);
+    return digestAccess(m_auth, mRealm, mNonce, QLatin1String("GET"), QLatin1Char('/') + request);
 }
 
 

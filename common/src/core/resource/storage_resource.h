@@ -71,8 +71,10 @@ public:
     virtual ~QnStorageResource();
 
     AVIOContext* createFfmpegIOContext(const QString& url, QIODevice::OpenMode openMode, int IO_BLOCK_SIZE = 32768);
+    static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int IO_BLOCK_SIZE = 32768);
     void closeFfmpegIOContext(AVIOContext* ioContext);
-	qint64 getFileSizeByIOContext(AVIOContext* ioContext);
+    qint64 getFileSizeByIOContext(AVIOContext* ioContext);
+
 public:
     //virtual void registerFfmpegProtocol() const = 0;
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) = 0;
@@ -134,14 +136,14 @@ public:
 
     virtual bool isRealFiles() const{return true;};
 
-	qint64 getWritedSpace() const;
-	void addWritedSpace(qint64 value);
+    qint64 getWritedSpace() const;
+    void addWritedSpace(qint64 value);
 
     virtual qint64 getFileSize(const QString& fillName) const = 0;
 public:
     virtual void setUrl(const QString& value);
 protected:
-	qint64 m_writedSpace;
+    qint64 m_writedSpace;
 };
 
 typedef QnStorageResource* (*StorageTypeInstance)();

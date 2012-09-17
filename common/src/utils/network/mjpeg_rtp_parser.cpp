@@ -277,7 +277,7 @@ void QnMjpegRtpParser::updateHeaderTables(quint8* lummaTable, quint8* chromaTabl
 // -----------------------------------------------------------------------
 
 QnMjpegRtpParser::QnMjpegRtpParser():
-    QnRtpStreamParser(),
+    QnRtpVideoStreamParser(),
     m_frequency(90000),
     m_frameData(CL_MEDIA_ALIGNMENT, 1024*64)
 {
@@ -320,12 +320,10 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
-
-    result.clear();
 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) {
         m_videoData.clear();
@@ -344,7 +342,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
 
     //1. jpeg main header
 
-    int typeSpecific = *curPtr++;
+    /*int typeSpecific = */ *curPtr++;
     int fragmentOffset = (curPtr[0] << 16) + (curPtr[1] << 8) + curPtr[2];
     curPtr += 3;
     int jpegType = *curPtr++;
@@ -375,7 +373,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         {
             if (bytesLeft < 4)
                 return false;
-            quint8 MBZ = *curPtr++;
+            /*quint8 MBZ =*/ *curPtr++;
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
@@ -469,7 +467,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         else
             m_videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
-        result << m_videoData;
+        result = m_videoData;
         m_videoData.clear();
     }
     return true;

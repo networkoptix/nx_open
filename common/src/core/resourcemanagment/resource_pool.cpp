@@ -4,7 +4,7 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_resource.h"
@@ -76,7 +76,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
         // if resources are local assign localserver as parent
         if (!resource->getParentId().isValid())
         {
-            if (resource->checkFlags(QnResource::local))
+            if (resource->hasFlags(QnResource::local))
                 resource->setParentId(localServer->getId());
         }
 
@@ -155,7 +155,7 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     {
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleStatusChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(statusChanged(QnResource::Status,QnResource::Status)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
-		connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
+        connect(resource.data(), SIGNAL(disabledChanged(bool, bool)), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
         connect(resource.data(), SIGNAL(resourceChanged()), this, SLOT(handleResourceChange()), Qt::QueuedConnection);
 
         if (resource->getStatus() != QnResource::Offline && !resource->isDisabled())
@@ -198,7 +198,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         disconnect(resource.data(), NULL, this, NULL);
 
         if(m_updateLayouts)
-            foreach (const QnLayoutResourcePtr &layoutResource, QnResourceCriterion::filter<QnLayoutResource>(getResources())) // TODO: this is way beyond what one may call 'not optimal'.
+            foreach (const QnLayoutResourcePtr &layoutResource, getResources().filtered<QnLayoutResource>()) // TODO: this is way beyond what one may call 'suboptimal'.
                 foreach(const QnLayoutItemData &data, layoutResource->getItems())
                     if(data.resource.id == resource->getId() || data.resource.path == resource->getUniqueId())
                         layoutResource->removeItem(data);
@@ -320,7 +320,7 @@ QnResourceList QnResourcePool::getResourcesWithFlag(QnResource::Flag flag) const
 
     QMutexLocker locker(&m_resourcesMtx);
     foreach (const QnResourcePtr &resource, m_resources)
-        if (resource->checkFlags(flag))
+        if (resource->hasFlags(flag))
             result.append(resource);
 
     return result;
@@ -374,7 +374,7 @@ int QnResourcePool::activeCameras() const
         if (!camera)
             continue;
 
-		if (!camera->isDisabled() && !camera->isScheduleDisabled())
+        if (!camera->isDisabled() && !camera->isScheduleDisabled())
             count++;
     }
 

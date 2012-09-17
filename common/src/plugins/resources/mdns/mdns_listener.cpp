@@ -55,7 +55,7 @@ static int strEqualAmount(const char* str1, const char* str2)
     return rez;
 }
 
-QString QnMdnsListener::getBestLocalAddress(const QString& removeAddress)
+QString QnMdnsListener::getBestLocalAddress(const QString& remoteAddress)
 {
     if (m_localAddressList.isEmpty())
         return QString();
@@ -64,7 +64,7 @@ QString QnMdnsListener::getBestLocalAddress(const QString& removeAddress)
     int bestIndex = 0;
     for (int i = 0; i < m_localAddressList.size(); ++i)
     {
-        int eq = strEqualAmount(m_localAddressList[i].toLocal8Bit().constData(), removeAddress.toLocal8Bit().constData());
+        int eq = strEqualAmount(m_localAddressList[i].toLocal8Bit().constData(), remoteAddress.toLocal8Bit().constData());
         if (eq > bestEq) {
             bestEq = eq;
             bestIndex = i;
@@ -100,18 +100,18 @@ void QnMdnsListener::readSocketInternal(UDPSocket* socket, QString localAddress)
     quint8 tmpBuffer[1024*16];
     while (socket->hasData())
     {
-        QString removeAddress;
-        quint16 removePort;
-        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), removeAddress, removePort);
+        QString remoteAddress;
+        quint16 remotePort;
+        int datagramSize = socket->recvFrom(tmpBuffer, sizeof(tmpBuffer), remoteAddress, remotePort);
         if (datagramSize > 0) {
             QByteArray responseData((const char*) tmpBuffer, datagramSize);
-            if (m_localAddressList.contains(removeAddress))
+            if (m_localAddressList.contains(remoteAddress))
                 continue; // ignore own packets
             if (localAddress.isEmpty())
-                localAddress = getBestLocalAddress(removeAddress);
+                localAddress = getBestLocalAddress(remoteAddress);
             for (ConsumersMap::iterator itr = m_data.begin(); itr != m_data.end(); ++itr) 
             {
-                itr.value().append(ConsumerData(responseData, localAddress, removeAddress));
+                itr.value().append(ConsumerData(responseData, localAddress, remoteAddress));
             }
         }
     }

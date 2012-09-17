@@ -39,7 +39,7 @@ private:
 
 
 /**
- * QVector4D->QColor converter. 
+ * QVector4D -> QColor converter. 
  */
 class QnColorToVectorConverter: public AbstractConverter {
 public:

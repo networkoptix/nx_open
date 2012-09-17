@@ -11,24 +11,24 @@ class CLSimpleTFTPClient;
 class AVPanoramicClientPullSSTFTPStreamreader : public QnPlAVClinetPullStreamReader
 {
 public:
-	explicit AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res);
+    explicit AVPanoramicClientPullSSTFTPStreamreader(QnResourcePtr res);
 
-	~AVPanoramicClientPullSSTFTPStreamreader();
+    ~AVPanoramicClientPullSSTFTPStreamreader();
 
 protected:
-	virtual QnAbstractMediaDataPtr getNextData();
+    virtual QnAbstractMediaDataPtr getNextData();
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
-	virtual bool needKeyData() const;
+    virtual bool needKeyData() const;
 
 protected:
 
-	int m_last_width; // to avoid frequent moving data!!
-	int m_last_height;
-	bool m_last_resolution;
+    int m_last_width; // to avoid frequent moving data!!
+    int m_last_height;
+    bool m_last_resolution;
 
-	unsigned int m_timeout;
-	
+    unsigned int m_timeout;
+    
     bool m_panoramic;
     bool m_dualsensor;
     QString m_name;

@@ -20,4 +20,5 @@ def gen_filetypes_h():
     print >> filetypes_h, 'static const char* IMAGE_FILETYPES[] = {%s};' % string.join(['"' + x[0] + '"' for x in image_filetypes], ', ')
     print >> filetypes_h, '#endif // UNICLIENT_FILETYPES_H_'
 
-gen_filetypes_h()	
+if __name__ == '__main__':
+  gen_filetypes_h()

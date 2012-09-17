@@ -13,8 +13,37 @@ class GraphicsWidget: public QGraphicsWidget {
 
 public:
     enum HandlingFlag {
-        ItemHandlesMovement = 0x1,
-        ItemHandlesResizing = 0x2
+        /** 
+         * Item's event handlers provide default implementation of item
+         * movement with left mouse button. Note that this implementation 
+         * respects the <tt>QGraphicsItem::ItemIsMovable</tt> flag.
+         * 
+         * This flag is not set by default.
+         */
+        ItemHandlesMovement = 0x1, 
+
+        /**
+         * Item's event handlers provide default implementation of item
+         * resizing with left mouse button for windows.
+         * Note that window is a widget with <tt>Qt::Window</tt> and 
+         * <tt>Qt::WindowTitleHint</tt> flags set.
+         * 
+         * This flag is not set by default.
+         */
+        ItemHandlesResizing = 0x2,
+
+        /**
+         * Item's layout changes are handled by default implementation in
+         * <tt>QGraphicsWidget</tt>. If this flag is not set, 
+         * <tt>handlePendingLayoutRequests()</tt> function can be used to
+         * process all pending layout requests.
+         * 
+         * Note that this flag is considered set if
+         * <tt>QGraphicsLayout::instantInvalidatePropagation()</tt> is <tt>true</tt>.
+         *
+         * This flag is not set by default.
+         */
+        ItemHandlesLayoutRequests = 0x4
     };
     Q_DECLARE_FLAGS(HandlingFlags, HandlingFlag);
 
@@ -26,7 +55,7 @@ public:
 #define ItemHandlingFlagsChange ItemHandlingFlagsChange
 #define ItemHandlingFlagsHaveChanged ItemHandlingFlagsHaveChanged
 
-    GraphicsWidget(QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
+    GraphicsWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~GraphicsWidget();
 
     HandlingFlags handlingFlags() const;
@@ -37,8 +66,23 @@ public:
     void setStyle(GraphicsStyle *style);
     using base_type::setStyle;
 
+    /**
+     * \returns                         The area inside the widget's margins.
+     */
+    QRectF contentsRect() const;
+
+    /**
+     * Processes pending layout requests for all graphics widgets on the given
+     * scene that have <tt>ItemHandlesLayoutRequests</tt> flag unset.
+     *
+     * \param scene                     Graphics scene to process items at.
+     */
+    static void handlePendingLayoutRequests(QGraphicsScene *scene);
+
 protected:
     GraphicsWidget(GraphicsWidgetPrivate &dd, QGraphicsItem *parent, Qt::WindowFlags windowFlags = 0);
+
+    virtual void updateGeometry() override;
 
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
 

@@ -1,6 +1,6 @@
 #include "camera_history.h"
 #include "core/resourcemanagment/resource_pool.h"
-#include "video_server.h"
+#include "video_server_resource.h"
 #include "utils/common/warnings.h"
 
 QnId QnCameraTimePeriod::getServerId() const
@@ -101,8 +101,8 @@ QnVideoServerResourcePtr QnCameraHistory::getPrevVideoServerFromTime(const QnCam
         return QnVideoServerResourcePtr();
     --itr;
     currentPeriod = *itr;
-	qDebug() << "switch to previous video server. prevTime=" << QDateTime::fromMSecsSinceEpoch(timestamp).toString() << "newPeriod=" <<
-		QDateTime::fromMSecsSinceEpoch(currentPeriod.startTimeMs).toString() << "-" << QDateTime::fromMSecsSinceEpoch(currentPeriod.endTimeMs()).toString();
+    qDebug() << "switch to previous video server. prevTime=" << QDateTime::fromMSecsSinceEpoch(timestamp).toString() << "newPeriod=" <<
+        QDateTime::fromMSecsSinceEpoch(currentPeriod.startTimeMs).toString() << "-" << QDateTime::fromMSecsSinceEpoch(currentPeriod.endTimeMs()).toString();
     return qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(itr->getServerId()));
 }
 

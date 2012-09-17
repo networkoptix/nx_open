@@ -7,6 +7,8 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/style/globals.h>
 
+#include "animated.h"
+
 namespace {
     const char *opacityAnimatorPropertyName = "_qn_opacityAnimator";
 
@@ -34,18 +36,25 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
     }
 
     VariantAnimator *animator = item->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
-    if(animator != NULL)
+    if(animator) {
+        animator->setSpeed(speed);
         return animator;
-
-    if(item->scene() == NULL) {
-        qnWarning("Cannot create opacity animator for an item not on a scene.");
-        return staticVariantAnimator();
     }
 
-    AnimationTimer *animationTimer = InstrumentManager::animationTimerOf(item->scene());
-    if(animationTimer == NULL) {
-        qnWarning("Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
-        return staticVariantAnimator();
+    AnimationTimer *animationTimer = NULL;
+    AnimatedBase *animatedBase = dynamic_cast<AnimatedBase *>(item);
+
+    if(!animatedBase) {
+        if(!item->scene()) {
+            qnWarning("Cannot create opacity animator for an item not on a scene.");
+            return staticVariantAnimator();
+        }
+            
+        animationTimer = InstrumentManager::animationTimerOf(item->scene());
+        if(!animationTimer) {
+            qnWarning("Cannot create opacity animator for an item on a scene that has no associated animation instrument.");
+            return staticVariantAnimator();
+        }
     }
 
     animator = new VariantAnimator(item);
@@ -54,6 +63,8 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
     animator->setTargetObject(item);
     animator->setTimeLimit(qnGlobals->opacityChangePeriod());
     animator->setSpeed(speed);
+    if(animatedBase)
+        animatedBase->registerAnimation(animator);
 
     item->setProperty(opacityAnimatorPropertyName, QVariant::fromValue<VariantAnimator *>(animator));
 

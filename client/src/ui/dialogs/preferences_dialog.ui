@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>611</height>
+    <height>671</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -153,10 +153,13 @@
           <property name="fieldGrowthPolicy">
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
           </property>
+          <property name="verticalSpacing">
+           <number>6</number>
+          </property>
           <item row="0" column="0">
            <widget class="QLabel" name="maxVideoItemsLabel">
             <property name="text">
-             <string>Maximum video items on the scene (*)</string>
+             <string>Maximum video items on the scene (*):</string>
             </property>
             <property name="buddy">
              <cstring>maxVideoItemsSpinBox</cstring>
@@ -194,7 +197,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="animateBackgroundLabel">
             <property name="text">
-             <string>Animate background</string>
+             <string>Animate background:</string>
             </property>
            </widget>
           </item>
@@ -208,7 +211,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="backgroundColorLabel">
             <property name="text">
-             <string>Background animation color</string>
+             <string>Background animation color:</string>
             </property>
            </widget>
           </item>
@@ -244,6 +247,27 @@
             </layout>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="tourCycleTimeLabel">
+            <property name="text">
+             <string>Tour cycle time:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
+            <item>
+             <widget class="QSpinBox" name="tourCycleTimeSpinBox"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>seconds</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </item>
@@ -252,7 +276,40 @@
          <property name="title">
           <string>Misc</string>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_15">
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QLabel" name="languageLabel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Language:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="languageComboBox"/>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
           <item>
            <widget class="QCheckBox" name="downmixAudioCheckBox">
             <property name="text">

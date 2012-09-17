@@ -41,13 +41,13 @@ PlDroidStreamReader::~PlDroidStreamReader()
 
 QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
 {
-    QList<QnAbstractMediaDataPtr> result;
+    QnAbstractMediaDataPtr result;
     quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
 
-    while (!m_needStop && result.isEmpty())
+    while (!m_needStop && !result)
     {
         if (!m_gotSDP) {
             msleep(10);
@@ -58,7 +58,7 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
         int readed = m_videoIoDevice->read( (char*) rtpBuffer, sizeof(rtpBuffer));
         m_h264Parser->processData(rtpBuffer, readed, m_videoIoDevice->getStatistic(), result );
     }
-    return result.isEmpty() ? QnAbstractMediaDataPtr() : result[0];
+    return result;
 }
 
 void PlDroidStreamReader::openStream()
@@ -68,18 +68,18 @@ void PlDroidStreamReader::openStream()
         return;
     
     QString portStr = m_resource->getUrl();
-    if (!portStr.startsWith("raw://"))
+    if (!portStr.startsWith(QLatin1String("raw://")))
         return;
-    portStr = portStr.mid(QString("raw://").length());
+    portStr = portStr.mid(QString(QLatin1String("raw://")).length());
 
-    QStringList ports = portStr.split(',');
+    QStringList ports = portStr.split(QLatin1Char(','));
     if (ports.size() < 2) {
         qWarning() << "Invalid droid URL format. Expected at least 4 ports";
         return;
     }
 
-    if (ports[0].contains(':'))
-        m_connectionPort = ports[0].mid(ports[0].indexOf(':')+1).toInt();
+    if (ports[0].contains(QLatin1Char(':')))
+        m_connectionPort = ports[0].mid(ports[0].indexOf(QLatin1Char(':'))+1).toInt();
     
     //m_videoPort = ports[1].toInt();
     //m_audioPort = ports[2].toInt();
@@ -93,7 +93,7 @@ void PlDroidStreamReader::openStream()
 
     if (m_tcpSock.isClosed())
         m_tcpSock.reopen();
-    if (!m_tcpSock.connect(host.toLatin1().data(), m_connectionPort))
+    if (!m_tcpSock.connect(host, m_connectionPort))
     {
         closeStream();
         return;
@@ -108,7 +108,7 @@ void PlDroidStreamReader::openStream()
         quint32 ip = res->getHostAddress().toIPv4Address();
         m_allReaders.insert(ip, this);
     }
-    QByteArray request = QString("v:%1,a:%2,f:%3").arg(m_videoIoDevice->getMediaSocket()->getLocalPort()).
+    QByteArray request = QString(QLatin1String("v:%1,a:%2,f:%3")).arg(m_videoIoDevice->getMediaSocket()->getLocalPort()).
                             arg(m_audioIoDevice->getMediaSocket()->getLocalPort()).arg(DROID_CONTROL_TCP_SERVER_PORT).toAscii();
     
     int sendLen = m_tcpSock.send(request.data(), request.size());

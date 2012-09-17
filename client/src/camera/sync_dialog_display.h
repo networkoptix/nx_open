@@ -1,10 +1,11 @@
 #ifndef __SIGN_DIALOG_DISPLAY_H__
 #define __SIGN_DIALOG_DISPLAY_H__
 
-#include "camera/camdisplay.h"
-#include <openssl/evp.h>
+#include <utils/common/cryptographic_hash.h>
 
-class QnSignDialogDisplay: public CLCamDisplay
+#include <camera/cam_display.h>
+
+class QnSignDialogDisplay: public QnCamDisplay
 {
     Q_OBJECT
 public:
@@ -19,8 +20,7 @@ protected:
     virtual bool processData(QnAbstractDataPacketPtr data) override;
     void finilizeSign();
 private:
-    EVP_MD_CTX* m_mdctx;
-    EVP_MD_CTX* m_tmpMdCtx;
+    QnCryptographicHash m_mdctx;
     QnCompressedVideoDataPtr m_prevFrame;
     bool m_eofProcessed;
     qint64 m_lastDisplayTime;

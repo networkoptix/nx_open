@@ -30,7 +30,7 @@ QnWorkbenchLayoutSynchronizer::QnWorkbenchLayoutSynchronizer(QnWorkbenchLayout *
     m_update(false),
     m_submit(false),
     m_autoDeleting(false),
-    m_submitting(false)
+    m_submitPending(false)
 {
     if(layout == NULL) {
         qnNullWarning(layout);
@@ -159,14 +159,14 @@ void QnWorkbenchLayoutSynchronizer::submit() {
     if(!m_submit)
         return;
 
-    m_submitting = false;
+    m_submitPending = false;
     m_pendingItems.clear();
     QnScopedValueRollback<bool> guard(&m_update, false);
     m_layout->submit(m_resource);
 }
 
 void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
-    m_submitting = false;
+    m_submitPending = false;
 
     QnScopedValueRollback<bool> guard(&m_update, false);
 
@@ -188,10 +188,10 @@ void QnWorkbenchLayoutSynchronizer::submitPendingItems() {
 }
 
 void QnWorkbenchLayoutSynchronizer::submitPendingItemsLater() {
-    if(m_submitting)
+    if(m_submitPending)
         return;
 
-    m_submitting = true;
+    m_submitPending = true;
     QMetaObject::invokeMethod(this, "submitPendingItems", Qt::QueuedConnection);
 }
 
@@ -287,9 +287,7 @@ void QnWorkbenchLayoutSynchronizer::at_resource_cellSpacingChanged() {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_itemAdded(QnWorkbenchItem *item) {
-    connect(item, SIGNAL(geometryChanged()),                            this, SLOT(at_item_changed()));
-    connect(item, SIGNAL(geometryDeltaChanged()),                       this, SLOT(at_item_changed()));
-    connect(item, SIGNAL(rotationChanged()),                            this, SLOT(at_item_changed()));
+    connect(item, SIGNAL(dataChanged(int)),                             this, SLOT(at_item_dataChanged(int)));
     connect(item, SIGNAL(flagChanged(Qn::ItemFlag, bool)),              this, SLOT(at_item_flagChanged(Qn::ItemFlag, bool)));
 
     if(!m_submit)
@@ -343,10 +341,16 @@ void QnWorkbenchLayoutSynchronizer::at_layout_cellSpacingChanged() {
 }
 
 void QnWorkbenchLayoutSynchronizer::at_layout_aboutToBeDestroyed() {
+    m_resource->setData(m_layout->data());
+    submitPendingItems();
+
     clearLayout();
 }
 
-void QnWorkbenchLayoutSynchronizer::at_item_changed() {
+void QnWorkbenchLayoutSynchronizer::at_item_dataChanged(int role) {
+    if(role == Qn::ItemFlagsRole)
+        return; /* This one is handled separately. */
+
     if(!m_submit)
         return;
 
@@ -362,7 +366,7 @@ void QnWorkbenchLayoutSynchronizer::at_item_flagChanged(Qn::ItemFlag flag, bool 
 
     QnScopedValueRollback<bool> guard(&m_update, false);
     QnWorkbenchItem *item = checked_cast<QnWorkbenchItem *>(sender());
-    if(item->checkFlag(flag) != value)
+    if(item->hasFlag(flag) != value)
         return; /* Somebody has already changed it back. */
 
     m_pendingItems.insert(item->uuid());

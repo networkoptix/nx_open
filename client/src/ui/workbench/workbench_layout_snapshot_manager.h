@@ -49,48 +49,49 @@ public:
     void save(const QnLayoutResourcePtr &resource, QObject *object, const char *slot);
     void save(const QnLayoutResourceList &resources, QObject *object, const char *slot);
 
+    void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
-    Qn::LayoutFlags flags(const QnLayoutResourcePtr &resource) const;
-    Qn::LayoutFlags flags(QnWorkbenchLayout *layout) const;
+    Qn::ResourceSavingFlags flags(const QnLayoutResourcePtr &resource) const;
+    Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
 
     bool isChanged(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::LayoutIsChanged;
+        return flags(resource) & Qn::ResourceIsChanged;
     }
 
     bool isLocal(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::LayoutIsLocal;
+        return flags(resource) & Qn::ResourceIsLocal;
     }
 
     bool isBeingSaved(const QnLayoutResourcePtr &resource) const {
-        return flags(resource) & Qn::LayoutIsBeingSaved;
+        return flags(resource) & Qn::ResourceIsBeingSaved;
     }
 
     bool isSaveable(const QnLayoutResourcePtr &resource) const {
-        Qn::LayoutFlags flags = this->flags(resource);
-        if(flags & Qn::LayoutIsBeingSaved)
+        Qn::ResourceSavingFlags flags = this->flags(resource);
+        if(flags & Qn::ResourceIsBeingSaved)
             return false;
 
-        if(flags & (Qn::LayoutIsLocal | Qn::LayoutIsChanged))
+        if(flags & (Qn::ResourceIsLocal | Qn::ResourceIsChanged))
             return true;
 
         return false;
     }
 
     bool isModified(const QnLayoutResourcePtr &resource) const {
-        return (flags(resource) & (Qn::LayoutIsChanged | Qn::LayoutIsBeingSaved)) == Qn::LayoutIsChanged; /* Changed and not being saved. */
+        return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
     }
 
 signals:
     void flagsChanged(const QnLayoutResourcePtr &resource);
 
 protected:
-    void setFlags(const QnLayoutResourcePtr &resource, Qn::LayoutFlags flags);
+    void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
 
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
 
-    Qn::LayoutFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
+    Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
     QnAppServerConnectionPtr connection() const;
 
@@ -99,7 +100,7 @@ protected slots:
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layouts_saved(const QnLayoutResourceList &resources);
     void at_layouts_saveFailed(const QnLayoutResourceList &resources);
-    void at_layout_changed(const QnLayoutResourcePtr &resource);
+    void at_layout_storeRequested();
     void at_layout_changed();
 
 private:
@@ -109,7 +110,7 @@ private:
     QnWorkbenchLayoutSnapshotStorage *m_storage;
 
     /** Layout to flags mapping. */
-    QHash<QnLayoutResourcePtr, Qn::LayoutFlags> m_flagsByLayout;
+    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags> m_flagsByLayout;
 };
 
 

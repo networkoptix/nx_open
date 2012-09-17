@@ -13,8 +13,9 @@
 
 class QGraphicsProxyWidget;
 class QGraphicsWidget;
+class QGraphicsLinearLayout;
 
-class CLVideoCamera;
+class QnVideoCamera;
 
 class InstrumentManager;
 class UiElementsInstrument;
@@ -46,6 +47,8 @@ class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnAc
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
+    typedef QObject base_type;
+
 public:
     enum Flag {
         /** Whether controls should be hidden after a period without activity in zoomed mode. */
@@ -73,6 +76,10 @@ public:
 
     void setFlags(Flags flags);
 
+    bool isWindowButtonsUsed() const {
+        return m_windowButtonsUsed;
+    }
+
     bool isTitleUsed() const {
         return m_titleUsed;
     }
@@ -95,6 +102,10 @@ public:
         return m_helpOpened;
     }
 
+    bool isCalendarOpened() const {
+        return m_calendarOpened;
+    }
+
     bool isTreeVisible() const {
         return m_treeVisible;
     }
@@ -111,23 +122,31 @@ public:
         return m_helpVisible;
     }
 
+    bool isCalendarVisible() const {
+        return m_calendarVisible;
+    }
+
+
 public slots:
     void setProxyUpdatesEnabled(bool updatesEnabled);
     void enableProxyUpdates() { setProxyUpdatesEnabled(true); }
     void disableProxyUpdates() { setProxyUpdatesEnabled(false); }
 
     void setTitleUsed(bool titleUsed = true);
+    void setWindowButtonsUsed(bool windowButtonsUsed = true);
     void setFpsVisible(bool fpsVisible = true);
 
     void setTreeVisible(bool visible = true, bool animate = true);
     void setSliderVisible(bool visible = true, bool animate = true);
     void setTitleVisible(bool visible = true, bool animate = true);
     void setHelpVisible(bool visible = true, bool animate = true);
+    void setCalendarVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true);
     void setSliderOpened(bool opened = true, bool animate = true);
     void setTitleOpened(bool opened = true, bool animate = true);
     void setHelpOpened(bool opened = true, bool animate = true);
+    void setCalendarOpened(bool opened = true, bool animate = true);
 
     void toggleTreeOpened() {
         setTreeOpened(!isTreeOpened());
@@ -146,22 +165,28 @@ public slots:
     }
 
 protected:
+    virtual bool event(QEvent *event) override;
+
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();
 
     void updateTreeGeometry();
     void updateHelpGeometry();
     void updateFpsGeometry();
+    void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
+    void updatePanicButtonGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
-    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
+    QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
+    QRectF updatedCalendarGeometry(const QRectF &sliderGeometry);
     void updateActivityInstrumentState();
 
     void setTreeOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setSliderOpacity(qreal opacity, bool animate);
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
+    void setCalendarOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
@@ -173,12 +198,13 @@ protected slots:
     void updateSliderOpacity(bool animate = true);
     void updateTitleOpacity(bool animate = true);
     void updateHelpOpacity(bool animate = true);
+    void updateCalendarOpacity(bool animate = true);
+    void updateCalendarVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
 
     void setTreeShowButtonUsed(bool used = true);
     void setHelpShowButtonUsed(bool used = true);
 
-    void at_mainMenuAction_triggered();
     void at_freespaceAction_triggered();
     void at_fullscreenAction_triggered();
     void at_activityStopped();
@@ -194,6 +220,7 @@ protected slots:
     void at_sliderResizerItem_geometryChanged();
     void at_sliderShowButton_toggled(bool checked);
     void at_toggleThumbnailsAction_toggled(bool checked);
+    void at_toggleCalendarAction_toggled(bool checked);
 
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
@@ -214,6 +241,9 @@ protected slots:
     void at_helpItem_paintGeometryChanged();
     void at_helpWidget_showRequested();
     void at_helpWidget_hideRequested();
+
+    void at_calendarShowButton_toggled(bool checked);
+    void at_calendarItem_paintGeometryChanged();
 
     void at_fpsItem_geometryChanged();
 
@@ -244,32 +274,47 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
+    /** Whether the tree is pinned. */
+    bool m_treePinned;
+
     /** Whether the tree is opened. */
     bool m_treeOpened;
 
-    /** Whether navigation slider is opened. */
-    bool m_sliderOpened;
+    bool m_treeVisible;
+
+    bool m_titleUsed;
 
     /** Whether title bar is opened. */
     bool m_titleOpened;
 
-    bool m_helpOpened;
+    bool m_titleVisible;
 
-    bool m_treeVisible;
+    /** Whether navigation slider is opened. */
+    bool m_sliderOpened;
 
     bool m_sliderVisible;
 
-    bool m_titleVisible;
+    bool m_helpPinned;
+
+    bool m_helpOpened;
 
     bool m_helpVisible;
 
-    bool m_titleUsed;
+    bool m_calendarOpened;
+
+    bool m_calendarVisible;
+
+    bool m_windowButtonsUsed;
+
+    bool m_ignoreClickEvent;
 
     bool m_inactive;
 
     GraphicsLabel *m_fpsItem;
 
-    bool m_ignoreClickEvent;
+    /* In freespace mode? */
+    bool m_inFreespace;
+
 
 
     /* Slider-related state. */
@@ -314,9 +359,6 @@ private:
     /** Button to pin the tree. */
     QnImageButtonWidget *m_treePinButton;
 
-    /** Whether the tree is pinned. */
-    bool m_treePinned;
-
     /** Hover processor that is used to hide the tree when the mouse leaves it. */
     HoverFocusProcessor *m_treeHidingProcessor;
 
@@ -357,6 +399,9 @@ private:
 
     HoverFocusProcessor *m_titleOpacityProcessor;
 
+    QGraphicsLinearLayout *m_titleRightButtonsLayout;
+
+    QGraphicsWidget *m_windowButtonsWidget;
 
 
     /* Help window-related state. */
@@ -381,14 +426,22 @@ private:
 
     AnimatorGroup *m_helpOpacityAnimatorGroup;
 
-    bool m_helpPinned;
-
     QnWorkbenchMotionDisplayWatcher *m_motionDisplayWatcher;
 
 
+    /* Calendar window-related state. */
 
-    /* Freespace-related state. */
-    bool m_inFreespace;
+    QnMaskedProxyWidget *m_calendarItem;
+
+    VariantAnimator *m_calendarSizeAnimator;
+
+    QnImageButtonWidget *m_calendarShowButton;
+
+    AnimatorGroup *m_calendarOpacityAnimatorGroup;
+
+    HoverFocusProcessor *m_calendarOpacityProcessor;
+
+    bool m_inCalendarGeometryUpdate;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);

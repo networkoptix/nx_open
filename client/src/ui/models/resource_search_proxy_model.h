@@ -1,10 +1,10 @@
 #ifndef QN_RESOURCE_SEARCH_PROXY_MODEL_H
 #define QN_RESOURCE_SEARCH_PROXY_MODEL_H
 
-#include <QSortFilterProxyModel>
+#include <QtGui/QSortFilterProxyModel>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resourcemanagment/resource_criterion.h>
-#include "item_data_role.h"
 
 
 /**

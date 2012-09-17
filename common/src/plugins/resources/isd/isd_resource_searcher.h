@@ -17,7 +17,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
 
 protected:
     virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) override;

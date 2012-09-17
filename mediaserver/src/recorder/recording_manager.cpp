@@ -10,7 +10,7 @@
 #include "core/misc/scheduleTask.h"
 #include "server_stream_recorder.h"
 #include "utils/common/synctime.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -100,7 +100,7 @@ QnServerStreamRecorder* QnRecordingManager::createRecorder(QnResourcePtr res, Qn
 
 bool QnRecordingManager::isResourceDisabled(QnResourcePtr res) const
 {
-	if (res->isDisabled())
+    if (res->isDisabled())
         return true;
 
     QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
@@ -165,10 +165,10 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
             }
             else {
                 if (recorderLowRes)
-                    recorderLowRes->stop();
-                providerLow->stop();
-                if (recorderLowRes)
-                    recorderLowRes->clearUnprocessedData();
+                    recorderLowRes->pleaseStop();
+                providerLow->pleaseStop();
+                //if (recorderLowRes)
+                //    recorderLowRes->clearUnprocessedData();
             }
         }
     }
@@ -182,15 +182,19 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (needStopLow)
             recorderLowRes->pleaseStop();
 
+        /*
         if (needStopHi)
             recorderHiRes->stop();
         if (needStopLow)
             recorderLowRes->stop();
+        */
         camera->stopIfNoActivity();
+        /*
         if (needStopHi)
             recorderHiRes->clearUnprocessedData();
         if (needStopLow)
             recorderLowRes->clearUnprocessedData();
+        */
 
         if (needStopHi) {
             cl_log.log("Recording stopped for camera ", res->getUniqueId(), cl_logINFO);
@@ -228,7 +232,7 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 
             startOrStopRecording(res, camera, recorders.recorderHiRes, recorders.recorderLowRes);
         }
-		else if (!res->isDisabled())
+        else if (!res->isDisabled())
         {
             QnServerStreamRecorder* recorderHiRes = createRecorder(res, camera, QnResource::Role_LiveVideo);
             QnServerStreamRecorder* recorderLowRes = createRecorder(res, camera, QnResource::Role_SecondaryLiveVideo);
@@ -237,10 +241,10 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
                 return;
             
             QnDualStreamingHelperPtr dialStreamingHelper(new QnDualStreamingHelper());
-			if (recorderHiRes)
-				recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
-			if (recorderLowRes)
-				recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
+            if (recorderHiRes)
+                recorderHiRes->setDualStreamingHelper(dialStreamingHelper);
+            if (recorderLowRes)
+                recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
 
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
 
@@ -258,7 +262,7 @@ void QnRecordingManager::at_cameraUpdated()
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
-        if (!camera->isInitialized()) {
+        if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->init();
             if (camera->isInitialized() && camera->getStatus() == QnResource::Unauthorized)
                 camera->setStatus(QnResource::Online);
@@ -279,7 +283,7 @@ void QnRecordingManager::at_cameraUpdated()
 
 void QnRecordingManager::at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus)
 {
-	if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
+    if ((oldStatus == QnResource::Offline || oldStatus == QnResource::Unauthorized) && newStatus == QnResource::Online)
     {
         QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource> (dynamic_cast<QnSecurityCamResource*>(sender())->toSharedPointer());
         if (camera)
@@ -362,14 +366,14 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, inst2);
+Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance);
 QnRecordingManager* QnRecordingManager::instance()
 {
-    return inst2();
+    return qn_recordingManager_instance();
 }
 
 // --------------------- QnServerDataProviderFactory -------------------
-Q_GLOBAL_STATIC(QnServerDataProviderFactory, inst);
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance);
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
@@ -385,5 +389,7 @@ QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInt
 
 QnServerDataProviderFactory* QnServerDataProviderFactory::instance()
 {
-    return inst();
+    return qn_serverDataProviderFactory_instance();
 }
+
+

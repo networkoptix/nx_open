@@ -281,7 +281,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QTextTicksSlider" name="sensitivitySlider">
+           <widget class="QnTextTickSlider" name="sensitivitySlider">
             <property name="minimumSize">
              <size>
               <width>0</width>
@@ -398,6 +398,11 @@
        </item>
       </layout>
      </widget>
+     <widget class="QWidget" name="tabAdvanced">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+     </widget>
     </widget>
    </item>
   </layout>
@@ -406,13 +411,13 @@
   <customwidget>
    <class>QnCameraScheduleWidget</class>
    <extends>QWidget</extends>
-   <header>ui/device_settings/camera_schedule_widget.h</header>
+   <header>ui/widgets/properties/camera_schedule_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QTextTicksSlider</class>
+   <class>QnTextTickSlider</class>
    <extends>QSlider</extends>
-   <header>ui/widgets/properties/qtextticksslider.h</header>
+   <header>ui/widgets/properties/text_tick_slider.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

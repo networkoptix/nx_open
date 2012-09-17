@@ -11,7 +11,7 @@
  * This interval (2T) has the following semantic:
  *   - Server sends us pings every T msecs
  *   - We wake up every 2T msecs
- *   - If T msecs passed sinse last received ping => emit connectionClosed.
+ *   - If 2T msecs passed sinse last received ping => emit connectionClosed.
  */
 static const int PING_INTERVAL = 60000;
 
@@ -139,7 +139,7 @@ void QnMessageSource::httpFinished()
     } else {
         // Connection closed normally by the server. Reconnect immediately.
         QTimer::singleShot(0, this, SLOT(startRequest()));
-        emit connectionClosed("OK");
+        emit connectionClosed(QLatin1String("OK"));
     }
 
     m_reply->deleteLater();
@@ -162,7 +162,7 @@ void QnMessageSource::httpReadyRead()
         if (!event.load(parsed))
             continue;
 
-        if (event.eventType == pb::Message_Type_Initial)
+        if (event.eventType == Qn::Message_Type_Initial)
         {
             if (m_seqNumber == 0)
             {
@@ -179,7 +179,7 @@ void QnMessageSource::httpReadyRead()
             }
 
             emit connectionOpened();
-        } else if (event.eventType != pb::Message_Type_Ping)
+        } else if (event.eventType != Qn::Message_Type_Ping)
         {
             emit messageReceived(event);
         }
@@ -190,17 +190,17 @@ void QnMessageSource::httpReadyRead()
 
 void QnMessageSource::slotAuthenticationRequired(QNetworkReply*,QAuthenticator *authenticator)
 {
-    authenticator->setUser("xxxuser");
-    authenticator->setPassword("xxxpassword");
+    authenticator->setUser(QLatin1String("xxxuser"));
+    authenticator->setPassword(QLatin1String("xxxpassword"));
 }
 
 void QnMessageSource::onPingTimer()
 {
-    if (m_eventWaitTimer.elapsed() > PING_INTERVAL)
+    if (m_eventWaitTimer.elapsed() > 2 * PING_INTERVAL)
     {
         doStop();
 
-        emit connectionClosed("Timeout");
+        emit connectionClosed(QLatin1String("Timeout"));
     }
 }
 
@@ -210,7 +210,7 @@ void QnMessageSource::sslErrors(QNetworkReply*,const QList<QSslError> &errors)
     QString errorString;
     foreach (const QSslError &error, errors) {
         if (!errorString.isEmpty())
-            errorString += ", ";
+            errorString += QLatin1String(", ");
         errorString += error.errorString();
     }
     qnWarning("SSL errors: %1.", errorString);

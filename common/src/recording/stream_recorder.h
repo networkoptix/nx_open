@@ -1,14 +1,15 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
-#include "core/dataconsumer/dataconsumer.h"
-#include "core/datapacket/mediadatapacket.h"
-#include "core/resource/resource.h"
-#include "core/resource/resource_media_layout.h"
-#include <openssl/evp.h>
-#include <QPixmap>
+#include <QtGui/QPixmap>
 
-#include "core/resource/storage_resource.h"
+#include <utils/common/cryptographic_hash.h>
+
+#include <core/dataconsumer/dataconsumer.h>
+#include <core/datapacket/mediadatapacket.h>
+#include <core/resource/resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <core/resource/storage_resource.h>
 
 class QnAbstractMediaStreamDataProvider;
 
@@ -77,8 +78,12 @@ protected:
 
     virtual bool saveMotion(QnAbstractMediaDataPtr media);
 
-    virtual void fileFinished(qint64 /*durationMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*,  qint64 fileSize) {}
-    virtual void fileStarted(qint64 /*startTimeMs*/, const QString& /*fileName*/, QnAbstractMediaStreamDataProvider*) {}
+    virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
+        Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
+    }
+    virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+        Q_UNUSED(startTimeMs) Q_UNUSED(fileName) Q_UNUSED(provider)
+    }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
     bool addSignatureFrame(QString& errorString);
@@ -108,7 +113,7 @@ private:
     QString m_fileName;
     qint64 m_startOffset;
     int m_prebufferingUsec;
-    QQueue<QnAbstractMediaDataPtr> m_prebuffer;
+    QnUnsafeQueue<QnAbstractMediaDataPtr> m_prebuffer;
 
     qint64 m_EofDateTime;
     bool m_endOfData;
@@ -117,7 +122,7 @@ private:
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     
     Role m_role;
-    EVP_MD_CTX* m_mdctx;
+    QnCryptographicHash m_mdctx;
     QPixmap m_logo;
     QString m_container;
     int m_videoChannels;

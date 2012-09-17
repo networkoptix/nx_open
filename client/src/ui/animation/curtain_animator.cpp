@@ -1,11 +1,13 @@
 #include "curtain_animator.h"
+
 #include <cassert>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
-#include <ui/graphics/items/curtain_item.h>
-#include <ui/graphics/items/resource_widget.h>
+
+#include <ui/graphics/items/grid/curtain_item.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+
 #include "variant_animator.h"
 
 QnCurtainAnimator::QnCurtainAnimator(QObject *parent):
@@ -92,6 +94,10 @@ void QnCurtainAnimator::uncurtain() {
     curtain->setColor(toTransparent(m_curtainColor));
     curtain->hide();
     setCurtained(false);
+}
+
+bool QnCurtainAnimator::isCurtained() const {
+    return m_curtained;
 }
 
 void QnCurtainAnimator::restoreFrameColor() {

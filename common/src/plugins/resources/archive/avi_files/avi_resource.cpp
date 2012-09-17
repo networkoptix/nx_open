@@ -1,15 +1,19 @@
 #include "avi_resource.h"
 #include "avi_archive_delegate.h"
+
+#include <core/resource/storage_resource.h>
+
 #include "../archive_stream_reader.h"
 #include "../filetypesupport.h"
 #include "../single_shot_file_reader.h"
+
 
 QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
-    setName(shortName.mid(shortName.indexOf('?')+1));
+    setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
 }
 
 QnAviResource::~QnAviResource()
@@ -44,7 +48,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     if (m_storage)
         aviDelegate->setStorage(m_storage);
     result->setArchiveDelegate(aviDelegate);
-    if (checkFlags(still_image))
+    if (hasFlags(still_image))
         result->setCycleMode(false);
 
     return result;

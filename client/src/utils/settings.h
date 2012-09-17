@@ -34,12 +34,12 @@ struct QnConnectionData {
 
 typedef QList<QnConnectionData> QnConnectionDataList;
 
-Q_DECLARE_METATYPE(QnConnectionData);
-Q_DECLARE_METATYPE(QnConnectionDataList);
+Q_DECLARE_METATYPE(QnConnectionData)
+Q_DECLARE_METATYPE(QnConnectionDataList)
 
 
 class QnSettings: public QnPropertyStorage {
-    Q_OBJECT;
+    Q_OBJECT
 
     typedef QnPropertyStorage base_type;
 
@@ -47,18 +47,26 @@ public:
     enum Variable {
         MAX_VIDEO_ITEMS,
         DOWNMIX_AUDIO,
+        AUDIO_VOLUME,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
-        BACKGROUND_ANIMATED,
-        BACKGROUND_COLOR,
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
-        
+
+        BACKGROUND_EDITABLE,
+        BACKGROUND_ANIMATED,
+        BACKGROUND_COLOR,
+
         DEFAULT_CONNECTION,
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
 
         DEBUG_COUNTER,
+
+        EXTRA_TRANSLATIONS_PATH,
+        TRANSLATION_PATH,
+
+        TOUR_CYCLE_TIME,
 
         VARIABLE_COUNT
     };
@@ -68,47 +76,39 @@ public:
 
     static QnSettings *instance();
 
-    virtual void updateFromSettings(QSettings *settings) override;
-
     void load();
     void save();
 
-signals:
-    /**
-     * This signal is emitted whenever last used connection changes.
-     *
-     * Note that due to implementation limitations, this signal may get emitted
-     * even if the actual connection parameters didn't change.
-     */
-    void lastUsedConnectionChanged();
-
 protected:
-    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
-    virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
+    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids) override;
 
-    virtual bool updateValue(int id, const QVariant &value) override;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) override;
+    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
-    virtual void lock() const override;
-    virtual void unlock() const override;
-
-private:
-    QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT);
-        QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24);
-        QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false);
-        QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString());
-        QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList());
-        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true);
-        QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor());
-        QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false);
-        QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false);
-        QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData());
-        QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData());
-        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList());
-        QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0);
-    QN_END_PROPERTY_STORAGE();
+    virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
-    mutable QMutex m_mutex;
+    QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
+        QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
+        QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
+        QN_DECLARE_RW_PROPERTY(qreal,                   audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)
+        QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
+        QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
+        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
+        QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
+        QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
+        QN_DECLARE_RW_PROPERTY(bool,                    isLayoutsOpenedOnLogin, setLayoutsOpenedOnLogin,    OPEN_LAYOUTS_ON_LOGIN,      false)
+        QN_DECLARE_RW_PROPERTY(bool,                    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)
+        QN_DECLARE_R_PROPERTY (QnConnectionData,        defaultConnection,                                  DEFAULT_CONNECTION,         QnConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnConnectionData,        lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
+        QN_DECLARE_RW_PROPERTY(QnConnectionDataList,    customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
+        QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
+        QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
+        QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
+        QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
+    QN_END_PROPERTY_STORAGE()
+
+private:
     QSettings *m_settings;
     bool m_loading;
 };

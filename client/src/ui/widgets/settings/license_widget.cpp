@@ -15,7 +15,7 @@
 
 namespace {
     bool isValidSerialKey(const QString &key) {
-        return key.length() == QnLicense::FREE_LICENSE_KEY.length() && !key.contains(' ');
+        return key.length() == QnLicense::FREE_LICENSE_KEY.length() && !key.contains(QLatin1Char(' '));
     }
 
 } // anonymous namespace
@@ -76,7 +76,7 @@ void LicenseWidget::setFreeLicenseAvailable(bool available) {
 }
 
 void LicenseWidget::setHardwareId(const QByteArray& hardwareId) {
-    ui->hardwareIdEdit->setText(hardwareId);
+    ui->hardwareIdEdit->setText(QLatin1String(hardwareId));
 }
 
 QString LicenseWidget::serialKey() const {
@@ -144,7 +144,7 @@ void LicenseWidget::at_browseLicenseFileButton_clicked() {
 }
 
 void LicenseWidget::at_activateFreeLicenseButton_clicked() {
-    ui->serialKeyEdit->setText(QnLicense::FREE_LICENSE_KEY);
+    ui->serialKeyEdit->setText(QLatin1String(QnLicense::FREE_LICENSE_KEY));
     at_activateLicenseButton_clicked();
 }
 

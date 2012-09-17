@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_globals.h>
+#include <core/resource/user_resource.h>
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -155,6 +156,9 @@ public:
 
     void removeChild(QnAction *action);
 
+    QString toolTipFormat() const;
+    void setToolTipFormat(const QString &toolTipFormat);
+
     /**
      * \param scope                     Scope in which action is to be executed.
      * \param parameters                Parameters for action execution.
@@ -164,11 +168,29 @@ public:
      */
     Qn::ActionVisibility checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const;
 
+    void addConditionalText(QnActionCondition *condition, const QString &text);
+
+    /**
+     * \returns true if there is at least one conditional text
+    */
+    bool hasConditionalTexts();
+
+    /**
+     * \param parameters                Parameters for action execution.
+     * \returns                         New text if condition is executed;
+     *                                  empty string otherwise.
+     */
+    QString checkConditionalText(const QnActionParameters &parameters) const;
+
 protected:
     virtual bool event(QEvent *event) override;
 
 private slots:
     void updateText();
+    void updateToolTip(bool notify = false);
+
+private:
+    QString defaultToolTipFormat() const;
 
 private:
     struct Permissions {
@@ -182,9 +204,11 @@ private:
     Qn::ActionFlags m_flags;
     QHash<QString, Permissions> m_permissions;
     QString m_normalText, m_toggledText, m_pulledText;
+    QString m_toolTipFormat, m_toolTipMarker;
     QWeakPointer<QnActionCondition> m_condition;
 
     QList<QnAction *> m_children;
+    QHash<QnActionCondition *, QString> m_textConditions;
 };
 
 #endif // QN_ACTION_H

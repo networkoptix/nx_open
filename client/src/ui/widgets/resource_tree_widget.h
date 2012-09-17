@@ -67,9 +67,10 @@ signals:
     void selectionChanged();
 
 protected:
-    virtual void contextMenuEvent(QContextMenuEvent *event) override;
+    virtual void contextMenuEvent(QContextMenuEvent *) override;
     virtual void wheelEvent(QWheelEvent *event) override;
     virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
@@ -84,6 +85,7 @@ protected:
     void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
 
     void killSearchTimer();
+    void showContextMenuAt(const QPoint &pos);
 
 private slots:
     void expandAll();
@@ -101,8 +103,8 @@ private slots:
     void at_workbench_currentLayoutChanged();
     
     void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_workbench_itemAdded(QnWorkbenchItem *item);
-    void at_workbench_itemRemoved(QnWorkbenchItem *item);
+    void at_layout_itemAdded(QnWorkbenchItem *item);
+    void at_layout_itemRemoved(QnWorkbenchItem *item);
 
 private:
     QScopedPointer<Ui::ResourceTreeWidget> ui;

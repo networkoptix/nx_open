@@ -8,6 +8,11 @@
 #include <shlobj.h>
 #include "version.h"
 
+#pragma comment(lib, "Shell32.lib") /* For IsUserAnAdmin. */
+#pragma comment(lib, "AdvApi32.lib") /* For ControlService and other service-related functions. */
+
+
+#define USE_SINGLE_STREAMING_PORT
 
 static const QString MEDIA_SERVER_NAME (QString(ORGANIZATION_NAME) + QString(" Media Server"));
 static const QString APP_SERVER_NAME("Enterprise Controller");
@@ -51,12 +56,21 @@ QnSystrayWindow::QnSystrayWindow():
 {
     ui->setupUi(this);
 
-    m_iconOK = QIcon(":/images/traytool.png");
-    m_iconBad = QIcon(":/images/traytool.png");
+#ifdef USE_SINGLE_STREAMING_PORT
+    ui->apiPortLineEdit->setVisible(false);
+    ui->label_ApiPort->setVisible(false);
+    ui->label_RtspPort->setText(tr("Port"));
+#endif
+
+    m_iconOK = QIcon(":/traytool.png");
+    m_iconBad = QIcon(":/traytool.png");
 
     m_mediaServerHandle = 0;
     m_appServerHandle = 0;
     m_skipTicks = 0;
+
+    m_mediaServerServiceName = QString(VER_CUSTOMIZATION) + QString("MediaServer");
+    m_appServerServiceName = QString(VER_CUSTOMIZATION) + QString("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -159,17 +173,17 @@ void QnSystrayWindow::findServiceInfo()
     }
     
     if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_ALL_ACCESS);
+        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_ALL_ACCESS);
     if (m_mediaServerHandle == 0)
-        m_mediaServerHandle = OpenService(m_scManager, L"VmsMediaServer", SERVICE_QUERY_STATUS);
+        m_mediaServerHandle = OpenService(m_scManager, (LPCWSTR) m_mediaServerServiceName.data(), SERVICE_QUERY_STATUS);
 
     if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_ALL_ACCESS);
+        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_ALL_ACCESS);
     if (m_appServerHandle == 0)
-        m_appServerHandle  = OpenService(m_scManager, L"VmsAppServer",   SERVICE_QUERY_STATUS);
+        m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
     if (!m_mediaServerHandle && !m_appServerHandle)
-        showMessage("No HDWitness servers component installed");
+        showMessage(QString("No %1 services installed").arg(ORGANIZATION_NAME));
 }
 
 void QnSystrayWindow::setVisible(bool visible)
@@ -613,7 +627,9 @@ void QnSystrayWindow::onSettingsAction()
     else
         ui->rtspTransportComboBox->setCurrentIndex(0);
 
+#ifndef USE_SINGLE_STREAMING_PORT
     ui->apiPortLineEdit->setText(m_mServerSettings.value("apiPort").toString());
+#endif
     ui->appServerPortLineEdit->setText(m_appServerSettings.value("port").toString());
     ui->proxyPortLineEdit->setText(m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toString());
 
@@ -646,8 +662,10 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     if (ui->rtspPortLineEdit->text().toInt() != m_mServerSettings.value("rtspPort").toInt())
         return true;
 
+#ifndef USE_SINGLE_STREAMING_PORT
     if (ui->apiPortLineEdit->text().toInt() != m_mServerSettings.value("apiPort").toInt())
         return true;
+#endif
 
     return false;
 }
@@ -740,7 +758,9 @@ bool QnSystrayWindow::validateData()
     if (m_mediaServerHandle)
     {
         checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP");
+#ifndef USE_SINGLE_STREAMING_PORT
         checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API");
+#endif
     }
     
     for(int i = 0; i < checkedPorts.size(); ++i)
@@ -772,7 +792,9 @@ void QnSystrayWindow::saveData()
     m_mServerSettings.setValue("appserverLogin", ui->appServerLogin->text());
     m_mServerSettings.setValue("appserverPassword",ui->appServerPassword->text());
     m_mServerSettings.setValue("rtspPort", ui->rtspPortLineEdit->text());
+#ifndef USE_SINGLE_STREAMING_PORT
     m_mServerSettings.setValue("apiPort", ui->apiPortLineEdit->text());
+#endif
 
     m_mServerSettings.setValue("rtspTransport", ui->rtspTransportComboBox->currentText());
 

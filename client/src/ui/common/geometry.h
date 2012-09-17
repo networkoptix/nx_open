@@ -20,6 +20,8 @@ public:
     /* Some coefficient-wise arithmetic functions follow. */
     static QPointF cwiseMul(const QPointF &l, const QPointF &r);
     static QPointF cwiseDiv(const QPointF &l, const QPointF &r);
+    static QPointF cwiseMul(const QPointF &l, const QSizeF &r);
+    static QPointF cwiseDiv(const QPointF &l, const QSizeF &r);
     static QSizeF cwiseMul(const QSizeF &l, const QSizeF &r);
     static QSizeF cwiseDiv(const QSizeF &l, const QSizeF &r);
     static MarginsF cwiseMul(const MarginsF &l, const QSizeF &r);
@@ -201,6 +203,8 @@ public:
     static QRectF expanded(qreal aspectRatio, const QRectF &minRect, Qt::AspectRatioMode mode, Qt::Alignment alignment = Qt::AlignCenter);
 
     static QRectF aligned(const QSizeF &size, const QRectF &rect, Qt::Alignment alignment = Qt::AlignCenter);
+
+    static QRect aligned(const QSize &size, const QRect &rect, Qt::Alignment alignment = Qt::AlignCenter);
 
     /**
      * Dilates the given rectangle by the given amount.

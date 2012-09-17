@@ -9,14 +9,14 @@ class CLAbstractAudioDecoder;
 class CLAbstractAudioDecoder
 {
 public:
-	explicit CLAbstractAudioDecoder(){}
-	virtual ~CLAbstractAudioDecoder(){};
+    explicit CLAbstractAudioDecoder(){}
+    virtual ~CLAbstractAudioDecoder(){};
 
-	virtual bool decode(QnCompressedAudioDataPtr& data, CLByteArray& result) = 0;
+    virtual bool decode(QnCompressedAudioDataPtr& data, QnByteArray& result) = 0;
 
 private:
-	CLAbstractAudioDecoder(const CLAbstractAudioDecoder&) {}
-	CLAbstractAudioDecoder& operator=(CLAbstractAudioDecoder&) { return *this; }
+    CLAbstractAudioDecoder(const CLAbstractAudioDecoder&) {}
+    CLAbstractAudioDecoder& operator=(CLAbstractAudioDecoder&) { return *this; }
 
 };
 
@@ -26,7 +26,7 @@ public:
     /**
       * Passing ffmpeg codec-id. In case of other decoder we'll change it to some decoder-independent type and add decoder framework id as parameter.
       */
-	static CLAbstractAudioDecoder* createDecoder(QnCompressedAudioDataPtr data);
+    static CLAbstractAudioDecoder* createDecoder(QnCompressedAudioDataPtr data);
 };
 
 #endif //abstract_audio_decoder_h_1532

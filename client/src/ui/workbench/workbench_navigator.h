@@ -13,17 +13,18 @@
 #include "workbench_context_aware.h"
 #include "workbench_globals.h"
 
-class QRegion;
 class QAction;
-class QGraphicsSceneContextMenuEvent;
 
 class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
 class QnCachingTimePeriodLoader;
 class QnThumbnailsLoader;
+class QnCalendarWidget;
+class QnWorkbenchStreamSynchronizer;
 
 class QnWorkbenchNavigator: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -48,6 +49,9 @@ public:
 
     QnTimeScrollBar *timeScrollBar() const;
     void setTimeScrollBar(QnTimeScrollBar *scrollBar);
+
+    QnCalendarWidget *calendar() const;
+    void setCalendar(QnCalendarWidget *calendar);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -93,23 +97,15 @@ protected:
         SliderLineCount
     };
 
-    struct SliderUserData {
-        SliderUserData(): window(0, -1), selection(0, 0), selectionValid(false) {}
-
-        QnTimePeriod window;
-        QnTimePeriod selection;
-        bool selectionValid;
-    };
-
     void initialize();
     void deinitialize();
     bool isValid();
 
-    void addSyncedWidget(QnResourceWidget *widget);
-    void removeSyncedWidget(QnResourceWidget *widget);
+    void addSyncedWidget(QnMediaResourceWidget *widget);
+    void removeSyncedWidget(QnMediaResourceWidget *widget);
     
-    SliderUserData currentSliderData() const;
-    void setCurrentSliderData(const SliderUserData &localData, bool preferToPreserveWindow = false);
+    void updateItemDataFromSlider(QnResourceWidget *widget) const;
+    void updateSliderFromItemData(QnResourceWidget *widget, bool preferToPreserveWindow = false);
 
     void setPlayingTemporary(bool playing);
 
@@ -126,6 +122,7 @@ protected slots:
     void updateSliderOptions();
     void updateScrollBarFromSlider();
     void updateSliderFromScrollBar();
+    void updateCalendarFromSlider();
 
     void updateCurrentPeriods();
     void updateCurrentPeriods(Qn::TimePeriodRole type);
@@ -133,6 +130,7 @@ protected slots:
     void updateSyncedPeriods(Qn::TimePeriodRole type);
     void updateTargetPeriod();
     void updateLines();
+    void updateCalendar();
 
     void updateLive();
     void updateLiveSupported();
@@ -150,10 +148,10 @@ protected slots:
     void at_display_widgetAdded(QnResourceWidget *widget);
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
 
-    void at_widget_motionSelectionChanged(QnResourceWidget *widget);
+    void at_widget_motionSelectionChanged(QnMediaResourceWidget *widget);
     void at_widget_motionSelectionChanged();
-    void at_widget_displayFlagsChanged(QnResourceWidget *widget);
-    void at_widget_displayFlagsChanged();
+    void at_widget_optionsChanged(QnResourceWidget *widget);
+    void at_widget_optionsChanged();
 
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
@@ -165,7 +163,7 @@ protected slots:
     void at_timeSlider_sliderPressed();
     void at_timeSlider_sliderReleased();
     void at_timeSlider_selectionPressed();
-    void at_timeSlider_selectionChanged();
+    void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_destroyed();
@@ -174,18 +172,24 @@ protected slots:
     void at_timeScrollBar_sliderReleased();
 
     void at_timeScrollBar_destroyed();
+    void at_calendar_destroyed();
+    void at_calendar_dateChanged(const QDate &date);
 
 private:
+    QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
+
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
+    QnCalendarWidget *m_calendar;
 
-    QSet<QnResourceWidget *> m_syncedWidgets;
+    QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
     QnResourceWidget *m_centralWidget;
     QnResourceWidget *m_currentWidget;
+    QnMediaResourceWidget *m_currentMediaWidget;
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
     bool m_currentWidgetIsCentral;
@@ -201,15 +205,16 @@ private:
     bool m_lastPlaying;
     bool m_lastPlayingSupported;
     bool m_pausedOverride;
+    bool m_preciseNextSeek;
 
     qreal m_lastSpeed;
     qreal m_lastMinimalSpeed;
     qreal m_lastMaximalSpeed;
 
-    QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
+    qint64 m_lastUpdateSlider;
+    qint64 m_lastCameraTime;
 
-    /** Widget to per-widget slider data mapping. */
-    QHash<QnResourceWidget *, SliderUserData> m_localDataByWidget;
+    QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
 
     QHash<QnResourcePtr, QnCachingTimePeriodLoader *> m_loaderByResource;
     

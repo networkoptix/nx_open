@@ -9,9 +9,10 @@ static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
 static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
-        QnRtpStreamParser(),
+        QnRtpVideoStreamParser(),
         m_frequency(90000), // default value
         m_rtpChannel(98),
+        m_prevSequenceNum(-1),
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
@@ -20,8 +21,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_lastTimeStamp(0),
         m_firstSeqNum(0),
         m_packetPerNal(0),
-        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128),
-        m_prevSequenceNum(-1)
+        m_videoBuffer(CL_MEDIA_ALIGNMENT, 1024*128)
 {
 }
 
@@ -60,7 +60,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                 continue;
 
             QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
-            if (fmpParam.size() < 2 || fmpParam[1].toUInt() != m_rtpChannel)
+            if (fmpParam.size() < 2 || fmpParam[1].toUInt() != (uint)m_rtpChannel)
                 continue;
             //if (values.size() < 2)
             //    continue;
@@ -114,7 +114,7 @@ int CLH264RtpParser::getSpsPpsSize() const
     return result;
 }
 
-void CLH264RtpParser::serializeSpsPps(CLByteArray& dst)
+void CLH264RtpParser::serializeSpsPps(QnByteArray& dst)
 {
     for (int i = 0; i < m_sdpSpsPps.size(); ++i)
         dst.write(m_sdpSpsPps[i]);
@@ -179,7 +179,7 @@ bool CLH264RtpParser::clearInternalBuffer()
     m_videoBuffer.clear();
     m_keyDataExists = m_builtinPpsFound = m_builtinSpsFound = false;
     m_frameExists = false;
-    m_packetPerNal = INT_MIN;
+    m_packetPerNal = 0;
     return false;
 }
 
@@ -191,12 +191,10 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     m_frameExists     |= nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR;
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
-    result.clear();
-
     int nalUnitLen;
-    int don;
+    //int don;
     quint8 nalUnitType;
 
     if (readed < RtpHeader::RTP_HEADER_SIZE + 1) 
@@ -207,9 +205,12 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     quint8* bufferEnd = rtpBuffer + readed;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
+
     
     bool packetLostDetected = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
-    if (m_videoBuffer.size() > MAX_ALLOWED_FRAME_SIZE)
+    if (m_videoBuffer.size() > (uint)MAX_ALLOWED_FRAME_SIZE)
     {
         qWarning() << "Too large RTP/H.264 frame. Truncate video buffer";
         clearInternalBuffer();
@@ -234,11 +235,13 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
         case STAP_B_PACKET:
             if (bufferEnd-curPtr < 2)
                 return clearInternalBuffer();
-            don = (*curPtr++ << 8) + *curPtr++;
+            //don = (curPtr[0] << 8) + curPtr[1];
+            curPtr += 2;
         case STAP_A_PACKET:
             if (bufferEnd-curPtr < 2)
                 return clearInternalBuffer();
-            nalUnitLen = (*curPtr++ << 8) + *curPtr++;
+            nalUnitLen = (curPtr[0] << 8) + curPtr[1];
+            curPtr += 2;
             if (bufferEnd-curPtr < nalUnitLen)
                 return clearInternalBuffer();
 
@@ -278,7 +281,9 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             {
                 if (bufferEnd-curPtr < 2)
                     return clearInternalBuffer();
-                don = (*curPtr++ << 8) + *curPtr++;
+                //don = (curPtr[0] << 8) + curPtr[1];
+                curPtr += 2;
+
             }
             m_videoBuffer.write( (const char*) curPtr, bufferEnd - curPtr);
             break;
@@ -301,7 +306,7 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
     if (rtpHeader->marker) 
     {   // last packet
         if (m_videoBuffer.size() > 0 && m_frameExists)
-            result << createVideoData(ntohl(rtpHeader->timestamp), statistics);
+            result = createVideoData(ntohl(rtpHeader->timestamp), statistics);
     }
 
     return true;

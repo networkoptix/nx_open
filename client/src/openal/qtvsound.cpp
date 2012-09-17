@@ -1,12 +1,7 @@
 #include "qtvsound.h"
 
-#ifndef Q_OS_LINUX
-#include <OpenAL/al.h>
-#include <OpenAL/alc.h>
-#else
 #include <AL/al.h>
 #include <AL/alc.h>
-#endif
 
 #include "utils/common/sleep.h"
 #include "qtvaudiodevice.h"
@@ -145,8 +140,7 @@ void QtvSound::clearBuffers(bool clearAll)
     checkOpenALErrorDebug(m_device);
     if (processed)
     {
-        if (processed > sizeof(m_tmpBuffer) / sizeof(m_tmpBuffer[0]))
-            processed = sizeof(m_tmpBuffer) / sizeof(m_tmpBuffer[0]);
+        processed = qMin(processed, static_cast<ALint>(sizeof(m_tmpBuffer) / sizeof(m_tmpBuffer[0])));
         alSourceUnqueueBuffers(m_source, processed, m_tmpBuffer);
         checkOpenALErrorDebug(m_device);
         if (alGetError() == AL_NO_ERROR)
@@ -233,7 +227,7 @@ bool QtvSound::play(const quint8* data, uint size)
         int copyLen = qMin(size, m_size - m_proxyBufferLen);
         memcpy(m_proxyBuffer + m_proxyBufferLen, data, copyLen);
         m_proxyBufferLen += copyLen;
-        if (m_proxyBufferLen == m_size)
+        if (m_proxyBufferLen == (int)m_size)
         {
             internalPlay(m_proxyBuffer, m_size);
             m_proxyBufferLen = 0;

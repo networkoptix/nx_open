@@ -5,12 +5,12 @@
 #include <QHttpRequestHeader>
 #include <QNetworkInterface>
 #include "utils/common/longrunnable.h"
-#include "utils/common/base.h"
+#include "utils/common/pimpl.h"
 
 class TCPSocket;
 class QnTCPConnectionProcessor;
 
-class QnTcpListener: public CLLongRunnable
+class QnTcpListener: public QnLongRunnable
 {
 public:
     bool authenticate(const QHttpRequestHeader& headers, QHttpResponseHeader& responseHeaders) const;
@@ -21,6 +21,8 @@ public:
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
+    void* getOpenSSLContext();
+    bool enableSSLMode();
 protected:
     virtual void run();
     virtual QnTCPConnectionProcessor* createRequestProcessor(TCPSocket* clientSocket, QnTcpListener* owner) = 0;

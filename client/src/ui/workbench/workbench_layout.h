@@ -1,14 +1,19 @@
 #ifndef QN_WORKBENCH_LAYOUT_H
 #define QN_WORKBENCH_LAYOUT_H
 
-#include <QObject>
-#include <QSet>
-#include <QHash>
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <QtCore/QHash>
+
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
 #include <utils/common/hash.h> /* For qHash(const QUuid &). */
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/common/magnitude.h>
+
+#include "workbench_globals.h"
 
 class QnWorkbenchItem;
 
@@ -19,7 +24,7 @@ class QnWorkbenchItem;
  * necessary functions for moving items around.
  */
 class QnWorkbenchLayout: public QObject {
-    Q_OBJECT
+    Q_OBJECT;
 public:
     /**
      * Helper struct for obtaining detailed information on move operations. 
@@ -218,6 +223,23 @@ public:
      */
     QRect closestFreeSlot(const QPointF &gridPos, const QSize &size, TypedMagnitudeCalculator<QPoint> *metric = NULL) const;
 
+    /**
+     * \param role                      Role to get data for.
+     * \returns                         Data for the given role.
+     */
+    QVariant data(int role) const;
+
+    /**
+     * \param role                      Role to set data for.
+     * \param value                     New value for the given data role.
+     * \returns                         Whether the data was successfully set.
+     */
+    bool setData(int role, const QVariant &value);
+
+    QHash<int, QVariant> data() const {
+        return m_dataByRole;
+    }
+
 public slots:
     /**
      * Adds the given item to this layout. This layout takes ownership of the
@@ -290,6 +312,13 @@ signals:
      */
     void cellSpacingChanged();
 
+    /**
+     * This signal is emitted whenever data associated with the provided role is changed.
+     * 
+     * \param role                      Role of the changed data.
+     */
+    void dataChanged(int role);
+
 private:
     template<bool returnEarly>
     bool canMoveItems(const QList<QnWorkbenchItem *> &items, const QList<QRect> &geometries, Disposition *disposition);
@@ -329,6 +358,9 @@ private:
 
     /** Empty item list, to return a reference to. */
     const QSet<QnWorkbenchItem *> m_noItems;
+
+    /** User data by role. */
+    QHash<int, QVariant> m_dataByRole;
 };
 
 Q_DECLARE_METATYPE(QnWorkbenchLayout *);

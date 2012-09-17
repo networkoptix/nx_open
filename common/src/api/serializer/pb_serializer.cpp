@@ -25,7 +25,7 @@ QString serializeNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QStringList addListStrings;
     std::transform(netAddrList.begin(), netAddrList.end(), std::back_inserter(addListStrings), std::mem_fun_ref(&QHostAddress::toString));
-    return addListStrings.join(";");
+    return addListStrings.join(QLatin1String(";"));
 }
 
 QHostAddress stringToAddr(const QString& hostStr)
@@ -35,7 +35,7 @@ QHostAddress stringToAddr(const QString& hostStr)
 
 void deserializeNetAddrList(QList<QHostAddress>& netAddrList, const QString& netAddrListString)
 {
-    QStringList addListStrings = netAddrListString.split(";");
+    QStringList addListStrings = netAddrListString.split(QLatin1Char(';'));
     std::transform(addListStrings.begin(), addListStrings.end(), std::back_inserter(netAddrList), stringToAddr);
 }
 
@@ -70,15 +70,18 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     {
         const pb::Resource_Property& pb_property = pb_cameraResource.property(j);
 
-        camera->setParam(pb_property.name().c_str(), pb_property.value().c_str(), QnDomainDatabase);
+        camera->setParam(QString::fromStdString(pb_property.name()), QString::fromStdString(pb_property.value()), QnDomainDatabase);
     }
 
     camera->setScheduleDisabled(pb_camera.scheduledisabled());
     if (pb_camera.has_audioenabled())
         camera->setAudioEnabled(pb_camera.audioenabled());
 
+    if (pb_camera.has_manuallyadded())
+        camera->setManuallyAdded(pb_camera.manuallyadded());
+
     if (pb_camera.has_physicalid())
-        camera->setPhysicalId(pb_camera.physicalid().c_str());
+        camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
@@ -86,7 +89,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_region())
     {
         QList<QnMotionRegion> regions;
-        parseMotionRegionList(regions, pb_camera.region().c_str());
+        parseMotionRegionList(regions, QString::fromStdString(pb_camera.region()));
         while (regions.size() < CL_MAX_CHANNELS)
             regions << QnMotionRegion();
 
@@ -144,8 +147,10 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setId(pb_serverResource.id());
     server->setName(QString::fromUtf8(pb_serverResource.name().c_str()));
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
-    server->setGuid(pb_serverResource.guid().c_str());
+    server->setGuid(QString::fromStdString(pb_serverResource.guid()));
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
+    if (pb_server.has_streamingurl())
+        server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -153,13 +158,19 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     if (pb_server.has_netaddrlist())
     {
         QList<QHostAddress> netAddrList;
-        deserializeNetAddrList(netAddrList, pb_server.netaddrlist().c_str());
+        //TODO:UTF unuse std::string
+        deserializeNetAddrList(netAddrList, QString::fromStdString(pb_server.netaddrlist()));
         server->setNetAddrList(netAddrList);
     }
 
     if (pb_server.has_reserve())
     {
         server->setReserve(pb_server.reserve());
+    }
+
+    if (pb_server.has_panicmode())
+    {
+        server->setPanicMode(pb_server.panicmode());
     }
 
     if (pb_server.storage_size() > 0)
@@ -180,7 +191,7 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
             parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
             parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
 
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName("Storage")->getId(), parameters);
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
 
             storages.append(storage);
@@ -215,7 +226,7 @@ void parseLayout(QnLayoutResourcePtr& layout, const pb::Resource& pb_layoutResou
         layout->setId(pb_layoutResource.id());
 
     if (pb_layoutResource.has_guid())
-        layout->setGuid(pb_layoutResource.guid().c_str());
+        layout->setGuid(QString::fromStdString(pb_layoutResource.guid()));
 
     layout->setParentId(pb_layoutResource.parentid());
     layout->setName(QString::fromUtf8(pb_layoutResource.name().c_str()));
@@ -274,7 +285,8 @@ void parseUser(QnUserResourcePtr& user, const pb::Resource& pb_userResource)
 
     user->setName(QString::fromUtf8(pb_userResource.name().c_str()));
     user->setAdmin(pb_user.isadmin());
-    user->setGuid(pb_userResource.guid().c_str());
+    user->setPermissions(pb_user.rights());
+    user->setGuid(QString::fromUtf8(pb_userResource.guid().c_str()));
 }
 
 void parseUsers(QnUserResourceList& users, const PbResourceList& pb_users)
@@ -420,8 +432,8 @@ void parserCameraServerItems(QnCameraHistoryList& cameraServerItems, const PbCam
     for (PbCameraServerItemList::const_iterator ci = pb_cameraServerItems.begin(); ci != pb_cameraServerItems.end(); ++ci)
     {
         const pb::CameraServerItem& pb_item = *ci;
-
-        history[pb_item.physicalid().c_str()][pb_item.timestamp()] = pb_item.serverguid().c_str();
+        //TODO:UTF unuse std::string
+        history[QString::fromStdString(pb_item.physicalid())][pb_item.timestamp()] = QString::fromStdString(pb_item.serverguid());
     }
 
     for(HistoryType::const_iterator ci = history.begin(); ci != history.end(); ++ci)
@@ -471,6 +483,7 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_camera.set_region(serializeMotionRegionList(cameraPtr->getMotionRegionList()).toUtf8().constData());
     pb_camera.set_scheduledisabled(cameraPtr->isScheduleDisabled());
     pb_camera.set_audioenabled(cameraPtr->isAudioEnabled());
+    pb_camera.set_manuallyadded(cameraPtr->isManuallyAdded());
     pb_camera.set_motiontype(static_cast<pb::Camera_MotionType>(cameraPtr->getMotionType()));
 
     QnParamList params = cameraPtr->getResourceParamList();
@@ -666,14 +679,17 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
         throw QnSerializeException(errorString);
     }
 
-    connectInfo->version = pb_connectInfo.version().c_str();
+    //TODO:UTF unuse std::string
+    connectInfo->version = QString::fromStdString(pb_connectInfo.version());
 
     typedef google::protobuf::RepeatedPtrField<pb::CompatibilityItem> PbCompatibilityItemList;
     PbCompatibilityItemList items = pb_connectInfo.compatibilityitems().item();
 
     for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci)
     {
-        connectInfo->compatibilityItems.append(QnCompatibilityItem(ci->ver1().c_str(), ci->comp1().c_str(), ci->ver2().c_str()));
+        //TODO:UTF unuse std::string
+        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()), 
+            QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
 }
@@ -719,12 +735,14 @@ void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPt
     pb_serverResource.set_url(serverPtr->getUrl().toUtf8().constData());
     pb_serverResource.set_guid(serverPtr->getGuid().toAscii().constData());
     pb_server.set_apiurl(serverPtr->getApiUrl().toUtf8().constData());
+    pb_server.set_streamingurl(serverPtr->getStreamingUrl().toUtf8().constData());
     pb_serverResource.set_status(static_cast<pb::Resource_Status>(serverPtr->getStatus()));
 
     if (!serverPtr->getNetAddrList().isEmpty())
         pb_server.set_netaddrlist(serializeNetAddrList(serverPtr->getNetAddrList()).toUtf8().constData());
 
     pb_server.set_reserve(serverPtr->getReserve());
+    pb_server.set_panicmode(serverPtr->isPanicMode());
 
     if (!serverPtr->getStorages().isEmpty()) {
         foreach (const QnAbstractStorageResourcePtr& storagePtr, serverPtr->getStorages()) {
@@ -755,8 +773,9 @@ void QnApiPbSerializer::serializeUser(const QnUserResourcePtr& userPtr, QByteArr
 
     pb_userResource.set_name(userPtr->getName().toUtf8().constData());
     pb_user.set_password(userPtr->getPassword().toUtf8().constData());
+    pb_user.set_rights(userPtr->getPermissions());
     pb_user.set_isadmin(userPtr->isAdmin());
-    pb_userResource.set_guid(userPtr->getGuid().toAscii().constData());
+    pb_userResource.set_guid(userPtr->getGuid().toUtf8().constData());
 
     std::string str;
     pb_users.SerializeToString(&str);
@@ -853,10 +872,11 @@ void parseLicense(QnLicensePtr& license, const pb::License& pb_license)
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem)
 {
+    //TODO:UTF unuse std::string
     historyItem = QnCameraHistoryItemPtr(new QnCameraHistoryItem(
-                                            pb_cameraServerItem.physicalid().c_str(),
+                                            QString::fromStdString(pb_cameraServerItem.physicalid()),
                                             pb_cameraServerItem.timestamp(),
-                                            pb_cameraServerItem.serverguid().c_str()
+                                            QString::fromStdString(pb_cameraServerItem.serverguid())
                                         ));
 
 }

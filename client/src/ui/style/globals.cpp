@@ -7,6 +7,8 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
+#include <utils/common/module_resources.h>
+
 #include "config.h"
 
 Q_GLOBAL_STATIC(QnGlobals, qn_globalsInstance);
@@ -65,13 +67,13 @@ QnGlobals::QnGlobals(QObject *parent):
     /* Ensure that default skin resource is loaded. 
      * This is needed because globals instance may be constructed before the
      * corresponding resource initializer is called. */
-    Q_INIT_RESOURCE(skin);
+    QN_INIT_MODULE_RESOURCES(client);
 
     init();
 
-    QString path = QString(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
+    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
     QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
-    settings->beginGroup("globals");
+    settings->beginGroup(QLatin1String("globals"));
     updateFromSettings(settings.data());
     settings->endGroup();
 }
@@ -84,12 +86,28 @@ QnGlobals *QnGlobals::instance() {
     return qn_globalsInstance();
 }
 
-QVariant QnGlobals::updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
+QVariant QnGlobals::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
     int type = this->type(id);
     if(type == QMetaType::QColor) {
         return parseColor(settings->value(name(id)), defaultValue.value<QColor>());
     } else {
-        return base_type::updateValueFromSettings(settings, id, defaultValue);
+        return base_type::readValueFromSettings(settings, id, defaultValue);
     }
+}
+
+QnColorVector QnGlobals::initSystemHealthColors() {
+    QnColorVector result;
+    result.append(QColor(66, 140, 237));
+    result.append(QColor(219, 59, 169));
+    result.append(QColor(237, 237, 237));
+    result.append(QColor(237, 200, 66));
+    result.append(QColor(103, 237, 66));
+    result.append(QColor(255, 131, 48));
+    result.append(QColor(178, 0, 255));
+    result.append(QColor(0, 255, 255));
+    result.append(QColor(38, 127, 0));
+    result.append(QColor(255, 127, 127));
+    result.append(QColor(201, 0, 0));
+    return result;
 }
 

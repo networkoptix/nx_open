@@ -414,7 +414,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getH264FrameType(const quint8*
             BitStreamReader bitReader;
             bitReader.setBuffer(data+1, end);
             try {
-                int first_mb_in_slice = NALUnit::extractUEGolombCode(bitReader);
+                /*int first_mb_in_slice =*/ NALUnit::extractUEGolombCode(bitReader);
 
                 int slice_type = NALUnit::extractUEGolombCode(bitReader);
                 if (slice_type >= 5)
@@ -482,7 +482,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getWMVFrameType(const quint8* 
 
 FrameTypeExtractor::FrameType FrameTypeExtractor::getVCFrameType(const quint8* data, int size)
 {
-    if (data[3] == VC1_CODE_FRAME || data[3] == VC1_USER_CODE_FRAME && m_vcSequence)
+    if (data[3] == VC1_CODE_FRAME || (data[3] == VC1_USER_CODE_FRAME && m_vcSequence))
         return getWMVFrameType(data+4, size-4);
     else if (data[3] == VC1_CODE_SEQHDR) 
     {
@@ -559,8 +559,10 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* dat
             return getVCFrameType(data, dataLen);
         case CODEC_ID_MPEG4:
             return getMpeg4FrameType(data, dataLen);
+        default:
+            return UnknownFrameType;
     }
-    return UnknownFrameType;
+    
 }
 
 void QnFfmpegHelper::appendCtxField(QByteArray *dst, QnFfmpegHelper::CodecCtxField field, const char* data, int size)

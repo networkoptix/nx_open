@@ -32,6 +32,9 @@ protected:
 
     virtual void contextMenuEvent(QContextMenuEvent *event) override;
 
+    virtual void mousePressEvent(QMouseEvent *event) override;
+    virtual void mouseReleaseEvent(QMouseEvent *event) override;
+
     virtual void tabInserted(int index) override;
     virtual void tabRemoved(int index) override;
 
@@ -67,6 +70,9 @@ private:
 
     /** Context associated with this tab bar. */
     QnWorkbenchContext *m_context;
+
+    /** Tab we are trying to close with middle mouse button */
+    int m_midClickedTab;
 };
 
 

@@ -6,10 +6,6 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 
-namespace {
-
-}
-
 GridAdjustmentInstrument::GridAdjustmentInstrument(QnWorkbench *workbench, QObject *parent):
     Instrument(
         makeSet(QEvent::Wheel), 

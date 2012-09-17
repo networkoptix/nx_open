@@ -38,12 +38,12 @@ void QnResourceCommand::beforeDisconnectFromResource()
 QnResourceCommandProcessor::QnResourceCommandProcessor():
     QnAbstractDataConsumer(1000)
 {
-	//start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
+    //start(); This is static singleton and run() uses log (another singleton). Jusst in case I will start it with first device created.
 }
 
 QnResourceCommandProcessor::~QnResourceCommandProcessor()
 {
-	stop();
+    stop();
 }
 
 void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
@@ -55,12 +55,14 @@ void QnResourceCommandProcessor::putData(QnAbstractDataPacketPtr data)
 
 bool QnResourceCommandProcessor::processData(QnAbstractDataPacketPtr data)
 {
-	QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
+    if (!data)
+        return true;
+    QnResourceCommandPtr command = data.staticCast<QnResourceCommand>();
 
     bool result = command->execute();
 
     if (!result) // if command failed for this resource. => resource must be not available, lets remove everything related to the resouce from the queue
-        m_dataQueue.removeDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
+        m_dataQueue.detachDataByCondition(sameResourceFunctor, QVariant::fromValue<QnResourcePtr>(command->getResource()) );
         
     
 

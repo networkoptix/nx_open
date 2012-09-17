@@ -9,10 +9,10 @@ class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
 class QnVideoResourceLayout;
-class CLCamDisplay;
-class CLLongRunnable;
+class QnCamDisplay;
+class QnLongRunnable;
 class QnAbstractRenderer;
-class CLVideoCamera;
+class QnVideoCamera;
 
 namespace detail {
     class QnRendererGuard: public QObject {
@@ -36,7 +36,7 @@ namespace detail {
 
 
 class QnResourceDisplay: public QObject, protected QnResourceConsumer {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     /**
      * Constructor.
@@ -44,7 +44,7 @@ public:
      * \param resource                  Resource that this display is associated with. Must not be NULL.
      * \param parent                    Parent of this display.                
      */
-    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent = NULL);
+    QnResourceDisplay(const QnResourcePtr &resource, QObject *parent);
 
     /**
      * Virtual destructor. 
@@ -89,14 +89,14 @@ public:
     /**
      * \returns                         Video camera associated with this display, if any.
      */
-    CLVideoCamera *camera() const {
+    QnVideoCamera *camera() const {
         return m_camera;
     }
 
     /**
      * \returns                         Camdisplay for this display, if any.
      */
-    CLCamDisplay *camDisplay() const;
+    QnCamDisplay *camDisplay() const;
 
     /**
      * \returns                         Video resource layout, if any, 
@@ -142,7 +142,7 @@ protected:
     virtual void disconnectFromResource() override;
 
 private:
-    void cleanUp(CLLongRunnable *runnable) const;
+    void cleanUp(QnLongRunnable *runnable) const;
 
 private:
     /** Media resource. */
@@ -158,7 +158,7 @@ private:
     QnAbstractArchiveReader *m_archiveReader;
 
     /** Video camera. */
-    CLVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
+    QnVideoCamera *m_camera; // TODO: Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;

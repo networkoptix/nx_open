@@ -26,14 +26,21 @@ public slots:
 
     void timeout();
 
-	void oldHttpTestResults(int status ,QByteArray errorString,QByteArray data, int handle);
+    void oldHttpTestResults(int status ,QByteArray errorString,QByteArray data, int handle);
     void testResults(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:
     void testSettings();
 
+    /**
+     * Updates ui elements depending of the test result
+     *
+     * \param success - Status of the connection test
+     */
+    void updateUi(bool success);
+
 private:
-    Q_DISABLE_COPY(QnConnectionTestingDialog);
+    Q_DISABLE_COPY(QnConnectionTestingDialog)
 
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
     QTimer m_timeoutTimer;

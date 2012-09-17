@@ -10,7 +10,7 @@ class QnAbstractMediaStreamDataProvider;
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;
 
-enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSeted};
+enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSet};
 
 class QnMediaResource : virtual public QnResource
 {
@@ -25,7 +25,7 @@ public:
 
     // returns one image best for such time
     // in case of live video time should be ignored
-    virtual QImage getImage(int channnel, QDateTime time, QnStreamQuality quality) const;
+    virtual QImage getImage(int channel, QDateTime time, QnStreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
     virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);

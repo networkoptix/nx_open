@@ -1,5 +1,8 @@
 package pb;
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "ResourceProtos";
+
 message Resource {
     extensions 100 to max;
 

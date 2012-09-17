@@ -71,6 +71,8 @@ public:
     int getFps() const { return m_data.m_fps; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
+    void setFps(int value) { m_data.m_fps = value; }
+
     /*
     * Duration at ms
     */
@@ -92,7 +94,7 @@ private:
 
     Data m_data;
 
-    friend class QnCameraScheduleWidget; // ###
+    friend class QnCameraScheduleWidget; // TODO: what the hell?
 };
 
 inline bool operator<(qint64 first, const QnScheduleTask &other)
@@ -120,38 +122,47 @@ inline uint qHash(const QnScheduleTask::Data &key)
 
 inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 {
-    QString recTypeStr;
-    if (data.getRecordingType() == QnScheduleTask::RecordingType_Run)
-        recTypeStr = "Always";
-    if (data.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
-        recTypeStr = "Motion";
-    if (data.getRecordingType() == QnScheduleTask::RecordingType_Never)
-        recTypeStr = "Never";
-
-    QString qualityStr;
-    switch (data.getStreamQuality())
-    {
-    case QnQualityLowest:
-        qualityStr = "lowest";
+    QString recordingTypeString;
+    switch(data.getRecordingType()) {
+    case QnScheduleTask::RecordingType_Run:
+        recordingTypeString = QLatin1String("Always");
         break;
-    case QnQualityLow:
-        qualityStr = "low";
+    case QnScheduleTask::RecordingType_MotionOnly:
+        recordingTypeString = QLatin1String("Motion");
         break;
-    case QnQualityNormal:
-        qualityStr = "normal";
+    case QnScheduleTask::RecordingType_Never:
+        recordingTypeString = QLatin1String("Never");
         break;
-    case QnQualityHigh:
-        qualityStr = "high";
+    case QnScheduleTask::RecordingType_MotionPlusLQ:
+        recordingTypeString = QLatin1String("MotionAndLQ");
         break;
-    case QnQualityHighest:
-        qualityStr = "highest";
-        break;
-    case QnQualityPreSeted:
-        qualityStr = "presetted";
+    default:
         break;
     }
 
-    stream << "type=" << recTypeStr << " fps=" << data.getFps() << " quality=" << qualityStr;
+    QString qualityString;
+    switch (data.getStreamQuality()) {
+    case QnQualityLowest:
+        qualityString = QLatin1String("lowest");
+        break;
+    case QnQualityLow:
+        qualityString = QLatin1String("low");
+        break;
+    case QnQualityNormal:
+        qualityString = QLatin1String("normal");
+        break;
+    case QnQualityHigh:
+        qualityString = QLatin1String("high");
+        break;
+    case QnQualityHighest:
+        qualityString = QLatin1String("highest");
+        break;
+    case QnQualityPreSet:
+        qualityString = QLatin1String("preset");
+        break;
+    }
+
+    stream << "type=" << recordingTypeString << " fps=" << data.getFps() << " quality=" << qualityString;
     if (data.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
         stream << " pre-motion=" << data.getBeforeThreshold() << "post-motion=" << data.getAfterThreshold();
     return stream;

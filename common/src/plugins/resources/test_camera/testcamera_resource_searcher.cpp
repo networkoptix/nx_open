@@ -36,14 +36,14 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
             QHostAddress sender;
             quint16 senderPort;
-            sock.readDatagram(responseData.data(), responseData.size(),	&sender, &senderPort);
+            sock.readDatagram(responseData.data(), responseData.size(),    &sender, &senderPort);
 
             QList<QByteArray> params = responseData.split(';');
             if (params[0] != TestCamConst::TEST_CAMERA_ID_MSG || params.size() < 3)
                 continue;
 
             int videoPort = params[1].toInt();
-            const QString resName("TestCameraLive");
+            const QString resName(tr("TestCameraLive"));
             for (int j = 2; j < params.size(); ++j)
             {
                 QnTestCameraResourcePtr resource ( new QnTestCameraResource() );
@@ -52,12 +52,14 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
                 if (!rt.isValid())
                     continue;
 
+                QLatin1String s(params[j]);
+
                 resource->setTypeId(rt);
                 resource->setName(resName);
-                QString mac(params[j]);
+                QString mac(s);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(ipaddrs.at(i).address);
-                resource->setUrl(QString("tcp://") + sender.toString() + QString(':') + QString::number(videoPort) + QString("/") + QString(params[j]));
+                resource->setUrl(QLatin1String("tcp://") + sender.toString() + QLatin1Char(':') + QString::number(videoPort) + QLatin1Char('/') + QLatin1String(params[j]));
                 resources.insert(mac, resource);
             }
         }
@@ -99,11 +101,13 @@ QnResourcePtr QnTestCameraResourceSearcher::createResource(QnId resourceTypeId, 
 
 QString QnTestCameraResourceSearcher::manufacture() const
 {
-    return QnTestCameraResource::MANUFACTURE;
+    return QLatin1String(QnTestCameraResource::MANUFACTURE);
 }
 
-QnResourcePtr QnTestCameraResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnTestCameraResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 

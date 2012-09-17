@@ -166,7 +166,7 @@ struct PESPacket {
 
 	void setPts(quint64 pts) {
 		set_pts_int((quint8*)this + HEADER_SIZE, pts, 0x20);
-		flagsLo = flagsLo & 0x3f | 0x80;
+		flagsLo = (flagsLo & 0x3f) | 0x80;
 	}
 	void setPtsAndDts(quint64 pts, quint64 dts) {
 		set_pts_int((quint8*)this + HEADER_SIZE, pts, 0x30);

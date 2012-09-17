@@ -6,7 +6,7 @@
 class QnTextureTransitionShaderProgram: public QGLShaderProgram {
     Q_OBJECT;
 public:
-    QnTextureTransitionShaderProgram(QObject *parent = NULL);
+    QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent = NULL);
 
     void setTexture0(int target);
     void setTexture1(int target);
@@ -19,4 +19,4 @@ private:
 };
 
 
-#endif QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H
+#endif //QN_TEXTURE_TRANSITION_SHADER_PROGRAM_H

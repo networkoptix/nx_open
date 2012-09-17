@@ -12,42 +12,42 @@ namespace Ui {
 }
 
 namespace detail {
-	static const int INVALID_PATH = -1;
-	static const int SERVER_ERROR = -2;
-	struct FreeSpaceInfo 
-	{
-		FreeSpaceInfo(): freeSpace(0), usedSpace(0), errorCode(0) {}
-		FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace, int _errorCode): freeSpace(_freeSpace), usedSpace(_usedSpace), errorCode(_errorCode) {}
-		qint64 freeSpace;
-		qint64 usedSpace;
-		int errorCode;
-	};
-	typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
+    static const int INVALID_PATH = -1;
+    static const int SERVER_ERROR = -2;
+    struct FreeSpaceInfo 
+    {
+        FreeSpaceInfo(): freeSpace(0), usedSpace(0), errorCode(0) {}
+        FreeSpaceInfo(qint64 _freeSpace, qint64 _usedSpace, int _errorCode): freeSpace(_freeSpace), usedSpace(_usedSpace), errorCode(_errorCode) {}
+        qint64 freeSpace;
+        qint64 usedSpace;
+        int errorCode;
+    };
+    typedef QMap<int, FreeSpaceInfo> FreeSpaceMap;
 
     class CheckFreeSpaceReplyProcessor: public QObject 
-	{
+    {
         Q_OBJECT;
     public:
 
         CheckFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
-		FreeSpaceMap freeSpaceInfo() const {
-			return m_freeSpace;
-		}
+        FreeSpaceMap freeSpaceInfo() const {
+            return m_freeSpace;
+        }
 
     signals:
         void replyReceived(int status, qint64 freeSpace, qint64 usedSpace, int handle);
 
     public slots:
         void processReply(int status, qint64 freeSpace, qint64 usedSpace,  int handle) 
-		{
-			int errCode = status == 0 ? (freeSpace > 0 ? 0 : INVALID_PATH) : SERVER_ERROR;
-			m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace, errCode));
+        {
+            int errCode = status == 0 ? (freeSpace > 0 ? 0 : INVALID_PATH) : SERVER_ERROR;
+            m_freeSpace.insert(handle, FreeSpaceInfo(freeSpace, usedSpace, errCode));
             emit replyReceived(status, freeSpace, usedSpace, handle);
         }
 
     private:
-		FreeSpaceMap m_freeSpace;
+        FreeSpaceMap m_freeSpace;
     };
 
 } // namespace detail
@@ -75,13 +75,13 @@ private:
     void setTableStorages(const QnAbstractStorageResourceList &storages);
     QnAbstractStorageResourceList tableStorages() const;
 
-    bool validateStorages(const QnAbstractStorageResourceList &storages, QString *errorString);
+    bool validateStorages(const QnAbstractStorageResourceList &storages);
 
     void updateSpaceLimitCell(int row, bool force = false);
 
 private slots: 
-    void at_addStorageButton_clicked();
-    void at_removeStorageButton_clicked();
+    void at_storageAddButton_clicked();
+    void at_storageRemoveButton_clicked();
     void at_storagesTable_cellChanged(int row, int column);
 
 private:

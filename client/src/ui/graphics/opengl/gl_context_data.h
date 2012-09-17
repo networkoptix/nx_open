@@ -23,7 +23,7 @@ public:
 };
 
 
-template<class T, class Factory = QnGlContextDataStardardFactory<T> >
+template<class T, class Factory = QnGlContextDataForwardingFactory<T> >
 class QnGlContextData {
 public:
     typedef QHash<const QGLContext *, QSharedPointer<T> > map_type;
@@ -38,10 +38,6 @@ public:
             pos = m_map.insert(context, QSharedPointer<T>(m_factory(context)));
 
         return *pos;
-    }
-
-    QSharedPointer<T> get() {
-        return get(QGLContext::currentContext());
     }
 
 private:

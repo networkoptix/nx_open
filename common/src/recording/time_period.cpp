@@ -1,5 +1,10 @@
 #include "time_period.h"
-#include "utils/common/util.h"
+
+#include <QtCore/QDebug>
+
+#include <utils/common/util.h>
+
+#include "time_period_list.h"
 
 
 bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
@@ -31,30 +36,48 @@ qint64 QnTimePeriod::endTimeMs() const
         return startTimeMs + durationMs;
 }
 
-
-bool QnTimePeriod::containPeriod(const QnTimePeriod &timePeriod) const
+bool QnTimePeriod::contains(const QnTimePeriod &timePeriod) const
 {
     return startTimeMs <= timePeriod.startTimeMs && (startTimeMs + durationMs >= timePeriod.startTimeMs + timePeriod.durationMs);
 }
 
-bool QnTimePeriod::containTime(qint64 timeMs) const
+bool QnTimePeriod::contains(qint64 timeMs) const
 {
-    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs+durationMs : DATETIME_NOW);
+    return qBetween(timeMs, startTimeMs, durationMs != -1 ? startTimeMs + durationMs : DATETIME_NOW);
 }
-
 
 void QnTimePeriod::addPeriod(const QnTimePeriod &timePeriod)
 {
     qint64 endPoint1 = startTimeMs + durationMs;
     qint64 endPoint2 = timePeriod.startTimeMs + timePeriod.durationMs;
+
     startTimeMs = qMin(startTimeMs, timePeriod.startTimeMs);
-    durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
+    if (durationMs == -1 || timePeriod.durationMs == -1)
+        durationMs = -1;
+    else
+        durationMs = qMax(endPoint1, endPoint2) - startTimeMs;
 }
 
-QnTimePeriod QnTimePeriod::intersect(const QnTimePeriod &other) const
+QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
 {
-    if (durationMs == -1 || other.startTimeMs == -1)
+    if (durationMs == -1 && other.durationMs == -1)
         return QnTimePeriod(qMax(startTimeMs, other.startTimeMs), -1);
+
+    if (durationMs == -1){
+        if (startTimeMs > other.startTimeMs + other.durationMs)
+            return QnTimePeriod();
+        if (startTimeMs < other.startTimeMs)
+            return QnTimePeriod(other.startTimeMs, other.durationMs);
+        return QnTimePeriod(startTimeMs, other.durationMs - (startTimeMs - other.startTimeMs));
+    }
+
+    if (other.durationMs == -1){
+        if (other.startTimeMs > startTimeMs + durationMs)
+            return QnTimePeriod();
+        if (other.startTimeMs < startTimeMs)
+            return QnTimePeriod(startTimeMs, durationMs);
+        return QnTimePeriod(other.startTimeMs, durationMs - (other.startTimeMs - startTimeMs));
+    }
 
     if (other.startTimeMs > startTimeMs + durationMs || startTimeMs > other.startTimeMs + other.durationMs)
         return QnTimePeriod();
@@ -121,7 +144,9 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>&
                 QnTimePeriod& last = result.last();
                 if (periods[minIndex][startIdx].durationMs == -1) 
                 {
-                    if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
+                    if (last.durationMs == -1)
+                        last.startTimeMs = qMin(last.startTimeMs, periods[minIndex][startIdx].startTimeMs);
+                    else if (periods[minIndex][startIdx].startTimeMs > last.startTimeMs+last.durationMs)
                         result << periods[minIndex][startIdx];
                     else 
                         last.durationMs = -1;
@@ -254,4 +279,9 @@ bool QnTimePeriod::decode(QByteArray &stream, QnTimePeriodList &periods)
 bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 {
     return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
+}
+
+QDebug operator<<(QDebug dbg, const QnTimePeriod &period) {
+    dbg.nospace() << "QnTimePeriod(" << period.startTimeMs << ',' << period.durationMs << ')';
+    return dbg.space();
 }

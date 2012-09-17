@@ -22,10 +22,11 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     m_submit(false),
-    m_update(false)
+    m_update(false),
+    m_midClickedTab(-1)
 {
     /* Set up defaults. */
-    setMovable(true);
+    setMovable(false);
     setSelectionBehaviorOnRemove(QTabBar::SelectPreviousTab);
     setDrawBase(false);
     setShape(QTabBar::RoundedNorth);
@@ -145,6 +146,23 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     menu->exec(event->globalPos());
 }
 
+void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){
+    if (event->button() == Qt::MiddleButton)
+        m_midClickedTab = tabAt(event->pos());
+
+    QTabBar::mousePressEvent(event);
+}
+
+void QnLayoutTabBar::mouseReleaseEvent(QMouseEvent *event){
+    if (event->button() == Qt::MiddleButton) {
+        if (m_midClickedTab >= 0 && m_midClickedTab == tabAt(event->pos())) 
+            emit tabCloseRequested(m_midClickedTab);
+        m_midClickedTab = -1;
+    }
+
+    QTabBar::mouseReleaseEvent(event);
+}
+
 void QnLayoutTabBar::at_workbench_layoutsChanged() {
     if(!m_update)
         return;
@@ -224,6 +242,7 @@ void QnLayoutTabBar::tabInserted(int index) {
 
     guard.rollback();
     checkInvariants();
+    setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::tabRemoved(int index) {
@@ -240,6 +259,7 @@ void QnLayoutTabBar::tabRemoved(int index) {
 
     guard.rollback();
     checkInvariants();
+    setMovable(count() > 1);
 }
 
 void QnLayoutTabBar::at_tabMoved(int from, int to) {

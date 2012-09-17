@@ -1,24 +1,28 @@
 
-Template: networkoptix-entcontroller/ecs_port
+Template: ${deb.customization.company.name}-entcontroller/ecsPort
 Type: string
 Default: 7001
 Description: Enterprise Controller port:
 
-Template: networkoptix-entcontroller/ecs_proxy_port
+Template: ${deb.customization.company.name}-entcontroller/ecsPort_invalid
+Type: error
+Description: The port is invalid. Please try again.
+
+Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort
 Type: string
-Default: 7301
+Default: 7004
 Description: Enterprise Controller Media Proxy port:
 
-Template: networkoptix-entcontroller/ecs_password
+Template: ${deb.customization.company.name}-entcontroller/ecsProxyPort_invalid
+Type: error
+Description: The port is invalid. Please try again.
+
+Template: ${deb.customization.company.name}-entcontroller/ecsPassword
 Type: string
 Default: 
 Description: Enterprise Controller password:
 
-Template: networkoptix-entcontroller/ecs_port_invalid
-Type: error
-Description: The port is invalid. Please try again.
-
-Template: networkoptix-entcontroller/ecs_pass_empty
+Template: ${deb.customization.company.name}-entcontroller/ecsPassword_invalid
 Type: error
 Description: The password should not be empty
 

@@ -1,16 +1,103 @@
-#ifdef WIN32
 #include "openssl/evp.h"
-#else
-#include "evp.h"
-#endif
 
 #include "soap_wrapper.h"
 #include "onvif/Onvif.nsmap"
 #include "onvif/soapDeviceBindingProxy.h"
 #include "onvif/soapMediaBindingProxy.h"
+#include "onvif/soapPTZBindingProxy.h"
+#include "onvif/soapImagingBindingProxy.h"
 #include "onvif/wsseapi.h"
 
 #include <QtGlobal>
+
+namespace {
+
+/** Size of the random nonce */
+#define SOAP_WSSE_NONCELEN	(20)
+
+/**
+@fn static void calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
+@brief Calculates randomized nonce (also uses time() in case a poorly seeded PRNG is used)
+@param soap context
+@param[out] nonce value
+*/
+static void
+calc_nonce(struct soap *soap, char nonce[SOAP_WSSE_NONCELEN])
+{
+    Q_UNUSED(soap)
+    int i;
+    time_t r = time(NULL);
+    memcpy(nonce, &r, 4);
+    for (i = 4; i < SOAP_WSSE_NONCELEN; i += 4){
+        r = soap_random;
+        memcpy(nonce + i, &r, 4);
+    }
+}
+
+/**
+@fn static void calc_digest(struct soap *soap, const char *created, const char *nonce, int noncelen, const char *password, char hash[SOAP_SMD_SHA1_SIZE])
+@brief Calculates digest value SHA1(created, nonce, password)
+@param soap context
+@param[in] created string (XSD dateTime format)
+@param[in] nonce value
+@param[in] noncelen length of nonce value
+@param[in] password string
+@param[out] hash SHA1 digest
+*/
+static void
+    calc_digest(struct soap *soap, const char *created, const char *nonce, int noncelen, const char *password, char hash[SOAP_SMD_SHA1_SIZE])
+{ struct soap_smd_data context;
+/* use smdevp engine */
+soap_smd_init(soap, &context, SOAP_SMD_DGST_SHA1, NULL, 0);
+soap_smd_update(soap, &context, nonce, noncelen);
+soap_smd_update(soap, &context, created, strlen(created));
+soap_smd_update(soap, &context, password, strlen(password));
+soap_smd_final(soap, &context, hash, NULL);
+}
+
+
+/**
+@fn int soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password)
+@brief Adds UsernameToken element for digest authentication.
+@param soap context
+@param[in] id string for signature referencing or NULL
+@param[in] username string
+@param[in] password string
+@return SOAP_OK
+
+Computes SHA1 digest of the time stamp, a nonce, and the password. The digest
+provides the authentication credentials. Passwords are NOT sent in the clear.
+Note: this release supports the use of at most one UsernameToken in the header.
+*/
+int
+soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
+{ _wsse__Security *security = soap_wsse_add_Security(soap);
+  const char *created = soap_dateTime2s(soap, now);
+  char HA[SOAP_SMD_SHA1_SIZE], HABase64[29];
+  char nonce[SOAP_WSSE_NONCELEN], *nonceBase64;
+  DBGFUN2("soap_wsse_add_UsernameTokenDigest", "id=%s", id?id:"", "username=%s", username?username:"");
+  /* generate a nonce */
+  calc_nonce(soap, nonce);
+  nonceBase64 = soap_s2base64(soap, (unsigned char*)nonce, NULL, SOAP_WSSE_NONCELEN);
+  /* The specs are not clear: compute digest over binary nonce or base64 nonce? */
+  /* compute SHA1(created, nonce, password) */
+  calc_digest(soap, created, nonce, SOAP_WSSE_NONCELEN, password, HA);
+  /*
+  calc_digest(soap, created, nonceBase64, strlen(nonceBase64), password, HA);
+  */
+  soap_s2base64(soap, (unsigned char*)HA, HABase64, SOAP_SMD_SHA1_SIZE);
+  /* populate the UsernameToken with digest */
+  soap_wsse_add_UsernameTokenText(soap, id, username, HABase64);
+  /* populate the remainder of the password, nonce, and created */
+  security->UsernameToken->Password->Type = (char*)wsse_PasswordDigestURI;
+  security->UsernameToken->Nonce = nonceBase64;
+  security->UsernameToken->wsu__Created = soap_strdup(soap, created);
+  return SOAP_OK;
+}
+
+} // anonymous namespace
+
+
 
 const int SOAP_RECEIVE_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
 const int SOAP_SEND_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
@@ -18,14 +105,17 @@ const int SOAP_CONNECT_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
 const int SOAP_ACCEPT_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
 const std::string DEFAULT_ONVIF_LOGIN = "admin";
 const std::string DEFAULT_ONVIF_PASSWORD = "admin";
+static const int DIGEST_TIMEOUT_SEC = 60;
 
 template <class T>
-SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
+SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
     m_login(0),
     m_passwd(0),
-    invoked(false)
+    invoked(false),
+    m_timeDrift(_timeDrift)
 {
-    Q_ASSERT(!endpoint.empty());
+    //Q_ASSERT(!endpoint.empty());
+	Q_ASSERT_X(!endpoint.empty(), Q_FUNC_INFO, "Onvif URL is empty!!! It is debug only check.");
     m_endpoint = new char[endpoint.size() + 1];
     strcpy(m_endpoint, endpoint.c_str());
     m_endpoint[endpoint.size()] = '\0';
@@ -71,10 +161,6 @@ void SoapWrapper<T>::cleanLoginPassword()
 template <class T>
 void SoapWrapper<T>::setLoginPassword(const std::string& login, const std::string& passwd)
 {
-    if (login.empty()) {
-        return;
-    }
-
     cleanLoginPassword();
 
     m_login = new char[login.size() + 1];
@@ -92,6 +178,14 @@ soap* SoapWrapper<T>::getSoap()
     return m_soapProxy->soap;
 }
 
+void correctTimeInternal(char* buffer, const QDateTime& dt)
+{
+    if (strlen(buffer) > 19) {
+        QByteArray datetime = dt.toString(Qt::ISODate).toLocal8Bit();
+        memcpy(buffer, datetime.data(), 19);
+    }
+}
+
 template <class T>
 void SoapWrapper<T>::beforeMethodInvocation()
 {
@@ -105,7 +199,8 @@ void SoapWrapper<T>::beforeMethodInvocation()
         invoked = true;
     }
 
-    if (m_login) soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, "Id", m_login, m_passwd);
+    if (m_login && *m_login)
+        soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, NULL, m_login, m_passwd, time(NULL) + m_timeDrift);
 }
 
 template <class T>
@@ -121,6 +216,12 @@ const char* SoapWrapper<T>::getPassword()
 }
 
 template <class T>
+int SoapWrapper<T>::getTimeDrift()
+{
+    return m_timeDrift;
+}
+
+template <class T>
 const QString SoapWrapper<T>::getLastError()
 {
     return SoapErrorHelper::fetchDescription(m_soapProxy->soap_fault());
@@ -129,7 +230,7 @@ const QString SoapWrapper<T>::getLastError()
 template <class T>
 const QString SoapWrapper<T>::getEndpointUrl()
 {
-    return m_endpoint;
+    return QLatin1String(m_endpoint);
 }
 
 template <class T>
@@ -148,8 +249,8 @@ bool SoapWrapper<T>::isConflictError()
 // DeviceSoapWrapper
 //
 
-DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
-    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd),
+DeviceSoapWrapper::DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
+    SoapWrapper<DeviceBindingProxy>(endpoint, login, passwd, _timeDrift),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -213,6 +314,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
                 qDebug() << "User is NOT created";
             }
 
+            setLoginPassword(std::string(), std::string());
             return false;
         }
 
@@ -222,6 +324,7 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer)
 
     } while (true);
 
+    setLoginPassword(std::string(), std::string());
     return false;
 }
 
@@ -246,15 +349,43 @@ int DeviceSoapWrapper::getDeviceInformation(DeviceInfoReq& request, DeviceInfoRe
 int DeviceSoapWrapper::getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response)
 {
     beforeMethodInvocation();
-    return m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, &response);
+    int rez = m_soapProxy->GetCapabilities(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
+int DeviceSoapWrapper::GetSystemDateAndTime(_onvifDevice__GetSystemDateAndTime& request, _onvifDevice__GetSystemDateAndTimeResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetSystemDateAndTime(m_endpoint, NULL, &request, &response);
+}
+
+
+int DeviceSoapWrapper::systemReboot(RebootReq& request, RebootResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SystemReboot(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultHard(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Hard;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
+}
+
+int DeviceSoapWrapper::systemFactoryDefaultSoft(FactoryDefaultReq& request, FactoryDefaultResp& response)
+{
+    beforeMethodInvocation();
+    request.FactoryDefault = onvifXsd__FactoryDefaultType__Soft;
+    return m_soapProxy->SetSystemFactoryDefault(m_endpoint, NULL, &request, &response);
 }
 
 //
 // MediaSoapWrapper
 //
 
-MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd):
-    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd),
+MediaSoapWrapper::MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
+    SoapWrapper<MediaBindingProxy>(endpoint, login, passwd, _timeDrift),
     passwordsData(PasswordHelper::instance())
 {
 
@@ -281,6 +412,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
 {
     beforeMethodInvocation();
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetCompatibleMetadataConfigurations(m_endpoint, NULL, &request, &response);
 }
 
 int MediaSoapWrapper::getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response)
@@ -311,6 +448,12 @@ int MediaSoapWrapper::addVideoEncoderConfiguration(AddVideoConfigReq& request, A
 {
     beforeMethodInvocation();
     return m_soapProxy->AddVideoEncoderConfiguration(m_endpoint, NULL, &request, &response);
+}
+
+int MediaSoapWrapper::addPTZConfiguration(AddPTZConfigReq& request, AddPTZConfigResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AddPTZConfiguration(m_endpoint, NULL, &request, &response);
 }
 
 int MediaSoapWrapper::setVideoEncoderConfiguration(SetVideoConfigReq& request, SetVideoConfigResp& response)
@@ -386,12 +529,115 @@ int MediaSoapWrapper::getVideoEncoderConfiguration(VideoConfigReq& request, Vide
 }
 
 //
+// PtzSoapWrapper
+//
+
+PtzSoapWrapper::PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
+    SoapWrapper<PTZBindingProxy>(endpoint, login, passwd, _timeDrift),
+    passwordsData(PasswordHelper::instance())
+{
+
+}
+
+PtzSoapWrapper::~PtzSoapWrapper()
+{
+
+}
+
+//
+// ImagingSoapWrapper
+//
+
+ImagingSoapWrapper::ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
+    SoapWrapper<ImagingBindingProxy>(endpoint, login, passwd, _timeDrift),
+    passwordsData(PasswordHelper::instance())
+{
+
+}
+
+ImagingSoapWrapper::~ImagingSoapWrapper()
+{
+
+}
+
+int ImagingSoapWrapper::getOptions(ImagingOptionsReq& request, ImagingOptionsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetOptions(m_endpoint, NULL, &request, &response);
+}
+
+int ImagingSoapWrapper::getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetImagingSettings(m_endpoint, NULL, &request, &response);
+}
+
+int ImagingSoapWrapper::setImagingSettings(SetImagingSettingsReq& request, SetImagingSettingsResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->SetImagingSettings(m_endpoint, NULL, &request, &response);
+}
+
+// ---------------------------------------- PtzSoapWrapper -------------------------------------------
+
+int PtzSoapWrapper::doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->AbsoluteMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doGetNode(_onvifPtz__GetNode& request, _onvifPtz__GetNodeResponse& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetNode(m_endpoint, NULL, &request, &response);
+    if (rez != SOAP_OK)
+    {
+        qWarning() << "PTZ settings reading error: " << m_endpoint <<  ". " << getLastError();
+    }
+    return rez;
+}
+
+int PtzSoapWrapper::doGetNodes(_onvifPtz__GetNodes& request, _onvifPtz__GetNodesResponse& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetNodes(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
+int PtzSoapWrapper::doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetConfigurations(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
+int PtzSoapWrapper::doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->ContinuousMove(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->Stop(m_endpoint, NULL, &request, &response);
+}
+
+int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response)
+{
+    beforeMethodInvocation();
+    int rez = m_soapProxy->GetServiceCapabilities(m_endpoint, NULL, &request, &response);
+    return rez;
+}
+
+//
 // Explicit instantiating
 //
 
 template soap* SoapWrapper<DeviceBindingProxy>::getSoap();
 template const char* SoapWrapper<DeviceBindingProxy>::getLogin();
 template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
+template int SoapWrapper<DeviceBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<DeviceBindingProxy>::getLastError();
 template const QString SoapWrapper<DeviceBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
@@ -400,7 +646,26 @@ template bool SoapWrapper<DeviceBindingProxy>::isConflictError();
 template soap* SoapWrapper<MediaBindingProxy>::getSoap();
 template const char* SoapWrapper<MediaBindingProxy>::getLogin();
 template const char* SoapWrapper<MediaBindingProxy>::getPassword();
+template int SoapWrapper<MediaBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
 template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<MediaBindingProxy>::isConflictError();
+
+template soap* SoapWrapper<PTZBindingProxy>::getSoap();
+template const char* SoapWrapper<PTZBindingProxy>::getLogin();
+template const char* SoapWrapper<PTZBindingProxy>::getPassword();
+template int SoapWrapper<PTZBindingProxy>::getTimeDrift();
+template const QString SoapWrapper<PTZBindingProxy>::getLastError();
+template const QString SoapWrapper<PTZBindingProxy>::getEndpointUrl();
+template bool SoapWrapper<PTZBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<PTZBindingProxy>::isConflictError();
+
+template soap* SoapWrapper<ImagingBindingProxy>::getSoap();
+template const char* SoapWrapper<ImagingBindingProxy>::getLogin();
+template const char* SoapWrapper<ImagingBindingProxy>::getPassword();
+template int SoapWrapper<ImagingBindingProxy>::getTimeDrift();
+template const QString SoapWrapper<ImagingBindingProxy>::getLastError();
+template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();
+template bool SoapWrapper<ImagingBindingProxy>::isNotAuthenticated();
+template bool SoapWrapper<ImagingBindingProxy>::isConflictError();

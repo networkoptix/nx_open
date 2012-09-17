@@ -1,11 +1,12 @@
 #ifndef QN_RESOURCE_CRITERION_H
 #define QN_RESOURCE_CRITERION_H
 
+#include <QtCore/QVariant>
+#include <QtCore/QMetaType>
+#include <QtCore/QList>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_property.h>
-#include <QVariant>
-#include <QMetaType>
-#include <QList>
 
 class QRegExp;
 
@@ -20,7 +21,7 @@ public:
         Next            /**< Criterion has nothing to say of whether the resource should be accepted or rejected. Next criterion should be invoked. */
     };
 
-	enum Type {
+    enum Type {
         Nothing,        /**< Match no resources. Target is ignored. */
         Equality,       /**< One of the resource's fields must equal provided value. */
         Containment,    /**< One of the resource's fields must contain provided value. */
@@ -31,7 +32,7 @@ public:
 
     typedef Operation (*CriterionFunction)(const QnResourcePtr &, const QVariant &value);
 
-	QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
+    QnResourceCriterion(const QRegExp &regExp, const char *propertyName = QnResourceProperty::searchString, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
     QnResourceCriterion(int flags, const char *propertyName = QnResourceProperty::flags, Operation matchOperation = Accept, Operation mismatchOperation = Next);
 
@@ -97,22 +98,15 @@ public:
 
     Operation check(const QnResourcePtr &resource) const;
 
-    QnResourceList filter(const QnResourceList &resources) const;
-
-    static QnResourceList filter(const QnResourceList &resources, const QnResourceCriterion &criterion);
-
-    template<class Resource, class Result>
-    static Result filter(const QnResourceList &resources) {
-        Result result;
-        foreach(const QnResourcePtr &resource, resources)
-            if(QnSharedResourcePointer<Resource> derived = resource.dynamicCast<Resource>())
-                result.push_back(derived);
-        return result;
-    }
-
     template<class Resource>
-    static QList<QnSharedResourcePointer<Resource> > filter(const QnResourceList &resources) {
-        return filter<Resource, QList<QnSharedResourcePointer<Resource> > >(resources);
+    QnSharedResourcePointerList<Resource> filter(const QnSharedResourcePointerList<Resource> &resources) const {
+        QnSharedResourcePointerList<Resource> result;
+        foreach(const QnSharedResourcePointer<Resource> &resource, resources) {
+            Operation operation = check(resource);
+            if(operation == Accept)
+                result.push_back(resource);
+        }
+        return result;
     }
 
     friend bool operator==(const QnResourceCriterion &l, const QnResourceCriterion &r);
@@ -166,6 +160,12 @@ public:
 
 Q_DECLARE_METATYPE(QnResourceCriterion);
 Q_DECLARE_METATYPE(QnResourceCriterionList);
+
+
+template<class Resource>
+QnSharedResourcePointerList<Resource> QnSharedResourcePointerList<Resource>::filtered(const QnResourceCriterion &criterion) const {
+    return criterion.filter(*this);
+}
 
 
 namespace QnResourceCriterionExpressions {

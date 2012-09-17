@@ -17,25 +17,24 @@ public:
       */
     bool isValid() const;
 
-    const QString& name() const;
-    const QByteArray& key() const;
-    const qint32 cameraCount() const;
-    const QByteArray& hardwareId() const;
-    const QByteArray& signature() const;
+    const QString &name() const;
+    const QByteArray &key() const;
+    qint32 cameraCount() const;
+    const QByteArray &hardwareId() const;
+    const QByteArray &signature() const;
 
     QByteArray toString() const;
     static QnLicense fromString(const QByteArray &licenseString);
 
 public:
-    static const QByteArray FREE_LICENSE_KEY;
+    static const QByteArray FREE_LICENSE_KEY; // TODO: add isFree accessor instead 
 
 private:
     QString m_name;
     QByteArray m_key;
     qint32 m_cameraCount;
-    QByteArray m_signature;
     QByteArray m_hardwareId;
-
+    QByteArray m_signature;
     mutable int m_validLicense;
 };
 
@@ -72,10 +71,10 @@ class QnLicensePool : public QObject
 public:
     static QnLicensePool* instance();
 
-    const QnLicenseList& getLicenses() const;
-    void addLicenses(const QnLicenseList& licenses);
-    void replaceLicenses(const QnLicenseList& licenses);
-    void addLicense(const QnLicensePtr&);
+    const QnLicenseList &getLicenses() const;
+    void addLicenses(const QnLicenseList &licenses);
+    void replaceLicenses(const QnLicenseList &licenses);
+    void addLicense(const QnLicensePtr &license);
 
     void reset();
     bool isEmpty() const;

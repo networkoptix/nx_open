@@ -1,97 +1,85 @@
 #include "bytearray.h"
+#include "warnings.h"
 
-#include "log.h"
+/**
+ * Same as FF_INPUT_BUFFER_PADDING_SIZE.
+ */
+#define QN_BYTE_ARRAY_PADDING 16
 
-// same as FF_INPUT_BUFFER_PADDING_SIZE
-#define CLBYTEARRAY_PADDING_SIZE 16
-
-CLByteArray::CLByteArray(unsigned int alignment, unsigned int capacity):
+QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity):
     m_alignment(alignment),
     m_capacity(0),
     m_size(0),
-    m_data(0),
-    m_ignore(0)
+    m_data(NULL),
+    m_ignore(0),
+    m_ownBuffer( true )
 {
     if (capacity > 0)
         reallocate(capacity);
 }
 
-CLByteArray::~CLByteArray()
+QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
+:
+    m_alignment( 1 ),
+    m_capacity( dataSize ),
+    m_size( dataSize ),
+    m_data( buf ),
+    m_ignore( 0 ),
+    m_ownBuffer( false )
 {
-    qFreeAligned(m_data);
 }
 
-void CLByteArray::clear()
+QnByteArray::~QnByteArray()
+{
+    if( m_ownBuffer )
+        qFreeAligned(m_data);
+}
+
+void QnByteArray::clear()
 {
     m_size = 0;
     m_ignore = 0;
 }
 
-const char *CLByteArray::constData() const
+const char *QnByteArray::constData() const
 {
     return m_data + m_ignore;
 }
 
-char *CLByteArray::data()
+char *QnByteArray::data()
 {
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
     return m_data + m_ignore;
 }
 
-// ### consider deprecating ignore_first_bytes() as it could break data alignment
-void CLByteArray::ignore_first_bytes(int bytes_to_ignore)
+void QnByteArray::ignore_first_bytes(int bytes_to_ignore)
 {
     m_ignore = bytes_to_ignore;
 }
 
-unsigned int CLByteArray::size() const
+int QnByteArray::getAlignment() const
+{
+    return m_alignment;
+}
+
+unsigned int QnByteArray::size() const
 {
     return m_size - m_ignore;
 }
 
-unsigned int CLByteArray::capacity() const
+unsigned int QnByteArray::capacity() const
 {
     return m_capacity;
 }
 
-bool CLByteArray::reallocate(unsigned int new_capacity)
+unsigned int QnByteArray::write( const char *data, unsigned int size )
 {
-    Q_ASSERT(new_capacity > 0);
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
 
-    if (new_capacity < m_size)
-    {
-        qWarning("CLByteArray::reallocate(): Unable to decrease capacity. "
-                 "Did you forget to clean() the buffer?");
-        return false;
-    }
-
-    if (new_capacity <= m_capacity)
-        return true;
-
-    //char *new_data = (char *)qReallocAligned(m_data, new_capacity + CLBYTEARRAY_PADDING_SIZE, m_capacity, m_alignment);
-    char *new_data = (char *)qMallocAligned(new_capacity + CLBYTEARRAY_PADDING_SIZE, m_alignment);
-    qMemCopy(new_data, m_data, m_size);
-    qFreeAligned(m_data);
-
-    if (!q_check_ptr(new_data))
-        return false; // ### would probably crash anyways
-
-    m_capacity = new_capacity;
-    m_data = new_data;
-    // size remains unchanged
-
-    return true;
-}
-
-unsigned int CLByteArray::write(const char *data, unsigned int size)
-{
-    if (size > m_capacity - m_size) // if we do not have enough space
-    {
-        if (!reallocate(m_capacity * 2 + size))
-        {
-            cl_log.log(QLatin1String("CLByteArray::write(): Unable to increase capacity"), cl_logWARNING);
-            return 0;
-        }
-    }
+    reserve(m_size + size);
 
     qMemCopy(m_data + m_size, data, size);
 
@@ -100,63 +88,93 @@ unsigned int CLByteArray::write(const char *data, unsigned int size)
     return size;
 }
 
-unsigned int CLByteArray::write(const char *data, unsigned int size, int abs_shift)
+unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 {
-    if (size+abs_shift > m_capacity) // if we do not have enough space
-    {
-        if (!reallocate(qMax(m_capacity * 2 + size, size + abs_shift)))
-        {
-            cl_log.log(QLatin1String("CLByteArray::write(): Unable to increase capacity"), cl_logWARNING);
-            return 0;
-        }
-    }
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
 
-    qMemCopy(m_data + abs_shift, data, size);
+    reserve(pos + size);
 
-    if (size + abs_shift > m_size)
-        m_size = size + abs_shift;
+    qMemCopy(m_data + pos, data, size);
+
+    if (size + pos > m_size)
+        m_size = size + pos;
 
     return size;
 }
 
-char *CLByteArray::prepareToWrite(unsigned int size)
+void QnByteArray::writeFiller(quint8 filler, int size)
 {
-    if (size > m_capacity - m_size) // if we do not have enough space
-    {
-        if (!reallocate(m_capacity * 2 + size))
-        {
-            cl_log.log(QLatin1String("CLByteArray::prepareToWrite(): Unable to increase capacity"), cl_logWARNING);
-            return 0;
-        }
-    }
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
+    reserve(m_size + size);
+
+    memset(m_data + m_size, filler, size);
+    m_size += size;
+}
+
+char *QnByteArray::startWriting(unsigned int size)
+{
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
+    reserve(m_size + size);
 
     return m_data + m_size;
 }
 
-void CLByteArray::done(unsigned int size)
+void QnByteArray::finishWriting(unsigned int size)
 {
     m_size += size;
 }
 
-void CLByteArray::resize(unsigned int size)
+void QnByteArray::resize(unsigned int size)
 {
+    reserve(size);
+
     m_size = size;
 }
 
-void CLByteArray::removeZerosAtTheEnd()
+void QnByteArray::reserve(unsigned int size)
 {
-    while (m_size>0 && m_data[m_size-1] == 0)
+    if(size <= m_capacity)
+        return;
+
+    if(!reallocate(qMax(m_capacity * 2, size)))
+        qnWarning("Could not reserve '%1' bytes.", size);
+}
+
+void QnByteArray::removeTrailingZeros()
+{
+    while (m_size > 0 && m_data[m_size - 1] == 0)
         --m_size;
 }
 
-void CLByteArray::fill(quint8 filler, int size)
+bool QnByteArray::reallocate(unsigned int capacity)
 {
-    // if we do not have enough space
-    if (size > m_capacity - m_size && !reallocate(m_capacity * 2 + size)) 
+    Q_ASSERT(capacity > 0);
+
+    if (capacity < m_size)
     {
-        qWarning() << Q_FUNC_INFO << "Unable to increase capacity";
-        return;
+        qWarning("QnByteArray::reallocate(): Unable to decrease capacity. "
+                 "Did you forget to clear() the buffer?");
+        return false;
     }
-    memset(m_data + m_size, filler, size);
-    m_size += size;
+
+    if (capacity < m_capacity)
+        return true;
+
+    char *data = (char *) qMallocAligned(capacity + QN_BYTE_ARRAY_PADDING, m_alignment);
+    if(!data)
+        return false;
+
+    qMemCopy(data, m_data, m_size);
+    if( m_ownBuffer )
+        qFreeAligned(m_data);
+    m_capacity = capacity;
+    m_data = data;
+    m_ownBuffer = true;
+
+    return true;
 }

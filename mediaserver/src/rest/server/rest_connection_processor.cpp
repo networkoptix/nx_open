@@ -8,9 +8,10 @@
 #include <QTime>
 
 static const int CONNECTION_TIMEOUT = 60 * 1000;
-static const int MAX_REQUEST_SIZE = 1024*1024*15;
 
-struct QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
+QnRestConnectionProcessor::Handlers QnRestConnectionProcessor::m_handlers;
+
+class QnRestConnectionProcessor::QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 };
 
@@ -29,40 +30,13 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
 void QnRestConnectionProcessor::run()
 {
     Q_D(QnRestConnectionProcessor);
-    QTime globalTimeout;
+
+    bool ready = true;
+    if (d->clientRequest.isEmpty())
+        ready = readRequest();
+
     while (1)
     {
-        globalTimeout.restart();
-        d->requestHeaders = QHttpRequestHeader();
-        d->responseHeaders = QHttpResponseHeader();
-        d->clientRequest.clear();
-        d->requestBody.clear();
-        d->responseBody.clear();
-        bool ready = false;
-        while (!m_needStop && d->socket->isConnected())
-        {
-            int readed = d->socket->recv(d->tcpReadBuffer, TCP_READ_BUFFER_SIZE);
-            if (readed > 0) 
-            {
-                globalTimeout.restart();
-                d->clientRequest.append((const char*) d->tcpReadBuffer, readed);
-                if (isFullMessage(d->clientRequest))
-                {
-                    ready = true;
-                    break;
-                }
-                else if (d->clientRequest.size() > MAX_REQUEST_SIZE)
-                {
-                    qWarning() << "Too large HTTP client request. Ignoring";
-                    break;
-                }
-            }
-            else //if (globalTimeout.elapsed() > CONNECTION_TIMEOUT)
-            {
-                break;
-            }
-        }
-
         bool isKeepAlive = false;
         if (ready)
         {
@@ -73,29 +47,25 @@ void QnRestConnectionProcessor::run()
                 d->responseHeaders.addValue(QString("Keep-Alive"), QString("timeout=%1").arg(d->socketTimeout/1000));
             }
 
-            QByteArray data = d->requestHeaders.path().toUtf8();
-            data = data.replace("+", "%20");
-            QUrl url = QUrl::fromEncoded(data);
-
             d->responseBody.clear();
             int rez = CODE_OK;
             QByteArray encoding = "application/xml";
-
-            QnRestRequestHandler* handler = static_cast<QnRestServer*>(d->owner)->findHandler(url.path());
+            QUrl url = getDecodedUrl();
+            QnRestRequestHandlerPtr handler = findHandler(url.path());
             if (handler) 
             {
                 QList<QPair<QString, QString> > params = url.queryItems();
                 if (d->owner->authenticate(d->requestHeaders, d->responseHeaders))
                 {
                     if (d->requestHeaders.method().toUpper() == "GET") {
-                        rez = handler->executeGet(url.path(), params, d->responseBody);
+                        rez = handler->executeGet(url.path(), params, d->responseBody, encoding);
                     }
                     else if (d->requestHeaders.method().toUpper() == "POST") {
-                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody);
+                        rez = handler->executePost(url.path(), params, d->requestBody, d->responseBody, encoding);
                     }
                     else {
                         qWarning() << "Unknown REST method " << d->requestHeaders.method();
-                        encoding = "plain/text";
+                        encoding = "text/plain";
                         d->responseBody = "Invalid HTTP method";
                         rez = CODE_NOT_FOUND;
                     }
@@ -118,8 +88,7 @@ void QnRestConnectionProcessor::run()
                 d->responseBody.append("<body>\n");
 
                 d->responseBody.append("<TABLE BORDER=\"1\" CELLSPACING=\"0\">\n");
-                const QnRestServer::Handlers& allHandlers = static_cast<QnRestServer*>(d->owner)->allHandlers();
-                for(QnRestServer::Handlers::const_iterator itr = allHandlers.begin(); itr != allHandlers.end(); ++itr)
+                for(Handlers::const_iterator itr = m_handlers.begin(); itr != m_handlers.end(); ++itr)
                 {
                     QString str = itr.key();
                     if (str.startsWith("api/"))
@@ -142,13 +111,30 @@ void QnRestConnectionProcessor::run()
         }
         if (!isKeepAlive)
             break;
+        ready = readRequest();
     }
     d->socket->close();
-    m_runing = false;
 }
 
-void QnRestConnectionProcessor::parseRequest()
+void QnRestConnectionProcessor::registerHandler(const QString& path, QnRestRequestHandler* handler)
 {
-    Q_D(QnRestConnectionProcessor);
-    QnTCPConnectionProcessor::parseRequest();
+    m_handlers.insert(path, QnRestRequestHandlerPtr(handler));
+    handler->setPath(path);
+}
+
+QnRestRequestHandlerPtr QnRestConnectionProcessor::findHandler(QString path)
+{
+    if (path.startsWith('/'))
+        path = path.mid(1);
+    if (path.endsWith('/'))
+        path = path.left(path.length()-1);
+
+    for (Handlers::iterator i = m_handlers.begin();i != m_handlers.end(); ++i)
+    {
+        QRegExp expr(i.key(), Qt::CaseSensitive, QRegExp::Wildcard);
+        if (expr.indexIn(path) != -1)
+            return i.value();
+    }
+
+    return QnRestRequestHandlerPtr();
 }

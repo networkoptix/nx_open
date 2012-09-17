@@ -5,15 +5,15 @@
 static const int TESTCAM_TIMEOUT = 1 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
-    QnLiveStreamProvider(res),
-    CLServerPushStreamreader(res)
+    CLServerPushStreamreader(res),
+    QnLiveStreamProvider(res)
 {
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
 }
 
 QnTestCameraStreamReader::~QnTestCameraStreamReader()
 {
-    closeStream();
+    stop();
 }
 
 int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
@@ -26,6 +26,7 @@ int QnTestCameraStreamReader::receiveData(quint8* buffer, int size)
             return readed;
         done += readed;
     }
+    return done;
 }
 
 QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
@@ -41,7 +42,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 
     quint8 header[6];
 
-    int readed = receiveData(header, sizeof(header));
+    quint32 readed = receiveData(header, sizeof(header));
     if (readed != sizeof(header)) {
         closeStream();
         return QnAbstractMediaDataPtr();
@@ -62,7 +63,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     if (isCodecContext)
     {
         quint8* ctxData = new quint8[size];
-        int readed = receiveData(ctxData, size);
+        quint32 readed = receiveData(ctxData, size);
 
         if (readed == size)
         {
@@ -75,7 +76,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
     QnAbstractMediaDataPtr rez(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, size, m_context));
     rez->compressionType = (CodecID) codec;
 
-    rez->data.done(size);
+    rez->data.finishWriting(size);
     rez->timestamp = qnSyncTime->currentMSecsSinceEpoch()*1000;
     if (isKeyData)
         rez->flags |= AV_PKT_FLAG_KEY;
@@ -117,7 +118,7 @@ void QnTestCameraStreamReader::openStream()
     m_tcpSock.setReadTimeOut(TESTCAM_TIMEOUT);
     m_tcpSock.setWriteTimeOut(TESTCAM_TIMEOUT);
 
-    if (!m_tcpSock.connect(url.host().toLatin1().data(), url.port()))
+    if (!m_tcpSock.connect(url.host(), url.port()))
     {
         closeStream();
         return;

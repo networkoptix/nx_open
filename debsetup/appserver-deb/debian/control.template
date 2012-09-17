@@ -1,17 +1,17 @@
-Package: networkoptix-entcontroller
-Source: networkoptix-entcontroller
+Package: ${deb.customization.company.name}-entcontroller
+Source: ${deb.customization.company.name}-entcontroller
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
 Architecture: ARCHITECTURE
-Maintainer: Network Optix <support@networkoptix.com>
+Maintainer: ${company.name} <${company.support.address}>
 Pre-Depends: debconf
-Depends: libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, upstart-job, psmisc, upstart (>= 0.6.5-8)
+Depends: libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, upstart-job, psmisc, upstart (>= 0.6.5-8), libxi6, libxrender1, libxt6, libfontconfig1, libsm6, libice6, libaudio2
 Recommends: 
 Suggests: 
-Conflicts: networkoptix-entcontroller-1.1 (<< VERSION)
-Replaces: networkoptix-entcontroller-1.1 (<< VERSION)
-Provides: networkoptix-entcontroller
+Conflicts: ${deb.customization.company.name}-entcontroller-1.2 (<< VERSION)
+Replaces: ${deb.customization.company.name}-entcontroller-1.2 (<< VERSION)
+Provides: ${deb.customization.company.name}-entcontroller
 Section: database
 Priority: optional
-Homepage: http://networkoptix.com/
-Description: Here is description of Network Optix Enterprise Controller
+Homepage: http://${company.url}
+Description: ${company.name} Enterprise Controller

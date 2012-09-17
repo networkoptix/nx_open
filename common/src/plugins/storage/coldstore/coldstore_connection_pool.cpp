@@ -121,9 +121,8 @@ void QnColdStoreConnection::close()
 
     m_lastUsed.restart();
 
-    
-
-    Veracity::u32 status = m_connection.Close(m_stream);
+    /*Veracity::u32 status =*/
+    m_connection.Close(m_stream);
 
     //qDebug() << " cs file closed==================!!!!:" << m_filename << " channel " << m_channel;
 
@@ -193,7 +192,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
     m_pos += returned_data_length;
 
-    Q_ASSERT(returned_data_length == len);
+    Q_ASSERT(returned_data_length == (Veracity::u64)len);
 
     return true;
 }
@@ -265,7 +264,7 @@ qint64 QnColdStoreConnection::oldestFileTime(const QString& fn)
     if (resultCount==0)
         return 0;
 
-    qint64 resultT = QString(result).toULongLong();
+    qint64 resultT = QString(QLatin1String(result)).toULongLong();
 
     delete result;
 

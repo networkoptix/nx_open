@@ -10,16 +10,16 @@ static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 
 QnServerArchiveDelegate::QnServerArchiveDelegate(): 
     QnAbstractArchiveDelegate(),
+    m_opened(false),
+    m_lastPacketTime(0),
+    m_skipFramesToTime(0),
     m_reverseMode(false),
     m_selectedAudioChannel(0),
-    m_opened(false),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
     m_sendMotion(false),
     m_eof(false),
-    m_quality(MEDIA_Quality_High),
-    m_skipFramesToTime(0),
-    m_lastPacketTime(0)
+    m_quality(MEDIA_Quality_High)
 {
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
@@ -78,7 +78,7 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     m_catalogHi = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_LiveVideo);
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 
-    m_currentChunkCatalog = m_quality == MEDIA_Quality_High ? m_catalogHi : m_catalogLow;
+    m_currentChunkCatalog = m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi;
 
     return true;
 }
@@ -194,10 +194,10 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
 {
     if (m_currentChunk.durationMs == -1)
         m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
-	if (m_currentChunk.durationMs == -1) {
-		m_eof = true;
+    if (m_currentChunk.durationMs == -1) {
+        m_eof = true;
         return false;
-	}
+    }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || 
@@ -216,10 +216,11 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
         return rez;
     }
 
-    int waitMotionCnt = 0;
+    //int waitMotionCnt = 0;
 begin_label:
     QnAbstractMediaDataPtr data = m_aviDelegate->getNextData();
-    if (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
+    int chunkSwitchCnt = 0;
+    while (!data || m_currentChunk.durationMs != -1 && data->timestamp >= m_currentChunk.durationMs*1000)
     {
         DeviceFileCatalog::Chunk chunk;
         DeviceFileCatalogPtr chunkCatalog;
@@ -243,8 +244,13 @@ begin_label:
         }
 
         data = m_aviDelegate->getNextData();
-        if (data) 
+        if (data) {
             data->flags &= ~QnAbstractMediaData::MediaFlags_BOF;
+        }
+        else {
+            if (++chunkSwitchCnt > 10)
+                break;
+        }
     }
 
     if (data && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE)) 
@@ -352,6 +358,9 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 
 bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive)
 {
+    if (quality == MEDIA_Quality_AlwaysHigh)
+        quality = MEDIA_Quality_High;
+
     m_dialQualityHelper.setPrefferedQuality(quality);
     m_quality = quality;
     m_newQualityTmpData.clear();

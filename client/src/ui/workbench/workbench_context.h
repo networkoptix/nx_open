@@ -1,6 +1,8 @@
 #ifndef QN_WORKBENCH_CONTEXT_H
 #define QN_WORKBENCH_CONTEXT_H
 
+#include <typeinfo>
+
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
@@ -10,13 +12,13 @@
 class QAction;
 
 class QnResourcePool;
-class QnResourcePoolUserWatcher;
 class QnWorkbench;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;
 class QnWorkbenchNavigator;
+class QnWorkbenchUserWatcher;
 class QnActionManager;
 
 /**
@@ -24,7 +26,7 @@ class QnActionManager;
  * and serves as an application context.
  */
 class QnWorkbenchContext: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnWorkbenchContext(QnResourcePool *resourcePool, QObject *parent = NULL);
 
@@ -68,7 +70,14 @@ public:
 
     void setUserName(const QString &userName);
 
-    static QnWorkbenchContext *instance(QnWorkbench *workbench);
+    template<class T>
+    T *instance() {
+        QByteArray key(typeid(T).name());
+        QObject *&result = m_instanceByTypeName[key];
+        if(!result)
+            result = new T(this);
+        return static_cast<T *>(result);
+    }
 
 signals:
     /**
@@ -90,13 +99,15 @@ protected slots:
 private:
     QnResourcePool *m_resourcePool;
     QScopedPointer<QnWorkbench> m_workbench;
-    QScopedPointer<QnResourcePoolUserWatcher> m_userWatcher;
     QScopedPointer<QnWorkbenchSynchronizer> m_synchronizer;
     QScopedPointer<QnWorkbenchLayoutSnapshotManager> m_snapshotManager;
     QScopedPointer<QnWorkbenchAccessController> m_accessController;
     QScopedPointer<QnActionManager> m_menu;
     QScopedPointer<QnWorkbenchDisplay> m_display;
     QScopedPointer<QnWorkbenchNavigator> m_navigator;
+
+    QnWorkbenchUserWatcher *m_userWatcher;
+    QHash<QByteArray, QObject *> m_instanceByTypeName;
 };
 
 

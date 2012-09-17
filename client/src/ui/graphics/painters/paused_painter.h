@@ -1,13 +1,15 @@
 #ifndef QN_PAUSED_PAINTER_H
 #define QN_PAUSED_PAINTER_H
 
-#include <QScopedPointer>
+#include <QtCore/QSharedPointer>
+
+class QGLContext;
 
 class QnColorShaderProgram;
 
 class QnPausedPainter {
 public:
-    QnPausedPainter();
+    QnPausedPainter(const QGLContext *context);
 
     ~QnPausedPainter();
 
@@ -17,7 +19,7 @@ public:
 
 private:
     unsigned m_list;
-    QScopedPointer<QnColorShaderProgram> m_program;
+    QSharedPointer<QnColorShaderProgram> m_program;
 };
 
 #endif // QN_PAUSED_PAINTER_H

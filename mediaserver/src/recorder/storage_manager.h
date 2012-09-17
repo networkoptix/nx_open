@@ -5,6 +5,8 @@
 #include <QMap>
 #include <QFile>
 #include <QMutex>
+
+#include "recording/time_period_list.h"
 #include "device_file_catalog.h"
 #include "core/resource/storage_resource.h"
 

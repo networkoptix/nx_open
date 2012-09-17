@@ -1,10 +1,18 @@
+#ifndef QN_WIN_AUDIO_EXTEND_INFO_H
+#define QN_WIN_AUDIO_EXTEND_INFO_H
+
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN
+
+#include <Windows.h>
+
 #include <QString>
 
 struct IMMDeviceEnumerator;
 struct IMMDevice;
 
-class WinAudioExtendInfo
-{
+class WinAudioExtendInfo {
 public:
     WinAudioExtendInfo(const QString& name);
     virtual ~WinAudioExtendInfo();
@@ -25,3 +33,7 @@ private:
 
     friend BOOL CALLBACK enumFunc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName,LONG_PTR lParam);
 };
+
+#endif // Q_OS_WIN
+
+#endif // QN_WIN_AUDIO_EXTEND_INFO_H

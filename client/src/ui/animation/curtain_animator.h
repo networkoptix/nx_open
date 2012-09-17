@@ -1,8 +1,9 @@
 #ifndef QN_CURTAIN_ANIMATOR_H
 #define QN_CURTAIN_ANIMATOR_H
 
-#include <QObject>
-#include <QWeakPointer>
+#include <QtCore/QObject>
+#include <QtCore/QWeakPointer>
+
 #include "animator_group.h"
 
 class QnCurtainItem;
@@ -26,6 +27,8 @@ public:
     void uncurtain();
 
     void setSpeed(qreal speed);
+
+    bool isCurtained() const;
 
 signals:
     void curtained();

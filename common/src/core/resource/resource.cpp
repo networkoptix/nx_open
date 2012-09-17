@@ -20,12 +20,12 @@
 QnResource::QnResource(): 
     QObject(),
     m_mutex(QMutex::Recursive),
-    m_initMutex(QMutex::Recursive),
-    m_flags(0),
-	m_disabled(false),
-    m_status(Offline),
     m_resourcePool(NULL),
-    m_initialized(false)
+    m_flags(0),
+    m_disabled(false),
+    m_status(Offline),
+    m_initialized(false),
+    m_initMutex(QMutex::Recursive)
 {
     static volatile bool metaTypesInitialized = false;
     if (!metaTypesInitialized) {
@@ -91,12 +91,13 @@ void QnResource::update(QnResourcePtr other)
         consumer->beforeUpdate();
 
     {
-        QMutexLocker mutexLocker(&m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        QMutexLocker mutexLocker2(&other->m_mutex); // this is virtual atomic operation; so mutexes shold be outside
-        updateInner(other); // this is virtual atomic operation; so mutexes shold be outside
+        // TODO: use ordered mutex locker here to avoid deadlocks.
+        QMutexLocker mutexLocker(&m_mutex); 
+        QMutexLocker mutexLocker2(&other->m_mutex); 
+        updateInner(other); 
     }
     setStatus(other->m_status);
-	setDisabled(other->m_disabled);
+    setDisabled(other->m_disabled);
     emit resourceChanged();
 
     QnParamList paramList = other->getResourceParamList();
@@ -136,8 +137,8 @@ void QnResource::deserialize(const QnResourceParameters& parameters)
     if (parameters.contains(QLatin1String("status")))
         m_status = (QnResource::Status)parameters[QLatin1String("status")].toInt();
 
-	if (parameters.contains(QLatin1String("disabled")))
-		m_disabled = parameters[QLatin1String("disabled")].toInt();
+    if (parameters.contains(QLatin1String("disabled")))
+        m_disabled = parameters[QLatin1String("disabled")].toInt();
 
     blockSignals(signalsBlocked);
 }
@@ -319,14 +320,13 @@ QnParamList QnResource::getResourceParamList() const
         }
     }
 
-    
     if (m_resourceParamList.isEmpty())
         m_resourceParamList = resourceParamList;
 
     return m_resourceParamList;
 }
 
-bool QnResource::hasSuchParam(const QString &name) const
+bool QnResource::hasParam(const QString &name) const
 {
     return getResourceParamList().contains(name);
 }
@@ -351,9 +351,11 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     getResourceParamList();
     if (!m_resourceParamList.contains(name))
     {
-        if (!name.contains("VideoLayout"))
+        if (!name.contains(QLatin1String("VideoLayout")))
             qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
 
+        QMetaObject::invokeMethod( this, "asyncParamGetDone", Qt::DirectConnection, Q_ARG(QString, name), Q_ARG(QVariant, QVariant()), Q_ARG(bool, false) );
+        emit asyncParamGetDone( name, QVariant(), false );
         return false;
     }
 
@@ -361,13 +363,14 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
     //QnParam &param = m_resourceParamList[name];
     //val = param.value();
     //m_mutex.unlock();
-	m_mutex.lock();
-	QnParam param = m_resourceParamList[name];
-	val = param.value();
-	m_mutex.unlock();
+    m_mutex.lock();
+    QnParam param = m_resourceParamList[name];
+    val = param.value();
+    m_mutex.unlock();
 
     if (domain == QnDomainMemory)
     {
+        emit asyncParamGetDone( name, val, true );
         return true;
     }
     else if (domain == QnDomainPhysical)
@@ -378,31 +381,40 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
                 val = newValue;
                 m_mutex.lock();
                 //param.setValue(newValue);
-				m_resourceParamList[name].setValue(newValue);
+                m_resourceParamList[name].setValue(newValue);
                 m_mutex.unlock();
                 QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param));
             }
+            emit asyncParamGetDone( name, newValue, true );
             return true;
         }
     }
     else if (domain == QnDomainDatabase)
     {
         if (param.isPhysical())
+        {
+            emit asyncParamGetDone( name, val, true );
             return true;
+        }
     }
 
+    emit asyncParamGetDone( name, QVariant(), false );
     return false;
 }
 
 bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain domain)
 {
     if (setSpecialParam(name, val, domain))
+    {
+        emit asyncParamSetDone( name, val, true );
         return true;
+    }
 
     getResourceParamList(); // paramList loaded once. No more changes, instead of param value. So, use mutex for value only
     if (!m_resourceParamList.contains(name))
     {
         qWarning() << "Can't set parameter. Parameter" << name << "does not exists for resource" << getName();
+        emit asyncParamSetDone( name, val, false );
         return false;
     }
 
@@ -412,6 +424,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     {
         cl_log.log("setParam: cannot set readonly param!", cl_logWARNING);
         m_mutex.unlock();
+        emit asyncParamSetDone( name, val, false );
         return false;
     }
     param.setDomain(domain);
@@ -422,7 +435,10 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (domain == QnDomainPhysical)
     {
         if (!param.isPhysical() || !setParamPhysical(param, val))
+        {
+            emit asyncParamSetDone( name, val, false );
             return false;
+        }
     }
 
     //QnDomainMemory should changed anyway
@@ -432,6 +448,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
         if (!m_resourceParamList[name].setValue(val))
         {
             cl_log.log("cannot set such param!", cl_logWARNING);
+            emit asyncParamSetDone( name, val, false );
             return false;
 
         }
@@ -441,6 +458,7 @@ bool QnResource::setParam(const QString &name, const QVariant &val, QnDomain dom
     if (oldValue != val)
         QMetaObject::invokeMethod(this, "parameterValueChanged", Qt::QueuedConnection, Q_ARG(QnParam, param)); // TODO: queued calls are not needed anymore.
 
+    emit asyncParamSetDone( name, val, true );
     return true;
 }
 
@@ -541,8 +559,8 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         QMutexLocker mutexLocker(&m_mutex);
         oldStatus = m_status;
 
-        if (oldStatus == Unauthorized && newStatus == Offline)
-            return; 
+        //if (oldStatus == Unauthorized && newStatus == Offline)
+        //    return; 
 
         m_status = newStatus;
 
@@ -554,13 +572,13 @@ void QnResource::setStatus(QnResource::Status newStatus, bool silenceMode)
         return;
 
 #ifdef QN_RESOURCE_DEBUG
-	qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
+    qDebug() << "Change status. oldValue=" << oldStatus << " new value=" << newStatus << " id=" << m_id << " name=" << getName();
 #endif
 
     if (newStatus == Offline || newStatus == Unauthorized)
         m_initialized = false;
 
-    if (oldStatus == Offline && newStatus == Online)
+    if (oldStatus == Offline && newStatus == Online && !m_disabled)
         init();
 
     emit statusChanged(oldStatus, m_status);
@@ -736,14 +754,14 @@ void QnResource::addCommandToProc(QnAbstractDataPacketPtr data)
 
 int QnResource::commandProcQueueSize()
 {
-	return commandProcessor()->queueSize();
+    return commandProcessor()->queueSize();
 }
 
 bool QnResource::isDisabled() const
 {
-	QMutexLocker mutexLocker(&m_mutex);
+    QMutexLocker mutexLocker(&m_mutex);
 
-	return m_disabled;
+    return m_disabled;
 }
 
 void QnResource::setDisabled(bool disabled)
@@ -761,19 +779,19 @@ void QnResource::setDisabled(bool disabled)
     }
 
     if (oldDisabled != disabled)
-		emit disabledChanged(oldDisabled, disabled);
+        emit disabledChanged(oldDisabled, disabled);
 
 }
 
 void QnResource::init()
 {
-        QMutexLocker lock(&m_initMutex);
-        if (!m_initialized) 
-        {
-            m_initialized = initInternal();
-            if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
-                setStatus(Offline);
-        }
+    QMutexLocker lock(&m_initMutex);
+    if (!m_initialized) 
+    {
+        m_initialized = initInternal();
+        if (!m_initialized && (getStatus() == Online || getStatus() == Recording))
+            setStatus(Offline);
+    }
 }
 
 void QnResource::initAndEmit()
@@ -803,4 +821,9 @@ void QnResource::initAsync()
 bool QnResource::isInitialized() const
 {
     return m_initialized;
+}
+
+QnAbstractPtzController* QnResource::getPtzController()
+{
+    return 0;
 }

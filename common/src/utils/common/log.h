@@ -1,47 +1,74 @@
 #ifndef QN_LOG_H
 #define QN_LOG_H
 
-#include <QMutex>
-#include <QFile>
+#include <QtCore/QMutex>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
 
-#include "base.h"
-
-enum QnLogLevel {cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
+enum QnLogLevel { cl_logUNKNOWN, cl_logALWAYS, cl_logERROR, cl_logWARNING, cl_logINFO, cl_logDEBUG1, cl_logDEBUG2 };
 
 class QnLogPrivate;
 
-class QN_EXPORT QnLog
-{
+class QN_EXPORT QnLog {
 public:
-    bool create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
+    bool create(const QString &baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel);
 
-    void setLogLevel(QnLogLevel loglevel);
+    void setLogLevel(QnLogLevel logLevel);
     QnLogLevel logLevel() const;
 
-    void log(const QString& msg, QnLogLevel loglevel);
-    void log(const QString& msg, int val, QnLogLevel loglevel);
-    void log(const QString& msg, qint64 val, QnLogLevel loglevel);
-    void log(const QString& msg, qreal val, QnLogLevel loglevel);
-    void log(const QString& msg1, const QString& msg2, QnLogLevel loglevel);
-    void log(const QString& msg1, int val, const QString& msg2, QnLogLevel loglevel);
-    void log(const QString& msg1, int val, const QString& msg2, int val2, QnLogLevel loglevel);
-    void log(QnLogLevel loglevel, const char* format, ...);
+    void log(const QString &msg, QnLogLevel logLevel);
+    void log(QnLogLevel logLevel, const char* format, ...);
 
-    static void initLog(const QString& logLevelStr);
+#define QN_LOG_BODY(ARGS)                                                       \
+        if(!isActive(logLevel))                                                 \
+            return;                                                             \
+                                                                                \
+        QString message;                                                        \
+        QTextStream stream(&message);                                           \
+        stream << ARGS;                                                         \
+        log(message, logLevel);                                                 \
+
+    template<class T0>
+    void log(const T0 &arg0, QnLogLevel logLevel) {
+        QN_LOG_BODY(arg0);
+    }
+
+    template<class T0, class T1>
+    void log(const T0 &arg0, const T1 &arg1, QnLogLevel logLevel) {
+        QN_LOG_BODY(arg0 << arg1);
+    }
+
+    template<class T0, class T1, class T2>
+    void log(const T0 &arg0, const T1 &arg1, const T2 &arg2, QnLogLevel logLevel) {
+        QN_LOG_BODY(arg0 << arg1 << arg2);
+    }
+
+    template<class T0, class T1, class T2, class T3>
+    void log(const T0 &arg0, const T1 &arg1, const T2 &arg2, const T3 &arg3, QnLogLevel logLevel) {
+        QN_LOG_BODY(arg0 << arg1 << arg2 << arg3);
+    }
+#undef QN_LOG_BODY
+    
+    static void initLog(const QString &logLevelStr);
     static QnLog instance();
-    static QnLogLevel logLevelFromString(const QString& value);
+    
+    static QnLogLevel logLevelFromString(const QString &value);
     static QString logLevelToString(QnLogLevel value);
 
 protected:
     QnLog(QnLogPrivate *d);
 
 private:
+    bool isActive(QnLogLevel loglevel) const {
+        return d && loglevel <= logLevel();
+    }
+
+private:
     QnLogPrivate *d;
 };
 
 #define CL_LOG(level)                                                           \
-    if (level > cl_log.logLevel()) {}                                           \
-    else
+    if (level > cl_log.logLevel()) {} else                                      \
 
 #define cl_log (QnLog::instance())
 

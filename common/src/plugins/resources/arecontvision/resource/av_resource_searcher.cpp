@@ -10,6 +10,8 @@
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
+#include "plugins/resources/mdns/mdns_device_searcher.h"
+
 #define CL_BROAD_CAST_RETRY 1
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
@@ -21,7 +23,7 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 
 QString QnPlArecontResourceSearcher::manufacture() const
 {
-    return QnPlAreconVisionResource::MANUFACTURE;
+    return QLatin1String(QnPlAreconVisionResource::MANUFACTURE);
 }
 
 // returns all available devices
@@ -31,6 +33,9 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+        if (shouldStop())
+            return QnResourceList();
+
         QUdpSocket sock;
 
         if (!bindToInterface(sock, iface))
@@ -61,7 +66,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 QHostAddress sender;
                 quint16 senderPort;
 
-                sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+                sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
                 if (senderPort!=69 || datagram.size() < 32) // minimum response size
                     continue;
@@ -109,7 +114,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 // in any case let's HTTP do it's job at very end of discovery
                 QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
                 //resource->setName("AVUNKNOWN");
-                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, "ArecontVision_Abstract"));
+                resource->setTypeId(qnResTypePool->getResourceTypeId(QLatin1String(QnPlAreconVisionResource::MANUFACTURE), QLatin1String("ArecontVision_Abstract")));
 
                 if (resource==0)
                     continue;
@@ -117,7 +122,7 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 resource->setHostAddress(sender, QnDomainMemory);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(iface.address);
-                resource->setName("ArecontVision_Abstract");
+                resource->setName(QLatin1String("ArecontVision_Abstract"));
 
 
                 bool need_to_continue = false;
@@ -125,6 +130,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 {
                     if (res->getUniqueId() == resource->getUniqueId())
                     {
+                        QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
+                        if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), iface.address.toString(), net_res->getDiscoveryAddr().toString()))
+                            net_res->setDiscoveryAddr(iface.address);
+                    
                         need_to_continue = true; //already has such
                         break;
                     }
@@ -142,7 +151,6 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
         }
 
     }
-
     return result;
 
 }
@@ -182,7 +190,9 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 }
 
 
-QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }

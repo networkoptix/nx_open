@@ -6,6 +6,7 @@
 
 class QnNoptixStyleAnimator;
 class QnSkin;
+class QnGlobals;
 
 class QnNoptixStyle: public QProxyStyle, public GraphicsStyle { 
     Q_OBJECT;
@@ -15,6 +16,8 @@ class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
 public:
     QnNoptixStyle(QStyle *style = NULL);
     virtual ~QnNoptixStyle();
+
+    virtual QPixmap	generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const override;
 
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
@@ -36,6 +39,7 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
+    bool drawProgressBarControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
@@ -48,10 +52,14 @@ private:
     void setHoverProgress(const QWidget *widget, qreal value) const;
     qreal hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const;
     void stopHoverTracking(const QWidget *widget) const;
+    void drawProgressBarGroove(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarContents(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
+    void drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
 
 private:
     QnNoptixStyleAnimator *m_animator;
     QnSkin *m_skin;
+    QnGlobals *m_globals;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
     QPixmap m_grooveBorder, m_grooveBody, m_sliderHandleHovered, m_sliderHandle;
 };

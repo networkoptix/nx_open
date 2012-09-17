@@ -6,6 +6,7 @@
 
 class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
+    Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
     QnTestCameraResourceSearcher();
 public:
     static QnTestCameraResourceSearcher& instance();
@@ -16,7 +17,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(QHostAddress addr);
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
 
 };
 

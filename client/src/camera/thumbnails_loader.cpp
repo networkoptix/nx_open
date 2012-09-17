@@ -5,7 +5,6 @@
 #include <limits>
 
 #include <QtCore/QTimer>
-#include <QtGui/QPixmap>
 #include <QtGui/QImage>
 
 #include <utils/common/math.h>
@@ -40,17 +39,18 @@ namespace {
 
 //#define QN_THUMBNAILS_LOADER_DEBUG
 
-QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource):
+QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource, bool decode):
     m_mutex(QMutex::NonRecursive),
     m_resource(resource),
+    m_decode(decode),
     m_timeStep(0),
     m_requestStart(0),
     m_requestEnd(0),
     m_processingStart(invalidProcessingTime),
     m_processingEnd(invalidProcessingTime),
+    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
-    m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleSourceSize(0, 0),
     m_scaleTargetSize(0, 0),
     m_scaleSourceLine(0),
@@ -377,6 +377,10 @@ void QnThumbnailsLoader::process() {
         {
             QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
             rtspDelegate->setMultiserverAllowed(false);
+            if (m_decode)
+                rtspDelegate->setQuality(MEDIA_Quality_Low, true);
+            else
+                rtspDelegate->setQuality(MEDIA_Quality_High, true);
             QnThumbnailsArchiveDelegatePtr thumbnailDelegate(new QnThumbnailsArchiveDelegate(rtspDelegate));
             rtspDelegate->setResource(cameras[i]);
             delegates << thumbnailDelegate;
@@ -401,10 +405,10 @@ void QnThumbnailsLoader::process() {
         QQueue<qint64> timingsQueue;
         QQueue<int> frameFlags;
 
-        QnThumbnail thumbnail(QPixmap(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
+        QnThumbnail thumbnail(QImage(), thumbnailSize, period.startTimeMs, period.startTimeMs, timeStep, generation);
         qint64 time = period.startTimeMs;
         QnCompressedVideoDataPtr frame = client->getNextData().dynamicCast<QnCompressedVideoData>();
-        if (frame) 
+        if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
             CLVideoDecoderOutput outFrame;
@@ -416,10 +420,19 @@ void QnThumbnailsLoader::process() {
 
                 timingsQueue << frame->timestamp;
                 frameFlags << frame->flags;
-                if (decoder.decode(frame, &outFrame)) 
-                {
-                    outFrame.pkt_dts = timingsQueue.dequeue();
-                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+
+                if(m_decode) {
+                    if (decoder.decode(frame, &outFrame)) 
+                    {
+                        outFrame.pkt_dts = timingsQueue.dequeue();
+                        thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                        time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
+                    }
+                } else {
+                    frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;
+
+                    qint64 actualTime = (timingsQueue.dequeue() + 999) / 1000;
+                    thumbnail = QnThumbnail(frame, qRound(actualTime, timeStep), actualTime, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
 
@@ -431,10 +444,10 @@ void QnThumbnailsLoader::process() {
                     }
                 }
 
-                frame = qSharedPointerDynamicCast<QnCompressedVideoData> (client->getNextData());
+                frame = qSharedPointerDynamicCast<QnCompressedVideoData>(client->getNextData());
             }
 
-            if(!invalidated) {
+            if(!invalidated && m_decode) { // TODO: m_decode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
                 QnCompressedVideoDataPtr emptyData(new QnCompressedVideoData(1, 0));
                 while (decoder.decode(emptyData, &outFrame)) 
@@ -481,6 +494,7 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 }
 
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
+    Q_UNUSED(boundingSize)
     bool needsReallocation = false;
     
     if(m_scaleSourceSize != sourceSize) {
@@ -519,6 +533,7 @@ void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sou
         int numBytes = avpicture_get_size(PIX_FMT_RGBA, qPower2Ceil(static_cast<quint32>(m_scaleTargetSize.width()), 8), m_scaleTargetSize.height());
         m_scaleBuffer = static_cast<quint8 *>(qMallocAligned(numBytes, 32));
         m_scaleContext = sws_getContext(m_scaleSourceSize.width(), m_scaleSourceSize.height(), static_cast<PixelFormat>(m_scaleSourceFormat), m_scaleTargetSize.width(), m_scaleTargetSize.height(), PIX_FMT_BGRA, SWS_BICUBIC, NULL, NULL, NULL);
+        // TODO: sws_getContext may fail and return NULL.
     }
 }
 
@@ -539,10 +554,11 @@ QnThumbnail QnThumbnailsLoader::generateThumbnail(const CLVideoDecoderOutput &ou
 
     sws_scale(m_scaleContext, outFrame.data, outFrame.linesize, 0, outFrame.height, dstBuffer, dstLineSize);
 
-    QPixmap pixmap(QPixmap::fromImage(image));
-    qint64 actualTime = outFrame.pkt_dts / 1000;
+    /* We need to do copy the image since it doesn't own its data buffer. */
+    image = image.copy();
 
-    return QnThumbnail(pixmap, pixmap.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
+    qint64 actualTime = (outFrame.pkt_dts + 999) / 1000;
+    return QnThumbnail(image, image.size(), qRound(actualTime, timeStep), actualTime, timeStep, generation);
 }
 
 qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64 startTime, qint64 endTime, bool ignorePeriod) {
@@ -554,6 +570,6 @@ qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
 
-        return qMin(startTime, endTime + thumbnail.timeStep());
+        return qMax(startTime, endTime + thumbnail.timeStep());
     }
 }

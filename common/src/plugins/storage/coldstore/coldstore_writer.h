@@ -6,7 +6,7 @@
 
 struct QnCSFile;
 
-class QnColdStoreWriter : public QnResourceConsumer, public CLLongRunnable
+class QnColdStoreWriter : public QnResourceConsumer, public QnLongRunnable
 {
 public:
     QnColdStoreWriter(QnResourcePtr res);
@@ -24,7 +24,8 @@ protected:
 private:
     QnPlColdStoreStoragePtr storage() const;
 private:
-    CLThreadQueue<QnCSFile*> m_writeQueue;
+    typedef QSharedPointer<QnCSFile> QnCSFilePtr;
+    CLThreadQueue<QnCSFilePtr> m_writeQueue;
 };
 
 #endif //cold_store_writer_1838_h

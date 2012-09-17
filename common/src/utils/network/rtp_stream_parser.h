@@ -15,25 +15,25 @@ typedef struct
     static const int RTP_HEADER_SIZE = 12;
     static const int RTP_VERSION = 2;
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
-    unsigned short   version:2;	/* packet type                */
-    unsigned short   padding:1;		/* padding flag               */
-    unsigned short   extension:1;		/* header extension flag      */
-    unsigned short   CSRCCount:4;		/* CSRC count                 */
-    unsigned short   marker:1;		/* marker bit                 */
-    unsigned short   payloadType:7;		/* payload type               */
+    unsigned short   version:2;     /* packet type                */
+    unsigned short   padding:1;     /* padding flag               */
+    unsigned short   extension:1;   /* header extension flag      */
+    unsigned short   CSRCCount:4;   /* CSRC count                 */
+    unsigned short   marker:1;      /* marker bit                 */
+    unsigned short   payloadType:7; /* payload type               */
 #else
-    unsigned short   CSRCCount:4;		/* CSRC count                 */
-    unsigned short   extension:1;		/* header extension flag      */
-    unsigned short   padding:1;		/* padding flag               */
-    unsigned short   version:2;	/* packet type                */
-    unsigned short   payloadType:7;		/* payload type               */
-    unsigned short   marker:1;		/* marker bit                 */
+    unsigned short   CSRCCount:4;   /* CSRC count                 */
+    unsigned short   extension:1;   /* header extension flag      */
+    unsigned short   padding:1;     /* padding flag               */
+    unsigned short   version:2;     /* packet type                */
+    unsigned short   payloadType:7; /* payload type               */
+    unsigned short   marker:1;      /* marker bit                 */
 #endif
-    quint16 sequence;		// sequence number
-    quint32 timestamp;		// timestamp
-    quint32 ssrc;		// synchronization source
-    //quint32 csrc;		// synchronization source
-    //quint32 csrc[1];	// optional CSRC list
+    quint16 sequence;               // sequence number
+    quint32 timestamp;              // timestamp
+    quint32 ssrc;                   // synchronization source
+    //quint32 csrc;                 // synchronization source
+    //quint32 csrc[1];              // optional CSRC list
 } RtpHeader;
 #pragma pack(pop)
 
@@ -43,8 +43,6 @@ public:
     QnRtpStreamParser();
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) = 0;
     
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
-
     virtual ~QnRtpStreamParser();
 
     // used for sync audio/video streams
@@ -64,10 +62,18 @@ private:
     AudioTrack m_audioTrack;
 };
 
+class QnRtpVideoStreamParser: public QnRtpStreamParser
+{
+public:
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
+};
+
 class QnRtpAudioStreamParser: public QnRtpStreamParser
 {
 public:
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
+
+    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
 protected:
     void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);

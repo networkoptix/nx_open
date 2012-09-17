@@ -1,7 +1,7 @@
 #ifndef NAVIGATIONITEM_H
 #define NAVIGATIONITEM_H
 
-#include <ui/graphics/items/simple_frame_widget.h>
+#include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnSpeedSlider;
@@ -11,6 +11,7 @@ class QnImageButtonWidget;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnWorkbenchNavigator;
+class QGraphicsProxyWidget;
 
 class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -18,7 +19,7 @@ class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAw
     typedef QnSimpleFrameWidget base_type;
 
 public:
-    explicit QnNavigationItem(QGraphicsItem *parent = NULL, QnWorkbenchContext *context = NULL);
+    explicit QnNavigationItem(QGraphicsItem *parent = NULL);
     ~QnNavigationItem();
 
     QnTimeSlider *timeSlider() const {
@@ -44,6 +45,7 @@ private slots:
     void updateSpeedSliderParametersFromNavigator();
     void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
+    void updateJumpButtonsTooltips();
     
 
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
@@ -62,23 +64,22 @@ private:
     QnImageButtonWidget *m_playButton;
     QnImageButtonWidget *m_stepForwardButton;
     QnImageButtonWidget *m_jumpForwardButton;
-    QnImageButtonWidget *m_liveButton;
-    QnImageButtonWidget *m_mrsButton;
-    QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_muteButton;
+
+    QnImageButtonWidget *m_liveButton;
+    QnImageButtonWidget *m_syncButton;
     QnImageButtonWidget *m_thumbnailsButton;
+    QnImageButtonWidget *m_calendarButton;
 
     GraphicsLabel *m_timeLabel;
 
-    bool m_updatingNavigatorFromSpeedSlider;
     bool m_updatingSpeedSliderFromNavigator;
+    bool m_updatingNavigatorFromSpeedSlider;
 
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;
     QnSpeedSlider *m_speedSlider;
     QnVolumeSlider *m_volumeSlider;
-
-    QnWorkbenchNavigator *m_navigator;
 };
 
 #endif // NAVIGATIONITEM_H

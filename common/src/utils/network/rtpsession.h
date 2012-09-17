@@ -12,6 +12,7 @@ class RTPSession;
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
+static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
 class RtspStatistic 
@@ -54,12 +55,11 @@ public:
 private:
     void processRtcpData();
 private:
-    UDPSocket* m_mediaSocket;
-    UDPSocket* m_rtcpSocket;
-
     RTPSession* m_owner;
     bool m_tcpMode;
     RtspStatistic m_statistic;
+    UDPSocket* m_mediaSocket;
+    UDPSocket* m_rtcpSocket;
 };
 
 class RTPSession: public QObject
@@ -77,15 +77,15 @@ public:
             codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
             trackTypeStr = trackTypeStr.toLower();
-            if (trackTypeStr == "audio")
+            if (trackTypeStr == QLatin1String("audio"))
                 trackType = TT_AUDIO;
-            else if (trackTypeStr == "audio-rtcp")
+            else if (trackTypeStr == QLatin1String("audio-rtcp"))
                 trackType = TT_AUDIO_RTCP;
-            else if (trackTypeStr == "video")
+            else if (trackTypeStr == QLatin1String("video"))
                 trackType = TT_VIDEO;
-            else if (trackTypeStr == "video-rtcp")
+            else if (trackTypeStr == QLatin1String("video-rtcp"))
                 trackType = TT_VIDEO_RTCP;
-            else if (trackTypeStr == "metadata")
+            else if (trackTypeStr == QLatin1String("metadata"))
                 trackType = TT_METADATA;
             else
                 trackType = TT_UNKNOWN;
@@ -182,12 +182,11 @@ public:
 
     RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
     int buildClientRTCPReport(quint8 *dstBuffer);
+
+    void setUsePredefinedTracks(int numOfVideoChannel);
 signals:
     void gotTextResponse(QByteArray text);
 private:
-    qint64 m_startTime;
-    qint64 m_endTime;
-
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     int readRAWData();
@@ -209,9 +208,25 @@ private:
 
     // in case of error return false
     bool checkIfDigestAuthIsneeded(const QByteArray& response);
-
+    void usePredefinedTracks();
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 64 * 16 };
+
+    // 'initialization in order' block
+    unsigned int m_csec;
+    QString m_transport;
+    int m_selectedAudioChannel;
+    qint64 m_startTime;
+    qint64 m_endTime;
+    float m_scale;
+    int m_tcpTimeout;
+    int m_proxyPort;
+    int m_responseCode;
+    bool m_isAudioEnabled;
+    bool m_useDigestAuth;
+    int m_numOfPredefinedChannels;
+    unsigned int m_TimeOut;
+    // end of initialized fields
 
     //unsigned char m_responseBuffer[MAX_RESPONCE_LEN];
     quint8* m_responseBuffer;
@@ -220,37 +235,25 @@ private:
 
     TCPSocket m_tcpSock;
     //RtpIoTracks m_rtpIoTracks; // key: tracknum, value: track IO device
-    int m_selectedAudioChannel;
 
     QUrl mUrl;
 
-    unsigned int m_csec;
     QString m_SessionId;
     unsigned short m_ServerPort;
     // format: key - track number, value - codec name
     TrackMap m_sdpTracks;
 
-    unsigned int m_TimeOut;
-
     QTime m_keepAliveTime;
-    QString m_transport;
-    float m_scale;
 
     friend class RTPIODevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
-    int m_tcpTimeout;
     QAuthenticator m_auth;
     QString m_proxyAddr;
-    int m_proxyPort;
     QString m_contentBase;
-    int m_responseCode;
-    bool m_isAudioEnabled;
     QString m_prefferedTransport;
 
-    bool m_useDigestAuth;
     QString m_realm;
     QString m_nonce;
-
 };
 
 #endif //rtp_session_h_1935_h

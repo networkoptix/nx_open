@@ -1,5 +1,5 @@
-#ifndef __AVI_PLAYLIST_ARCHIVE_DELEGATE_H
-#define __AVI_PLAYLIST_ARCHIVE_DELEGATE_H
+#ifndef QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
+#define QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H
 
 #include <QStringList>
 #include <QFile>
@@ -12,8 +12,8 @@ class QnAVIPlaylistArchiveDelegate : public QnAviArchiveDelegate
     Q_OBJECT;
 
 public:
-	QnAVIPlaylistArchiveDelegate();
-	virtual ~QnAVIPlaylistArchiveDelegate();
+    QnAVIPlaylistArchiveDelegate();
+    virtual ~QnAVIPlaylistArchiveDelegate();
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
@@ -63,4 +63,4 @@ private:
     QnDefaultDeviceVideoLayout m_defaultVideoLayout;
 };
 
-#endif __AVI_PLAYLIST_ARCHIVE_DELEGATE_H
+#endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H

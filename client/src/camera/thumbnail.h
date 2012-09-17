@@ -3,7 +3,9 @@
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
-#include <QtGui/QPixmap>
+#include <QtGui/QImage>
+
+#include <core/datapacket/mediadatapacket.h>
 
 #include <ui/common/geometry.h>
 
@@ -12,8 +14,16 @@
  */
 class QnThumbnail {
 public:
-    QnThumbnail(const QPixmap &pixmap, const QSize &size, qint64 time, qint64 actualTime, qint64 timeStep, int generation): 
-        m_pixmap(pixmap),
+    QnThumbnail(const QnCompressedVideoDataPtr &data, qint64 time, qint64 actualTime, qint64 timeStep, int generation):
+        m_data(data),
+        m_time(time),
+        m_actualTime(actualTime),
+        m_timeStep(timeStep),
+        m_generation(generation)
+    {}
+
+    QnThumbnail(const QImage &image, const QSize &size, qint64 time, qint64 actualTime, qint64 timeStep, int generation): 
+        m_image(image),
         m_size(size),
         m_time(time),
         m_actualTime(actualTime),
@@ -28,7 +38,8 @@ public:
     {}
 
     QnThumbnail(const QnThumbnail &other, qint64 time):
-        m_pixmap(other.m_pixmap),
+        m_data(other.m_data),
+        m_image(other.m_image),
         m_size(other.m_size),
         m_time(time),
         m_actualTime(other.m_actualTime),
@@ -37,11 +48,15 @@ public:
     {}
 
     bool isEmpty() const {
-        return m_pixmap.isNull();
+        return m_data.isNull() && m_image.isNull();
     }
 
-    const QPixmap &pixmap() const {
-        return m_pixmap;
+    const QnCompressedVideoDataPtr &data() const {
+        return m_data;
+    }
+
+    const QImage &image() const {
+        return m_image;
     }
 
     const QSize &size() const {
@@ -69,7 +84,8 @@ public:
     }
 
 private:
-    QPixmap m_pixmap;
+    QnCompressedVideoDataPtr m_data;
+    QImage m_image;
     QSize m_size;
     qint64 m_time, m_actualTime;
     qint64 m_timeStep;

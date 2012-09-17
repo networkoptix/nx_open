@@ -1,7 +1,7 @@
 #include "time_period_loader.h"
 #include <utils/common/warnings.h>
 #include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
@@ -58,7 +58,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     /* Check whether the requested data is already loaded. */
     foreach(const QnTimePeriod &loadedPeriod, m_loadedPeriods) 
     {
-        if (loadedPeriod.containPeriod(timePeriod)) 
+        if (loadedPeriod.contains(timePeriod)) 
         {
             /* Data already loaded. */
             int handle = qn_fakeHandle.fetchAndAddAcquire(1);
@@ -74,7 +74,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     /* Check whether requested data is currently being loaded. */
     for (int i = 0; i < m_loading.size(); ++i)
     {
-        if (m_loading[i].period.containPeriod(timePeriod)) 
+        if (m_loading[i].period.contains(timePeriod)) 
         {
             int handle = qn_fakeHandle.fetchAndAddAcquire(1);
 
@@ -94,7 +94,7 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
         if (qBetween(periodToLoad.startTimeMs, itr->startTimeMs, itr->startTimeMs + itr->durationMs))
         {
             qint64 endPoint = periodToLoad.startTimeMs + periodToLoad.durationMs;
-            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 20*1000; // add addition 20 sec (may server does not flush data e.t.c)
+            periodToLoad.startTimeMs = itr->startTimeMs + itr->durationMs - 40*1000; // add addition 40 sec (may server does not flush data e.t.c)
             periodToLoad.durationMs = endPoint - periodToLoad.startTimeMs;
             ++itr;
             if (itr != m_loadedPeriods.end()) {

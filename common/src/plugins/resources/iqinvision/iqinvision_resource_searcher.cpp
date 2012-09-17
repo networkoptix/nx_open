@@ -62,12 +62,14 @@ QnResourcePtr QnPlIqResourceSearcher::createResource(QnId resourceTypeId, const 
 
 QString QnPlIqResourceSearcher::manufacture() const
 {
-    return QnPlIqResource::MANUFACTURE;
+    return QLatin1String(QnPlIqResource::MANUFACTURE);
 }
 
 
-QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 
@@ -94,9 +96,9 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
         name += QLatin1Char(responseData[i]);
     }
 
-    name.replace(QString(" "), QString()); // remove spaces
-    name.replace(QString("-"), QString()); // remove spaces
-    name.replace(QString("\t"), QString()); // remove tabs
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
 
     if (macpos+12 > responseData.size())
         return local_results;
@@ -145,7 +147,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     if (!rt.isValid())
     {
         // try with default camera name
-        name = "IQA32N";
+        name = QLatin1String("IQA32N");
         rt = qnResTypePool->getResourceTypeId(manufacture(), name);
 
         if (!rt.isValid())
@@ -199,7 +201,8 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
         }
     }
 
-    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    QString nameStr = QString::fromLatin1(name);
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), nameStr);
     if (!rt.isValid()) {
         qWarning() << "Unregistered IQvision camera type:" << name;
         return;
@@ -207,9 +210,9 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
 
     QnNetworkResourcePtr resource ( new QnPlIqResource() );
     in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
-    QHostAddress peerAddress(inet_ntoa(*peer_addr));
+    QHostAddress peerAddress(QLatin1String(inet_ntoa(*peer_addr)));
     resource->setTypeId(rt);
-    resource->setName(name);
+    resource->setName(nameStr);
     resource->setMAC(macAddr);
     resource->setHostAddress(peerAddress, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryAddress);
@@ -230,7 +233,7 @@ QnResourceList QnPlIqResourceSearcher::findResources()
         if (!bindToInterface(receiveSock, iface, NATIVE_DISCOVERY_RESPONSE_PORT))
             continue;
 
-        for (int i = 0; i < sizeof(requests)/sizeof(char*); ++i)
+        for (uint i = 0; i < sizeof(requests)/sizeof(char*); ++i)
         {
             // sending broadcast
             QByteArray datagram(requests[i], REQUEST_SIZE);

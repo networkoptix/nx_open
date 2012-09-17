@@ -1,7 +1,11 @@
-#ifndef __CL_SCREEN_GRABBER_H
-#define __CL_SCREEN_GRABBER_H
+#ifndef QN_SCREEN_GRABBER_H
+#define QN_SCREEN_GRABBER_H
 
-#include <QObject>
+#include <QtCore/QtGlobal>
+
+#ifdef Q_OS_WIN
+
+#include <QtCore/QObject>
 
 #include <windows.h>
 #include <shellapi.h>
@@ -10,7 +14,7 @@
 #include <d3dx9.h>
 #include <QTime>
 
-class CLScreenGrabber: public QObject
+class QnScreenGrabber: public QObject
 {
     Q_OBJECT
 public:
@@ -29,9 +33,9 @@ public:
     // resolution (0,0) - use default(native resolution)
     // negative resolution - use specified scale factor
 
-    CLScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
+    QnScreenGrabber(int displayNumber, int poolSize, CaptureMode mode, bool captureCursor,
                     const QSize& captureResolution, QWidget* widget);
-    virtual ~CLScreenGrabber();
+    virtual ~QnScreenGrabber();
 
     // capture screenshot in YUV 4:2:0 format
     // allocate frame data if frame is not initialized
@@ -48,25 +52,27 @@ public:
     void setLogo(const QPixmap& logo);
     int screenWidth() const;
     int screenHeight() const;
+
 private:
-    HRESULT	InitD3D(HWND hWnd);
+    HRESULT        InitD3D(HWND hWnd);
     bool dataToFrame(quint8* data, int width, int height, AVFrame* pFrame);
     bool direct3DDataToFrame(void* opaque, AVFrame* pFrame);
     Q_INVOKABLE void captureFrameOpenGL(void* opaque);
     void drawCursor(quint32* data, int dataStride, int height, int leftOffset, int topOffset, bool flip) const;
     void drawLogo(quint8* data, int width, int height);
     void allocateTmpFrame(int width, int height, PixelFormat format);
+
 private:
     QPixmap m_logo;
     int m_displayNumber;
 
-    IDirect3D9*			m_pD3D;
-    IDirect3DDevice9*	m_pd3dDevice;
-    QVector<IDirect3DSurface9*>	m_pSurface;
-    QVector<quint8*>	m_openGLData;
-    RECT		m_rect;
+    IDirect3D9*                        m_pD3D;
+    IDirect3DDevice9*        m_pd3dDevice;
+    QVector<IDirect3DSurface9*>        m_pSurface;
+    QVector<quint8*>        m_openGLData;
+    RECT                m_rect;
     HRESULT m_initialized;
-    D3DDISPLAYMODE	m_ddm;
+    D3DDISPLAYMODE        m_ddm;
     QTime m_timer;
     unsigned m_frameNum;
     int m_currentIndex;
@@ -90,5 +96,6 @@ private:
     int m_tmpFrameHeight;
 };
 
+#endif // Q_OS_WIN
 
 #endif

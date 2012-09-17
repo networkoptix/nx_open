@@ -73,7 +73,7 @@ public:
 	VC1Unit(): m_nalBuffer(0), m_nalBufferLen(0) {}
 	~VC1Unit() {delete m_nalBuffer;}
 
-	inline static bool isMarker(quint8* ptr) {return ptr[0] == ptr[1] == 0 && ptr[2] == 1;}
+    inline static bool isMarker(quint8* ptr) {return ptr[0] == 0 && ptr[1] == 0 && ptr[2] == 1;}
 	inline static quint8* findNextMarker(quint8* buffer, quint8* end) {
 		for (buffer += 2; buffer < end;)
 		{
@@ -224,7 +224,7 @@ public:
 
 class VC1Frame: public VC1Unit {
 public:
-	VC1Frame(): VC1Unit(), rptfrm(0), fcm(0), rff(0), rptfrmBitPos(0) {}
+    VC1Frame(): VC1Unit(), fcm(0), rptfrm(0), rff(0), rptfrmBitPos(0) {}
 	int fcm;
 	int interpfrm;
 	int framecnt;

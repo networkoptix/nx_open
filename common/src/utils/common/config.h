@@ -2,7 +2,16 @@
 #define QN_COMMON_CONFIG_H
 
 // -------------------------------------------------------------------------- //
-// Globals. Do not change.
+// Application globals. Do not change.
+// -------------------------------------------------------------------------- //
+
+// TODO: #VASILENKO add doxy-comments for these defines
+#define CL_MEDIA_ALIGNMENT 32
+#define CL_MEDIA_EXTRA 8
+
+
+// -------------------------------------------------------------------------- //
+// Library & Compiler globals. Do not change.
 // -------------------------------------------------------------------------- //
 /* Get GCC version in human-readable format. */
 #ifdef __GNUC__
@@ -11,8 +20,8 @@
 
 
 /* Use expression-template-based string concatenation in Qt. */
-#define QT_USE_FAST_CONCATENATION
-#define QT_USE_FAST_OPERATOR_PLUS
+//#define QT_USE_FAST_CONCATENATION
+//#define QT_USE_FAST_OPERATOR_PLUS
 
 
 /* Define override specifier for MSVC. */
@@ -36,6 +45,19 @@
 #  define noexcept
 #endif
 
+
+/* Some windows-specific defines. */
+#ifdef _WIN32
+#   undef NOMINMAX
+#   define NOMINMAX 
+#endif
+
+
+/* Some MSVC-specific defines. */
+#ifdef _MSC_VER
+#   undef __STDC_CONSTANT_MACROS
+#   define __STDC_CONSTANT_MACROS
+#endif
 
 
 #endif // QN_COMMON_CONFIG_H

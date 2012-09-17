@@ -27,7 +27,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
     for (int i = 0; i < data.size(); ++i)
     {
         QString localAddress = data[i].localAddress;
-        QString removeAddress = data[i].removeAddress;
+        QString removeAddress = data[i].remoteAddress;
 
         QList<QnNetworkResourcePtr> nresourceLst = processPacket(result, data[i].response, QHostAddress(localAddress));
 
@@ -55,7 +55,7 @@ int strEqualAmount(const char* str1, const char* str2)
     return rez;
 }
 
-bool QnMdnsResourceSearcher::isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
+bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress)
 {
     int eq1 = strEqualAmount(host.toLocal8Bit().constData(), newAddress.toLocal8Bit().constData());
     int eq2 = strEqualAmount(host.toLocal8Bit().constData(), oldAddress.toLocal8Bit().constData());

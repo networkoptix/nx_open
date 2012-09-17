@@ -119,13 +119,13 @@ QString closeDirPath(const QString& value)
 {
     QString tmp = value;
     for (int i = 0; i < tmp.size(); ++i) {
-        if (tmp[i] == '\\')
-            tmp[i] = '/';
+        if (tmp[i] == QLatin1Char('\\'))
+            tmp[i] = QLatin1Char('/');
     }
-    if (tmp.endsWith('/'))
+    if (tmp.endsWith(QLatin1Char('/')))
         return tmp;
     else
-        return tmp + QString('/');
+        return tmp + QLatin1Char('/');
 }
 #ifdef Q_OS_WIN32
 qint64 getDiskFreeSpace(const QString& root)
@@ -147,9 +147,9 @@ qint64 getDiskFreeSpace(const QString& root) {
     struct statvfs buf;
     if (statvfs(root.toUtf8().data(), &buf) == 0)
     {
-        qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
+        //qint64 disk_size = buf.f_blocks * (qint64) buf.f_bsize;
         qint64 free = buf.f_bavail * (qint64) buf.f_bsize;
-        qint64 used = disk_size - free;
+        //qint64 used = disk_size - free;
 
         return free;
     }

@@ -17,7 +17,7 @@ class QMenu;
 class QLabel;
 class QPropertyAnimation;
 
-class CLVideoCamera;
+class QnVideoCamera;
 
 class InstrumentManager;
 class HandScrollInstrument;
@@ -40,6 +40,7 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnWorkbench;
 class QnResourceWidget;
+class QnMediaResourceWidget;
 class QnWorkbenchItem;
 class QnWorkbenchGridMapper;
 class QnScreenRecorder;
@@ -66,7 +67,7 @@ public:
     QnWorkbenchGridMapper *mapper() const;
 
     MotionSelectionInstrument *motionSelectionInstrument() const {
-	    return m_motionSelectionInstrument;
+        return m_motionSelectionInstrument;
     }
 
     ClickInstrument *itemRightClickInstrument() const {
@@ -104,6 +105,7 @@ protected:
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
 
     void moveCursor(const QPoint &direction);
+    void showContextMenuAt(const QPoint &pos);
 
 protected slots:
     void at_resizingStarted(QGraphicsView *view, QGraphicsWidget *widget, const ResizingInfo &info);
@@ -117,9 +119,9 @@ protected slots:
     void at_rotationStarted(QGraphicsView *view, QGraphicsWidget *widget);
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
-    void at_motionSelectionProcessStarted(QGraphicsView *view, QnResourceWidget *widget);
-    void at_motionRegionCleared(QGraphicsView *view, QnResourceWidget *widget);
-    void at_motionRegionSelected(QGraphicsView *view, QnResourceWidget *widget, const QRect &region);
+    void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
@@ -139,6 +141,8 @@ protected slots:
     void at_widget_rotationStartRequested(QnResourceWidget *widget);
     void at_widget_rotationStartRequested();
     void at_widget_rotationStopRequested();
+
+    void at_workbench_currentLayoutChanged();
 
     void at_selectAllAction_triggered();
     void at_startSmartSearchAction_triggered();

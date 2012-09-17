@@ -1,7 +1,7 @@
 #include "texture_transition_shader_program.h"
 
-QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(QObject *parent):
-    QGLShaderProgram(parent)
+QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLContext *context, QObject *parent):
+    QGLShaderProgram(context, parent)
 {
     addShaderFromSourceCode(QGLShader::Vertex, "                                \
         void main() {                                                           \

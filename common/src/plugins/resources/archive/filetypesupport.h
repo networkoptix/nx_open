@@ -1,6 +1,8 @@
 #ifndef uniclient_filetypesupport_h
 #define uniclient_filetypesupport_h
 
+#include <QtCore/QString>
+
 class QN_EXPORT FileTypeSupport
 {
 public:

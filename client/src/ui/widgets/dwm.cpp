@@ -1,8 +1,11 @@
 #include "dwm.h"
-#include <QLibrary>
-#include <QWidget>
+
+#include <QtCore/QLibrary>
+#include <QtGui/QWidget>
+
 #include <utils/common/warnings.h>
 #include <utils/common/mpl.h>
+
 #include <ui/events/invocation_event.h>
 
 #ifdef Q_OS_WIN
@@ -82,15 +85,11 @@ public:
 
 #ifdef Q_OS_WIN
     void updateFrameStrut();
-    bool hitTestEvent(MSG *message, long *result);
     bool calcSizeEvent(MSG *message, long *result);
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
     bool ncPaintEvent(MSG *message, long *result);
-    bool ncLeftButtonDoubleClickEvent(MSG *message, long *result);
-    bool sysCommandEvent(MSG *message, long *result);
-    bool eraseBackground(MSG *message, long *result);
-#endif
+#endif // Q_OS_WIN
 
     static bool isSupported();
 
@@ -119,18 +118,8 @@ public:
     /** Widget frame margins specified by the user. */
     QMargins userFrameMargins;
 
-    QMargins nonErasableContentMargins;
-
     bool overrideFrameMargins;
-    bool systemPaintWindow;
-    bool transparentErasing;
-    bool processDoubleClicks;
-    bool titleBarDrag;
-#endif
-
-    bool emulateFrame;
-    QMargins emulatedFrameMargins;
-    int emulatedTitleBarHeight;
+#endif // Q_OS_WIN
 };
 
 bool QnDwmPrivate::isSupported() {
@@ -143,7 +132,7 @@ bool QnDwmPrivate::isSupported() {
         qnWarning("Compile-time and run-time Qt versions differ (%1 != %2), DWM will be disabled.", qVersion(), QT_VERSION_STR);
 #else
     result = false;
-#endif
+#endif // Q_OS_WIN
 
     return result;
 }
@@ -175,14 +164,7 @@ void QnDwmPrivate::init(QWidget *widget) {
         dwmSetWindowAttribute != NULL;
 
     overrideFrameMargins = false;
-    systemPaintWindow = true;
-    transparentErasing = false;
-    processDoubleClicks = false;
-    titleBarDrag = true;
-#endif
-
-    emulateFrame = false;
-    emulatedTitleBarHeight = 0;
+#endif // Q_OS_WIN
 }
 
 #ifdef Q_OS_WIN
@@ -205,7 +187,7 @@ void QnDwmPrivate::updateFrameStrut() {
         qt_qwidget_data(widget)->fstrut_dirty = false;
     }
 }
-#endif
+#endif // Q_OS_WIN
 
 QnDwm::QnDwm(QWidget *widget):
     QObject(widget),
@@ -223,43 +205,7 @@ QnDwm::~QnDwm() {
 }
 
 bool QnDwm::isSupported() {
-    return qn_dwm_isSupported();
-}
-
-bool QnDwm::enableSystemWindowPainting(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-#ifdef Q_OS_WIN
-    d->systemPaintWindow = enable;
-    return true;
-#else
-    return false;
-#endif
-}
-
-bool QnDwm::enableTransparentErasing(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-#ifdef Q_OS_WIN
-    d->transparentErasing = enable;
-    return true;
-#else
-    return false;
-#endif
-}
-
-bool QnDwm::setNonErasableContentMargins(const QMargins &margins) {
-    if(!d->hasApi)
-        return false;
-
-#ifdef Q_OS_WIN
-    d->nonErasableContentMargins = margins;
-    return true;
-#else
-    return false;
-#endif
+    return *qn_dwm_isSupported();
 }
 
 bool QnDwm::enableBlurBehindWindow(bool enable) {
@@ -280,8 +226,9 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     
     return SUCCEEDED(status);
 #else
+    Q_UNUSED(enable)
     return false;
-#endif
+#endif // Q_OS_WIN
 }
 
 bool QnDwm::isCompositionEnabled() const {
@@ -304,7 +251,7 @@ bool QnDwm::isCompositionEnabled() const {
     }
 #else
     return false;
-#endif
+#endif // Q_OS_WIN
 }
 
 bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
@@ -340,8 +287,9 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 
     return SUCCEEDED(status);
 #else
+    Q_UNUSED(margins)
     return false;
-#endif
+#endif // Q_OS_WIN
 }
 
 QMargins QnDwm::themeFrameMargins() const {
@@ -364,7 +312,7 @@ QMargins QnDwm::themeFrameMargins() const {
     return QMargins(frameX, frameY, frameX, frameY);
 #else
     return QMargins(-1, -1, -1, -1);
-#endif
+#endif // Q_OS_WIN
 }
 
 int QnDwm::themeTitleBarHeight() const {
@@ -381,69 +329,7 @@ int QnDwm::themeTitleBarHeight() const {
     }
 #else
     return -1;
-#endif
-}
-
-bool QnDwm::enableFrameEmulation(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-    if(d->emulateFrame == enable)
-        return true;
-
-#ifdef Q_OS_WIN
-    d->emulateFrame = enable;
-    return true;
-#else
-    return false;
-#endif
-}
-
-bool QnDwm::isFrameEmulated() const {
-    return d->emulateFrame;
-}
-
-void QnDwm::setEmulatedFrameMargins(const QMargins &margins) {
-    d->emulatedFrameMargins = margins;
-}
-
-QMargins QnDwm::emulatedFrameMargins() const {
-    return d->emulatedFrameMargins;
-}
-
-void QnDwm::setEmulatedTitleBarHeight(int height) {
-    d->emulatedTitleBarHeight = height;
-}
-
-int QnDwm::emulatedTitleBarHeight() const {
-    return d->emulatedTitleBarHeight;
-}
-
-bool QnDwm::enableDoubleClickProcessing(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-    if(d->emulateFrame == enable)
-        return true;
-
-#ifdef Q_OS_WIN
-    d->processDoubleClicks = enable;
-    return true;
-#else 
-    return false;
-#endif
-}
-
-bool QnDwm::enableTitleBarDrag(bool enable) {
-    if(!d->hasApi)
-        return false;
-
-#ifdef Q_OS_WIN
-    d->titleBarDrag = enable;
-    return true;
-#else 
-    return false;
-#endif
+#endif // Q_OS_WIN
 }
 
 QMargins QnDwm::currentFrameMargins() const {
@@ -479,7 +365,7 @@ QMargins QnDwm::currentFrameMargins() const {
     );
 #else
     return QMargins(-1, -1, -1, -1);
-#endif
+#endif // Q_OS_WIN
 }
 
 bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
@@ -502,8 +388,9 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
 
     return true;
 #else
+    Q_UNUSED(margins)
     return false;
-#endif
+#endif // Q_OS_WIN
 }
 
 bool QnDwm::widgetEvent(QEvent *event) {
@@ -533,7 +420,7 @@ bool QnDwm::widgetEvent(QEvent *event) {
         if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == AdjustPositionInvocation)
             d->widget->move(d->widget->pos()); 
     }
-#endif
+#endif // Q_OS_WIN
 
     return false;
 }
@@ -554,13 +441,9 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
 
     switch(message->message) {
     case WM_NCCALCSIZE:             return d->calcSizeEvent(message, result);
-    case WM_NCHITTEST:              return d->hitTestEvent(message, result);
     case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
     case WM_NCACTIVATE:             return d->activateEvent(message, result);
     case WM_NCPAINT:                return d->ncPaintEvent(message, result);
-    case WM_NCLBUTTONDBLCLK:        return d->ncLeftButtonDoubleClickEvent(message, result);
-    case WM_SYSCOMMAND:             return d->sysCommandEvent(message, result);
-    case WM_ERASEBKGND:             return d->eraseBackground(message, result);
     default:                        return false;
     }
 }
@@ -603,102 +486,6 @@ bool QnDwmPrivate::calcSizeEvent(MSG *message, long *result) {
     return true;
 }
 
-namespace {
-    int sweep(int v, int v0, int v1, int v2, int v3, int r0, int r1, int r2, int r3, int r4) {
-        /* Note that [v0, v3] and [v1, v2] are treated as closed segments. */
-
-        if(v <= v2) {
-            if(v < v1) {
-                if (v < v0) {
-                    return r0;
-                } else {
-                    return r1;
-                }
-            } else {
-                return r2;
-            }
-        } else if(v <= v3) {
-            return r3;
-        } else {
-            return r4;
-        }
-    }
-
-    int frameSectionMap[5][5] = {
-        {HTNOWHERE,     HTNOWHERE,      HTNOWHERE,      HTNOWHERE,      HTNOWHERE},
-        {HTNOWHERE,     HTTOPLEFT,      HTTOP,          HTTOPRIGHT,     HTNOWHERE},
-        {HTNOWHERE,     HTLEFT,         HTCLIENT,       HTRIGHT,        HTNOWHERE},
-        {HTNOWHERE,     HTBOTTOMLEFT,   HTBOTTOM,       HTBOTTOMRIGHT,  HTNOWHERE},
-        {HTNOWHERE,     HTNOWHERE,      HTNOWHERE,      HTNOWHERE,      HTNOWHERE}
-    };
-
-} // anonymous namespace
-
-bool QnDwmPrivate::hitTestEvent(MSG *message, long *result) {
-    BOOL handled = FALSE;
-    if(hasDwm) {
-        RESULT localResult;
-        handled = dwmDefWindowProc(message->hwnd, message->message, message->wParam, message->lParam, &localResult);
-        if(handled)
-            *result = localResult;
-    }
-    if(!handled)
-        *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
-
-    if(!emulateFrame)    
-        return true;
-
-    /* Leave buttons as is. */
-    switch(*result) {
-    case HTMINBUTTON:
-    case HTMAXBUTTON:
-    case HTCLOSE:
-        return true;
-    default:
-        break;
-    }
-
-    BOOL status = S_OK;
-
-    /* There is a bug in Qt: coordinates for WM_NCHITTEST are supplied in screen coordinates, 
-     * but Qt calls ClientToScreen for them. This is why we re-extract screen coordinates from lParam. */
-    POINT systemPos;
-    systemPos.x = GET_X_LPARAM(message->lParam);
-    systemPos.y = GET_Y_LPARAM(message->lParam);
-    QPoint pos = QPoint(systemPos.x, systemPos.y);
-
-    /* Get frame rect from the system. */
-    RECT systemRect;
-    status = GetWindowRect(message->hwnd, &systemRect);
-    if(!SUCCEEDED(status))
-        return false;
-
-    QRect frameRect = QRect(QPoint(systemRect.left, systemRect.top), QPoint(systemRect.right, systemRect.bottom));
-    
-    /* Calculate emulated client rect, title bar excluded. */
-    QRect clientRect = QRect(
-        QPoint(
-            frameRect.left() + emulatedFrameMargins.left(),
-            frameRect.top() + emulatedFrameMargins.top()
-        ),
-        QPoint(
-            frameRect.right() - emulatedFrameMargins.right(),
-            frameRect.bottom() - emulatedFrameMargins.bottom()
-        )
-    );
-
-    /* Find window frame section. */
-    int row = sweep(pos.x(), frameRect.left(), clientRect.left(), clientRect.right(),  frameRect.right(),  0, 1, 2, 3, 4);
-    int col = sweep(pos.y(), frameRect.top(),  clientRect.top(),  clientRect.bottom(), frameRect.bottom(), 0, 1, 2, 3, 4);
-    *result = frameSectionMap[col][row];
-
-    /* Handle title bar. */
-    if(*result == HTCLIENT && pos.y() <= clientRect.top() + emulatedTitleBarHeight)
-        *result = HTCAPTION;
-
-    return true;
-}
-
 bool QnDwmPrivate::compositionChangedEvent(MSG *message, long *result) {
     Q_UNUSED(message);
 
@@ -709,147 +496,83 @@ bool QnDwmPrivate::compositionChangedEvent(MSG *message, long *result) {
 }
 
 bool QnDwmPrivate::activateEvent(MSG *message, long *result) {
-    if(!systemPaintWindow)
+    if(overrideFrameMargins)
         message->lParam = -1; /* Don't repaint the frame in default handler. It causes frame flickering. */
-
+    
     *result = DefWindowProc(message->hwnd, message->message, message->wParam, message->lParam);
     return true;
 }
 
 bool QnDwmPrivate::ncPaintEvent(MSG *message, long *result) {
-    if(!systemPaintWindow) {
+    if(!overrideFrameMargins)
+        return false;
 
-        if(transparentErasing) {
-            HDC hdc = GetWindowDC(message->hwnd);
+    HDC hdc = GetWindowDC(message->hwnd);
 
-            bool deleteHrgn = false;
-            HRGN hrgn = 0;
-            if(message->wParam == 1) {
-                RECT rect;
-                GetClipBox(hdc, &rect);
-                hrgn = CreateRectRgnIndirect(&rect);
-                deleteHrgn = true;
-            } else {
-                hrgn = (HRGN) message->wParam;
-                deleteHrgn = false;
-            }
-
-            if(!nonErasableContentMargins.isNull()) {
-                HRGN rectHrgn;
-                RECT rect;
-
-                /* Calculate client rect delta relative to window rect. */
-                POINT clientTopLeft;
-                clientTopLeft.x = 0;
-                clientTopLeft.y = 0;
-                ClientToScreen(message->hwnd, &clientTopLeft);
-
-                RECT windowRect;
-                GetWindowRect(message->hwnd, &windowRect);
-
-                POINT clientDelta;
-                clientDelta.x = clientTopLeft.x - windowRect.left;
-                clientDelta.y = clientTopLeft.y - windowRect.top;
-
-                /* Construct client rect in window coordinates. */
-                GetClientRect(message->hwnd, &rect);
-                rect.left   += clientDelta.x;
-                rect.top    += clientDelta.y;
-                rect.right  += clientDelta.x;
-                rect.bottom += clientDelta.y;
-
-                /* Adjust for non-erasable margins. */
-                rect.left   += nonErasableContentMargins.left();
-                rect.top    += nonErasableContentMargins.top();
-                rect.right  -= nonErasableContentMargins.right();
-                rect.bottom -= nonErasableContentMargins.bottom();
-
-                /* Combine with region. */
-                rectHrgn = CreateRectRgnIndirect(&rect);
-
-                HRGN resultHrgn = CreateRectRgn(0, 0, 0, 0);
-                int status = CombineRgn(resultHrgn, hrgn, rectHrgn, RGN_DIFF);
-                Q_UNUSED(status);
-
-                DeleteObject(rectHrgn);
-                if(deleteHrgn)
-                    DeleteObject(hrgn);
-                
-                hrgn = resultHrgn;
-                deleteHrgn = true;
-            }
-
-            HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
-            SelectBrush(hdc, hbr);
-            PaintRgn(hdc, hrgn);
-            DeleteObject(hbr);
-
-            if(deleteHrgn)
-                DeleteObject(hrgn);
-
-            ReleaseDC(message->hwnd, hdc);
-        }
-
-        /* An application should return zero if it processes this message. */
-        *result = 0;
-        return true;
+    bool deleteHrgn = false;
+    HRGN hrgn = 0;
+    if(message->wParam == 1) {
+        RECT rect;
+        GetClipBox(hdc, &rect);
+        hrgn = CreateRectRgnIndirect(&rect);
+        deleteHrgn = true;
     } else {
-        return false;
-    }
-}
-
-bool QnDwmPrivate::eraseBackground(MSG *message, long *result) {
-    if(!systemPaintWindow) {
-        if(transparentErasing) {
-            HDC hdc = (HDC) message->wParam;
-            HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
-            if(!hbr) {
-                *result = 0;
-                return true;
-            }
-
-            RECT rect;
-            GetClientRect(message->hwnd, &rect);
-            DPtoLP(hdc, (LPPOINT) &rect, 2);
-            FillRect(hdc, &rect, hbr);
-        }
-
-        /* An application should return non-zero if it processes this message. */
-        *result = 1;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-bool QnDwmPrivate::ncLeftButtonDoubleClickEvent(MSG *message, long *result) {
-    Q_UNUSED(result)
-
-    if(!processDoubleClicks)    
-        return false;
-
-    if(message->wParam == HTCAPTION) {
-        emit q->titleBarDoubleClicked();
-        *result = 0; /* If an application processes this message, it should return zero. */
-        return true;
+        hrgn = (HRGN) message->wParam;
+        deleteHrgn = false;
     }
 
-    return false;
+    HRGN rectHrgn;
+    RECT rect;
+
+    /* Calculate client rect delta relative to window rect. */
+    POINT clientTopLeft;
+    clientTopLeft.x = 0;
+    clientTopLeft.y = 0;
+    ClientToScreen(message->hwnd, &clientTopLeft);
+
+    RECT windowRect;
+    GetWindowRect(message->hwnd, &windowRect);
+
+    POINT clientDelta;
+    clientDelta.x = clientTopLeft.x - windowRect.left;
+    clientDelta.y = clientTopLeft.y - windowRect.top;
+
+    /* Construct client rect in window coordinates. */
+    GetClientRect(message->hwnd, &rect);
+    rect.left   += clientDelta.x;
+    rect.top    += clientDelta.y;
+    rect.right  += clientDelta.x;
+    rect.bottom += clientDelta.y;
+
+    /* Combine with region. */
+    rectHrgn = CreateRectRgnIndirect(&rect);
+
+    HRGN resultHrgn = CreateRectRgn(0, 0, 0, 0);
+    int status = CombineRgn(resultHrgn, hrgn, rectHrgn, RGN_DIFF);
+    Q_UNUSED(status);
+
+    DeleteObject(rectHrgn);
+    if(deleteHrgn)
+        DeleteObject(hrgn);
+
+    hrgn = resultHrgn;
+    deleteHrgn = true;
+
+    HBRUSH hbr = (HBRUSH) GetStockObject(BLACK_BRUSH);
+    SelectBrush(hdc, hbr);
+    PaintRgn(hdc, hrgn);
+    DeleteObject(hbr);
+
+    if(deleteHrgn)
+        DeleteObject(hrgn);
+
+    ReleaseDC(message->hwnd, hdc);
+
+    /* An application should return zero if it processes this message. */
+    *result = 0;
+    return true;
 }
 
-bool QnDwmPrivate::sysCommandEvent(MSG *message, long *result) {
-    switch(message->wParam & 0xFFF0) {
-    case SC_MOVE:
-        if(titleBarDrag) {
-            return false;
-        } else {
-            *result = 0; 
-            return true; 
-        }
-    default:
-        return false;
-    }
-}
+#endif // Q_OS_WIN
 
-#endif
 

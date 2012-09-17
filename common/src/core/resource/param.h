@@ -51,11 +51,11 @@ typedef QSharedPointer<QnParamType> QnParamTypePtr;
 
 struct QN_EXPORT QnParam
 {
-    QnParam() : m_paramType(new QnParamType), m_domain(QnDomainMemory) {}
-    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant(), QnDomain domain = QnDomainMemory)
-        : m_paramType(paramType),
-          m_domain(domain)
-    { setValue(value); }
+    QnParam(): m_paramType(new QnParamType), m_domain(QnDomainMemory) {}
+
+    QnParam(QnParamTypePtr paramType, const QVariant &value = QVariant(), QnDomain domain = QnDomainMemory): m_paramType(paramType), m_domain(domain) { 
+        setValue(value); 
+    }
 
     bool isValid() const { return !m_paramType->name.isEmpty(); }
 
@@ -72,12 +72,12 @@ struct QN_EXPORT QnParam
     QnParamType::DataType type() const { return m_paramType->type;}
     const QList<QVariant> &uiPossibleValues() const { return m_paramType->ui_possible_values; }
     const QList<QVariant> &possibleValues() const { return m_paramType->possible_values; }
-    const QString& description() const { return m_paramType->description; }
+    const QString &description() const { return m_paramType->description; }
     bool isUiParam() const { return m_paramType->ui; }
     bool isPhysical() const { return m_paramType->isPhysical; }
-    const bool isReadOnly() const { return m_paramType->isReadOnly; }
-    const QString netHelper() const { return m_paramType->paramNetHelper; }
-    const QnId& paramTypeId() const { return m_paramType->id; }
+    bool isReadOnly() const { return m_paramType->isReadOnly; }
+    const QString &netHelper() const { return m_paramType->paramNetHelper; }
+    const QnId &paramTypeId() const { return m_paramType->id; }
 
 private:
     QnParamTypePtr m_paramType;

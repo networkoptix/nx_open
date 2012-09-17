@@ -31,14 +31,17 @@ unix {
 include(../contrib/qtcolorpicker/src/qtcolorpicker.pri)
 }
 
-TRANSLATIONS += help/context_help_en.ts
-RESOURCES += help/context_help.qrc
+TRANSLATIONS += # help/context_help_en.ts
+RESOURCES += # help/context_help.qrc
 
 INCLUDEPATH += $$PWD
 PRECOMPILED_HEADER = $$PWD/StdAfx.h
 PRECOMPILED_SOURCE = $$PWD/StdAfx.cpp
 
 QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include
+
+# Boris build doesn't use const.pro
+QMAKE_CXXFLAGS += -DNO_TRANSLATIONS
 
 unix {
   QMAKE_CXXFLAGS += -I/usr/include
@@ -87,10 +90,10 @@ win* {
     } else {
         OPENAL_LIBS_PATH = $$PWD/../contrib/openal/bin/win64
     }
-    INCLUDEPATH += $$PWD/../contrib/openal/include
     LIBS += -L$$OPENAL_LIBS_PATH -lOpenAL32
 
     INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+    INCLUDEPATH += $$PWD/../contrib/openal/include
 
     win32-msvc2010 {
         LIBS += -L$$PWD/../../common/contrib/openssl/bin/win32-msvc2010
@@ -219,13 +222,13 @@ FORMS += \
     ui/dialogs/about_dialog.ui \
     youtube/youtubeuploaddialog.ui \
     youtube/youtubesetting.ui \
-    ui/device_settings/camera_schedule_widget.ui \
     ui/widgets/settings/connections_settings_widget.ui \
     ui/widgets/settings/license_widget.ui \
     ui/widgets/settings/license_manager_widget.ui \
     ui/widgets/settings/recording_settings_widget.ui \
     ui/widgets/help_widget.ui \
     ui/widgets/resource_tree_widget.ui \
+    ui/widgets/properties/camera_schedule_widget.ui \
     ui/widgets/properties/single_camera_settings_widget.ui \
     ui/widgets/properties/multiple_camera_settings_widget.ui \
 
@@ -245,3 +248,4 @@ DEFINES += $$OVERRIDE_DEFINITION
 # DEFINES += QN_HAS_BACKGROUND_COLOR_ADJUSTMENT
 
 SOURCES += $$PWD/../build/generated/compatibility_info.cpp
+

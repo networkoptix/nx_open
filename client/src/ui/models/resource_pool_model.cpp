@@ -19,6 +19,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_globals.h>
 
 #include "file_processor.h"
 
@@ -191,10 +192,10 @@ public:
             }
             break;
         case Qn::UsersNode:
-            bastard = m_model->accessController()->isViewer();
+            bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
             break;
         case Qn::ServersNode:
-            bastard = m_model->accessController()->isViewer();
+            bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
             break;
         default:
             break;
@@ -319,7 +320,7 @@ public:
                 result |= Qt::ItemIsEditable;
             /* Fall through. */
         case Qn::ItemNode:
-            if(m_flags & (QnResource::media | QnResource::layout))
+            if(m_flags & (QnResource::media | QnResource::layout | QnResource::server))
                 result |= Qt::ItemIsDragEnabled;
             break;
         default:
@@ -352,13 +353,13 @@ public:
             if(m_resource)
                 return static_cast<int>(m_flags);
             break;
-        case Qn::UuidRole:
+        case Qn::ItemUuidRole:
             if(m_type == Qn::ItemNode)
                 return QVariant::fromValue<QUuid>(m_uuid);
             break;
-        case Qn::SearchStringRole: 
+        case Qn::ResourceSearchStringRole: 
             return m_searchString;
-        case Qn::StatusRole: 
+        case Qn::ResourceStatusRole: 
             return static_cast<int>(m_status);
         case Qn::NodeTypeRole:
             return static_cast<int>(m_type);
@@ -493,9 +494,9 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
     QHash<int, QByteArray> roles = roleNames();
     roles.insert(Qn::ResourceRole,      "resource");
     roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::UuidRole,          "uuid");
-    roles.insert(Qn::SearchStringRole,  "searchString");
-    roles.insert(Qn::StatusRole,        "status");
+    roles.insert(Qn::ItemUuidRole,          "uuid");
+    roles.insert(Qn::ResourceSearchStringRole,  "searchString");
+    roles.insert(Qn::ResourceStatusRole,        "status");
     roles.insert(Qn::NodeTypeRole,      "nodeType");
     setRoleNames(roles);
 
@@ -583,7 +584,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         return m_rootNode;
 
     if(node->resourceFlags() & QnResource::user) {
-        if(accessController()->isViewer()) {
+        if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
             return m_rootNode;
         } else {
             return m_usersNode;
@@ -728,7 +729,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         node = node->parent(); /* Dropping into a server item is the same as dropping into a server */
 
     if(QnLayoutResourcePtr layout = node->resource().dynamicCast<QnLayoutResource>()) {
-        QnResourceList medias = QnResourceCriterion::filter<QnMediaResource, QnResourceList>(resources);
+        QnMediaResourceList medias = resources.filtered<QnMediaResource>();
 
         menu()->trigger(Qn::OpenInLayoutAction, QnActionParameters(medias).withArgument(Qn::LayoutParameter, layout));
     } else if(QnUserResourcePtr user = node->resource().dynamicCast<QnUserResource>()) {
@@ -751,7 +752,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
-            QnResourceList cameras = QnResourceCriterion::filter<QnNetworkResource, QnResourceList>(resources);
+            QnNetworkResourceList cameras = resources.filtered<QnNetworkResource>();
             if(!cameras.empty())
                 menu()->trigger(Qn::MoveCameraAction, QnActionParameters(cameras).withArgument(Qn::ServerParameter, server));
         }
@@ -774,8 +775,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource.data(), SIGNAL(parentIdChanged()),                                     this, SLOT(at_resource_parentIdChanged()));
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
-	connect(resource.data(), SIGNAL(disabledChanged(bool, bool)),                           this, SLOT(at_resource_resourceChanged()));
-	connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
+    connect(resource.data(), SIGNAL(disabledChanged(bool, bool)),                           this, SLOT(at_resource_resourceChanged()));
+    connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
     if(layout) {

@@ -4,6 +4,62 @@
 #include <QtCore/QtGlobal>
 
 namespace Qn {
+
+    /** 
+     * Type of a node in resource tree displayed to the user.
+     */
+    enum NodeType {
+        RootNode,
+        LocalNode,
+        ServersNode,
+        UsersNode,
+        ResourceNode,   /**< Node that represents a resource. */
+        ItemNode        /**< Node that represents a layout item. */
+    };
+
+
+    /**
+     * Generic enumeration holding different data roles used in Qn classes.
+     */
+    enum ItemDataRole {
+        FirstItemDataRole   = Qt::UserRole,
+
+        /* Tree-based. */
+        NodeTypeRole        = FirstItemDataRole,    /**< Role for node type, see <tt>Qn::NodeType</tt>. */
+
+        /* Resource-based. */
+        ResourceRole,                               /**< Role for QnResourcePtr. */
+        ResourceNameRole,                           /**< Role for resource name. Value of type QString. */
+        ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (QnResource::Flags). */
+        ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
+        ResourceStatusRole,                         /**< Role for resource status. Value of type int (QnResource::Status). */
+        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
+
+        /* Layout-based. */
+        LayoutCellSpacingRole,                      /**< Role for layout's cell spacing. Value of type QSizeF. */
+        LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
+        LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
+        LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
+        LayoutSearchStateRole,                      /**< */
+        LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
+        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
+
+        /* Item-based. */
+        ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */
+        ItemGeometryRole,                           /**< Role for item's integer geometry. Value of type QRect. */
+        ItemGeometryDeltaRole,                      /**< Role for item's floating point geometry delta. Value of type QRectF. */
+        ItemCombinedGeometryRole,                   /**< Role for item's floating point combined geometry. Value of type QRectF. */
+        ItemFlagsRole,                              /**< Role for item's flags. Value of type int (Qn::ItemFlags). */
+        ItemRotationRole,                           /**< Role for item's rotation. Value of type qreal. */
+
+        ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
+        ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
+        ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
+        ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
+        ItemSliderSelectionRole                     /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
+    };
+
+
     /**
      * Role of an item on the scene. 
      * 
@@ -28,7 +84,7 @@ namespace Qn {
                                              * Center of item's combined geometry defines desired position. 
                                              * If item's rect is invalid, but not empty (width or height are negative), then any position is OK. */
     };
-    Q_DECLARE_FLAGS(ItemFlags, ItemFlag);
+    Q_DECLARE_FLAGS(ItemFlags, ItemFlag)
 
 
     /**
@@ -44,11 +100,10 @@ namespace Qn {
         PinnedRaisedLayer,          /**< Layer for pinned items that are raised. */
         UnpinnedLayer,              /**< Layer for unpinned items. */
         UnpinnedRaisedLayer,        /**< Layer for unpinned items that are raised. */
-        CurtainLayer,               /**< Layer for curtain that blacks out the background when an item is zoomed. */
         ZoomedLayer,                /**< Layer for zoomed items. */
         FrontLayer,                 /**< Topmost layer for items. Items that are being dragged, resized or manipulated in any other way are to be placed here. */
         EffectsLayer,               /**< Layer for top-level effects. */
-        UiLayer,                    /**< Layer for ui elements, i.e. close button, navigation bar, etc... */
+        UiLayer                     /**< Layer for ui elements, i.e. navigation bar, resource tree, etc... */
     };
 
 
@@ -63,7 +118,7 @@ namespace Qn {
         BottomBorder = 0x8,
         AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
     };
-    Q_DECLARE_FLAGS(Borders, Border);
+    Q_DECLARE_FLAGS(Borders, Border)
 
 
     /**
@@ -74,92 +129,120 @@ namespace Qn {
         MarginsAffectSize = 0x1,        
 
         /** Viewport margins affect how viewport position is bounded. */
-        MarginsAffectPosition = 0x2,
+        MarginsAffectPosition = 0x2
     };
-    Q_DECLARE_FLAGS(MarginFlags, MarginFlag);
+    Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
 
 
     /**
-     * Flags describing state of a layout in the context of client-server interaction.
+     * Flags describing the differences between instances of the same resource
+     * on the client and on the enterprise controller.
      */
-    enum LayoutFlag {
-        /** Layout is local and was never saved to appserver. */
-        LayoutIsLocal = 0x1,
+    enum ResourceSavingFlag {
+        /** Resource is local and has never been saved to EC. */
+        ResourceIsLocal = 0x1,
 
-        /** Layout is currently being saved to appserver. */
-        LayoutIsBeingSaved = 0x2,
+        /** Resource is currently being saved to EC. */
+        ResourceIsBeingSaved = 0x2,
 
-        /** Unsaved changes are present in the layout. */
-        LayoutIsChanged = 0x4,
-
-        /** Layout is a file. */
-        LayoutIsFile = 0x8,
+        /** Unsaved changes are present in the resource. */
+        ResourceIsChanged = 0x4
     };
-    Q_DECLARE_FLAGS(LayoutFlags, LayoutFlag);
+    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
 
 
     /**
-     * Flags describing the actions permitted for the user. 
+     * Flags describing the actions permitted for the user to do with the 
+     * selected resource.
      */
     enum Permission {
         /* Generic permissions. */
 
         /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        ReadPermission              = 0x00000001,   
+        ReadPermission                      = 0x00010000,   
 
         /** Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
-        WritePermission             = 0x00000002,   
+        WritePermission                     = 0x00020000,   
 
         /** Generic save access. Entity can be saved to appserver. */
-        SavePermission              = 0x00000004,   
+        SavePermission                      = 0x00040000,   
 
         /** Generic delete permission. */
-        RemovePermission            = 0x00000008,
+        RemovePermission                    = 0x00080000,
 
         /** Generic read-write-save permission. */
-        ReadWriteSavePermission     = ReadPermission | WritePermission | SavePermission,
+        ReadWriteSavePermission             = ReadPermission | WritePermission | SavePermission,
 
 
         /* Layout-specific permissions. */
 
         /** Permission to add or remove items from a layout. */
-        AddRemoveItemsPermission    = 0x00000010,
+        AddRemoveItemsPermission            = 0x00100000,
 
 
         /* User-specific permissions. */
 
         /** Permission to edit login. */
-        WriteLoginPermission        = 0x00000100, // TODO: replace with generic WriteNamePermission
+        WriteLoginPermission                = 0x01000000, // TODO: replace with generic WriteNamePermission
 
         /** Permission to edit associated password. */
-        WritePasswordPermission     = 0x00000200,
+        WritePasswordPermission             = 0x02000000,
 
         /** Permission to edit access rights. */
-        WriteAccessRightsPermission = 0x00000400,
+        WriteAccessRightsPermission         = 0x04000000,
 
         /** Permission to create layouts for the user. */
-        CreateLayoutPermission      = 0x00000800,
+        CreateLayoutPermission              = 0x08000000,
 
 
-        /* Current user-specific permissions. Are meaningful for a resource representing current user only. */
 
-        /** Permission to create users. */
-        CreateUserPermission        = 0x10000000,
+        /* Global permissions, applicable to current user only. */
+
+        /** Root, can edit admins. */
+        GlobalEditProtectedUserPermission   = 0x00000001,
+
+        /** Admin, can edit other non-admins. */
+        GlobalProtectedPermission           = 0x00000002,
+
+        /** Can create and edit layouts. */
+        GlobalEditLayoutsPermission         = 0x00000004,
+
+        /** Can create and edit users. */        
+        GlobalEditUsersPermission            = 0x00000008,
+
+        /** Can edit camera settings. */
+        GlobalEditCamerasPermission         = 0x00000010,
+
+        /** Can edit server settings. */
+        GlobalEditServersPermissions        = 0x00000020,
+
+        /** Can view archives of available cameras. */
+        GlobalViewArchivePermission         = 0x00000040,
+
+        /** Can view live stream of available cameras. */
+        GlobalViewLivePermission            = 0x00000080,
+
+        /* Shortcuts. */
+        GlobalLiveViewerPermission          = GlobalViewLivePermission,
+        GlobalViewerPermission              = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
+        GlobalAdvancedViewerPermission      = GlobalViewerPermission           | GlobalEditCamerasPermission,
+        GlobalAdminPermission               = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalOwnerPermission               = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
 
 
-        AllPermissions              = 0xFFFFFFFF
+        AllPermissions                      = 0xFFFFFFFF
     };
-    Q_DECLARE_FLAGS(Permissions, Permission);
+    Q_DECLARE_FLAGS(Permissions, Permission)
 
 
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::LayoutFlags);
-Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions);
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ItemFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Borders)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
 
 #endif // QN_WORKBENCH_GLOBALS_H

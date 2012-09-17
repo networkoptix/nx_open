@@ -7,8 +7,46 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
 #include "core/datapacket/mediadatapacket.h"
+#include "rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
+
+struct RtspServerTrackInfo
+{
+    RtspServerTrackInfo(): clientPort(0), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
+    {
+
+    }
+    ~RtspServerTrackInfo()
+    {
+        delete mediaSocket;
+        delete rtcpSocket;
+    }
+
+    bool openServerSocket(const QString& peerAddress)
+    {
+        mediaSocket = new UDPSocket();
+        rtcpSocket = new UDPSocket();
+        if (mediaSocket->setLocalPort(0) && rtcpSocket->setLocalPort(0))
+        {
+            mediaSocket->setDestAddr(peerAddress, clientPort);
+            rtcpSocket->setDestAddr(peerAddress, clientRtcpPort);
+            return true;
+        }
+        return false;
+    }
+
+    int clientPort;
+    int clientRtcpPort;
+    UDPSocket* mediaSocket;
+    UDPSocket* rtcpSocket;
+    QnRtspEncoderPtr encoder;
+    quint16 sequence;
+    qint64 firstRtpTime;
+
+};
+typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
+typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
 
 class QnRtspConnectionProcessor: public QnTCPConnectionProcessor
 {
@@ -18,7 +56,8 @@ public:
     virtual ~QnRtspConnectionProcessor();
     qint64 getRtspTime();
     void setRtspTime(qint64 time);
-    void switchToLive();
+    void resetTrackTiming();
+    bool isTcpMode() const;
     QnMediaResourcePtr getResource() const;
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
 
@@ -30,6 +69,9 @@ public:
     QString getRangeHeaderIfChanged();
     int getMetadataTcpChannel() const;
     int getAVTcpChannel(int trackNum) const;
+    //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
+    //UDPSocket* getMediaSocket(int trackNum) const;
+    RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
 protected:
     virtual void run();
     void addResponseRangeHeader();
@@ -62,6 +104,11 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
+    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media);
+    QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
+    static int isFullBinaryMessage(const QByteArray& data);
+    void processBinaryRequest();
+    void createPredefinedTracks();
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnRtspConnectionProcessor);
     friend class QnRtspDataConsumer;

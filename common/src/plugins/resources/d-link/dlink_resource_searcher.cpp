@@ -57,6 +57,10 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
     foreach (QnInterfaceAndAddr iface, getAllIPv4Interfaces())
     {
+
+        if (shouldStop())
+            return QnResourceList();
+
         QUdpSocket sock;
 
         if (!bindToInterface(sock, iface))
@@ -85,12 +89,12 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             QHostAddress sender;
             quint16 senderPort;
 
-            sock.readDatagram(datagram.data(), datagram.size(),	&sender, &senderPort);
+            sock.readDatagram(datagram.data(), datagram.size(),    &sender, &senderPort);
 
             if (senderPort != 62976 || datagram.size() < 32) // minimum response size
                 continue;
 
-            QString name  = "DCS-";
+            QString name  = QLatin1String("DCS-");
 
             int iqpos = datagram.indexOf("DCS-");
 
@@ -153,12 +157,14 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
 QString QnPlDlinkResourceSearcher::manufacture() const
 {
-    return QnPlDlinkResource::MANUFACTURE;
+    return QLatin1String(QnPlDlinkResource::MANUFACTURE);
 }
 
 
-QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(QHostAddress addr)
+QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 

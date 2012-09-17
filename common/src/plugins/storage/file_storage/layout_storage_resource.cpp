@@ -11,7 +11,7 @@ public:
         m_fileOffset(0),
         m_fileSize(0)
     {
-        m_fileName = fileName.mid(fileName.indexOf('?')+1);
+        m_fileName = fileName.mid(fileName.indexOf(QLatin1Char('?'))+1);
     }
 
     virtual bool seek(qint64 offset) override
@@ -29,12 +29,12 @@ public:
         return m_file.pos() - m_fileOffset;
     }
 
-    virtual qint64	readData (char * data, qint64 maxSize ) override
+    virtual qint64 readData(char *data, qint64 maxSize) override
     {
         return m_file.read(data, qMin(m_fileSize - pos(), maxSize));
     }
 
-    virtual qint64	writeData (const char * data, qint64 maxSize ) override
+    virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
         return m_file.write(data, maxSize);
     }
@@ -60,16 +60,17 @@ public:
 
 private:
     QFile m_file;
+    QnLayoutFileStorageResource& m_storageResource;
+
+    qint64 m_fileOffset;
     qint64 m_fileSize;
     QString m_fileName;
-    qint64 m_fileOffset;
-    QnLayoutFileStorageResource& m_storageResource;
 };
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     if (getUrl().isEmpty()) {
-        int postfixPos = url.indexOf('?');
+        int postfixPos = url.indexOf(QLatin1Char('?'));
         if (postfixPos == -1)
             setUrl(url);
         else
@@ -138,12 +139,13 @@ QFileInfoList QnLayoutFileStorageResource::getFileList(const QString& dirName)
 
 qint64 QnLayoutFileStorageResource::getFileSize(const QString& fillName) const
 {
-	return 0; // not implemented
+    Q_UNUSED(fillName)
+    return 0; // not implemented
 }
 
 bool QnLayoutFileStorageResource::isStorageAvailable()
 {
-    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QString("tmp") + QString::number(rand());
+    QString tmpDir = closeDirPath(removeProtocolPrefix(getUrl())) + QLatin1String("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
         dir.remove(tmpDir);
@@ -169,7 +171,7 @@ int QnLayoutFileStorageResource::getChunkLen() const
 
 QString QnLayoutFileStorageResource::removeProtocolPrefix(const QString& url)
 {
-    int prefix = url.indexOf("://");
+    int prefix = url.indexOf(QLatin1String("://"));
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
@@ -192,7 +194,7 @@ void QnLayoutFileStorageResource::readIndexHeader()
 
 bool QnLayoutFileStorageResource::addFileEntry(const QString& fileName)
 {
-    if (m_index.entryCount >= MAX_FILES_AT_LAYOUT)
+    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 
     QFile file(removeProtocolPrefix(getUrl()));
@@ -228,7 +230,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 
     quint32 hash = qHash(fileName);
     QByteArray utf8FileName = fileName.toUtf8();
-    for (int i = 0; i < m_index.entryCount; ++i)
+    for (uint i = 0; i < m_index.entryCount; ++i)
     {
         if (m_index.entries[i].fileNameCrc == hash)
         {

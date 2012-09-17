@@ -16,7 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <core/resourcemanagment/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server.h>
+#include <core/resource/video_server_resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -29,6 +29,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 
 #include "ui_resource_tree_widget.h"
 #include "ui/style/proxy_style.h"
@@ -52,8 +53,8 @@ public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
     {
-        m_recIcon = qnSkin->icon("decorations/recording.png");
-        m_raisedIcon = qnSkin->icon("decorations/raised.png");
+        m_recIcon = qnSkin->icon("tree/recording.png");
+        m_raisedIcon = qnSkin->icon("tree/raised.png");
     }
 
     QnWorkbench *workbench() const {
@@ -75,7 +76,7 @@ protected:
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
         QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
 
         /* Bold items of current layout in tree. */
         if(!resource.isNull() && !currentLayoutResource.isNull()) {
@@ -196,8 +197,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     QWidget(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::ResourceTreeWidget()),
-    m_filterTimerId(0),
-    m_ignoreFilterChanges(false)
+    m_ignoreFilterChanges(false),
+    m_filterTimerId(0)
 {
     ui->setupUi(this);
 
@@ -206,7 +207,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(QnResource::still_image));
     ui->typeComboBox->addItem(tr("Live Cameras"), static_cast<int>(QnResource::live));
 
-    ui->clearFilterButton->setIcon(qnSkin->icon("clear.png"));
+    ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
 
     m_resourceModel = new QnResourcePoolModel(this);
@@ -232,6 +233,11 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
     ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
+    /* This is needed so that control's context menu is not embedded into the scene. */
+    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->resourceTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
     m_renameAction = new QAction(this);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
@@ -253,8 +259,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(workbench(),        SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_workbench_itemAdded(QnWorkbenchItem *)));
-    connect(workbench(),        SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_workbench_itemRemoved(QnWorkbenchItem *)));
 
     /* Run handlers. */
     updateFilter();
@@ -303,7 +307,7 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
         result = new QnResourceSearchProxyModel(layout);
         result->setFilterCaseSensitivity(Qt::CaseInsensitive);
         result->setFilterKeyColumn(0);
-        result->setFilterRole(Qn::SearchStringRole);
+        result->setFilterRole(Qn::ResourceSearchStringRole);
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
@@ -342,6 +346,31 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
+void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos){
+    if(!context() || !context()->menu()) {
+        qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
+        return;
+    }
+    QnActionManager *manager = context()->menu();
+
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
+
+    /* Add tree-local actions to the menu. */
+    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+
+    if(menu->isEmpty())
+        return;
+
+    /* Run menu. */
+    QAction *action = menu->exec(pos);
+
+    /* Process tree-local actions. */
+    if(action == m_renameAction)
+        currentItemView()->edit(currentSelectionModel()->currentIndex());
+}
+
 QTreeView *QnResourceTreeWidget::currentItemView() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
         return ui->resourceTreeView;
@@ -370,7 +399,7 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
-        QUuid uuid = index.data(Qn::UuidRole).value<QUuid>();
+        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
         if(uuid.isNull())
             continue;
 
@@ -394,7 +423,7 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
 
     QItemSelectionModel *selectionModel = currentSelectionModel();
 
-    if(!selectionModel->currentIndex().data(Qn::UuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
+    if(!selectionModel->currentIndex().data(Qn::ItemUuidRole).value<QUuid>().isNull()) { /* If it's a layout item. */
         return QVariant::fromValue(selectedLayoutItems());
     } else {
         return QVariant::fromValue(selectedResources());
@@ -420,7 +449,7 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
-        int pos = qMax(filter.lastIndexOf(QChar('+')), filter.lastIndexOf(QChar('\\'))) + 1;
+        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
         
         /* Estimate size of the last term in filter expression. */
         int size = 0;
@@ -443,31 +472,12 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
-    if(!context() || !context()->menu()) {
-        qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
-        return;
-    }
-    QnActionManager *manager = context()->menu();
-
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
-
-    /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
-
-    if(menu->isEmpty())
-        return;
-
-    /* Run menu. 
-     * Note that we cannot use evet->globalPos() here as it doesn't work when
-     * the widget is embedded into graphics scene. */
-    QAction *action = menu->exec(QCursor::pos());
-
-    /* Process tree-local actions. */
-    if(action == m_renameAction)
-        currentItemView()->edit(currentSelectionModel()->currentIndex());
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
+    /** 
+     * Note that we cannot use event->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene.
+     */
+    showContextMenuAt(QCursor::pos());
 }
 
 void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {
@@ -478,8 +488,31 @@ void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
+void QnResourceTreeWidget::mouseReleaseEvent(QMouseEvent *event) {
+    event->accept(); /* Prevent surprising click-through scenarios. */
+}
+
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
+    if (event->key() == Qt::Key_Menu){
+        if (ui->filterLineEdit->hasFocus())
+            return;
+
+        QnTreeView* treeView = ui->searchTab->isActiveWindow() 
+            ? ui->searchTreeView 
+            : ui->resourceTreeView; 
+
+        QModelIndexList selectedRows = treeView->selectionModel()->selectedRows();
+        if (selectedRows.isEmpty())
+            return;
+        
+        QModelIndex selected = selectedRows.back();
+        QPoint pos = treeView->visualRect(selected).bottomRight();
+      
+        // mapToGlobal works incorrectly here, using two-step transformation
+        pos = treeView->mapToGlobal(pos);
+        showContextMenuAt(display()->view()->mapToGlobal(pos));
+    }
 }
 
 void QnResourceTreeWidget::keyReleaseEvent(QKeyEvent *event) {
@@ -521,6 +554,8 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
 void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
+    disconnect(layout, NULL, this, NULL);
+
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
     if(synchronizer)
         synchronizer->disableUpdates();
@@ -546,6 +581,9 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
 
     /* Bold state has changed. */
     currentItemView()->update();
+
+    connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),               this,   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
+    connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
 }
 
 void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
@@ -553,12 +591,12 @@ void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     ui->resourceTreeView->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemAdded(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_workbench_itemRemoved(QnWorkbenchItem *) {
+void QnResourceTreeWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
@@ -589,7 +627,10 @@ void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
 
 void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource && !(resource->flags() & QnResource::layout)) /* Layouts cannot be activated by double clicking. */
+
+    if (resource && 
+        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
+        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
 }
 
@@ -601,7 +642,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
-    if((resource && resource->checkFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
+    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
         ui->resourceTreeView->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);

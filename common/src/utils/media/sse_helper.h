@@ -6,13 +6,17 @@
 #include <emmintrin.h>
 
 
-#if defined(Q_CC_GNU)
+#if defined(Q_CC_GNU) && !defined(Q_OS_MAC)
 
-// it is required to fix <smmintrin.h> GCC header.
-// For each function need to add 'sse4_attribute'
-// For more internal GCC SSE4 intrisicts see: http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/smmintrin.h
+/* We cannot include GCC intrinsic headers cause they cause compilation errors.
+ * Instead, we place the definitions for the functions we're interested in here.
+ * 
+ * For more GCC intrinsics see: 
+ * http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/smmintrin.h
+ * http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/tmmintrin.h
+ */
 
-#define __always_inline__ __always_inline__, __nodebug__
+#define __always_inline__ __always_inline__
 
 #undef __STATIC_INLINE
 #ifdef __GNUC_STDC_INLINE__
@@ -22,25 +26,30 @@
 #endif
 
 #define sse4_attribute __attribute__ ((__target__ ("sse4.1")))
+#define ssse3_attribute __attribute__ ((__target__ ("ssse3")))
 
-#ifndef Q_OS_MAC // Mac gcc smmintrin.h header already has this
 __STATIC_INLINE int __attribute__((__always_inline__)) sse4_attribute
 _mm_testz_si128 (__m128i __M, __m128i __V)
 {
     return __builtin_ia32_ptestz128 ((__v2di)__M, (__v2di)__V);
 }
 
-__STATIC_INLINE __m128i __attribute__((__gnu_inline__, __always_inline__, __artificial__)) sse4_attribute
+__STATIC_INLINE __m128i __attribute__((__always_inline__)) sse4_attribute
 _mm_packus_epi32 (__m128i __X, __m128i __Y)
 {
   return (__m128i) __builtin_ia32_packusdw128 ((__v4si)__X, (__v4si)__Y);
 }
 
-#endif
+__STATIC_INLINE __m128i __attribute__((__always_inline__)) ssse3_attribute
+_mm_hadd_epi16 (__m128i __X, __m128i __Y)
+{
+    return (__m128i) __builtin_ia32_phaddw128 ((__v8hi)__X, (__v8hi)__Y);
+}
 
 #else
 #include <smmintrin.h>
 #define sse4_attribute 
+#define ssse3_attribute
 #endif
 
 

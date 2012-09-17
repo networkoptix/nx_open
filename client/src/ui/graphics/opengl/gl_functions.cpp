@@ -15,9 +15,16 @@ typedef void (APIENTRY *PFNProgramLocalParameter4fARB) (GLenum, GLuint, GLfloat,
 
 typedef void (APIENTRY *PFNActiveTexture) (GLenum);
 
-namespace QnGl {
+namespace {
     bool qn_warnOnInvalidCalls = false;
 
+    enum {
+        DefaultMaxTextureSize = 1024, /* A sensible default supported by most modern GPUs. */
+    };
+
+} // anonymous namespace
+
+namespace QnGl {
 #define WARN()                                                                  \
         if(qn_warnOnInvalidCalls)                                               \
             qnWarning("This function is not supported for current OpenGL context.");
@@ -31,16 +38,22 @@ namespace QnGl {
     void APIENTRY glActiveTexture(GLenum) { WARN(); }
 
 #undef WARN
+
 } // namespace QnGl
+
 
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsGlobal
 // -------------------------------------------------------------------------- //
+/**
+ * A global object that contains state that is shared between all OpenGL functions
+ * instances.
+ */
 class QnGlFunctionsGlobal {
 public:
     QnGlFunctionsGlobal(): 
         m_initialized(false),
-        m_maxTextureSize(1024)  /* A sensible default supported by most modern GPUs. */
+        m_maxTextureSize(DefaultMaxTextureSize)  
     {}
 
     GLint maxTextureSize() const {
@@ -158,12 +171,10 @@ Q_GLOBAL_STATIC(QnGlFunctionsPrivateStorage, qn_glFunctionsPrivateStorage);
 // QnGlFunctions
 // -------------------------------------------------------------------------- //
 QnGlFunctions::QnGlFunctions(const QGLContext *context) {
-    if(context == NULL)
-        context = QGLContext::currentContext();
-
     QnGlFunctionsPrivateStorage *storage = qn_glFunctionsPrivateStorage();
     if(storage)
         d = qn_glFunctionsPrivateStorage()->get(context);
+    
     if(d.isNull()) /* Application is being shut down. */
         d = QSharedPointer<QnGlFunctionsPrivate>(new QnGlFunctionsPrivate(NULL));
 }
@@ -175,11 +186,11 @@ QnGlFunctions::Features QnGlFunctions::features() const {
 }
 
 void QnGlFunctions::enableWarnings(bool enable) {
-    QnGl::qn_warnOnInvalidCalls = enable;
+    qn_warnOnInvalidCalls = enable;
 }
 
 bool QnGlFunctions::isWarningsEnabled() {
-    return QnGl::qn_warnOnInvalidCalls;
+    return qn_warnOnInvalidCalls;
 }
 
 void QnGlFunctions::glProgramStringARB(GLenum target, GLenum format, GLsizei len, const GLvoid *string) const {
@@ -218,10 +229,10 @@ namespace {
         {
             if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE){
                 QString v = QString::fromWCharArray(dd.DeviceString);
-                if (v.contains("Intel(R) HD Graphics 3000"))
+                if (v.contains(QLatin1String("Intel(R) HD Graphics 3000")))
                     result |= QnGlFunctions::OpenGLBroken;
                 else
-                if (v.contains("Gallium 0.1, Poulsbo on EMGD"))
+                if (v.contains(QLatin1String("Gallium 0.1, Poulsbo on EMGD")))
                     result |= QnGlFunctions::ShadersBroken;
                 break;
             }
@@ -249,6 +260,12 @@ GLint QnGlFunctions::estimatedInteger(GLenum target) {
         return 0;
     }
 
-    return qn_glFunctionsGlobal()->maxTextureSize();
+    QnGlFunctionsGlobal *global = qn_glFunctionsGlobal();
+    if(global) {
+        return global->maxTextureSize();
+    } else {
+        /* We may get called when application is shutting down. */
+        return DefaultMaxTextureSize;
+    }
 }
 

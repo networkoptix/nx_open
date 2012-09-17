@@ -11,6 +11,10 @@
 #include "workbench_layout_synchronizer.h"
 #include "workbench_utility.h"
 
+
+#include "extensions/workbench_stream_synchronizer.h"
+#include "utils/common/util.h"
+
 namespace {
     template<class PointContainer>
     void pointize(const QRect &region, PointContainer *points) {
@@ -27,6 +31,9 @@ namespace {
 QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent): 
     QObject(parent)
 {
+    // TODO: this does not belong here.
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
+
     initCellParameters();
 }
 
@@ -37,6 +44,9 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
         qnNullWarning(resource);
         return;
     }
+
+    // TODO: this does not belong here.
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
 
@@ -80,12 +90,19 @@ void QnWorkbenchLayout::setName(const QString &name) {
     m_name = name;
 
     emit nameChanged();
+    emit dataChanged(Qn::ResourceNameRole);
 }
 
 bool QnWorkbenchLayout::update(const QnLayoutResourcePtr &resource) {
     setName(resource->getName());
     setCellAspectRatio(resource->cellAspectRatio());
     setCellSpacing(resource->cellSpacing());
+
+    // TODO: note that we keep items that are not present in resource's data.
+    // This is not correct, but we currently need it.
+    const QHash<int, QVariant> data = resource->data();
+    for(QHash<int, QVariant>::const_iterator i = data.begin(); i != data.end(); i++)
+        setData(i.key(), i.value());
 
     bool result = true;
 
@@ -193,7 +210,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem *item) {
 void QnWorkbenchLayout::clear()
 {
     foreach (QnWorkbenchItem *item, m_items)
-		delete item;
+        delete item;
     m_items.clear();
 }
 
@@ -471,6 +488,7 @@ void QnWorkbenchLayout::updateBoundingRectInternal() {
 
     m_boundingRect = boundingRect;
     emit boundingRectChanged();
+    emit dataChanged(Qn::LayoutBoundingRectRole);
 }
 
 void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
@@ -483,6 +501,7 @@ void QnWorkbenchLayout::setCellAspectRatio(qreal cellAspectRatio) {
     m_cellAspectRatio = cellAspectRatio;
     
     emit cellAspectRatioChanged();
+    emit dataChanged(Qn::LayoutCellAspectRatioRole);
 }
 
 void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
@@ -497,6 +516,7 @@ void QnWorkbenchLayout::setCellSpacing(const QSizeF &cellSpacing) {
     m_cellSpacing = cellSpacing;
     
     emit cellSpacingChanged();
+    emit dataChanged(Qn::LayoutCellSpacingRole);
 }
 
 void QnWorkbenchLayout::initCellParameters() {
@@ -504,3 +524,63 @@ void QnWorkbenchLayout::initCellParameters() {
     m_cellSpacing = qnGlobals->defaultLayoutCellSpacing();
 }
 
+QVariant QnWorkbenchLayout::data(int role) const {
+    switch(role) {
+    case Qn::ResourceNameRole:
+        return m_name;
+    case Qn::LayoutCellSpacingRole:
+        return m_cellSpacing;
+    case Qn::LayoutCellAspectRatioRole:
+        return m_cellAspectRatio;
+    case Qn::LayoutBoundingRectRole:
+        return m_boundingRect;
+    default:
+        return m_dataByRole.value(role);
+    }
+}
+
+bool QnWorkbenchLayout::setData(int role, const QVariant &value) {
+    switch(role) {
+    case Qn::ResourceNameRole:
+        if(value.canConvert<QString>()) {
+            setName(value.toString());
+            return true;
+        } else {
+            qnWarning("Provided name value '%1' must be convertible to QString.", value);
+            return false;
+        }
+    case Qn::LayoutCellSpacingRole:
+        if(value.canConvert<QSizeF>()) {
+            setCellSpacing(value.toSizeF());
+            return true;
+        } else {
+            qnWarning("Provided cell spacing value '%1' must be convertible to QSizeF.", value);
+            return false;
+        }
+    case Qn::LayoutCellAspectRatioRole: {
+        bool ok;
+        qreal cellAspectRatio = value.toReal(&ok);
+        if(ok) {
+            setCellAspectRatio(cellAspectRatio);
+            return true;
+        } else {
+            qnWarning("Provided cell aspect ratio value '%1' must be convertible to qreal.", value);
+            return false;
+        }
+    }
+    case Qn::LayoutBoundingRectRole:
+        if(m_boundingRect == value.toRect()) {
+            return true;
+        } else {
+            qnWarning("Changing bounding rect of a workbench layout is not supported.");
+            return false;
+        }
+    default:
+        QVariant &localValue = m_dataByRole[role];
+        if(localValue != value) {
+            localValue = value;
+            emit dataChanged(role);
+        }
+        return true;
+    }
+}

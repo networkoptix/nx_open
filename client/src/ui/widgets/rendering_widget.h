@@ -16,11 +16,13 @@ class QnRenderingWidget: public QGLWidget {
     Q_OBJECT;
 public:
     QnRenderingWidget(QWidget *parent = 0, Qt::WindowFlags f = 0);
-
     virtual ~QnRenderingWidget();
 
     QnMediaResourcePtr resource() const;
     void setResource(const QnMediaResourcePtr &resource);
+
+protected:
+    void updateChannelScreenSize();
 
 protected:
     virtual void initializeGL() override;

@@ -59,6 +59,8 @@ bool AACCodec::decodeFrame(quint8* buffer, quint8* end)
 		m_id = bits.getBit();          /* 0: MPEG-4, 1: MPEG-2*/
 		m_layer = bits.getBits(2);        /* layer */
 		int protection_absent = bits.getBit();          /* protection_absent */
+        (void) protection_absent;
+
 		// -- 16 bit
 		m_profile = bits.getBits(2);        /* profile_objecttype */
 		m_sample_rates_index = bits.getBits(4);    /* sample_frequency_index */
@@ -80,6 +82,8 @@ bool AACCodec::decodeFrame(quint8* buffer, quint8* end)
 		int frameSize = bits.getBits(13) >> 2; /* aac_frame_length */
 		//LTRACE(LT_DEBUG, 0, "decodec frame size: " << m_size);
 		int adts_buffer_fullness = bits.getBits(11);       /* adts_buffer_fullness */
+        (void) adts_buffer_fullness;
+
 		m_rdb = bits.getBits(2);   /* number_of_raw_data_blocks_in_frame */
 
 		m_channels = aac_channels[m_channels_index];
@@ -102,7 +106,7 @@ void AACCodec::buildADTSHeader(quint8* buffer, int frameSize)
 	writer.putBit(1); // protection_absent
 	writer.putBits(2, m_profile);
 	m_sample_rates_index = 0;
-	for (int i = 0; i < sizeof(aac_sample_rates); i++)
+	for (uint i = 0; i < sizeof(aac_sample_rates); i++)
 		if (aac_sample_rates[i] == m_sample_rate) {
 			m_sample_rates_index = i;
 			break;
@@ -110,7 +114,7 @@ void AACCodec::buildADTSHeader(quint8* buffer, int frameSize)
 	writer.putBits(4, m_sample_rates_index);
 	writer.putBit(0); /* private_bit */
 	m_channels_index = 0;
-	for (int i = 0; i < sizeof(aac_channels); i++)
+	for (uint i = 0; i < sizeof(aac_channels); i++)
 		if (aac_channels[i] == m_channels) {
 			m_channels_index = i;
 			break;

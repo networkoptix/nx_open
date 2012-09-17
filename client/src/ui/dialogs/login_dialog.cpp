@@ -47,18 +47,17 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         qnNullWarning(context);
 
     ui->setupUi(this);
-    QPushButton *resetButton = ui->buttonBox->button(QDialogButtonBox::Reset);
 
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
 
-    QDir dir(":/skin");
-    QStringList	introList = dir.entryList(QStringList() << "intro.*");
-    QString resourceName = ":/skin/intro";
+    QDir dir(QLatin1String(":/skin"));
+    QStringList introList = dir.entryList(QStringList() << QLatin1String("intro.*"));
+    QString resourceName = QLatin1String(":/skin/intro");
     if (!introList.isEmpty())
-        resourceName = QString(":/skin/") + introList.first();
+        resourceName = QLatin1String(":/skin/") + introList.first();
 
-    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QString("qtfile://") + resourceName));
+    QnAviResourcePtr resource = QnAviResourcePtr(new QnAviResource(QLatin1String("qtfile://") + resourceName));
     if (FileTypeSupport::isImageFileExt(resourceName))
         resource->addFlags(QnResource::still_image);
 
@@ -70,32 +69,27 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->setContentsMargins(0,0,0,10);
     layout->addWidget(m_renderingWidget);
 
-    resetButton->setText(tr("&Reset"));
-
     m_connectionsModel = new QStandardItemModel(this);
     ui->connectionsComboBox->setModel(m_connectionsModel);
 
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
-    connect(ui->configureConnectionsButton, SIGNAL(clicked()),                      this,   SLOT(at_configureConnectionsButton_clicked()));
     connect(ui->passwordLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->portSpinBox,                SIGNAL(valueChanged(int)),              this,   SLOT(updateAcceptibility()));
     connect(ui->buttonBox,                  SIGNAL(accepted()),                     this,   SLOT(accept()));
     connect(ui->buttonBox,                  SIGNAL(rejected()),                     this,   SLOT(reject()));
-    connect(resetButton,                    SIGNAL(clicked()),                      this,   SLOT(reset()));
 
     m_dataWidgetMapper = new QDataWidgetMapper(this);
     m_dataWidgetMapper->setModel(m_connectionsModel);
-    m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::AutoSubmit);
+    m_dataWidgetMapper->setSubmitPolicy(QDataWidgetMapper::ManualSubmit);
     m_dataWidgetMapper->setOrientation(Qt::Horizontal);
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
     m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
     m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
-    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
-    updateStoredConnections();
+    resetConnectionsModel();
     updateFocus();
 }
 
@@ -105,41 +99,16 @@ LoginDialog::~LoginDialog() {
 
 void LoginDialog::updateFocus() 
 {
-    int size = m_dataWidgetMapper->model()->columnCount();
-
-    QWidget *widget = NULL;
-    for(int i = 0; i < size; i++) {
-        widget = m_dataWidgetMapper->mappedWidgetAt(i);
-        if(!widget)
-            continue;
-
-        QByteArray propertyName = m_dataWidgetMapper->mappedPropertyName(widget);
-        QVariant value = widget->property(propertyName.constData());
-        if(!value.isValid())
-            continue;
-
-        if(value.toString().isEmpty())
-            break;
-
-        if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
-            break;
-    }
-    
-    /* Set focus on the last widget in list if every widget is filled. */
-    if(widget)
-        widget->setFocus();
+    ui->passwordLineEdit->setFocus();
 }
 
 QUrl LoginDialog::currentUrl() const {
-    const int row = ui->connectionsComboBox->currentIndex();
-
     QUrl url;
-    url.setScheme("https");
-    url.setHost(m_connectionsModel->item(row, 1)->text());
-    url.setPort(m_connectionsModel->item(row, 2)->text().toInt());
-    url.setUserName(m_connectionsModel->item(row, 3)->text());
-    url.setPassword(m_connectionsModel->item(row, 4)->text());
-
+    url.setScheme(QLatin1String("https"));
+    url.setHost(ui->hostnameLineEdit->text());
+    url.setPort(ui->portSpinBox->value());
+    url.setUserName(ui->loginLineEdit->text());
+    url.setPassword(ui->passwordLineEdit->text());
     return url;
 }
 
@@ -149,7 +118,7 @@ QnConnectInfoPtr LoginDialog::currentInfo() const {
 
 void LoginDialog::accept() {
     /* Widget data may not be written out to the model yet. Force it. */
-    m_dataWidgetMapper->submit();
+ //   m_dataWidgetMapper->submit();
 
     QUrl url = currentUrl();
     if (!url.isValid()) {
@@ -160,17 +129,18 @@ void LoginDialog::accept() {
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
     m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
 
-	{
-		// Temporary 1.0/1.1 version check.
-		// Let's remove it 1.3/1.4.
-		QUrl httpUrl;
-		httpUrl.setHost(url.host());
-		httpUrl.setPort(url.port());
-		httpUrl.setScheme("http");
-		httpUrl.setUserName("");
-		httpUrl.setPassword("");
-		QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, "resourceEx", this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
-	}
+    {
+        // TODO: #gdm ask Elrik about it a bit later
+        // Temporary 1.0/1.1 version check.
+        // Let's remove it 1.3/1.4.
+        QUrl httpUrl;
+        httpUrl.setHost(url.host());
+        httpUrl.setPort(url.port());
+        httpUrl.setScheme(QLatin1String("http"));
+        httpUrl.setUserName(QString());
+        httpUrl.setPassword(QString());
+        QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
+    }
 
     updateUsability();
 }
@@ -185,15 +155,6 @@ void LoginDialog::reject() {
     updateUsability();
 }
 
-void LoginDialog::reset() {
-    ui->hostnameLineEdit->clear();
-    ui->portSpinBox->setValue(0);
-    ui->loginLineEdit->clear();
-    ui->passwordLineEdit->clear();
-
-    updateStoredConnections();
-}
-
 void LoginDialog::changeEvent(QEvent *event) {
     QDialog::changeEvent(event);
 
@@ -206,32 +167,24 @@ void LoginDialog::changeEvent(QEvent *event) {
     }
 }
 
-void LoginDialog::updateStoredConnections() {
+void LoginDialog::resetConnectionsModel() {
     m_connectionsModel->removeRows(0, m_connectionsModel->rowCount());
 
     QnConnectionDataList connections = qnSettings->customConnections();
-    connections.push_front(qnSettings->defaultConnection());
-
-    QnConnectionData lastUsedConnection = qnSettings->lastUsedConnection();
-    if(!lastUsedConnection.isValid()) {
-        lastUsedConnection = qnSettings->defaultConnection();
-        lastUsedConnection.name = QString();
-    }
-    if(connections.contains(lastUsedConnection))
-        connections.removeOne(lastUsedConnection);
-    connections.push_front(lastUsedConnection);
+    if (connections.isEmpty())
+        connections.append(qnSettings->defaultConnection());
 
     foreach (const QnConnectionData &connection, connections) {
         QList<QStandardItem *> row;
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
             << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
+            << new QStandardItem(connection.url.userName());
         m_connectionsModel->appendRow(row);
     }
 
     ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
+    ui->passwordLineEdit->clear();
 }
 
 void LoginDialog::updateAcceptibility() {
@@ -265,20 +218,18 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle) {
-	Q_UNUSED(handle);
+void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray /*errorString*/, QByteArray /*data*/, int /*handle*/) {
+    if (status == 204) {
+        m_requestHandle = -1;
 
-	if (status == 204) 	{
-		m_requestHandle = -1;
-
-		updateUsability();
+        updateUsability();
 
         QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
             tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your enterprise controller or contact VMS administrator.")
         );
-	}
+    }
 }
 
 void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
@@ -324,6 +275,8 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    ui->passwordLineEdit->clear();
+    updateFocus();
 }
 
 void LoginDialog::at_testButton_clicked() {
@@ -339,12 +292,4 @@ void LoginDialog::at_testButton_clicked() {
     dialog->exec();
 
     updateFocus();
-}
-
-void LoginDialog::at_configureConnectionsButton_clicked() {
-    QScopedPointer<QnPreferencesDialog> dialog(new QnPreferencesDialog(m_context.data(), this));
-    dialog->setCurrentPage(QnPreferencesDialog::PageConnections);
-
-    if (dialog->exec() == QDialog::Accepted)
-        updateStoredConnections();
 }

@@ -9,12 +9,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>1.2.1</version>
+        <version>1.3.0</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>1.2.1</version>
+    <version>1.3.0</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
@@ -22,25 +22,11 @@
 
     <properties>
         <product.title>${client.name}</product.title>
-        <!--QT libs used--> 
-        <qtlib1>core</qtlib1>
-        <qtlib2>gui</qtlib2>
-        <qtlib3>network</qtlib3>
-        <qtlib4>opengl</qtlib4>
-        <qtlib5>xml</qtlib5>
-        <!--<qtlib6/>
-        <qtlib7/>
-        <qtlib8/>
-        <qtlib9/> -->
-        <!--QT plugins used-->      
-        <qtplugin1>imageformats</qtplugin1>
-        <qtplugin2>enter its name here...</qtplugin2>
-        <qtplugin3>enter its name here...</qtplugin3>
         <!--Global libs-->
-        <global.libs>-lcommon</global.libs>
+        <global.libs></global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm -lcommon</windows.oslibs>
-        <linux.oslibs>-lcrypto -lz</linux.oslibs>
+        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
+        <linux.oslibs>-lcrypto -lz -lopenal</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -48,74 +34,5 @@
         <windows.defines/>
         <linux.defines/>
         <mac.defines/>          
-    </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>org</groupId>
-            <artifactId>openssl</artifactId>
-            <version>${openssl.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.ffmpeg</groupId>
-            <artifactId>ffmpeg</artifactId>
-            <version>${ffmpeg.version}</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>                       
-        <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>protobuf</artifactId>
-            <version>2.4.1</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>                           
-        <dependency>
-            <groupId>com.nokia.qt.addons</groupId>
-            <artifactId>qtcolorpicker</artifactId>
-            <version>2.6</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.sourceforge.cloudcity</groupId>
-            <artifactId>bespin</artifactId>
-            <version>1.1</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>                               
-        <dependency>
-            <groupId>com.creativelabs</groupId>
-            <artifactId>openal</artifactId>
-            <version>1.1</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3d9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
-        <dependency>
-            <groupId>com.microsoft.directx</groupId>
-            <artifactId>d3dx9</artifactId>
-            <version>JUN2010</version>
-            <type>zip</type>
-            <classifier>${platform}-${arch}</classifier>
-        </dependency>   
-        <dependency>
-            <groupId>com.nokia.qt</groupId>
-            <artifactId>qtsingleapplication</artifactId>
-            <version>4.7.4</version>
-            <type>zip</type>
-        </dependency>   
-    </dependencies>     
-
-    <build>
-
-    </build>    
+    </properties>   
 </project>

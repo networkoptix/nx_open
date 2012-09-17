@@ -7,19 +7,31 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
+#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource/video_server_resource.h"
+#include "core/dataprovider/spush_media_stream_provider.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
     m_role(role),
     m_mediaProvider(mediaProvider),
     m_scheduleMutex(QMutex::Recursive),
-    m_dualStreamingHelper(0)
+    m_dualStreamingHelper(0),
+    m_usedPanicMode(false)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
+    m_videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    
+    QnScheduleTask::Data scheduleData;
+    scheduleData.m_startTime = 0;
+    scheduleData.m_endTime = 24*3600*7;
+    scheduleData.m_recordType = QnScheduleTask::RecordingType_Run;
+    scheduleData.m_streamQuality = QnQualityHighest;
+    m_panicSchedileRecord.setData(scheduleData);
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -102,16 +114,16 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     }
 
     bool isRecording = m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never;
-	if (!m_device->isDisabled()) {
-		if (isRecording) {
-			if(m_device->getStatus() == QnResource::Online)
-				m_device->setStatus(QnResource::Recording);
-		}
-		else {
-			if(m_device->getStatus() == QnResource::Recording)
-				m_device->setStatus(QnResource::Online);
-		}
-	}
+    if (!m_device->isDisabled()) {
+        if (isRecording) {
+            if(m_device->getStatus() == QnResource::Online)
+                m_device->setStatus(QnResource::Recording);
+        }
+        else {
+            if(m_device->getStatus() == QnResource::Recording)
+                m_device->setStatus(QnResource::Online);
+        }
+    }
 
     if (!isMotionRec(m_currentScheduleTask.getRecordingType()))
         return;
@@ -174,7 +186,7 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
             m_endDateTime = media->timestamp;
         else
-            m_endDateTime += MIN_FRAME_DURATION*1000;
+            m_endDateTime += MIN_FRAME_DURATION;
         close();
     }
     return rez;
@@ -202,10 +214,35 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
+
+    if (m_videoServer && m_videoServer->isPanicMode())
+    {
+        if (!m_usedPanicMode)
+        {
+            QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+            if (m_role == QnResource::Role_LiveVideo)
+                m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
+            else
+                m_panicSchedileRecord.setFps(2);
+
+            // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
+            CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+            bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
+            updateRecordingType(m_panicSchedileRecord);
+            if (!doNotChangeParams)
+                updateStreamParams();
+            m_lastSchedulePeriod.clear();
+            m_usedPanicMode = true;
+        }
+        return;
+    }
+
+    m_usedPanicMode = false;
+
     if (!m_schedule.isEmpty())
     {
         //bool isEmptyPeriod = m_skipDataToTime != AV_NOPTS_VALUE && timeMs < m_skipDataToTime;
-        if (!m_lastSchedulePeriod.containTime(timeMs))
+        if (!m_lastSchedulePeriod.contains(timeMs))
         {
             // find new schedule
             QDateTime packetDateTime = QDateTime::fromMSecsSinceEpoch(timeMs);
@@ -269,7 +306,7 @@ void QnServerStreamRecorder::updateCamera(QnSecurityCamResourcePtr cameraRes)
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 
     if (m_mediaProvider)
-    {
+    {   
         QnLiveStreamProvider* liveProvider = dynamic_cast<QnLiveStreamProvider*>(m_mediaProvider);
         liveProvider->updateSoftwareMotion();
     }
@@ -308,7 +345,8 @@ void QnServerStreamRecorder::endOfRun()
 {
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
-		m_device->setStatus(QnResource::Online);
+        m_device->setStatus(QnResource::Online);
+    m_dataQueue.clear();
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)

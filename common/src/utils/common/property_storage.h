@@ -3,8 +3,15 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QSet>
+#include <QtCore/QStringList>
 
 class QSettings;
+class QMutex;
+class QTextStream;
+
+class QnPropertyStorageLocker;
 
 class QnPropertyNotifier: public QObject {
     Q_OBJECT;
@@ -19,6 +26,18 @@ private:
 };
 
 
+/**
+ * Storage of typed key-value pairs that supports value change notifications,
+ * writing and reading to/from <tt>QSettings</tt> and updating from command line.
+ * 
+ * The typical usage is to derive from this class, create an enumeration
+ * for ids of all properties, and then declare them using 
+ * <tt>QN_DECLARE_R_PROPERTY</tt> and <tt>QN_DECLARE_RW_PROPERTY</tt> macros,
+ * wrapped in a pair of <tt>QN_BEGIN_PROPERTY_STORAGE</tt> and 
+ * <tt>QN_END_PROPERTY_STORAGE</tt> invocations. These macros will generate
+ * an <tt>init()</tt> function, that is the to be called from derived class's
+ * constructor.
+ */
 class QnPropertyStorage: public QObject {
     Q_OBJECT;
 public:
@@ -31,27 +50,46 @@ public:
     QnPropertyNotifier *notifier(int id) const;
 
     QString name(int id) const;
-    int type(int id) const;
-    bool isWriteable(int id) const;
+    void setName(int id, const QString &name);
 
-    virtual void updateFromSettings(QSettings *settings);
-    virtual void submitToSettings(QSettings *settings) const;
+    void addArgumentName(int id, const char *argumentName);
+    void addArgumentName(int id, const QString &argumentName);
+    void setArgumentNames(int id, const QStringList &argumentNames);
+    QStringList argumentNames(int id) const;
+
+    int type(int id) const;
+    void setType(int id, int type);
+
+    bool isWriteable(int id) const;
+    void setWriteable(int id, bool writeable);
+
+    bool isThreadSafe() const;
+    void setThreadSafe(bool threadSafe);
+
+    void updateFromSettings(QSettings *settings);
+    void submitToSettings(QSettings *settings) const;
+
+    // TODO: we need a way to make command line parameters not to be saved to settings if they are not changed.
+
+    bool updateFromCommandLine(int &argc, char **argv, FILE *errorFile);
+    bool updateFromCommandLine(int &argc, char **argv, QTextStream *errorStream);
 
 signals:
     void valueChanged(int id);
 
 protected:
-    virtual QVariant updateValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
-    virtual void submitValueToSettings(QSettings *settings, int id, const QVariant &value) const;
+    enum UpdateStatus {
+        Changed,    /**< Value was changed. */
+        Skipped,    /**< Value didn't change. */
+        Failed,     /**< An error has occurred. */
+    };
 
-    virtual bool updateValue(int id, const QVariant &value);
+    virtual void updateValuesFromSettings(QSettings *settings, const QList<int> &ids);
+    virtual void submitValuesToSettings(QSettings *settings, const QList<int> &ids) const;
+    virtual QVariant readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue);
+    virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const;
 
-    virtual void lock() const {}
-    virtual void unlock() const {}
-
-    void setName(int id, const QString &name);
-    void setType(int id, int type);
-    void setWriteable(int id, bool writeable);
+    virtual UpdateStatus updateValue(int id, const QVariant &value);
 
 #define QN_BEGIN_PROPERTY_STORAGE(LAST_ID)                                      \
 private:                                                                        \
@@ -67,10 +105,10 @@ private:                                                                        
 private:                                                                        \
     inline void init(const Dummy<ID> &) {                                       \
         init(Dummy<ID - 1>());                                                  \
-        setWriteable(ID, WRITEABLE);                                            \
         setType(ID, qMetaTypeId<TYPE>());                                       \
         setName(ID, QLatin1String(NAME));                                       \
-        updateValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));              \
+        setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
+        setWriteable(ID, WRITEABLE);                                            \
     }                                                                           \
 
 #define QN_DECLARE_R_PROPERTY(TYPE, GETTER, ID, DEFAULT_VALUE)                  \
@@ -89,8 +127,23 @@ private:                                                                        
 #define QN_END_PROPERTY_STORAGE()                                               \
 
 private:
+    friend class QnPropertyStorageLocker;
+
+    void lock() const;
+    void unlock() const;
+    void notify(int id) const;
+
+    bool isWritableLocked(int id) const;
+
+private:
+    bool m_threadSafe;
+    QScopedPointer<QMutex> m_mutex;
+    mutable int m_lockDepth;
+    mutable QSet<int> m_pendingNotifications;
+
     QHash<int, QVariant> m_valueById;
     QHash<int, QString> m_nameById;
+    QHash<int, QStringList> m_argumentNamesById;
     QHash<int, int> m_typeById;
     QHash<int, bool> m_writeableById;
     mutable QHash<int, QnPropertyNotifier *> m_notifiers;

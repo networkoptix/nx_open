@@ -46,6 +46,7 @@ private slots:
     void onComboboxChanged(int index);
     void onMonitorChanged(int);
     void onDisableAeroChecked(bool);
+    void updateRecordingWarning();
 
 private:
     QScopedPointer<Ui::RecordingSettings> ui;

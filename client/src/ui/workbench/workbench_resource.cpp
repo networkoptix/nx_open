@@ -37,7 +37,7 @@ namespace {
     QList<QUrl> serializeResourcesToUriList(const QnResourceList &resources) {
         QList<QUrl> result;
         foreach (const QnResourcePtr &resource, resources) {
-            if (resource->checkFlags(QnResource::url))
+            if (resource->hasFlags(QnResource::url))
                 result.append(QUrl::fromLocalFile(resource->getUrl()));
         }
         return result;
@@ -57,7 +57,7 @@ namespace {
 
         quint64 pid;
         stream >> pid;
-        if(pid != QApplication::applicationPid())
+        if(pid != (quint64)QApplication::applicationPid())
             fromOtherApp = true;
 
         quint64 magic;

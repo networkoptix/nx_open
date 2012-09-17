@@ -140,7 +140,7 @@ os.mkdir('bin/release-test')
 os.mkdir('build')
 os.mkdir('build/generated')
 
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug = ''
     ldpath_release = ''
 
@@ -149,12 +149,13 @@ if platform() == 'win32':
     copy_files(ffmpeg_path_debug + '/bin/*-[0-9][0-9].dll', 'bin/debug')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9].dll', 'bin/release')
     copy_files(ffmpeg_path_release + '/bin/*-[0-9][0-9].dll', 'bin/release')
-elif platform() == 'mac':
+else:
     ldpath_debug += ffmpeg_path_debug + '/lib'
     ldpath_release += ffmpeg_path_release + '/lib'
 
-copy_files(openal_path + '/*.dll', 'bin/release')
-copy_files(openal_path + '/*.dll', 'bin/debug')
+if platform() == 'win32':
+    copy_files(openal_path + '/*.dll', 'bin/release')
+    copy_files(openal_path + '/*.dll', 'bin/debug')
 
 if platform() == 'win32':
     copy_files('contrib/qtcolorpicker/lib/QtSolutions_ColorPicker-2.6.dll', 'bin/release')
@@ -166,15 +167,15 @@ if platform() == 'win32':
 
     copy_files(tools_path + '/bin/*.dll', 'bin/release')
     copy_files(tools_path + '/bin/*.dll', 'bin/debug')
-elif platform() == 'mac':
+else:
     ldpath_debug += ':' + tools_path + '/lib'
     ldpath_release += ':' + tools_path + '/lib'
 
-if platform() == 'mac':
+if platform() != 'win32':
     ldpath_debug += ':' + os.path.abspath('../common/bin/debug')
     ldpath_release += ':' + os.path.abspath('../common/bin/release')
 
-if platform() == 'mac':
+if platform() != 'win32':
     gen_env_sh('bin/debug/env.sh', ldpath_debug, {'FFMPEG_PATH' : ffmpeg_path_debug})
     gen_env_sh('bin/release/env.sh', ldpath_release, {'FFMPEG_PATH' : ffmpeg_path_release})
 

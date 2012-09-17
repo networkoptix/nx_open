@@ -54,42 +54,42 @@ QString QnSecurityCamResource::oemName() const
 
 int QnSecurityCamResource::getMaxFps()
 {
-    if (!hasSuchParam("MaxFPS"))
+    if (!hasParam(QLatin1String("MaxFPS")))
     {
         //Q_ASSERT(false);
         return 15;
     }
 
     QVariant val;
-    getParam("MaxFPS", val, QnDomainMemory);
+    getParam(QLatin1String("MaxFPS"), val, QnDomainMemory);
     return val.toInt();
 }
 
 int QnSecurityCamResource::reservedSecondStreamFps()
 {
-    if (!hasSuchParam("reservedSecondStreamFps"))
+    if (!hasParam(QLatin1String("reservedSecondStreamFps")))
     {
         //Q_ASSERT(false);
         return 2;
     }
 
     QVariant val;
-    getParam("reservedSecondStreamFps", val, QnDomainMemory);
+    getParam(QLatin1String("reservedSecondStreamFps"), val, QnDomainMemory);
     return val.toInt();
 }
 
 QSize QnSecurityCamResource::getMaxSensorSize()
 {
 
-    if (!hasSuchParam("MaxSensorWidth") || !hasSuchParam("MaxSensorHeight"))
+    if (!hasParam(QLatin1String("MaxSensorWidth")) || !hasParam(QLatin1String("MaxSensorHeight")))
     {
         Q_ASSERT(false);
         return QSize(0,0);
     }
 
     QVariant val_w, val_h;
-    getParam("MaxSensorWidth", val_w, QnDomainMemory);
-    getParam("MaxSensorHeight", val_h, QnDomainMemory);
+    getParam(QLatin1String("MaxSensorWidth"), val_w, QnDomainMemory);
+    getParam(QLatin1String("MaxSensorHeight"), val_h, QnDomainMemory);
 
     return QSize(val_w.toInt(), val_h.toInt());
 
@@ -174,11 +174,10 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 {
     {
         QMutexLocker mutexLocker(&m_mutex);
-        bool sameMask = true;
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
-        {
-            sameMask &= m_motionMaskList[i] == maskList[i];
-        }
+        bool sameMask = maskList.size() == m_motionMaskList.size();
+        if(sameMask)
+            for (int i = 0; i < maskList.size(); ++i) 
+                sameMask &= m_motionMaskList[i] == maskList[i];
         if (sameMask)
             return;
         m_motionMaskList = maskList;
@@ -211,7 +210,7 @@ const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 
 bool QnSecurityCamResource::hasDualStreaming() const
 {
-    if (!hasSuchParam("hasDualStreaming"))
+    if (!hasParam(QLatin1String("hasDualStreaming")))
     {
         //Q_ASSERT(false);
         return false;
@@ -219,7 +218,7 @@ bool QnSecurityCamResource::hasDualStreaming() const
 
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam("hasDualStreaming", val, QnDomainMemory);
+    this_casted->getParam(QLatin1String("hasDualStreaming"), val, QnDomainMemory);
     return val.toInt();
 }
 
@@ -238,17 +237,17 @@ MotionType QnSecurityCamResource::getDefaultMotionType() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("supportedMotion"), val, QnDomainMemory))
     {
-        QStringList vals = val.toString().split(',');
+        QStringList vals = val.toString().split(QLatin1Char(','));
         for (int i = 0; i < vals.size(); ++i)
         {
             QString s1 = vals[i].toLower();
-            if (s1 == QString("hardwaregrid"))
+            if (s1 == QLatin1String("hardwaregrid"))
                 return MT_HardwareGrid;
-            else if (s1 == QString("softwaregrid") && hasDualStreaming())
+            else if (s1 == QLatin1String("softwaregrid") && hasDualStreaming())
                 return MT_SoftwareGrid;
-            else if (s1 == QString("motionwindow"))
+            else if (s1 == QLatin1String("motionwindow"))
                 return MT_MotionWindow;
         }
         return MT_NoMotion;
@@ -262,7 +261,7 @@ int QnSecurityCamResource::motionWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam("motionWindowCnt", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("motionWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -273,7 +272,7 @@ int QnSecurityCamResource::motionMaskWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam("motionMaskWindowCnt", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("motionMaskWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -284,7 +283,7 @@ int QnSecurityCamResource::motionSensWindowCount() const
 {
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    if (this_casted->getParam("motionSensWindowCnt", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("motionSensWindowCnt"), val, QnDomainMemory))
     {
         return val.toInt();
     }
@@ -295,7 +294,7 @@ bool QnSecurityCamResource::isAudioSupported() const
 {
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     QVariant val;
-    if (this_casted->getParam("isAudioSupported", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("isAudioSupported"), val, QnDomainMemory))
         return val.toUInt() > 0;
     else
         return false;
@@ -307,17 +306,17 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
     MotionTypeFlags result = MT_Default;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
 
-    if (this_casted->getParam("supportedMotion", val, QnDomainMemory))
+    if (this_casted->getParam(QLatin1String("supportedMotion"), val, QnDomainMemory))
     {
-        QStringList vals = val.toString().split(',');
+        QStringList vals = val.toString().split(QLatin1Char(','));
         foreach(const QString& str, vals)
         {
             QString s1 = str.toLower().trimmed();
-            if (s1 == QString("hardwaregrid"))
+            if (s1 == QLatin1String("hardwaregrid"))
                 result |= MT_HardwareGrid;
-            else if (s1 == QString("softwaregrid"))
+            else if (s1 == QLatin1String("softwaregrid"))
                 result |= MT_SoftwareGrid;
-            else if (s1 == QString("motionwindow"))
+            else if (s1 == QLatin1String("motionwindow"))
                 result |= MT_MotionWindow;
         }
         if (!hasDualStreaming())

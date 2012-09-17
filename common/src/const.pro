@@ -3,10 +3,14 @@ QT *= network xml
 CONFIG += precompile_header %BUILDLIB
 CONFIG -= flat
 
+
+INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
+INCLUDEPATH += $$PWD/../../common/contrib/openssl/include/openssl/crypto
+
+
 win32 {
   CONFIG += x86
   QT *= multimedia
-  INCLUDEPATH += $$PWD/../../common/contrib/openssl/include
   
   LIBS += -L$$PWD/../../common/contrib/openssl/bin -llibeay32 -ssleay32
   win32-msvc2010 {
@@ -84,7 +88,6 @@ win32 {
 }
 
 unix {
-  INCLUDEPATH += /usr/include/openssl
   DEFINES += QN_EXPORT=
 }
 
@@ -101,8 +104,7 @@ unix:!mac {
 
 DEFINES += __STDC_CONSTANT_MACROS
 
-
-QMAKE_CXXFLAGS += -I$$EVETOOLS_DIR/include 
+INCLUDEPATH += $$EVETOOLS_DIR/include $$EVETOOLS_DIR/include/dvr
 LIBS += -L$$EVETOOLS_DIR/lib
 
 PROTOC_FILE = $$EVETOOLS_DIR/bin/protoc

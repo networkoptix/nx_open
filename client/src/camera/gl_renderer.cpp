@@ -1,20 +1,25 @@
 #include "gl_renderer.h"
+
 #include <cassert>
-#include <QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
-#include <QMessageBox>
-#include <QErrorMessage>
-#include <QScopedPointer>
-#include <QMutex>
+
+#include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
+#include <QtCore/QScopedPointer>
+#include <QtCore/QMutex>
+#include <QtGui/QErrorMessage>
+
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
+
+#include <utils/yuvconvert.h>
+
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
-#include "utils/yuvconvert.h"
-#include "camera.h"
+
+#include "video_camera.h"
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -54,8 +59,8 @@ public:
 
     QnGLRendererPrivate(const QGLContext *context):
         QnGlFunctions(context),
-        supportsNonPower2Textures(false),
-        status(QnGLRenderer::SUPPORTED)
+        status(QnGLRenderer::SUPPORTED),
+        supportsNonPower2Textures(false)
     {
         QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
         QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -139,6 +144,7 @@ public:
     ~QnGlRendererTexture() {
         //glDeleteTextures(3, m_textures);
 
+        // TODO
         // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
         // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
         if(m_allocated)
@@ -754,5 +760,5 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata(int channel) const
 
 bool QnGLRenderer::usingShaderYuvToRgb() const {
     return (d->features() & QnGlFunctions::ArbPrograms) && (d->features() & QnGlFunctions::OpenGL1_3) && !m_forceSoftYUV && isYuvFormat() && 
-		d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
+        d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
 }

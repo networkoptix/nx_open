@@ -7,7 +7,7 @@
 #include "utils/network/multicodec_rtp_reader.h"
 #include "soap_wrapper.h"
 
-struct CameraInfo;
+struct CameraInfoParams;
 struct ProfilePair;
 class onvifXsd__Profile;
 class onvifXsd__VideoEncoderConfiguration;
@@ -16,22 +16,22 @@ class onvifXsd__AudioEncoderConfiguration;
 class onvifXsd__AudioSourceConfiguration;
 
 typedef onvifXsd__Profile Profile;
-typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
 typedef onvifXsd__AudioEncoderConfiguration AudioEncoder;
 typedef onvifXsd__AudioSourceConfiguration AudioSource;
 
 class QnOnvifStreamReader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
+public:
     static const char* NETOPTIX_PRIMARY_NAME;
     static const char* NETOPTIX_SECONDARY_NAME;
     static const char* NETOPTIX_PRIMARY_TOKEN;
     static const char* NETOPTIX_SECONDARY_TOKEN;
 
-public:
     QnOnvifStreamReader(QnResourcePtr res);
     virtual ~QnOnvifStreamReader();
     const QnResourceAudioLayout* getDPAudioLayout() const;
+    virtual void pleaseStop() override;
 protected:
     virtual QnAbstractMediaDataPtr getNextData() override;
     virtual void openStream() override;
@@ -56,11 +56,11 @@ private:
     const QString updateCameraAndFetchStreamUrl(bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
-    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
-    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfo& info, bool isPrimary) const;
+    bool fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateAudioEncoder(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateProfile(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
+    bool fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const;
 
     //Returned pointers are valid while response object is living. (For all functions in the following block)
     VideoEncoder* fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const;
@@ -75,7 +75,7 @@ private:
     void updateVideoSource(VideoSource& source, bool isPrimary) const;
     void updateAudioSource(AudioSource& source, bool isPrimary) const;
 
-    bool sendProfileToCamera(CameraInfo& info, Profile& profile, bool create = false) const;
+    bool sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create = false) const;
     bool sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     bool sendVideoSourceToCamera(VideoSource& source) const;
     bool sendAudioEncoderToCamera(AudioEncoder& encoder) const;

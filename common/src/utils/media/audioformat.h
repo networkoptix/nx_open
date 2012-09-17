@@ -57,7 +57,9 @@ QT_MODULE(Multimedia)
 
 class QnAudioFormatPrivate;
 
-class Q_MULTIMEDIA_EXPORT QnAudioFormat
+// TODO: move to contrib?
+
+class QnAudioFormat
 {
 public:
     enum SampleType { Unknown, SignedInt, UnSignedInt, Float };

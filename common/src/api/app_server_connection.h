@@ -4,10 +4,12 @@
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
 
+#include "utils/common/request_param.h"
+
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-#include "core/resource/video_server.h"
+#include "core/resource/video_server_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/misc/scheduleTask.h"
 #include "core/resource/camera_resource.h"
@@ -18,6 +20,8 @@
 #include "connectinfo.h"
 
 #include "api/serializer/pb_serializer.h"
+
+#include "api_fwd.h"
 
 class QnAppServerConnectionFactory;
 
@@ -149,8 +153,6 @@ private:
 
     friend class QnAppServerConnectionFactory;
 };
-
-typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 
 class QN_EXPORT QnAppServerConnectionFactory
 {

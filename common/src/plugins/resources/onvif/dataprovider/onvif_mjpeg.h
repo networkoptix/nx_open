@@ -11,8 +11,8 @@
 class MJPEGtreamreader: public CLServerPushStreamreader , public QnLiveStreamProvider
 {
 public:
-	MJPEGtreamreader(QnResourcePtr res, const QString& requst);
-	virtual ~MJPEGtreamreader();
+    MJPEGtreamreader(QnResourcePtr res, const QString& requst);
+    virtual ~MJPEGtreamreader();
 
 protected:
     virtual QnAbstractMediaDataPtr getNextData();

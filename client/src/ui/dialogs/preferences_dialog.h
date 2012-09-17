@@ -25,18 +25,10 @@ class QnPreferencesDialog: public QDialog, protected QnWorkbenchContextAware {
     typedef QDialog base_type;
 
 public:
-    enum SettingsPage {
-        PageGeneral = 0,
-        PageConnections = 1,
-        PageRecordingSettings = 2,
-        PageLicense = 3,
-        PageYouTubeSettings = 10,
-    };
-
     QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent = 0);
     ~QnPreferencesDialog();
 
-    void setCurrentPage(SettingsPage page);
+    void openLicensesPage();
 
     virtual void accept() override;
 
@@ -45,6 +37,7 @@ private:
     void submitToSettings();
 
     void initColorPicker();
+    void initLanguages();
 
 private slots:
     void at_animateBackgroundCheckBox_stateChanged(int state);
@@ -58,12 +51,14 @@ private:
     Q_DISABLE_COPY(QnPreferencesDialog)
 
     QScopedPointer<Ui::PreferencesDialog> ui;
-    QnConnectionsSettingsWidget *m_connectionsSettingsWidget;
     QnRecordingSettingsWidget *m_recordingSettingsWidget;
     QnYouTubeSettingsWidget *m_youTubeSettingsWidget;
     QnLicenseManagerWidget *m_licenseManagerWidget;
 
     QnSettings *m_settings;
+
+    /** Index of "Licenses" tab to open it from outside */
+    int m_licenseTabIndex;
 };
 
 #endif // QN_PREFERENCES_DIALOG_H

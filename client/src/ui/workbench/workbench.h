@@ -159,11 +159,6 @@ signals:
     void aboutToBeDestroyed();
 
     /**
-     * This signal is emitted whenever the mode of this workbench changes.
-     */
-    void modeChanged();
-
-    /**
      * This signal is emitted whenever the layout of this workbench is about to be changed.
      */
     void currentLayoutAboutToBeChanged();
@@ -184,22 +179,6 @@ signals:
     void layoutsChanged();
 
     /**
-     * This signal is emitted whenever an item is added to this workbench's
-     * layout.
-     *
-     * \param item                      Item that was added.
-     */
-    void itemAdded(QnWorkbenchItem *item);
-
-    /**
-     * This signal is emitted whenever an item is about to be removed from
-     * this workbench's layout.
-     *
-     * \param item                      Item that is about to be removed.
-     */
-    void itemRemoved(QnWorkbenchItem *item);
-
-    /**
      * This signal is emitted whenever a new item is assigned to the role.
      *
      * \param role                      Item role.
@@ -207,10 +186,14 @@ signals:
     void itemChanged(Qn::ItemRole role);
 
     /**
-     * This signal is emitted whenever the bounding rect of this workbench's 
-     * layout changes.
+     * This signal is emitted whenever current cell aspect ratio changes.
      */
-    void boundingRectChanged();
+    void cellAspectRatioChanged();
+
+    /**
+     * This signal is emitted whenever current cell spacing changes.
+     */
+    void cellSpacingChanged();
 
 private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);

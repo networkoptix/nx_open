@@ -282,6 +282,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 
 void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs)
 {
+    Q_UNUSED(newEndTimeMs)
     QnStorageResource* storage = qobject_cast<QnStorageResource*> (sender());
     if (!storage)
         return;
@@ -298,10 +299,11 @@ void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newE
 /*
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
+    Q_UNUSED(provider)
     QMutexLocker lock(&m_mutex);
     QnStorageResourcePtr result;
     qint64 maxFreeSpace = 0;
-    float minBitrate = INT_MAX;
+    float minBitrate = (float)INT_MAX;
 
     // balance storages evenly by bitrate
     bool balanceByBitrate = true;
@@ -428,7 +430,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
             result = candidates[i];
         }
     }
-    qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+
+	if (result)
+		qDebug() << "QnFileStorageResource. selectedStorage= " << result->getUrl() << "for provider" << provider->getResource()->getUrl();
+	else
+		qDebug() << "No storage available for recording";
 
     return result;
 }
@@ -482,7 +488,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
@@ -501,7 +507,8 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
-    for(StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    QMutexLocker lock(&m_mutex);
+    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = itr.value()->getUrl();
         if (fileName.startsWith(root))

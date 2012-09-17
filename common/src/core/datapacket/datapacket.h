@@ -11,7 +11,7 @@ struct QnAbstractDataPacket
 {
     QnAbstractDataPacket(): dataProvider(0), timestamp(AV_NOPTS_VALUE) {}
     virtual ~QnAbstractDataPacket() {}
-	QnAbstractStreamDataProvider* dataProvider;
+    QnAbstractStreamDataProvider* dataProvider;
     qint64 timestamp; // mksec // 10^-6
 };
 
@@ -25,10 +25,10 @@ public:
     qint64 mediaLength() const
     {
         QMutexLocker mutex(&m_cs);
-        if (m_queue.isEmpty())
+        if (m_bufferLen == 0)
             return 0;
         else
-            return m_queue.last()->timestamp - m_queue.front()->timestamp;
+            return last()->timestamp - front()->timestamp;
     }
 };
 

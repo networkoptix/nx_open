@@ -2,6 +2,9 @@ package pb;
 
 import "resource.proto";
 
+option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_outer_classname = "UserProtos";
+
 message User {
     extend Resource {
         required User resource = 102;
@@ -9,4 +12,5 @@ message User {
 
     optional string password = 1;
     required bool isAdmin    = 2;
+    optional uint64 rights   = 3;
 }

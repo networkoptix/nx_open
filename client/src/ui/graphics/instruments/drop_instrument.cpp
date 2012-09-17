@@ -1,14 +1,19 @@
 #include "drop_instrument.h"
+
 #include <limits>
-#include <QGraphicsSceneDragDropEvent>
-#include <QMimeData>
-#include <QGraphicsItem>
+
+#include <QtGui/QGraphicsSceneDragDropEvent>
+#include <QtGui/QGraphicsItem>
+#include <QtCore/QMimeData>
+
 #include <utils/common/warnings.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
+
 #include "file_processor.h"
 #include "destruction_guard_item.h"
 
@@ -41,8 +46,8 @@ private:
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
     Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
     m_context(context),
-    m_intoNewLayout(intoNewLayout),
-    m_filterItem(new SceneEventFilterItem())
+    m_filterItem(new SceneEventFilterItem()),
+    m_intoNewLayout(intoNewLayout)
 {
     if(context == NULL)
         qnNullWarning(context);

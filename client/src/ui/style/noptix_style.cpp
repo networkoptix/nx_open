@@ -1,19 +1,30 @@
 #include "noptix_style.h"
-#include <QApplication>
-#include <QPainter>
-#include <QStyleOption>
-#include <QMenu>
-#include <QAction>
-#include <QSet>
-#include <QToolBar>
-#include <QAbstractItemView>
+
+#include <cmath> /* For std::fmod. */
+
+#include <QtCore/QSet>
+#include <QtGui/QApplication>
+#include <QtGui/QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QStyleOption>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/QToolBar>
+#include <QtGui/QAbstractItemView>
 
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/variant.h>
+#include <utils/common/util.h>
+
+#include <ui/common/text_pixmap_cache.h>
+#include <ui/common/linear_combination.h>
+#include <ui/common/color_transformations.h>
+#include <ui/common/geometry.h>
 
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
+#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -38,23 +49,40 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
+    m_animator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
-    m_animator(new QnNoptixStyleAnimator(this))
+    m_globals(qnGlobals)
 {
     GraphicsStyle::setBaseStyle(this);
 
-    m_branchClosed = m_skin->icon("branch_closed.png");
-    m_branchOpen = m_skin->icon("branch_open.png");
-    m_closeTab = m_skin->icon("decorations/close_tab.png");
+    m_branchClosed = m_skin->icon("tree/branch_closed.png");
+    m_branchOpen = m_skin->icon("tree/branch_open.png");
+    m_closeTab = m_skin->icon("titlebar/close_tab.png");
 
-    m_grooveBorder = m_skin->pixmap("slider_groove_lborder.png");
-    m_grooveBody = m_skin->pixmap("slider_groove_body.png");
-    m_sliderHandleHovered = m_skin->pixmap("slider_handle_hovered.png");
-    m_sliderHandle = m_skin->pixmap("slider_handle.png");
+    m_grooveBorder = m_skin->pixmap("slider/slider_groove_lborder.png");
+    m_grooveBody = m_skin->pixmap("slider/slider_groove_body.png");
+    m_sliderHandleHovered = m_skin->pixmap("slider/slider_handle_hovered.png");
+    m_sliderHandle = m_skin->pixmap("slider/slider_handle.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
     return;
+}
+
+QPixmap	QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &pixmap, const QStyleOption *option) const {
+    if(iconMode == QIcon::Disabled) {
+        QImage image = QImage(pixmap.size(), QImage::Format_ARGB32);
+        image.fill(qRgba(0, 0, 0, 0));
+
+        QPainter painter(&image);
+        painter.setOpacity(0.3);
+        painter.drawPixmap(0, 0, pixmap);
+        painter.end();
+        
+        return QPixmap::fromImage(image);
+    } else {
+        return base_type::generatedIconPixmap(iconMode, pixmap, option);
+    }
 }
 
 int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
@@ -124,6 +152,10 @@ void QnNoptixStyle::drawControl(ControlElement element, const QStyleOption *opti
         if(drawItemViewItemControl(option, painter, widget))
             return;
         break;
+    case CE_ProgressBar:
+        if(drawProgressBarControl(option, painter, widget))
+            return;
+        break;
     default:
         break;
     }
@@ -169,6 +201,19 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
 void QnNoptixStyle::polish(QApplication *application) {
     base_type::polish(application);
 
+    QColor activeColor = withAlpha(m_globals->selectionColor(), 255);
+
+    QPalette palette = application->palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
+    palette.setColor(QPalette::Button, activeColor);
+    application->setPalette(palette);
+
+    QFont font;
+    font.setPixelSize(12);
+    font.setStyle(QFont::StyleNormal);
+    font.setWeight(QFont::Normal);
+    application->setFont(font);
+
     QFont menuFont;
     menuFont.setFamily(QLatin1String("Bodoni MT"));
     menuFont.setPixelSize(18);
@@ -186,16 +231,6 @@ void QnNoptixStyle::polish(QWidget *widget) {
 
     if(QAbstractItemView *itemView = qobject_cast<QAbstractItemView *>(widget)) {
         itemView->setIconSize(QSize(18, 18));
-        
-        QFont font = itemView->font();
-        font.setPointSize(10);
-        itemView->setFont(font);
-    } else if(QTabBar *tabBar = qobject_cast<QTabBar *>(widget)) {
-        if(tabBar->inherits("QnLayoutTabBar")) {
-            QFont font = tabBar->font();
-            font.setPointSize(10);
-            tabBar->setFont(font);
-        }
     }
 }
 
@@ -309,7 +344,7 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     if(editor == NULL)
         return false;
 
-    /* If an editor is opened, don't draw item's text. 
+    /* If an editor is opened, don'h draw item's text. 
      * Editor's background may be transparent, and item text will shine through. */
 
     QStyleOptionViewItemV4 *localOption = const_cast<QStyleOptionViewItemV4 *>(itemOption);
@@ -317,6 +352,100 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     localOption->text = QString();
     base_type::drawControl(CE_ItemViewItem, option, painter, widget);
     localOption->text = text;
+    return true;
+}
+
+bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const{
+    /* Bespin's progress bar painting is way too ugly, so we do it our way. */
+
+    const QStyleOptionProgressBarV2 *pb = qstyleoption_cast<const QStyleOptionProgressBarV2 *>(option);
+    if (!pb)
+        return false;
+
+    int x,y,w,h;
+    pb->rect.getRect(&x, &y, &w, &h);
+
+    const bool vertical = (pb->orientation == Qt::Vertical);
+
+    painter->save();
+    if (vertical){
+        QTransform transform(painter->transform());
+        if (pb->bottomToTop)
+            painter->setTransform(transform.translate(0.0, h).rotate(-90));
+        else
+            painter->setTransform(transform.translate(w, 0.0).rotate(90));
+        int t = w;
+        w = h;
+        h = t;
+    }
+
+    const bool busy = pb->maximum == pb->minimum;
+    
+    const qreal progress = busy ? 1.0 : pb->progress / qreal(pb->maximum - pb->minimum);
+
+    qreal animationProgress = 0.0;
+    if (!m_animator->isRunning(widget)) {
+        m_animator->start(widget, 0.5, animationProgress);
+    } else {
+        animationProgress = m_animator->value(widget);
+        if (animationProgress >= 1.0){
+            animationProgress = std::fmod(animationProgress, 1.0);
+            m_animator->setValue(widget, animationProgress);
+        }
+    }
+
+   
+    painter->setPen(Qt::NoPen);
+
+    /* Draw progress indicator. */
+    if (progress > 0.0) { 
+        const QColor baseColor(4, 154, 116); // TODO: take color from config?
+        const QColor glareColor = pb->palette.color(QPalette::WindowText);
+
+        QLinearGradient gradient(x, y, x + w, y);
+  
+        const qreal radius = 0.1;
+        const qreal center = animationProgress * (1.0 + radius * 2) - radius;
+        const qreal points[] = {0.0, center - radius, center, center + radius, 1.0};
+        for(uint i = 0; i < arraysize(points); i++) {
+            qreal position = points[i];
+            if(position < 0.0 || position > 1.0)
+                continue;
+
+            qreal alpha = 0.5 + 0.5 * qMin(qAbs(position - center) / radius, 1.0);
+            gradient.setColorAt(position, linearCombine(alpha, baseColor, 1.0 - alpha, glareColor));
+        }
+
+        painter->setBrush(gradient);
+        if (w * progress > 12) {
+            painter->drawRoundedRect(x, y, w * progress, y + h, 6, 6);
+        } else {
+            painter->setClipRegion(QRegion(x, y, 12, y + h, QRegion::Ellipse));
+            painter->drawRoundedRect(x - 12, y, 12 + w * progress, y + h, 6, 6);
+            painter->setClipping(false);
+        }
+    }
+
+    /* Draw groove. */
+    QLinearGradient gradient(x, 0, x, y + h);
+    gradient.setColorAt(0,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
+    gradient.setColorAt(0.2,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+    gradient.setColorAt(0.4,    toTransparent(pb->palette.color(QPalette::Button), 0.5));
+    gradient.setColorAt(0.5,    toTransparent(pb->palette.color(QPalette::Button).darker(), 0.5));
+    gradient.setColorAt(1,      toTransparent(pb->palette.color(QPalette::Button).lighter(), 0.5));
+    painter->setBrush(gradient);
+    painter->setPen(pb->palette.color(QPalette::Window));
+    painter->drawRoundedRect(x, y, w, h, 6, 6);
+
+    /* Draw label. */
+    if (pb->textVisible) {
+        QRect rect(x, y, w, h);
+        QnTextPixmapCache *cache = QnTextPixmapCache::instance();
+        QPixmap textPixmap = cache->pixmap(pb->text, painter->font(), pb->palette.color(QPalette::WindowText));
+        painter->drawPixmap(QnGeometry::aligned(textPixmap.size(), rect, Qt::AlignCenter), textPixmap);
+    }
+
+    painter->restore();
     return true;
 }
 
@@ -342,9 +471,9 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
         grooveBodyPic = m_grooveBody;
         handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
     } else {
-        grooveBorderPic = m_skin->pixmap("slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider_handle_hovered.png" : "slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     }
 
     int d = grooveRect.height();
@@ -366,7 +495,7 @@ bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, 
 bool QnNoptixStyle::drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
     QStyleOptionToolButton buttonOption;
     buttonOption.QStyleOption::operator=(*option);
-    buttonOption.state &= ~State_Selected; /* We don't want 'selected' state overriding 'active'. */
+    buttonOption.state &= ~State_Selected; /* We don'h want 'selected' state overriding 'active'. */
     buttonOption.subControls = 0;
     buttonOption.activeSubControls = 0;
     buttonOption.icon = m_closeTab;
@@ -410,7 +539,7 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
         return false;
 
     if (buttonOption->features & QStyleOptionToolButton::Arrow)
-        return false; /* We don't handle arrow tool buttons,... */
+        return false; /* We don'h handle arrow tool buttons,... */
 
     if (qobject_cast<QToolBar *>(widget->parent()))
         return false; /* ...toolbar buttons,... */
@@ -504,6 +633,3 @@ qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *wi
 
     return progress;
 }
-
-
-

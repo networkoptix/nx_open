@@ -62,9 +62,9 @@ static const int MIN_SQUARE_BY_SENS[10] =
 
 static quint16 sadTransformMatrix[256*256];
 static const int SAD_SCALED_BITS = 2;
-static const double SCALED_MAX_VALUE = 4000;
+//static const double SCALED_MAX_VALUE = 4000;
 static const int ZERR_THRESHOLD = 8;
-static double sad_yPow = log(SCALED_MAX_VALUE-1)/log(255.0);
+//static double sad_yPow = log(SCALED_MAX_VALUE-1)/log(255.0);
 class SadTransformInit
 {
 
@@ -445,8 +445,6 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
     squareSum = 0;\
     dstCurLine += MD_HEIGHT;\
 }
-    quint8* dstOrig = dst;
-
     Q_ASSERT(frame->width % 8 == 0);
     Q_ASSERT(frame->linesize[0] % 16 == 0);
     Q_ASSERT(sqWidth % 8 == 0);
@@ -510,6 +508,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         prevLinePtr += lineSize*rowCnt;
         dst++;
     }
+#undef flushData
 }
 
 void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, int sqWidth)
@@ -572,6 +571,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         curLinePtr += lineSize*rowCnt;
         dst++;
     }
+#undef flushData
 }
 
 
@@ -888,7 +888,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
     if (!m_decoder->decode(videoData, m_frames[idx]))
         return;
-    if (m_firstFrameTime == AV_NOPTS_VALUE)
+    if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
     m_lastFrameTime = m_frames[idx]->pkt_dts;
 
@@ -911,7 +911,8 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
 
 #define ANALIZE_PER_PIXEL_DIF
 #ifdef ANALIZE_PER_PIXEL_DIF
-    if (m_totalFrames > 0)
+    // do not calc motion if resolution just changed
+    if (m_frames[0]->width == m_frames[1]->width && m_frames[0]->height == m_frames[1]->height  && m_frames[0]->format == m_frames[1]->format) 
     {
         // calculate difference between frames
         if (m_xStep == 8)

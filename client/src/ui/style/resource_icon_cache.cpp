@@ -7,27 +7,27 @@ Q_GLOBAL_STATIC(QnResourceIconCache, qn_resourceIconCache);
 
 QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(Local,                   qnSkin->icon("home.png"));
-    m_cache.insert(Server,                  qnSkin->icon("server.png"));
-    m_cache.insert(Servers,                 qnSkin->icon("servers.png"));
-    m_cache.insert(Layout,                  qnSkin->icon("layout.png"));
-    m_cache.insert(Camera,                  qnSkin->icon("camera.png"));
-    m_cache.insert(Image,                   qnSkin->icon("snapshot.png"));
-    m_cache.insert(Media,                   qnSkin->icon("media.png"));
-    m_cache.insert(User,                    qnSkin->icon("user.png"));
-    m_cache.insert(Users,                   qnSkin->icon("users.png"));
+    m_cache.insert(Local,                   qnSkin->icon("tree/home.png"));
+    m_cache.insert(Server,                  qnSkin->icon("tree/server.png"));
+    m_cache.insert(Servers,                 qnSkin->icon("tree/servers.png"));
+    m_cache.insert(Layout,                  qnSkin->icon("tree/layout.png"));
+    m_cache.insert(Camera,                  qnSkin->icon("tree/camera.png"));
+    m_cache.insert(Image,                   qnSkin->icon("tree/snapshot.png"));
+    m_cache.insert(Media,                   qnSkin->icon("tree/media.png"));
+    m_cache.insert(User,                    qnSkin->icon("tree/user.png"));
+    m_cache.insert(Users,                   qnSkin->icon("tree/users.png"));
 
-    m_cache.insert(Server | Offline,        qnSkin->icon("server_offline.png"));
-    m_cache.insert(Camera | Offline,        qnSkin->icon("camera_offline.png"));
+    m_cache.insert(Server | Offline,        qnSkin->icon("tree/server_offline.png"));
+    m_cache.insert(Camera | Offline,        qnSkin->icon("tree/camera_offline.png"));
 #if 0
-    m_cache.insert(User | Offline,          qnSkin->icon("user_offline.png"));
+    m_cache.insert(User | Offline,          qnSkin->icon("tree/user_offline.png"));
 #endif
 
-    m_cache.insert(Camera | Unauthorized,   qnSkin->icon("camera_unauthorized.png"));
+    m_cache.insert(Camera | Unauthorized,   qnSkin->icon("tree/camera_unauthorized.png"));
 
 #if 0
-    m_cache.insert(Offline,                 Skin::icon("offline.png"));
-    m_cache.insert(Unauthorized,            Skin::icon("unauthorized.png"));
+    m_cache.insert(Offline,                 Skin::icon("tree/offline.png"));
+    m_cache.insert(Unauthorized,            Skin::icon("tree/unauthorized.png"));
 #endif
 }
 
@@ -72,8 +72,6 @@ QIcon QnResourceIconCache::icon(QnResource::Flags flags, QnResource::Status stat
 
 QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnResource::Status status) {
     Key key = Unknown;
-
-    const QnResource::Flags localServer = QnResource::local | QnResource::server;
 
     if ((flags & QnResource::local_server) == QnResource::local_server) {
         key = Local;

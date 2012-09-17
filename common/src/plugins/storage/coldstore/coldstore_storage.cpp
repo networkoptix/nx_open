@@ -5,13 +5,13 @@
 
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
-m_connectionPool(this),
-m_metaDataPool(this),
-m_mutex(QMutex::Recursive),
-m_cswriterThread(0),
-m_currH(0),
-m_prevH(0),
-m_RangeUpdatedAtLeastOnce(false)
+    m_mutex(QMutex::Recursive),
+    m_connectionPool(this),
+    m_metaDataPool(this),
+    m_cswriterThread(0),
+    m_currH(0),
+    m_prevH(0),
+    m_RangeUpdatedAtLeastOnce(false)
 {
     
     /*
@@ -44,7 +44,7 @@ m_RangeUpdatedAtLeastOnce(false)
     b = connR.seek(1024*1024*50);
     int r = connR.read(dataW, sizeof(dataW));
     connR.close();
-    /**/
+    */
     
 }
 
@@ -294,7 +294,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     {
         qWarning() << fi.absoluteFilePath();
     }
-    /**/
+    */
 
     return result;
 
@@ -302,6 +302,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
 
 qint64 QnPlColdStoreStorage::getFileSize(const QString& fillName) const
 {
+    Q_UNUSED(fillName)
 	return 0;
 }
 
@@ -312,26 +313,32 @@ bool QnPlColdStoreStorage::isNeedControlFreeSpace()
 
 bool QnPlColdStoreStorage::removeFile(const QString& url) 
 {
+    Q_UNUSED(url)
     return false;
 }
 
 bool QnPlColdStoreStorage::removeDir(const QString& url) 
 {
+    Q_UNUSED(url)
     return false;
 }
 
 bool QnPlColdStoreStorage::renameFile(const QString& oldName, const QString& newName)
 {
+    Q_UNUSED(oldName)
+    Q_UNUSED(newName)
     return false;
 }
 
 bool QnPlColdStoreStorage::isFileExists(const QString& url) 
 {
+    Q_UNUSED(url)
     return false;
 }
 
 bool QnPlColdStoreStorage::isDirExists(const QString& url) 
 {
+    Q_UNUSED(url)
     return true;
 }
 
@@ -430,14 +437,14 @@ qint64 QnPlColdStoreStorage::getOldestFileTime()
 {
     QnColdStoreConnection conn(coldstoreAddr());
 
-    return conn.oldestFileTime("%_md%");
+    return conn.oldestFileTime(QLatin1String("%_md%"));
 }
 
 
 QString QnPlColdStoreStorage::coldstoreAddr() const
 {
     QString url = getUrl();
-    int prefix = url.indexOf("://");
+    int prefix = url.indexOf(QLatin1String("://"));
 
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
@@ -459,7 +466,7 @@ QString QnPlColdStoreStorage::normolizeFileName(const QString& fn) const
             result = fn.mid(index + addr.length());
     }
 
-    if (result.endsWith("/"))
+    if (result.endsWith(QLatin1Char('/')))
         result = result.left(result.length() - 1);
 
     return result;
@@ -478,7 +485,7 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
     
     s << serverID;
 
-    QStringList restList = nfn.split("/", QString::SkipEmptyParts);
+    QStringList restList = nfn.split(QLatin1Char('/'), QString::SkipEmptyParts);
     if (restList.size() ==0 )
         return result;
 
@@ -509,7 +516,7 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
 
     if (restList.size() > 6)
         s << restList.at(6); // 
-        /**/
+        */
 
 
 
