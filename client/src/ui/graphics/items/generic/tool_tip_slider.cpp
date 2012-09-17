@@ -191,6 +191,12 @@ void QnToolTipSliderAnimationListener::tick(int) {
     m_slider->updateToolTipOpacity();
 }
 
+QString QnToolTipSlider::toolTipAt(const QPointF &) const {
+    /* Default tooltip is meaningless for this slider, 
+     * so we don't want it to be shown. */
+    return QString(); 
+}
+
 bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
     if(target == m_toolTipItem) {
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);

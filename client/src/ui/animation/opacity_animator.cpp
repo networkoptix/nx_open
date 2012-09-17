@@ -36,8 +36,10 @@ VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {
     }
 
     VariantAnimator *animator = item->property(opacityAnimatorPropertyName).value<VariantAnimator *>();
-    if(animator != NULL)
+    if(animator) {
+        animator->setSpeed(speed);
         return animator;
+    }
 
     AnimationTimer *animationTimer = NULL;
     AnimatedBase *animatedBase = dynamic_cast<AnimatedBase *>(item);

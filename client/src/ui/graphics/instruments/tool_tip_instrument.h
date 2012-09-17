@@ -3,6 +3,11 @@
 
 #include "instrument.h"
 
+/**
+ * Instrument that implements tooltips that are shown on the scene as graphics items. 
+ * This approach is better than the default one because showing widgets on top of 
+ * OpenGL window (graphics view in our case) results in FPS drop.
+ */
 class ToolTipInstrument: public Instrument {
     Q_OBJECT
 

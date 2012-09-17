@@ -3,12 +3,15 @@
 
 #include <limits>
 
+#include <QtCore/QBasicTimer>
 #include <QtGui/QStyle>
 #include <QtGui/QStyleOption>
 #include <QtGui/QPainter>
 #include <QtGui/QToolTip>
 #include <QtGui/QGraphicsScene>
 #include <QtGui/QTextDocument>
+
+#include <ui/animation/opacity_animator.h>
 
 #define NOPARENT
 
@@ -41,7 +44,7 @@ protected:
     virtual bool sceneEventFilter(QGraphicsItem *watched, QEvent *event) override;
 
 private:
-    QGraphicsItem *m_item;
+    QGraphicsItem *m_item; // TODO: #GDM what happens if item is suddenly deleted?
 };
 
 GraphicsTooltipLabel *GraphicsTooltipLabel::instance = 0;
@@ -89,7 +92,7 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
     setText(newText);
     resize(sizeHint(Qt::PreferredSize) + QSize(2 * toolTipMargin, 2 * toolTipMargin));
     newItem->installSceneEventFilter(this);
-    newItem->setAcceptHoverEvents(true); // this wont be undone, can be stored in inner field
+    newItem->setAcceptHoverEvents(true); // this won't be undone, can be stored in inner field
     restartExpireTimer();
 }
 
@@ -101,8 +104,9 @@ void GraphicsTooltipLabel::hideTip()
 
 void GraphicsTooltipLabel::hideTipImmediately()
 {
-    close(); // to trigger QEvent::Close which stops the animation
-    deleteLater();
+    opacityAnimator(this, 6.0)->animateTo(0.0);
+    //close(); 
+    //deleteLater();
 }
 
 bool GraphicsTooltipLabel::eventFilter(QObject *, QEvent *e)
@@ -131,7 +135,9 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     // default pos - below the button and below the cursor
     QRectF cursorRect = m_item->sceneTransform().mapRect(QRectF(0, 0, 10, 20));
 
-    p.setY(qMax(p.y() + cursorRect.height(), m_item->sceneBoundingRect().y() + m_item->sceneBoundingRect().height()));
+    // TODO: doesn't work well with tree tooltips
+    //p.setY(qMax(p.y() + cursorRect.height(), m_item->sceneBoundingRect().y() + m_item->sceneBoundingRect().height()));
+    p.setY(p.y() + cursorRect.height());
 
 #ifdef NOPARENT
     QRectF self = m_item->sceneTransform().mapRect(this->boundingRect());
@@ -202,6 +208,8 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
             if (GraphicsTooltipLabel::instance->tipChanged(text, item)){
                 GraphicsTooltipLabel::instance->reuseTip(text, item);
                 GraphicsTooltipLabel::instance->placeTip(pos, viewport);
+
+                opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
             }
             return;
         }
@@ -209,8 +217,12 @@ void GraphicsTooltip::showText(QString text, QGraphicsItem *item, QPointF pos, Q
 
     if (!text.isEmpty()) { // no tip can be reused, create new tip:
         new GraphicsTooltipLabel(text, item); // sets GraphicsTooltipLabel::instance to itself
+        GraphicsTooltipLabel::instance->setOpacity(0.0);
         GraphicsTooltipLabel::instance->placeTip(pos, viewport);
         GraphicsTooltipLabel::instance->setObjectName(QLatin1String("graphics_tooltip_label"));
-        GraphicsTooltipLabel::instance->show();
+
+        opacityAnimator(GraphicsTooltipLabel::instance, 3.0)->animateTo(1.0);
+
+        //GraphicsTooltipLabel::instance->show();
     }
 }
