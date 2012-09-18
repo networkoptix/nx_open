@@ -8,6 +8,7 @@ New Features:
  - HD Witness components can be installed on Ubuntu 10.04, 11.10 and 12.04.
  - Web Client. Allows to view live/archive video from a single camera. It can be accessed by https://<IP>:<Port>/web (IP and Port of Enterprise Controller).
  - Camera settings (incl. Zoom and Focus) - ability to setup a proprietary camera parameters. Can be opened by a camera's Context Menu (Advanced tab).
+ - Manual camera registration. Can be applied to any Onvif camera. Right click on a server in Tree and specify IP of the camera. It is possible to search several cameras in specified range as well.
  - Health Monitoring - this feature allows monitoring servers in the real-time mode (CPU and hard disks load). Can be opened from a server's Context Menu (or just drag a server on Scene).
  - PTZ. Can be used with Onvif cameras that support PTZ adjustments. 
  - Localization is fully supported. To localize HD Witness for the particular country send a request on support@networkoptix.com. You'll be provided with resource file which can be translated to the particular language. 
@@ -51,7 +52,7 @@ Improvements:
  - Incorrect total # of licenses displayed in recording schedule form right after a license registration. Fixed.
  - Screen recording were saved as *.av. Now *.avi.
  - If switch off a server and try to seek on the recorded position camera could hang for a long time instead of NO DATA. Fixed.
- -	New tree context menu items for layout: Open in New Tab and Open in New Window.
+ - New tree context menu items for layout: Open in New Tab and Open in New Window.
  - If disconnect unauthorized cameras it wasn't possible to delete them because they wasn't swithed to Offline status until the client was restarted. Fixed.
  - Fixed a bub when Media Server could use deleted storages.
  - Fixed artifacts when seeking within screen-recorded video resulted in. 
