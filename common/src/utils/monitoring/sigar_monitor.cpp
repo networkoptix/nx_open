@@ -113,9 +113,16 @@ QList<QnPlatformMonitor::Hdd> QnSigarMonitor::hdds() {
     if(INVOKE(sigar_file_system_list_get(d->sigar, &fileSystems)) != SIGAR_OK)
         return result;
 
+    for(int i = 0; i < fileSystems.number; i++) {
+        const sigar_file_system_t &fileSystem = fileSystems.data[i];
+        if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
+            continue; /* Skip non-hdds. */
 
+        result.push_back(Hdd(i, QLatin1String(fileSystem.dir_name)));
+    }
     
     INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
+    return result;
 }
 
 qreal QnSigarMonitor::totalHddLoad(const Hdd &hdd) {

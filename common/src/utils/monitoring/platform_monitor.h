@@ -16,6 +16,9 @@ public:
      * Description of an HDD.
      */
     struct Hdd {
+        Hdd(): id(-1) {}
+        Hdd(std::intptr_t id, const QString &partitions): id(id), partitions(partitions) {}
+
         /** Hdd ID, to be used internally. */
         std::intptr_t id;
 
