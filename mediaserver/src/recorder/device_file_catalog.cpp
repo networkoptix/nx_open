@@ -101,6 +101,10 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return false;
+
+    if (!storage->isCatalogAccessible())
+        return true; // Can't check if file really exists
+
     QString prefix = closeDirPath(storage->getUrl()) + prefixForRole(m_role) + QString('/') + m_macAddress + QString('/');
 
    

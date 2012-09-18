@@ -11,7 +11,7 @@
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
-
+#include "plugins/storage/dts/abstract_dts_searcher.h"
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -79,6 +79,13 @@ void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* ser
     QMutexLocker locker(&m_searchersListMutex);
     m_searchersList.push_back(serv);
 }
+
+void QnResourceDiscoveryManager::addDTSServer(QnAbstractDTSSearcher* serv)
+{
+    QMutexLocker locker(&m_searchersListMutex);
+    m_dstList.push_back(serv);
+}
+
 
 void QnResourceDiscoveryManager::setResourceProcessor(QnResourceProcessor* processor)
 {
@@ -265,7 +272,9 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 
     appendManualDiscoveredResources(resources);
-    if (processDiscoveredResources(resources, true)) {
+    if (processDiscoveredResources(resources, true)) 
+    {
+        dtsAssignment();
         cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
         return resources;
     }
@@ -951,6 +960,32 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
         if (resource->setHostAddress(subnet.currHostAddress, QnDomainPhysical) && resource->isResourceAccessible())
         {
             resource->removeNetworkStatus(QnNetworkResource::BadHostAddr);
+        }
+    }
+}
+
+void QnResourceDiscoveryManager::dtsAssignment()
+{
+    for (int i = 0; i < m_dstList.size(); ++i)
+    {
+        //QList<QnDtsUnit> unitsLst =  QnColdStoreDTSSearcher::instance().findDtsUnits();
+        QList<QnDtsUnit> unitsLst =  m_dstList[i]->findDtsUnits();
+
+        foreach(QnDtsUnit unit, unitsLst)
+        {
+            QnResourcePtr res = qnResPool->getResourceByUniqId(unit.resourceID);
+            if (!res)
+                continue;
+
+            QnVirtualCameraResourcePtr vcRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
+            if (!vcRes)
+                continue;
+
+            Q_ASSERT(unit.factory!=0);
+
+            vcRes->lockDTSFactory();
+            vcRes->setDTSFactory(unit.factory);
+            vcRes->unLockDTSFactory();
         }
     }
 }

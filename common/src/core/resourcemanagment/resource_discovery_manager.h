@@ -9,6 +9,7 @@
 #include "utils/network/nettools.h"
 
 class QnAbstractResourceSearcher;
+class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
@@ -45,6 +46,7 @@ public:
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
+    void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
@@ -86,6 +88,7 @@ private:
     void pingResources(QnResourcePtr res);
     void appendManualDiscoveredResources(QnResourceList& resources);
     bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
+    void dtsAssignment();
 private:
     QMutex m_searchersListMutex;
     QMutex m_discoveryMutex;
@@ -103,7 +106,7 @@ private:
 
 
     QMap<QString, int> m_resourceDiscoveryCounter;
-
+    QVector<QnAbstractDTSSearcher*> m_dstList;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

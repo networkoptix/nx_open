@@ -62,6 +62,7 @@
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_rest_handler.h"
 #include "utils/common/module_resources.h"
+#include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -726,6 +727,8 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
     //Onvif searcher should be the last:
     QnResourceDiscoveryManager::instance().addDeviceServer(&OnvifResourceSearcher::instance());
+
+    QnResourceDiscoveryManager::instance().addDTSServer(&QnColdStoreDTSSearcher::instance());
 
     //QnResourceDiscoveryManager::instance().addDeviceServer(&DwDvrResourceSearcher::instance());
 
