@@ -412,7 +412,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
-    quint64 rights = 0;
+    quint64 rights = Qn::GlobalViewLivePermission;
     QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
     while (i.hasNext()) {
         i.next();
