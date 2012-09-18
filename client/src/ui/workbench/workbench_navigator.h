@@ -80,6 +80,7 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
@@ -109,7 +110,6 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);

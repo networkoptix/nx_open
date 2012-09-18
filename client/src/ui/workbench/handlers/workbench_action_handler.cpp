@@ -1963,21 +1963,29 @@ Do you want to continue?"),
     m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
     m_exportStorage->setUrl(fileName);
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
-    if (device)
+    if (!device)
     {
-        QnApiPbSerializer serializer;
-        QByteArray layoutData;
-        serializer.serializeLayout(layout, layoutData);
-        device->write(layoutData);
-        delete device;
-
-        exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
-        m_layoutExportCamera->setExportProgressOffset(-100);
-        at_layoutCamera_exportFinished(fileName);
-    }
-    else {
         at_cameraCamera_exportFailed(fileName);
+        return;
     }
+
+    QnApiPbSerializer serializer;
+    QByteArray layoutData;
+    serializer.serializeLayout(layout, layoutData);
+    device->write(layoutData);
+    delete device;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i)
+    {
+        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.pb")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
+        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole);
+        QByteArray data;
+        periods.encode(data);
+    }
+
+    exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
+    m_layoutExportCamera->setExportProgressOffset(-100);
+    at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)

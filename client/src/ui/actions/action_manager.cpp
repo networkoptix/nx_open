@@ -889,9 +889,10 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnExportActionCondition(this));
 
     factory(Qn::ExportLayoutAction).
-        // flags(Qn::Slider | Qn::SingleTarget). // TODO
+         flags(Qn::Slider | Qn::SingleTarget). 
         text(tr("Export Selection as Multi-Stream...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        condition(new QnExportActionCondition(this));
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
