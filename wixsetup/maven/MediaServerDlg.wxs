@@ -65,7 +65,7 @@
                     <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES > 1 OR NOT SERVERDIR_CANT_WRITE ]]></Condition>
                     <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES <= 1 AND SERVERDIR_CANT_WRITE ]]></Condition>
                 </Control>
-                <Control Id="warning3label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Recording folder is already configured">
+                <Control Id="warning3label" Type="Text" Height="21" Width="304" X="56" Y="191" Text="Recording folders have been previously configured">
                     <Condition Action="hide"><![CDATA[ NUMBER_OF_STORAGES <= 1 ]]></Condition>
                     <Condition Action="show"><![CDATA[ NUMBER_OF_STORAGES > 1 ]]></Condition>
                 </Control>

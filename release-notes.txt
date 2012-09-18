@@ -1,22 +1,40 @@
 ----------------------------------------------- 1.3 Beta -----------------------------------------------
+New Cameras and Recorders Supported:
+ - IQ models list is extended.
+ - A lot of new Axis models are introduced.
 
+New Features: 
+ - Linux Client is available.
+ - Localization is fully supported. To localize HD Witness for the particular country send a request on support@networkoptix.com. You'll be provided with resource file which can be translated to the particular language. 
  - Calendar Search - "Cal" button in right bottom corner opens the calendar that helps navigate through the timeline. 
  - Tours through items - (Context Menu on scene's empty space). Enables slideshow of videos on the scene (if more than one). 
- - Panic Recording (button in top right corner). If enabled, all cameras recording is setup on start recording with maximum FPS and quality
+ - Panic Recording (button in the top right corner). If enabled, all cameras recording is setup on, start recording with maximum FPS and quality
  - Thumbnail search - this featre allows more advanced thumbnail search. How to use:
    - select a video on Scene
-   - select a region to search on the timeline (use right click)
+   - select a region to search on Time Line (use right click)
    - open context menu and choose Thumbnail Search. New layout will be opened which displays this camera from particular moments. Each item can be played back, ff/rew. It is possible to perform thumbnail search once more, export etc.
- - Several User Roles 
+ - Extended Viewer Permissions (can be combined). See Advanced button in user registration dialog:
    - live - only live monitoring
    - playback - only archive viewing
    - settings - only set up cameras and system
- - These roles can be combined
-   - admin - can do everything except deleting himself and owners
-   - owner - can do everything except deleting himself
- - Web Client. Allows to view live/archive video from a single camera. It can be accessed by https://<IP>:<Port>/web (IP and Port of EC).
+ - Web Client. Allows to view live/archive video from a single camera. It can be accessed by https://<IP>:<Port>/web (IP and Port of Enterprise Controller).
  - Camera settings (incl. Zoom and Focus) - ability to setup a proprietary camera parameters. Can be opened by a camera's Context Menu (Advanced tab).
- - Health Monitoring - this feature allows monitoring server in the real-time mode (CPU and hard disk load). Cam be opened from a server's Context Menu (or just drag a server on Scene).
+ - Health Monitoring - this feature allows monitoring server in the real-time mode (CPU and hard disk load). Can be opened from a server's Context Menu (or just drag a server on Scene).
+ - PTZ. Can be used with Onvif cameras that support PTZ adjustments.
+ - Tooltips are introduced instead of hints.
+ 
+Improvements:
+ - Item selection frame is brighter - it is easier to locate a selected item on Scene.
+ - All Linux packages can be installed in Ubuntu Software Center.
+ - Media Server is using a single port for HTTP, RTSP and SSL.
+ - Now it is possible to install different customizations of HD Withess on a single computer.
+ - Stored connections form is removes, last used connections are stored automagically.
+ - Onvif support is greatly improved.
+ - Playback is optimized.
+ - If uninstall and reinstall the system, Media Server storages configuration will be restored.
+ - It is possible to delete database during uninstall.
+ - Look and Feel of the Interface is improved.
+ - Server settings form is redesigned.
 
 ----------------------------------------------- 1.2 -----------------------------------------------
 
@@ -41,7 +59,6 @@ New Features:
  - At the end of install process it is suggested to run the client
  - Context menu from the lower scroll panel is removed
  - It is possible to change grid cells' aspect ratio on Scene. It can be useful for 16:9 cameras. Also it is possible to adjust items' distance using Context Menu
-
  
 Bugs Fixed:
  - If view a video in full screen buttons (info and close) were overriden by top panel and thus inaccessible. Now the fullscreen video can be zoomed out a bit and those buttons can be pressed
@@ -60,7 +77,6 @@ Bugs Fixed:
  - Linux Server did't detect Pulse cameras. Fixed
  - Smart search did't work sometimes if an archive is longer than 1 month. Fixed
  
-
 ----------------------------------------------- 1.1 -----------------------------------------------
 
 - Linux server officially released 
