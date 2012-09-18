@@ -23,6 +23,7 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
 {
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
+    m_aviDelegate->setFastStreamFind(true);
 
     m_newQualityAviDelegate = QnAviArchiveDelegatePtr(0);
 }
@@ -144,11 +145,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
     if (newChunk.startTimeMs != m_currentChunk.startTimeMs || newChunkCatalog != m_currentChunkCatalog)
     {
-        bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
+        //bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
         if (!switchToChunk(newChunk, newChunkCatalog))
             return -1;
-        if (isStreamsFound)
-            m_aviDelegate->doNotFindStreamInfo(); // optimization
+        //if (isStreamsFound)
+        //    m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
 
 
@@ -392,13 +393,14 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));
         m_newQualityAviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
         m_newQualityAviDelegate->setUseAbsolutePos(false);
+        m_newQualityAviDelegate->setFastStreamFind(true);
 
         m_newQualityAviDelegate->setStorage(qnStorageMan->getStorageByUrl(m_newQualityFileRes->getUrl()));
         if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
             return false;
         m_newQualityAviDelegate->setAudioChannel(m_selectedAudioChannel);
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;
-        m_newQualityAviDelegate->doNotFindStreamInfo();
+        //m_newQualityAviDelegate->doNotFindStreamInfo();
         if (m_newQualityAviDelegate->seek(chunkOffset, false) == -1)
             return false;
 

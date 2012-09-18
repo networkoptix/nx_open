@@ -1288,8 +1288,15 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
     if (value == m_isRealTimeSource)
         return;
     m_isRealTimeSource = value;
-    if (m_isRealTimeSource)
+    if (m_isRealTimeSource) {
+        QnResourceConsumer* archive = dynamic_cast<QnResourceConsumer*>(sender());
+        if (archive) {
+            QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());
+            if (camera)
+                m_hadAudio = camera->isAudioEnabled();
+        }
         setMTDecoding(m_playAudio && m_useMTRealTimeDecode);
+    }
     emit liveMode(m_isRealTimeSource);
     if (m_isRealTimeSource && m_speed > 1)
         m_speed = 1.0f;

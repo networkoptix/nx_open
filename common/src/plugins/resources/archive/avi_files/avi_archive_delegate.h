@@ -35,7 +35,8 @@ public:
     virtual AVCodecContext* setAudioChannel(int num);
 
     // for optimization       
-    void doNotFindStreamInfo();
+    //void doNotFindStreamInfo();
+    void setFastStreamFind(bool value);
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
@@ -73,6 +74,7 @@ private:
     bool m_eofReached;
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
+    bool m_fastStreamFind;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;
