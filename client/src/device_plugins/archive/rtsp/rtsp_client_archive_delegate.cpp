@@ -137,11 +137,14 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
         otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
-        if (otherCamera && otherRtspSession.open(getUrl(otherCamera)))
+        if (otherCamera)
         {
-            if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
-            {
-                return otherRtspSession.startTime();
+            QnResourcePtr server = qnResPool->getResourceById(otherCamera->getParentId());
+            if (server && server->getStatus() != QnResource::Offline && otherRtspSession.open(getUrl(otherCamera))) {
+                if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+                {
+                    return otherRtspSession.startTime();
+                }
             }
         }
     }
@@ -204,7 +207,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     m_closing = false;
     m_resource = resource;
     QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
-    if (server == 0)
+    if (server == 0 || server->getStatus() == QnResource::Offline)
         return false;
 
     
