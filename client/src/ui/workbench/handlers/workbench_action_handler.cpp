@@ -78,6 +78,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
+#include "camera/caching_time_period_loader.h"
 
 
 
