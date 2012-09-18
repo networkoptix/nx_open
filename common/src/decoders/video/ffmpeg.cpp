@@ -10,7 +10,7 @@
 extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
-static const int MAX_DECODE_THREAD = 2;
+static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
 int CLFFmpegVideoDecoder::hwcounter = 0;
 
