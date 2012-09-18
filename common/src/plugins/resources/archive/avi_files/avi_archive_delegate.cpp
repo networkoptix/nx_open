@@ -123,7 +123,8 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
-    m_eofReached(false)
+    m_eofReached(false),
+    m_fastStreamFind(false)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -297,6 +298,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     return m_initialized;
 }
 
+/*
 void QnAviArchiveDelegate::doNotFindStreamInfo()
 {
     // this call used for optimization. Avoid av_find_stream_info_call for server's chunks to increase speed
@@ -307,6 +309,7 @@ void QnAviArchiveDelegate::doNotFindStreamInfo()
             m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
     }
 }
+*/
 
 void QnAviArchiveDelegate::close()
 {
@@ -373,6 +376,13 @@ QnResourceAudioLayout* QnAviArchiveDelegate::getAudioLayout()
     return m_audioLayout;
 }
 
+extern "C" {
+int interruptDetailFindStreamInfo(void*)
+{
+    return 1;
+}
+};
+
 bool QnAviArchiveDelegate::findStreams()
 {
     if (!m_initialized)
@@ -380,8 +390,18 @@ bool QnAviArchiveDelegate::findStreams()
     if (!m_streamsFound)
     {
         global_ffmpeg_mutex.lock();
-        //m_streamsFound = m_formatContext->nb_streams > 0 || av_find_stream_info(m_formatContext) >= 0;
-        m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+        if (m_fastStreamFind) {
+            m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
+            av_find_stream_info(m_formatContext) >= 0;
+            m_formatContext->interrupt_callback.callback = 0;
+            m_streamsFound = m_formatContext->nb_streams > 0;
+            for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)
+                m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
+        }
+        else {
+            m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
+        }
+
         global_ffmpeg_mutex.unlock();
         if (m_streamsFound) 
         {
@@ -563,4 +583,9 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         }
     }
     return "";
+}
+
+void QnAviArchiveDelegate::setFastStreamFind(bool value)
+{
+    m_fastStreamFind = value;
 }

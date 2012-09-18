@@ -581,7 +581,7 @@ void QnImageButtonWidget::updateFromDefaultAction() {
     setToolTip(m_action->toolTip());
     setCheckable(m_action->isCheckable());
     setChecked(m_action->isChecked());
-    setEnabled(m_action->isEnabled());
+    setEnabled(m_action->isEnabled()); // TODO: do backsync?
 }
 
 bool QnImageButtonWidget::isCached() const {
