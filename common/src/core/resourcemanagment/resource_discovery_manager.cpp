@@ -290,7 +290,6 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
     QMutexLocker lock(&m_discoveryMutex);
 
     CLNetState netState;
-    netState.updateNetState(); // update net state before working with discovered resources
 
     QSet<QString> discoveredResources;
 

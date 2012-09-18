@@ -695,7 +695,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 mediaPacket->opaque = cseq;
                 mediaPacket->flags = flags;
 
-                if (context)
+                if (context && context->ctx())
                     mediaPacket->compressionType = context->ctx()->codec_id;
                 mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
                 int ssrcTmp = (ssrc - BASIC_FFMPEG_SSRC) / 2;

@@ -792,7 +792,9 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     if (!m_tcpSock.send(request.data(), request.size()))
         return false;
 
+    return true;
 
+    /*
     if (!readTextResponce(responce))
         return false;
 
@@ -802,8 +804,8 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
         m_keepAliveTime.restart();
         return true;
     }
-
     return false;
+    */
 }
 
 bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
@@ -851,8 +853,15 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         return false;
 
 
-    if (!readTextResponce(response))
-        return false;
+    while (1)
+    {
+        if (!readTextResponce(response))
+            return false;
+
+        QString cseq = extractRTSPParam(QLatin1String(response), QLatin1String("CSeq:"));
+        if (cseq.toInt() == m_csec-1)
+            break;
+    }    
 
 
     QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
@@ -895,6 +904,8 @@ bool RTPSession::sendPause()
         return false;
 
 
+    return true;
+    /*
     if (!readTextResponce(response))
         return false;
 
@@ -906,6 +917,7 @@ bool RTPSession::sendPause()
     }
 
     return false;
+    */
 }
 
 bool RTPSession::sendTeardown()
@@ -1058,6 +1070,7 @@ bool RTPSession::sendKeepAlive()
 }
 
 // read RAW: combination of text and binary data
+/*
 int RTPSession::readRAWData()
 {
     int readed = m_tcpSock.recv(m_responseBuffer + m_responseBufferLen, qMin(RTSP_BUFFER_LEN - m_responseBufferLen, MAX_RTSP_DATA_LEN));
@@ -1068,6 +1081,7 @@ int RTPSession::readRAWData()
     }
     return readed;
 }
+*/
 
 void RTPSession::sendBynaryResponse(quint8* buffer, int size)
 {
@@ -1129,6 +1143,42 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     return dataLen;
 }
 
+// demux text data only
+bool RTPSession::readTextResponce(QByteArray& response)
+{
+    bool readMoreData = m_responseBufferLen == 0;
+    for (int i = 0; i < 40 && m_tcpSock.isConnected(); ++i)
+    {
+        if (readMoreData) {
+            int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
+            if (readed <= 0)
+                return readed;
+            m_responseBufferLen += readed;
+        }
+        if (m_responseBuffer[0] == '$') {
+            // binary data
+            quint8 tmpData[1024*64];
+            readBinaryResponce(tmpData, sizeof(tmpData)); // skip binary data
+            QnSleep::msleep(1);
+        }
+        else {
+            // text data
+            int msgLen = QnTCPConnectionProcessor::isFullMessage(QByteArray::fromRawData((const char*)m_responseBuffer, m_responseBufferLen));
+            if (msgLen > 0)
+            {
+                response = QByteArray((const char*) m_responseBuffer, msgLen);
+                memmove(m_responseBuffer, m_responseBuffer + msgLen, m_responseBufferLen - msgLen);
+                m_responseBufferLen -= msgLen;
+                return true;
+            }
+        }
+        readMoreData = true;
+        if (m_responseBufferLen == RTSP_BUFFER_LEN)
+            return false;
+    }
+    return false;
+}
+
 /*
 // demux binary data only
 int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
@@ -1188,7 +1238,6 @@ int RTPSession::readBinaryResponce(quint8* data, int maxDataSize)
     }
     return -1;
 }
-*/
 
 // demux text data only
 bool RTPSession::readTextResponce(QByteArray& response)
@@ -1261,6 +1310,8 @@ bool RTPSession::readTextResponce(QByteArray& response)
     qWarning() << "RTSP Text response not found! RTSP command is failed!";
     return false;
 }
+
+*/
 
 QString RTPSession::extractRTSPParam(const QString& buffer, const QString& paramName)
 {
