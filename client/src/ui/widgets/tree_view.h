@@ -1,8 +1,10 @@
 #ifndef QN_TREE_VIEW_H
 #define QN_TREE_VIEW_H
 
-#include <QTreeView>
-#include <QBasicTimer>
+#include <QtCore/QBasicTimer>
+#include <QtGui/QTreeView>
+
+#include <ui/common/tool_tip_queryable.h>
 
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop
@@ -10,7 +12,7 @@
  * 
  * It also adds several features that the QTreeView is lacking.
  */
-class QnTreeView: public QTreeView {
+class QnTreeView: public QTreeView, public ToolTipQueryable {
     Q_OBJECT;
 public:
     QnTreeView(QWidget *parent = NULL);
@@ -31,6 +33,8 @@ protected:
     virtual void dragMoveEvent(QDragMoveEvent *event) override;
     virtual void dragLeaveEvent(QDragLeaveEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
+
+    virtual QString toolTipAt(const QPointF &pos) const override;
 
 private:
     QBasicTimer m_openTimer;

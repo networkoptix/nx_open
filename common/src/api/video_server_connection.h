@@ -199,7 +199,7 @@ public:
                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port);
 
     int asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                const QStringList &urls, const QString &manufacturer, const QString &username, const QString &password);
+                                const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);

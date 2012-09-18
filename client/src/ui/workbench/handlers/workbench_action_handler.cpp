@@ -1644,6 +1644,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
+    user->setPermissions(Qn::GlobalLiveViewerPermission);
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -2162,6 +2163,8 @@ Do you want to continue?"),
     connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
     camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+
+    exportProgressDialog->exec();
 }
 
 

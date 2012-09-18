@@ -27,6 +27,14 @@ namespace detail{
             return m_cameras;
         }
 
+        bool addSuccess(){
+            return (m_addStatus == 0);
+        }
+
+        bool isCancelled(){
+            return m_cancelled;
+        }
+
     signals:
         void replyReceived();
 
@@ -44,7 +52,7 @@ namespace detail{
             if (m_cancelled)
                 return;
 
-            m_AddStatus = status;
+            m_addStatus = status;
             emit replyReceived();
         }
 
@@ -54,7 +62,7 @@ namespace detail{
 
     private:
         QnCamerasFoundInfoList m_cameras;
-        int m_AddStatus;
+        int m_addStatus;
         bool m_cancelled;
     };
 }
@@ -71,9 +79,14 @@ protected:
     virtual bool eventFilter(QObject *, QEvent *) override;
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
+    void removeAddedCameras();
 
 private slots: 
-    void at_singleRadioButton_toggled(bool toggled);
+    void at_startIPLineEdit_textChanged(QString value);
+    void at_startIPLineEdit_editingFinished();
+    void at_endIPLineEdit_textChanged(QString value);
+    void at_camerasTable_cellChanged(int row, int column);
+    void at_camerasTable_cellClicked(int row, int column);
 
     void at_scanButton_clicked();
     void at_addButton_clicked();
@@ -83,6 +96,8 @@ private:
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
     QnVideoServerResourcePtr m_server;
+
+    bool m_inIpRangeEdit;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

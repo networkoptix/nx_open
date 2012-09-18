@@ -71,7 +71,7 @@
 // Do not change it until you know what you're doing.
 static const char COMPONENT_NAME[] = "MediaServer";
 
-static const char SERVICE_NAME[] = "Network Optix VMS Media Server";
+static QString SERVICE_NAME = QString(QLatin1String(VER_COMPANYNAME_STR)) + QString(QLatin1String(" Media Server"));
 
 class QnMain;
 static QnMain* serviceMainInstance = 0;
@@ -513,7 +513,7 @@ void QnMain::loadResourcesFromECS()
             QnVirtualCameraResourcePtr virtualCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(camera);
             if (virtualCamera->isManuallyAdded()) {
                 QnResourceTypePtr resType = qnResTypePool->getResourceType(virtualCamera->getTypeId());
-                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getManufacture()));
+                manualCameras.insert(virtualCamera->getUrl(), QnManualCameraInfo(QUrl(virtualCamera->getUrl()), virtualCamera->getAuth(), resType->getName()));
             }
         }
     }

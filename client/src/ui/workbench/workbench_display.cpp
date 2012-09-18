@@ -1374,15 +1374,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
         }
 
-        // TODO: don't start reader for thumbnails search
-        //widget->display()->archiveReader()->pauseMedia();
-        //widget->display()->camDisplay()->playAudio(false);
-        //widget->display()->archiveReader()->setSingleShotMode(true);
-
         if(hasTimeLabels) {
             widget->setDecorationsVisible(true, false);
             widget->setInfoVisible(true, false);
-            widget->setInfoText((widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd\thh:mm:ss")) : QTime().addMSecs(time).toString(tr("\thh:mm:ss")));
+            
+            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(time).toString(tr("hh:mm:ss"));
+            widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
     }
 
@@ -1403,32 +1400,34 @@ void QnWorkbenchDisplay::at_loader_thumbnailLoaded(const QnThumbnail &thumbnail)
     QList<QnResourceWidget *> widgets = this->widgets();
     if(index < 0)
         return;
-    if(index >= widgets.size()) {
-        foreach(QnResourceWidget *widget, this->widgets()) {
+
+    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
+
+    if(index < widgets.size()) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index])) {
+            mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
+            mediaWidget->display()->camDisplay()->setMTDecoding(false);
+            mediaWidget->display()->camDisplay()->putData(thumbnail.data());
+            mediaWidget->display()->camDisplay()->start();
+            mediaWidget->display()->archiveReader()->startPaused();
+        }
+    }
+
+    if(index >= widgets.size() - 1) {
+        int i = 0;
+        foreach(QnResourceWidget *widget, widgets) {
             if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
                 if(!mediaWidget->display()->camDisplay()->isRunning()) {
+                    mediaWidget->display()->archiveReader()->jumpTo((searchState.period.startTimeMs + searchState.step * i) * 1000, 0);
                     mediaWidget->display()->camDisplay()->setMTDecoding(false);
                     mediaWidget->display()->camDisplay()->start();
                     mediaWidget->display()->archiveReader()->startPaused();
                 }
             }
+            i++;
         }
         return;
     }
-
-    qSort(widgets.begin(), widgets.end(), WidgetPositionLess());
-
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widgets[index]);
-    if(!mediaWidget)
-        return;
-
-    mediaWidget->display()->archiveReader()->jumpTo(thumbnail.actualTime() * 1000, 0);
-    mediaWidget->display()->camDisplay()->setMTDecoding(false);
-    mediaWidget->display()->camDisplay()->putData(thumbnail.data());
-    mediaWidget->display()->camDisplay()->start();
-    //widget->display()->archiveReader()->pauseMedia();
-    //widget->display()->archiveReader()->setSingleShotMode(true);
-    mediaWidget->display()->archiveReader()->startPaused();
 }
 
 void QnWorkbenchDisplay::at_item_geometryChanged() {

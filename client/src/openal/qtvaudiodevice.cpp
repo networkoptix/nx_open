@@ -1,7 +1,6 @@
 #include "qtvaudiodevice.h"
 
 #include <QtCore/QScopedPointer>
-#include <QtCore/QSettings>
 
 #include "qtvsound.h"
 
@@ -11,30 +10,25 @@
 
 //#define OPENAL_STATIC
 
-//#include <algorithm>
 #ifdef OPENAL_STATIC
 extern "C" {
 void alc_init(void);
 void alc_deinit(void);
 #pragma comment(lib, "winmm.lib")
-//"msvcrt.lib"
 }
 #endif
 
-Q_GLOBAL_STATIC(QtvAudioDevice, audioDevice)
+Q_GLOBAL_STATIC(QtvAudioDevice, qtv_audioDevice_instance)
 
 QtvAudioDevice *QtvAudioDevice::instance()
 {
-    return audioDevice();
+    return qtv_audioDevice_instance();
 }
 
-QtvAudioDevice::QtvAudioDevice()
+QtvAudioDevice::QtvAudioDevice(QObject *parent)
     : m_device(0), m_context(0), m_volume(1.0)
 {
-    m_settings = new QSettings;
-    m_settings->beginGroup(QLatin1String("audioControl"));
-    m_volume = m_settings->value(QLatin1String("volume"), 1.0f).toFloat();
-
+    Q_UNUSED(parent)
 #ifdef OPENAL_STATIC
     alc_init();
     qDebug("OpenAL init");
@@ -68,10 +62,6 @@ QtvAudioDevice::QtvAudioDevice()
 
 QtvAudioDevice::~QtvAudioDevice()
 {
-    m_settings->setValue(QLatin1String("volume"), m_volume);
-    m_settings->endGroup();
-    delete m_settings;
-
     qDeleteAll(m_sounds);
 
     if (m_device) {
@@ -131,6 +121,8 @@ void QtvAudioDevice::setVolume(float volume)
     volume = qBound(0.0f, volume, 1.0f);
     foreach (QtvSound *sound, m_sounds)
         sound->setVolumeLevel(volume);
+
+    emit volumeChanged();
 }
 
 bool QtvAudioDevice::isMute() const

@@ -88,7 +88,6 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     m_dataWidgetMapper->addMapping(ui->hostnameLineEdit, 1);
     m_dataWidgetMapper->addMapping(ui->portSpinBox, 2);
     m_dataWidgetMapper->addMapping(ui->loginLineEdit, 3);
-    m_dataWidgetMapper->addMapping(ui->passwordLineEdit, 4);
 
     resetConnectionsModel();
     updateFocus();
@@ -100,29 +99,7 @@ LoginDialog::~LoginDialog() {
 
 void LoginDialog::updateFocus() 
 {
-    int size = m_dataWidgetMapper->model()->columnCount();
-
-    QWidget *widget = NULL;
-    for(int i = 0; i < size; i++) {
-        widget = m_dataWidgetMapper->mappedWidgetAt(i);
-        if(!widget)
-            continue;
-
-        QByteArray propertyName = m_dataWidgetMapper->mappedPropertyName(widget);
-        QVariant value = widget->property(propertyName.constData());
-        if(!value.isValid())
-            continue;
-
-        if(value.toString().isEmpty())
-            break;
-
-        if((value.userType() == QVariant::Int || value.userType() == QVariant::LongLong) && value.toInt() == 0)
-            break;
-    }
-    
-    /* Set focus on the last widget in list if every widget is filled. */
-    if(widget)
-        widget->setFocus();
+    ui->passwordLineEdit->setFocus();
 }
 
 QUrl LoginDialog::currentUrl() const {
@@ -202,12 +179,12 @@ void LoginDialog::resetConnectionsModel() {
         row << new QStandardItem(connection.name)
             << new QStandardItem(connection.url.host())
             << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(connection.url.password());
+            << new QStandardItem(connection.url.userName());
         m_connectionsModel->appendRow(row);
     }
 
     ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
+    ui->passwordLineEdit->clear();
 }
 
 void LoginDialog::updateAcceptibility() {
@@ -298,6 +275,8 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    ui->passwordLineEdit->clear();
+    updateFocus();
 }
 
 void LoginDialog::at_testButton_clicked() {

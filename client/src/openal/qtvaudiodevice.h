@@ -9,6 +9,7 @@
 #define __QTVAUDIODEVICE_H__
 
 #include <QtCore/QList>
+#include <QtCore/QObject>
 
 #ifndef Q_OS_WIN
 #include "utils/media/audioformat.h"
@@ -25,12 +26,12 @@ class QSettings;
 
 class QtvSound;
 
-class QtvAudioDevice
-{
+class QtvAudioDevice: public QObject {
+    Q_OBJECT
 public:
     static QtvAudioDevice *instance();
 
-    QtvAudioDevice();
+    QtvAudioDevice(QObject *parent = NULL);
     ~QtvAudioDevice();
 
     QtvSound *addSound(const QnAudioFormat &format);
@@ -45,6 +46,9 @@ public:
 
     QString versionString() const;
     QString company() const;
+
+signals:
+    void volumeChanged();
 
 private:
     ALCdevice *m_device;

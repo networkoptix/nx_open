@@ -90,7 +90,7 @@ void navRead_PCI(pci_t *pci, unsigned char *buffer) {
   }
 
 
-#ifndef NDEBUG
+#ifdef DVD_DEBUG
   /* Asserts */
 
   /* pci pci gi */ 
@@ -148,7 +148,7 @@ void navRead_PCI(pci_t *pci, unsigned char *buffer) {
       }
     }
   }
-#endif /* !NDEBUG */
+#endif // DVD_DEBUG
 }
 
 void navRead_DSI(dsi_t *dsi, unsigned char *buffer) {

@@ -4,7 +4,7 @@
 #include <QtCore/QString>
 #include <QtCore/QHash>
 
-#include <api/api_fwd.h>
+#include <api/video_server_connection.h>
 #include <core/resource/resource_fwd.h>
 #include <api/video_server_statistics_data.h>
 #include <api/video_server_statistics_storage.h>

@@ -4,6 +4,7 @@
 
 #include <utils/common/util.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <utils/common/variant.h>
 
 #include <ui/style/globals.h>
 
@@ -115,6 +116,12 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
 
         return QVariant::fromValue<QnConnectionDataList>(result);
     }
+    case AUDIO_VOLUME: {
+        settings->beginGroup(QLatin1String("audioControl"));
+        qreal result = qvariant_cast<qreal>(settings->value(QLatin1String("volume"), defaultValue));
+        settings->endGroup();
+        return result;
+    }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
         return defaultValue; /* Not to be read from settings. */
@@ -151,6 +158,12 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
 
         /* Write out last used connection as it has been cleared. */
         writeValueToSettings(settings, LAST_USED_CONNECTION, QVariant::fromValue<QnConnectionData>(lastUsedConnection()));
+        break;
+    }
+    case AUDIO_VOLUME: {
+        settings->beginGroup(QLatin1String("audioControl"));
+        settings->setValue(QLatin1String("volume"), value);
+        settings->endGroup();
         break;
     }
     case BACKGROUND_EDITABLE:

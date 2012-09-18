@@ -258,7 +258,7 @@ public:
         QPointF oldCenter = m_sceneViewportCenter;
         
         /* Scene to viewport transform at the end of the last tick. */
-        QTransform oldSceneToViewport = m_sceneToViewport;
+        //QTransform oldSceneToViewport = m_sceneToViewport;
 
         /* Correct. */
         if(!qFuzzyCompare(m_view->viewportTransform(), m_sceneToViewport)) {

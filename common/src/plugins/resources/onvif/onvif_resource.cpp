@@ -64,13 +64,13 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
         (s2.optionsResp.Options->JPEG ? s2.optionsResp.Options->JPEG->ResolutionsAvailable: ResVector()));
 
     int square1 = 0;
-    for (int i = 0; i < resolutionsAvailableS1.size(); ++i) {
+    for (uint i = 0; i < resolutionsAvailableS1.size(); ++i) {
         if (resolutionsAvailableS1[i])
             square1 = qMax(square1, resolutionsAvailableS1[i]->Width * resolutionsAvailableS1[i]->Height);
     }
     
     int square2 = 0;
-    for (int i = 0; i < resolutionsAvailableS2.size(); ++i) {
+    for (uint i = 0; i < resolutionsAvailableS2.size(); ++i) {
         if (resolutionsAvailableS2[i])
             square2 = qMax(square2, resolutionsAvailableS2[i]->Width * resolutionsAvailableS2[i]->Height);
     }
@@ -86,6 +86,7 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 //
 
 QnPlOnvifResource::QnPlOnvifResource() :
+    m_onvifAdditionalSettings(0),
     m_physicalParamsMutex(QMutex::Recursive),
     m_advSettingsLastUpdated(QDateTime::currentDateTime()),
     m_iframeDistance(-1),
@@ -102,9 +103,8 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
     m_forceCodecFromPrimaryEncoder(false),
-    m_onvifAdditionalSettings(0),
-    m_timeDrift(0),
-    m_ptzController(0)
+    m_ptzController(0),
+    m_timeDrift(0)
 {
 }
 
@@ -525,6 +525,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 
     QString user = auth.user();
     QString password = auth.password();
+    QString hardwareId;
     
     //Trying to get name
     if (getName().isEmpty())
@@ -544,6 +545,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         else
         {
             setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            hardwareId = QString::fromStdString(response.HardwareId);
         }
     }
 
@@ -602,6 +604,11 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         if (!mac.isEmpty()) 
             setMAC(mac);
 
+        if (getPhysicalId().isEmpty())
+        {
+            setPhysicalId(hardwareId);
+        }
+            
     }
 
     return result;
@@ -1660,12 +1667,12 @@ int QnPlOnvifResource::sendVideoEncoderToCamera(VideoEncoder& encoder) const
 void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& encoderId)
 {
     VideoEncoder* vEncoder = 0;
-    for (int i = 0; i < response.Configurations.size(); ++i)
+    for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
             vEncoder = response.Configurations[i];
     }
-    if (!vEncoder)    
+    if (!vEncoder || !vEncoder->RateControl)
         return;
 
     int maxFpsOrig = getMaxFps();

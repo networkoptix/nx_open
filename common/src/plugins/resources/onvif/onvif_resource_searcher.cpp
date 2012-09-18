@@ -59,7 +59,10 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthe
         if (rt)
             resource->setTypeId(rt);
 
-        return resource;
+        if(resource->getUniqueId().isEmpty())
+            return QnResourcePtr();
+        else
+            return resource;
     }
     else 
         return QnResourcePtr();
