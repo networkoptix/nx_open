@@ -720,8 +720,16 @@ void QnCamDisplay::setSpeed(float speed)
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
-        if (sign(m_speed) != sign(speed))
+        if (sign(m_speed) != sign(speed)) {
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
+            if (m_extTimeSrc) {
+                qint64 time = m_extTimeSrc->getCurrentTime();
+                for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+                    m_nextReverseTime[i] = AV_NOPTS_VALUE;
+                    m_display[i]->blockTimeValue(time);
+                }
+            }
+        }
         if (speed < 0 && m_speed >= 0) {
             for (int i = 0; i < CL_MAX_CHANNELS; ++i)
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
@@ -755,8 +763,10 @@ void QnCamDisplay::processNewSpeed(float speed)
         clearVideoQueue();
         QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
-        for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->unblockTimeValue();
+        }
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -1355,8 +1365,10 @@ qint64 QnCamDisplay::getNextTime() const
 {
     if (m_display[0]->isTimeBlocked())
         return m_display[0]->getLastDisplayedTime();
-    else 
-        return m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+    else {
+        qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
+        return rez != AV_NOPTS_VALUE ? rez : m_display[0]->getLastDisplayedTime();
+    }
 }
 
 qint64 QnCamDisplay::getDisplayedTime() const
