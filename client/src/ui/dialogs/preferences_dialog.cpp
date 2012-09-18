@@ -108,6 +108,10 @@ void QnPreferencesDialog::initLanguages() {
         QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
         ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
     }
+
+    //TODO: #gdm remove after release
+    ui->languageLabel->setVisible(false);
+    ui->languageComboBox->setVisible(false);
 }
 
 void QnPreferencesDialog::accept() {
