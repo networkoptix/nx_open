@@ -75,7 +75,11 @@ QPixmap	QnNoptixStyle::generatedIconPixmap(QIcon::Mode iconMode, const QPixmap &
         image.fill(qRgba(0, 0, 0, 0));
 
         QPainter painter(&image);
+#ifdef Q_OS_LINUX
+        painter.setOpacity(0.6);
+#else
         painter.setOpacity(0.3);
+#endif
         painter.drawPixmap(0, 0, pixmap);
         painter.end();
         
