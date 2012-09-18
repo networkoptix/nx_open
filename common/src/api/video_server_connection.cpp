@@ -406,7 +406,7 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     {
         if (reply.startsWith("BIN"))
         {
-            QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
+            result.decode((const quint8*) reply.constData()+3, reply.size()-3);
         }
         else {
             qWarning() << "VideoServerConnection: unexpected message received.";
@@ -462,7 +462,7 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList &param
         return 1;
 
     if (reply.startsWith("BIN")) {
-        QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
+        result.decode((const quint8*) reply.constData()+3, reply.size()-3);
     } else {
         qWarning() << "VideoServerConnection: unexpected message received.";
         return -1;

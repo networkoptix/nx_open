@@ -100,7 +100,7 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
         periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
     if (useBinary) {
         result.append("BIN");
-        QnTimePeriod::encode(result,periods);
+        periods.encode(result);
     }
     else {
 #if 0 // Roma asked to not remove this wonderful piece of code

@@ -43,32 +43,6 @@ public:
     static QnTimePeriodList mergeTimePeriods(const QVector<QnTimePeriodList>& periods);
     static QnTimePeriodList aggregateTimePeriods(const QnTimePeriodList& periods, int detailLevelMs);
     
-    /** 
-     * Encode (compress) data to a byte array. 
-     * TimePeriods must be arranged by time and must not intersected. If this condition is not met, the function returns false. 
-     * Average compressed QnTimePeriod size is close to 6 bytes.
-     * 
-     * \param stream                    Byte array to compress time periods to. 
-     * \param periods                   List of time periods to compress. 
-     */
-    static bool encode(QByteArray &stream, const QnTimePeriodList &periods);
-    
-    /** 
-     * Decode (decompress) data from a byte array. 
-     * 
-     * \param[in] stream                Byte array to decompress time periods from.
-     * \param[out] periods              Decompressed time periods.
-     */
-    static bool decode(QByteArray &stream, QnTimePeriodList &periods);
-
-    /**
-     * Decode (decompress) data from a byte array. 
-     * 
-     * \param[in] data                  Compressed data pointer.
-     * \param[in] dataSize              Size of the compressed data.
-     * \param[out] periods              Decompressed time periods.
-     */
-    static bool decode(const quint8 *data, int dataSize, QnTimePeriodList &periods);
 
     bool contains(qint64 timeMs) const;
     bool contains(const QnTimePeriod &timePeriod) const;
