@@ -238,17 +238,21 @@ bool CLH264RtpParser::processData(quint8* rtpBuffer, int readed, const RtspStati
             //don = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
         case STAP_A_PACKET:
-            if (bufferEnd-curPtr < 2)
-                return clearInternalBuffer();
-            nalUnitLen = (curPtr[0] << 8) + curPtr[1];
-            curPtr += 2;
-            if (bufferEnd-curPtr < nalUnitLen)
-                return clearInternalBuffer();
+            while (curPtr < bufferEnd)
+            {
+                if (bufferEnd-curPtr < 2)
+                    return clearInternalBuffer();
+                nalUnitLen = (curPtr[0] << 8) + curPtr[1];
+                curPtr += 2;
+                if (bufferEnd-curPtr < nalUnitLen)
+                    return clearInternalBuffer();
 
-            nalUnitType = *curPtr & 0x1f;
-            m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
-            m_videoBuffer.write((const char*)curPtr, nalUnitLen);
-            updateNalFlags(nalUnitType);
+                nalUnitType = *curPtr & 0x1f;
+                m_videoBuffer.write(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));
+                m_videoBuffer.write((const char*)curPtr, nalUnitLen);
+                updateNalFlags(nalUnitType);
+                curPtr += nalUnitLen;
+            }
             break;
         case FU_B_PACKET:
         case FU_A_PACKET:
