@@ -66,14 +66,35 @@ class IpAddressValidator: public QValidator{
 
 
 QnIpLineEdit::QnIpLineEdit(QWidget *parent):
-    QLineEdit(parent){
+    base_type(parent){
     setValidator(new IpAddressValidator());
     setText(QLatin1String("127.0.0.1"));
 }
 
+QSize QnIpLineEdit::sizeHint() const{
+    return minimumSizeHint();
+}
+
+QSize QnIpLineEdit::minimumSizeHint() const{
+    ensurePolished();
+
+    QMargins textMargins = this->textMargins();
+    QFontMetrics fm(font());
+    int h = qMax(fm.height(), 14) + 2
+            + textMargins.top() + textMargins.bottom();
+    //        + d->topmargin + d->bottommargin;
+    int w = fm.width(QLatin1String("255.255.255.255")) + 4
+            + textMargins.left() + textMargins.right();
+       //     + d->leftmargin + d->rightmargin; // "some"
+    QStyleOptionFrameV2 opt;
+    initStyleOption(&opt);
+    return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).
+                                      expandedTo(QApplication::globalStrut()), this));
+}
+
 void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
     if (event->key() >= QLatin1Char('0') && event->key() <= QLatin1Char('9')){
-        QLineEdit::keyPressEvent(event);
+        base_type::keyPressEvent(event);
 
         QString input = text();
         QStringList sections = input.split(DOT);
@@ -92,5 +113,5 @@ void QnIpLineEdit::keyPressEvent(QKeyEvent *event){
         }
         event->setAccepted(true);
     } else
-        QLineEdit::keyPressEvent(event);
+        base_type::keyPressEvent(event);
 }
