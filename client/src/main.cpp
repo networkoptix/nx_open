@@ -71,7 +71,6 @@
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
-#include "utils/monitoring/sigar_monitor.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -221,10 +220,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
-
-    //QnSigarMonitor m;
-    //m.hdds();
-
+    
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 

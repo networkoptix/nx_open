@@ -17,10 +17,14 @@ public:
      */
     struct Hdd {
         Hdd(): id(-1) {}
-        Hdd(std::intptr_t id, const QString &partitions): id(id), partitions(partitions) {}
+        Hdd(std::intptr_t id, const QString &name, const QString &partitions): id(id), name(name), partitions(partitions) {}
 
         /** Hdd ID, to be used internally. */
         std::intptr_t id;
+
+        /** Platform-specific string specifying device name suitable to be
+         * shown to the user. */
+        QString name;
 
         /** Platform-specific string describing logical partitions of this HDD,
          * suitable to be shown to the user. */
