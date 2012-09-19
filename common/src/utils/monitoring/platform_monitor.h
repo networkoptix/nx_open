@@ -36,6 +36,18 @@ public:
         }
     };
 
+    /**
+     * HDD load entry.
+     */
+    struct HddLoad {
+        /** Description of an HDD. */
+        Hdd hdd;
+
+        /** Load percentage of the HDD since the last call to load estimation function,
+         * a number in range <tt>[0.0, 1.0]</tt>. */
+        qreal load;
+    }
+
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
 
@@ -53,16 +65,9 @@ public:
     virtual qreal totalRamUsage() { return 0.0; }
 
     /**
-     * \returns                         A list of all HDDs on this PC.
+     * \returns                         A list of HDD load entries for all HDDs on this PC.
      */
-    virtual QList<Hdd> hdds() { return QList<Hdd>(); }
-
-    /**
-     * \param hdd                       HDD to get load information for.
-     * \returns                         Load percentage of the given HDD since the last call to this function,
-     *                                  a number in range <tt>[0.0, 1.0]</tt>.
-     */
-    virtual qreal totalHddLoad(const Hdd &hdd) { Q_UNUSED(hdd); return 0.0; }
+    virtual QList<HddLoad> totalHddLoad() { return QList<HddLoad>(); }
 
 private:
     Q_DISABLE_COPY(QnPlatformMonitor);
