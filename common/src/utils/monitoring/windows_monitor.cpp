@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtCore/QVector>
+
 #include <utils/common/warnings.h>
 
 #include <Windows.h>
@@ -12,6 +14,33 @@
 
 #define INVOKE(expression)                                                      \
     (d_func()->checkError(#expression, expression))
+
+namespace {
+    bool parseDiskDescription(LPCWSTR description, int *id, LPCWSTR *partitions) {
+        if(!description)
+            return false;
+
+        LPCWSTR pos = wcschr(description, L' ');
+        if(!pos)
+            return false;
+        while(*pos == L' ')
+            pos++;
+        if(*pos == L'\0')
+            return false;
+
+        int localId = _wtoi(description);
+        if(localId == 0 && description[0] != L'0')
+            return false;
+        
+        if(partitions)
+            *partitions = pos;
+        if(id)
+            *id = localId;
+        return true;
+    }
+
+} // anonymous namespace
+
 
 class QnWindowsMonitorPrivate {
 public:
@@ -70,11 +99,11 @@ public:
 
         lastCollectTimeMSec = timeMSec;
         if(INVOKE(PdhCollectQueryData(query)) != ERROR_SUCCESS) {
-            diskData.clear();
+            itemByHddId.clear();
             return;
         }
 
-        updateCounterValues(diskCounter, &diskData);
+        updateCounterValues(diskCounter, &diskBuffer, &itemByHddId);
     }
 
     DWORD checkError(const char *expression, DWORD status) const {
@@ -89,49 +118,71 @@ public:
             function.truncate(index);
 
         LPWSTR buffer = NULL;
-        if(FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, pdhLibrary, status, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) == 0)
+        if(FormatMessageW(FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, pdhLibrary, status, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) == 0) {
+            DWORD error = GetLastError();
             buffer = NULL; /* Error in FormatMessage. */
+        }
 
         if(buffer) {
-            qnWarning("Error in %1: %2 (%3).", function, status, buffer);
+            QString message = QString::fromWCharArray(buffer);
+            while(message.endsWith(QLatin1Char('\n')) || message.endsWith(QLatin1Char('\r')))
+                message.truncate(message.size() - 1);
+
+            qnWarning("Error in %1: %2 (%3).", function, status, message);
             LocalFree(buffer);
         } else {
             qnWarning("Error in %1: %2.", function, status);
         }
+
+        return status;
     }
 
     QString perfName(DWORD index) {
-        WCHAR buffer[PDH_MAX_COUNTER_NAME];
-        DWORD size = sizeof(buffer);
+        DWORD size = 0;
+        PDH_STATUS status = PdhLookupPerfNameByIndexW(NULL, index, NULL, &size);
+        if(status != PDH_MORE_DATA && status != ERROR_SUCCESS) {
+            checkError("PdhLookupPerfNameByIndexW", status);
+            return QString();
+        }
 
-        if(INVOKE(PdhLookupPerfNameByIndexW(NULL, index, buffer, &size)) !=  ERROR_SUCCESS)
+        QByteArray buffer;
+        buffer.resize(size * sizeof(WCHAR));
+        if(INVOKE(PdhLookupPerfNameByIndexW(NULL, index, reinterpret_cast<LPWSTR>(buffer.data()), &size)) != ERROR_SUCCESS)
             return QString();
 
-        return QString::fromWCharArray(buffer);
+        return QString::fromWCharArray(reinterpret_cast<LPCWSTR>(buffer.constData()));
     }
 
-    int updateCounterValues(PDH_HCOUNTER counter, QByteArray *data) {
-        assert(data);
-
+    void updateCounterValues(PDH_HCOUNTER counter, QByteArray *buffer, QHash<int, PDH_RAW_COUNTER_ITEM_W> *items) {
+        assert(buffer && items);
+        items->clear();
+        
         DWORD bufferSize = 0, itemCount = 0;
 
-        if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, NULL) != ERROR_SUCCESS)) {
-            data->clear();
-            return 0;
+        PDH_STATUS status = PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, NULL);
+        if(status != PDH_MORE_DATA && status != ERROR_SUCCESS) {
+            checkError("PdhGetRawCounterArrayW", status);
+            return;
         }
 
         /* Note that additional symbol is important here.
          * See http://msdn.microsoft.com/en-us/library/windows/desktop/aa372642%28v=vs.85%29.aspx. */
-        data->resize(bufferSize + sizeof(WCHAR)); 
-        bufferSize = data->size();
+        buffer->resize(bufferSize + sizeof(WCHAR)); 
+        bufferSize = buffer->size();
         itemCount = 0;
 
-        if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, reinterpret_cast<PDH_RAW_COUNTER_ITEM_W *>(data->data())) != ERROR_SUCCESS)) {
-            data->clear();
-            return 0;
-        }
+        PDH_RAW_COUNTER_ITEM_W *item = reinterpret_cast<PDH_RAW_COUNTER_ITEM_W *>(buffer->data());
+        if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, item) != ERROR_SUCCESS))
+            return;
 
-        return itemCount;
+        
+        for(int i = 0; i < itemCount; i++) {
+            int id;
+            if(!parseDiskDescription(item[i].szName, &id, NULL))
+                continue;
+
+            (*items)[id] = item[i];
+        }
     }
 
 private:
@@ -143,7 +194,10 @@ private:
     PDH_HCOUNTER diskCounter;
     
     ULONGLONG lastCollectTimeMSec;
-    QByteArray diskData;
+    QByteArray diskBuffer;
+    QHash<int, PDH_RAW_COUNTER_ITEM_W> itemByHddId;
+
+    QHash<int, PDH_RAW_COUNTER> lastCounterByHddId;
 
 private:
     Q_DECLARE_PUBLIC(QnWindowsMonitor);
@@ -165,19 +219,48 @@ QnWindowsMonitor::~QnWindowsMonitor() {
 QList<QnPlatformMonitor::Hdd> QnWindowsMonitor::hdds() {
     Q_D(QnWindowsMonitor);
 
-    QList<QnPlatformMonitor::Hdd> result;
-
     d->collectQuery();
-    if(d->diskCounter == INVALID_HANDLE_VALUE)
-        return result;
 
-    
+    QList<QnPlatformMonitor::Hdd> result;
+    foreach(const PDH_RAW_COUNTER_ITEM_W &item, d->itemByHddId) {
+        int id;
+        LPCWSTR partitions;
+        if(!parseDiskDescription(item.szName, &id, &partitions))
+            continue;
 
-//    PERF_OBJECT_TYPE *object = d->queryPerfObject(PERF_TITLE_DISK_KEY, &d->perfBuffer);
-
+        result.push_back(Hdd(id, QLatin1String("HDD") + QString::number(id), QString::fromWCharArray(partitions)));
+    }
+    return result;
 }
 
 qreal QnWindowsMonitor::totalHddLoad(const Hdd &hdd) {
-    return 0.0;
+    Q_D(QnWindowsMonitor);
+
+    d->collectQuery();
+
+    if(!d->itemByHddId.contains(hdd.id))
+        return 0.0;
+    PDH_RAW_COUNTER &current = d->itemByHddId[hdd.id].RawValue;
+
+    if(!d->lastCounterByHddId.contains(hdd.id)) { /* Is this the first call? */
+        d->lastCounterByHddId[hdd.id] = current;
+        return 0.0;
+    }
+    
+    PDH_RAW_COUNTER &last = d->lastCounterByHddId[hdd.id];
+    if(last.FirstValue == current.FirstValue)
+        return 0.0;
+
+    PDH_FMT_COUNTERVALUE result;
+    PDH_STATUS status = PdhCalculateCounterFromRawValue(d->diskCounter, PDH_FMT_DOUBLE | PDH_FMT_NOCAP100, &current, &last, &result);
+    
+    last = current;
+
+    if(status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS) {
+        d->checkError("PdhCalculateCounterFromRawValue", status);
+        return 0.0;
+    }
+
+    return result.doubleValue / 100.0;
 }
 

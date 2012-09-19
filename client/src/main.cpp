@@ -222,10 +222,14 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
-
+    
     QnWindowsMonitor m;
     QList<QnPlatformMonitor::Hdd> l = m.hdds();
-    m.totalHddLoad(l[0]);
+    while(1) {
+        qDebug() << l[0].partitions << m.totalHddLoad(l[0]);
+
+        Sleep(1000);
+    }
     
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
