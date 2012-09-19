@@ -5,62 +5,76 @@
 #include <utils/common/warnings.h>
 
 #include <Windows.h>
+#include <pdh.h>
+#include <pdhmsg.h>
 
-/* These defines are from win32_sigar.c. */
-
-#define PERF_TITLE_DISK_KEY  L"236"
-
-#define PdhFirstObject(block) \
-    ((PERF_OBJECT_TYPE *)((BYTE *) block + block->HeaderLength))
-
-#define PdhNextObject(object) \
-    ((PERF_OBJECT_TYPE *)((BYTE *) object + object->TotalByteLength))
-
-#define PdhFirstCounter(object) \
-    ((PERF_COUNTER_DEFINITION *)((BYTE *) object + object->HeaderLength))
-
-#define PdhNextCounter(counter) \
-    ((PERF_COUNTER_DEFINITION *)((BYTE *) counter + counter->ByteLength))
-
-#define PdhGetCounterBlock(inst) \
-    ((PERF_COUNTER_BLOCK *)((BYTE *) inst + inst->ByteLength))
-
-#define PdhFirstInstance(object) \
-    ((PERF_INSTANCE_DEFINITION *)((BYTE *) object + object->DefinitionLength))
-
-#define PdhNextInstance(inst) \
-    ((PERF_INSTANCE_DEFINITION *)((BYTE *)inst + inst->ByteLength + \
-    PdhGetCounterBlock(inst)->ByteLength))
-
-#define PdhInstanceName(inst) \
-    ((wchar_t *)((BYTE *)inst + inst->NameOffset))
-
+#pragma comment(lib, "pdh.lib")
 
 #define INVOKE(expression)                                                      \
     (d_func()->checkError(#expression, expression))
 
 class QnWindowsMonitorPrivate {
 public:
-    struct PerfOffsetMap {
-        int objectSize, counterCount;
-
-        QHash<int, int> counterOffsets;
+    enum {
+        UpdateIntervalMSec = 25
     };
 
-    QnWindowsMonitorPrivate(): handle(0) {
+    QnWindowsMonitorPrivate(): 
+        pdhLibrary(0), 
+        query(0),
+        diskCounter(0),
+        lastCollectTimeMSec(0)
+    {
+        pdhLibrary = LoadLibraryW(L"pdh.dll");
+        if(!pdhLibrary)
+            checkError("LoadLibrary", GetLastError());
     }
 
     virtual ~QnWindowsMonitorPrivate() {
-        if(handle != 0 && handle != INVALID_HANDLE_VALUE)
-            INVOKE(RegCloseKey(handle));
+        if(query != 0 && query != INVALID_HANDLE_VALUE)
+            INVOKE(PdhCloseQuery(query));
+
+        if(pdhLibrary)
+            FreeLibrary(pdhLibrary);
     }
 
-    void ensurePerfHandle() {
-        if(handle == 0 || handle == INVALID_HANDLE_VALUE)
+    void ensureQuery() {
+        if(query != 0)
             return;
 
-        if(INVOKE(RegConnectRegistryW(NULL, HKEY_PERFORMANCE_DATA, &handle)) != ERROR_SUCCESS)
-            handle = reinterpret_cast<HKEY>(INVALID_HANDLE_VALUE);
+        if(INVOKE(PdhOpenQueryW(NULL, 0, &query)) != ERROR_SUCCESS) {
+            query = INVALID_HANDLE_VALUE;
+            diskCounter = INVALID_HANDLE_VALUE;
+            return;
+        }
+
+        /* Note:
+         * 
+         * 234 = PhysicalDisk
+         * 200 = % Disk Time
+         * 
+         * See http://support.microsoft.com/?scid=kb%3Ben-us%3B287159&x=11&y=9  */
+        QString diskQuery = QString(QLatin1String("\\%1(*)\\%2")).arg(perfName(234)).arg(perfName(200));
+        if(INVOKE(PdhAddCounterW(query, reinterpret_cast<LPCWSTR>(diskQuery.utf16()), 0, &diskCounter)) != ERROR_SUCCESS)
+            diskCounter = INVALID_HANDLE_VALUE;
+    }
+
+    void collectQuery() {
+        ensureQuery();
+        if(query == INVALID_HANDLE_VALUE)
+            return;
+
+        ULONGLONG timeMSec = GetTickCount64();
+        if(timeMSec - lastCollectTimeMSec < UpdateIntervalMSec)
+            return; /* Don't update too often. */
+
+        lastCollectTimeMSec = timeMSec;
+        if(INVOKE(PdhCollectQueryData(query)) != ERROR_SUCCESS) {
+            diskData.clear();
+            return;
+        }
+
+        updateCounterValues(diskCounter, &diskData);
     }
 
     DWORD checkError(const char *expression, DWORD status) const {
@@ -74,8 +88,8 @@ public:
         if(index != -1)
             function.truncate(index);
 
-        LPWSTR buffer;
-        if(FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, status, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) == 0)
+        LPWSTR buffer = NULL;
+        if(FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, pdhLibrary, status, 0, reinterpret_cast<LPWSTR>(&buffer), 0, NULL) == 0)
             buffer = NULL; /* Error in FormatMessage. */
 
         if(buffer) {
@@ -84,75 +98,52 @@ public:
         } else {
             qnWarning("Error in %1: %2.", function, status);
         }
-
-        return status;
     }
 
-    bool queryPerfValue(LPCWSTR name, LPDWORD type, QByteArray *value, bool resize = true) {
-        assert(name && type && value);
+    QString perfName(DWORD index) {
+        WCHAR buffer[PDH_MAX_COUNTER_NAME];
+        DWORD size = sizeof(buffer);
 
-        ensurePerfHandle();
-        if(handle == INVALID_HANDLE_VALUE)
-            return false;
+        if(INVOKE(PdhLookupPerfNameByIndexW(NULL, index, buffer, &size)) !=  ERROR_SUCCESS)
+            return QString();
 
-        value->resize(value->capacity());
-        DWORD size = value->size();
-        LPBYTE data = reinterpret_cast<LPBYTE>(value->data());
-
-        LSTATUS status = RegQueryValueExW(handle, name, NULL, type, data, &size);
-        if(resize && status == ERROR_MORE_DATA) {
-            value->resize(size + 1);
-            return queryPerfValue(name, type, value, false);
-        }
-
-        if(status != ERROR_SUCCESS) {
-            checkError("RegQueryValueExW", status);
-            return false;
-        }
-
-        value->resize(size);
-        return;
+        return QString::fromWCharArray(buffer);
     }
 
-    PERF_OBJECT_TYPE *queryPerfObject(LPCWSTR name, QByteArray *buffer) {
-        assert(name && buffer);
+    int updateCounterValues(PDH_HCOUNTER counter, QByteArray *data) {
+        assert(data);
 
-        DWORD type;
-        if(!queryPerfValue(name, &type, buffer))
-            return NULL;
-    
-        PERF_DATA_BLOCK *block = reinterpret_cast<PERF_DATA_BLOCK *>(buffer->data());
-        if (block->NumObjectTypes == 0) {
-            qnWarning("No counters defined for title '%1'.", name);
-            return NULL;
-        }
-    
-        PERF_OBJECT_TYPE *object = PdhFirstObject(block);
+        DWORD bufferSize = 0, itemCount = 0;
 
-        /* Code from win32_sigar.c.
-         * 
-         * Only seen on windows 2003 server when pdh.dll
-         * functions are in use by the same process. */
-        if(object->NumInstances == PERF_NO_INSTANCES) {
-            for (DWORD i = 0; i < block->NumObjectTypes; i++) {
-                if (object->NumInstances != PERF_NO_INSTANCES)
-                    return object;
-                object = PdhNextObject(object);
-            }
-            return NULL;
-        } else {
-            return object;
+        if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, NULL) != ERROR_SUCCESS)) {
+            data->clear();
+            return 0;
         }
+
+        /* Note that additional symbol is important here.
+         * See http://msdn.microsoft.com/en-us/library/windows/desktop/aa372642%28v=vs.85%29.aspx. */
+        data->resize(bufferSize + sizeof(WCHAR)); 
+        bufferSize = data->size();
+        itemCount = 0;
+
+        if(INVOKE(PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, reinterpret_cast<PDH_RAW_COUNTER_ITEM_W *>(data->data())) != ERROR_SUCCESS)) {
+            data->clear();
+            return 0;
+        }
+
+        return itemCount;
     }
-
-
 
 private:
     const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
     
 private:
-    HKEY handle;
-    QByteArray perfBuffer;
+    HMODULE pdhLibrary;
+    PDH_HQUERY query;
+    PDH_HCOUNTER diskCounter;
+    
+    ULONGLONG lastCollectTimeMSec;
+    QByteArray diskData;
 
 private:
     Q_DECLARE_PUBLIC(QnWindowsMonitor);
@@ -174,15 +165,19 @@ QnWindowsMonitor::~QnWindowsMonitor() {
 QList<QnPlatformMonitor::Hdd> QnWindowsMonitor::hdds() {
     Q_D(QnWindowsMonitor);
 
-    d->ensurePerfHandle();
-
     QList<QnPlatformMonitor::Hdd> result;
 
-    PERF_OBJECT_TYPE *object = d->queryPerfObject(PERF_TITLE_DISK_KEY, &d->perfBuffer);
+    d->collectQuery();
+    if(d->diskCounter == INVALID_HANDLE_VALUE)
+        return result;
+
+    
+
+//    PERF_OBJECT_TYPE *object = d->queryPerfObject(PERF_TITLE_DISK_KEY, &d->perfBuffer);
 
 }
 
 qreal QnWindowsMonitor::totalHddLoad(const Hdd &hdd) {
-
+    return 0.0;
 }
 

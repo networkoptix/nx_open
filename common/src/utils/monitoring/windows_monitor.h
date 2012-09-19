@@ -3,7 +3,7 @@
 
 #include "sigar_monitor.h"
 
-class QnWindowsMonitorPrivate
+class QnWindowsMonitorPrivate;
 
 class QnWindowsMonitor: public QnSigarMonitor {
     Q_OBJECT;
