@@ -194,12 +194,6 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
-        if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
-        {
-            d->responseBody = "Video camera is not ready yet";
-            sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
-            return;
-        }
 
         QnProgressiveDownloadingDataConsumer dataConsumer(this);
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
@@ -207,6 +201,13 @@ void QnProgressiveDownloadingConsumer::run()
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
         if (position.isEmpty() || position == "now")
         {
+            if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
+            {
+                d->responseBody = "Video camera is not ready yet";
+                sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
+                return;
+            }
+
             if (isUTCRequest)
             {
                 d->responseBody = "now";
