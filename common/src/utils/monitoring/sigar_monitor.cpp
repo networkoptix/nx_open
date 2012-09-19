@@ -41,7 +41,6 @@ public:
         return status;
     }
 
-
 private:
     sigar_t *sigar;
     sigar_cpu_t cpu;
