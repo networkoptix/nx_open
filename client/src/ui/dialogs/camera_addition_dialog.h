@@ -83,7 +83,7 @@ private slots:
 
     void at_scanButton_clicked();
     void at_addButton_clicked();
-    void at_closeButton_clicked();
+    void at_subnetCheckbox_toggled(bool toggled);
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
@@ -92,6 +92,7 @@ private:
     QnVideoServerResourcePtr m_server;
 
     bool m_inIpRangeEdit;
+    QString m_startLabelTexts[2];
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

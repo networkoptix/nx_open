@@ -25,24 +25,33 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &s
     connect(ui->endIPLineEdit,      SIGNAL(textChanged(QString)), this, SLOT(at_endIPLineEdit_textChanged(QString)));
     connect(ui->camerasTable,       SIGNAL(cellChanged(int,int)), this, SLOT(at_camerasTable_cellChanged(int, int)));
     connect(ui->camerasTable,       SIGNAL(cellClicked(int,int)), this, SLOT(at_camerasTable_cellClicked(int, int)));
-    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLineEdit, SLOT(setEnabled(bool)));
-    connect(ui->closeButton,        SIGNAL(clicked()),            this, SLOT(at_closeButton_clicked()));
+    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        this, SLOT(at_subnetCheckbox_toggled(bool)));
+    connect(ui->closeButton,        SIGNAL(clicked()),            this, SLOT(accept()));
+
+    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLineEdit, SLOT(setVisible(bool)));
+    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLabel, SLOT(setVisible(bool)));
 
     ui->scanProgressBar->setVisible(false);
     ui->stopScanButton->setVisible(false);
     ui->validateLabelSearch->setVisible(false);
 
-    ui->endIPLineEdit->setEnabled(false);
+    ui->endIPLineEdit->setVisible(false);
+    ui->endIPLabel->setVisible(false);
+
     ui->addButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
 
     connect(ui->scanButton, SIGNAL(clicked()), this, SLOT(at_scanButton_clicked()));
-
     connect(ui->addButton, SIGNAL(clicked()), this, SLOT(at_addButton_clicked()));
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->validateLabelSearch->setPalette(palette);
+
+    m_startLabelTexts[0] = tr("Camera &IP:");
+    m_startLabelTexts[1] = ui->startIPLabel->text();
+
+    at_subnetCheckbox_toggled(false);
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -222,7 +231,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     ui->scanButton->setEnabled(true);
     ui->startIPLineEdit->setEnabled(true);
-    ui->endIPLineEdit->setEnabled(ui->subnetCheckbox->isChecked());
+    ui->endIPLineEdit->setEnabled(true);
     ui->portSpinBox->setEnabled(true);
     ui->subnetCheckbox->setEnabled(true);
     ui->loginLineEdit->setEnabled(true);
@@ -242,10 +251,6 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
         }
     }else
         ui->startIPLineEdit->setFocus();
-}
-
-void QnCameraAdditionDialog::at_closeButton_clicked(){
-    accept();
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked(){
@@ -298,3 +303,6 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     }
 }
 
+void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
+    ui->startIPLabel->setText(m_startLabelTexts[toggled ? 1 : 0]);
+}
