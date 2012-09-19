@@ -6,8 +6,6 @@
 #include <core/resource/resource_fwd.h>
 #include <api/video_server_cameras_data.h>
 
-#include "button_box_dialog.h"
-
 namespace Ui {
     class CameraAdditionDialog;
 }
@@ -67,16 +65,11 @@ namespace detail{
     };
 }
 
-class QnCameraAdditionDialog: public QnButtonBoxDialog {
+class QnCameraAdditionDialog: public QDialog {
     Q_OBJECT
-
-    typedef QnButtonBoxDialog base_type;
-
 public:
     explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
-protected:
-    virtual bool eventFilter(QObject *, QEvent *) override;
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
@@ -90,6 +83,7 @@ private slots:
 
     void at_scanButton_clicked();
     void at_addButton_clicked();
+    void at_closeButton_clicked();
 
 private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
