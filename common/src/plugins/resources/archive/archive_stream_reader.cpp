@@ -339,13 +339,13 @@ begin_label:
     if (mFirstTime)
     {
         // this is here instead if constructor to unload ui thread
+        m_BOF = true;
         if (init()) {
-            m_BOF = true;
             mFirstTime = false;
         }
         else {
-            // If media data can't be opened wait 1 second and try again
-            return QnAbstractMediaDataPtr();
+            // If media data can't be opened report 'no data'
+            return createEmptyPacket(m_reverseMode);
         }
     }
 

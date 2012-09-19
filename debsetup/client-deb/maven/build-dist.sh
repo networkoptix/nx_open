@@ -14,7 +14,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-${customization}
+STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
@@ -74,4 +74,4 @@ cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/
 
 sudo chown -R root:root $STAGEBASE
 
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}-${customization})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration})
