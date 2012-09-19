@@ -204,7 +204,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>P&amp;ort:</string>
+          <string>Http P&amp;ort:</string>
          </property>
          <property name="buddy">
           <cstring>portSpinBox</cstring>
