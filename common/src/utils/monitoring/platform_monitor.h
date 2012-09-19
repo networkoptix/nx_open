@@ -5,6 +5,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QHash>
 
 /**
  * Interface for monitoring performance in a platform-independent way.
@@ -29,6 +30,10 @@ public:
         /** Platform-specific string describing logical partitions of this HDD,
          * suitable to be shown to the user. */
         QString partitions;
+
+        friend uint qHash(const Hdd &hdd) {
+            return qHash(id) ^ qHash(name) ^ qHash(partitions);
+        }
     };
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
@@ -39,25 +44,25 @@ public:
      *                                  by all running processes since the last call to this function,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */
-    virtual qreal totalCpuUsage() = 0;
+    virtual qreal totalCpuUsage() { return 0.0; }
 
     /**
      * \returns                         Percent of RAM currently consumed by all running processes,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */
-    virtual qreal totalRamUsage() = 0;
+    virtual qreal totalRamUsage() { return 0.0; }
 
     /**
      * \returns                         A list of all HDDs on this PC.
      */
-    virtual QList<Hdd> hdds() = 0;
+    virtual QList<Hdd> hdds() { return QList<Hdd>(); }
 
     /**
      * \param hdd                       HDD to get load information for.
      * \returns                         Load percentage of the given HDD since the last call to this function,
      *                                  a number in range <tt>[0.0, 1.0]</tt>.
      */
-    virtual qreal totalHddLoad(const Hdd &hdd) = 0;
+    virtual qreal totalHddLoad(const Hdd &hdd) { Q_UNUSED(hdd); return 0.0; }
 
 private:
     Q_DISABLE_COPY(QnPlatformMonitor);

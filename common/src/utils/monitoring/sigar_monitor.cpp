@@ -44,7 +44,7 @@ public:
 private:
     sigar_t *sigar;
     sigar_cpu_t cpu;
-    QHash<QString, sigar_disk_usage_t> lastUsageByHddName;
+    QHash<int, sigar_disk_usage_t> lastUsageByHddId;
 
 private:
     Q_DECLARE_PUBLIC(QnSigarMonitor);
@@ -144,12 +144,12 @@ qreal QnSigarMonitor::totalHddLoad(const Hdd &hdd) {
     if(INVOKE(sigar_disk_usage_get(d->sigar, hdd.name.toLatin1().constData(), &current)) != SIGAR_OK)
         return 0.0;
 
-    if(!d->lastUsageByHddName.contains(hdd.name)) { /* Is this the first call? */
-        d->lastUsageByHddName[hdd.name] = current; 
+    if(!d->lastUsageByHddId.contains(hdd.id)) { /* Is this the first call? */
+        d->lastUsageByHddId[hdd.id] = current; 
         return 0.0;
     }
 
-    sigar_disk_usage_t &last = d->lastUsageByHddName[hdd.name];
+    sigar_disk_usage_t &last = d->lastUsageByHddId[hdd.id];
     if(current.snaptime == last.snaptime)
         return 0.0;
 
