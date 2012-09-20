@@ -46,8 +46,6 @@ public:
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
 
-    static void setProxyAddr(const QString& addr, int port);
-
     void setAdditionalAttribute(const QByteArray& name, const QByteArray& value);
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
@@ -95,8 +93,6 @@ private:
     QnTimePeriod m_serverTimePeriod;
     qint64 m_globalMinArchiveTime; // min archive time between all servers
 
-    static QString m_proxyAddr;
-    static int m_proxyPort;
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
 };

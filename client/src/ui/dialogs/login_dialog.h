@@ -3,6 +3,7 @@
 
 #include <QtGui/QDialog>
 #include "connectinfo.h"
+#include <utils/settings.h>
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 class QDataWidgetMapper;
@@ -46,6 +47,8 @@ private slots:
     void updateUsability();
 
     void at_testButton_clicked();
+    void at_saveButton_clicked();
+    void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
 	void at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);

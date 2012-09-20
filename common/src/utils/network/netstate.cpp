@@ -56,12 +56,13 @@ void CLNetState::updateNetState()
 
     m_netstate = new_netstate;
 
+    /*
     if (net_state_changed)
     {
         cl_log.log(QLatin1String("Network interface list:"), cl_logINFO);
         cl_log.log(toString(), cl_logINFO);
     }
-
+    */
 }
 
 QString CLNetState::toString() const

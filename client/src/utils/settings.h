@@ -32,7 +32,31 @@ struct QnConnectionData {
     bool readOnly;
 };
 
-typedef QList<QnConnectionData> QnConnectionDataList;
+class QnConnectionDataList: public QList<QnConnectionData>{
+public:
+    QnConnectionDataList(): QList<QnConnectionData>(){}
+
+    /**
+     *  Returns true if the list contains a connection with the name provided;
+     *  otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool contains(const QString &name);
+
+    /**
+     * Removes the first occurrence of a connection in the list with the
+     * name provided and returns true on success; otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool removeOne(const QString &name);
+
+    /**
+     * Generates the unique name with the provided name as the base,
+     * appending number to the end of the string.
+     * \param base - base name of the connection
+     */
+    QString generateUniqueName(const QString &base);
+};
 
 Q_DECLARE_METATYPE(QnConnectionData)
 Q_DECLARE_METATYPE(QnConnectionDataList)
