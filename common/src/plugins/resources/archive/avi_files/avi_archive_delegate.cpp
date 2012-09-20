@@ -362,7 +362,7 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
-                            m_resource->addFlags(QnResource::utc); // use sync for exported layout only
+                            m_resource->addFlags(QnResource::utc | QnResource::periods); // use sync for exported layout only
                     }
                 }
             }

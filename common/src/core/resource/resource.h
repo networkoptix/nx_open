@@ -73,6 +73,7 @@ public:
         user = 0x2000,          /**< User resource. */
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
+        periods = 0x8000,           /**< Resource uses UTC-based timing. */
 
         local_media = local | media,
 

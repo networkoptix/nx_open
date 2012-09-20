@@ -678,6 +678,9 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
             flags |= WidgetSupportsLive | WidgetSupportsPeriods;
 
+        if(m_currentWidget->resource()->flags() & QnResource::periods)
+            flags |= WidgetSupportsPeriods;
+
         if(m_currentWidget->resource()->flags() & QnResource::utc)
             flags |= WidgetUsesUTC | WidgetSupportsSync;
 

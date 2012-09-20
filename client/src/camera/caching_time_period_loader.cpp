@@ -7,6 +7,7 @@
 
 #include "time_period_loader.h"
 #include "multi_camera_time_period_loader.h"
+#include "layout_file_time_period_loader.h"
 
 namespace {
     const qint64 minLoadingMargin = 60 * 60 * 1000; /* 1 hour. */
@@ -14,24 +15,24 @@ namespace {
 }
 
 
-QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(const QnNetworkResourcePtr &networkResource, QObject *parent):
+QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(const QnResourcePtr &resource, QObject *parent):
     QObject(parent),
-    m_resource(networkResource)
+    m_resource(resource)
 {
     init();
 
-    if(!networkResource) {
-        qnNullWarning(networkResource);
+    if(!m_resource) {
+        qnNullWarning(m_resource);
     } else {
-        if(createLoaders(networkResource, m_loaders)) {
+        if(createLoaders(m_resource, m_loaders)) {
             initLoaders(m_loaders);
         } else {
-            qnWarning("Could not create time period loader for resource '%1'.", networkResource->getName());
+            qnWarning("Could not create time period loader for resource '%1'.", m_resource->getName());
         }
     }
 }
 
-QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(QnMultiCameraTimePeriodLoader **loaders, QObject *parent):
+QnCachingTimePeriodLoader::QnCachingTimePeriodLoader(QnAbstractTimePeriodLoader **loaders, QObject *parent):
     QObject(parent),
     m_resource(loaders[0]->resource())
 {
@@ -59,9 +60,9 @@ void QnCachingTimePeriodLoader::init() {
     }
 }
 
-void QnCachingTimePeriodLoader::initLoaders(QnMultiCameraTimePeriodLoader **loaders) {
+void QnCachingTimePeriodLoader::initLoaders(QnAbstractTimePeriodLoader **loaders) {
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
-        QnMultiCameraTimePeriodLoader *loader = loaders[i];
+        QnAbstractTimePeriodLoader *loader = loaders[i];
         m_loaders[i] = loader;
 
         if(loader) {
@@ -73,13 +74,19 @@ void QnCachingTimePeriodLoader::initLoaders(QnMultiCameraTimePeriodLoader **load
     }
 }
 
-bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnMultiCameraTimePeriodLoader **loaders) {
+bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnAbstractTimePeriodLoader **loaders) 
+{
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
         loaders[i] = NULL;
 
     bool success = true;
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
-        loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource);
+    bool isNetRes = resource.dynamicCast<QnNetworkResource>();
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) 
+    {
+        if (isNetRes)
+            loaders[i] = QnMultiCameraTimePeriodLoader::newInstance(resource);
+        else
+            loaders[i] = QnLayoutFileTimePeriodLoader::newInstance(resource);
         if(!loaders[i]) {
             success = false;
             break;
@@ -94,8 +101,9 @@ bool QnCachingTimePeriodLoader::createLoaders(const QnResourcePtr &resource, QnM
     return false;
 }
 
-QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resource, QObject *parent) {
-    QnMultiCameraTimePeriodLoader *loaders[Qn::TimePeriodRoleCount];
+QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResourcePtr &resource, QObject *parent) 
+{
+    QnAbstractTimePeriodLoader *loaders[Qn::TimePeriodRoleCount];
     if(createLoaders(resource, loaders)) {
         return new QnCachingTimePeriodLoader(loaders, parent);
     } else {
@@ -103,7 +111,7 @@ QnCachingTimePeriodLoader *QnCachingTimePeriodLoader::newInstance(const QnResour
     }
 }
 
-QnNetworkResourcePtr QnCachingTimePeriodLoader::resource() {
+QnResourcePtr QnCachingTimePeriodLoader::resource() {
     return m_resource;
 }
 
@@ -177,7 +185,7 @@ QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &ta
 }
 
 void QnCachingTimePeriodLoader::load(Qn::TimePeriodRole type) {
-    QnMultiCameraTimePeriodLoader *loader = m_loaders[type];
+    QnAbstractTimePeriodLoader *loader = m_loaders[type];
     if(!loader) {
         qnWarning("No valid loader in scope.");
         emit loadingFailed();

@@ -1980,9 +1980,11 @@ Do you want to continue?"),
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
         QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.pb")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
-        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole);
+        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
         QByteArray data;
         periods.encode(data);
+        device->write(data);
+        delete device;
     }
 
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);

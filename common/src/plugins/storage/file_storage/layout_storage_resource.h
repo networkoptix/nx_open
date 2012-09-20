@@ -74,4 +74,6 @@ private:
     QnLayoutFileIndex m_index;
 };
 
+typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
+
 #endif // _LAYOUT_STORAGE_PROTOCOL_H__

@@ -8,9 +8,8 @@ namespace {
 }
 
 QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
-    QObject(parent), 
-    m_connection(connection), 
-    m_resource(resource)
+    QnAbstractTimePeriodLoader(resource, parent),
+    m_connection(connection)
 {
     if(!connection)
         qnNullWarning(connection);
@@ -18,9 +17,6 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connect
     if(!resource)
         qnNullWarning(resource);
 
-    qRegisterMetaType<QnTimePeriodList>("QnTimePeriodList");
-
-    connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
 }
 
 QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent) {
@@ -37,13 +33,6 @@ QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObj
         return NULL;
 
     return new QnTimePeriodLoader(serverConnection, networkResource, parent);
-}
-
-QnNetworkResourcePtr QnTimePeriodLoader::resource() const 
-{
-    QMutexLocker lock(&m_mutex);
-
-    return m_resource;
 }
 
 int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
@@ -172,7 +161,7 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
 int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
 {
     return m_connection->asyncRecordedTimePeriods(
-        QnNetworkResourceList() << m_resource, 
+        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
         periodToLoad.startTimeMs, 
         periodToLoad.startTimeMs + periodToLoad.durationMs, 
         1, 

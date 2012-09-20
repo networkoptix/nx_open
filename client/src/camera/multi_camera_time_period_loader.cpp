@@ -8,11 +8,13 @@ namespace {
     QAtomicInt qn_multiHandle(1);
 }
 
-QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnNetworkResourcePtr resource, QObject *parent):
-    QObject(parent),
+// ------------------------------------------ QnMultiCameraTimePeriodLoader ----------------------------------------
+
+QnMultiCameraTimePeriodLoader::QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent):
+    QnAbstractTimePeriodLoader(resource, parent),
     m_mutex(QMutex::Recursive)
 {
-    m_resource = resource;
+
 }
 
 QnMultiCameraTimePeriodLoader* QnMultiCameraTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
@@ -34,7 +36,7 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     QList<int> handles;
     
     // sometime camera moved between media server. Get all servers for requested time period
-    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(m_resource, period);
+    QList<QnNetworkResourcePtr> cameraList = QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(m_resource.dynamicCast<QnNetworkResource>(), period);
     foreach(const QnNetworkResourcePtr& camera, cameraList)
     {
         int handle = loadInternal(camera, period, motionRegions);
@@ -123,9 +125,4 @@ void QnMultiCameraTimePeriodLoader::onLoadingFailed(int status, int handle)
             }
         }
     }
-}
-
-QnNetworkResourcePtr QnMultiCameraTimePeriodLoader::resource() const
-{
-    return m_resource;
 }

@@ -76,3 +76,8 @@ void QnAviResource::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
 }
+
+QnStorageResourcePtr QnAviResource::getStorage() const
+{
+    return m_storage;
+}
