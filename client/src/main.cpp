@@ -71,8 +71,7 @@
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
-#include "utils/monitoring/sigar_monitor.h"
-#include "utils/monitoring/windows_monitor.h"
+#include "utils/monitoring/platform_monitor.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -223,9 +222,9 @@ int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
     
-    QnWindowsMonitor m;
+    QnPlatformMonitor *m = QnPlatformMonitor::newInstance();
     while(1) {
-        foreach(const QnPlatformMonitor::HddLoad &hddLoad, m.totalHddLoad())
+        foreach(const QnPlatformMonitor::HddLoad &hddLoad, m->totalHddLoad())
             qDebug() << hddLoad.hdd.partitions << hddLoad.load;
 
         Sleep(1000);
