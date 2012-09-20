@@ -459,8 +459,10 @@ int QnRtspConnectionProcessor::composeDescribe()
             QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) {
                 encoder = createEncoderByMediaData(media);
-                encoder->setMediaData(media);
-                qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
+                if (encoder)
+                    encoder->setMediaData(media);
+                else
+                    qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
             }
         }
         if (encoder == 0)
