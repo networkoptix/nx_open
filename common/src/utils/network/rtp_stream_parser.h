@@ -65,6 +65,8 @@ private:
 class QnRtpVideoStreamParser: public QnRtpStreamParser
 {
 public:
+    QnRtpVideoStreamParser();
+
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
 protected:
     struct Chunk

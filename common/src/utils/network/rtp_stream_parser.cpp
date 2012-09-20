@@ -1,5 +1,11 @@
 #include "rtp_stream_parser.h"
 
+
+QnRtpVideoStreamParser::QnRtpVideoStreamParser()
+{
+    m_chunks.reserve(1024);
+}
+
 QnRtpStreamParser::QnRtpStreamParser():
 m_timeHelper(0)
 {

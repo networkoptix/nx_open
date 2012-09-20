@@ -39,6 +39,7 @@ public:
     void setUseSoftwareMotion(bool value);
 
     void updateSoftwareMotion();
+    bool canChangeStatus() const { return m_role == QnResource::Role_LiveVideo && m_isPhysicalResource; }
 protected:
 
     virtual void updateStreamParamsBasedOnQuality() = 0;
@@ -64,6 +65,7 @@ private:
     int m_softMotionLastChannel;
     const QnVideoResourceLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
+    bool m_isPhysicalResource;
 };
 
 #endif //live_strem_provider_h_1508

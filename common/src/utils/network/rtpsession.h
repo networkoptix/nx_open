@@ -107,7 +107,7 @@ public:
     static QString mediaTypeToStr(TrackType tt);
 
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
-    typedef QList<QSharedPointer<SDPTrackInfo> > TrackMap;
+    typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
     RTPSession();
     ~RTPSession();
