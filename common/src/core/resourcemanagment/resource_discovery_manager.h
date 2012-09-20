@@ -103,7 +103,8 @@ private:
 
 
     QMap<QString, int> m_resourceDiscoveryCounter;
-
+    CLNetState netState;
+    QTime netStateTime;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H
