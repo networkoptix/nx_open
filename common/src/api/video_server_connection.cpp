@@ -11,9 +11,6 @@
 #include <api/serializer/serializer.h>
 #include <api/video_server_statistics_data.h>
 
-QString QnVideoServerConnection::m_proxyAddr;
-int QnVideoServerConnection::m_proxyPort = 0;
-
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
@@ -27,9 +24,14 @@ public:
     {
     }
 
-    void addToProxyList(const QUrl& url)
+    void removeFromProxyList(const QUrl& url)
     {
-        m_proxyInfo.insert(url);
+        m_proxyInfo.remove(url);
+    }
+
+    void addToProxyList(const QUrl& url, const QString& addr, int port)
+    {
+        m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -43,7 +45,7 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
     {
         QList<QNetworkProxy> rez;
-        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
+        if (query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
             return rez;
         }
@@ -52,16 +54,22 @@ protected:
         url.setPath(QString());
         url.setUserInfo(QString());
         url.setQueryItems(QList<QPair<QString, QString> >());
-        QSet<QUrl>::const_iterator itr = m_proxyInfo.find(url);
+        QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
         else 
-            rez << QNetworkProxy(QNetworkProxy::HttpProxy, QnVideoServerConnection::getProxyHost(), QnVideoServerConnection::getProxyPort());
+            rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
         return rez;
     }
 
 private:
-    QSet<QUrl> m_proxyInfo;
+    struct ProxyInfo {
+        ProxyInfo(): port(0) {}
+        ProxyInfo(const QString& _addr, int _port): addr(_addr), port(_port) {}
+        QString addr;
+        int port;
+    };
+    QMap<QUrl, ProxyInfo> m_proxyInfo;
 };
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
@@ -216,9 +224,9 @@ namespace detail
 
 QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *parent):
     QObject(parent),
-    m_url(url)
+    m_url(url),
+    m_proxyPort(0)
 {
-    QnNetworkProxyFactory::instance()->addToProxyList(m_url);
 }
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
@@ -365,19 +373,39 @@ int QnVideoServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-int QnVideoServerConnection::asyncGetCameraAddition(QObject *target, const char *slot,
-                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password){
+int QnVideoServerConnection::asyncGetManualCameraSearch(QObject *target, const char *slot,
+                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port){
 
     QnRequestParamList params;
-    params << QnRequestParam("start", startAddr);
-    params << QnRequestParam("end", endAddr);
+    params << QnRequestParam("start_ip", startAddr);
+    params << QnRequestParam("end_ip", endAddr);
+    params << QnRequestParam("user", username);
+    params << QnRequestParam("password", password);
+    params << QnRequestParam("port" ,QString::number(port));
+
+    detail::VideoServerManualCameraRequestReplyProcessor *processor = new detail::VideoServerManualCameraRequestReplyProcessor();
+    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), params, processor, SLOT(at_searchReplyReceived(int, QByteArray, QByteArray, int)));
+}
+
+int QnVideoServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
+                                                     const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password){
+    QnRequestParamList params;
+
+    for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
+        params << QnRequestParam("url", urls[i]);
+        params << QnRequestParam("manufacturer", manufacturers[i]);
+    }
+
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
 
-    detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor *processor = new detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor();
-    connect(processor, SIGNAL(finished(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualAddcams"), params, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    detail::VideoServerManualCameraRequestReplyProcessor *processor = new detail::VideoServerManualCameraRequestReplyProcessor();
+    connect(processor, SIGNAL(finishedAdd(int)), target, slot, Qt::QueuedConnection);
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/add"), params, processor, SLOT(at_addReplyReceived(int, QByteArray, QByteArray, int)));
 }
+
+
 
 void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString*/, int handle) 
 {
@@ -386,7 +414,7 @@ void detail::VideoServerSessionManagerReplyProcessor::at_replyReceived(int statu
     {
         if (reply.startsWith("BIN"))
         {
-            QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
+            result.decode((const quint8*) reply.constData()+3, reply.size()-3);
         }
         else {
             qWarning() << "VideoServerConnection: unexpected message received.";
@@ -442,7 +470,7 @@ int QnVideoServerConnection::recordedTimePeriods(const QnRequestParamList &param
         return 1;
 
     if (reply.startsWith("BIN")) {
-        QnTimePeriod::decode((const quint8*) reply.constData()+3, reply.size()-3, result);
+        result.decode((const quint8*) reply.constData()+3, reply.size()-3);
     } else {
         qWarning() << "VideoServerConnection: unexpected message received.";
         return -1;
@@ -463,20 +491,10 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
-    //QnNetworkProxyFactory::instance()->clearProxyList();
-
-    /*
-    QNetworkProxy proxy;
-    proxy.setType(port ? QNetworkProxy::HttpProxy : QNetworkProxy::NoProxy);
-    proxy.setHostName(addr);
-    proxy.setPort(port);
-    proxy.setApplicationProxy(proxy);
-    */
-
-    //proxy.setUser("username");
-    //proxy.setPassword("password");
-
-    //QNetworkProxyQuery proxyQuery("http://?/RecordedTimePeriods")
+    if (port)
+        QnNetworkProxyFactory::instance()->addToProxyList(m_url, addr, port);
+    else
+        QnNetworkProxyFactory::instance()->removeFromProxyList(m_url);
 }
 
 void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &, int) {
@@ -507,11 +525,13 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
     deleteLater();
 }
 
-void detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray ,int ){
+void detail::VideoServerManualCameraRequestReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+    Q_UNUSED(errorString)
+    Q_UNUSED(handle)
 
     QnCamerasFoundInfoList result;
     if (status == 0){
-        QByteArray root = extractXmlBody(reply, "root");
+        QByteArray root = extractXmlBody(reply, "reply");
         QByteArray resource;
         int from = 0;
         do
@@ -521,12 +541,21 @@ void detail::VideoServerSessionManagerAddCamerasRequestReplyProcessor::at_replyR
                 break;
             QString url = QLatin1String(extractXmlBody(resource, "url"));
             QString name = QLatin1String(extractXmlBody(resource, "name"));
-            result.append(QnCamerasFoundInfo(url, name));
+            QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
+            result.append(QnCamerasFoundInfo(url, name, manufacture));
 
         } while (resource.length() > 0);
     }
 
-    emit finished(result);
+    emit finishedSearch(result);
+    deleteLater();
+}
+
+void detail::VideoServerManualCameraRequestReplyProcessor::at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+    Q_UNUSED(errorString)
+    Q_UNUSED(handle)
+    Q_UNUSED(reply)
+    emit finishedAdd(status);
     deleteLater();
 }
 

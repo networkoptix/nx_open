@@ -7,8 +7,8 @@ char* pict_type_str[4] = {"I_TYPE", "P_TYPE", "B_TYPE", "BI_TYPE"};
 
 static inline int get_unary(BitStreamReader& bitReader, int stop, int len)
 {
-    uint i;
-    for(i = 0; i < (uint)len && bitReader.getBit() != stop; i++);
+    int i;
+    for(i = 0; i < len && bitReader.getBit() != (uint)stop; i++);
     return i;
 } 
 
@@ -41,7 +41,7 @@ void VC1Unit::updateBits(int bitOffset, int bitLen, int value)
 	bitWriter.putBits(bitLen, value);
 
 	if (endBitsPostfix < 8) {
-		int postfix = *ptr_end & ( 1 << endBitsPostfix)-1;
+        int postfix = *ptr_end & (( 1 << endBitsPostfix)-1);
 		bitWriter.putBits(endBitsPostfix, postfix);
 	}
 	bitWriter.flushBits();
@@ -279,13 +279,15 @@ int VC1SequenceHeader::decode_sequence_header_adv()
  
 int VC1SequenceHeader::decode_entry_point()
 {
-    int i, blink, clentry, refdist;
+    int i;
 	try {
 		bitReader.setBuffer(m_nalBuffer, m_nalBuffer + m_nalBufferLen); // skip 00 00 01 xx marker
-		blink = bitReader.getBit(); // broken link
-		clentry = bitReader.getBit(); // closed entry
+        //blink = bitReader.getBit(); // broken link
+        //clentry = bitReader.getBit(); // closed entry
+        bitReader.skipBits(2);
 		panscanflag = bitReader.getBit();
-		refdist = bitReader.getBit(); // refdist flag
+        //refdist = bitReader.getBit(); // refdist flag
+        bitReader.skipBit();
 		loop_filter = bitReader.getBit();
 		fastuvmc = bitReader.getBit();
 		extended_mv = bitReader.getBit();

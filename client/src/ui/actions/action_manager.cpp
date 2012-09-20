@@ -44,7 +44,7 @@ class QnActionBuilder {
 public:
     QnActionBuilder(QnActionManager *manager, QnAction *action): 
         m_manager(manager), 
-        m_action(action) 
+        m_action(action)
     {
         action->setShortcutContext(Qt::WindowShortcut);
     }
@@ -106,6 +106,12 @@ public:
 
     QnActionBuilder toolTip(const QString &toolTip) {
         m_action->setToolTip(toolTip);
+
+        return *this;
+    }
+
+    QnActionBuilder toolTipFormat(const QString &toolTipFormat) {
+        m_action->setToolTipFormat(toolTipFormat);
 
         return *this;
     }
@@ -409,7 +415,6 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::TabBar | Qn::SingleTarget | Qn::NoTarget).
             text(tr("Tab")).
             pulledText(tr("New Tab")).
-            toolTip(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
             autoRepeat(false). /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
             icon(qnSkin->icon("titlebar/new_layout.png"));
@@ -786,7 +791,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add camera...")).
+        text(tr("Add camera(s)...")).
         condition(new QnResourceActionCondition(hasFlags(QnResource::remote_server), Qn::ExactlyOne, this));
 
     factory(Qn::ServerSettingsAction).
@@ -884,9 +889,10 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnExportActionCondition(this));
 
     factory(Qn::ExportLayoutAction).
-        // flags(Qn::Slider | Qn::SingleTarget). // TODO
+         flags(Qn::Slider | Qn::SingleTarget). 
         text(tr("Export Selection as Multi-Stream...")).
-        condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        condition(new QnExportActionCondition(this));
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
@@ -901,11 +907,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Show Thumbnails")).
         toggledText(tr("Hide Thumbnails"));
-
-    factory(Qn::ToggleCalendarAction).
-        flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Show Calendar")).
-        toggledText(tr("Hide Calendar"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
@@ -922,7 +923,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::PlayPauseAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("Space")).
-        text(tr("Play / Pause")).
+        text(tr("Play")).
+        toggledText(tr("Pause")).
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::SpeedDownAction).
@@ -963,30 +965,38 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::VolumeUpAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+Down")).
+        shortcut(tr("Ctrl+Up")).
         text(tr("Volume Down"));
 
     factory(Qn::VolumeDownAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
-        shortcut(tr("Ctrl+Up")).
+        shortcut(tr("Ctrl+Down")).
         text(tr("Volume Up"));
 
     factory(Qn::ToggleMuteAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("M")).
-        text(tr("Toggle Mute"));
+        text(tr("Toggle Mute")).
+        checkable();
 
     factory(Qn::JumpToLiveAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("L")).
         text(tr("Jump to Live")).
+        checkable().
         condition(new QnArchiveActionCondition(this));
 
     factory(Qn::ToggleSyncAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::Slider | Qn::SingleTarget).
         shortcut(tr("S")).
-        text(tr("Toggle Sync")).
+        text(tr("Synchronize Streams")).
+        toggledText(tr("Disable Stream Synchronization")).
         condition(new QnArchiveActionCondition(this));
+
+    factory(Qn::ToggleCalendarAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Calendar")).
+        toggledText(tr("Hide Calendar"));
 }
 
 QnActionManager::~QnActionManager() {

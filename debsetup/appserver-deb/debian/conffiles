@@ -1,2 +1,1 @@
-/opt/${deb.customization.company.name}/entcontroller/etc/entcontroller.conf
 /etc/init/${deb.customization.company.name}-entcontroller.conf

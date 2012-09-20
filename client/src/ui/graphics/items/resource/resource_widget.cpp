@@ -83,6 +83,21 @@ namespace {
 
     Q_GLOBAL_STATIC(QnDefaultDeviceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
+    void splitFormat(const QString &format, QString *left, QString *right) {
+        int index = format.indexOf(QLatin1Char('\t'));
+        if(index != -1) {
+            *left = format.mid(0, index);
+            *right = format.mid(index + 1);
+        } else {
+            *left = format;
+            *right = QString();
+        }
+    }
+
+    QString mergeFormat(const QString &left, const QString &right) {
+        return right.isEmpty() ? left : (left + QLatin1Char('\t') + right);
+    }
+
 } // anonymous namespace
 
 
@@ -93,13 +108,17 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
+    m_options(DisplaySelectionOverlay | DisplayButtons),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
-    m_frameWidth(-1.0),
     m_frameOpacity(1.0),
-    m_aboutToBeDestroyedEmitted(false),
-    m_options(DisplaySelectionOverlay | DisplayButtons)
+    m_frameWidth(-1.0),
+    m_titleTextFormat(QLatin1String("%1")),
+    m_infoTextFormat(QLatin1String("%1")),
+    m_titleTextFormatHasPlaceholder(true),
+    m_infoTextFormatHasPlaceholder(true),
+    m_aboutToBeDestroyedEmitted(false)
 {
     setAcceptHoverEvents(true);
 
@@ -121,9 +140,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     }
 
     /* Header overlay. */
-    m_headerLabel = new GraphicsLabel();
-    m_headerLabel->setAcceptedMouseButtons(0);
-    m_headerLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+    m_headerLeftLabel = new GraphicsLabel();
+    m_headerLeftLabel->setAcceptedMouseButtons(0);
+    m_headerLeftLabel->setPerformanceHint(QStaticText::AggressiveCaching);
+
+    m_headerRightLabel = new GraphicsLabel();
+    m_headerRightLabel->setAcceptedMouseButtons(0);
+    m_headerRightLabel->setPerformanceHint(QStaticText::AggressiveCaching);
 
 #if 0
     QnImageButtonWidget *togglePinButton = new QnImageButtonWidget();
@@ -165,8 +188,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerLabel);
+    headerLayout->addItem(m_headerLeftLabel);
     headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    headerLayout->addItem(m_headerRightLabel);
     headerLayout->addItem(m_buttonBar);
 
     m_headerWidget = new GraphicsWidget();
@@ -311,20 +335,30 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
 }
 
 QString QnResourceWidget::titleText() const {
-    return m_headerLabel->text();
+    return m_headerLeftLabel->text();
 }
 
-void QnResourceWidget::setTitleText(const QString &titleText) {
-    if(m_titleText == titleText)
+QString QnResourceWidget::titleTextFormat() const {
+    return m_titleTextFormat;
+}
+
+void QnResourceWidget::setTitleTextFormat(const QString &titleTextFormat) {
+    if(m_titleTextFormat == titleTextFormat)
         return;
 
-    m_titleText = titleText;
+    m_titleTextFormat = titleTextFormat;
+    m_titleTextFormatHasPlaceholder = titleTextFormat.contains(QLatin1String("%1"));
 
     updateTitleText();
 }
 
 void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
-    m_headerLabel->setText(titleText);
+    QString leftText, rightText;
+
+    splitFormat(titleText, &leftText, &rightText);
+
+    m_headerLeftLabel->setText(leftText);
+    m_headerRightLabel->setText(rightText);
 }
 
 QString QnResourceWidget::calculateTitleText() const {
@@ -332,34 +366,31 @@ QString QnResourceWidget::calculateTitleText() const {
 }
 
 void QnResourceWidget::updateTitleText() {
-    setTitleTextInternal(m_titleText.isNull() ? calculateTitleText() : m_titleText);
+    setTitleTextInternal(m_titleTextFormatHasPlaceholder ? m_titleTextFormat.arg(calculateTitleText()) : m_titleTextFormat);
 }
 
-void QnResourceWidget::setInfoText(const QString &infoText) {
-    if(m_infoText == infoText)
+QString QnResourceWidget::infoText() {
+    return mergeFormat(m_footerLeftLabel->text(), m_footerRightLabel->text());
+}
+
+QString QnResourceWidget::infoTextFormat() const {
+    return m_infoTextFormat;
+}
+
+void QnResourceWidget::setInfoTextFormat(const QString &infoTextFormat) {
+    if(m_infoTextFormat == infoTextFormat)
         return;
 
-    m_infoText = infoText;
+    m_infoTextFormat = infoTextFormat;
+    m_infoTextFormatHasPlaceholder = infoTextFormat.contains(QLatin1String("%1"));
 
     updateInfoText();
 }
 
-QString QnResourceWidget::infoText() {
-    QString leftText = m_footerLeftLabel->text();
-    QString rightText = m_footerRightLabel->text();
-    
-    return rightText.isEmpty() ? leftText : (leftText + QLatin1Char('\t') + rightText);
-}
-
 void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
-    QString leftText = infoText;
-    QString rightText;
-
-    int index = leftText.indexOf(QLatin1Char('\t'));
-    if(index != -1) {
-        rightText = leftText.mid(index + 1);
-        leftText = leftText.mid(0, index);
-    }
+    QString leftText, rightText;
+    
+    splitFormat(infoText, &leftText, &rightText);
 
     m_footerLeftLabel->setText(leftText);
     m_footerRightLabel->setText(rightText);
@@ -370,7 +401,7 @@ QString QnResourceWidget::calculateInfoText() const {
 }
 
 void QnResourceWidget::updateInfoText() {
-    setInfoTextInternal(m_infoText.isNull() ? calculateInfoText() : m_infoText);
+    setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {

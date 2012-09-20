@@ -42,7 +42,7 @@ PlDroidStreamReader::~PlDroidStreamReader()
 QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
 {
     QnAbstractMediaDataPtr result;
-    quint8 rtpBuffer[MAX_RTP_PACKET_SIZE];
+    QnByteArray rtpBuffer(16, 1024*64);
 
     if (!isStreamOpened())
         return QnAbstractMediaDataPtr(0);
@@ -55,8 +55,12 @@ QnAbstractMediaDataPtr PlDroidStreamReader::getNextData()
         }
 
         QMutexLocker lock(&m_controlPortSync);
-        int readed = m_videoIoDevice->read( (char*) rtpBuffer, sizeof(rtpBuffer));
-        m_h264Parser->processData(rtpBuffer, readed, m_videoIoDevice->getStatistic(), result );
+        rtpBuffer.reserve(rtpBuffer.size() + MAX_RTP_PACKET_SIZE);
+        int readed = m_videoIoDevice->read( (char*) rtpBuffer.data() + rtpBuffer.size(), MAX_RTP_PACKET_SIZE);
+        if (readed > 0) {
+            m_h264Parser->processData((quint8*)rtpBuffer.data(), rtpBuffer.size(), readed, m_videoIoDevice->getStatistic(), result );
+            rtpBuffer.finishWriting(readed);
+        }
     }
     return result;
 }

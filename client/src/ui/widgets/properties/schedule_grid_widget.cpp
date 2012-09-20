@@ -160,10 +160,10 @@ void QnScheduleGridWidget::paintEvent(QPaintEvent *)
             QColor color(m_gridParams[x][y][ColorParam].toUInt());
             QColor colorInside(m_gridParams[x][y][ColorInsideParam].toUInt());
             if (!m_mousePressed) {
-                if (y == m_mouseMoveCell.y() && x == m_mouseMoveCell.x() ||
-                    m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x() ||
-                    m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y() ||
-                    m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1)
+                if ((y == m_mouseMoveCell.y()  && x == m_mouseMoveCell.x()) ||
+                    (m_mouseMoveCell.y() == -1 && x == m_mouseMoveCell.x()) ||
+                    (m_mouseMoveCell.x() == -1 && y == m_mouseMoveCell.y()) ||
+                    (m_mouseMoveCell.y() == -1 && m_mouseMoveCell.x() == -1))
                 {
                     color = shiftColor(color, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);
                     colorInside = shiftColor(colorInside, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA, SEL_CELL_CLR_DELTA);

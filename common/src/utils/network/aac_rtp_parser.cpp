@@ -83,21 +83,22 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
+    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     result.clear();
     QVector<int> auSize;
     QVector<int> auIndex;
     QVector<int> auCtsDelta;
     QVector<int> auDtsDelta;
-    bool rapFlag = false;
-    int streamStateValue = 0;
+    //bool rapFlag = false;
+    //int streamStateValue = 0;
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;
     quint8* curPtr = rtpBuffer + RtpHeader::RTP_HEADER_SIZE;
     quint8* end = rtpBuffer + bufferSize;
 
-    bool isLastPacket = rtpHeader->marker;
+    //bool isLastPacket = rtpHeader->marker;
     try 
     {
         if (m_auHeaderExists)
@@ -130,9 +131,11 @@ bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspSt
                         auDtsDelta << 0;
                 }
                 if (m_randomAccessIndication)
-                    rapFlag = reader.getBit();
+                    //rapFlag = reader.getBit();
+                    reader.skipBit();
                 if (m_streamStateIndication)
-                    streamStateValue = reader.getBits(m_streamStateIndication);
+                    //streamStateValue = reader.getBits(m_streamStateIndication);
+                    reader.skipBits(m_streamStateIndication);
             }
             curPtr += qPower2Ceil(auHeaderLen, 8)/8;
         }

@@ -72,6 +72,8 @@ QnResourcePtr QnPlPulseSearcher::createResource(QnId resourceTypeId, const QnRes
 
 QnResourcePtr QnPlPulseSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    Q_UNUSED(url)
+    Q_UNUSED(auth)
     return QnResourcePtr(0);
 }
 

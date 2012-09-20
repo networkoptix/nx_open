@@ -55,6 +55,7 @@ protected:
 private:
     mutable int m_numberOfchannels;
     qint64 m_lastVideoTime[CL_MAX_CHANNELS];
+    bool m_isCamera;
 };
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;

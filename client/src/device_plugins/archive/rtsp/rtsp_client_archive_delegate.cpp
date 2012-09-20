@@ -13,28 +13,23 @@
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
-QString QnRtspClientArchiveDelegate::m_proxyAddr;
-int QnRtspClientArchiveDelegate::m_proxyPort = 0;
-
-
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     QnAbstractArchiveDelegate(),
-    m_tcpMode(true),
     m_rtpData(0),
+    m_tcpMode(true),
     m_position(DATETIME_NOW),
     m_opened(false),
-    //m_waitBOF(false),
     m_lastPacketFlags(-1),
     m_closing(false),
     m_singleShotMode(false),
+    m_sendedCSec(0),
+    m_lastSeekTime(AV_NOPTS_VALUE),
     m_lastReceivedTime(AV_NOPTS_VALUE),
     m_blockReopening(false),
     m_quality(MEDIA_Quality_High),
     m_qualityFastSwitch(true),
-    m_lastSeekTime(AV_NOPTS_VALUE),
-    m_sendedCSec(0),
-    m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_lastMinTimeTime(0),
+    m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true)
 {
@@ -52,11 +47,6 @@ void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
     updateRtpParam(resource);
 }
 
-void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
-{
-    m_proxyAddr = addr;
-    m_proxyPort = port;
-}
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 {
@@ -137,12 +127,18 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     {
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
-        otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
-        if (otherCamera && otherRtspSession.open(getUrl(otherCamera)))
+        if (otherCamera)
         {
-            if (otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+            QnVideoServerResourcePtr server = qnResPool->getResourceById(otherCamera->getParentId()).dynamicCast<QnVideoServerResource>();
+            if (server && server->getStatus() != QnResource::Offline)
             {
-                return otherRtspSession.startTime();
+                otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+                if (otherRtspSession.open(getUrl(otherCamera))) {
+                    if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+                    {
+                        return otherRtspSession.startTime();
+                    }
+                }
             }
         }
     }
@@ -204,19 +200,19 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     m_closing = false;
     m_resource = resource;
-    QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
-    if (server == 0)
+    QnVideoServerResourcePtr server = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnVideoServerResource>();
+    if (server == 0 || server->getStatus() == QnResource::Offline)
         return false;
 
     
 
     m_rtspSession.setTransport(QLatin1String("TCP"));
 
-    m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
+    m_rtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;
-    if (m_globalMinArchiveTime == 0 && m_rtspSession.startTime() != AV_NOPTS_VALUE) {
+    if (m_globalMinArchiveTime == 0 && (quint64)m_rtspSession.startTime() != AV_NOPTS_VALUE) {
         m_globalMinArchiveTime = m_rtspSession.startTime(); // block multiserver archive left point as current server left point (zerro velue mean: read value from current server)
         globalTimeBlocked = true;
     }
@@ -224,7 +220,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     bool isOpened = m_rtspSession.open(getUrl(resource));
 
     qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
-    if (globalMinTime !=AV_NOPTS_VALUE)
+    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
         m_globalMinArchiveTime = globalMinTime;
     else if (globalTimeBlocked)
         m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
@@ -273,7 +269,7 @@ qint64 QnRtspClientArchiveDelegate::startTime()
     //qint64 minTime = QnCameraHistoryPool::instance()->getMinTime(qSharedPointerDynamicCast<QnNetworkResource> (m_resource));
     //if (minTime != AV_NOPTS_VALUE)
     //    return minTime*1000;
-    if (m_globalMinArchiveTime == AV_NOPTS_VALUE)
+    if ((quint64)m_globalMinArchiveTime == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
 
     if (m_globalMinArchiveTime != 0)
@@ -310,15 +306,15 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     
     // Check if archive moved to other video server
     qint64 timeMs = result ? result->timestamp/1000 : 0;
-    bool outOfRange = m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs() || 
-                      m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs;
+    bool outOfRange = (m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
+                      (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs);
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
                     "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
                     QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
 
-        if (m_lastSeekTime == AV_NOPTS_VALUE)
+        if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         QnResourcePtr newResource = getNextVideoServerFromTime(m_resource, m_lastSeekTime/1000);
         if (newResource) {
@@ -696,7 +692,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 mediaPacket->opaque = cseq;
                 mediaPacket->flags = flags;
 
-                if (context)
+                if (context && context->ctx())
                     mediaPacket->compressionType = context->ctx()->codec_id;
                 mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
                 int ssrcTmp = (ssrc - BASIC_FFMPEG_SSRC) / 2;
@@ -815,7 +811,7 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
-    if ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250 || diff > 1000*10)
+    if (((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10)
     {
         m_blockReopening = true;
         close();

@@ -226,6 +226,7 @@ bool QnDwm::enableBlurBehindWindow(bool enable) {
     
     return SUCCEEDED(status);
 #else
+    Q_UNUSED(enable)
     return false;
 #endif // Q_OS_WIN
 }
@@ -286,6 +287,7 @@ bool QnDwm::extendFrameIntoClientArea(const QMargins &margins) {
 
     return SUCCEEDED(status);
 #else
+    Q_UNUSED(margins)
     return false;
 #endif // Q_OS_WIN
 }
@@ -386,6 +388,7 @@ bool QnDwm::setCurrentFrameMargins(const QMargins &margins) {
 
     return true;
 #else
+    Q_UNUSED(margins)
     return false;
 #endif // Q_OS_WIN
 }

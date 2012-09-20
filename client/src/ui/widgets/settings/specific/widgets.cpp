@@ -78,7 +78,8 @@ void SettingsOnOffWidget::toggled(bool checked)
 //==============================================
 SettingsMinMaxStepWidget::SettingsMinMaxStepWidget(const QnParam &param, QWidget *parent)
     : CLAbstractSettingsWidget(param, parent),
-      m_groupBox(0), m_slider(0)
+      m_slider(0),
+      m_groupBox(0)
 {
     m_groupBox = new QGroupBox(param.name());
     //m_groupBox->setFont(QFont("Courier New", 11));

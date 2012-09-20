@@ -41,11 +41,6 @@ void QnByteArray::clear()
     m_ignore = 0;
 }
 
-const char *QnByteArray::constData() const
-{
-    return m_data + m_ignore;
-}
-
 char *QnByteArray::data()
 {
     if( !m_ownBuffer )
@@ -62,16 +57,6 @@ void QnByteArray::ignore_first_bytes(int bytes_to_ignore)
 int QnByteArray::getAlignment() const
 {
     return m_alignment;
-}
-
-unsigned int QnByteArray::size() const
-{
-    return m_size - m_ignore;
-}
-
-unsigned int QnByteArray::capacity() const
-{
-    return m_capacity;
 }
 
 unsigned int QnByteArray::write( const char *data, unsigned int size )
@@ -122,11 +107,6 @@ char *QnByteArray::startWriting(unsigned int size)
     reserve(m_size + size);
 
     return m_data + m_size;
-}
-
-void QnByteArray::finishWriting(unsigned int size)
-{
-    m_size += size;
 }
 
 void QnByteArray::resize(unsigned int size)

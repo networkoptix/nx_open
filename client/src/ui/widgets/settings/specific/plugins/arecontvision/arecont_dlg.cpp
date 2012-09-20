@@ -17,7 +17,7 @@ AreconVisionDlgManufacture::AreconVisionDlgManufacture()
         3130, 3135, 20185, 20365
     };
 
-    for (int i = 0; i < sizeof(models) / sizeof(models[0]); ++i) {
+    for (uint i = 0; i < sizeof(models) / sizeof(models[0]); ++i) {
         const QString model = QString::number(models[i]);
         mPossibleNames.append(model);
         mPossibleNames.append(model + QLatin1String("M"));
@@ -138,11 +138,11 @@ void AVSettingsDlg::initImageQuality()
     if (QWidget *wgt = widgetByName(QLatin1String("Equalize Brightness"))) {
         wgt->move(135,360);
 
-        if (wgt = widgetByName(QLatin1String("Equalize Color")))
-            wgt->move(340,360);
+        if (QWidget *wgt2 = widgetByName(QLatin1String("Equalize Color")))
+            wgt2->move(340,360);
 
-        if (wgt = widgetByName(QLatin1String("Rotate 180")))
-            wgt->hide(); // for now
+        if (QWidget *wgt2 = widgetByName(QLatin1String("Rotate 180")))
+            wgt2->hide(); // for now
     } else {
         if (QWidget *wgt = widgetByName(QLatin1String("Rotate 180")))
             wgt->move(255,360);
@@ -219,14 +219,14 @@ void AVSettingsDlg::correctWgtsState()
 {
     if (QWidget *wgt = widgetByName(QLatin1String("Light Mode"))) {
         const QString val = param(wgt).value().toString();
-        if (wgt = widgetByName(QLatin1String("Short Exposure")))
-            wgt->setVisible(val == QLatin1String("highspeed"));
+        if (QWidget *wgt2 = widgetByName(QLatin1String("Short Exposure")))
+            wgt2->setVisible(val == QLatin1String("highspeed"));
     }
 
     if (QWidget *wgt = widgetByName(QLatin1String("Codec"))) {
         const QString val = param(wgt).value().toString();
-        if (wgt = widgetByName(QLatin1String("Bitrate")))
-            wgt->setVisible(val == QLatin1String("H.264"));
+        if (QWidget *wgt2 = widgetByName(QLatin1String("Bitrate")))
+            wgt2->setVisible(val == QLatin1String("H.264"));
     }
 }
 

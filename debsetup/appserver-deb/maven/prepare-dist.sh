@@ -1,3 +1,5 @@
+#!/bin/bash 
+
 #for f in ${project.build.directory}/*.zip 
 #do 
 #	unzip -a -o -u $f
@@ -8,10 +10,10 @@
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 
-sudo chown -R `whoami`:sudo ${project.build.directory}
+sudo chown -R $USER:sudo ${project.build.directory}
 
-chmod 775 ./init.d/*
-chmod 775 ./debian/prerm 
-chmod 775 ./debian/postinst
-chmod 775 ./bin/mediaproxy*
-chmod 775 ./build-dist.sh
+chmod 755 ./init.d/*
+chmod 755 ./debian/prerm 
+chmod 755 ./debian/postinst
+chmod 755 ./bin/mediaproxy*
+chmod 755 ./build-dist.sh

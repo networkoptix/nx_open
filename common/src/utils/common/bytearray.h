@@ -34,7 +34,7 @@ public:
     /**
      * \returns                         Pointer to the data stored in this array.
      */
-    const char *constData() const;
+    inline const char *constData() const { return m_data + m_ignore; }
 
     /**
      * \returns                         Pointer to the data stored in this array.
@@ -49,12 +49,12 @@ public:
     /**
      * \returns                         Size of this array.
      */
-    unsigned int size() const;
+    inline unsigned int size() const { return m_size - m_ignore; }
 
     /**
      * \returns                         Capacity of this array.
      */
-    unsigned int capacity() const;
+    inline unsigned int capacity() const { return m_capacity; }
 
     /**
      * \param data                      Pointer to the data to append to this array
@@ -62,6 +62,19 @@ public:
      * \returns                         New size of this array, or 0 in case of an error.
      */
     unsigned int write(const char *data, unsigned int size);
+
+    /**
+     * Write to buffer without any checks. Buffer MUST be preallocated before that call
+     * \param data                      Pointer to the data to append to this array
+     * \param size                      Size of the data to append.
+     */
+    inline void uncheckedWrite( const char *data, unsigned int size )
+    {
+        Q_ASSERT_X(m_size + size <= m_capacity, "Buffer MUST be preallocated!", Q_FUNC_INFO);
+        qMemCopy(m_data + m_size, data, size);
+        m_size += size;
+    }
+
 
     /**
      * \param data                      Data to append to this array.
@@ -110,7 +123,7 @@ public:
      * \param size                      Number of bytes that were appended to this
      *                                  array using external mechanisms.
      */
-    void finishWriting(unsigned int size);
+    inline void finishWriting(unsigned int size) { m_size += size; }
 
     /**
      * Removes trailing zero bytes from this array.
@@ -154,5 +167,6 @@ private:
     //!true, if we own memory pointed to by \a m_data
     bool m_ownBuffer;
 };
+
 
 #endif // QN_BYTE_ARRAY_H

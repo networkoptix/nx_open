@@ -350,6 +350,7 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
 }
 
 bool PtzInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) {
+    Q_UNUSED(scene)
     bool accepted = !dragProcessor()->isWaiting();
 
     event->setAccepted(accepted);
@@ -364,6 +365,7 @@ bool PtzInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *) {
 }
 
 bool PtzInstrument::hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
+    Q_UNUSED(event)
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
     setTarget(target);
     setTargetUnderMouse(true);
@@ -376,6 +378,8 @@ bool PtzInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent
 }
 
 bool PtzInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
+    Q_UNUSED(item)
+    Q_UNUSED(event)
     setTargetUnderMouse(false);
     
     return false;
@@ -414,10 +418,12 @@ void PtzInstrument::startDragProcess(DragInfo *) {
 }
 
 void PtzInstrument::startDrag(DragInfo *info) {
+    Q_UNUSED(info)
     emit ptzStarted(target());
 }
 
 void PtzInstrument::dragMove(DragInfo *info) {
+    Q_UNUSED(info)
     QVector3D localSpeed = ptzItem()->speed();
 
     setServerSpeed(localSpeed);

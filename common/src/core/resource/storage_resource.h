@@ -134,6 +134,12 @@ public:
     */
     virtual bool isDirExists(const QString& url) = 0;
 
+    /*
+    *   Returns true if storage support catalog functions: isFileExists, isDirExists, getFileList. 
+    *   If function returns false, server doesn't check file catalog on startup
+    */
+    virtual bool isCatalogAccessible() = 0;
+
     virtual bool isRealFiles() const{return true;};
 
     qint64 getWritedSpace() const;

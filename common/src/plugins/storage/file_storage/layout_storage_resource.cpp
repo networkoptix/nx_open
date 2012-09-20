@@ -60,10 +60,11 @@ public:
 
 private:
     QFile m_file;
+    QnLayoutFileStorageResource& m_storageResource;
+
+    qint64 m_fileOffset;
     qint64 m_fileSize;
     QString m_fileName;
-    qint64 m_fileOffset;
-    QnLayoutFileStorageResource& m_storageResource;
 };
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
@@ -117,6 +118,11 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
 {
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
+}
+
+bool QnLayoutFileStorageResource::isCatalogAccessible()
+{
+    return true;
 }
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)

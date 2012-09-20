@@ -61,7 +61,11 @@ QHostAddress QnNetworkResource::getHostAddress() const
 {
     //QMutexLocker mutex(&m_mutex);
     //return m_hostAddr;
-    return QHostAddress(getUrl());
+    QString url = getUrl();
+    if (url.indexOf(QLatin1String("://")) == -1)
+        return QHostAddress(url);
+    else
+        return QHostAddress(QUrl(url).host());
 }
 
 bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain domain)

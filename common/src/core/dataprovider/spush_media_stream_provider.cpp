@@ -19,7 +19,7 @@ m_cameraAudioEnabled(false)
 bool CLServerPushStreamreader::canChangeStatus() const
 {
     const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
-    return liveProvider && liveProvider->getRole() == QnResource::Role_LiveVideo && getResource().dynamicCast<QnPhysicalCameraResource>();
+    return liveProvider && liveProvider->canChangeStatus();
 }
 
 void CLServerPushStreamreader::run()
@@ -54,6 +54,7 @@ void CLServerPushStreamreader::run()
                     if (canChangeStatus())
                         getResource()->setStatus(QnResource::Offline);
                     m_stat[0].onLostConnection();
+                    mFramesLost = 0;
                 }
 
                 continue;

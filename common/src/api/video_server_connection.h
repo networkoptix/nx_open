@@ -72,17 +72,19 @@ namespace detail {
         void finished(const QnStatisticsDataList &/* usage data */);
     };
 
-    class VideoServerSessionManagerAddCamerasRequestReplyProcessor: public QObject
+    class VideoServerManualCameraRequestReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerAddCamerasRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+        VideoServerManualCameraRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
              qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
         }
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+        void at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
+        void at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
     signals:
-        void finished(const QnCamerasFoundInfoList &);
+        void finishedSearch(const QnCamerasFoundInfoList &);
+        void finishedAdd(int);
     };
 
     //!Handles response on GetParam request
@@ -179,9 +181,9 @@ public:
 
     int asyncGetFreeSpace(const QString &path, QObject *target, const char *slot);
 
-    static void setProxyAddr(const QString &addr, int port);
-    static int getProxyPort() { return m_proxyPort; }
-    static QString getProxyHost() { return m_proxyAddr; }
+    void setProxyAddr(const QString &addr, int port);
+    int getProxyPort() { return m_proxyPort; }
+    QString getProxyHost() { return m_proxyAddr; }
 
     /** 
      * \returns                         Request handle. 
@@ -193,8 +195,11 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    int asyncGetCameraAddition(QObject *target, const char *slot,
-                               const QString &startAddr, const QString &endAddr, const QString& username, const QString &password);
+    int asyncGetManualCameraSearch(QObject *target, const char *slot,
+                                   const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port);
+
+    int asyncGetManualCameraAdd(QObject *target, const char *slot,
+                                const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
@@ -209,8 +214,8 @@ protected:
 
 private:
     QUrl m_url;
-    static QString m_proxyAddr;
-    static int m_proxyPort;
+    QString m_proxyAddr;
+    int m_proxyPort;
 };
 
 

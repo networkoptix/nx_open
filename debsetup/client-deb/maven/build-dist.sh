@@ -1,11 +1,12 @@
 #!/bin/bash
 
-#. ../common.sh
-PACKAGENAME=${deb.customization.company.name}-client
+COMPANY_NAME=${deb.customization.company.name}
+
+PACKAGENAME=$COMPANY_NAME-client
 VERSION=${project.version}
 ARCHITECTURE=${os.arch}
 
-TARGET=/opt/${deb.customization.company.name}/client
+TARGET=/opt/$COMPANY_NAME/client
 BINTARGET=$TARGET/bin
 LIBTARGET=$TARGET/lib
 USRTARGET=/usr
@@ -13,7 +14,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization}
+STAGE=$STAGEBASE/${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration}
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
 
@@ -30,18 +31,28 @@ mkdir -p $BINSTAGE/styles
 mkdir -p $LIBSTAGE
 
 # Copy client binary and x264
-install -m 755 $CLIENT_BIN_PATH/client* $BINSTAGE
-install -m 755 $CLIENT_BIN_PATH/x264 $BINSTAGE
+cp -r $CLIENT_BIN_PATH/client* $BINSTAGE
+cp -r $CLIENT_BIN_PATH/x264 $BINSTAGE
 
 # Copy client startup script
-install -m 755 bin/client $BINSTAGE
+cp bin/client $BINSTAGE
 
 # Copy icons
 cp -P -Rf usr $STAGE
 
 # Copy libraries
-cp -P $CLIENT_LIB_PATH/*.so* $LIBSTAGE
-cp -P $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
+cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE
+cp -r $CLIENT_STYLES_PATH/*.* $BINSTAGE/styles
+
+for f in `find $LIBSTAGE -type f` `find $BINSTAGE/styles -type f` $BINSTAGE/client-bin
+do
+    strip $f
+    chrpath -d $f
+done
+
+find $PKGSTAGE -type d -print0 | xargs -0 chmod 755
+find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
+chmod 755 $BINSTAGE/*
 
 # Must use system libraries due to compatibility issues
 # cp -P ${qt.dir}/libaudio.so* $LIBSTAGE
@@ -59,8 +70,8 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
-(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums)
+(cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
 
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}-${customization})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-$VERSION.${buildNumber}-${arch}-${build.configuration})

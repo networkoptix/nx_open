@@ -78,6 +78,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
+#include "camera/caching_time_period_loader.h"
 
 
 
@@ -554,7 +555,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
-void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
+/*void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
     QnConnectionDataList connections = qnSettings->customConnections();
 
     // remove all existing duplicates
@@ -597,24 +598,24 @@ void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connecti
             if (*iter == compared)
                 continue;
 
-            if ((*iter).url.host() != compared.url.host())
+            if (iter->url.host() != compared.url.host())
                 continue;
 
-            if ((*iter).url.port() != compared.url.port())
+            if (iter->url.port() != compared.url.port())
                 otherPort = true;
             else
                 samePort = true;
         }
 
-        (*iter).name = (*iter).url.host();
+        iter->name = iter->url.host();
         if (samePort)
-            (*iter).name.prepend((*iter).url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
+            iter->name.prepend(iter->url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
 
         if (otherPort)
-            (*iter).name.append(QLatin1Char(':') + QString::number((*iter).url.port()));
+            iter->name.append(QLatin1Char(':') + QString::number(iter->url.port()));
     }
     qnSettings->setCustomConnections(connections);
-}
+}*/
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
@@ -1167,7 +1168,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
-    updateStoredConnections(connectionData);
+    //updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
 }
@@ -1644,6 +1645,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
+    user->setPermissions(Qn::GlobalLiveViewerPermission);
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
@@ -1963,21 +1965,29 @@ Do you want to continue?"),
     m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
     m_exportStorage->setUrl(fileName);
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
-    if (device)
+    if (!device)
     {
-        QnApiPbSerializer serializer;
-        QByteArray layoutData;
-        serializer.serializeLayout(layout, layoutData);
-        device->write(layoutData);
-        delete device;
-
-        exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
-        m_layoutExportCamera->setExportProgressOffset(-100);
-        at_layoutCamera_exportFinished(fileName);
-    }
-    else {
         at_cameraCamera_exportFailed(fileName);
+        return;
     }
+
+    QnApiPbSerializer serializer;
+    QByteArray layoutData;
+    serializer.serializeLayout(layout, layoutData);
+    device->write(layoutData);
+    delete device;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i)
+    {
+        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.pb")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
+        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole);
+        QByteArray data;
+        periods.encode(data);
+    }
+
+    exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
+    m_layoutExportCamera->setExportProgressOffset(-100);
+    at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
@@ -2162,6 +2172,8 @@ Do you want to continue?"),
     connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
     camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+
+    exportProgressDialog->exec();
 }
 
 

@@ -10,8 +10,8 @@
 
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_inUpdateScale(false),
-    m_desiredSize(QSizeF(0.0, 0.0))
+    m_desiredSize(QSizeF(0.0, 0.0)),
+    m_inUpdateScale(false)
 {
     itemChange(ItemSceneHasChanged, QVariant::fromValue(scene()));
 }

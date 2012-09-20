@@ -58,6 +58,7 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
+#include <ui/events/system_menu_event.h>
 
 #include <help/context_help.h>
 
@@ -428,7 +429,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_titleYAnimator->setTargetObject(m_titleItem);
     m_titleYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0);
+    //m_titleYAnimator->setSpeed(m_titleItem->size().height() * 2.0); // TODO: why height is zero here?
+    m_titleYAnimator->setSpeed(32.0 * 2.0);
     m_titleYAnimator->setTimeLimit(500);
 
     m_titleOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -612,7 +614,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
     m_sliderYAnimator->setTargetObject(m_sliderItem);
     m_sliderYAnimator->setAccessor(new PropertyAccessor("y"));
-    m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0);
+    //m_sliderYAnimator->setSpeed(m_sliderItem->size().height() * 2.0); // TODO: why height is zero at this point?
+    m_sliderYAnimator->setSpeed(70.0 * 2.0); 
     m_sliderYAnimator->setTimeLimit(500);
 
     m_sliderOpacityAnimatorGroup = new AnimatorGroup(this);
@@ -629,6 +632,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_sliderResizerItem,        SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_sliderResizerItem_geometryChanged()));
     connect(navigator(),                SIGNAL(currentWidgetChanged()),                                                             this,                           SLOT(updateControlsVisibility()));
     connect(action(Qn::ToggleThumbnailsAction), SIGNAL(toggled(bool)),                                                              this,                           SLOT(at_toggleThumbnailsAction_toggled(bool)));
+    connect(action(Qn::ToggleTourModeAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(updateControlsVisibility()));
 
     /* Connect to display. */
     display()->view()->addAction(action(Qn::FreespaceAction));
@@ -1073,7 +1077,8 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     bool sliderVisible = 
         navigator()->currentWidget() != NULL && 
         !(navigator()->currentWidget()->resource()->flags() & (QnResource::still_image | QnResource::server)) &&
-        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live));
+        ((accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) || !(navigator()->currentWidget()->resource()->flags() & QnResource::live)) &&
+        !action(Qn::ToggleTourModeAction)->isChecked();
 
     if(m_inactive) {
         bool hovered = m_sliderOpacityProcessor->isHovered() || m_treeOpacityProcessor->isHovered() || m_titleOpacityProcessor->isHovered() || m_helpOpacityProcessor->isHovered() || m_calendarOpacityProcessor->isHovered();
@@ -1435,6 +1440,19 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+bool QnWorkbenchUi::event(QEvent *event) {
+    bool result = base_type::event(event);
+
+    if(event->type() == QnSystemMenuEvent::SystemMenu) {
+        if(m_mainMenuButton->isVisible())
+            m_mainMenuButton->click();
+
+        result = true;
+    }
+
+    return result;
+}
+
 void QnWorkbenchUi::at_freespaceAction_triggered() {
     bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
 

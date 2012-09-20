@@ -46,8 +46,8 @@ private:
 DropInstrument::DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent):
     Instrument(Item, makeSet(/* No events here, we'll receive them from the surface item. */), parent),
     m_context(context),
-    m_intoNewLayout(intoNewLayout),
-    m_filterItem(new SceneEventFilterItem())
+    m_filterItem(new SceneEventFilterItem()),
+    m_intoNewLayout(intoNewLayout)
 {
     if(context == NULL)
         qnNullWarning(context);

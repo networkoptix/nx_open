@@ -5,13 +5,13 @@
 
 
 QnPlColdStoreStorage::QnPlColdStoreStorage():
-m_connectionPool(this),
-m_metaDataPool(this),
-m_mutex(QMutex::Recursive),
-m_cswriterThread(0),
-m_currH(0),
-m_prevH(0),
-m_RangeUpdatedAtLeastOnce(false)
+    m_mutex(QMutex::Recursive),
+    m_connectionPool(this),
+    m_metaDataPool(this),
+    m_cswriterThread(0),
+    m_currH(0),
+    m_prevH(0),
+    m_RangeUpdatedAtLeastOnce(false)
 {
     
     /*
@@ -44,7 +44,7 @@ m_RangeUpdatedAtLeastOnce(false)
     b = connR.seek(1024*1024*50);
     int r = connR.read(dataW, sizeof(dataW));
     connR.close();
-    /**/
+    */
     
 }
 
@@ -294,7 +294,7 @@ QFileInfoList QnPlColdStoreStorage::getFileList(const QString& dirName)
     {
         qWarning() << fi.absoluteFilePath();
     }
-    /**/
+    */
 
     return result;
 
@@ -341,6 +341,12 @@ bool QnPlColdStoreStorage::isDirExists(const QString& url)
     Q_UNUSED(url)
     return true;
 }
+
+bool QnPlColdStoreStorage::isCatalogAccessible()
+{
+    return false;
+}
+
 
 qint64 QnPlColdStoreStorage::getFreeSpace() 
 {
@@ -516,7 +522,7 @@ QString QnPlColdStoreStorage::fileName2csFileName(const QString& fn) const
 
     if (restList.size() > 6)
         s << restList.at(6); // 
-        /**/
+        */
 
 
 

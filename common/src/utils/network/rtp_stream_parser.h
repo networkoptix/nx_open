@@ -65,7 +65,20 @@ private:
 class QnRtpVideoStreamParser: public QnRtpStreamParser
 {
 public:
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
+    QnRtpVideoStreamParser();
+
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) = 0;
+protected:
+    struct Chunk
+    {
+        Chunk(): bufferOffset(0), len(0), nalStart(false) {}
+        Chunk(int _bufferOffset, quint16 _len, quint8 _nalStart = false): bufferOffset(_bufferOffset), len(_len), nalStart(_nalStart) {}
+
+        int bufferOffset;
+        quint16 len;
+        bool nalStart;
+    };
+    std::vector<Chunk> m_chunks;
 };
 
 class QnRtpAudioStreamParser: public QnRtpStreamParser
@@ -73,7 +86,7 @@ class QnRtpAudioStreamParser: public QnRtpStreamParser
 public:
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
 
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result) = 0;
 protected:
     void processIntParam(const QByteArray& checkName, int& setValue, const QByteArray& param);
     void processHexParam(const QByteArray& checkName, QByteArray& setValue, const QByteArray& param);

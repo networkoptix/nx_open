@@ -9,6 +9,7 @@
 #include "utils/network/nettools.h"
 
 class QnAbstractResourceSearcher;
+class QnAbstractDTSSearcher;
 
 struct QnManualCameraInfo
 {
@@ -45,6 +46,7 @@ public:
     // this function returns only new devices( not in all_devices list);
     //QnResourceList result();
     void addDeviceServer(QnAbstractResourceSearcher* serv);
+    void addDTSServer(QnAbstractDTSSearcher* serv);
     void setResourceProcessor(QnResourceProcessor* processor);
 
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
@@ -65,6 +67,7 @@ signals:
     void localInterfacesChanged();
 private slots:
     void onInitAsyncFinished(QnResourcePtr res, bool initialized);
+    void at_resourceDeleted(const QnResourcePtr& resource);
 private:
     void updateLocalNetworkInterfaces();
 
@@ -85,8 +88,10 @@ private:
     void pingResources(QnResourcePtr res);
     void appendManualDiscoveredResources(QnResourceList& resources);
     bool processDiscoveredResources(QnResourceList& resources, bool doOfflineCheck);
+    void dtsAssignment();
 private:
     QMutex m_searchersListMutex;
+    QMutex m_discoveryMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCamerasMap m_manualCameraMap;
@@ -101,7 +106,9 @@ private:
 
 
     QMap<QString, int> m_resourceDiscoveryCounter;
-
+    QVector<QnAbstractDTSSearcher*> m_dstList;
+	CLNetState netState;
+    QTime netStateTime;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

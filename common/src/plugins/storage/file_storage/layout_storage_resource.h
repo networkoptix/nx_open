@@ -33,6 +33,7 @@ public:
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
+    virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
 
 protected:

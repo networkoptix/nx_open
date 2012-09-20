@@ -278,8 +278,8 @@ void QnMjpegRtpParser::updateHeaderTables(quint8* lummaTable, quint8* chromaTabl
 
 QnMjpegRtpParser::QnMjpegRtpParser():
     QnRtpVideoStreamParser(),
-    m_frequency(90000),
-    m_frameData(CL_MEDIA_ALIGNMENT, 1024*64)
+    m_frequency(90000)
+    //m_frameData(CL_MEDIA_ALIGNMENT, 1024*64)
 {
     memset(m_lummaTable, 0, sizeof(m_lummaTable));
     memset(m_chromaTable, 0, sizeof(m_chromaTable));
@@ -294,6 +294,7 @@ QnMjpegRtpParser::QnMjpegRtpParser():
     m_headerLen = 0;
     m_lummaTablePos = 0;
     m_chromaTablePos = 0;
+    m_frameSize = 0;
 }
 
 QnMjpegRtpParser::~QnMjpegRtpParser()
@@ -320,8 +321,9 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result)
 {
+    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
 
     static quint8 jpeg_end[2] = {0xff, 0xd9};
 
@@ -342,7 +344,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
 
     //1. jpeg main header
 
-    int typeSpecific = *curPtr++;
+    /*int typeSpecific = */ *curPtr++;
     int fragmentOffset = (curPtr[0] << 16) + (curPtr[1] << 8) + curPtr[2];
     curPtr += 3;
     int jpegType = *curPtr++;
@@ -373,7 +375,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
         {
             if (bytesLeft < 4)
                 return false;
-            quint8 MBZ = *curPtr++;
+            /*quint8 MBZ =*/ *curPtr++;
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
@@ -429,7 +431,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
             updateHeaderTables(lummaTable, chromaTable);
         }
 
-        m_frameData.clear();
+        m_chunks.clear();
+        m_frameSize = 0;
     }
 
     if (!m_context) 
@@ -440,20 +443,29 @@ bool QnMjpegRtpParser::processData(quint8* rtpBuffer, int readed, const RtspStat
     }
 
 
-    m_frameData.write((const char*)curPtr, bytesLeft);
+    //m_frameData.write((const char*)curPtr, bytesLeft);
+    m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));
+    m_frameSize += bytesLeft;
+
 
     bool lastPacketReceived = rtpHeader->marker;
     if (lastPacketReceived)
     {
-        quint8* EOI_marker = (quint8*) m_frameData.data() + m_frameData.size() - 2;
-        if (m_frameData.size() < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
-            m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
+        quint8* EOI_marker = curPtr + bytesLeft - 2;
+        //if (m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1])
+        //    m_frameData.write((const char*) jpeg_end, sizeof(jpeg_end));
+        bool needAddMarker = m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
-        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameData.size()));
-        m_videoData->data.write((const char*)m_hdrBuffer, m_headerLen);
-        m_videoData->data.write(m_frameData);
-        m_frameData.clear();
+        m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
+        m_videoData->data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
+        //m_videoData->data.write(m_frameData);
+        for (int i = 0; i < m_chunks.size(); ++i) 
+            m_videoData->data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
+        if (needAddMarker)
+            m_videoData->data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));
 
+        m_chunks.clear();
+        m_frameSize = 0;
 
         m_videoData->channelNumber = 0;
         m_videoData->flags |= AV_PKT_FLAG_KEY;

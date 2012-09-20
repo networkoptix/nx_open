@@ -71,6 +71,7 @@
 #endif
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
+#include "openal/qtvaudiodevice.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -319,6 +320,12 @@ int main(int argc, char *argv[])
     QnWorkbenchTranslationManager::installTranslation(translationPath);
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
+    
+    /* Initialize sound. */
+    QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
+
+
+    /* Initialize log. */
     const QString dataLocation = getDataDirectory();
     if (!QDir().mkpath(dataLocation + QLatin1String("/log")))
         return 0;
@@ -484,6 +491,9 @@ int main(int argc, char *argv[])
 
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
+
+    /* Write out settings. */
+    qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
 
     return result;
 }

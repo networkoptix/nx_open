@@ -12,6 +12,7 @@ static const char *const FFMPEG_VERSION="${ffmpeg.version}";
 
 // These constans are here for windows resouce file.
 #define VER_CUSTOMIZATION           "${installer.customization}"
+#define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}"
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
 #define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}

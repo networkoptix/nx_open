@@ -32,7 +32,31 @@ struct QnConnectionData {
     bool readOnly;
 };
 
-typedef QList<QnConnectionData> QnConnectionDataList;
+class QnConnectionDataList: public QList<QnConnectionData>{
+public:
+    QnConnectionDataList(): QList<QnConnectionData>(){}
+
+    /**
+     *  Returns true if the list contains a connection with the name provided;
+     *  otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool contains(const QString &name);
+
+    /**
+     * Removes the first occurrence of a connection in the list with the
+     * name provided and returns true on success; otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool removeOne(const QString &name);
+
+    /**
+     * Generates the unique name with the provided name as the base,
+     * appending number to the end of the string.
+     * \param base - base name of the connection
+     */
+    QString generateUniqueName(const QString &base);
+};
 
 Q_DECLARE_METATYPE(QnConnectionData)
 Q_DECLARE_METATYPE(QnConnectionDataList)
@@ -47,6 +71,7 @@ public:
     enum Variable {
         MAX_VIDEO_ITEMS,
         DOWNMIX_AUDIO,
+        AUDIO_VOLUME,
         MEDIA_FOLDER,
         EXTRA_MEDIA_FOLDERS,
         OPEN_LAYOUTS_ON_LOGIN,
@@ -90,6 +115,7 @@ private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                     maxVideoItems,          setMaxVideoItems,           MAX_VIDEO_ITEMS,            24)
         QN_DECLARE_RW_PROPERTY(bool,                    isAudioDownmixed,       setAudioDownmixed,          DOWNMIX_AUDIO,              false)
+        QN_DECLARE_RW_PROPERTY(qreal,                   audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)

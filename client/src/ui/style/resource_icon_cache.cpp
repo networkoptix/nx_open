@@ -73,8 +73,6 @@ QIcon QnResourceIconCache::icon(QnResource::Flags flags, QnResource::Status stat
 QnResourceIconCache::Key QnResourceIconCache::key(QnResource::Flags flags, QnResource::Status status) {
     Key key = Unknown;
 
-    const QnResource::Flags localServer = QnResource::local | QnResource::server;
-
     if ((flags & QnResource::local_server) == QnResource::local_server) {
         key = Local;
     } else if ((flags & QnResource::server) == QnResource::server) {

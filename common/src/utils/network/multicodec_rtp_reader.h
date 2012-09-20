@@ -12,6 +12,7 @@ class QnRtpAudioStreamParser;
 class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
 
+
 class QnMulticodecRtpReader : public QnResourceConsumer
 {
 private:
@@ -47,7 +48,7 @@ private:
 
     QString m_request;
 
-    //QList<QnAbstractMediaDataPtr> m_lastVideoData;
+    QVector<QnByteArray*> m_demuxedData;
     QnAbstractMediaDataPtr m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;

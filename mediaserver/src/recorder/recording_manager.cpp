@@ -15,6 +15,7 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
+#include "plugins/storage/dts/abstract_dts_reader_factory.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -262,7 +263,7 @@ void QnRecordingManager::at_cameraUpdated()
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
     if (camera) {
-        if (!camera->isInitialized()) {
+        if (!camera->isInitialized() && !camera->isDisabled()) {
             camera->init();
             if (camera->isInitialized() && camera->getStatus() == QnResource::Unauthorized)
                 camera->setStatus(QnResource::Online);
@@ -377,7 +378,26 @@ Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instan
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
-    if (role == QnResource::Role_Archive)
+    QnVirtualCameraResourcePtr vcRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
+
+
+    bool sholdBeDts = (role == QnResource::Role_Archive) && vcRes && vcRes->getDTSFactory();
+    if (sholdBeDts)
+    {
+        QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+        archiveReader->setCycleMode(false);
+
+        vcRes->lockDTSFactory();
+
+        QnAbstractArchiveDelegate* del = vcRes->getDTSFactory()->createDeligate(vcRes);
+
+        vcRes->unLockDTSFactory();
+
+        archiveReader->setArchiveDelegate(del);
+        return archiveReader;
+        
+    }
+    else  if (role == QnResource::Role_Archive)
     {
         QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
         archiveReader->setCycleMode(false);

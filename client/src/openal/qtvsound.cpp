@@ -227,7 +227,7 @@ bool QtvSound::play(const quint8* data, uint size)
         int copyLen = qMin(size, m_size - m_proxyBufferLen);
         memcpy(m_proxyBuffer + m_proxyBufferLen, data, copyLen);
         m_proxyBufferLen += copyLen;
-        if (m_proxyBufferLen == m_size)
+        if (m_proxyBufferLen == (int)m_size)
         {
             internalPlay(m_proxyBuffer, m_size);
             m_proxyBufferLen = 0;

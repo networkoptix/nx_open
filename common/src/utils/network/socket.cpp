@@ -279,11 +279,6 @@ CommunicatingSocket::CommunicatingSocket(int newConnSD) : Socket(newConnSD),
 {
 }
 
-bool CommunicatingSocket::isConnected() const
-{
-    return mConnected;
-}
-
 void CommunicatingSocket::close()
 {
     Socket::close();
@@ -303,8 +298,8 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
-    u_long iMode = 1;
 #ifdef _WIN32
+    u_long iMode = 1;
     ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
     // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
@@ -341,8 +336,8 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
         return false;
 #endif // _WIN32
 
-    iMode = 0;
 #ifdef _WIN32
+    iMode = 0;
     ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
 #else
     // fcntl(sockDesc, F_SETFL, 0);

@@ -1,7 +1,7 @@
 #ifndef cl_ThreadQueue_h_2236
 #define cl_ThreadQueue_h_2236 
 
-#include <QVector>
+#include <vector>
 #include <QQueue>
 #include <QVariant>
 #include <QSemaphore>
@@ -32,6 +32,11 @@ public:
         clear();
     }
 
+    bool isEmpty() const
+    {
+        return m_bufferLen == 0;
+    }
+    
     bool push(const T& val) 
     { 
         QMutexLocker mutex(&m_cs);
@@ -119,44 +124,6 @@ public:
         m_cs.unlock();
     }
 
-    /*
-    void removeAt(int index)
-    {
-        QMutexLocker mutex(&m_cs);
-        m_sem.acquire(1);
-        m_queue.removeAt(index);
-    }
-
-    template <class ConditionFunc>
-    void removeFrontByCondition(const ConditionFunc& cond)
-    {
-        QMutexLocker mutex(&m_cs);
-        while (!m_queue.isEmpty() && cond(m_queue.front())) 
-        {
-            m_sem.acquire(1);
-            m_queue.dequeue();
-        }
-    }
-
-    template <class ConditionFunc>
-    void removeDataByCondition(const ConditionFunc& cond, QVariant opaque)
-    {
-        QMutexLocker mutex(&m_cs);
-        typename QQueue<T>::iterator itr = m_queue.begin();
-        while (itr != m_queue.end())
-        {
-            if (cond(*itr, opaque))
-            {
-                m_sem.acquire(1);
-                itr = m_queue.erase(itr);
-            }
-            else {
-                ++itr;
-            }
-        }
-    }
-    */
-
     template <class ConditionFunc>
     void detachDataByCondition(const ConditionFunc& cond, QVariant opaque)
     {
@@ -183,7 +150,7 @@ public:
     void setMaxSize(int value) 
     {
         m_maxSize = value;
-        reallocateBuffer(qMax(m_maxSize, m_buffer.size()));
+        reallocateBuffer(qMax(m_maxSize, (int) m_buffer.size()));
     }
 
     void clear()
@@ -201,18 +168,6 @@ public:
         m_headIndex = 0;
     }
 
-    /*
-    void clearDelete()
-    {
-        QMutexLocker mutex(&this->m_cs);
-
-        while (!this->m_queue.empty()) 
-        {
-            this->m_sem.tryAcquire();
-            delete this->m_queue.dequeue();
-        }
-    }
-    */
 private:
     // for grow only
     void reallocateBuffer(int newSize)
@@ -243,14 +198,169 @@ private:
     }
 
 protected:
-    //QQueue<T> m_queue;
-    QVector<T> m_buffer;
+    std::vector<T> m_buffer;
     int m_headIndex;
     int m_bufferLen;
 
     int m_maxSize;
     mutable QMutex m_cs;
     QSemaphore m_sem;
+};
+
+template <typename T>
+class QnUnsafeQueue
+{
+public:
+    QnUnsafeQueue( quint32 maxSize = MAX_THREAD_QUEUE_SIZE)
+        : m_headIndex(0),
+        m_bufferLen(0),
+        m_maxSize( maxSize )
+    {
+        reallocateBuffer(maxSize);
+    }
+    
+    ~QnUnsafeQueue() {
+        clear();
+    }
+
+    bool isEmpty() const
+    {
+        return m_bufferLen == 0;
+    }
+
+    bool push(const T& val) 
+    { 
+        if (m_bufferLen == m_buffer.size())
+            reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
+
+        // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
+        //if ( m_queue.size()>=m_maxSize )    return false; <- wrong aproach
+
+        //m_queue.enqueue(val); 
+        int index = (m_headIndex + m_bufferLen) % m_buffer.size();
+        m_buffer[index] = val;
+        m_bufferLen++;
+
+        return true;
+    }
+
+    T front() const
+    {
+        return m_buffer[m_headIndex];
+    }
+
+    T at(int i) const
+    {
+        int index = m_headIndex + i;
+        return m_buffer[index % m_buffer.size()];
+    }
+
+    T last() const
+    {
+        int index = m_headIndex + m_bufferLen - 1;
+        return m_buffer[index % m_buffer.size()];
+    }
+
+
+    bool pop(T& val)
+    {
+        if (m_bufferLen > 0)
+        {
+            val = m_buffer[m_headIndex]; //m_queue.dequeue();
+            m_buffer[m_headIndex] = T();
+            m_headIndex++;
+            if (m_headIndex >= m_buffer.size())
+                m_headIndex = 0;
+            m_bufferLen--;
+            return true; 
+        }
+        return false;
+    }
+
+    void removeFirst(int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            m_buffer[m_headIndex++] = T();
+            if (m_headIndex >= m_buffer.size())
+                m_headIndex = 0;
+        }
+        m_bufferLen -= count;
+    }
+
+    template <class ConditionFunc>
+    void detachDataByCondition(const ConditionFunc& cond, QVariant opaque)
+    {
+        int index = m_headIndex;
+        for (int i = 0; i < m_bufferLen; ++i)
+        {
+            if (cond(m_buffer[index], opaque))
+                m_buffer[index] = T();
+            index = (index + 1) % m_buffer.size();
+        }
+    }
+
+    int size() const
+    {
+        return m_bufferLen;
+    }
+
+    int maxSize() const
+    {
+        return m_maxSize;
+    }
+
+    void setMaxSize(int value) 
+    {
+        m_maxSize = value;
+        reallocateBuffer(qMax(m_maxSize, (int) m_buffer.size()));
+    }
+
+    void clear()
+    {
+        int index = m_headIndex;
+        for (int i = 0; i < m_bufferLen; ++i)
+        {
+            m_buffer[index] = T();
+            index = (index + 1) % m_buffer.size();
+        }
+        m_bufferLen = 0;
+        m_headIndex = 0;
+    }
+
+private:
+    // for grow only
+    void reallocateBuffer(int newSize)
+    {
+        int oldSize = m_buffer.size();
+        m_buffer.resize(newSize);
+
+        if (m_headIndex > 0 && m_bufferLen > 0 && newSize > oldSize)
+        {
+            int tailIndex = m_headIndex + m_bufferLen;
+            if (tailIndex > oldSize)
+                tailIndex -= oldSize;
+            else
+                return; // no correction is needed
+
+            int delta = newSize-oldSize;
+
+            for (int i = 0; i < delta && i < tailIndex; ++i)
+                m_buffer[oldSize + i] = m_buffer[i];
+            int i = 0;
+            for (;i < tailIndex - delta; ++i)
+                m_buffer[i] = m_buffer[i+delta];
+            for (;i < tailIndex; ++i)
+                m_buffer[i] = T();
+        }
+    }
+
+protected:
+    std::vector<T> m_buffer;
+    int m_headIndex;
+    int m_bufferLen;
+
+    int m_maxSize;
 };
 
 #endif //cl_ThreadQueue_h_2236
