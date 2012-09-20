@@ -14,6 +14,9 @@ class QnGlobalMonitorPrivate;
  */
 class QnGlobalMonitor: public QnPlatformMonitor {
     Q_OBJECT;
+
+    typedef QnPlatformMonitor base_type;
+
 public:
     /**
      * \param base                      Base platform monitor to get actual data from.
@@ -22,6 +25,11 @@ public:
      */
     QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent = NULL);
     virtual ~QnGlobalMonitor();
+
+    /**
+     * \returns                         Global monitor instance.
+     */
+    static QnGlobalMonitor *instance();
 
     /**
      * \returns                         Update period of this global monitor object, in milliseconds.
@@ -35,8 +43,7 @@ public:
 
     virtual qreal totalCpuUsage() override;
     virtual qreal totalRamUsage() override;
-    virtual QList<Hdd> hdds() override;
-    virtual qreal totalHddLoad(const Hdd &hdd) override;
+    virtual QList<HddLoad> totalHddLoad() override;
 
 protected:
     virtual void timerEvent(QTimerEvent *event) override;

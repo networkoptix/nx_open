@@ -7,6 +7,8 @@
 
 #include <utils/common/warnings.h>
 
+Q_GLOBAL_STATIC_WITH_ARGS(QnGlobalMonitor, qn_globalMonitor_instance, (QnPlatformMonitor::newInstance()));
+
 // -------------------------------------------------------------------------- //
 // QnGlobalMonitorPrivate
 // -------------------------------------------------------------------------- //
@@ -16,25 +18,29 @@ public:
         base(NULL),
         updatePeriod(1000),
         stopped(true),
+        requestCount(0),
         totalCpuUsage(0.0),
-        totalRamUsage(0.0),
-        lastUpdateTime(0)
+        totalRamUsage(0.0)
     {}
 
     virtual ~QnGlobalMonitorPrivate() {}
 
+    void restartTimers() {
+        updateTimer.start(updatePeriod, q_func());
+        stopTimer.start(updatePeriod * 64, q_func());
+    }
+
 private:
+    mutable QMutex mutex;
+
     QnPlatformMonitor *base;
     qint64 updatePeriod;
     bool stopped;
     int requestCount;
-    mutable QMutex mutex;
 
     qreal totalCpuUsage;
     qreal totalRamUsage;
-    QHash<QnPlatformMonitor::Hdd, qreal> totalUsageByHdd;
-
-    qint64 lastUpdateTime;
+    QList<QnPlatformMonitor::HddLoad> totalHddLoad;
 
     QBasicTimer updateTimer;
     QBasicTimer stopTimer;
@@ -53,7 +59,7 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 {
     Q_D(QnGlobalMonitor);
 
-    d->q_ptr = this;
+    d_ptr->q_ptr = this;
 
     if(!base) {
         qnNullWarning(base);
@@ -67,10 +73,16 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 
     base->setParent(this); /* Claim ownership. */
     d->base = base;
+
+    d->restartTimers();
 }
 
 QnGlobalMonitor::~QnGlobalMonitor() {
     return;
+}
+
+QnGlobalMonitor *QnGlobalMonitor::instance() {
+    return qn_globalMonitor_instance();
 }
 
 qint64 QnGlobalMonitor::updatePeriod() const {
@@ -88,14 +100,13 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
         return;
 
     d->updatePeriod = updatePeriod;
-    d->updateTimer.start(updatePeriod, this);
-    d->stopTimer.start(updatePeriod * 100, this);
+    d->restartTimers();
 }
 
 qreal QnGlobalMonitor::totalCpuUsage() {
     Q_D(QnGlobalMonitor);
 
-    /* Note: there is no need for locks here. */
+    /* Note: there is no need for locks here, at least on x86. */
 
     d->requestCount++;
     d->stopped = false;
@@ -105,20 +116,41 @@ qreal QnGlobalMonitor::totalCpuUsage() {
 qreal QnGlobalMonitor::totalRamUsage() {
     Q_D(QnGlobalMonitor);
 
-    /* Note: there is no need for locks here. */
+    /* Note: there is no need for locks here, at least on x86. */
 
     d->requestCount++;
     d->stopped = false;
     return d->totalRamUsage;
 }
 
-QList<QnPlatformMonitor::Hdd> QnGlobalMonitor::hdds() {
+QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
     Q_D(QnGlobalMonitor);
     QMutexLocker locker(&d->mutex);
 
+    d->requestCount++;
+    d->stopped = false;
+    return d->totalHddLoad;
 }
 
-qreal QnGlobalMonitor::totalHddLoad(const Hdd &hdd) {
+void QnGlobalMonitor::timerEvent(QTimerEvent *event) {
+    Q_D(QnGlobalMonitor);
 
+    QMutexLocker locker(&d->mutex);
+
+    if(event->timerId() == d->updateTimer.timerId()) {
+        if(!d->stopped) {
+            d->totalCpuUsage = d->base->totalCpuUsage();
+            d->totalRamUsage = d->base->totalRamUsage();
+            d->totalHddLoad = d->base->totalHddLoad();
+        }
+    } else if(event->timerId() == d->stopTimer.timerId()) {
+        if(d->requestCount == 0) {
+            d->stopped = true;
+        } else {
+            d->requestCount = 0;
+        }
+    } else {
+        locker.unlock();
+        base_type::timerEvent(event);
+    }
 }
-

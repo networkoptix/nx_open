@@ -11,6 +11,12 @@
 #   pragma comment(lib, "sigar.lib")
 #endif
 
+#define INVOKE(expression)                                                      \
+    (d_func()->checkError(#expression, expression))
+
+// -------------------------------------------------------------------------- //
+// QnSigarMonitorPrivate
+// -------------------------------------------------------------------------- //
 class QnSigarMonitorPrivate {
 public:
     QnSigarMonitorPrivate() {
@@ -41,19 +47,46 @@ public:
         return status;
     }
 
+    qreal hddLoad(const QnPlatformMonitor::Hdd &hdd) {
+        if(!sigar)
+            return 0.0;
+
+        sigar_disk_usage_t current;
+        if(INVOKE(sigar_disk_usage_get(sigar, hdd.name.toLatin1().constData(), &current)) != SIGAR_OK)
+            return 0.0;
+
+        if(!lastUsageByHddName.contains(hdd.name)) { /* Is this the first call? */
+            lastUsageByHddName[hdd.name] = current; 
+            return 0.0;
+        }
+
+        sigar_disk_usage_t &last = lastUsageByHddName[hdd.name];
+        if(current.snaptime == last.snaptime)
+            return 0.0;
+
+        qreal result = static_cast<qreal>(current.time - last.time) / (current.snaptime - last.snaptime);
+        last = current;
+
+        return result;
+    }
+
+private:
+    const QnSigarMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
+
 private:
     sigar_t *sigar;
     sigar_cpu_t cpu;
-    QHash<int, sigar_disk_usage_t> lastUsageByHddId;
+    QHash<QString, sigar_disk_usage_t> lastUsageByHddName;
 
 private:
     Q_DECLARE_PUBLIC(QnSigarMonitor);
     QnSigarMonitor *q_ptr;
 };
 
-#define INVOKE(expression)                                                      \
-    (d_func()->checkError(#expression, expression))
 
+// -------------------------------------------------------------------------- //
+// QnSigarMonitor
+// -------------------------------------------------------------------------- //
 QnSigarMonitor::QnSigarMonitor(QObject *parent):
     QnPlatformMonitor(parent),
     d_ptr(new QnSigarMonitorPrivate())
@@ -110,9 +143,10 @@ qreal QnSigarMonitor::totalRamUsage() {
     return mem.used_percent;
 }
 
-QList<QnPlatformMonitor::Hdd> QnSigarMonitor::hdds() {
+QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     Q_D(QnSigarMonitor);
-    QList<QnPlatformMonitor::Hdd> result;
+
+    QList<HddLoad> result;
 
     if(!d->sigar)
         return result;
@@ -127,35 +161,11 @@ QList<QnPlatformMonitor::Hdd> QnSigarMonitor::hdds() {
         if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
             continue; /* Skip non-hdds. */
 
-        result.push_back(Hdd(i, QLatin1String(fileSystem.dev_name), QLatin1String(fileSystem.dir_name)));
+        Hdd hdd(i, QLatin1String(fileSystem.dev_name), QLatin1String(fileSystem.dir_name));
+        result.push_back(HddLoad(hdd, d->hddLoad(hdd)));
     }
-    
+
     INVOKE(sigar_file_system_list_destroy(d->sigar, &fileSystems));
-    return result;
-}
-
-qreal QnSigarMonitor::totalHddLoad(const Hdd &hdd) {
-    Q_D(QnSigarMonitor);
-
-    if(!d->sigar)
-        return 0.0;
-
-    sigar_disk_usage_t current;
-    if(INVOKE(sigar_disk_usage_get(d->sigar, hdd.name.toLatin1().constData(), &current)) != SIGAR_OK)
-        return 0.0;
-
-    if(!d->lastUsageByHddId.contains(hdd.id)) { /* Is this the first call? */
-        d->lastUsageByHddId[hdd.id] = current; 
-        return 0.0;
-    }
-
-    sigar_disk_usage_t &last = d->lastUsageByHddId[hdd.id];
-    if(current.snaptime == last.snaptime)
-        return 0.0;
-
-    qreal result = static_cast<qreal>(current.time - last.time) / (current.snaptime - last.snaptime);
-    last = current;
-
     return result;
 }
 

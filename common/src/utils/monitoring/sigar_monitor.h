@@ -17,9 +17,7 @@ public:
 
     virtual qreal totalRamUsage() override;
 
-    virtual QList<Hdd> hdds() override;
-
-    virtual qreal totalHddLoad(const Hdd &hdd) override;
+    virtual QList<HddLoad> totalHddLoad() override;
 
 private:
     Q_DECLARE_PRIVATE(QnSigarMonitor);

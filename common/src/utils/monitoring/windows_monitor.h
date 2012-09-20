@@ -17,9 +17,7 @@ public:
     QnWindowsMonitor(QObject *parent = NULL);
     virtual ~QnWindowsMonitor();
 
-    virtual QList<Hdd> hdds() override;
-
-    virtual qreal totalHddLoad(const Hdd &hdd) override;
+    virtual QList<HddLoad> totalHddLoad() override;
 
 private:
     Q_DECLARE_PRIVATE(QnWindowsMonitor);

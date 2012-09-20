@@ -32,7 +32,7 @@ public:
         QString partitions;
 
         friend uint qHash(const Hdd &hdd) {
-            return qHash(id) ^ qHash(name) ^ qHash(partitions);
+            return qHash(hdd.id) ^ qHash(hdd.name) ^ qHash(hdd.partitions);
         }
     };
 
@@ -40,16 +40,26 @@ public:
      * HDD load entry.
      */
     struct HddLoad {
+        HddLoad() {}
+        HddLoad(const Hdd &hdd, qreal load): hdd(hdd), load(load) {}
+
         /** Description of an HDD. */
         Hdd hdd;
 
         /** Load percentage of the HDD since the last call to load estimation function,
          * a number in range <tt>[0.0, 1.0]</tt>. */
         qreal load;
-    }
+    };
 
     QnPlatformMonitor(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformMonitor() {}
+
+    /**
+     * \param parent                    Parent object for the platform monitor to be created.
+     * \returns                         A newly created platform monitor instance suitable for usage
+     *                                  on current platform.
+     */
+    static QnPlatformMonitor *newInstance(QObject *parent = NULL);
 
     /**
      * \returns                         Percent of CPU time (both user and kernel) consumed 

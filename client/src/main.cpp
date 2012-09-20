@@ -224,9 +224,9 @@ int main(int argc, char *argv[])
     QN_INIT_MODULE_RESOURCES(common);
     
     QnWindowsMonitor m;
-    QList<QnPlatformMonitor::Hdd> l = m.hdds();
     while(1) {
-        qDebug() << l[0].partitions << m.totalHddLoad(l[0]);
+        foreach(const QnPlatformMonitor::HddLoad &hddLoad, m.totalHddLoad())
+            qDebug() << hddLoad.hdd.partitions << hddLoad.load;
 
         Sleep(1000);
     }
