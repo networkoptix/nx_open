@@ -13,10 +13,6 @@
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
-QString QnRtspClientArchiveDelegate::m_proxyAddr;
-int QnRtspClientArchiveDelegate::m_proxyPort = 0;
-
-
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     QnAbstractArchiveDelegate(),
     m_rtpData(0),
@@ -51,11 +47,6 @@ void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
     updateRtpParam(resource);
 }
 
-void QnRtspClientArchiveDelegate::setProxyAddr(const QString& addr, int port)
-{
-    m_proxyAddr = addr;
-    m_proxyPort = port;
-}
 
 QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 {
@@ -136,14 +127,17 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
     {
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherVideoServer->getId().toString());
         RTPSession otherRtspSession;
-        otherRtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
         if (otherCamera)
         {
-            QnResourcePtr server = qnResPool->getResourceById(otherCamera->getParentId());
-            if (server && server->getStatus() != QnResource::Offline && otherRtspSession.open(getUrl(otherCamera))) {
-                if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
-                {
-                    return otherRtspSession.startTime();
+            QnVideoServerResourcePtr server = qnResPool->getResourceById(otherCamera->getParentId()).dynamicCast<QnVideoServerResource>();
+            if (server && server->getStatus() != QnResource::Offline)
+            {
+                otherRtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
+                if (otherRtspSession.open(getUrl(otherCamera))) {
+                    if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
+                    {
+                        return otherRtspSession.startTime();
+                    }
                 }
             }
         }
@@ -206,7 +200,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     m_closing = false;
     m_resource = resource;
-    QnResourcePtr server = qnResPool->getResourceById(resource->getParentId());
+    QnVideoServerResourcePtr server = qnResPool->getResourceById(resource->getParentId()).dynamicCast<QnVideoServerResource>();
     if (server == 0 || server->getStatus() == QnResource::Offline)
         return false;
 
@@ -214,7 +208,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
 
     m_rtspSession.setTransport(QLatin1String("TCP"));
 
-    m_rtspSession.setProxyAddr(m_proxyAddr, m_proxyPort);
+    m_rtspSession.setProxyAddr(server->getProxyHost(), server->getProxyPort());
     m_rtpData = 0;
 
     bool globalTimeBlocked = false;

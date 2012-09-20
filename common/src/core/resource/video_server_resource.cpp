@@ -243,3 +243,13 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
     }
     determineOptimalNetIF();
 }
+
+QString QnVideoServerResource::getProxyHost() const
+{
+    return m_restConnection->getProxyHost();
+}
+
+int QnVideoServerResource::getProxyPort() const
+{
+    return m_restConnection->getProxyPort();
+}

@@ -181,9 +181,9 @@ public:
 
     int asyncGetFreeSpace(const QString &path, QObject *target, const char *slot);
 
-    static void setProxyAddr(const QString &addr, int port);
-    static int getProxyPort() { return m_proxyPort; }
-    static QString getProxyHost() { return m_proxyAddr; }
+    void setProxyAddr(const QString &addr, int port);
+    int getProxyPort() { return m_proxyPort; }
+    QString getProxyHost() { return m_proxyAddr; }
 
     /** 
      * \returns                         Request handle. 
@@ -214,8 +214,8 @@ protected:
 
 private:
     QUrl m_url;
-    static QString m_proxyAddr;
-    static int m_proxyPort;
+    QString m_proxyAddr;
+    int m_proxyPort;
 };
 
 
