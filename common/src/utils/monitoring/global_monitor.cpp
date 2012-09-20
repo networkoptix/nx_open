@@ -7,7 +7,6 @@
 
 #include <utils/common/warnings.h>
 
-Q_GLOBAL_STATIC_WITH_ARGS(QnGlobalMonitor, qn_globalMonitor_instance, (QnPlatformMonitor::newInstance()));
 
 // -------------------------------------------------------------------------- //
 // QnGlobalMonitorPrivate
@@ -79,10 +78,6 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 
 QnGlobalMonitor::~QnGlobalMonitor() {
     return;
-}
-
-QnGlobalMonitor *QnGlobalMonitor::instance() {
-    return qn_globalMonitor_instance();
 }
 
 qint64 QnGlobalMonitor::updatePeriod() const {

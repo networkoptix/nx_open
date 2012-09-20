@@ -26,10 +26,12 @@ public:
     QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent = NULL);
     virtual ~QnGlobalMonitor();
 
-    /**
-     * \returns                         Global monitor instance.
+    /*
+     * Note from Elric:
+     *
+     * Do not add a singleton interface to this class. Add an instance to the
+     * place where you control its lifetime.
      */
-    static QnGlobalMonitor *instance();
 
     /**
      * \returns                         Update period of this global monitor object, in milliseconds.

@@ -9,6 +9,7 @@
 
 #include <utils/common/warnings.h>
 
+#define NOMINMAX
 #include <Windows.h>
 #include <pdh.h>
 #include <pdhmsg.h>

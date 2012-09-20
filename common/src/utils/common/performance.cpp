@@ -10,7 +10,6 @@
 
 #include "warnings.h"
 
-
 #if defined(Q_OS_WIN)
 #   define NOMINMAX
 #   define _WIN32_DCOM
@@ -25,7 +24,6 @@
 #   include <errno.h>
 #   define SIG_CODE SIGRTMIN
 #endif
-
 
 /** statistics usage update timer, in seconds. */
 #define STATISTICS_USAGE_REFRESH 2
@@ -811,7 +809,7 @@ qint64 estimateCpuFrequency() {
     return (endCycles - startCycles) * 10;
 }
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(qint64, qn_estimatedCpuFrequency, { *x = estimateCpuFrequency(); });
+Q_GLOBAL_STATIC_WITH_ARGS(qint64, qn_estimatedCpuFrequency, (estimateCpuFrequency()));
 #endif
 
 
@@ -843,7 +841,7 @@ QString estimateCpuBrand() {
 #endif
 }
 
-Q_GLOBAL_STATIC_WITH_INITIALIZER(QString, qn_estimatedCpuBrand, { *x = estimateCpuBrand(); });
+Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_estimatedCpuBrand, (estimateCpuBrand()));
 
 qint64 QnPerformance::currentThreadTimeMSecs() {
     qint64 result = currentThreadTimeNSecs();
