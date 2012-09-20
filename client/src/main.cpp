@@ -72,6 +72,7 @@
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
 #include "utils/monitoring/platform_monitor.h"
+#include "utils/common/sleep.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -227,7 +228,7 @@ int main(int argc, char *argv[])
         foreach(const QnPlatformMonitor::HddLoad &hddLoad, m->totalHddLoad())
             qDebug() << hddLoad.hdd.partitions << hddLoad.load;
 
-        Sleep(1000);
+        QnSleep::sleep(1000);
     }
     
     QTextStream out(stdout);
