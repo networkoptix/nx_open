@@ -83,8 +83,9 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
+    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     result.clear();
     QVector<int> auSize;
     QVector<int> auIndex;

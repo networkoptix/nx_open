@@ -212,7 +212,7 @@ public:
      */
     unsigned short getForeignPort() ;
 
-    bool isConnected() const;
+    bool isConnected() const { return mConnected; }
 
 protected:
     CommunicatingSocket(int type, int protocol) ;
