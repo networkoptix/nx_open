@@ -40,7 +40,7 @@ Improvements:
  - Password field is always empty if open login dialog.
  - If discover Digital Watchdog set default login credentials are being tried.
  - Non-indexed local files (outside media folders) are added in Tree after client restart if a layout that contains such items is opened.
-  
+ - If several media servers were hosted on EC client could acquire traffic through proxy for all servers only. Now not: one server can be accessed directly and another one - via Media Proxy. 
  Bugs Fixed:
  - If connect to another EC old cameras were still displayed on Scene. Fixed.
  - Fixed non-sequential port numbers during Linux installation. 
@@ -59,6 +59,7 @@ Improvements:
  - If create a layout for a user it displayed as changed (asterisk) on another computer. Fixed.
  - If change media storage the old one was using. Fixed.
  - >> and >>| buttons are disabled in Live mode.
+ - If camera is unauthorized it could draw circles for a long time. Fixed.
  
 ----------------------------------------------- 1.2 -----------------------------------------------
 

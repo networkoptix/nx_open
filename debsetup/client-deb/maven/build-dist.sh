@@ -3,7 +3,7 @@
 COMPANY_NAME=${deb.customization.company.name}
 
 PACKAGENAME=$COMPANY_NAME-client
-VERSION=${project.version}
+VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
 TARGET=/opt/$COMPANY_NAME/client
