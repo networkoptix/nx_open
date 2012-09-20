@@ -1,5 +1,5 @@
 #include "coldstore_dts_archive_reader.h"
-#include "../../coldstore\coldstore_api\sfs-client.h"
+#include "../../coldstore/coldstore_api/sfs-client.h"
 #include "core/resource/resource_media_layout.h"
 
 
@@ -80,9 +80,11 @@ bool QnColdStoreDelegate::open(QnResourcePtr resource)
 
     m_openedFile = -1;
 
+#ifdef _WIN32
     WSADATA wsaData;
     WORD wVersionRequested = MAKEWORD(1, 1);
     WSAStartup(wVersionRequested, &wsaData);
+#endif
 
 
     m_csConnection = new Veracity::SFSClient();
@@ -367,7 +369,7 @@ bool QnColdStoreDelegate::fileListQuery(int channel, QList<ColdstoreFile>& lst)
         (*it).mks-= first_ms;
         ++it;
     }
-    /**/
+    */
 
     return true;
 
