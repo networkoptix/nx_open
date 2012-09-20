@@ -107,7 +107,7 @@ private:
 
     QMap<QString, int> m_resourceDiscoveryCounter;
     QVector<QnAbstractDTSSearcher*> m_dstList;
-	QTime netStateTime;
+	CLNetState netState;
     QTime netStateTime;
 };
 
