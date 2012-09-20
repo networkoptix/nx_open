@@ -6,14 +6,18 @@
 #ifndef QUICKSYNCVIDEODECODER_H
 #define QUICKSYNCVIDEODECODER_H
 
-#ifndef _DEBUG
+#include <QSize>
 
 #include <fstream>
 #include <vector>
 
 #include <mfxvideo++.h>
 
+#ifdef XVBA_TEST
+#include "common.h"
+#else
 #include "abstractdecoder.h"
+#endif
 #include "mfxallocator.h"
 
 #define USE_D3D
@@ -39,6 +43,7 @@ public:
 
     //!Implementation of QnAbstractVideoDecoder::decode
     virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
+#ifndef XVBA_TEST
     //!Not implemented yet
     virtual void setLightCpuMode( DecodeMode val );
     //!Implementation of QnAbstractVideoDecoder::getWidth
@@ -51,7 +56,8 @@ public:
     virtual const AVFrame* lastFrame() const;
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
-    //!Reset decoder. Used for seek
+#endif
+    //!Hint decoder to scale decoded pictures (decoder is allowed to ignore this hint)
     /*!
         \note \a outSize.width is aligned to 16, \a outSize.height is aligned to 32 because of limitation of underlying API
     */
@@ -82,19 +88,24 @@ private:
     bool m_decodingInitialized;
     unsigned int m_totalBytesDropped;
     mfxU64 m_prevTimestamp;
+#ifndef XVBA_TEST
     AVFrame* m_lastAVFrame;
+#endif
 
     MFXBufferAllocator m_bufAllocator;
 #ifdef USE_D3D
-    MFXDirect3DSurfaceAllocator m_frameAllocator;
+    MFXSysMemFrameAllocator m_sysMemFrameAllocator;
+    MFXDirect3DSurfaceAllocator m_d3dFrameAllocator;
+    MFXFrameAllocatorDispatcher m_frameAllocator;
 #else
-    MFXFrameAllocator m_frameAllocator;
+    MFXSysMemFrameAllocator m_frameAllocator;
 #endif
     std::vector<mfxFrameSurface1> m_decoderSurfacePool;
     std::vector<mfxFrameSurface1> m_processingSurfacePool;
     mfxFrameAllocResponse m_decodingAllocResponse;
     mfxFrameAllocResponse m_vppAllocResponse;
     QSize m_outPictureSize;
+    mfxVideoParam m_processingParams;
 
 #ifdef WRITE_INPUT_STREAM_TO_FILE
     std::ofstream m_inputStreamFile;
@@ -108,13 +119,14 @@ private:
         std::vector<mfxFrameSurface1>* const surfacePool,
         mfxFrameAllocRequest* const decodingAllocRequest,
         mfxFrameAllocResponse* const allocResponse );
+    void initializeSurfacePoolFromAllocResponse(
+        std::vector<mfxFrameSurface1>* const surfacePool,
+        const mfxFrameAllocResponse& allocResponse );
     mfxFrameSurface1* findUnlockedSurface( std::vector<mfxFrameSurface1>* const surfacePool );
     bool processingNeeded() const;
     void saveToAVFrame( CLVideoDecoderOutput* outFrame, mfxFrameSurface1* decodedFrame );
-    bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
+    //bool readSequenceHeader( const QnCompressedVideoDataPtr& data );
     QString mfxStatusCodeToString( mfxStatus status ) const;
 };
-
-#endif  //_DEBUG
 
 #endif  //QUICKSYNCVIDEODECODER_H
