@@ -7,8 +7,9 @@
 
 void QnServerCameraProcessor::at_serverIfFound(const QString &)
 {
-    QnRtspClientArchiveDelegate::setProxyAddr(QString(), 0);
-    QnVideoServerConnection::setProxyAddr(QString(), 0);
+    QnVideoServerResource* server = dynamic_cast<QnVideoServerResource*>(sender());
+    if (server)
+        server->apiConnection()->setProxyAddr(QString(), 0);
 }
 
 void QnServerCameraProcessor::processResources(const QnResourceList &resources)
@@ -30,8 +31,7 @@ void QnServerCameraProcessor::determineOptimalIF(QnVideoServerResource* videoSer
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    QnRtspClientArchiveDelegate::setProxyAddr(url, port);
-    QnVideoServerConnection::setProxyAddr(url, port);
+    videoServer->apiConnection()->setProxyAddr(url, port);
     videoServer->disconnect(this, SLOT(at_serverIfFound(const QString &)));
     connect(videoServer, SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
     videoServer->determineOptimalNetIF();

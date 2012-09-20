@@ -291,7 +291,7 @@ protected slots:
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void updateStoredConnections(QnConnectionData connectionData);
+   // void updateStoredConnections(QnConnectionData connectionData);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
