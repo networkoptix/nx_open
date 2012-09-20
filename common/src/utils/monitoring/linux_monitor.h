@@ -23,6 +23,6 @@ private:
     Q_DECLARE_PRIVATE(QnLinuxMonitor);
     QScopedPointer<QnLinuxMonitorPrivate> d_ptr;
 };
-#endif
+#endif // Q_OS_LINUX
 
 #endif // QN_LINUX_MONITOR_H

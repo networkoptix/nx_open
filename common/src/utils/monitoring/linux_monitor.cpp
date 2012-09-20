@@ -203,7 +203,7 @@ private:
     QnLinuxMonitor *q_ptr;
 };
 
-QnLinuxMonitor::QnLinuxMonitor(QObject *parent = NULL):
+QnLinuxMonitor::QnLinuxMonitor(QObject *parent):
     base_type(parent),
     d_ptr(new QnLinuxMonitorPrivate())
 {
