@@ -27,7 +27,7 @@
 #define CHART_POINTS_LIMIT 60
 
 /** Data update period. For the best result should be equal to videoServerStatisticsManager's */
-#define REQUEST_TIME 2000
+#define REQUEST_TIME 2000 // TODO: #GDM extract this one from server's response (updatePeriod element).
 
 namespace {
     /** Convert angle from radians to degrees */
@@ -356,7 +356,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 painter->setTransform(legendTransform);
             }
         }
-#else //Q_WS_X11
+#else // Q_WS_X11
         font.setPixelSize(20);
         painter->setFont(font);
         /** Draw text values */
@@ -406,7 +406,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             }
             painter->scale(c, c);
         }
-#endif //Q_WS_X11
+#endif // Q_WS_X11
     }
 }
 
@@ -421,12 +421,12 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 void QnServerResourceWidget::at_statistics_received() {
     QnStatisticsHistory history_update;
     qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
-    if (id < 0){
+    if (id < 0) {
         m_renderStatus = Qn::CannotRender;
         return;
     }
 
-    if (id == m_lastHistoryId){
+    if (id == m_lastHistoryId) {
         m_renderStatus = Qn::OldFrameRendered;
         return;
     }
@@ -443,7 +443,7 @@ void QnServerResourceWidget::at_statistics_received() {
          }
     }
 
-    // update existsing charts
+    // update existing charts
     QnStatisticsIterator updater(history_update);
     while (updater.hasNext()) {
          updater.next();
@@ -451,11 +451,13 @@ void QnServerResourceWidget::at_statistics_received() {
          updateValues(updater.key(), updater.value());
     }
 
-    if (reSort){
+    if (reSort) {
         m_sortedKeys.clear();
         foreach(QString key, m_history.keys())
             m_sortedKeys.append(key);
         m_sortedKeys.sort();
+
+        // TODO: #gdm Just use a proper comparator with qSort!
 
         // ugly hack
         // TODO: #gdm Think about it. Later.

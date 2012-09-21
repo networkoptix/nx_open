@@ -3,7 +3,7 @@
 
 #include "rest/server/request_handler.h"
 
-class QnPlatformMonitor;
+class QnGlobalMonitor;
 
 class QnGetStatisticsHandler: public QnRestRequestHandler {
     Q_OBJECT
@@ -16,7 +16,7 @@ public:
     virtual QString description(TCPSocket* tcpSocket) const;
 
 private:
-    QnPlatformMonitor *m_monitor;
+    QnGlobalMonitor *m_monitor;
 };
 
 #endif // __REST_GET_STATISTICS_H__

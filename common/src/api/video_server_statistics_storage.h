@@ -12,7 +12,7 @@
 /**
   * Class that receives, parses and stores statistics data from one server.
   */
-class QnStatisticsStorage: QObject{
+class QnStatisticsStorage: QObject {
     Q_OBJECT
 public:
     /**

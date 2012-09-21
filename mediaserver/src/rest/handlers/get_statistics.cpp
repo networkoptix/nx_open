@@ -50,6 +50,10 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     result.append(QString("<usage>%1</usage>\n").arg(m_monitor->totalRamUsage()));
     result.append("</memory>\n");
 
+    result.append("<params>\n");
+    result.append(QString("<updatePeriod>%1</updatePeriod>\n").arg(m_monitor->updatePeriod()));
+    result.append("</params>\n");
+
     result.append("</root>\n");
 
     resultByteArray = result.toUtf8();

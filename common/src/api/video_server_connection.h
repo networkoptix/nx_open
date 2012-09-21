@@ -59,6 +59,7 @@ namespace detail {
         void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
     };
 
+    // TODO: #gdm class ForTheLoveOfGodDontCreateClassesWithSuchLongNamesRequestReplyProcessor: public QObject
     class VideoServerSessionManagerStatisticsRequestReplyProcessor: public QObject
     {
         Q_OBJECT

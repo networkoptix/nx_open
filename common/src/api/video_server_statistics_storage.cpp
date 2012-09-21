@@ -14,8 +14,7 @@ QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiCo
     m_timeStamp(0),
     m_listeners(0),
     m_apiConnection(apiConnection)
-{
-}
+{}
 
 void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot){
     connect(this, SIGNAL(statisticsChanged()), target, slot);
@@ -48,9 +47,10 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
     return m_lastId;
 }
 
-void QnStatisticsStorage::update(){
+void QnStatisticsStorage::update() {
     if (m_alreadyUpdating)
         return;
+
     if (!m_listeners){
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
@@ -69,20 +69,20 @@ void QnStatisticsStorage::update(){
     m_alreadyUpdating = true;
 }
 
-void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data){
+void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data) {
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
     QListIterator<QnStatisticsDataItem> iter(data);
-    while(iter.hasNext()){
-        QnStatisticsDataItem next_data = iter.next();
+    while(iter.hasNext()) {
+        QnStatisticsDataItem nextData = iter.next();
 
-        QString id = next_data.device == QnStatisticsDataItem::CPU
+        QString id = nextData.deviceType == QnStatisticsDataItem::CPU
            ? tr("CPU")
-           : next_data.description;
+           : nextData.description;
 
         QnStatisticsData &stats = m_history[id];
-        stats.append(next_data.value);
+        stats.append(nextData.value);
         if (stats.size() > STORAGE_LIMIT)
             stats.removeFirst();
     }
