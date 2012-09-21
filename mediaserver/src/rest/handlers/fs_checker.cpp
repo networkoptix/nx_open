@@ -7,13 +7,13 @@
 #include "fs_checker.h"
 #include "recorder/storage_manager.h"
 
-QnFsHelperHandler::QnFsHelperHandler(bool detectAvailableOnly):
+QnFileSystemHandler::QnFileSystemHandler(bool detectAvailableOnly):
     m_detectAvailableOnly(detectAvailableOnly)
 {
 
 }
 
-int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     QString pathStr;
@@ -84,13 +84,13 @@ int QnFsHelperHandler::executeGet(const QString& path, const QnRequestParamList&
     return CODE_OK;
 }
 
-int QnFsHelperHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnFileSystemHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnFsHelperHandler::description(TCPSocket* tcpSocket) const
+QString QnFileSystemHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;

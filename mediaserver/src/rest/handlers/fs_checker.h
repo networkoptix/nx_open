@@ -1,12 +1,12 @@
-#ifndef __FS_CHECKER_H__
-#define __FS_CHECKER_H__
+#ifndef QN_FILE_SYSTEM_HANDLER_H
+#define QN_FILE_SYSTEM_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
-class QnFsHelperHandler: public QnRestRequestHandler
+class QnFileSystemHandler: public QnRestRequestHandler
 {
 public:
-    QnFsHelperHandler(bool detectAvailableOnly);
+    QnFileSystemHandler(bool detectAvailableOnly);
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
@@ -18,4 +18,4 @@ private:
     bool m_detectAvailableOnly;
 };
 
-#endif // __FS_CHECKER_H__
+#endif // QN_FILE_SYSTEM_HANDLER_H

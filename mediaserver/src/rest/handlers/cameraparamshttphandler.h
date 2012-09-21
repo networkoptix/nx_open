@@ -3,8 +3,8 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef CAMERAPARAMSHTTPHANDLER_H
-#define CAMERAPARAMSHTTPHANDLER_H
+#ifndef QN_CAMERA_SETTINGS_HANDLER_H
+#define QN_CAMERA_SETTINGS_HANDLER_H
 
 #include <map>
 #include <set>
@@ -100,4 +100,4 @@ public:
     virtual QString description( TCPSocket* tcpSocket ) const;
 };
 
-#endif  //CAMERAPARAMSHTTPHANDLER_H
+#endif  //QN_CAMERA_SETTINGS_HANDLER_H

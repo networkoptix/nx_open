@@ -551,14 +551,14 @@ void QnMain::initTcpListener()
 {
     int rtspPort = qSettings.value("rtspPort", DEFAUT_RTSP_PORT).toInt();
 #ifdef USE_SINGLE_STREAMING_PORT
-    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunkListHandler());
-    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFsHelperHandler(true));
-    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFsHelperHandler(false));
+    QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
+    QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
+    QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
     QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
-    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzRestHandler());
+    QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

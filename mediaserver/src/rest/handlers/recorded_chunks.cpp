@@ -8,7 +8,7 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-qint64 QnRecordedChunkListHandler::parseDateTime(const QString& dateTime)
+qint64 QnRecordedChunksHandler::parseDateTime(const QString& dateTime)
 {
     if (dateTime.contains('T') || dateTime.contains('-'))
     {
@@ -22,7 +22,7 @@ qint64 QnRecordedChunkListHandler::parseDateTime(const QString& dateTime)
         return dateTime.toLongLong();
 }
 
-QRect QnRecordedChunkListHandler::deserializeMotionRect(const QString& rectStr)
+QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
 {
     QList<QString> params = rectStr.split(",");
     if (params.size() != 4)
@@ -31,7 +31,7 @@ QRect QnRecordedChunkListHandler::deserializeMotionRect(const QString& rectStr)
         return QRect(params[0].toInt(), params[1].toInt(), params[2].toInt(), params[3].toInt());
 }
 
-int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(path)
     qint64 startTime = -1, endTime = 1, detailLevel = -1;
@@ -132,13 +132,13 @@ int QnRecordedChunkListHandler::executeGet(const QString& path, const QnRequestP
     return CODE_OK;
 }
 
-int QnRecordedChunkListHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnRecordedChunksHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnRecordedChunkListHandler::description(TCPSocket* tcpSocket) const
+QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;

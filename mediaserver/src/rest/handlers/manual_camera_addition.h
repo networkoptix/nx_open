@@ -1,10 +1,7 @@
-#ifndef __MANUAL_CAMERA_ADDITION_CHECKER_H__1506
-#define __MANUAL_CAMERA_ADDITION_CHECKER_H__1506
+#ifndef QN_MANUAL_CAMERA_ADDITION_HANDLER_H
+#define QN_MANUAL_CAMERA_ADDITION_HANDLER_H
 
-
-#include "../server/request_handler.h"
-
-
+#include "rest/server/request_handler.h"
 
 class QnManualCameraAdditionHandler: public QnRestRequestHandler
 {
@@ -19,4 +16,4 @@ private:
     int addAction(const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType);
 };
 
-#endif // __MANUAL_CAMERA_ADDITION_CHECKER_H__1506
+#endif // QN_MANUAL_CAMERA_ADDITION_HANDLER_H

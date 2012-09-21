@@ -1,5 +1,5 @@
-#ifndef __REST_GET_STATISTICS_H__
-#define __REST_GET_STATISTICS_H__
+#ifndef QN_GET_STATISTICS_HANDLER_H
+#define QN_GET_STATISTICS_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
@@ -19,4 +19,4 @@ private:
     QnGlobalMonitor *m_monitor;
 };
 
-#endif // __REST_GET_STATISTICS_H__
+#endif // QN_GET_STATISTICS_HANDLER_H

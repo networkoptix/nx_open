@@ -6,12 +6,12 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
 
-QnPtzRestHandler::QnPtzRestHandler()
+QnPtzHandler::QnPtzHandler()
 {
 
 }
 
-int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     QnVirtualCameraResourcePtr res;
     QnAbstractPtzController* ptz = 0;
@@ -127,13 +127,13 @@ int QnPtzRestHandler::executeGet(const QString& path, const QnRequestParamList& 
 
 }
 
-int QnPtzRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnPtzHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnPtzRestHandler::description(TCPSocket* tcpSocket) const
+QString QnPtzHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;

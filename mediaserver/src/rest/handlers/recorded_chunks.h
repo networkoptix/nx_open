@@ -1,10 +1,11 @@
-#ifndef __RECORDED_CHUNKS_H__
-#define __RECORDED_CHUNKS_H__
+#ifndef QN_RECORDED_CHUNKS_HANDLER_H
+#define QN_RECORDED_CHUNKS_HANDLER_H
 
-#include <QRect>
+#include <QtCore/QRect>
+
 #include "rest/server/request_handler.h"
 
-class QnRecordedChunkListHandler: public QnRestRequestHandler
+class QnRecordedChunksHandler: public QnRestRequestHandler
 {
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
@@ -20,4 +21,4 @@ class QnXsdHelperHandler: public QnRestRequestHandler
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
 };
 
-#endif // __RECORD_CHUNKS_H__
+#endif // QN_RECORDED_CHUNKS_HANDLER_H

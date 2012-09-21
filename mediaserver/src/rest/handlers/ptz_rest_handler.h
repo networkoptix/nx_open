@@ -1,12 +1,12 @@
-#ifndef __PTZ_CONTROL_H__
-#define __PTZ_CONTROL_H__
+#ifndef QN_PTZ_HANDLER_H
+#define QN_PTZ_HANDLER_H
 
 #include "rest/server/request_handler.h"
 
-class QnPtzRestHandler: public QnRestRequestHandler
+class QnPtzHandler: public QnRestRequestHandler
 {
 public:
-    QnPtzRestHandler();
+    QnPtzHandler();
 protected:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
@@ -15,4 +15,4 @@ private:
     bool m_detectAvailableOnly;
 };
 
-#endif // __PTZ_CONTROL_H__
+#endif // QN_PTZ_HANDLER_H
