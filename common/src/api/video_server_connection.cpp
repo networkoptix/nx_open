@@ -498,30 +498,39 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
 }
 
 void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &, int) {
-    if(status == 0)
-    {
-        //QByteArray usagestr = extractXmlBody(reply, "usage"); // usage of the current process
-        QByteArray usageStr = extractXmlBody(reply, "load"); // total cpu load of the current machine
-        int usage =  usageStr.toShort();
-        QByteArray modelStr = extractXmlBody(reply, "model");
-
+    if(status == 0) {
         QnStatisticsDataList data;
-        data.append(QnStatisticsDataItem(QLatin1String(modelStr), usage, QnStatisticsDataItem::CPU));
 
-        QByteArray storages = extractXmlBody(reply, "storages");
-        QByteArray storage;
+        QByteArray cpuBlock = extractXmlBody(reply, "cpuinfo");
+        data.append(QnStatisticsDataItem(
+            QLatin1String("CPU"), 
+            extractXmlBody(cpuBlock, "load").toDouble(), 
+            QnStatisticsDataItem::CPU
+        ));
+
+        QByteArray memoryBlock = extractXmlBody(reply, "memory");
+        data.append(QnStatisticsDataItem(
+            QLatin1String("RAM"), 
+            extractXmlBody(memoryBlock, "usage").toDouble(), 
+            QnStatisticsDataItem::RAM
+        ));
+
+        QByteArray storagesBlock = extractXmlBody(reply, "storages"), storageBlock;
         int from = 0;
-        do 
-        {
-            storage = extractXmlBody(storages, "storage", &from);
-            if (storage.length() == 0)
+        do {
+            storageBlock = extractXmlBody(storagesBlock, "storage", &from);
+            if (storageBlock.length() == 0)
                 break;
-            QString url = QLatin1String(extractXmlBody(storage, "url"));
-            usage = extractXmlBody(storage, "usage").toShort();
-            data.append(QnStatisticsDataItem(url, usage, QnStatisticsDataItem::HDD));
-        } while (storage.length() > 0);
+            data.append(QnStatisticsDataItem(
+                QLatin1String(extractXmlBody(storageBlock, "url")), 
+                extractXmlBody(storageBlock, "usage").toDouble(), 
+                QnStatisticsDataItem::HDD
+            ));
+        } while (storageBlock.length() > 0);
+
         emit finished(data); 
     }
+
     deleteLater();
 }
 

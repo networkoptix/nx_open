@@ -3,14 +3,20 @@
 
 #include "rest/server/request_handler.h"
 
-class QnGetStatisticsHandler: public QnRestRequestHandler
-{
+class QnGlobalMonitor;
+
+class QnGetStatisticsHandler: public QnRestRequestHandler {
+    Q_OBJECT
+public:
+    QnGetStatisticsHandler();
+    virtual ~QnGetStatisticsHandler();
+
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
     virtual QString description(TCPSocket* tcpSocket) const;
+
 private:
-    qint64 parseDateTime(const QString& dateTime);
-    QRect deserializeMotionRect(const QString& rectStr);
+    QnGlobalMonitor *m_monitor;
 };
 
 #endif // __REST_GET_STATISTICS_H__

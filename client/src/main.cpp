@@ -220,7 +220,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
-
+    
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 

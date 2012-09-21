@@ -12,7 +12,6 @@
 
 #include "version.h"
 #include "utils/common/util.h"
-#include "utils/common/performance.h"
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resourcemanagment/resource_discovery_manager.h"
@@ -805,9 +804,6 @@ protected:
 
         serverMain(app->argc(), app->argv());
         m_main.start();
-
-        /** Cpu usage timer MUST be initialized from the main thread */
-        Q_UNUSED(QnPerformance::currentCpuUsage())
     }
 
     void stop()

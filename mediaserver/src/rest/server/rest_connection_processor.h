@@ -5,8 +5,8 @@
 #include "utils/network/tcp_connection_processor.h"
 #include "request_handler.h"
 
-class QnRestConnectionProcessor: public QnTCPConnectionProcessor
-{
+class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
+    Q_OBJECT
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
 
@@ -15,8 +15,10 @@ public:
 
     static void registerHandler(const QString& path, QnRestRequestHandler* handler);
     static QnRestRequestHandlerPtr findHandler(QString path);
+
 protected:
     virtual void run() override;
+
 private:
     static Handlers m_handlers;
     QN_DECLARE_PRIVATE_DERIVED(QnRestConnectionProcessor);

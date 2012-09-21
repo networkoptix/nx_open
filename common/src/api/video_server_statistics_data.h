@@ -12,23 +12,25 @@
 struct QnStatisticsDataItem {
     enum DeviceType {
         CPU,
+        RAM,
         HDD
     };
 
+    QnStatisticsDataItem() {}
+    QnStatisticsDataItem(const QString &description, qreal value, DeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
+
     QString description;
-    int value;
-    DeviceType device;
-
-    QnStatisticsDataItem(){}
-
-    QnStatisticsDataItem(QString description, int value, DeviceType device): description(description), value(value), device(device) {}
+    qreal value;
+    DeviceType deviceType;
 };
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
-typedef QLinkedList<int> QnStatisticsData;
-typedef QLinkedListIterator<int> QnStatisticsDataIterator;
+typedef QLinkedList<qreal> QnStatisticsData;
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
+
+// TODO: remove this iterator hell.
+typedef QLinkedListIterator<qreal> QnStatisticsDataIterator; 
 typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
 typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 
