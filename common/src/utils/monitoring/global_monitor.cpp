@@ -24,9 +24,15 @@ public:
 
     virtual ~QnGlobalMonitorPrivate() {}
 
-    void restartTimers() {
+    void restartTimersLocked() {
         updateTimer.start(updatePeriod, q_func());
         stopTimer.start(updatePeriod * 64, q_func());
+    }
+
+    void updateCacheLocked() {
+        totalCpuUsage = base->totalCpuUsage();
+        totalRamUsage = base->totalRamUsage();
+        totalHddLoad = base->totalHddLoad();
     }
 
 private:
@@ -73,7 +79,8 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
     base->setParent(this); /* Claim ownership. */
     d->base = base;
 
-    d->restartTimers();
+    d->updateCacheLocked();
+    d->restartTimersLocked();
 }
 
 QnGlobalMonitor::~QnGlobalMonitor() {
@@ -95,7 +102,7 @@ void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
         return;
 
     d->updatePeriod = updatePeriod;
-    d->restartTimers();
+    d->restartTimersLocked();
 }
 
 qreal QnGlobalMonitor::totalCpuUsage() {
@@ -133,11 +140,8 @@ void QnGlobalMonitor::timerEvent(QTimerEvent *event) {
     QMutexLocker locker(&d->mutex);
 
     if(event->timerId() == d->updateTimer.timerId()) {
-        if(!d->stopped) {
-            d->totalCpuUsage = d->base->totalCpuUsage();
-            d->totalRamUsage = d->base->totalRamUsage();
-            d->totalHddLoad = d->base->totalHddLoad();
-        }
+        if(!d->stopped)
+            d->updateCacheLocked();
     } else if(event->timerId() == d->stopTimer.timerId()) {
         if(d->requestCount == 0) {
             d->stopped = true;

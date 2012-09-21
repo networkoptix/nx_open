@@ -510,17 +510,17 @@ void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyR
             QnStatisticsDataItem::CPU
         ));
 
-        QByteArray memoryBlock = extractXmlBody(reply, "storagesBlock");
+        QByteArray memoryBlock = extractXmlBody(reply, "memory");
         data.append(QnStatisticsDataItem(
             QLatin1String("RAM"), 
             extractXmlBody(memoryBlock, "usage").toDouble(), 
-            QnStatisticsDataItem::CPU
+            QnStatisticsDataItem::RAM
         ));
 
-        QByteArray storagesBlock = extractXmlBody(reply, "storagesBlock"), storageBlock;
+        QByteArray storagesBlock = extractXmlBody(reply, "storages"), storageBlock;
         int from = 0;
         do {
-            storageBlock = extractXmlBody(storagesBlock, "storageBlock", &from);
+            storageBlock = extractXmlBody(storagesBlock, "storage", &from);
             if (storageBlock.length() == 0)
                 break;
             data.append(QnStatisticsDataItem(

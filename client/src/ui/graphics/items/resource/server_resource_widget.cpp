@@ -42,40 +42,37 @@ namespace {
     }
 
     /** Create path for the chart */
-    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsed_step, qreal *current_value) {
+    QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
-        int max_value = -1;
-        int prev_value = 0;
-        int last_value = 0;
+        qreal maxValue = -1;
+        qreal value;
+        qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
         
         qreal x1, y1;
-        x1 = -x_step * elapsed_step;
+        x1 = -x_step * elapsedStep;
 
-        qreal angle = elapsed_step >= 0.5 
-            ? radiansToDegrees(qAcos(2 * (1 - elapsed_step))) 
-            : radiansToDegrees(qAcos(2 * elapsed_step));
+        qreal angle = elapsedStep >= 0.5 
+            ? radiansToDegrees(qAcos(2 * (1 - elapsedStep))) 
+            : radiansToDegrees(qAcos(2 * elapsedStep));
 
         bool first(true);
 
         QnStatisticsDataIterator iter(values);
         bool last = !iter.hasNext();
-        while (!last){
-            int i_value = iter.next();
+        while (true) {
+            qreal value = qBound(0.0, iter.next(), 1.0);
             last = !iter.hasNext();
 
-            prev_value = last_value;
-            last_value = i_value;
-
-            max_value = qMax(max_value, i_value);
-            if (first){ 
-                y1 = i_value * scale * 0.01;
+            maxValue = qMax(maxValue, value);
+            if (first) {
+                y1 = value * scale;
                 path.moveTo(x1, y1);
                 first = false;
                 continue;
             }
 
-            qreal y2 = i_value * scale * 0.01;
+            qreal y2 = value * scale;
 
             /* Note that we're using 89 degrees for arc length for a reason.
              * When using full 90 degrees, arcs are connected, but Qt still
@@ -83,6 +80,9 @@ namespace {
              * Path triangulator then chokes when trying to calculate a normal
              * for this line segment, producing NaNs in its output.
              * These NaNs are then fed to GPU, resulting in artifacts. */
+
+            // TODO: #gdm This logic seems overly complicated to me.
+            //            I'm sure we can do the same with a code that is at least three times shorter.
 
             /* Drawing only second part of the arc, cut at the beginning */
             if (x1 + x_step2 < 0.0) {
@@ -125,7 +125,7 @@ namespace {
                 }
             }
             /* Drawing both parts of the arc, cut at the end */
-            else if (elapsed_step >= 0.5) {
+            else if (elapsedStep >= 0.5) {
                 if (y2 > y1) {
                     path.arcTo(x1 - x_step2, y1, x_step, (y2 - y1), 90, -89);
                     path.arcTo(x1 + x_step2, y1, x_step, (y2 - y1), 180, angle);
@@ -133,7 +133,7 @@ namespace {
                     path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 89);
                     path.arcTo(x1 + x_step2, y2, x_step, (y1 - y2), 180, -angle);
                 } else { // y2 == y1
-                    path.lineTo(x1 + x_step * elapsed_step, y2);
+                    path.lineTo(x1 + x_step * elapsedStep, y2);
                 }
             } 
             /* Drawing only first part of the arc, cut at the end */
@@ -143,14 +143,21 @@ namespace {
                 } else if (y2 < y1) {
                     path.arcTo(x1 - x_step2, y2, x_step, (y1 - y2), -90, 90 - angle);
                 } else { // y2 == y1
-                    path.lineTo(x1 + x_step * elapsed_step, y2);
+                    path.lineTo(x1 + x_step * elapsedStep, y2);
                 }
             }
+            
+            if(last) {
+                /* Value that will be shown */
+                *currentValue = (lastValue * (1.0 - elapsedStep) + value * elapsedStep);
+                break;
+            }
+
             x1 += x_step;
             y1 = y2;
+            lastValue = value;
         }
-        /** value that will be shown */
-        *current_value = ((last_value - prev_value)*elapsed_step + prev_value);
+
         return path;
     }
 
@@ -284,11 +291,11 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         int counter = 0;
 
-        foreach(QString key, m_sortedKeys){
+        foreach(QString key, m_sortedKeys) {
             QnStatisticsData &stats = m_history[key];
-            qreal current_value = 0;
-            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &current_value);
-            values.append(current_value);
+            qreal currentValue = 0;
+            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &currentValue);
+            values.append(currentValue);
             graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);
 
@@ -313,29 +320,32 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QFont font(this->font());
 
+        // TODO: #gdm there seems to be a lot of copypasta between these two blocks,
+        // so fixing them is a real hell for me. Factor out common parts and unify them.
+
 #ifndef Q_WS_X11
         font.setPointSizeF(offset * 0.3);
         painter->setFont(font);
-        /** Draw text values */
+        /* Draw text values */
         {
-            qreal x = offset*1.1 + ow;
+            qreal x = offset * 1.1 + ow;
             for (int i = 0; i < values.length(); i++){
-                qreal inter_value = values[i];
+                qreal interValue = values[i];
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
-                qreal y = offset + oh * (1.0 - inter_value * 0.01);
-                painter->drawText(x, y, QString::number(qRound(inter_value))+QLatin1Char('%'));
+                qreal y = offset + oh * (1.0 - interValue);
+                painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
             }
         }
 
-        /** Draw legend */
+        /* Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
 
             QTransform legendTransform = painter->transform();
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset*0.2, -offset*0.2);
+            legend.addRect(0.0, 0.0, -offset * 0.2, -offset * 0.2);
 
             legendTransform.translate(width * 0.5, oh + offset * 1.5);
 
@@ -351,7 +361,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 main_pen.setColor(getColorById(counter++));
                 painter->setPen(main_pen);
                 painter->strokePath(legend, main_pen);
-                painter->drawText(offset*0.1, offset*0.1, key);
+                painter->drawText(offset * 0.1, offset * 0.1, key);
                 legendTransform.translate(painter->fontMetrics().width(key) + space, 0.0);
                 painter->setTransform(legendTransform);
             }
@@ -361,16 +371,16 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         painter->setFont(font);
         /** Draw text values */
         {
-            qreal c = offset*0.02;
+            qreal c = offset * 0.02;
             painter->scale(c, c);
             c = 1/c;
-            qreal x = offset*1.1 + ow;
+            qreal x = offset * 1.1 + ow;
             for (int i = 0; i < values.length(); i++){
-                qreal inter_value = values[i];
+                qreal interValue = values[i];
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
-                qreal y = offset + oh * (1.0 - inter_value * 0.01);
-                painter->drawText(x*c, y*c, QString::number(qRound(inter_value))+QLatin1Char('%'));
+                qreal y = offset + oh * (1.0 - interValue);
+                painter->drawText(x*c, y*c, tr("%1%").arg(qRound(interValue * 100.0)));
             }
             painter->scale(c, c);
         }
@@ -381,7 +391,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             Q_UNUSED(transformRollback)
             painter->translate(width * 0.5, oh + offset * 1.5);
 
-            qreal c = offset*0.02;
+            qreal c = offset * 0.02;
             painter->scale(c, c);
 
             qreal legendOffset = 0.0;
@@ -390,7 +400,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 legendOffset += painter->fontMetrics().width(key) + space;
             painter->translate(-legendOffset * 0.5, 0.0);
 
-            c = 1/c; // 50 / offset
+            c = 1 / c; // 50 / offset
 
             QPainterPath legend;
             legend.addRect(0.0, 0.0, -10, -10);
@@ -474,7 +484,7 @@ void QnServerResourceWidget::at_statistics_received() {
     m_counter++;
 }
 
-void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues){
+void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues) {
     QnStatisticsData &oldValues = m_history[key];
 
     while (!newValues.isEmpty())

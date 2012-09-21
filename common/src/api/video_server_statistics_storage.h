@@ -61,12 +61,14 @@ signals:
      * Signal emitted when new data is received.
      */
     void statisticsChanged();
+
 private slots:
 
     /**
      * Private slot for the handling data received from the server.
      */
     void at_statisticsReceived(const QnStatisticsDataList &data);
+
 private:
     bool m_alreadyUpdating;
     qint64 m_lastId;

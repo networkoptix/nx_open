@@ -17,7 +17,7 @@ struct QnStatisticsDataItem {
     };
 
     QnStatisticsDataItem() {}
-    QnStatisticsDataItem(QString description, int value, DeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
+    QnStatisticsDataItem(const QString &description, qreal value, DeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
 
     QString description;
     qreal value;
@@ -26,11 +26,11 @@ struct QnStatisticsDataItem {
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
-typedef QLinkedList<int> QnStatisticsData;
+typedef QLinkedList<qreal> QnStatisticsData;
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
 
 // TODO: remove this iterator hell.
-typedef QLinkedListIterator<int> QnStatisticsDataIterator; 
+typedef QLinkedListIterator<qreal> QnStatisticsDataIterator; 
 typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
 typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 

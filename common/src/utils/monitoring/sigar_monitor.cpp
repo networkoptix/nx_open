@@ -140,7 +140,7 @@ qreal QnSigarMonitor::totalRamUsage() {
     if(INVOKE(sigar_mem_get(d->sigar, &mem)) != SIGAR_OK)
         return 0.0;
 
-    return mem.used_percent;
+    return mem.used_percent / 100.0;
 }
 
 QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
