@@ -1,18 +1,18 @@
-#ifndef __DESKTOP_DEVICE_SERVER_H
-#define __DESKTOP_DEVICE_SERVER_H
+#ifndef QN_DESKTOP_RESOURCE_SEARCHER_H
+#define QN_DESKTOP_RESOURCE_SEARCHER_H
 
 #include "core/resource_managment/resource_searcher.h"
 
 struct IDirect3D9;
 
-class DesktopDeviceServer : public QnAbstractResourceSearcher // TODO: rename to resource searcher
+class QnDesktopResourceSearcher : public QnAbstractResourceSearcher
 {
-    DesktopDeviceServer();
+    QnDesktopResourceSearcher();
 
 public:
-    ~DesktopDeviceServer();
+    ~QnDesktopResourceSearcher();
 
-    static DesktopDeviceServer& instance();
+    static QnDesktopResourceSearcher& instance();
 
     virtual QString manufacture() const override;
 
@@ -27,4 +27,4 @@ private:
     IDirect3D9 *m_pD3D;
 };
 
-#endif // __DESKTOP_DEVICE_SERVER_H
+#endif // QN_DESKTOP_RESOURCE_SEARCHER_H

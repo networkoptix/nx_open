@@ -11,13 +11,13 @@
 
 #define ONLY_PRIMARY_DESKTOP
 
-DesktopDeviceServer &DesktopDeviceServer::instance()
+QnDesktopResourceSearcher &QnDesktopResourceSearcher::instance()
 {
-    static DesktopDeviceServer inst;
+    static QnDesktopResourceSearcher inst;
     return inst;
 }
 
-DesktopDeviceServer::DesktopDeviceServer()
+QnDesktopResourceSearcher::QnDesktopResourceSearcher()
 {
 #ifdef Q_OS_WIN
     m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
@@ -26,18 +26,18 @@ DesktopDeviceServer::DesktopDeviceServer()
 #endif
 }
 
-DesktopDeviceServer::~DesktopDeviceServer()
+QnDesktopResourceSearcher::~QnDesktopResourceSearcher()
 {
 #ifdef Q_OS_WIN
     m_pD3D->Release();
 #endif
 }
 
-QString DesktopDeviceServer::manufacture() const {
+QString QnDesktopResourceSearcher::manufacture() const {
     return QLatin1String("NetworkOptix");
 }
 
-QnResourceList DesktopDeviceServer::findResources() {
+QnResourceList QnDesktopResourceSearcher::findResources() {
 #ifdef Q_OS_WIN
     QnResourceList result;
     if (m_pD3D == 0)
@@ -52,7 +52,7 @@ QnResourceList DesktopDeviceServer::findResources() {
         if(FAILED(m_pD3D->GetAdapterDisplayMode(i, &ddm)))
             break;
 
-        QnResourcePtr dev(new QnDesktopDevice(i));
+        QnResourcePtr dev(new QnDesktopResource(i));
         result.push_back(dev);
     }
     return result;
@@ -61,13 +61,13 @@ QnResourceList DesktopDeviceServer::findResources() {
 #endif
 }
 
-bool DesktopDeviceServer::isResourceTypeSupported(QnId resourceTypeId) const {
+bool QnDesktopResourceSearcher::isResourceTypeSupported(QnId resourceTypeId) const {
     Q_UNUSED(resourceTypeId)
 
     return false;
 }
 
-QnResourcePtr DesktopDeviceServer::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
+QnResourcePtr QnDesktopResourceSearcher::createResource(QnId resourceTypeId, const QnResourceParameters &parameters) {
     Q_UNUSED(resourceTypeId)
     Q_UNUSED(parameters)
 
