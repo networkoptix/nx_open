@@ -109,8 +109,8 @@ void QnSyncPlayArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
 {
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
-    if (maskedDelegate)
-        maskedDelegate->setSendMotion(value);
+    //if (maskedDelegate)
+    //    m_ownerDelegate->setSendMotion(value);
 }
 
 void QnSyncPlayArchiveDelegate::beforeSeek(qint64 time)

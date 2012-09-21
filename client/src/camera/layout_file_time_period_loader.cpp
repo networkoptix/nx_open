@@ -1,7 +1,6 @@
 #include "layout_file_time_period_loader.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
-#include "core/datapacket/mediadatapacket.h"
 
 QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks, QnMetaDataV1Light* motionData, int motionDataSize):
     QnAbstractTimePeriodLoader(resource, parent),
@@ -14,7 +13,7 @@ QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resourc
 
 QnLayoutFileTimePeriodLoader::~QnLayoutFileTimePeriodLoader()
 {
-    delete [] m_motionData;
+    qFreeAligned(m_motionData);
 }
 
 QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
@@ -38,8 +37,9 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
     int motionDataSize = 0;
     QIODevice* motionIO = storage->open(QString(QLatin1String("motion_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
     if (motionIO) {
+        Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
         motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-        motionData = new QnMetaDataV1Light[motionDataSize];
+        motionData = (QnMetaDataV1Light*) qMallocAligned(motionIO->size(), CL_MEDIA_ALIGNMENT);
         motionIO->read((char*) motionData, motionIO->size());
         delete motionIO;
         for (int i = 0; i < motionDataSize; ++i)
@@ -60,7 +60,7 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
 {
     QVector<char*> masks;
     for (int i = 0; i < motionRegions.size(); ++i) {
-        masks << (char*) qMallocAligned(CL_MEDIA_ALIGNMENT, MD_WIDTH * MD_HEIGHT / 8);
+        masks << (char*) qMallocAligned(MD_WIDTH * MD_HEIGHT / 8, CL_MEDIA_ALIGNMENT);
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 

@@ -1999,7 +1999,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     if (m_motionFileBuffer)
     {
         m_motionFileBuffer->close();
-        QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".motion"));
+        
+        QString motionFileName = QString(QLatin1String("motion_%1.bin")).arg(m_exportedMediaRes->getUniqueId());
+        //QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".bin"));
         QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
         device->write(m_motionFileBuffer->buffer());
         device->close();

@@ -589,3 +589,9 @@ void QnAviArchiveDelegate::setFastStreamFind(bool value)
 {
     m_fastStreamFind = value;
 }
+
+QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::createMotionConnection(int channel)
+{
+    // todo: implement me
+    return QnAbstractMotionArchiveConnectionPtr();
+}

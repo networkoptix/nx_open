@@ -40,7 +40,7 @@ public:
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
-
+    virtual QnAbstractMotionArchiveConnectionPtr createMotionConnection(int channel) override;
 protected:
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();

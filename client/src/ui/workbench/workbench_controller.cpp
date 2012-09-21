@@ -1016,7 +1016,7 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(!(widget->resource()->flags() & QnResource::network)) {
+    if(!(widget->resource()->flags() & QnResource::motion)) { // TODO: #Elric maybe there is a better place for this check?
         m_motionSelectionInstrument->resetLater();
         return;
     }
@@ -1029,12 +1029,12 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
         widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region) {
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
         widget->addToMotionSelection(region);
 }
 

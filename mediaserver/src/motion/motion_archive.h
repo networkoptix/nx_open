@@ -9,6 +9,7 @@
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
 #include "core/resource/security_cam_resource.h"
+#include "motion/abstract_motion_archive.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
 static const int MOTION_INDEX_RECORD_SIZE = 8;
@@ -32,7 +33,7 @@ struct IndexHeader
 };
 #pragma pack(pop)
 
-class QnMotionArchiveConnection
+class QnMotionArchiveConnection: public QnAbstractMotionArchiveConnection
 {
 public:
     QnMetaDataV1Ptr getMotionData(qint64 timeUsec);

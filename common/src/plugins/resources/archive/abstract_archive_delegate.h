@@ -6,6 +6,7 @@
 #include <QVector>
 #include "core/resource/resource.h"
 #include "core/datapacket/media_data_packet.h"
+#include "motion/abstract_motion_archive.h"
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -30,7 +31,8 @@ public:
     { 
         Flag_SlowSource = 1, 
         Flag_CanProcessNegativeSpeed = 2, // flag inform that delegate is going to process negative speed. If flag is not setted, ArchiveReader is going to process negative speed
-        Flag_CanProcessMediaStep = 4      // flag inform that delegate is going to process media step itself.
+        Flag_CanProcessMediaStep = 4,      // flag inform that delegate is going to process media step itself.
+        Flag_CanSendMotion       = 8,      // motion supported
     };
     Q_DECLARE_FLAGS(Flags, Flag);
 
@@ -70,6 +72,8 @@ public:
 
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }
+
+    virtual QnAbstractMotionArchiveConnectionPtr createMotionConnection(int channel) { return QnAbstractMotionArchiveConnectionPtr(); }
 
 protected:
     Flags m_flags;

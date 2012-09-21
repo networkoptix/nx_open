@@ -217,6 +217,9 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
+    } else if(m_resource->flags() & QnResource::motion) {
+        for(int i = 0, count = channelCount(); i < count; i++)
+            m_motionSensitivity.push_back(QnMotionRegion());
     } else {
         m_motionSensitivity.clear();
     }

@@ -57,7 +57,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQualityFastSwitch(true),
     m_isStillImage(false),
     m_speed(1.0),
-    m_pausedStart(false)
+    m_pausedStart(false),
+    m_sendMotion(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -452,6 +453,13 @@ begin_label:
     }
     m_dataMarker = m_newDataMarker;
 
+    if (m_afterMotionData)
+    {
+        QnAbstractMediaDataPtr result = m_afterMotionData;
+        m_afterMotionData.clear();
+        return result;
+    }
+
     /*
     if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
     {
@@ -720,6 +728,24 @@ begin_label:
     if (jumpTime != DATETIME_NOW)
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
+    // process motion
+    if (m_currentData && m_sendMotion)
+    {
+        int channel = m_currentData->channelNumber;
+        if (!m_motionConnection[channel])
+            m_motionConnection[channel] = m_delegate->createMotionConnection(channel);
+        if (m_motionConnection[channel]) {
+            QnMetaDataV1Ptr motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
+            if (motion) 
+            {
+                motion->flags = m_currentData->flags;
+                motion->opaque = m_currentData->opaque;
+                m_afterMotionData = m_currentData;
+                return motion;
+            }
+        }
+    }
+
     return m_currentData;
 }
 
@@ -727,6 +753,7 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 {
     m_skippedMetadata.clear();
     m_nextData.clear();
+    m_afterMotionData.clear();
     qint64 seekRez = 0;
     if (mksec > 0) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
@@ -754,6 +781,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     QnAbstractMediaDataPtr result;
     while (!m_needStop)
     {
+
         result = m_delegate->getNextData();
 
         if (result == 0 && !m_needStop)
@@ -948,12 +976,22 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 bool QnArchiveStreamReader::setSendMotion(bool value)
 {
     /*
-    if (m_navDelegate) {
+    if (m_navDelegate) 
         return m_navDelegate->setSendMotion(value);
-    }
     */
+
+    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
+    {
+        m_sendMotion = value;
+        return true;
+    }
+    else {
+        return false;
+    }
+    /*
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
     if (maskedDelegate) {
+        m_sendMotion = value;
         maskedDelegate->setSendMotion(value);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
             jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
@@ -962,6 +1000,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     else {
         return false;
     }
+    */
 }
 
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)

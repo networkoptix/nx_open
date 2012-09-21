@@ -869,14 +869,9 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
-        QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
-        if (serverArchive) 
-        {
-            QString sendMotion = d->requestHeaders.value("x-send-motion");
-            if (!sendMotion.isNull()) {
-                serverArchive->setSendMotion(sendMotion == "1" || sendMotion == "true");
-            }
-        }
+        QString sendMotion = d->requestHeaders.value("x-send-motion");
+        if (!sendMotion.isNull()) 
+            d->archiveDP->setSendMotion(sendMotion == "1" || sendMotion == "true");
 
         d->archiveDP->lock();
         d->archiveDP->setSpeed(d->rtspScale);
