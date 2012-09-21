@@ -25,7 +25,7 @@
 #include "appserver/processor.h"
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
-#include "rest/handlers/recorded_chunks.h"
+#include "rest/handlers/recorded_chunks_handler.h"
 #include "core/resource/media_server_resource.h"
 #include "api/session_manager.h"
 #include <signal.h>
@@ -52,14 +52,14 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "plugins/storage/coldstore/coldstore_storage.h"
 #include "main.h"
-#include "rest/handlers/fs_checker.h"
-#include "rest/handlers/get_statistics.h"
-#include "rest/handlers/cameraparamshttphandler.h"
-#include "rest/handlers/manual_camera_addition.h"
+#include "rest/handlers/file_system_handler.h"
+#include "rest/handlers/statistics_handler.h"
+#include "rest/handlers/camera_settings_handler.h"
+#include "rest/handlers/manual_camera_addition_handler.h"
 #include "rest/server/rest_connection_processor.h"
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
-#include "rest/handlers/ptz_rest_handler.h"
+#include "rest/handlers/ptz_handler.h"
 #include "utils/common/module_resources.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 
@@ -554,7 +554,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/RecordedTimePeriods", new QnRecordedChunksHandler());
     QnRestConnectionProcessor::registerHandler("api/CheckPath", new QnFileSystemHandler(true));
     QnRestConnectionProcessor::registerHandler("api/GetFreeSpace", new QnFileSystemHandler(false));
-    QnRestConnectionProcessor::registerHandler("api/statistics", new QnGetStatisticsHandler());
+    QnRestConnectionProcessor::registerHandler("api/statistics", new QnStatisticsHandler());
     QnRestConnectionProcessor::registerHandler("api/getCameraParam", new QnGetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());

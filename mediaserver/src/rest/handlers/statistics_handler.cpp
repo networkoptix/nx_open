@@ -1,4 +1,4 @@
-#include "get_statistics.h"
+#include "statistics_handler.h"
 
 #include <QtCore/QFileInfo>
 
@@ -13,17 +13,17 @@
 #include "rest/server/rest_server.h"
 #include "recorder/storage_manager.h"
 
-QnGetStatisticsHandler::QnGetStatisticsHandler() {
+QnStatisticsHandler::QnStatisticsHandler() {
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(), this);
 }
 
-QnGetStatisticsHandler::~QnGetStatisticsHandler() 
+QnStatisticsHandler::~QnStatisticsHandler() 
 {
 
 }
 
 
-int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
+int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
     Q_UNUSED(path)
@@ -61,13 +61,13 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     return CODE_OK;
 }
 
-int QnGetStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnStatisticsHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnGetStatisticsHandler::description(TCPSocket* tcpSocket) const
+QString QnStatisticsHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;

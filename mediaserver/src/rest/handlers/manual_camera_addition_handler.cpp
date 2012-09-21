@@ -1,6 +1,8 @@
-#include <QFileInfo>
-#include <QAuthenticator>
-#include "manual_camera_addition.h"
+#include "manual_camera_addition_handler.h"
+
+#include <QtCore/QFileInfo>
+#include <QtNetwork/QAuthenticator>
+
 #include "utils/network/tcp_connection_priv.h"
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource/resource.h"

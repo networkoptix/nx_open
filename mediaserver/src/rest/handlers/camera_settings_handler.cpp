@@ -3,11 +3,11 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "cameraparamshttphandler.h"
+#include "camera_settings_handler.h"
 
 #include <algorithm>
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_fwd.h>

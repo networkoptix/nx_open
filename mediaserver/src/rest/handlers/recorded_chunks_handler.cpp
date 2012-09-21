@@ -1,5 +1,7 @@
-#include <QFileInfo>
-#include "recorded_chunks.h"
+#include "recorded_chunks_handler.h"
+
+#include <QtCore/QFileInfo>
+
 #include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"

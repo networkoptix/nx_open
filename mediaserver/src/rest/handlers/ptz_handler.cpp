@@ -1,7 +1,8 @@
+#include "ptz_handler.h"
+
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
 #include "utils/common/util.h"
-#include "ptz_rest_handler.h"
 #include "core/resource/network_resource.h"
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
