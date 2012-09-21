@@ -587,6 +587,10 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     }
 
     m_emptyPacketCounter = 0;
+    if (m_extTimeSrc && m_eofSignalSended) {
+        m_extTimeSrc->onEofReached(this, false);
+        m_eofSignalSended = false;
+    }
     clearUnprocessedData();
 
     if (m_skipPrevJumpSignal > 0) {
@@ -835,12 +839,15 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
 
     m_processedPackets++;
 
-    bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (media->dataType != QnAbstractMediaData::EMPTY_DATA)
+    {
+        bool mediaIsLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
-    m_timeMutex.lock();
-    if (mediaIsLive != m_isRealTimeSource && !m_buffering)
-        onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
-    m_timeMutex.unlock();
+        m_timeMutex.lock();
+        if (mediaIsLive != m_isRealTimeSource && !m_buffering)
+            onRealTimeStreamHint(mediaIsLive && !m_singleShotMode);
+        m_timeMutex.unlock();
+    }
 
     float speed = m_speed;
     bool speedIsNegative = speed < 0;
