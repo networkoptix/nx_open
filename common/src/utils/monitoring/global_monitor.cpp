@@ -15,7 +15,7 @@ class QnGlobalMonitorPrivate {
 public:
     QnGlobalMonitorPrivate():
         base(NULL),
-        updatePeriod(1000),
+        updatePeriod(2500),
         stopped(true),
         requestCount(0),
         totalCpuUsage(0.0),

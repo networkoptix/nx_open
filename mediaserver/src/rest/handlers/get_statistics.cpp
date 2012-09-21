@@ -1,12 +1,26 @@
-#include <QFileInfo>
-#include "utils/network/tcp_connection_priv.h"
-#include "rest/server/rest_server.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "utils/common/util.h"
-#include "api/serializer/serializer.h"
 #include "get_statistics.h"
+
+#include <QtCore/QFileInfo>
+
+#include "utils/common/util.h"
+#include "utils/monitoring/global_monitor.h"
+#include "utils/network/tcp_connection_priv.h"
+
+#include "core/resourcemanagment/resource_pool.h"
+
+#include "api/serializer/serializer.h"
+
+#include "rest/server/rest_server.h"
 #include "recorder/storage_manager.h"
-#include "utils/common/performance.h"
+
+QnGetStatisticsHandler::QnGetStatisticsHandler() {
+    m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(), this);
+}
+
+QnGetStatisticsHandler::~QnGetStatisticsHandler() 
+{
+
+}
 
 
 int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
@@ -19,24 +33,22 @@ int QnGetStatisticsHandler::executeGet(const QString& path, const QnRequestParam
     result.append("<root>\n");
 
     result.append("<storages>\n");
-
-    QList<QnPerformance::QnHddData> hddUsage;
-    QnPerformance::currentHddUsage(&hddUsage);
-    for (int i = 0; i < hddUsage.count(); i++){
+    foreach(const QnPlatformMonitor::HddLoad &hddLoad, m_monitor->totalHddLoad()) {
         result.append("<storage>\n");
-        result.append(QString("<url>%1</url>\n").arg(hddUsage.at(i).name));
-        result.append(QString("<usage>%1</usage>\n").arg(hddUsage.at(i).usage));
+        result.append(QString("<url>%1</url>\n").arg(hddLoad.hdd.partitions));
+        result.append(QString("<usage>%1</usage>\n").arg(hddLoad.load));
         result.append("</storage>\n");
     }
     result.append("</storages>\n");
 
     result.append("<cpuinfo>\n");
-    
-    result.append(QString("<model>%1</model>\n").arg(QnPerformance::cpuBrand()));
-    result.append(QString("<cores>%1</cores>\n").arg(QnPerformance::cpuCoreCount()));
-    result.append(QString("<usage>%1</usage>\n").arg(QnPerformance::currentCpuUsage()));
-    result.append(QString("<load>%1</load>\n").arg(QnPerformance::currentCpuTotalUsage()));
+    result.append(QString("<cores>%1</cores>\n").arg(QThread::idealThreadCount()));
+    result.append(QString("<load>%1</load>\n").arg(m_monitor->totalCpuUsage()));
     result.append("</cpuinfo>\n");
+
+    result.append("<memory>\n");
+    result.append(QString("<usage>%1</usage>\n").arg(m_monitor->totalRamUsage()));
+    result.append("</memory>\n");
 
     result.append("</root>\n");
 

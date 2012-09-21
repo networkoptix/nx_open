@@ -11,8 +11,9 @@
 #include <QSharedPointer>
 
 class TCPSocket;
-class QnRestRequestHandler: public QObject
-{
+
+class QnRestRequestHandler: public QObject {
+    Q_OBJECT
 public:
     /*!
         \return http statusCode
@@ -25,17 +26,19 @@ public:
 
     // incoming connection socket
     virtual QString description(TCPSocket* tcpSocket) const { Q_UNUSED(tcpSocket) return QString(); }
+    
     friend class QnRestConnectionProcessor;
+
 protected:
     void setPath(const QString& path) { m_path = path; }
+
 protected:
     QString m_path;
 };
 
 typedef QSharedPointer<QnRestRequestHandler> QnRestRequestHandlerPtr;
 
-class QnRestGUIRequestHandler: public QnRestRequestHandler
-{
+class QnRestGUIRequestHandler: public QnRestRequestHandler {
     Q_OBJECT
 public:
     QnRestGUIRequestHandler();

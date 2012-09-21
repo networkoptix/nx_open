@@ -223,14 +223,6 @@ int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
     
-    QnPlatformMonitor *m = QnPlatformMonitor::newInstance();
-    while(1) {
-        foreach(const QnPlatformMonitor::HddLoad &hddLoad, m->totalHddLoad())
-            qDebug() << hddLoad.hdd.partitions << hddLoad.load;
-
-        QnSleep::sleep(1000);
-    }
-    
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
