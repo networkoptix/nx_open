@@ -3,7 +3,7 @@
 
 #include <QtCore/QThread>
 #include <QAuthenticator>
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 #include "utils/network/netstate.h"
 #include "core/resource/resource.h"
 #include "utils/network/nettools.h"

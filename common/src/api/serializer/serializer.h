@@ -5,7 +5,7 @@
 
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/user_resource.h"

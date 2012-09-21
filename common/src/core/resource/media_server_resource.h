@@ -4,7 +4,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/media_resource.h"
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 
 class QnLocalVideoServerResource : public QnMediaResource
 {

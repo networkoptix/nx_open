@@ -4,8 +4,8 @@
 #include <QVector>
 #include <QRect>
 #include "libavcodec/avcodec.h"
-#include "datapacket.h"
-#include "utils/common/bytearray.h"
+#include "abstract_data_packet.h"
+#include "utils/common/byte_array.h"
 #include "utils/media/sse_helper.h"
 
 #ifndef Q_OS_WIN

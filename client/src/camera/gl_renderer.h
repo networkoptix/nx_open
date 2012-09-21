@@ -7,7 +7,7 @@
 #include <QtOpenGL>
 #include <QScopedPointer>
 #include <QSharedPointer>
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include "render_status.h"
 #include "core/resource/resource_media_layout.h"
 

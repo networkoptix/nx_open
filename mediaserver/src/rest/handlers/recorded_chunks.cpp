@@ -3,7 +3,7 @@
 #include "recorder/storage_manager.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "rest/server/rest_server.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"

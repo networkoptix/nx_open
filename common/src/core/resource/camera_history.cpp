@@ -1,6 +1,6 @@
 #include "camera_history.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "video_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "media_server_resource.h"
 #include "utils/common/warnings.h"
 
 QnId QnCameraTimePeriod::getServerId() const

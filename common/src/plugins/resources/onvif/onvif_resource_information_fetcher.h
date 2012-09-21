@@ -1,7 +1,7 @@
 #ifndef onvif_resource_information_fetcher_h
 #define onvif_resource_information_fetcher_h
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "onvif_helper.h"
 #include "soap_wrapper.h"
 #include "onvif_resource.h"

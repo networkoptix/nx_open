@@ -2,7 +2,7 @@
 #include "resource_pool_model.h"
 
 #include <utils/common/delete_later.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <core/resource/resource.h>
 
 #include <ui/workbench/workbench_globals.h>

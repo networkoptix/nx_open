@@ -9,10 +9,10 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 
-#include <api/video_server_connection.h>
+#include <api/media_server_connection.h>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

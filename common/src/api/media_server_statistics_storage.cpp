@@ -1,7 +1,7 @@
-#include "video_server_statistics_storage.h"
+#include "media_server_statistics_storage.h"
 
-#include <api/video_server_statistics_data.h>
-#include <core/resource/video_server_resource.h>
+#include <api/media_server_statistics_data.h>
+#include <core/resource/media_server_resource.h>
 
 #include <utils/common/synctime.h>
 

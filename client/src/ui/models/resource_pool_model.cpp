@@ -10,7 +10,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>

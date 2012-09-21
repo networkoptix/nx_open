@@ -1,4 +1,4 @@
-#include "bytearray.h"
+#include "byte_array.h"
 #include "warnings.h"
 
 /**

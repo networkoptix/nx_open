@@ -6,7 +6,7 @@
 #include "utils/monitoring/global_monitor.h"
 #include "utils/network/tcp_connection_priv.h"
 
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 #include "api/serializer/serializer.h"
 

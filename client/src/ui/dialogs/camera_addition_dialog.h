@@ -4,7 +4,7 @@
 #include <QtGui/QDialog>
 
 #include <core/resource/resource_fwd.h>
-#include <api/video_server_cameras_data.h>
+#include <api/media_server_cameras_data.h>
 
 namespace Ui {
     class CameraAdditionDialog;

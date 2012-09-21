@@ -17,7 +17,7 @@
 #include <utils/common/toggle.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/video_camera.h>
 

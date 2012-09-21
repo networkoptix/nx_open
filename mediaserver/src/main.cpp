@@ -14,8 +14,8 @@
 #include "utils/common/util.h"
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/common/sleep.h"
 #include "rtsp/rtsp_listener.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
@@ -26,10 +26,10 @@
 #include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "api/session_manager.h"
 #include <signal.h>
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "qtservice.h"
 #include "server_message_processor.h"
 #include "settings.h"

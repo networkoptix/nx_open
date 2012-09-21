@@ -6,8 +6,8 @@
 
 #include <api/api_fwd.h>
 #include <core/resource/resource_fwd.h>
-#include <api/video_server_statistics_data.h>
-#include <api/video_server_statistics_storage.h>
+#include <api/media_server_statistics_data.h>
+#include <api/media_server_statistics_storage.h>
 
 /**
   * Class that receives, parses and stores statistics data from all servers.

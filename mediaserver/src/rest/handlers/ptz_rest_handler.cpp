@@ -3,7 +3,7 @@
 #include "utils/common/util.h"
 #include "ptz_rest_handler.h"
 #include "core/resource/network_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_resource.h"
 
 QnPtzRestHandler::QnPtzRestHandler()

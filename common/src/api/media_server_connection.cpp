@@ -4,12 +4,12 @@
 #include <QSharedPointer>
 #include "utils/common/util.h"
 
-#include "video_server_connection.h"
-#include "video_server_connection_p.h"
+#include "media_server_connection.h"
+#include "media_server_connection_p.h"
 #include "session_manager.h"
 
 #include <api/serializer/serializer.h>
-#include <api/video_server_statistics_data.h>
+#include <api/media_server_statistics_data.h>
 
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory

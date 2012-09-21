@@ -1,6 +1,6 @@
 #include "cam_display.h"
 
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "video_stream_display.h"
 #include "audio_stream_display.h"
 #include "decoders/audio/ffmpeg_audio.h"

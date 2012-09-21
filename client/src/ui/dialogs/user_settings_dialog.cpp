@@ -6,7 +6,7 @@
 #include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 

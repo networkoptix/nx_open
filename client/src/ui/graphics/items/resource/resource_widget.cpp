@@ -14,7 +14,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/color_transformations.h>
 #include <ui/animation/opacity_animator.h>

@@ -2,9 +2,9 @@
 #include <QAuthenticator>
 #include "manual_camera_addition.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 QnManualCameraAdditionHandler::QnManualCameraAdditionHandler()
 {

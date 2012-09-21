@@ -5,8 +5,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>

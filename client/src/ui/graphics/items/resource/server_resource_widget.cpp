@@ -5,11 +5,11 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 
-#include <api/video_server_connection.h>
-#include <api/video_server_statistics_manager.h>
-#include <api/video_server_statistics_data.h>
+#include <api/media_server_connection.h>
+#include <api/media_server_statistics_manager.h>
+#include <api/media_server_statistics_data.h>
 
 #include <ui/style/globals.h>
 

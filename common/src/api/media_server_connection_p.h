@@ -1,7 +1,7 @@
 #ifndef __VIDEO_SERVER_CONNECTION_P_H_
 #define __VIDEO_SERVER_CONNECTION_P_H_
 
-#include "video_server_connection.h"
+#include "media_server_connection.h"
 
 class VideoServerSessionManager;
 

@@ -8,7 +8,7 @@
 #include <QtGui/QMessageBox>
 
 #include <core/resource/resource_directory_browser.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_resource.h>
 #include <plugins/resources/archive/avi_files/avi_bluray_resource.h>
 #include <plugins/resources/archive/avi_files/avi_dvd_archive_delegate.h>

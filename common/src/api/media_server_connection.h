@@ -12,8 +12,8 @@
 #include "recording/time_period_list.h"
 
 #include <utils/common/request_param.h>
-#include <api/video_server_statistics_data.h>
-#include <api/video_server_cameras_data.h>
+#include <api/media_server_statistics_data.h>
+#include <api/media_server_cameras_data.h>
 
 #include "api_fwd.h"
 

@@ -6,7 +6,7 @@
 #include <QQueue>
 #include "utils/fs/file.h"
 #include "utils/common/threadqueue.h"
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 
 class QBufferedFile;
 

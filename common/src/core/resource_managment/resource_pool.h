@@ -7,7 +7,7 @@
 #include <QtCore/QObject>
 
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_criterion.h"
+#include "core/resource_managment/resource_criterion.h"
 #include "core/resource/network_resource.h"
 
 class QnResource;

@@ -1,6 +1,6 @@
 #include "video_camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "utils/media/frame_info.h"

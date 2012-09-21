@@ -5,7 +5,7 @@
 #include <QObject>
 #include <QVector>
 #include "core/resource/resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class QnVideoResourceLayout;
 class QnResourceAudioLayout;

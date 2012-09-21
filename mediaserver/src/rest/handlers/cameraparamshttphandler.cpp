@@ -9,7 +9,7 @@
 
 #include <QElapsedTimer>
 
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/param.h>
 

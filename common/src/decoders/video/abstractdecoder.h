@@ -1,7 +1,7 @@
 #ifndef clabstractdecoder_h_2155
 #define clabstractdecoder_h_2155
 
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/media/frame_info.h"
 
 

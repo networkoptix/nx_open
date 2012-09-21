@@ -19,8 +19,8 @@
 #include <utils/common/string.h>
 #include <utils/common/time.h>
 
-#include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <api/session_manager.h>
 

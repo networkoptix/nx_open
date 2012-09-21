@@ -7,7 +7,7 @@
 
 #include <ui/style/globals.h>
 
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
     QDialog(parent),

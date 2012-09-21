@@ -5,7 +5,7 @@
 
 #include <QtGui/QMessageBox>
 
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"
 #include "ui/common/read_only.h"

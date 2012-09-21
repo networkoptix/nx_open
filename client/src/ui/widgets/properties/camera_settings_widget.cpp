@@ -5,7 +5,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>

@@ -2,8 +2,8 @@
 #include <cassert>
 #include <utils/common/checked_cast.h>
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <plugins/resources/archive/abstract_archive_resource.h>
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"

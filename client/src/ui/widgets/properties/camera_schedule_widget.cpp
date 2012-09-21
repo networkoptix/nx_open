@@ -1,9 +1,9 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <licensing/license.h>
 
 #include <ui/style/globals.h>

@@ -1,6 +1,6 @@
 #include "rtsp_client_archive_delegate.h"
-#include "core/datapacket/mediadatapacket.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/datapacket/media_data_packet.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/network/rtp_stream_parser.h"
 #include "libavcodec/avcodec.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -9,7 +9,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "core/resource/camera_history.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 

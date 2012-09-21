@@ -3,7 +3,7 @@
 
 
 #include "core/resource/network_resource.h"
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 bool isNewDiscoveryAddressBetter(const QString& host, const QString& newAddress, const QString& oldAddress);
 

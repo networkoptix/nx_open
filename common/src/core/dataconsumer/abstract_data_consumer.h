@@ -1,8 +1,8 @@
 #ifndef abstract_data_processor_h_2111
 #define abstract_data_processor_h_2111
 
-#include "core/datapacket/datapacket.h"
-#include "utils/common/longrunnable.h"
+#include "core/datapacket/abstract_data_packet.h"
+#include "utils/common/long_runnable.h"
 
 class QN_EXPORT QnAbstractDataConsumer : public QnLongRunnable
 {

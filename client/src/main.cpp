@@ -32,8 +32,8 @@
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
@@ -44,7 +44,7 @@
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"

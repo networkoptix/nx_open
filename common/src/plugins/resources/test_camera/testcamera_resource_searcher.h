@@ -1,7 +1,7 @@
 #ifndef __TEST_CAMERA_RESOURCE_SEARCHER_H_
 #define __TEST_CAMERA_RESOURCE_SEARCHER_H_
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 
 class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher

@@ -9,7 +9,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
 #include "core/resource/interface/abstract_ptz_controller.h"

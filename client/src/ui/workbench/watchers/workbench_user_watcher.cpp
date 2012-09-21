@@ -4,7 +4,7 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),

@@ -4,7 +4,7 @@
 #define CL_MAX_CHANNELS 4 // TODO: get rid of this definition
 #include <QVector>
 #include <QStringList>
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class QN_EXPORT QnDeviceLayout
 {

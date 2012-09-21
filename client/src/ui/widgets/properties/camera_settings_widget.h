@@ -2,7 +2,7 @@
 #define QN_CAMERA_SETTINGS_WIDGET_H
 
 #include <QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "camera_settings_tab.h"

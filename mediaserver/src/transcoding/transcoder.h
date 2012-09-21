@@ -4,7 +4,7 @@
 #include <QString>
 #include <QSharedPointer>
 #include "libavcodec/avcodec.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 
 //!Base class for all raw media stream transcoders

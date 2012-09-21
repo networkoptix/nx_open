@@ -5,8 +5,8 @@
 
 #include <utils/common/cryptographic_hash.h>
 
-#include <core/dataconsumer/dataconsumer.h>
-#include <core/datapacket/mediadatapacket.h>
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/datapacket/media_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>

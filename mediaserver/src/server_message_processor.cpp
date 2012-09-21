@@ -3,8 +3,8 @@
 #include <qglobal.h>
 
 #include "api/app_server_connection.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "server_message_processor.h"
 #include "recorder/recording_manager.h"
 #include "serverutil.h"

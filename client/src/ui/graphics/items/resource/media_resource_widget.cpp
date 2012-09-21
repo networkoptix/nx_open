@@ -26,8 +26,8 @@
 #include "resource_widget.h"
 
 // TODO: remove
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 #include "version.h" // TODO: remove

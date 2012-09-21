@@ -1,5 +1,5 @@
 #include "server_archive_delegate.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"

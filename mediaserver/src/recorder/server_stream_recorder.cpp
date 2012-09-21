@@ -7,8 +7,8 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):

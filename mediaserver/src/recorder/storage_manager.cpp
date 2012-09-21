@@ -1,7 +1,7 @@
 #include <QDir>
 #include "storage_manager.h"
 #include "utils/common/util.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource.h"
 #include "server_stream_recorder.h"
 #include "recording_manager.h"

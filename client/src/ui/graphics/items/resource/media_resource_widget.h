@@ -3,7 +3,7 @@
 
 #include "resource_widget.h"
 
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 

@@ -26,7 +26,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>

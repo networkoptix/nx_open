@@ -2,7 +2,7 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"

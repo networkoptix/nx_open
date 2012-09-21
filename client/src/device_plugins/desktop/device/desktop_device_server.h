@@ -1,7 +1,7 @@
 #ifndef __DESKTOP_DEVICE_SERVER_H
 #define __DESKTOP_DEVICE_SERVER_H
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 struct IDirect3D9;
 
