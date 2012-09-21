@@ -71,8 +71,6 @@
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
-#include "utils/monitoring/platform_monitor.h"
-#include "utils/common/sleep.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
