@@ -2,7 +2,7 @@
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "ui/workbench/workbench_context_aware.h"
@@ -41,10 +41,10 @@ public:
         return *(new QList< QPair< QString, QVariant> >);
     }
 
-    QnVideoServerConnectionPtr getServerConnection() const {
+    QnMediaServerConnectionPtr getServerConnection() const {
         //This ability avaible only for single camera settings
         Q_ASSERT(false);
-        return QnVideoServerConnectionPtr(0);
+        return QnMediaServerConnectionPtr(0);
     }
 
     bool isReadOnly() const;

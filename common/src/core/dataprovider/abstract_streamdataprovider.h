@@ -1,11 +1,11 @@
 #ifndef stream_reader_514
 #define stream_reader_514
 
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 #include "../resource/resource_consumer.h"
-#include "../datapacket/datapacket.h"
+#include "../datapacket/abstract_data_packet.h"
 #include "../resource/param.h"
-#include "../dataconsumer/dataconsumer.h"
+#include "../dataconsumer/abstract_data_consumer.h"
 
 class QnAbstractStreamDataProvider;
 class QnResource;

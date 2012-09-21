@@ -2,8 +2,8 @@
 #include <cassert>
 #include <utils/common/checked_cast.h>
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <plugins/resources/archive/abstract_archive_resource.h>
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
@@ -88,7 +88,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
         return calculatePermissions(archive);
 
-    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return calculatePermissions(server);
 
     return 0;
@@ -155,7 +155,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstra
     return Qn::ReadPermission;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
     assert(server);
 
     if(m_userPermissions & Qn::GlobalEditServersPermissions) {

@@ -17,7 +17,7 @@ void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result,
 
     if (m_objectName == QLatin1String("server"))
     {
-        QnVideoServerResourceList servers;
+        QnMediaServerResourceList servers;
 
         if(status == 0) {
             try {
@@ -280,7 +280,7 @@ int QnAppServerConnection::getResources(const QString& args, QnResourceList& res
     return status;
 }
 
-int QnAppServerConnection::registerServer(const QnVideoServerResourcePtr& serverPtr, QnVideoServerResourceList& servers, QByteArray& errorString)
+int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& errorString)
 {
     QByteArray data;
 
@@ -330,7 +330,7 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr
 
 int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot)
 {
-    if (QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+    if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return saveAsync(server, target, slot);
     else if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
         return saveAsync(camera, target, slot);
@@ -380,7 +380,7 @@ int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* 
     return addObjectAsync(QLatin1String("user"), data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
 }
 
-int QnAppServerConnection::saveAsync(const QnVideoServerResourcePtr& serverPtr, QObject* target, const char* slot)
+int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr& serverPtr, QObject* target, const char* slot)
 {
     conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("server"));
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
@@ -454,7 +454,7 @@ int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &camer
 }
 
 
-int QnAppServerConnection::getServers(QnVideoServerResourceList &servers, QByteArray &errorString)
+int QnAppServerConnection::getServers(QnMediaServerResourceList &servers, QByteArray &errorString)
 {
     QByteArray data;
     int status = getObjects(QLatin1String("server"), QString(),data, errorString);
@@ -668,9 +668,9 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
     return true;
 }
 
-int QnAppServerConnection::saveSync(const QnVideoServerResourcePtr &server, QByteArray &errorString)
+int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server, QByteArray &errorString)
 {
-    QnVideoServerResourceList servers;
+    QnMediaServerResourceList servers;
     return registerServer(server, servers, errorString);
 }
 
@@ -680,7 +680,7 @@ int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera, QB
     return addCamera(camera, cameras, errorString);
 }
 
-int QnAppServerConnection::deleteAsync(const QnVideoServerResourcePtr& server, QObject* target, const char* slot)
+int QnAppServerConnection::deleteAsync(const QnMediaServerResourcePtr& server, QObject* target, const char* slot)
 {
     return deleteObjectAsync(QLatin1String("server"), server->getId().toInt(), target, slot);
 }
@@ -701,7 +701,7 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObjec
 }
 
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
-    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>()) {
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
         return deleteAsync(server, target, slot);
     } else if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
         return deleteAsync(camera, target, slot);

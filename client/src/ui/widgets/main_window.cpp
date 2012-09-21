@@ -14,8 +14,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
-#include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>

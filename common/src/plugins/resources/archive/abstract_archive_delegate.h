@@ -5,9 +5,9 @@
 #include <QObject>
 #include <QVector>
 #include "core/resource/resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
 class QnAbstractFilterPlaybackDelegate
@@ -44,7 +44,7 @@ public:
     virtual QnAbstractMediaDataPtr getNextData() = 0;
     // If findIFrame=true, jump to position before time to a nearest IFrame.
     virtual qint64 seek (qint64 time, bool findIFrame) = 0;
-    virtual QnVideoResourceLayout* getVideoLayout() = 0;
+    virtual QnResourceVideoLayout* getVideoLayout() = 0;
     virtual QnResourceAudioLayout* getAudioLayout() = 0;
 
     virtual AVCodecContext* setAudioChannel(int num) { Q_UNUSED(num); return 0; }

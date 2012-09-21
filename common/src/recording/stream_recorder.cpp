@@ -1,7 +1,7 @@
 #include "stream_recorder.h"
 #include "core/resource/resource_consumer.h"
-#include "core/datapacket/datapacket.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/abstract_data_packet.h"
+#include "core/datapacket/media_data_packet.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "utils/common/util.h"
@@ -333,7 +333,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
-    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
+    const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
 
     {

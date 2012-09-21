@@ -330,9 +330,9 @@ void QnAviArchiveDelegate::close()
     m_storage.clear();
 }
 
-static QnDefaultDeviceVideoLayout defaultVideoLayout;
+static QnDefaultResourceVideoLayout defaultVideoLayout;
 
-QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
+QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
     {
@@ -341,7 +341,7 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
 
     if (m_videoLayout == 0)
     {
-        m_videoLayout = new QnCustomDeviceVideoLayout(1, 1);
+        m_videoLayout = new QnCustomResourceVideoLayout(1, 1);
 
         // prevent standart tag name parsing in 'avi' format
         QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
@@ -479,7 +479,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
 }
 
-bool QnAviArchiveDelegate::deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr)
+bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr)
 {
     QStringList info = layoutStr.split(QLatin1Char(';'));
     for (int i = 0; i < info.size(); ++i)

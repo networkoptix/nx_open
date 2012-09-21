@@ -1,8 +1,8 @@
 #include "action_conditions.h"
 
 #include <utils/common/warnings.h>
-#include <core/resourcemanagment/resource_criterion.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
 #include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>

@@ -6,7 +6,7 @@
 #include <QMap>
 #include "core/resource/resource.h"
 #include "core/resource/security_cam_resource.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 
 class QnServerStreamRecorder;
 class QnVideoCamera;

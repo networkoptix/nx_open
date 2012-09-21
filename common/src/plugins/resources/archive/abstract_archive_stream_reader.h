@@ -2,7 +2,7 @@
 #define abstract_archive_stream_reader_h1907
 
 #include "abstract_archive_delegate.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "recording/time_period.h"
 

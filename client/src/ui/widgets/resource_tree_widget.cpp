@@ -14,9 +14,9 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>

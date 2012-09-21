@@ -6,7 +6,7 @@
 class QnAppServerConnection;
 typedef QSharedPointer<QnAppServerConnection> QnAppServerConnectionPtr;
 
-class QnVideoServerConnection;
-typedef QSharedPointer<QnVideoServerConnection> QnVideoServerConnectionPtr;
+class QnMediaServerConnection;
+typedef QSharedPointer<QnMediaServerConnection> QnMediaServerConnectionPtr;
 
 #endif // QN_API_FWD_H

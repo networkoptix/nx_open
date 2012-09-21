@@ -36,7 +36,7 @@
 #if defined(_MSC_VER)
 #  define noexcept throw()
 #elif defined(__GNUC__)
-#  if (GCC_VERSION >= 406000)
+#  if (GCC_VERSION >= 40600)
 #    define noexcept noexcept
 #  else
 #    define noexcept throw()

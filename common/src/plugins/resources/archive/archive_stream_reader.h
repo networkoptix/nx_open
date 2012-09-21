@@ -29,10 +29,10 @@ public:
     virtual bool isSingleShotMode() const;
 
 
-    virtual const QnVideoResourceLayout* getDPVideoLayout() const;
+    virtual const QnResourceVideoLayout* getDPVideoLayout() const;
     virtual const QnResourceAudioLayout* getDPAudioLayout() const;
-    static bool deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr);
-    static QString serializeLayout(const QnVideoResourceLayout* layout);
+    static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
+    static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);

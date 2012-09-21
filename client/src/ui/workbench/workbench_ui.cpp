@@ -64,7 +64,7 @@
 
 #include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "watchers/workbench_render_watcher.h"

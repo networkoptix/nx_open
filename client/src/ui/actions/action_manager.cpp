@@ -6,7 +6,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <core/resource/resource.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
@@ -392,7 +392,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
-        //requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
 
     factory().

@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QHttpRequestHeader>
 #include <QNetworkInterface>
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 #include "utils/common/pimpl.h"
 
 class TCPSocket;

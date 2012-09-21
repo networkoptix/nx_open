@@ -1,7 +1,7 @@
 #ifndef onvif_resource_searcher_mdns_h
 #define onvif_resource_searcher_mdns_h
 
-//#include "core/resourcemanagment/resource_searcher.h"
+//#include "core/resource_managment/resource_searcher.h"
 //#include "../onvif/onvif_device_searcher.h"
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"

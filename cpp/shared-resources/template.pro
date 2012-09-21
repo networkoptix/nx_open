@@ -98,9 +98,10 @@ win* {
 unix {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse2
+  QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
   DEFINES += ${linux.defines}
+  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
 }
 
 mac {
@@ -108,3 +109,7 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
 }
+
+
+
+

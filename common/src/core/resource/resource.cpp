@@ -7,7 +7,7 @@
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"

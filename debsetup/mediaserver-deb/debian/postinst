@@ -45,7 +45,7 @@ function write_config {
     [ -z "$ECS_LOGIN" ] || echo "appserverLogin=$ECS_LOGIN" >> $CONFIG_FILE
     [ -z "$ECS_PASSWORD" ] || echo "appserverPassword=$ECS_PASSWORD" >> $CONFIG_FILE
     [ -z "$STORAGE" ] || echo "mediaDir=$STORAGE" >> $CONFIG_FILE
-    [ -z "$PORT" ] || echo "port=$PORT" >> $CONFIG_FILE
+    [ -z "$PORT" ] || echo "rtspPort=$PORT" >> $CONFIG_FILE
 }
 
 function to_int {

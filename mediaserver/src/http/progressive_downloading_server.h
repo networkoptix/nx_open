@@ -2,7 +2,7 @@
 #define __PROGRESSIVE_DOWNLOADING_SERVER_H__
 
 #include "utils/network/tcp_connection_processor.h"
-#include "core/dataconsumer/dataconsumer.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/tcp_listener.h"
 
 class QnFfmpegTranscoder;

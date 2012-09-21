@@ -59,7 +59,7 @@ class QnServerSettingsDialog: public QnButtonBoxDialog {
     typedef QnButtonBoxDialog base_type;
 
 public:
-    explicit QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
+    explicit QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnServerSettingsDialog();
 
 public slots:
@@ -88,7 +88,7 @@ private:
     Q_DISABLE_COPY(QnServerSettingsDialog);
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
-    QnVideoServerResourcePtr m_server;
+    QnMediaServerResourcePtr m_server;
 
     bool m_hasStorageChanges;
 };

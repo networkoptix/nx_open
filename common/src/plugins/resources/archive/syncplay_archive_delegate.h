@@ -23,7 +23,7 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);

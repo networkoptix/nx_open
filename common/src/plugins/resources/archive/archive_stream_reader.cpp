@@ -174,7 +174,7 @@ AVIOContext* QnArchiveStreamReader::getIOContext()
     return 0;
 }
 
-QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layout)
+QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layout)
 {
     QString rez;
     QTextStream ost(&rez);
@@ -186,7 +186,7 @@ QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layo
     return rez;
 }
 
-const QnVideoResourceLayout* QnArchiveStreamReader::getDPVideoLayout() const
+const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
     m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();

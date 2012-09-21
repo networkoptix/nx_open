@@ -41,8 +41,16 @@ namespace detail {
             return s.arg(QLatin1String(arg));
         }
 
+        inline QString operator<<(const QString &s, const wchar_t *arg) {
+            return s.arg(QString::fromWCharArray(arg));
+        }
+
         inline QString operator<<(const QString &s, char *arg) {
             return s.arg(QLatin1String(arg));
+        }
+
+        inline QString operator<<(const QString &s, wchar_t *arg) {
+            return s.arg(QString::fromWCharArray(arg));
         }
 
         inline QString operator<<(const QString &s, const QByteArray &arg) {

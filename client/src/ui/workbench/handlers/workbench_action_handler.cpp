@@ -19,8 +19,8 @@
 #include <utils/common/string.h>
 #include <utils/common/time.h>
 
-#include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <api/session_manager.h>
 
@@ -522,7 +522,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     }
 
     QnVirtualCameraResourcePtr cameraPtr = cameras.front();
-    QnVideoServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
+    QnMediaServerConnectionPtr serverConnectionPtr = cameraSettingsDialog()->widget()->getServerConnection();
     if (serverConnectionPtr.isNull())
     {
         QString error = QString::fromLatin1("Connection refused");
@@ -992,7 +992,7 @@ void QnWorkbenchActionHandler::at_moveCameraAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnResourceList resources = parameters.resources();
-    QnVideoServerResourcePtr server = parameters.argument<QnVideoServerResourcePtr>(Qn::ServerParameter);
+    QnMediaServerResourcePtr server = parameters.argument<QnMediaServerResourcePtr>(Qn::ServerParameter);
     if(!server)
         return;
     QnVirtualCameraResourceList serverCameras = resourcePool()->getResourcesWithParentId(server->getId()).filtered<QnVirtualCameraResource>();
@@ -1473,7 +1473,7 @@ void QnWorkbenchActionHandler::at_selectionChangeAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
-    QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
+    QnMediaServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
     if(resources.size() != 1)
         return;
 
@@ -1483,7 +1483,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
 }
 
 void QnWorkbenchActionHandler::at_serverSettingsAction_triggered() {
-    QnVideoServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVideoServerResource>();
+    QnMediaServerResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>();
     if(resources.size() != 1)
         return;
 
@@ -1705,7 +1705,7 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
         return;
 
     QnResourceDisplay *display = widget->display();
-    const QnVideoResourceLayout *layout = display->videoLayout();
+    const QnResourceVideoLayout *layout = display->videoLayout();
 
     QImage screenshot;
     if (layout->numberOfChannels() > 0) {
@@ -2341,9 +2341,9 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnVideoServerResourceList resources = resourcePool()->getResources().filtered<QnVideoServerResource>();
+    QnMediaServerResourceList resources = resourcePool()->getResources().filtered<QnMediaServerResource>();
 
-    foreach(QnVideoServerResourcePtr resource, resources) {
+    foreach(QnMediaServerResourcePtr resource, resources) {
         if(resource->isPanicMode() != checked) {
             resource->setPanicMode(checked);
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));

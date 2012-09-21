@@ -21,7 +21,7 @@
 class QGraphicsLinearLayout;
 
 class QnViewportBoundWidget;
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnWorkbenchItem;
 
 class QnLoadingProgressPainter;
@@ -87,7 +87,7 @@ public:
         return m_item.data();
     }
 
-    const QnVideoResourceLayout *channelLayout() const {
+    const QnResourceVideoLayout *channelLayout() const {
         return m_channelsLayout;
     }
     
@@ -297,7 +297,7 @@ protected:
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
-    void setChannelLayout(const QnVideoResourceLayout *channelLayout);
+    void setChannelLayout(const QnResourceVideoLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
     virtual void optionsChangedNotify(Options changedFlags) { Q_UNUSED(changedFlags); }
@@ -348,7 +348,7 @@ private:
     Options m_options;
 
     /** Layout of this widget's channels. */
-    const QnVideoResourceLayout *m_channelsLayout;
+    const QnResourceVideoLayout *m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;

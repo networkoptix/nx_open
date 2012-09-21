@@ -1,8 +1,8 @@
 #ifndef __RTSP_ENCODER_H__
 #define __RTSP_ENCODER_H__
 
-#include "core/datapacket/mediadatapacket.h"
-#include "utils/common/bytearray.h"
+#include "core/datapacket/media_data_packet.h"
+#include "utils/common/byte_array.h"
 
 /*
 * Base class for RTSP codec. Used for encode data only

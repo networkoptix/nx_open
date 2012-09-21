@@ -4,10 +4,10 @@
 #include <QMutex>
 #include <QUrl>
 
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 #include "utils/network/socket.h"
 #include "utils/common/pimpl.h"
-#include "utils/common/bytearray.h"
+#include "utils/common/byte_array.h"
 
 class QnTcpListener;
 

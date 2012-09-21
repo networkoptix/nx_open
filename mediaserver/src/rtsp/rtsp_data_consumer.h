@@ -3,13 +3,13 @@
 
 #include <QHostAddress>
 #include <QTime>
-#include "core/dataconsumer/dataconsumer.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "core/datapacket/datapacket.h"
+#include "core/datapacket/abstract_data_packet.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
 #include "rtsp_ffmpeg_encoder.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 
 class QnRtspConnectionProcessor;
 

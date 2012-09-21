@@ -26,8 +26,8 @@
 #include "resource_widget.h"
 
 // TODO: remove
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
 #include "version.h" // TODO: remove
@@ -229,7 +229,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
     bool changed = false;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -255,7 +255,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     int channel =0;
     QPoint channelPos = gridPos;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
@@ -444,7 +444,7 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
         return;
 
     if(!m_connection) {
-        QnVideoServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnVideoServerResource>();
+        QnMediaServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
         if(server)
             m_connection = server->apiConnection();
     }

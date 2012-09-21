@@ -2,7 +2,7 @@
 #define __MULTI_CODEC_RTP_READER__
 
 #include "core/resource/resource_consumer.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/network/rtpsession.h"
 
 

@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 class QnWorkbenchContext;
 class QCheckBox;
 
@@ -13,7 +15,7 @@ namespace Ui {
     class UserSettingsDialog;
 }
 
-class QnUserSettingsDialog: public QDialog {
+class QnUserSettingsDialog: public QDialog, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
     enum Element {
@@ -75,13 +77,12 @@ protected slots:
 private:
     void createAccessRightsPresets();
     void createAccessRightsAdvanced();
-    void createAccessRightCheckBox(QString text, quint64 right);
+    QCheckBox *createAccessRightCheckBox(QString text, quint64 right, QWidget *previous);
     void selectAccessRightsPreset(quint64 rights);
     void fillAccessRightsAdvanced(quint64 rights);
     quint64 readAccessRightsAdvanced();
 
     QScopedPointer<Ui::UserSettingsDialog> ui;
-    QWeakPointer<QnWorkbenchContext> m_context;
     QString m_currentPassword;
     QHash<QString, QnResourcePtr> m_userByLogin;
     QnUserResourcePtr m_user;

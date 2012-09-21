@@ -1,7 +1,7 @@
 #include "multi_camera_time_period_loader.h"
 #include "utils/common/warnings.h"
-#include "core/resource/video_server_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource/media_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/camera_history.h"
 
 namespace {

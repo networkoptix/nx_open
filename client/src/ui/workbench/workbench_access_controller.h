@@ -79,6 +79,9 @@ public:
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
 
+    // TODO: #Elric rename and add sane comment
+    Qn::Permissions calculateGlobalPermissions(const QnUserResourcePtr &user);
+
 signals:
     /**
      * \param resource                  Resource for which permissions have changed. 
@@ -99,8 +102,6 @@ protected slots:
     void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &layout);
 
 private:
-    Qn::Permissions calculateGlobalPermissions(const QnUserResourcePtr &user);
-
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource);
@@ -108,7 +109,7 @@ private:
     Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
     Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
     Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive);
-    Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
+    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server);
 
 private:
     struct PermissionsData {

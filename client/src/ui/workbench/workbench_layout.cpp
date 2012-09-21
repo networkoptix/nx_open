@@ -1,6 +1,6 @@
 #include "workbench_layout.h"
 #include <limits>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <utils/common/warnings.h>
 #include <utils/common/range.h>

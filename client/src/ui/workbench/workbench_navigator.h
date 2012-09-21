@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/longrunnable.h>
+#include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/actions/action_target_provider.h>

@@ -4,6 +4,10 @@
 #   include <vld.h>
 #endif
 
+#ifdef Q_OS_LINUX
+#   include <unistd.h>
+#endif
+
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "utils/settings.h"
@@ -28,8 +32,8 @@
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
@@ -40,7 +44,7 @@
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
@@ -127,20 +131,6 @@ void addTestFile(const QString& fileName, const QString& resId)
 void addTestData()
 {
     /*
-    QnVideoServerPtr server(new QnVideoServer());
-    server->setUrl("rtsp://localhost:50000");
-    server->setApiUrl("rtsp://localhost:8080");
-    //server->startRTSPListener();
-    qnResPool->addResource(QnResourcePtr(server));
-
-    QnServerCameraPtr testCamera(new QnServerCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
     resource->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
     resource->addFlag(QnResource::remote); // to initialize access to resource throught RTSP server
@@ -217,10 +207,10 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 #ifndef API_TEST_MAIN
 
-int main(int argc, char *argv[])
+int qnMain(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
-
+    
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -484,6 +474,19 @@ int main(int argc, char *argv[])
 
     return result;
 }
+
+int main(int argc, char *argv[]) {
+    // TODO: this is an ugly hack for a problem with threads not being stopped before globals are destroyed.
+
+    int result = qnMain(argc, argv);
+#if defined(Q_OS_WIN)
+    Sleep(3000);
+#elif defined(Q_OS_LINUX)
+    sleep(3);
+#endif
+    return result;
+}
+
 #endif // API_TEST_MAIN
 #endif
 

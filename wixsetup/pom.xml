@@ -28,7 +28,7 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
-        <finalName>${project.parent.artifactId}-${project.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+        <finalName>${project.parent.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -278,7 +278,7 @@
                         <configuration>
                             <artifacts>
                                 <artifact>
-                                    <file>${basedir}/bin/${msbuild.configuration}/${pom.parent.artifact}-${project.version}.exe</file>
+                                    <file>${basedir}/bin/${msbuild.configuration}/${pom.parent.artifact}-${release.version}.exe</file>
                                     <type>exe</type>
                                     <classifier>${platform}-x86-${msbuild.configuration}</classifier>
                                 </artifact>

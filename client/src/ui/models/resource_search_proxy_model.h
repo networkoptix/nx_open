@@ -4,7 +4,7 @@
 #include <QtGui/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 
 /**

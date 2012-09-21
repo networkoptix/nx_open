@@ -3,7 +3,7 @@
 
 #include <QList>
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "utils/network/nettools.h"
 #include "droid_controlport_listener.h"
 

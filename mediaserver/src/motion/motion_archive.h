@@ -5,7 +5,7 @@
 #include <QFile>
 #include <QSharedPointer>
 #include "core/resource/network_resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
 #include "core/resource/security_cam_resource.h"

@@ -2,7 +2,7 @@
 #define __SERVER_STREAM_RECORDER_H__
 
 #include "recording/stream_recorder.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "recorder/device_file_catalog.h"
 #include "recording/time_period.h"
 #include "motion/motion_estimation.h"
@@ -54,7 +54,7 @@ private:
     QnResource::ConnectionRole m_role;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
     QnDualStreamingHelperPtr m_dualStreamingHelper;
-    QnVideoServerResourcePtr m_videoServer;
+    QnMediaServerResourcePtr m_mediaServer;
     QnScheduleTask m_panicSchedileRecord;
     bool m_usedPanicMode;
 };
