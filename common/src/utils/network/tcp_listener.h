@@ -17,7 +17,7 @@ public:
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
 
-    explicit QnTcpListener(const QHostAddress& address, int port);
+    explicit QnTcpListener(const QHostAddress& address, int port, int maxConnections = 100);
     virtual ~QnTcpListener();
 
     void updatePort(int newPort);
