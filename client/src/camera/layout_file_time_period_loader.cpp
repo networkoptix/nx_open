@@ -22,7 +22,8 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
     if (!chunkData)
         return 0;
     QnTimePeriodList chunks;
-    chunks.decode(chunkData->readAll());
+    QByteArray chunkDataArray(chunkData->readAll());
+    chunks.decode(chunkDataArray);
     delete chunkData;
     // todo: add motion info here
     return new QnLayoutFileTimePeriodLoader(resource, parent, chunks);
