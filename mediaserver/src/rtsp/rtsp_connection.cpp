@@ -318,7 +318,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
         return -1;
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
+    const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -425,7 +425,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     QTextStream sdp(&d->responseBody);
 
     
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
 
     
     int numAudio = 0;
@@ -535,7 +535,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
@@ -740,7 +740,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
     int trackNum = 0;
     for (; trackNum < videoLayout->numberOfChannels(); ++trackNum)
     {

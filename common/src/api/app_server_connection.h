@@ -87,24 +87,24 @@ public:
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
+    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getServers(QnVideoServerResourceList& servers, QByteArray& errorString);
+    int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
 
-    int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
+    int saveSync(const QnMediaServerResourcePtr&, QByteArray& errorString);
     int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
 
     // Returns request id
-    int saveAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
@@ -115,7 +115,7 @@ public:
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
     int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
 
-    int deleteAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
@@ -147,7 +147,7 @@ private:
     QnRequestParamList m_requestParams;
 
     QnResourceFactory& m_resourceFactory;
-    QnVideoServerResourceFactory m_serverFactory;
+    QnMediaServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
 

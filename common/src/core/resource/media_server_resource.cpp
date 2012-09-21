@@ -5,7 +5,7 @@
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "api/session_manager.h"
 
-QnLocalVideoServerResource::QnLocalVideoServerResource()
+QnLocalMediaServerResource::QnLocalMediaServerResource()
     : QnResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
@@ -15,13 +15,13 @@ QnLocalVideoServerResource::QnLocalVideoServerResource()
     setStatus(Online);
 }
 
-QString QnLocalVideoServerResource::getUniqueId() const
+QString QnLocalMediaServerResource::getUniqueId() const
 {
     return QLatin1String("LocalServer");
 }
 
 
-QnVideoServerResource::QnVideoServerResource():
+QnMediaServerResource::QnMediaServerResource():
     QnResource(),
     m_panicMode(false)
 {
@@ -31,21 +31,21 @@ QnVideoServerResource::QnVideoServerResource():
     m_primaryIFSelected = false;
 }
 
-QnVideoServerResource::~QnVideoServerResource()
+QnMediaServerResource::~QnMediaServerResource()
 {
     //delete m_rtspListener;
 }
 
-QString QnVideoServerResource::getUniqueId() const
+QString QnMediaServerResource::getUniqueId() const
 {
     QMutexLocker mutexLocker(&m_mutex); // needed here !!!
-    QnVideoServerResource* nonConstThis = const_cast<QnVideoServerResource*> (this);
+    QnMediaServerResource* nonConstThis = const_cast<QnMediaServerResource*> (this);
     if (!getId().isValid())
         nonConstThis->setId(QnId::generateSpecialId());
     return QLatin1String("Server ") + getId().toString();
 }
 
-void QnVideoServerResource::setApiUrl(const QString& restUrl)
+void QnMediaServerResource::setApiUrl(const QString& restUrl)
 {
     QMutexLocker lock(&m_mutex);
     if (restUrl != m_apiUrl)
@@ -54,61 +54,61 @@ void QnVideoServerResource::setApiUrl(const QString& restUrl)
 
         /* We want the video server connection to be deleted in its associated thread, 
          * no matter where the reference count reached zero. Hence the custom deleter. */
-        m_restConnection = QnVideoServerConnectionPtr(new QnVideoServerConnection(restUrl), &qnDeleteLater);
+        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(restUrl), &qnDeleteLater);
     }
 }
 
-QString QnVideoServerResource::getApiUrl() const
+QString QnMediaServerResource::getApiUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_apiUrl;
 }
 
-void QnVideoServerResource::setStreamingUrl(const QString& value)
+void QnMediaServerResource::setStreamingUrl(const QString& value)
 {
     QMutexLocker lock(&m_mutex);
     m_streamingUrl = value;
 }
 
-QString QnVideoServerResource::getStreamingUrl() const
+QString QnMediaServerResource::getStreamingUrl() const
 {
     QMutexLocker lock(&m_mutex);
     return m_streamingUrl;
 }
 
-void QnVideoServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
+void QnMediaServerResource::setNetAddrList(const QList<QHostAddress>& netAddrList)
 {
     QMutexLocker lock(&m_mutex);
     m_netAddrList = netAddrList;
 }
 
-QList<QHostAddress> QnVideoServerResource::getNetAddrList()
+QList<QHostAddress> QnMediaServerResource::getNetAddrList()
 {
     QMutexLocker lock(&m_mutex);
     return m_netAddrList;
 }
 
-QnVideoServerConnectionPtr QnVideoServerResource::apiConnection()
+QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
     return m_restConnection;
 }
 
-QnResourcePtr QnVideoServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
+QnResourcePtr QnMediaServerResourceFactory::createResource(QnId resourceTypeId, const QnResourceParameters &parameters)
 {
     Q_UNUSED(resourceTypeId)
 
-    QnResourcePtr result(new QnVideoServerResource());
+    QnResourcePtr result(new QnMediaServerResource());
     result->deserialize(parameters);
 
     return result;
 }
 
-QnAbstractStorageResourceList QnVideoServerResource::getStorages() const
+QnAbstractStorageResourceList QnMediaServerResource::getStorages() const
 {
     return m_storages;
 }
 
-void QnVideoServerResource::setStorages(const QnAbstractStorageResourceList &storages)
+void QnMediaServerResource::setStorages(const QnAbstractStorageResourceList &storages)
 {
     m_storages = storages;
 }
@@ -123,7 +123,7 @@ protected:
     }
 };
 
-QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(ConnectionRole ){
+QnAbstractStreamDataProvider* QnMediaServerResource::createDataProviderInternal(ConnectionRole ){
     return new QnEmptyDataProvider(toSharedPointer());
 }
 
@@ -132,7 +132,7 @@ QnAbstractStreamDataProvider* QnVideoServerResource::createDataProviderInternal(
 class TestConnectionTask: public QRunnable
 {
 public:
-    TestConnectionTask(QnVideoServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
+    TestConnectionTask(QnMediaServerResource* owner, const QUrl& url): m_owner(owner), m_url(url) {}
 
     void run()
     {
@@ -146,11 +146,11 @@ public:
         }
     }
 private:
-    QnVideoServerResource* m_owner;
+    QnMediaServerResource* m_owner;
     QUrl m_url;
 };
 
-void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
+void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
 {
     QMutexLocker lock(&m_mutex);
     if (m_primaryIFSelected)
@@ -170,21 +170,21 @@ void QnVideoServerResource::setPrimaryIF(const QString& primaryIF)
     emit serverIFFound(primaryIF);
 }
 
-void QnVideoServerResource::setReserve(bool reserve)
+void QnMediaServerResource::setReserve(bool reserve)
 {
     m_reserve = reserve;
 }
 
-bool QnVideoServerResource::getReserve() const
+bool QnMediaServerResource::getReserve() const
 {
     return m_reserve;
 }
 
-bool QnVideoServerResource::isPanicMode() const {
+bool QnMediaServerResource::isPanicMode() const {
     return m_panicMode;
 }
 
-void QnVideoServerResource::setPanicMode(bool panicMode) {
+void QnMediaServerResource::setPanicMode(bool panicMode) {
     if(m_panicMode == panicMode)
         return;
 
@@ -193,7 +193,7 @@ void QnVideoServerResource::setPanicMode(bool panicMode) {
     emit panicModeChanged(::toSharedPointer(this)); // TODO: emit it AFTER mutex unlock.
 }
 
-void QnVideoServerResource::determineOptimalNetIF()
+void QnMediaServerResource::determineOptimalNetIF()
 {
     QMutexLocker lock(&m_mutex);
     //if (m_prevNetAddrList == m_netAddrList)
@@ -210,13 +210,13 @@ void QnVideoServerResource::determineOptimalNetIF()
     }
 }
 
-void QnVideoServerResource::updateInner(QnResourcePtr other) 
+void QnMediaServerResource::updateInner(QnResourcePtr other) 
 {
     QMutexLocker lock(&m_mutex);
 
     QnResource::updateInner(other);
 
-    QnVideoServerResourcePtr localOther = other.dynamicCast<QnVideoServerResource>();
+    QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
         setPanicMode(localOther->isPanicMode());
 
@@ -244,12 +244,12 @@ void QnVideoServerResource::updateInner(QnResourcePtr other)
     determineOptimalNetIF();
 }
 
-QString QnVideoServerResource::getProxyHost() const
+QString QnMediaServerResource::getProxyHost() const
 {
     return m_restConnection->getProxyHost();
 }
 
-int QnVideoServerResource::getProxyPort() const
+int QnMediaServerResource::getProxyPort() const
 {
     return m_restConnection->getProxyPort();
 }

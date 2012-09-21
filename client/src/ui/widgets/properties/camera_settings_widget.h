@@ -42,7 +42,7 @@ public:
     bool hasAnyCameraChanges() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
-    QnVideoServerConnectionPtr getServerConnection() const;
+    QnMediaServerConnectionPtr getServerConnection() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;

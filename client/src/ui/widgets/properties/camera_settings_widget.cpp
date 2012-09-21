@@ -171,12 +171,12 @@ const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdv
     }
 }
 
-QnVideoServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
+QnMediaServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
 {
     switch(mode()) {
     case SingleMode: return m_singleWidget->getServerConnection();
     case MultiMode: return m_multiWidget->getServerConnection();
-    default: return QnVideoServerConnectionPtr(0);
+    default: return QnMediaServerConnectionPtr(0);
     }
 }
 

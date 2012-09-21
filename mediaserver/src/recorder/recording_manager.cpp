@@ -122,7 +122,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
             currentTime = qMin(currentTime,  archiveMinTime);
     }
 
-    QnVideoServerResourcePtr server = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(res->getParentId()));
+    QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
     QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -302,17 +302,17 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         return;
     }
 
-    QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-    if (videoServer) {
-        connect(videoServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
+    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(res);
+    if (mediaServer) {
+        connect(mediaServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
     }
 }
 
 void QnRecordingManager::at_updateStorage()
 {
-    QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
-    qnStorageMan->removeAbsentStorages(videoServer->getStorages());
-    foreach(QnAbstractStorageResourcePtr storage, videoServer->getStorages())
+    QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (sender());
+    qnStorageMan->removeAbsentStorages(mediaServer->getStorages());
+    foreach(QnAbstractStorageResourcePtr storage, mediaServer->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
         if (physicalStorage)

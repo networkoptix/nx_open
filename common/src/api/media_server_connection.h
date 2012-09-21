@@ -17,14 +17,12 @@
 
 #include "api_fwd.h"
 
-class VideoServerSessionManager;
-
 namespace detail {
-    class VideoServerSimpleReplyProcessor: public QObject
+    class QnMediaServerSimpleReplyProcessor: public QObject
     {
         Q_OBJECT;
     public:
-        VideoServerSimpleReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        QnMediaServerSimpleReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
@@ -33,11 +31,11 @@ namespace detail {
         void finished(int status, int handle);
     };
 
-    class VideoServerSessionManagerReplyProcessor: public QObject
+    class QnMediaServerTimePeriodsReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        QnMediaServerTimePeriodsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
@@ -46,11 +44,11 @@ namespace detail {
         void finished(int status, const QnTimePeriodList& timePeriods, int handle);
     };
 
-    class VideoServerSessionManagerFreeSpaceRequestReplyProcessor: public QObject
+    class QnMediaServerFreeSpaceReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerFreeSpaceRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        QnMediaServerFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle);
@@ -59,12 +57,11 @@ namespace detail {
         void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
     };
 
-    // TODO: #gdm class ForTheLoveOfGodDontCreateClassesWithSuchLongNamesRequestReplyProcessor: public QObject
-    class VideoServerSessionManagerStatisticsRequestReplyProcessor: public QObject
+    class QnMediaServerStatisticsReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerSessionManagerStatisticsRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+        QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {
             qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
         }
     public slots:
@@ -73,11 +70,11 @@ namespace detail {
         void finished(const QnStatisticsDataList &/* usage data */);
     };
 
-    class VideoServerManualCameraRequestReplyProcessor: public QObject
+    class QnMediaServerManualCameraReplyProcessor: public QObject
     {
         Q_OBJECT
     public:
-        VideoServerManualCameraRequestReplyProcessor(QObject *parent = NULL): QObject(parent) {
+        QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {
              qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
         }
     public slots:
@@ -89,7 +86,7 @@ namespace detail {
     };
 
     //!Handles response on GetParam request
-    class VideoServerGetParamReplyProcessor: public QObject
+    class QnMediaServerGetParamReplyProcessor: public QObject
     {
         Q_OBJECT
 
@@ -114,7 +111,7 @@ namespace detail {
     };
 
     //!Handles response on SetParam request
-    class VideoServerSetParamReplyProcessor: public QObject
+    class QnMediaServerSetParamReplyProcessor: public QObject
     {
         Q_OBJECT
 
@@ -138,12 +135,13 @@ namespace detail {
     };
 }
 
-class QN_EXPORT QnVideoServerConnection: public QObject
+
+class QN_EXPORT QnMediaServerConnection: public QObject
 {
     Q_OBJECT
 public:
-    QnVideoServerConnection(const QUrl &url, QObject *parent = 0);
-    virtual ~QnVideoServerConnection();
+    QnMediaServerConnection(const QUrl &url, QObject *parent = 0);
+    virtual ~QnMediaServerConnection();
 
     QnTimePeriodList recordedTimePeriods(const QnNetworkResourceList &list, qint64 startTimeMs = 0, qint64 endTimeMs = INT64_MAX, qint64 detail = 1, const QList<QRegion> &motionRegions = QList<QRegion>());
 

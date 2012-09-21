@@ -7,7 +7,7 @@
 
 #define STORAGE_LIMIT 60
 
-QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
@@ -16,17 +16,17 @@ QnStatisticsStorage::QnStatisticsStorage(const QnVideoServerConnectionPtr &apiCo
     m_apiConnection(apiConnection)
 {}
 
-void QnStatisticsStorage::registerServerWidget(QObject *target, const char *slot) {
+void QnMediaServerStatisticsStorage::registerServerWidget(QObject *target, const char *slot) {
     connect(this, SIGNAL(statisticsChanged()), target, slot);
     m_listeners++;
 }
 
-void QnStatisticsStorage::unregisterServerWidget(QObject *target) {
+void QnMediaServerStatisticsStorage::unregisterServerWidget(QObject *target) {
     disconnect(this, 0, target, 0);
     m_listeners--;
 }
 
-qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *history) {
+qint64 QnMediaServerStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *history) {
     if (m_history.isEmpty())
         return -1;
 
@@ -47,7 +47,7 @@ qint64 QnStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *histo
     return m_lastId;
 }
 
-void QnStatisticsStorage::update() {
+void QnMediaServerStatisticsStorage::update() {
     if (m_alreadyUpdating)
         return;
 
@@ -68,7 +68,7 @@ void QnStatisticsStorage::update() {
     m_alreadyUpdating = true;
 }
 
-void QnStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data) {
+void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDataList &data) {
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 

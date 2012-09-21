@@ -6,6 +6,6 @@
 QString serverGuid();
 QString getDataDirectory();
 QString defaultStoragePath();
-void syncStoragesToSettings(QnVideoServerResourcePtr server);
+void syncStoragesToSettings(QnMediaServerResourcePtr server);
 
 #endif // _SERVER_UTIL_H

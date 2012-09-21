@@ -16,7 +16,7 @@ namespace ParameterMetaType {
         ResourcePtr,
         UserResourcePtr,
         LayoutResourcePtr,
-        VideoServerResourcePtr,
+        MediaServerResourcePtr,
         ResourceList,
         ResourceWidget,
         ResourceWidgetList,
@@ -37,7 +37,7 @@ namespace {
         x->insert(qMetaTypeId<QnResourcePtr>(),             ResourcePtr);
         x->insert(qMetaTypeId<QnUserResourcePtr>(),         UserResourcePtr);
         x->insert(qMetaTypeId<QnLayoutResourcePtr>(),       LayoutResourcePtr);
-        x->insert(qMetaTypeId<QnVideoServerResourcePtr>(),  VideoServerResourcePtr);
+        x->insert(qMetaTypeId<QnMediaServerResourcePtr>(),  MediaServerResourcePtr);
         x->insert(qMetaTypeId<QnResourceList>(),            ResourceList);
         x->insert(qMetaTypeId<QnResourceWidget *>(),        ResourceWidget);
         x->insert(qMetaTypeId<QnResourceWidgetList>(),      ResourceWidgetList);
@@ -56,8 +56,8 @@ namespace {
             return items.value<QnUserResourcePtr>();
         case LayoutResourcePtr:
             return items.value<QnLayoutResourcePtr>();
-        case VideoServerResourcePtr:
-            return items.value<QnVideoServerResourcePtr>();
+        case MediaServerResourcePtr:
+            return items.value<QnMediaServerResourcePtr>();
         default:
             return QnResourcePtr();
         }
@@ -90,7 +90,7 @@ int QnActionParameterTypes::size(const QVariant &items) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
-    case VideoServerResourcePtr:
+    case MediaServerResourcePtr:
         return singleResource(items) ? 1 : 0;
     case ResourceList:
         return items.value<QnResourceList>().size();
@@ -116,7 +116,7 @@ Qn::ActionParameterType QnActionParameterTypes::type(const QVariant &items) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
-    case VideoServerResourcePtr:
+    case MediaServerResourcePtr:
     case ResourceList:
         return Qn::ResourceType;
     case ResourceWidget:
@@ -212,7 +212,7 @@ QnResourceList QnActionParameterTypes::resources(const QVariant &items) {
     case ResourcePtr:
     case UserResourcePtr:
     case LayoutResourcePtr:
-    case VideoServerResourcePtr:
+    case MediaServerResourcePtr:
         return makeList<QnResourceList>(singleResource(items));
     case ResourceList:
         return items.value<QnResourceList>();

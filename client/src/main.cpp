@@ -131,20 +131,6 @@ void addTestFile(const QString& fileName, const QString& resId)
 void addTestData()
 {
     /*
-    QnVideoServerPtr server(new QnVideoServer());
-    server->setUrl("rtsp://localhost:50000");
-    server->setApiUrl("rtsp://localhost:8080");
-    //server->startRTSPListener();
-    qnResPool->addResource(QnResourcePtr(server));
-
-    QnServerCameraPtr testCamera(new QnServerCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
     resource->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
     resource->addFlag(QnResource::remote); // to initialize access to resource throught RTSP server

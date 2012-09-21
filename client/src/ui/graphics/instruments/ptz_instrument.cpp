@@ -397,7 +397,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         return false; /* Ignore clicks on widget frame. */
 
     if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
-        if(QnVideoServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnVideoServerResource>()) {
+        if(QnMediaServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>()) {
             setServerSpeed(QVector3D(), true);
 
             m_camera = camera;
@@ -436,7 +436,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
 void PtzInstrument::finishDragProcess(DragInfo *) {
     setServerSpeed(QVector3D(), true);
     m_camera = QnNetworkResourcePtr();
-    m_connection = QnVideoServerConnectionPtr();
+    m_connection = QnMediaServerConnectionPtr();
 
     updatePtzItemOpacity();
 

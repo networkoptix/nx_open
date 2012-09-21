@@ -36,7 +36,7 @@ private:
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
-    QnVideoServerResourcePtr m_videoServer;
+    QnMediaServerResourcePtr m_mediaServer;
 };
 
 #endif // MAIN_H

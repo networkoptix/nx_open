@@ -9,7 +9,7 @@ class QnServerCameraProcessor : public QObject, public QnResourceProcessor
 public:
     void processResources(const QnResourceList &resources);
 private:
-    void determineOptimalIF(QnVideoServerResource* videoServer);
+    void determineOptimalIF(QnMediaServerResource* mediaServer);
 private slots:
     void at_serverIfFound(const QString &);
 };
@@ -25,7 +25,7 @@ public:
     virtual QString manufacture() const;
     virtual void setIframeDistance(int frames, int timems);
 
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0) override;
 protected:
     virtual QString getUniqueId() const override;

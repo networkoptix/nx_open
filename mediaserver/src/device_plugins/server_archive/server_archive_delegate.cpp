@@ -309,7 +309,7 @@ begin_label:
     return data;
 }
 
-QnVideoResourceLayout* QnServerArchiveDelegate::getVideoLayout()
+QnResourceVideoLayout* QnServerArchiveDelegate::getVideoLayout()
 {
     return m_aviDelegate->getVideoLayout();
 }

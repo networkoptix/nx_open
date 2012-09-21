@@ -12,7 +12,7 @@ public:
     const char* format() const { return "pb"; }
 
     void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) override;
-    void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) override;
+    void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) override;
     void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) override;
     void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) override;
     void deserializeUsers(QnUserResourceList& users, const QByteArray& data) override;
@@ -30,7 +30,7 @@ public:
 
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) override;
-    void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data) override;
+    void serializeServer(const QnMediaServerResourcePtr& resource, QByteArray& data) override;
     void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) override;
 };
 

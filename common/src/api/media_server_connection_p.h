@@ -3,13 +3,11 @@
 
 #include "media_server_connection.h"
 
-class VideoServerSessionManager;
-
 namespace detail {
-    class QnVideoServerConnectionReplyProcessor: public QObject {
+    class QnMediaServerConnectionReplyProcessor: public QObject {
         Q_OBJECT;
     public:
-        QnVideoServerConnectionReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+        QnMediaServerConnectionReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
         void at_replyReceived(int status, const QnTimePeriodList &result, int handle);

@@ -68,7 +68,7 @@ namespace detail{
 class QnCameraAdditionDialog: public QDialog {
     Q_OBJECT
 public:
-    explicit QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent = NULL);
+    explicit QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent = NULL);
     virtual ~QnCameraAdditionDialog();
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
@@ -89,7 +89,7 @@ private:
     Q_DISABLE_COPY(QnCameraAdditionDialog)
 
     QScopedPointer<Ui::CameraAdditionDialog> ui;
-    QnVideoServerResourcePtr m_server;
+    QnMediaServerResourcePtr m_server;
 
     bool m_inIpRangeEdit;
     QString m_startLabelTexts[2];

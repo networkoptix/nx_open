@@ -39,11 +39,11 @@ void QnWorkbenchPanicWatcher::updatePanicMode() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
-    QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if(!server)
         return;
 
-    connect(server.data(), SIGNAL(panicModeChanged(const QnVideoServerResourcePtr &)), this, SLOT(at_resource_panicModeChanged(const QnVideoServerResourcePtr &)));
+    connect(server.data(), SIGNAL(panicModeChanged(const QnMediaServerResourcePtr &)), this, SLOT(at_resource_panicModeChanged(const QnMediaServerResourcePtr &)));
 
     m_servers.insert(server);
     if(server->isPanicMode())
@@ -53,7 +53,7 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceAdded(const QnResourcePtr 
 }
 
 void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
-    QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>();
+    QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if(!server)
         return;
 
@@ -65,7 +65,7 @@ void QnWorkbenchPanicWatcher::at_resourcePool_resourceRemoved(const QnResourcePt
     updatePanicMode();
 }
 
-void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnVideoServerResourcePtr &resource) {
+void QnWorkbenchPanicWatcher::at_resource_panicModeChanged(const QnMediaServerResourcePtr &resource) {
     if(resource->isPanicMode()) {
         m_panicServers.insert(resource);
     } else {

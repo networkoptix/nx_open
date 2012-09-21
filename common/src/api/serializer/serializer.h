@@ -53,7 +53,7 @@ public:
 
     virtual const char* format() const = 0;
     virtual void deserializeCameras(QnVirtualCameraResourceList& cameras, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
-    virtual void deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
+    virtual void deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory) = 0;
     virtual void deserializeLayout(QnLayoutResourcePtr& layout, const QByteArray& data) = 0;
     virtual void deserializeLayouts(QnLayoutResourceList& layouts, const QByteArray& data) = 0;
     virtual void deserializeUsers(QnUserResourceList& users, const QByteArray& data) = 0;
@@ -71,7 +71,7 @@ public:
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;
-    virtual void serializeServer(const QnVideoServerResourcePtr& resource, QByteArray& data) = 0;
+    virtual void serializeServer(const QnMediaServerResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeUser(const QnUserResourcePtr& resource, QByteArray& data) = 0;
 };
 

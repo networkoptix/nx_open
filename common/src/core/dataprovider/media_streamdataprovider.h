@@ -7,7 +7,7 @@
 #include "abstract_streamdataprovider.h"
 #include "../datapacket/media_data_packet.h"
 
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
 

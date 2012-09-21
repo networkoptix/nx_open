@@ -10,7 +10,7 @@
 #include "resource_widget.h"
 
 class QnRadialGradientPainter;
-class QnVideoServerStatisticsManager;
+class QnMediaServerStatisticsManager;
 
 class QnServerResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -34,7 +34,7 @@ public:
     /**
      * \returns                         Resource associated with this widget.
      */
-    QnVideoServerResourcePtr resource() const;
+    QnMediaServerResourcePtr resource() const;
 
 protected:
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
@@ -56,10 +56,10 @@ private:
     void updateValues(QString key, QnStatisticsData newValues);
 
 private:
-    QnVideoServerStatisticsManager *m_manager;
+    QnMediaServerStatisticsManager *m_manager;
 
     /** Video server resource. */
-    QnVideoServerResourcePtr m_resource;
+    QnMediaServerResourcePtr m_resource;
 
     /** History of last usage responses. */
     QnStatisticsHistory m_history;

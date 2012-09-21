@@ -68,9 +68,9 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
     {
         QnResourcePtr resource = event.resource;
 
-        QnVideoServerResourcePtr ownVideoServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnVideoServerResource>();
+        QnMediaServerResourcePtr ownMediaServer = qnResPool->getResourceByGuid(serverGuid()).dynamicCast<QnMediaServerResource>();
 
-        bool isServer = resource.dynamicCast<QnVideoServerResource>();
+        bool isServer = resource.dynamicCast<QnMediaServerResource>();
         bool isCamera = resource.dynamicCast<QnVirtualCameraResource>();
 
         if (!isServer && !isCamera)
@@ -81,7 +81,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
             return;
 
         // If camera from other server - ignore 
-        if (isCamera && resource->getParentId() != ownVideoServer->getId())
+        if (isCamera && resource->getParentId() != ownMediaServer->getId())
             return;
 
         // We are always online
@@ -101,7 +101,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
 
         if (isServer)
-            syncStoragesToSettings(ownVideoServer);
+            syncStoragesToSettings(ownMediaServer);
 
     } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
     {

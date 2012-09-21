@@ -149,8 +149,8 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 resources.push_back(context()->workbench()->currentLayout()->resource());
             } else if(key == Qn::CurrentUserParameter) {
                 resources.push_back(context()->user());
-            } else if(key == Qn::AllVideoServersParameter) {
-                resources = context()->resourcePool()->getResources().filtered<QnVideoServerResource>();
+            } else if(key == Qn::AllMediaServersParameter) {
+                resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
             }
 
             if((accessController()->permissions(resources) & required) != required)

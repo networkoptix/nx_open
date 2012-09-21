@@ -1,5 +1,5 @@
-#ifndef QN_STATISTICS_STORAGE
-#define QN_STATISTICS_STORAGE
+#ifndef QN_MEDIA_SERVER_STATISTICS_STORAGE
+#define QN_MEDIA_SERVER_STATISTICS_STORAGE
 
 #include <QtCore/QString>
 #include <QtCore/QHash>
@@ -12,7 +12,7 @@
 /**
   * Class that receives, parses and stores statistics data from one server.
   */
-class QnStatisticsStorage: QObject {
+class QnMediaServerStatisticsStorage: QObject {
     Q_OBJECT
 public:
     /**
@@ -21,7 +21,7 @@ public:
      * \param apiConnection     Api connection of the server that will provide the statistics.
      * \param parent            Parent of the object
      */
-    QnStatisticsStorage(const QnVideoServerConnectionPtr &apiConnection, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, QObject *parent);
 
     // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
@@ -76,7 +76,7 @@ private:
     uint m_listeners;
 
     QnStatisticsHistory m_history;
-    QnVideoServerConnectionPtr m_apiConnection;
+    QnMediaServerConnectionPtr m_apiConnection;
 };
 
-#endif // QN_STATISTICS_STORAGE
+#endif // QN_MEDIA_SERVER_STATISTICS_STORAGE

@@ -63,7 +63,7 @@ private:
     QnResource::ConnectionRole m_role;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
-    const QnVideoResourceLayout* m_layout;
+    const QnResourceVideoLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
 };

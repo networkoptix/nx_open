@@ -88,7 +88,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
         return calculatePermissions(archive);
 
-    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return calculatePermissions(server);
 
     return 0;
@@ -155,7 +155,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstra
     return Qn::ReadPermission;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
     assert(server);
 
     if(m_userPermissions & Qn::GlobalEditServersPermissions) {

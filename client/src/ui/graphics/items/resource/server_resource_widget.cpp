@@ -26,7 +26,7 @@
 /** How many points of the chart are shown on the screen simultaneously */
 #define CHART_POINTS_LIMIT 60
 
-/** Data update period. For the best result should be equal to videoServerStatisticsManager's */
+/** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
 #define REQUEST_TIME 2000 // TODO: #GDM extract this one from server's response (updatePeriod element).
 
 namespace {
@@ -175,12 +175,12 @@ namespace {
 
 QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /* = NULL */):
     QnResourceWidget(context, item, parent),
-    m_manager(context->instance<QnVideoServerStatisticsManager>()),
+    m_manager(context->instance<QnMediaServerStatisticsManager>()),
     m_lastHistoryId(-1),
     m_counter(0),
     m_renderStatus(Qn::NothingRendered)
 {
-    m_resource = base_type::resource().dynamicCast<QnVideoServerResource>();
+    m_resource = base_type::resource().dynamicCast<QnMediaServerResource>();
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
@@ -197,7 +197,7 @@ QnServerResourceWidget::~QnServerResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
 
-QnVideoServerResourcePtr QnServerResourceWidget::resource() const {
+QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
 }
 

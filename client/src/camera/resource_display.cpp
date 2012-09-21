@@ -117,7 +117,7 @@ void QnResourceDisplay::disconnectFromResource() {
     QnResourceConsumer::disconnectFromResource();
 }
 
-const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
+const QnResourceVideoLayout *QnResourceDisplay::videoLayout() const {
     if(m_mediaProvider == NULL)
         return NULL;
 

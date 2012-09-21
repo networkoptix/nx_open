@@ -36,7 +36,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     if (other_casted)
     {
 
-        const QnVideoResourceLayout* layout = getVideoLayout();
+        const QnResourceVideoLayout* layout = getVideoLayout();
         int numChannels = layout->numberOfChannels();
 
         m_motionType = other_casted->m_motionType;

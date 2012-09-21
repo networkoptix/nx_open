@@ -23,7 +23,7 @@ public:
      * \param resource                  Network resource representing the camera to work with.
      * \param parent                    Parent object.
      */
-    QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
+    QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent = NULL);
 
     /**
      * Creates a new time period loader for the given camera resource. Returns NULL
@@ -63,7 +63,7 @@ private:
     mutable QMutex m_mutex;
 
     /** Video server connection that this loader uses. */
-    QnVideoServerConnectionPtr m_connection;
+    QnMediaServerConnectionPtr m_connection;
 
     QnTimePeriodList m_loadedPeriods;
     QList<LoadingInfo> m_loading;

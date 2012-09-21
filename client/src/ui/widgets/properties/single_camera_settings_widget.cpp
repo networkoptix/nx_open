@@ -65,15 +65,15 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
     cleanAdvancedSettings();
 }
 
-QnVideoServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() const {
+QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() const {
     if (!m_camera.isNull() && m_serverConnection.isNull())
     {
-        QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
-        if (videoServer.isNull()) {
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
+        if (mediaServer.isNull()) {
             return m_serverConnection;
         }
 
-        m_serverConnection = QnVideoServerConnectionPtr(videoServer->apiConnection());
+        m_serverConnection = QnMediaServerConnectionPtr(mediaServer->apiConnection());
     }
 
     return m_serverConnection;
@@ -162,7 +162,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
     QVariant id;
     if (m_camera && m_camera->getParam(QString::fromLatin1("cameraSettingsId"), id, QnDomainDatabase) && !id.isNull())
     {
-        QnVideoServerConnectionPtr serverConnection = getServerConnection();
+        QnMediaServerConnectionPtr serverConnection = getServerConnection();
         if (serverConnection.isNull()) {
             return;
         }

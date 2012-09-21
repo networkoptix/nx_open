@@ -41,10 +41,10 @@ public:
         return *(new QList< QPair< QString, QVariant> >);
     }
 
-    QnVideoServerConnectionPtr getServerConnection() const {
+    QnMediaServerConnectionPtr getServerConnection() const {
         //This ability avaible only for single camera settings
         Q_ASSERT(false);
-        return QnVideoServerConnectionPtr(0);
+        return QnMediaServerConnectionPtr(0);
     }
 
     bool isReadOnly() const;

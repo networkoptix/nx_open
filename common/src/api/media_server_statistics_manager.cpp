@@ -10,7 +10,7 @@
 /** Data update period. For the best result should be equal to server's */
 #define REQUEST_TIME 2000
 
-QnVideoServerStatisticsManager::QnVideoServerStatisticsManager(QObject *parent):
+QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
     QObject(parent)
 {
     QTimer *timer = new QTimer(this);
@@ -18,28 +18,28 @@ QnVideoServerStatisticsManager::QnVideoServerStatisticsManager(QObject *parent):
     timer->start(REQUEST_TIME);
 }
 
-void QnVideoServerStatisticsManager::registerServerWidget(const QnVideoServerResourcePtr &resource, QObject *target, const char *slot){
+void QnMediaServerStatisticsManager::registerServerWidget(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
-        m_statistics[id] = new QnStatisticsStorage(resource->apiConnection(), this);
+        m_statistics[id] = new QnMediaServerStatisticsStorage(resource->apiConnection(), this);
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
-void QnVideoServerStatisticsManager::unregisterServerWidget(const QnVideoServerResourcePtr &resource, QObject *target){
+void QnMediaServerStatisticsManager::unregisterServerWidget(const QnMediaServerResourcePtr &resource, QObject *target){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return;
     m_statistics[id]->unregisterServerWidget(target);
 }
 
-qint64 QnVideoServerStatisticsManager::getHistory(const QnVideoServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history){
+qint64 QnMediaServerStatisticsManager::getHistory(const QnMediaServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history){
     QString id = resource->getUniqueId();
     if (!m_statistics.contains(id))
         return -1;
     return m_statistics[id]->getHistory(lastId, history);
 }
 
-void QnVideoServerStatisticsManager::at_timer_timeout(){
-    foreach(QnStatisticsStorage *storage, m_statistics)
+void QnMediaServerStatisticsManager::at_timer_timeout(){
+    foreach(QnMediaServerStatisticsStorage *storage, m_statistics)
         storage->update();
 }

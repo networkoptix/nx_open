@@ -203,7 +203,7 @@ QnAbstractStorageResourcePtr createDefaultStorage()
     return storage;
 }
 
-void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddress)
+void setServerNameAndUrls(QnMediaServerResourcePtr server, const QString& myAddress)
 {
     if (server->getName().isEmpty())
         server->setName(QString("Server ") + myAddress);
@@ -223,9 +223,9 @@ void setServerNameAndUrls(QnVideoServerResourcePtr server, const QString& myAddr
 #endif
 }
 
-QnVideoServerResourcePtr createServer()
+QnMediaServerResourcePtr createServer()
 {
-    QnVideoServerResourcePtr serverPtr(new QnVideoServerResource());
+    QnMediaServerResourcePtr serverPtr(new QnMediaServerResource());
     serverPtr->setGuid(serverGuid());
 
     serverPtr->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
@@ -233,9 +233,9 @@ QnVideoServerResourcePtr createServer()
     return serverPtr;
 }
 
-QnVideoServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
+QnMediaServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection)
 {
-    QnVideoServerResourceList servers;
+    QnMediaServerResourceList servers;
 
     while (servers.isEmpty())
     {
@@ -247,25 +247,25 @@ QnVideoServerResourcePtr findServer(QnAppServerConnectionPtr appServerConnection
         QnSleep::msleep(1000);
     }
 
-    foreach(QnVideoServerResourcePtr server, servers)
+    foreach(QnMediaServerResourcePtr server, servers)
     {
         if (server->getGuid() == serverGuid())
             return server;
     }
 
-    return QnVideoServerResourcePtr();
+    return QnMediaServerResourcePtr();
 }
 
-QnVideoServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnVideoServerResourcePtr serverPtr)
+QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnection, QnMediaServerResourcePtr serverPtr)
 {
-    QnVideoServerResourceList servers;
+    QnMediaServerResourceList servers;
     QByteArray errorString;
     serverPtr->setStatus(QnResource::Online);
     if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
-        return QnVideoServerResourcePtr();
+        return QnMediaServerResourcePtr();
     }
 
     return servers.at(0);
@@ -390,7 +390,7 @@ void initAppServerConnection(const QSettings &settings)
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
 }
 
-void initAppServerEventConnection(const QSettings &settings, const QnVideoServerResourcePtr& mediaServer)
+void initAppServerEventConnection(const QSettings &settings, const QnMediaServerResourcePtr& mediaServer)
 {
     QUrl appServerEventsUrl;
 
@@ -495,7 +495,7 @@ void QnMain::loadResourcesFromECS()
     QByteArray errorString;
 
     QnVirtualCameraResourceList cameras;
-    while (appServerConnection->getCameras(cameras, m_videoServer->getId(), errorString) != 0)
+    while (appServerConnection->getCameras(cameras, m_mediaServer->getId(), errorString) != 0)
     {
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
         QnSleep::msleep(10000);
@@ -536,9 +536,9 @@ void QnMain::at_localInterfacesChanged()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    m_videoServer->setNetAddrList(allLocalAddresses());
+    m_mediaServer->setNetAddrList(allLocalAddresses());
 
-    appServerConnection->saveAsync(m_videoServer, this, SLOT(at_serverSaved(int, const QByteArray&, const QnResourceList&, int)));
+    appServerConnection->saveAsync(m_mediaServer, this, SLOT(at_serverSaved(int, const QByteArray&, const QnResourceList&, int)));
 }
 
 void QnMain::at_serverSaved(int status, const QByteArray &errorString, const QnResourceList &, int)
@@ -660,9 +660,9 @@ void QnMain::run()
 
     initTcpListener();
 
-    while (m_videoServer.isNull())
+    while (m_mediaServer.isNull())
     {
-        QnVideoServerResourcePtr server = findServer(appServerConnection);
+        QnMediaServerResourcePtr server = findServer(appServerConnection);
 
         if (!server)
             server = createServer();
@@ -674,26 +674,26 @@ void QnMain::run()
         if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
             server->setStorages(QnAbstractStorageResourceList() << createDefaultStorage());
 
-        m_videoServer = registerServer(appServerConnection, server);
-        if (m_videoServer.isNull())
+        m_mediaServer = registerServer(appServerConnection, server);
+        if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
     }
 
-    syncStoragesToSettings(m_videoServer);
+    syncStoragesToSettings(m_mediaServer);
 
     int status;
     do
     {
-        status = appServerConnection->setResourceStatus(m_videoServer->getId(), QnResource::Online, errorString);
+        status = appServerConnection->setResourceStatus(m_mediaServer->getId(), QnResource::Online, errorString);
     } while (status != 0);
 
-    initAppServerEventConnection(qSettings, m_videoServer);
+    initAppServerEventConnection(qSettings, m_mediaServer);
     QnServerMessageProcessor* eventManager = QnServerMessageProcessor::instance();
     eventManager->run();
 
-    m_processor = new QnAppserverResourceProcessor(m_videoServer->getId());
+    m_processor = new QnAppserverResourceProcessor(m_mediaServer->getId());
 
-    foreach (QnAbstractStorageResourcePtr storage, m_videoServer->getStorages())
+    foreach (QnAbstractStorageResourcePtr storage, m_mediaServer->getStorages())
     {
         qnResPool->addResource(storage);
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
@@ -703,7 +703,7 @@ void QnMain::run()
     qnStorageMan->loadFullFileCatalog();
 
     QnRecordingManager::instance()->start();
-    qnResPool->addResource(m_videoServer);
+    qnResPool->addResource(m_mediaServer);
 
     // ------------------------------------------
 

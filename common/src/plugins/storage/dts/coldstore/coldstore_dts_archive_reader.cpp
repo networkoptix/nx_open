@@ -301,15 +301,15 @@ qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 
 }
 
-QnVideoResourceLayout* QnColdStoreDelegate::getVideoLayout()
+QnResourceVideoLayout* QnColdStoreDelegate::getVideoLayout()
 {
-    static  QnDefaultDeviceVideoLayout l;
+    static  QnDefaultResourceVideoLayout l;
     return &l;
 }
 
 QnResourceAudioLayout* QnColdStoreDelegate::getAudioLayout()
 {
-    static QnEmptyAudioLayout l;
+    static QnEmptyResourceAudioLayout l;
     return &l;
 }
 

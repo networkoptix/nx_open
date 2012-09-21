@@ -151,7 +151,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
 
     /** Connection for camera's server */
-    QnVideoServerConnectionPtr m_connection; // TODO: move out?
+    QnMediaServerConnectionPtr m_connection; // TODO: move out?
 
     /** Display. */
     QnResourceDisplay *m_display;

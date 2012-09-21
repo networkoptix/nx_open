@@ -7,7 +7,7 @@ namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
+QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
     QnAbstractTimePeriodLoader(resource, parent),
     m_connection(connection)
 {
@@ -24,11 +24,11 @@ QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObj
     if (!networkResource)
         return NULL;
 
-    QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
     if (!serverResource)
         return NULL;
 
-    QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
         return NULL;
 

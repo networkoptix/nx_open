@@ -46,7 +46,7 @@ public:
         return m_hasDbChanges;
     }
 
-    QnVideoServerConnectionPtr getServerConnection() const;
+    QnMediaServerConnectionPtr getServerConnection() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
         return m_modifiedAdvancedParamsOutgoing;
@@ -127,7 +127,7 @@ private:
     CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
-    mutable QnVideoServerConnectionPtr m_serverConnection;
+    mutable QnMediaServerConnectionPtr m_serverConnection;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

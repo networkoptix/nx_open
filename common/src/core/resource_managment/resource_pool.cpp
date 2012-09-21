@@ -26,7 +26,7 @@ QnResourcePool::QnResourcePool() : QObject(),
     qRegisterMetaType<QnResourceList>("QnResourceList");
     qRegisterMetaType<QnResource::Status>("QnResource::Status");
 
-    localServer = QnResourcePtr(new QnLocalVideoServerResource);
+    localServer = QnResourcePtr(new QnLocalMediaServerResource);
     addResource(localServer);
 }
 

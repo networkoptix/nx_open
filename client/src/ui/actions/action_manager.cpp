@@ -392,7 +392,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
-        //requiredPermissions(Qn::AllVideoServersParameter, Qn::ReadWriteSavePermission).
+        //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
         condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
 
     factory().

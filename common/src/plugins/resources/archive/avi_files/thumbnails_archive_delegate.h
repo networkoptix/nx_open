@@ -15,7 +15,7 @@ public:
     virtual qint64 startTime() override;
     virtual qint64 endTime() override;
     virtual qint64 seek (qint64 time, bool findIFrame) override;
-    virtual QnVideoResourceLayout* getVideoLayout() override;
+    virtual QnResourceVideoLayout* getVideoLayout() override;
     virtual QnResourceAudioLayout* getAudioLayout() override;
 
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep);

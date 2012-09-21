@@ -1,17 +1,17 @@
-#ifndef QN_VIDEO_SERVER_RESOURCE_H
-#define QN_VIDEO_SERVER_RESOURCE_H
+#ifndef QN_MEDIA_SERVER_RESOURCE_H
+#define QN_MEDIA_SERVER_RESOURCE_H
 
 #include "core/resource/resource.h"
 #include "core/resource/storage_resource.h"
 #include "core/resource/media_resource.h"
 #include "api/media_server_connection.h"
 
-class QnLocalVideoServerResource : public QnMediaResource
+class QnLocalMediaServerResource : public QnMediaResource
 {
     Q_OBJECT
 
 public:
-    QnLocalVideoServerResource();
+    QnLocalMediaServerResource();
 
     virtual QString getUniqueId() const;
 
@@ -20,15 +20,15 @@ protected:
 };
 
 
-class QnVideoServerResource : public QnMediaResource
+class QnMediaServerResource : public QnMediaResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)
     Q_PROPERTY(QString streamingUrl READ getStreamingUrl WRITE setStreamingUrl)
 
 public:
-    QnVideoServerResource();
-    virtual ~QnVideoServerResource();
+    QnMediaServerResource();
+    virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;
 
@@ -41,7 +41,7 @@ public:
     void setNetAddrList(const QList<QHostAddress>&);
     QList<QHostAddress> getNetAddrList();
 
-    QnVideoServerConnectionPtr apiConnection();
+    QnMediaServerConnectionPtr apiConnection();
 
     QnAbstractStorageResourceList getStorages() const;
     void setStorages(const QnAbstractStorageResourceList& storages);
@@ -64,12 +64,12 @@ public:
 
 signals:
     void serverIFFound(const QString &);
-    void panicModeChanged(const QnVideoServerResourcePtr &resource);
+    void panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 protected:
 
 private:
-    QnVideoServerConnectionPtr m_restConnection;
+    QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
     QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
@@ -80,13 +80,13 @@ private:
     bool m_panicMode;
 };
 
-class QnVideoServerResourceFactory : public QnResourceFactory
+class QnMediaServerResourceFactory : public QnResourceFactory
 {
 public:
     QnResourcePtr createResource(QnId resourceTypeId, const QnResourceParameters &parameters);
 };
 
-Q_DECLARE_METATYPE(QnVideoServerResourcePtr);
-Q_DECLARE_METATYPE(QnVideoServerResourceList);
+Q_DECLARE_METATYPE(QnMediaServerResourcePtr);
+Q_DECLARE_METATYPE(QnMediaServerResourceList);
 
-#endif // QN_VIDEO_SERVER_RESOURCE_H
+#endif // QN_MEDIA_SERVER_RESOURCE_H

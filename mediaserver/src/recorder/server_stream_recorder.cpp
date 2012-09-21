@@ -24,7 +24,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
-    m_videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
     
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
@@ -215,7 +215,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_videoServer && m_videoServer->isPanicMode())
+    if (m_mediaServer && m_mediaServer->isPanicMode())
     {
         if (!m_usedPanicMode)
         {
