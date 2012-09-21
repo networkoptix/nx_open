@@ -1,4 +1,4 @@
-#include "desktop_device.h"
+#include "desktop_resource.h"
 #include "../streamreader/desktop_stream_reader.h"
 
 QnDesktopResource::QnDesktopResource(int index): QnResource() {

@@ -28,7 +28,7 @@
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
-#include "device_plugins/desktop/device/desktop_device_server.h"
+#include "device_plugins/desktop/device/desktop_resource_searcher.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"

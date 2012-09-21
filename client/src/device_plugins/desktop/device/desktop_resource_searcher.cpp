@@ -1,5 +1,5 @@
-#include "desktop_device_server.h"
-#include "desktop_device.h"
+#include "desktop_resource_searcher.h"
+#include "desktop_resource.h"
 
 #ifdef Q_OS_WIN
 #   include <windows.h>
