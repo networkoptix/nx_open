@@ -28,7 +28,7 @@ protected:
 
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
     void beforeProcessData(QnAbstractMediaDataPtr media);
-    bool saveMotion(QnAbstractMediaDataPtr media);
+    virtual bool saveMotion(QnMetaDataV1Ptr motion) override;
 
     virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;

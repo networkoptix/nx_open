@@ -29,6 +29,12 @@ public:
     void setTruncateInterval(int seconds);
 
     void setFileName(const QString& fileName);
+    
+    /*
+    * Export motion stream to separate file
+    */
+    void setMotionFile(QIODevice* motionFile);
+
     void close();
     
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
@@ -76,7 +82,7 @@ protected:
     int getPrebufferingUsec() const;
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
 
-    virtual bool saveMotion(QnAbstractMediaDataPtr media);
+    virtual bool saveMotion(QnMetaDataV1Ptr media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -130,6 +136,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
+    QIODevice* m_motionFile;
 };
 
 #endif // _STREAM_RECORDER_H__

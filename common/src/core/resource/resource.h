@@ -74,6 +74,7 @@ public:
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
         periods = 0x8000,           /**< Resource uses UTC-based timing. */
+        motion = 0x10000,           /**< Resource has motion */
 
         local_media = local | media,
 

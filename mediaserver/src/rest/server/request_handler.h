@@ -11,6 +11,10 @@
 #include <QSharedPointer>
 
 class TCPSocket;
+
+/*
+*  QnRestRequestHandler MUST be thread safe and stateless
+*/
 class QnRestRequestHandler: public QObject
 {
 public:

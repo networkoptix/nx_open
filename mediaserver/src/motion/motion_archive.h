@@ -77,7 +77,6 @@ public:
 private:
     QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
-    bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
     bool saveToArchiveInternal(QnMetaDataV1Ptr data);
     QString getChannelPrefix();

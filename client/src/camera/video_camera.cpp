@@ -15,7 +15,8 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStre
     m_isVisible(true),
     m_exportRecorder(0),
     m_exportReader(0),
-    m_progressOffset(0)
+    m_progressOffset(0),
+    m_motionFile(0)
 {
     if (m_resource)
         cl_log.log(QLatin1String("Creating camera for "), m_resource->toString(), cl_logDEBUG1);
@@ -198,6 +199,10 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
     }
+    if (m_motionFile) {
+        m_exportReader->setSendMotion(true);
+        m_exportRecorder->setMotionFile(m_motionFile);
+    }
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTime);
@@ -262,4 +267,9 @@ void QnVideoCamera::setExportProgressOffset(int value)
 int QnVideoCamera::getExportProgressOffset() const
 {
     return m_progressOffset;
+}
+
+void QnVideoCamera::setMotionIODevice(QIODevice* motionFile)
+{
+    m_motionFile = motionFile;
 }

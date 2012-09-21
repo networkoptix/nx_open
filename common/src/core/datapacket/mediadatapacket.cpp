@@ -8,6 +8,7 @@
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
+#include "utils/common/math.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -74,7 +75,7 @@ void QnAbstractMediaData::assign(QnAbstractMediaData* other)
     compressionType = other->compressionType;
     flags = other->flags;
     channelNumber = other->channelNumber;
-    subChannelNumber = other->subChannelNumber;
+    //subChannelNumber = other->subChannelNumber;
     context = other->context;
     opaque = other->opaque;
 }
@@ -113,7 +114,6 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
     //useTwice = false;
 
     flags = 0;
-    i_mask = 0x01;
     m_input = 0;
     m_duration = 0;
     m_firstTimestamp = AV_NOPTS_VALUE;
@@ -124,10 +124,40 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
         data.writeFiller(0, data.capacity());
 }
 
+
+inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    for (int i = maskStart; i <= maskEnd; ++i)
+    {
+        if (_mm_testz_si128(mask[i], data[i]) == 0) /* SSE4. */
+            return true;
+    }
+    return false;
+}
+
+inline bool mathImage_sse2(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    static const __m128i zerroValue = _mm_setr_epi32(0, 0, 0, 0);
+    for (int i = maskStart; i <= maskEnd; ++i)
+    {
+        if (_mm_movemask_epi8(_mm_cmpeq_epi32(_mm_and_si128(mask[i], data[i]), zerroValue)) != 0xffff) /* SSE2. */
+            return true;
+    }
+    return false;
+}
+
+bool QnMetaDataV1::mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
+{
+    if (useSSE41())
+        return mathImage_sse41(data, mask, maskStart, maskEnd);
+    else 
+        return mathImage_sse2(data, mask, maskStart, maskEnd);
+}
+
+
 void QnMetaDataV1::assign(QnMetaDataV1* other)
 {
     QnAbstractMediaData::assign(other);
-    i_mask = other->i_mask;
     m_input = other->m_input;
     m_duration = other->m_duration;
 }
@@ -307,6 +337,42 @@ void QnMetaDataV1::createMask(const QRegion& region,  char* mask, int* maskStart
         }
     }
 
+}
+
+void QnMetaDataV1::serialize(QIODevice* ioDevice)
+{
+    Q_ASSERT(channelNumber <= 255);
+    qint64 timeStampMs = htonll(timestamp/1000);
+    int durationMs = htonl(m_duration/1000);
+    ioDevice->write((const char*) &timeStampMs, sizeof(qint64));
+    ioDevice->write((const char*) &durationMs, sizeof(int));
+    quint8 channel8 = channelNumber;
+    ioDevice->write((const char*) &channel8, 1);
+    ioDevice->write((const char*) &m_input, 1);
+    quint16 reserved  = 0;
+    ioDevice->write((const char*) &reserved, 2);
+    ioDevice->write(data.data(), data.size());
+}
+
+/*
+void QnMetaDataV1::deserialize(QIODevice* ioDevice)
+{
+    qint64 timeMs = 0;
+    int durationMs = 0;
+
+    ioDevice->read((char*) &timeMs, sizeof(timeMs));
+    ioDevice->read((char*) &durationMs, 3);
+    ioDevice->read((char*) &m_input, 1);
+    ioDevice->read(data.data(), data.size());
+
+    timeMs = ntohll(timeMs);
+    durationMs = ntohl(durationMs);
+}
+*/
+
+bool operator< (const QnMetaDataV1Light& first, const QnMetaDataV1Light& second)
+{
+    return first.startTimeMs < second.startTimeMs;
 }
 
 // ----------------------------------- QnCompressedAudioData -----------------------------------------

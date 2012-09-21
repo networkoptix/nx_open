@@ -362,7 +362,7 @@ QnVideoResourceLayout* QnAviArchiveDelegate::getVideoLayout()
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
-                            m_resource->addFlags(QnResource::utc | QnResource::periods); // use sync for exported layout only
+                            m_resource->addFlags(QnResource::utc | QnResource::periods | QnResource::motion); // use sync for exported layout only
                     }
                 }
             }
@@ -392,7 +392,7 @@ bool QnAviArchiveDelegate::findStreams()
         global_ffmpeg_mutex.lock();
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
-            av_find_stream_info(m_formatContext) >= 0;
+            av_find_stream_info(m_formatContext);
             m_formatContext->interrupt_callback.callback = 0;
             m_streamsFound = m_formatContext->nb_streams > 0;
             for (unsigned i = 0; i < m_formatContext->nb_streams; ++i)

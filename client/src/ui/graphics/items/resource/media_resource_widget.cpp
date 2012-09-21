@@ -572,8 +572,10 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if(m_camera) {
+    if (resource()->flags() & QnResource::motion)
         result |= MotionSearchButton | InfoButton;
+
+    if(m_camera) {
 
         if(
             /*version >= 103010 && */

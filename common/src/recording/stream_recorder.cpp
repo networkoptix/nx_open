@@ -40,7 +40,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_videoChannels(0),
     m_ioContext(0),
     m_needReopen(false),
-    m_isAudioPresent(false)
+    m_isAudioPresent(false),
+    m_motionFile(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
 }
@@ -49,6 +50,8 @@ QnStreamRecorder::~QnStreamRecorder()
 {
     stop();
     close();
+    if (m_motionFile)
+        m_motionFile->close();
 }
 
 void QnStreamRecorder::close()
@@ -84,6 +87,8 @@ void QnStreamRecorder::close()
         m_formatCtx = 0;
 
     }
+    if (m_motionFile)
+        m_motionFile->close();
     m_packetWrited = false;
     m_endDateTime = m_startDateTime = AV_NOPTS_VALUE;
 
@@ -200,7 +205,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     
 
     if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md);
+        return saveMotion(md.dynamicCast<QnMetaDataV1>());
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
     //if (!vd)
@@ -448,6 +453,11 @@ void QnStreamRecorder::setFileName(const QString& fileName)
     m_fixedFileName = fileName;
 }
 
+void QnStreamRecorder::setMotionFile(QIODevice* motionFile)
+{
+    m_motionFile = motionFile;
+}
+
 void QnStreamRecorder::setStartOffset(qint64 value)
 {
     m_startOffset = value;
@@ -470,9 +480,10 @@ bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     return true;
 }
 
-bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+bool QnStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
 {
-    Q_UNUSED(media)
+    if (motion && !motion->isEmpty() && m_motionFile) 
+        motion->serialize(m_motionFile);
     return true;
 }
 

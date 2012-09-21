@@ -64,9 +64,8 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     QnStreamRecorder::putData(data);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+bool QnServerStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
 {
-    QnMetaDataV1Ptr motion = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
     return true;

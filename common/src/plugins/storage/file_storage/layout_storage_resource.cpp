@@ -14,6 +14,11 @@ public:
         m_fileName = fileName.mid(fileName.indexOf(QLatin1Char('?'))+1);
     }
 
+    virtual ~QnLayoutFile()
+    {
+        close();
+    }
+
     virtual bool seek(qint64 offset) override
     {
         return m_file.seek(offset + m_fileOffset);
@@ -37,6 +42,11 @@ public:
     virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
         return m_file.write(data, maxSize);
+    }
+
+    virtual void close() override
+    {
+        m_file.close();
     }
 
     virtual bool open(QIODevice::OpenMode openMode) override

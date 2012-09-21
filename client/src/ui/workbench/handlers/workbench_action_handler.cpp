@@ -1924,8 +1924,8 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    QnLayoutFileStorageResource layoutStorage;
-    layoutStorage.setUrl(fileName);
+    //QnLayoutFileStorageResource layoutStorage;
+    //layoutStorage.setUrl(fileName);
     m_layoutFileName = fileName;
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
@@ -1979,7 +1979,7 @@ Do you want to continue?"),
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
-        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.pb")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
+        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
         QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
         QByteArray data;
         periods.encode(data);
@@ -1992,19 +1992,35 @@ Do you want to continue?"),
     at_layoutCamera_exportFinished(fileName);
 }
 
+
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
     Q_UNUSED(fileName)
+    if (m_motionFileBuffer)
+    {
+        m_motionFileBuffer->close();
+        QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".motion"));
+        QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
+        device->write(m_motionFileBuffer->buffer());
+        device->close();
+    }
+    m_exportedMediaRes.clear();
+    m_motionFileBuffer.clear();
+
     if (m_layoutExportResources.isEmpty()) {
         disconnect(sender(), NULL, this, NULL);
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->deleteLater();
+        m_exportStorage.clear();
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
     } else {
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
-        QnMediaResourcePtr mediaRes = m_layoutExportResources.dequeue();
-        m_layoutExportCamera->setResource(mediaRes);
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, mediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
+        m_exportedMediaRes = m_layoutExportResources.dequeue();
+        m_layoutExportCamera->setResource(m_exportedMediaRes);
+        m_motionFileBuffer = QSharedPointer<QBuffer>(new QBuffer());
+        m_motionFileBuffer->open(QIODevice::ReadWrite);
+        m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer.data());
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, m_exportedMediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
 
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
         if (layout) {
@@ -2013,13 +2029,17 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         }
 
         if(m_exportProgressDialog)
-            m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(mediaRes->getUrl()).arg(m_layoutFileName));
+            m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
     }
 }
 
 void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage) 
 {
     disconnect(sender(), NULL, this, NULL);
+
+    m_exportedMediaRes.clear();
+    m_motionFileBuffer.clear();
+    m_exportStorage.clear();
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();

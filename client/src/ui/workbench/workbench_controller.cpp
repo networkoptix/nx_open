@@ -451,7 +451,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!(widget->resource()->flags() & QnResource::network))
+        if(!(widget->resource()->flags() & QnResource::motion))
             continue;
 
         widget->setOption(QnResourceWidget::DisplayMotion, display);

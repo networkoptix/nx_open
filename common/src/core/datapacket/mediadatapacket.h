@@ -14,6 +14,8 @@
 #   include <QAudioFormat>
 #   define QnAudioFormat QAudioFormat
 #endif
+#include "utils/common/math.h"
+#include "utils/network/socket.h"
 
 struct AVCodecContext;
 
@@ -157,6 +159,37 @@ typedef QSharedPointer<QnCompressedVideoData> QnCompressedVideoDataPtr;
 
 enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
+/** 
+* This structure used for serialized QnMetaDataV1
+* Timestamp and duration specified in milliseconds
+* structure can be directly mapped to deserialized memory buffer to represent MetaData
+*/
+#pragma pack(push, 1)
+struct QnMetaDataV1Light
+{
+
+    /** 
+    * Structure MUST be prepared before use by calling doMarshalling method
+    */
+    void doMarshalling()
+    {
+        startTimeMs = ntohll(startTimeMs);
+        durationMs = ntohl(durationMs);
+    }
+
+    qint64 endTimeMs()   const  { return startTimeMs + durationMs; }
+
+    quint64 startTimeMs;
+    quint32 durationMs;
+    quint8 channel;
+    quint8 input;
+    quint16 reserved;
+    quint8 data[MD_WIDTH*MD_HEIGHT/8];
+};
+#pragma pack(pop)
+bool operator< (const QnMetaDataV1Light& first, const QnMetaDataV1Light& second);
+
+
 struct QnMetaDataV1 : public QnAbstractMediaData
 {
     QnMetaDataV1(int initialValue = 0);
@@ -204,7 +237,12 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 
     virtual QnMetaDataV1* clone() override;
 
-    unsigned char i_mask;
+    //void deserialize(QIODevice* ioDevice);
+    void serialize(QIODevice* ioDevice);
+
+    static bool mathImage(const __m128i* data, const __m128i* mask, int maskStart = 0, int maskEnd = MD_WIDTH * MD_HEIGHT / 128);
+
+
     quint8 m_input;
     qint64 m_duration;
 protected:
