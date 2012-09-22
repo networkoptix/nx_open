@@ -579,7 +579,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
 
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (m_realtimeMode || !isLive)
+    if (m_realtimeMode && !isLive)
         doRealtimeDelay(media);
 
     if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
