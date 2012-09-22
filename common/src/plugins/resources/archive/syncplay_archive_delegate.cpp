@@ -100,6 +100,7 @@ QnAbstractMediaDataPtr QnSyncPlayArchiveDelegate::getNextData()
     return m_ownerDelegate->getNextData();
 }
 
+/*
 void QnSyncPlayArchiveDelegate::setMotionRegion(const QRegion& region)
 {
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_ownerDelegate);
@@ -112,6 +113,7 @@ void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
     //if (maskedDelegate)
     //    m_ownerDelegate->setSendMotion(value);
 }
+*/
 
 void QnSyncPlayArchiveDelegate::beforeSeek(qint64 time)
 {
@@ -126,4 +128,9 @@ void QnSyncPlayArchiveDelegate::beforeChangeReverseMode(bool reverseMode)
 bool QnSyncPlayArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
     return m_ownerDelegate->setQuality(quality, fastSwitch);
+}
+
+QnAbstractMotionArchiveConnectionPtr QnSyncPlayArchiveDelegate::getMotionConnection(int channel)
+{
+    return m_ownerDelegate->getMotionConnection(channel);
 }

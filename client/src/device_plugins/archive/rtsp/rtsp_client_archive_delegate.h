@@ -12,7 +12,7 @@
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 
-class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
+class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
     QnRtspClientArchiveDelegate();
