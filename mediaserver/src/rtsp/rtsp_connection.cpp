@@ -835,6 +835,9 @@ int QnRtspConnectionProcessor::composePlay()
     QnResource::Status status = getResource()->getStatus();
 
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
+
+    if (!d->useProprietaryFormat)
+        d->quality = MEDIA_Quality_AlwaysHigh; // keep redAss for native client only
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 
