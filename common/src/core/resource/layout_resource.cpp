@@ -224,22 +224,24 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
 
-
-        QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion_%1.bin")).arg(path), QIODevice::ReadOnly);
-        if (motionIO) {
-            Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
-            QVector<QnMetaDataV1Light> motionData;
-            int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-            if (motionDataSize > 0) {
-                motionData.resize(motionDataSize);
-                motionIO->read((char*) &motionData[0], motionIO->size());
+        int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
+        for (int channel = 0; channel < numberOfChannels; ++channel)
+        {
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(path), QIODevice::ReadOnly);
+            if (motionIO) {
+                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                QnMetaDataLightVector motionData;
+                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                if (motionDataSize > 0) {
+                    motionData.resize(motionDataSize);
+                    motionIO->read((char*) &motionData[0], motionIO->size());
+                }
+                delete motionIO;
+                for (int i = 0; i < motionData.size(); ++i)
+                    motionData[i].doMarshalling();
+                aviResource->setMotionBuffer(motionData, channel);
             }
-            delete motionIO;
-            for (int i = 0; i < motionData.size(); ++i)
-                motionData[i].doMarshalling();
-            aviResource->setMotionBuffer(motionData);
         }
-
 
         qnResPool->addResource(aviResource);
     }

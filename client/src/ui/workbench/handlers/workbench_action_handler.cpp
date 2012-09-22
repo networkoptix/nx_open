@@ -1996,18 +1996,26 @@ Do you want to continue?"),
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
     Q_UNUSED(fileName)
-    if (m_motionFileBuffer)
+    if (m_exportedMediaRes) 
     {
-        m_motionFileBuffer->close();
-        
-        QString motionFileName = QString(QLatin1String("motion_%1.bin")).arg(m_exportedMediaRes->getUniqueId());
-        //QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".bin"));
-        QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
-        device->write(m_motionFileBuffer->buffer());
-        device->close();
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        for (int i = 0; i < numberOfChannels; ++i)
+        {
+            if (m_motionFileBuffer[i])
+            {
+                m_motionFileBuffer[i]->close();
+                
+                QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(m_exportedMediaRes->getUniqueId());
+                //QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".bin"));
+                QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
+                device->write(m_motionFileBuffer[i]->buffer());
+                device->close();
+            }
+            m_motionFileBuffer[i].clear();
+        }
     }
+
     m_exportedMediaRes.clear();
-    m_motionFileBuffer.clear();
 
     if (m_layoutExportResources.isEmpty()) {
         disconnect(sender(), NULL, this, NULL);
@@ -2019,9 +2027,12 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         m_exportedMediaRes = m_layoutExportResources.dequeue();
         m_layoutExportCamera->setResource(m_exportedMediaRes);
-        m_motionFileBuffer = QSharedPointer<QBuffer>(new QBuffer());
-        m_motionFileBuffer->open(QIODevice::ReadWrite);
-        m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer.data());
+        int numberOfChannels = m_exportedMediaRes->getVideoLayout()->numberOfChannels();
+        for (int i = 0; i < numberOfChannels; ++i) {
+            m_motionFileBuffer[i] = QSharedPointer<QBuffer>(new QBuffer());
+            m_motionFileBuffer[i]->open(QIODevice::ReadWrite);
+            m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer[i], i);
+        }
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, m_exportedMediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
 
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
@@ -2040,7 +2051,8 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
     disconnect(sender(), NULL, this, NULL);
 
     m_exportedMediaRes.clear();
-    m_motionFileBuffer.clear();
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_motionFileBuffer[i].clear();
     m_exportStorage.clear();
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))

@@ -318,7 +318,7 @@ private:
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;  
-    QSharedPointer<QBuffer> m_motionFileBuffer;
+    QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;
 
 

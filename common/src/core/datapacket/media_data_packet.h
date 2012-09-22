@@ -16,6 +16,7 @@
 #endif
 #include "utils/common/math.h"
 #include "utils/network/socket.h"
+#include "utils/common/util.h"
 
 struct AVCodecContext;
 
@@ -187,8 +188,10 @@ struct QnMetaDataV1Light
     quint8 data[MD_WIDTH*MD_HEIGHT/8];
 };
 #pragma pack(pop)
-bool operator< (const QnMetaDataV1Light& first, const QnMetaDataV1Light& second);
+bool operator< (const QnMetaDataV1Light& data, const qint64 timeMs);
+bool operator< (const qint64 timeMs, const QnMetaDataV1Light& data);
 
+typedef std::vector<QnMetaDataV1Light, AlignmentAllocator<QnMetaDataV1Light> > QnMetaDataLightVector;
 
 struct QnMetaDataV1 : public QnAbstractMediaData
 {

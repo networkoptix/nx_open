@@ -39,7 +39,7 @@ public:
     virtual void setMotionRegion(const QRegion& region);
 
     // Send motion data to client
-    virtual void setSendMotion(bool value);
+    virtual void setSendMotion(bool value) override;
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
 

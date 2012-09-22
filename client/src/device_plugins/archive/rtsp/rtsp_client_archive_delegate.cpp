@@ -37,6 +37,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
+    m_flags |= Flag_CanSendMotion;
 }
 
 void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)

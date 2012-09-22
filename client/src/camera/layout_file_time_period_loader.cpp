@@ -54,31 +54,33 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
     QnMetaDataV1Light startTime;
     QnMetaDataV1Light endTime;
 
-    startTime.startTimeMs = period.startTimeMs;
-    endTime.startTimeMs = period.endTimeMs();
-
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)
         return -1;
-    const QVector<QnMetaDataV1Light>& m_motionData = aviRes->getMotionBuffer();
-    QnTimePeriodList result;
-    if (!m_motionData.isEmpty())
+    QVector<QnTimePeriodList> periods;
+    for (int channel = 0; channel < motionRegions.size(); ++channel)
     {
-        QVector<QnMetaDataV1Light>::const_iterator itrStart = qUpperBound(m_motionData.begin(), m_motionData.end(), startTime);
-        QVector<QnMetaDataV1Light>::const_iterator itrEnd = qUpperBound(itrStart, m_motionData.end(), endTime);
-
-        if (itrStart > m_motionData.begin() && itrStart[-1].endTimeMs() > period.startTimeMs)
-            --itrStart;
-
-        for (const QnMetaDataV1Light* itr = itrStart; itr != itrEnd; ++itr)
+        const QnMetaDataLightVector& m_motionData = aviRes->getMotionBuffer(channel);
+        if (!m_motionData.empty())
         {
-            if (itr->channel <= motionRegions.size() && QnMetaDataV1::mathImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
-                result << QnTimePeriod(itr->startTimeMs, itr->durationMs);
+            periods << QnTimePeriodList();
+            QnMetaDataLightVector::const_iterator itrStart = qUpperBound(m_motionData.begin(), m_motionData.end(), period.startTimeMs);
+            QnMetaDataLightVector::const_iterator itrEnd = qUpperBound(itrStart, m_motionData.end(), period.endTimeMs());
+
+            if (itrStart > m_motionData.begin() && itrStart[-1].endTimeMs() > period.startTimeMs)
+                --itrStart;
+
+            for (QnMetaDataLightVector::const_iterator itr = itrStart; itr != itrEnd; ++itr)
+            {
+                if (itr->channel <= motionRegions.size() && QnMetaDataV1::mathImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
+                    periods.last() << QnTimePeriod(itr->startTimeMs, itr->durationMs);
+            }
         }
-        result = QnTimePeriod::aggregateTimePeriods(result, 1);
-        for (int i = 0; i < masks.size(); ++i)
-            qFreeAligned(masks[i]);
     }
+    QnTimePeriodList result = QnTimePeriod::mergeTimePeriods(periods);
+    for (int i = 0; i < masks.size(); ++i)
+        qFreeAligned(masks[i]);
+
 
     ++m_handle;
     emit delayedReady(result, m_handle);

@@ -48,7 +48,7 @@ public:
     /*
     * Export motion stream to separate file
     */
-    void setMotionIODevice(QIODevice* motionFile);
+    void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
 
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage = QnStorageResourcePtr());
 
@@ -89,7 +89,7 @@ private:
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
-    QIODevice* m_motionFile;
+    QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 #endif //QN_VIDEO_CAMERA_H

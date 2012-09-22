@@ -130,6 +130,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
+    m_flags |= Flag_CanSendMotion;
 }
 
 void QnAviArchiveDelegate::setUseAbsolutePos(bool value)
@@ -597,7 +598,7 @@ QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::getMotionConnection(i
     QnAviResourcePtr aviResource = m_resource.dynamicCast<QnAviResource>();
     if (!aviResource)
         return QnAbstractMotionArchiveConnectionPtr();
-    const QVector<QnMetaDataV1Light>& motionData = aviResource->getMotionBuffer();
+    const QnMetaDataLightVector& motionData = aviResource->getMotionBuffer(channel);
     return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
 }
 

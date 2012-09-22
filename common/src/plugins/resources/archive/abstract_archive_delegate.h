@@ -75,6 +75,7 @@ public:
 
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) { return QnAbstractMotionArchiveConnectionPtr(); }
 
+    virtual void setSendMotion(bool value) {}
 protected:
     Flags m_flags;
 };

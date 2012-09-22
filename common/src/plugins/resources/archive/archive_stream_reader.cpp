@@ -980,6 +980,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
         return m_navDelegate->setSendMotion(value);
     */
 
+    m_delegate->setSendMotion(value);
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
     {
         m_sendMotion = value;

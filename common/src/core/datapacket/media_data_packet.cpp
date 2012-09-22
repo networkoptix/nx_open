@@ -380,9 +380,14 @@ void QnMetaDataV1::deserialize(QIODevice* ioDevice)
 }
 */
 
-bool operator< (const QnMetaDataV1Light& first, const QnMetaDataV1Light& second)
+bool operator< (const QnMetaDataV1Light& data, const qint64 timeMs)
 {
-    return first.startTimeMs < second.startTimeMs;
+    return data.startTimeMs < timeMs;
+}
+
+bool operator< (const qint64 timeMs, const QnMetaDataV1Light& data)
+{
+    return timeMs < data.startTimeMs;
 }
 
 // ----------------------------------- QnCompressedAudioData -----------------------------------------

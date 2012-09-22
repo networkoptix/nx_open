@@ -1,6 +1,7 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
+#include <QBuffer>
 #include <QtGui/QPixmap>
 
 #include <utils/common/cryptographic_hash.h>
@@ -33,7 +34,7 @@ public:
     /*
     * Export motion stream to separate file
     */
-    void setMotionFile(QIODevice* motionFile);
+    void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
 
     void close();
     
@@ -136,7 +137,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
-    QIODevice* m_motionFile;
+    QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 #endif // _STREAM_RECORDER_H__
