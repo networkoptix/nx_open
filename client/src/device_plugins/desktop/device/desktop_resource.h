@@ -1,12 +1,12 @@
-#ifndef __DESKTOP_DEVICE_H
-#define __DESKTOP_DEVICE_H
+#ifndef QN_DESKTOP_RESOURCE_H
+#define QN_DESKTOP_RESOURCE_H
 
 #include "core/resource/resource.h"
 
-class QnDesktopDevice: public QnResource { // TODO: rename to resource
+class QnDesktopResource: public QnResource {
     Q_OBJECT;
 public:
-    QnDesktopDevice(int index);
+    QnDesktopResource(int index);
 
     virtual QString toString() const override;
 
@@ -16,4 +16,4 @@ protected:
     virtual QnAbstractStreamDataProvider *createDataProviderInternal(ConnectionRole role) override;
 };
 
-#endif //__DESKTOP_DEVICE_H
+#endif // QN_DESKTOP_RESOURCE_H
