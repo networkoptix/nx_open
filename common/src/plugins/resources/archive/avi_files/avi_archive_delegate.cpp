@@ -10,6 +10,8 @@
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "utils/media/nalUnits.h"
+#include "avi_resource.h"
+#include "motion/light_motion_archive_connection.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -590,8 +592,20 @@ void QnAviArchiveDelegate::setFastStreamFind(bool value)
     m_fastStreamFind = value;
 }
 
-QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::createMotionConnection(int channel)
+QnAbstractMotionArchiveConnectionPtr QnAviArchiveDelegate::getMotionConnection(int channel)
 {
-    // todo: implement me
-    return QnAbstractMotionArchiveConnectionPtr();
+    QnAviResourcePtr aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (!aviResource)
+        return QnAbstractMotionArchiveConnectionPtr();
+    const QVector<QnMetaDataV1Light>& motionData = aviResource->getMotionBuffer();
+    return QnAbstractMotionArchiveConnectionPtr(new QnLightMotionArchiveConnection(motionData, channel));
 }
+
+/*
+void QnAviArchiveDelegate::setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel)
+{
+    while (m_motionConnections.size() <= channel)
+        m_motionConnections << QnAbstractMotionArchiveConnectionPtr();
+    m_motionConnections[channel] = connection;
+}
+*/

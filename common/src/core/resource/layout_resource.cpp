@@ -210,9 +210,10 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
+        QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
         item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + item.resource.path + QLatin1String(".mkv");
+        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + path + QLatin1String(".mkv");
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
@@ -222,6 +223,24 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         aviResource->setStorage(storage);
         aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+
+
+        QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion_%1.bin")).arg(path), QIODevice::ReadOnly);
+        if (motionIO) {
+            Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+            QVector<QnMetaDataV1Light> motionData;
+            int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+            if (motionDataSize > 0) {
+                motionData.resize(motionDataSize);
+                motionIO->read((char*) &motionData[0], motionIO->size());
+            }
+            delete motionIO;
+            for (int i = 0; i < motionData.size(); ++i)
+                motionData[i].doMarshalling();
+            aviResource->setMotionBuffer(motionData);
+        }
+
+
         qnResPool->addResource(aviResource);
     }
     layout->setItems(updatedItems);

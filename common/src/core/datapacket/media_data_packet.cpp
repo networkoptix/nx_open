@@ -124,6 +124,16 @@ QnMetaDataV1::QnMetaDataV1(int initialValue):
         data.writeFiller(0, data.capacity());
 }
 
+QnMetaDataV1Ptr QnMetaDataV1::fromLightData(const QnMetaDataV1Light& lightData)
+{
+    QnMetaDataV1Ptr result(new QnMetaDataV1());
+    result->timestamp = lightData.startTimeMs*1000;
+    result->m_duration = lightData.durationMs*1000;
+    result->channelNumber = lightData.channel;
+    result->m_input = lightData.input;
+    memcpy(result->data.data(), lightData.data, result->data.size());
+    return result;
+}
 
 inline bool sse4_attribute mathImage_sse41(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd)
 {

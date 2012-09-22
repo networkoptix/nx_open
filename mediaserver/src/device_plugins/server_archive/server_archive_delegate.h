@@ -33,7 +33,7 @@ public:
     virtual void onReverseMode(qint64 displayTime, bool value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
-    virtual QnAbstractMotionArchiveConnectionPtr createMotionConnection(int channel) override;
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
 
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);

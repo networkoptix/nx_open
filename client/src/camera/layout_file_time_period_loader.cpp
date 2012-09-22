@@ -2,18 +2,18 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
-QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks, QnMetaDataV1Light* motionData, int motionDataSize):
+QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks):
     QnAbstractTimePeriodLoader(resource, parent),
     m_chunks(chunks),
-    m_handle(0),
-    m_motionData(motionData), 
-    m_motionDataSize(motionDataSize)
+    m_handle(0)
+    //m_motionData(motionData), 
+    //m_motionDataSize(motionDataSize)
 {
 }
 
 QnLayoutFileTimePeriodLoader::~QnLayoutFileTimePeriodLoader()
 {
-    qFreeAligned(m_motionData);
+    //qFreeAligned(m_motionData);
 }
 
 QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent)
@@ -33,20 +33,7 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
     chunks.decode(chunkDataArray);
     delete chunkData;
 
-    QnMetaDataV1Light* motionData = 0;
-    int motionDataSize = 0;
-    QIODevice* motionIO = storage->open(QString(QLatin1String("motion_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
-    if (motionIO) {
-        Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
-        motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
-        motionData = (QnMetaDataV1Light*) qMallocAligned(motionIO->size(), CL_MEDIA_ALIGNMENT);
-        motionIO->read((char*) motionData, motionIO->size());
-        delete motionIO;
-        for (int i = 0; i < motionDataSize; ++i)
-            motionData[i].doMarshalling();
-    }
-
-    return new QnLayoutFileTimePeriodLoader(resource, parent, chunks, motionData, motionDataSize);
+    return new QnLayoutFileTimePeriodLoader(resource, parent, chunks);
 }
 
 int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
@@ -70,22 +57,28 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
     startTime.startTimeMs = period.startTimeMs;
     endTime.startTimeMs = period.endTimeMs();
 
-    QnMetaDataV1Light* itrStart = qUpperBound(m_motionData, m_motionData + m_motionDataSize, startTime);
-    QnMetaDataV1Light* itrEnd = qUpperBound(itrStart, m_motionData + m_motionDataSize, endTime);
-
-    if (itrStart > m_motionData && itrStart[-1].endTimeMs() > period.startTimeMs)
-        --itrStart;
-
+    QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
+    if (!aviRes)
+        return -1;
+    const QVector<QnMetaDataV1Light>& m_motionData = aviRes->getMotionBuffer();
     QnTimePeriodList result;
-    for (QnMetaDataV1Light* itr = itrStart; itr != itrEnd; ++itr)
+    if (!m_motionData.isEmpty())
     {
-        if (itr->channel <= motionRegions.size() && QnMetaDataV1::mathImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
-            result << QnTimePeriod(itr->startTimeMs, itr->durationMs);
-    }
-    result = QnTimePeriod::aggregateTimePeriods(result, 1);
+        QVector<QnMetaDataV1Light>::const_iterator itrStart = qUpperBound(m_motionData.begin(), m_motionData.end(), startTime);
+        QVector<QnMetaDataV1Light>::const_iterator itrEnd = qUpperBound(itrStart, m_motionData.end(), endTime);
 
-    for (int i = 0; i < masks.size(); ++i)
-        qFreeAligned(masks[i]);
+        if (itrStart > m_motionData.begin() && itrStart[-1].endTimeMs() > period.startTimeMs)
+            --itrStart;
+
+        for (const QnMetaDataV1Light* itr = itrStart; itr != itrEnd; ++itr)
+        {
+            if (itr->channel <= motionRegions.size() && QnMetaDataV1::mathImage((__m128i*) itr->data, (__m128i*) masks[itr->channel]))
+                result << QnTimePeriod(itr->startTimeMs, itr->durationMs);
+        }
+        result = QnTimePeriod::aggregateTimePeriods(result, 1);
+        for (int i = 0; i < masks.size(); ++i)
+            qFreeAligned(masks[i]);
+    }
 
     ++m_handle;
     emit delayedReady(result, m_handle);

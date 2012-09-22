@@ -18,7 +18,7 @@ class QnMetaDataV1Light;
 class QnLayoutFileTimePeriodLoader: public QnAbstractTimePeriodLoader
 {
 public:
-    QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks, QnMetaDataV1Light* motionData, int motionDataSize);
+    QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks);
     virtual ~QnLayoutFileTimePeriodLoader();
     static QnLayoutFileTimePeriodLoader* newInstance(QnResourcePtr resource, QObject *parent = 0);
     virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
@@ -27,8 +27,8 @@ private:
     int loadMotion(const QnTimePeriod &period, const QList<QRegion> &motionRegions);
 private:
     QnTimePeriodList m_chunks;
-    QnMetaDataV1Light* m_motionData;
-    int m_motionDataSize;
+    //QnMetaDataV1Light* m_motionData;
+    //int m_motionDataSize;
     int m_handle;
 };
 

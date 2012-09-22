@@ -194,6 +194,8 @@ struct QnMetaDataV1 : public QnAbstractMediaData
 {
     QnMetaDataV1(int initialValue = 0);
 
+    static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
+
     /** 
     * Merge existing motion image with new motion image. Matrix is allowed col to col 
     * 0   1

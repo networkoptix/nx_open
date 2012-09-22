@@ -2,6 +2,7 @@
 #define QN_AVI_RESOURCE_H
 
 #include "../abstract_archive_resource.h"
+#include <QSharedPointer>
 
 class QnArchiveStreamReader;
 
@@ -23,10 +24,16 @@ public:
 
     void setStorage(QnStorageResourcePtr);
     QnStorageResourcePtr getStorage() const;
+
+    void setMotionBuffer(const QVector<QnMetaDataV1Light>& data);
+    const QVector<QnMetaDataV1Light>& getMotionBuffer() const;
 protected:
 
 private:
     QnStorageResourcePtr m_storage;
+    int m_motionBufferSize;
+    QVector<QnMetaDataV1Light> m_motionBuffer;
+    QVector<QnMetaDataV1Light> m_motion;
 };
 
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;

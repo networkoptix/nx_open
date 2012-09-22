@@ -733,7 +733,7 @@ begin_label:
     {
         int channel = m_currentData->channelNumber;
         if (!m_motionConnection[channel])
-            m_motionConnection[channel] = m_delegate->createMotionConnection(channel);
+            m_motionConnection[channel] = m_delegate->getMotionConnection(channel);
         if (m_motionConnection[channel]) {
             QnMetaDataV1Ptr motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
             if (motion) 

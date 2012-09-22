@@ -40,7 +40,9 @@ public:
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
-    virtual QnAbstractMotionArchiveConnectionPtr createMotionConnection(int channel) override;
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    
+    //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
 protected:
     virtual qint64 packetTimestamp(const AVPacket& packet);
     virtual bool findStreams();
@@ -75,6 +77,8 @@ private:
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
+
+    //QVector<QnAbstractMotionArchiveConnectionPtr> m_motionConnections;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

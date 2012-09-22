@@ -81,3 +81,13 @@ QnStorageResourcePtr QnAviResource::getStorage() const
 {
     return m_storage;
 }
+
+void QnAviResource::setMotionBuffer(const QVector<QnMetaDataV1Light>& data)
+{
+    m_motionBuffer = data;
+}
+
+const QVector<QnMetaDataV1Light>& QnAviResource::getMotionBuffer() const
+{
+    return m_motionBuffer;
+}

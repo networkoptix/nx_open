@@ -314,7 +314,7 @@ begin_label:
     return data;
 }
 
-QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::createMotionConnection(int channel)
+QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnection(int channel)
 {
     return QnMotionHelper::instance()->createConnection(m_resource, channel);
 }
