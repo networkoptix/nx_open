@@ -714,8 +714,7 @@ begin_label:
         {
             if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
-            internalJumpTo(newTime);
-            setSkipFramesToTime(newTime, true);
+            jumpTo(newTime, newTime);
             m_BOF = true;
             goto begin_label;
         }
