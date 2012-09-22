@@ -503,7 +503,7 @@ void QnRtspDataConsumer::doRealtimeDelay(QnAbstractMediaDataPtr media)
     else {
         qint64 timeDiff = media->timestamp - m_lastRtTime;
         if (timeDiff <= MAX_FRAME_DURATION*1000)
-            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION); // if diff too large, it is recording hole. do not calc delay for this case
+            m_adaptiveSleep.terminatedSleep(timeDiff, MAX_FRAME_DURATION*1000); // if diff too large, it is recording hole. do not calc delay for this case
     }
     m_lastRtTime = media->timestamp;
 }
