@@ -29,7 +29,7 @@ private:
     QnTimePeriodList m_chunks;
     //QnMetaDataV1Light* m_motionData;
     //int m_motionDataSize;
-    int m_handle;
+    static int m_handle;
 };
 
 #endif // QN_LAYOUT_FILE_TIME_PERIOD_LOADER_H

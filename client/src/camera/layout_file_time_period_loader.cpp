@@ -2,12 +2,11 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 
+int QnLayoutFileTimePeriodLoader::m_handle = 0;
+
 QnLayoutFileTimePeriodLoader::QnLayoutFileTimePeriodLoader(QnResourcePtr resource, QObject *parent, const QnTimePeriodList& chunks):
     QnAbstractTimePeriodLoader(resource, parent),
-    m_chunks(chunks),
-    m_handle(0)
-    //m_motionData(motionData), 
-    //m_motionDataSize(motionDataSize)
+    m_chunks(chunks)
 {
 }
 
