@@ -8,21 +8,20 @@ QnAppFocusListener::QnAppFocusListener():
     hideLauncher();
 }
 
-QnAppFocusListener::~QnAppFocusListener(){
+QnAppFocusListener::~QnAppFocusListener() {
     restoreLauncher();
 }
 
-void QnAppFocusListener::hideLauncher(){
+void QnAppFocusListener::hideLauncher() {
     x11_hideLauncher();
 }
 
-void QnAppFocusListener::restoreLauncher(){
+void QnAppFocusListener::restoreLauncher() {
     x11_showLauncher();
 }
 
-bool QnAppFocusListener::eventFilter(QObject *obj, QEvent *event){
-#ifdef Q_WS_X11
-    switch (event->type()){
+bool QnAppFocusListener::eventFilter(QObject *obj, QEvent *event) {
+    switch (event->type()) {
     case QEvent::ApplicationActivate:
         hideLauncher();
         break;
@@ -32,6 +31,6 @@ bool QnAppFocusListener::eventFilter(QObject *obj, QEvent *event){
     default:
         break;
     }
-#endif
+
     return QObject::eventFilter(obj, event);
 }

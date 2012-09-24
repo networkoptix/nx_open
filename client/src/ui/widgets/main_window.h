@@ -75,7 +75,6 @@ protected slots:
     void setFullScreen(bool fullScreen);
     void minimize();
 
-    void toggleFullScreen();
     void toggleTitleVisibility();
 
     void updateDecorationsState();

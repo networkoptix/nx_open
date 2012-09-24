@@ -39,6 +39,7 @@
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 #include "ui/events/system_menu_event.h"
+#include "ui/workaround/full_screen_action.h"
 
 #include "file_processor.h"
 #include "utils/settings.h"
@@ -79,7 +80,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -211,7 +212,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(QnFullScreenAction::get(context)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
@@ -308,10 +309,6 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
     }
 }
 
-void QnMainWindow::toggleFullScreen() {
-    setFullScreen(!isFullScreen());
-}
-
 void QnMainWindow::minimize() {
     setWindowState(Qt::WindowMinimized | windowState());
 }
@@ -347,9 +344,9 @@ void QnMainWindow::updateDecorationsState() {
     action(Qn::FullscreenAction)->setChecked(fullScreen);
     action(Qn::MaximizeAction)->setChecked(maximized);
 
-    setTitleVisible(!fullScreen);
-    m_ui->setTitleUsed(fullScreen);
-    m_view->setLineWidth(isFullScreen() ? 0 : 1);
+    setTitleVisible(!(fullScreen || maximized));
+    m_ui->setTitleUsed(fullScreen || maximized);
+    m_view->setLineWidth(fullScreen || maximized ? 0 : 1);
 
     updateDwmState();
 }
@@ -380,9 +377,9 @@ void QnMainWindow::updateDwmState() {
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
-        /* Windowed with aero glass. */
+        /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
-        m_frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -401,9 +398,9 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.bottom()
         );
     } else {
-        /* Windowed without aero glass. */
+        /* Windowed or maximized without aero glass. */
         m_drawCustomFrame = true;
-        m_frameMargins = m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8);
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
 
         if(m_dwm->isSupported()) {
             setAttribute(Qt::WA_NoSystemBackground, false);
@@ -413,6 +410,8 @@ void QnMainWindow::updateDwmState() {
             m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
             m_dwm->disableBlurBehindWindow();
         }
+
+        setContentsMargins(0, 0, 0, 0);
 
         m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
@@ -459,7 +458,7 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        toggleFullScreen();
+        QnFullScreenAction::get(context())->toggle();
         event->accept();
     }
 }

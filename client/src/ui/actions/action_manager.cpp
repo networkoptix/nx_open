@@ -513,7 +513,8 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
-        autoRepeat(false);
+        autoRepeat(false).
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
