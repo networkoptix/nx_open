@@ -1455,14 +1455,16 @@ bool QnWorkbenchUi::event(QEvent *event) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-    bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
+    QAction *fullScreenAction = QnFullScreenAction::get(context());
+
+    bool isFullscreen = fullScreenAction->isChecked();
 
     if(!m_inFreespace)
         m_inFreespace = isFullscreen && !isTreeOpened() && !isTitleOpened() && !isHelpOpened() && !isSliderOpened();
 
     if(!m_inFreespace) {
         if(!isFullscreen)
-            action(Qn::FullscreenAction)->setChecked(true);
+            fullScreenAction->setChecked(true);
         
         setTreeOpened(false, isFullscreen);
         setTitleOpened(false, isFullscreen);
