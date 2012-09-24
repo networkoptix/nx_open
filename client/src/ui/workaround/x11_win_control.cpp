@@ -113,7 +113,9 @@ int x11_showLauncher(){
 int x11_hideLauncher(){
     return setLauncherState(_NET_WM_STATE_ADD);
 }
-#else
+
+#else // Q_WS_X11
+
 int x11_showLauncher(){
     return 1;
 }
@@ -121,4 +123,5 @@ int x11_showLauncher(){
 int x11_hideLauncher(){
     return 1;
 }
-#endif
+
+#endif // Q_WS_X11

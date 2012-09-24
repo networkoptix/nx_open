@@ -59,6 +59,7 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/events/system_menu_event.h>
+#include <ui/workaround/full_screen_action.h>
 
 #include <help/context_help.h>
 
@@ -383,7 +384,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->setSpacing(2);
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    windowButtonsLayout->addItem(newActionButton(QnFullScreenAction::get(context())));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
     m_windowButtonsWidget = new GraphicsWidget();
@@ -446,7 +447,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    QnFullScreenAction::get(context()), SLOT(toggle()));
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
 
 
@@ -1454,14 +1455,16 @@ bool QnWorkbenchUi::event(QEvent *event) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-    bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
+    QAction *fullScreenAction = QnFullScreenAction::get(context());
+
+    bool isFullscreen = fullScreenAction->isChecked();
 
     if(!m_inFreespace)
         m_inFreespace = isFullscreen && !isTreeOpened() && !isTitleOpened() && !isHelpOpened() && !isSliderOpened();
 
     if(!m_inFreespace) {
         if(!isFullscreen)
-            action(Qn::FullscreenAction)->setChecked(true);
+            fullScreenAction->setChecked(true);
         
         setTreeOpened(false, isFullscreen);
         setTitleOpened(false, isFullscreen);
