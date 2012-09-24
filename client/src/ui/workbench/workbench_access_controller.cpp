@@ -123,7 +123,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
     } if(isFileLayout(layout)) {
-        return Qn::ReadPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {

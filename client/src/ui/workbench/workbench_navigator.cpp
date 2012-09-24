@@ -702,7 +702,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
-    bool selectionEditable = workbench()->currentLayout()->resource() && (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
+    bool selectionEditable = workbench()->currentLayout()->resource(); //&& (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
     if(!selectionEditable)
         m_timeSlider->setSelectionValid(false);
