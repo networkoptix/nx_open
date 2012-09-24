@@ -242,7 +242,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     
     if (packet.size > 0)
     {
-        qDebug() << "packet.pts=" << packet.pts;
+        //qDebug() << "packet.pts=" << packet.pts;
 
         if (av_write_frame(m_formatCtx, &packet) < 0) {
             qWarning() << QLatin1String("Transcoder error: can't write AV packet");
