@@ -77,7 +77,8 @@ QnTranscoder::QnTranscoder():
     m_audioCodec(CODEC_ID_NONE),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
-    m_eofCounter(0)
+    m_eofCounter(0),
+    m_packetizedMode(false)
 {
 
 }
@@ -149,6 +150,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
     m_internalBuffer.clear();
+    m_outputPacketSize.clear();
     if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         if (++m_eofCounter >= 3)
@@ -212,5 +214,17 @@ QString QnTranscoder::getLastErrorMessage() const
 int QnTranscoder::writeBuffer(const char* data, int size)
 {
     m_internalBuffer.write(data,size);
+    if (m_packetizedMode)
+        m_outputPacketSize << size;
     return size;
+}
+
+void QnTranscoder::setPacketizedMode(bool value)
+{
+    m_packetizedMode = value;
+}
+
+const QVector<int>& QnTranscoder::getPacketsSize()
+{
+    return m_outputPacketSize;
 }

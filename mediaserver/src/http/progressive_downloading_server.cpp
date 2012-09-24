@@ -120,14 +120,36 @@ QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
 }
 
-QByteArray QnProgressiveDownloadingConsumer::getMimeType(QByteArray streamingFormat)
+QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& streamingFormat)
 {
     if (streamingFormat == "webm")
         return "video/webm";
     else if (streamingFormat == "mpegts")
         return "video/mp2t";
+    else if (streamingFormat == "mp4")
+        return "video/mp4";
+    else if (streamingFormat == "3gp")
+        return "video/3gp";
+    else if (streamingFormat == "rtp")
+        return "video/3gp";
     else 
         return QByteArray();
+}
+
+void QnProgressiveDownloadingConsumer::updateCodecByFormat(const QByteArray& streamingFormat)
+{
+    Q_D(QnProgressiveDownloadingConsumer);
+
+    if (streamingFormat == "webm")
+        d->videoCodec = CODEC_ID_VP8;
+    else if (streamingFormat == "mpegts")
+        d->videoCodec = CODEC_ID_MPEG2VIDEO;
+    else if (streamingFormat == "mp4")
+        d->videoCodec = CODEC_ID_MPEG4;
+    else if (streamingFormat == "3gp")
+        d->videoCodec = CODEC_ID_MPEG4;
+    else if (streamingFormat == "rtp")
+        d->videoCodec = CODEC_ID_MPEG4;
 }
 
 void QnProgressiveDownloadingConsumer::run()
@@ -156,6 +178,7 @@ void QnProgressiveDownloadingConsumer::run()
             sendResponse("HTTP", CODE_NOT_FOUND, "text/plain");
             return;
         }
+        updateCodecByFormat(d->streamingFormat);
 
         QSize videoSize(640,480);
         QByteArray resolutionStr = getDecodedUrl().queryItemValue("resolution").toLocal8Bit().toLower();
@@ -316,6 +339,8 @@ int QnProgressiveDownloadingConsumer::getVideoStreamResolution() const
     if (d->streamingFormat == "webm")
         return 1000;
     else if (d->streamingFormat == "mpegts")
+        return 90000;
+    else if (d->streamingFormat == "mp4")
         return 90000;
     else 
         return 60;

@@ -622,8 +622,18 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
         m_sendBuffer.clear();
 
-        buildRtspTcpHeader(rtpTcpChannel, codecEncoder->getSSRC(), 0, codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence); 
-        m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        if (codecEncoder->isRtpHeaderExists()) {
+            m_sendBuffer.write((quint8) '$');
+            m_sendBuffer.write((quint8) rtpTcpChannel);
+            m_sendBuffer.write((quint8) 0);
+            m_sendBuffer.write((quint8) 0);
+        }
+        else {
+            buildRtspTcpHeader(rtpTcpChannel, codecEncoder->getSSRC(), 0, codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence); 
+            m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        }
+        RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
+
         dataExists = codecEncoder->getNextPacket(m_sendBuffer);
         //Q_ASSERT(rtpTcpChannel == 0);
         if (dataExists) 

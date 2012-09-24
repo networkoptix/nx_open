@@ -31,6 +31,8 @@
 #include "device_plugins/server_archive/thumbnails_stream_reader.h"
 #include "rtsp_encoder.h"
 #include "rtsp_h264_encoder.h"
+#include "rtsp_ffmpeg_encoder.h"
+#include "rtp_ffmpeg_encoder.h"
 
 class QnTcpListener;
 
@@ -365,8 +367,35 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     Q_D(QnRtspConnectionProcessor);
     switch (media->compressionType)
     {
+        //case CODEC_ID_H264:
+        //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_H263:
+        case CODEC_ID_H263P:
         case CODEC_ID_H264:
-            return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_MPEG1VIDEO:
+        case CODEC_ID_MPEG2VIDEO:
+        case CODEC_ID_MPEG4:
+        case CODEC_ID_AAC:
+        case CODEC_ID_MP2:
+        case CODEC_ID_MP3:
+        case CODEC_ID_PCM_ALAW:
+        case CODEC_ID_PCM_MULAW:
+        case CODEC_ID_PCM_S8:
+        case CODEC_ID_PCM_S16BE:
+        case CODEC_ID_PCM_S16LE:
+        case CODEC_ID_PCM_U16BE:
+        case CODEC_ID_PCM_U16LE:
+        case CODEC_ID_PCM_U8:
+        case CODEC_ID_MPEG2TS:
+        case CODEC_ID_AMR_NB:
+        case CODEC_ID_AMR_WB:
+        case CODEC_ID_VORBIS:
+        case CODEC_ID_THEORA:
+        case CODEC_ID_VP8:
+        case CODEC_ID_ADPCM_G722:
+        case CODEC_ID_ADPCM_G726:
+            return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media, CODEC_ID_MPEG4)); // transcode src codec to MPEG4
+            //return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media)); // no transcode
         default:
             return QnRtspEncoderPtr();
     }
@@ -475,8 +504,10 @@ int QnRtspConnectionProcessor::composeDescribe()
 
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
-        sdp << encoder->getAdditionSDP();
+        QByteArray additionSDP = encoder->getAdditionSDP();
+        if (!additionSDP.contains("a=rtpmap:"))
+            sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
+        sdp << additionSDP;
     }
 
     if (d->liveMode != Mode_ThumbNails)

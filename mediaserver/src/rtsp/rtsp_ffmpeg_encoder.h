@@ -23,6 +23,8 @@ public:
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
+
+    virtual bool isRtpHeaderExists() const override { return false; }
 private:
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:

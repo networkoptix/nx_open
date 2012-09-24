@@ -63,6 +63,8 @@ public:
      */
     unsigned int write(const char *data, unsigned int size);
 
+    unsigned int write(quint8 value);
+
     /**
      * Write to buffer without any checks. Buffer MUST be preallocated before that call
      * \param data                      Pointer to the data to append to this array
