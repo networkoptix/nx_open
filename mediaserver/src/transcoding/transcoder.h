@@ -25,7 +25,7 @@ public:
     * Function may be not implemented in derived classes and return NULL
     * In this case, all necessary information MUST be present in bitstream. For example, SPS/PPS blocks for H.264
     */
-    virtual AVCodecContext* getCodecContext();
+    //virtual AVCodecContext* getCodecContext();
 
     //!Set codec-specific params for output stream. For list of supported params please refer to derived class' doc
     virtual void setParams(const Params& params);

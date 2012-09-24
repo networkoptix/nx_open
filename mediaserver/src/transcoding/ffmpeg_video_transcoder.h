@@ -13,6 +13,7 @@ public:
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
     virtual void open(QnCompressedVideoDataPtr video) override;
+    AVCodecContext* getCodecContext();
 private:
     int rescaleFrame();
 private:
@@ -26,5 +27,7 @@ private:
     int m_lastSrcWidth;
     int m_lastSrcHeight;
 };
+
+typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
 
 #endif // __FFMPEG_VIDEO_TRANSCODER_H__

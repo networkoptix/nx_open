@@ -18,8 +18,8 @@ public:
 
     int setContainer(const QString& value);
 
-    AVCodecContext* getVideoCodecContext() const { return m_videoEncoderCodecCtx; }
-    AVCodecContext* getAudioCodecContext() const { return m_videoEncoderCodecCtx; }
+    AVCodecContext* getVideoCodecContext() const;
+    AVCodecContext* getAudioCodecContext() const;
     AVFormatContext* getFormatContext() const { return m_formatCtx; }
 
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;

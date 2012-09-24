@@ -26,10 +26,12 @@ int QnCodecTranscoder::getBitrate() const
     return m_bitrate;
 }
 
+/*
 AVCodecContext* QnCodecTranscoder::getCodecContext()
 {
     return 0;
 }
+*/
 
 QString QnCodecTranscoder::getLastError() const
 {

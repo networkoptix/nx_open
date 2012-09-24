@@ -1,5 +1,6 @@
 #include "ffmpeg_transcoder.h"
 #include <QDebug>
+#include "ffmpeg_video_transcoder.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024*16;
@@ -135,8 +136,9 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         {
             m_vTranscoder->open(video);
 
-            if (m_vTranscoder->getCodecContext()) {
-                avcodec_copy_context(m_videoEncoderCodecCtx, m_vTranscoder->getCodecContext());
+            QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
+            if (ffmpegVideoTranscoder->getCodecContext()) {
+                avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -264,4 +266,20 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         }
     }
     return 0;
+}
+
+AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const 
+{ 
+    /*
+    QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
+    if (ffmpegVideoTranscoder)
+        return ffmpegVideoTranscoder->getCodecContext();
+    else
+    */
+        return m_videoEncoderCodecCtx; 
+}
+
+AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const 
+{ 
+    return m_videoEncoderCodecCtx; 
 }
