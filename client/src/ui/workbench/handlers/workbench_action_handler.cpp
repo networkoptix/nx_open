@@ -1168,6 +1168,9 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
+    QnConnectionDataList connections = qnSettings->customConnections();
+    if (connections.reorderByUrl(connectionData.url))
+        qnSettings->setCustomConnections(connections);
     //updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
