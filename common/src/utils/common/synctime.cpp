@@ -61,8 +61,9 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000*10)
         {
             m_lastWarnTime = localTime;
-            qWarning() << "Local time differs from server! local time=" << QDateTime::fromMSecsSinceEpoch(localTime).toString() <<
-                          "server time=" << QDateTime::fromMSecsSinceEpoch(time).toString();
+            if (m_lastWarnTime == 0)
+                qWarning() << "Local time differs from enterprise controller! local time=" << QDateTime::fromMSecsSinceEpoch(localTime).toString() <<
+                            "EC time=" << QDateTime::fromMSecsSinceEpoch(time).toString();
         }
         return time;
     }

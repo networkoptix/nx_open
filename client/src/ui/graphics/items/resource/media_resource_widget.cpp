@@ -578,7 +578,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
         if(
             /*version >= 103010 && */
             (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) && 
-            accessController()->hasPermissions(m_resource, Qn::GlobalEditCamerasPermission) 
+            accessController()->hasPermissions(m_resource, Qn::WritePermission) 
         ) {
             result |= PtzButton;
 

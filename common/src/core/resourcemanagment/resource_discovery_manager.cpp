@@ -12,6 +12,7 @@
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
 
+static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 
 namespace {
     class QnResourceDiscoveryManagerInstance: public QnResourceDiscoveryManager {};
@@ -47,6 +48,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager():
 
 {
     connect(QnResourcePool::instance(), SIGNAL(resourceRemoved(const QnResourcePtr&)), this, SLOT(at_resourceDeleted(const QnResourcePtr&)), Qt::DirectConnection);
+    netStateTime.restart();
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
@@ -289,7 +291,11 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 {
     QMutexLocker lock(&m_discoveryMutex);
 
-    CLNetState netState;
+    if (netStateTime.elapsed() > NETSTATE_UPDATE_TIME) {
+        netState.updateNetState();
+        netStateTime.restart();
+    }
+    
 
     QSet<QString> discoveredResources;
 

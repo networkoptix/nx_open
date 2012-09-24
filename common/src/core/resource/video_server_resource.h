@@ -59,6 +59,9 @@ public:
 
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(ConnectionRole role);
 
+    QString getProxyHost() const;
+    int getProxyPort() const;
+
 signals:
     void serverIFFound(const QString &);
     void panicModeChanged(const QnVideoServerResourcePtr &resource);

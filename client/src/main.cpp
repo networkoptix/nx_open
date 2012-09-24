@@ -4,6 +4,10 @@
 #   include <vld.h>
 #endif
 
+#ifdef Q_OS_LINUX
+#   include <unistd.h>
+#endif
+
 #include "version.h"
 #include "ui/widgets/main_window.h"
 #include "utils/settings.h"
@@ -217,7 +221,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 #ifndef API_TEST_MAIN
 
-int main(int argc, char *argv[])
+int qnMain(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
 
@@ -484,6 +488,19 @@ int main(int argc, char *argv[])
 
     return result;
 }
+
+int main(int argc, char *argv[]) {
+    // TODO: this is an ugly hack for a problem with threads not being stopped before globals are destroyed.
+
+    int result = qnMain(argc, argv);
+#if defined(Q_OS_WIN)
+    Sleep(3000);
+#elif defined(Q_OS_LINUX)
+    sleep(3);
+#endif
+    return result;
+}
+
 #endif // API_TEST_MAIN
 #endif
 

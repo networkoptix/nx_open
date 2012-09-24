@@ -11,9 +11,6 @@
 #include <api/serializer/serializer.h>
 #include <api/video_server_statistics_data.h>
 
-QString QnVideoServerConnection::m_proxyAddr;
-int QnVideoServerConnection::m_proxyPort = 0;
-
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
@@ -27,9 +24,14 @@ public:
     {
     }
 
-    void addToProxyList(const QUrl& url)
+    void removeFromProxyList(const QUrl& url)
     {
-        m_proxyInfo.insert(url);
+        m_proxyInfo.remove(url);
+    }
+
+    void addToProxyList(const QUrl& url, const QString& addr, int port)
+    {
+        m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
@@ -43,7 +45,7 @@ protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query = QNetworkProxyQuery()) override
     {
         QList<QNetworkProxy> rez;
-        if (QnVideoServerConnection::getProxyPort() == 0 || query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
+        if (query.url().path().isEmpty() || query.url().path() == QLatin1String("api/ping/")) {
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
             return rez;
         }
@@ -52,16 +54,22 @@ protected:
         url.setPath(QString());
         url.setUserInfo(QString());
         url.setQueryItems(QList<QPair<QString, QString> >());
-        QSet<QUrl>::const_iterator itr = m_proxyInfo.find(url);
+        QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
         else 
-            rez << QNetworkProxy(QNetworkProxy::HttpProxy, QnVideoServerConnection::getProxyHost(), QnVideoServerConnection::getProxyPort());
+            rez << QNetworkProxy(QNetworkProxy::HttpProxy, itr.value().addr, itr.value().port);
         return rez;
     }
 
 private:
-    QSet<QUrl> m_proxyInfo;
+    struct ProxyInfo {
+        ProxyInfo(): port(0) {}
+        ProxyInfo(const QString& _addr, int _port): addr(_addr), port(_port) {}
+        QString addr;
+        int port;
+    };
+    QMap<QUrl, ProxyInfo> m_proxyInfo;
 };
 
 Q_GLOBAL_STATIC(QnNetworkProxyFactory, qn_reserveProxyFactory);
@@ -216,9 +224,9 @@ namespace detail
 
 QnVideoServerConnection::QnVideoServerConnection(const QUrl &url, QObject *parent):
     QObject(parent),
-    m_url(url)
+    m_url(url),
+    m_proxyPort(0)
 {
-    QnNetworkProxyFactory::instance()->addToProxyList(m_url);
 }
 
 QnVideoServerConnection::~QnVideoServerConnection() {}
@@ -483,20 +491,10 @@ void QnVideoServerConnection::setProxyAddr(const QString& addr, int port)
 {
     m_proxyAddr = addr;
     m_proxyPort = port;
-    //QnNetworkProxyFactory::instance()->clearProxyList();
-
-    /*
-    QNetworkProxy proxy;
-    proxy.setType(port ? QNetworkProxy::HttpProxy : QNetworkProxy::NoProxy);
-    proxy.setHostName(addr);
-    proxy.setPort(port);
-    proxy.setApplicationProxy(proxy);
-    */
-
-    //proxy.setUser("username");
-    //proxy.setPassword("password");
-
-    //QNetworkProxyQuery proxyQuery("http://?/RecordedTimePeriods")
+    if (port)
+        QnNetworkProxyFactory::instance()->addToProxyList(m_url, addr, port);
+    else
+        QnNetworkProxyFactory::instance()->removeFromProxyList(m_url);
 }
 
 void detail::VideoServerSessionManagerStatisticsRequestReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &, int) {
