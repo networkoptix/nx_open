@@ -1,14 +1,14 @@
 #include "main_window.h"
 
-#include <QApplication>
-#include <QBoxLayout>
-#include <QFileDialog>
-#include <QToolButton>
-#include <QMenu>
-#include <QMessageBox>
-#include <QFile>
-#include <QNetworkReply>
-#include <QFileOpenEvent>
+#include <QtCore/QFile>
+#include <QtGui/QApplication>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QFileDialog>
+#include <QtGui/QToolButton>
+#include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
+#include <QtGui/QFileOpenEvent>
+#include <QtNetwork/QNetworkReply>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
@@ -173,6 +173,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DecrementDebugCounterAction));
     addAction(action(Qn::TogglePanicModeAction));
 
+    connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
@@ -285,13 +286,24 @@ void QnMainWindow::setWindowButtonsVisible(bool visible) {
     }
 }
 
+void QnMainWindow::setMaximized(bool maximized) {
+    if(maximized == isMaximized())
+        return;
+
+    if(maximized) {
+        showMaximized();
+    } else if(isMaximized()) {
+        showNormal();
+    }
+}
+
 void QnMainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
 
     if(fullScreen) {
         showFullScreen();
-    } else {
+    } else if(isFullScreen()) {
         showNormal();
     }
 }
@@ -328,10 +340,12 @@ void QnMainWindow::setOptions(Options options) {
     m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
-void QnMainWindow::updateFullScreenState() {
+void QnMainWindow::updateDecorationsState() {
     bool fullScreen = isFullScreen();
+    bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
+    action(Qn::MaximizeAction)->setChecked(maximized);
 
     setTitleVisible(!fullScreen);
     m_ui->setTitleUsed(fullScreen);
@@ -341,20 +355,6 @@ void QnMainWindow::updateFullScreenState() {
 }
 
 void QnMainWindow::updateDwmState() {
-#if 0
-    if(!m_dwm->isSupported()) {
-        /* Non-windows systems where DWM is not supported. */
-
-        m_drawCustomFrame = false;
-
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
-
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else */
-#endif
-        
     if(isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
@@ -445,7 +445,6 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
 
@@ -467,7 +466,7 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 
 void QnMainWindow::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange)
-        updateFullScreenState();
+        updateDecorationsState();
 
     base_type::changeEvent(event);
 }
@@ -540,24 +539,6 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-void QnMainWindow::at_sessionManager_error(int error) {
-    switch (error) {
-    case QNetworkReply::ConnectionRefusedError:
-    case QNetworkReply::HostNotFoundError:
-    case QNetworkReply::TimeoutError: // ### remove ?
-    case QNetworkReply::ContentAccessDenied:
-    case QNetworkReply::AuthenticationRequiredError:
-    case QNetworkReply::UnknownNetworkError:
-        // Do not show popup box! It's annoying!
-        // Show something like color label in the main window.
-        // showAuthenticationDialog();
-        break;
-
-    default:
-        break;
-    }
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

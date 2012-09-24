@@ -71,17 +71,17 @@ protected:
 protected slots:
     void setTitleVisible(bool visible);
     void setWindowButtonsVisible(bool visible);
+    void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
     void minimize();
 
     void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void updateFullScreenState();
+    void updateDecorationsState();
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
-    void at_sessionManager_error(int error);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
 private:

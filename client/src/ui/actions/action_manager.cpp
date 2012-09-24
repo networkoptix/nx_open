@@ -511,7 +511,9 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::MaximizeAction).
         flags(Qn::NoTarget).
-        text(tr("Maximize"));
+        text(tr("Maximize")).
+        toggledText(tr("Restore Down")).
+        autoRepeat(false);
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).

@@ -298,7 +298,7 @@ QMargins QnDwm::themeFrameMargins() const {
 
 #ifdef Q_OS_WIN
     int frameX, frameY;
-    if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
+    if(d->widget->windowFlags() & Qt::FramelessWindowHint) {
         frameX = 0;
         frameY = 0;
     } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
