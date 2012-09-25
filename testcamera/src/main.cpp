@@ -4,6 +4,7 @@
 #include <QDir>
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
+#include "utils/common/module_resources.h"
 
 QString doUnquote(const QString& fileName)
 {
@@ -25,6 +26,8 @@ void ffmpegInit()
 
 int main(int argc, char *argv[])
 {
+    QN_INIT_MODULE_RESOURCES(common);
+
     QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
