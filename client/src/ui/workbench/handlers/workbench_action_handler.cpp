@@ -2024,8 +2024,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             {
                 m_motionFileBuffer[i]->close();
                 
-                QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(m_exportedMediaRes->getUniqueId());
-                //QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".bin"));
+                QString uniqId = m_exportedMediaRes->getUniqueId();
+                uniqId = uniqId.mid(uniqId.indexOf(QLatin1String("?"))+1); // simplify name if export from existing layout
+                QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
                 device->write(m_motionFileBuffer[i]->buffer());
                 device->close();
@@ -2060,7 +2061,10 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             m_motionFileBuffer[i]->open(QIODevice::ReadWrite);
             m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer[i], i);
         }
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, m_exportedMediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
+
+        QString uniqId = m_exportedMediaRes->getUniqueId();
+        uniqId = uniqId.mid(uniqId.indexOf(QLatin1String("?"))+1); // simplify name if export from existing layout
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));
