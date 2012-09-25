@@ -211,28 +211,27 @@ public:
         m_lastAction = parent;
     }
 
-    void enterSubMenu() {
+    void beginSubMenu() {
         m_actionStack.push_back(m_lastAction);
     }
 
-    void leaveSubMenu() {
+    void endSubMenu() {
         m_actionStack.pop_back();
     }
 
-    void beginGroup(){
+    void beginGroup() {
         m_currentGroup = new QActionGroup(m_manager);
     }
 
-    void endGroup(){
+    void endGroup() {
         m_currentGroup = NULL;
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
-        QnAction *action = m_manager->m_actionById.value(id);
+        QnAction *action = m_manager->action(id);
         if(action == NULL) {
             action = new QnAction(id, m_manager);
-            m_manager->m_actionById[id] = action;
-            m_manager->m_idByAction[action] = id;
+            m_manager->addAction(action);
         }
 
         m_actionStack.back()->addChild(action);
@@ -403,7 +402,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::TabBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory(Qn::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredPermissions(Qn::CreateLayoutPermission).
@@ -431,13 +430,13 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User..."));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Main | Qn::Scene).
         text(tr("Open..."));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
@@ -456,7 +455,7 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -707,7 +706,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
          text(tr("Rotate to..."));
 
-    factory.enterSubMenu();{
+    factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("0 degrees"));
@@ -723,7 +722,7 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::Rotate270Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("270 degrees"));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -807,7 +806,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Cell Aspect Ratio"));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory.beginGroup();
 
         factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
@@ -824,13 +823,13 @@ QnActionManager::QnActionManager(QObject *parent):
             checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
 
         factory.endGroup();
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Cell Spacing"));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory.beginGroup();
 
         factory(Qn::SetCurrentLayoutItemSpacing0Action).
@@ -859,7 +858,7 @@ QnActionManager::QnActionManager(QObject *parent):
             checkable();
         factory.endGroup();
 
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget).
@@ -1003,7 +1002,7 @@ QnActionManager::QnActionManager(QObject *parent):
 }
 
 QnActionManager::~QnActionManager() {
-    qDeleteAll(m_actionById);
+    qDeleteAll(m_idByAction.keys());
 }
 
 void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {
@@ -1013,12 +1012,46 @@ void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) 
         m_targetProviderGuard = this;
 }
 
-QAction *QnActionManager::action(Qn::ActionId id) const {
+void QnActionManager::addAction(QnAction *action) {
+    if(!action) {
+        qnNullWarning(action);
+        return;
+    }
+
+    if(m_idByAction.contains(action))
+        return; /* Re-registration is allowed. */
+
+    if(m_actionById.contains(action->id())) {
+        qnWarning("Action with id '%1' is already registered with this action manager.", action->id());
+        return;
+    }
+
+    m_actionById[action->id()] = action;
+    m_idByAction[action] = action->id();
+}
+
+void QnActionManager::addAlias(Qn::ActionId id, Qn::ActionId targetId) {
+    QnAction *action = this->action(id);
+    if(action && action->id() != targetId) {
+        qnWarning("Id '%1' is already taken by action '%2'.", id, action->text());
+        return;
+    }
+
+    QnAction *targetAction = this->action(targetId);
+    if(!targetAction) {
+        qnWarning("Action with id '%1' is not registered with this action manager.", targetId);
+        return;
+    }
+
+    m_actionById[id] = targetAction;
+}
+
+QnAction *QnActionManager::action(Qn::ActionId id) const {
     return m_actionById.value(id, NULL);
 }
 
 QList<QnAction *> QnActionManager::actions() const {
-    return m_actionById.values();
+    return m_idByAction.keys();
 }
 
 bool QnActionManager::canTrigger(Qn::ActionId id, const QnActionParameters &parameters) {

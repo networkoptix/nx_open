@@ -1,8 +1,10 @@
 #include "workbench_context_aware.h"
-#include <QObject>
+
+#include <QtCore/QObject>
+
 #include <utils/common/warnings.h>
 #include <core/resource_managment/resource_pool.h>
-#include <ui/actions/action_manager.h>
+
 #include "workbench_context.h"
 
 Q_GLOBAL_STATIC_WITH_ARGS(QnWorkbenchContext, qn_staticContext, (qnResPool))
@@ -40,7 +42,7 @@ QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context): m
 }
 
 QAction *QnWorkbenchContextAware::action(const Qn::ActionId id) const {
-    return menu()->action(id);
+    return context()->action(id);
 }
 
 QnActionManager *QnWorkbenchContextAware::menu() const {
