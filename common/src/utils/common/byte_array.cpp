@@ -73,6 +73,20 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
     return size;
 }
 
+unsigned int QnByteArray::write(quint8 value)
+{
+    if( !m_ownBuffer )
+        reallocate( m_capacity );
+
+    reserve(m_size + 1);
+
+    qMemCopy(m_data + m_size, &value, 1);
+
+    m_size += 1;
+
+    return 1;
+}
+
 unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 {
     if( !m_ownBuffer )

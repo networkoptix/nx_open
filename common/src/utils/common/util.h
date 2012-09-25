@@ -1,7 +1,10 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include <QString>
+#include "config.h"
+
+#include <QtCore/QString>
+
 #include "math.h" /* For INT64_MAX. */
 
 template <typename T, size_t N>
@@ -92,39 +95,41 @@ public:
     typedef const T & const_reference;
 
 public:
-    inline AlignmentAllocator () throw () { }
+    inline AlignmentAllocator() noexcept {}
 
     template <typename T2>
-    inline AlignmentAllocator (const AlignmentAllocator<T2, N> &) throw () { }
+    inline AlignmentAllocator(const AlignmentAllocator<T2, N> &) noexcept {}
 
-    inline ~AlignmentAllocator () throw () { }
+    inline ~AlignmentAllocator() noexcept {}
 
-    inline pointer adress (reference r) {
+    inline pointer address(reference r) {
         return &r;
     }
 
-    inline const_pointer adress (const_reference r) const {
+    inline const_pointer address(const_reference r) const {
         return &r;
     }
 
-    inline pointer allocate (size_type n) {
-        return (pointer)qMallocAligned(n*sizeof(value_type), N);
+    inline pointer allocate(size_type n) {
+        return (pointer) qMallocAligned(n * sizeof(value_type), N);
     }
 
-    inline void deallocate (pointer p, size_type) {
-        qFreeAligned (p);
+    inline void deallocate(pointer p, size_type) {
+        qFreeAligned(p);
     }
 
-    inline void construct (pointer p, const value_type & wert) {
-        new (p) value_type (wert);
+    inline void construct(pointer p, const value_type &wert) {
+        new (p) value_type(wert);
     }
 
-    inline void destroy (pointer p) {
-        p->~value_type ();
+    inline void destroy(pointer p) {
+        (void) p; /* Silence MSVC unused variable warnings. */
+
+        p->~value_type();
     }
 
-    inline size_type max_size () const throw () {
-        return size_type (-1) / sizeof (value_type);
+    inline size_type max_size() const noexcept {
+        return size_type(-1) / sizeof(value_type);
     }
 
     template <typename T2>
@@ -132,7 +137,7 @@ public:
         typedef AlignmentAllocator<T2, N> other;
     };
 
-    bool operator!=(const AlignmentAllocator<T,N>& other) const  {
+    bool operator!=(const AlignmentAllocator<T, N> &other) const  {
         return !(*this == other);
     }
 

@@ -308,9 +308,13 @@ void LoginDialog::at_saveButton_clicked() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     bool ok = false;
-    QString defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    if (connections.contains(defaultName))
-        defaultName = connections.generateUniqueName(defaultName);
+
+    QString defaultName(ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex()));
+    if (defaultName == QnConnectionDataList::defaultLastUsedName()){
+        defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+        if (connections.contains(defaultName))
+            defaultName = connections.generateUniqueName(defaultName);
+    }
     QString name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, defaultName, &ok);
     if (!ok)
         return;
@@ -327,6 +331,7 @@ void LoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
+    connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 

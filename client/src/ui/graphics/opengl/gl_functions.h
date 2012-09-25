@@ -13,7 +13,8 @@ public:
         ArbPrograms = 0x1,          /**< Supports ARB shader programs. */
         OpenGL1_3 = 0x2,            /**< Implements OpenGL1.3 spec. */
         ShadersBroken = 0x4,        /**< Vendor has messed something up, and shaders are not supported. */
-        OpenGLBroken = 0x8          /**< Vendor has messed something up, and videodriver dies using OpenGL. */
+        OpenGLBroken = 0x8,          /**< Vendor has messed something up, and videodriver dies using OpenGL. */
+        NoOpenGLFullScreen = 0x16   /**< There are some arthefacts in fullscreen mode **/
     };
     Q_DECLARE_FLAGS(Features, Feature);
 

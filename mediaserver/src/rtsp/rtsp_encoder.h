@@ -39,6 +39,11 @@ public:
     virtual quint8 getPayloadtype() = 0;
     virtual QString getName() = 0;
 
+    /*
+    * Return true if codec can produce RTP header
+    */
+    virtual bool isRtpHeaderExists() const = 0;
+
 protected:
     QnAbstractMediaDataPtr m_sdpMediaPacket;
 };

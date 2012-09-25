@@ -51,6 +51,19 @@ bool QnConnectionDataList::removeOne(const QString &name){
     return false;
 }
 
+bool QnConnectionDataList::reorderByUrl(const QUrl &url){
+    QUrl clean_url(url);
+    clean_url.setPassword(QString());
+    foreach(QnConnectionData data, *this){
+        if (data.url != clean_url)
+            continue;
+        QList::removeOne(data);
+        QList::prepend(data);
+        return true;
+    }
+    return false;
+}
+
 QString QnConnectionDataList::generateUniqueName(const QString &base){
     int counter = 0;
     QString uniqueName;
@@ -61,6 +74,9 @@ QString QnConnectionDataList::generateUniqueName(const QString &base){
     return uniqueName;
 }
 
+QString QnConnectionDataList::defaultLastUsedName(){
+    return QObject::tr("* Last used connection *");
+}
 
 
 Q_GLOBAL_STATIC(QnSettings, qn_settings)

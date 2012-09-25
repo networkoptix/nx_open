@@ -1,5 +1,6 @@
 #include "ffmpeg_transcoder.h"
 #include <QDebug>
+#include "ffmpeg_video_transcoder.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024*16;
@@ -99,6 +100,9 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
         qWarning() << m_lastErrMessage;
         return -2;
     }
+    if (container == QLatin1String("rtp"))
+        m_formatCtx->packet_size = MTU_SIZE;
+
 
     return 0;
 }
@@ -132,8 +136,9 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         {
             m_vTranscoder->open(video);
 
-            if (m_vTranscoder->getCodecContext()) {
-                avcodec_copy_context(m_videoEncoderCodecCtx, m_vTranscoder->getCodecContext());
+            QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
+            if (ffmpegVideoTranscoder->getCodecContext()) {
+                avcodec_copy_context(m_videoEncoderCodecCtx, ffmpegVideoTranscoder->getCodecContext());
             }
             else {
                 m_videoEncoderCodecCtx->width = m_vTranscoder->getResolution().width();
@@ -143,20 +148,30 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         }
         else 
         {
+            int videoWidth = video->width;
+            int videoHeight = video->height;
             if (!video || video->width < 1 || video->height < 1)
             {
-                m_lastErrMessage = tr("Transcoder error: for direct stream copy video frame size must exists");
-                return -3;
+                CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+                CLVideoDecoderOutput decodedVideoFrame;
+                decoder.decode(video, &decodedVideoFrame);
+                videoWidth = decoder.getWidth();
+                videoHeight = decoder.getHeight();
+                if (videoWidth < 1 || videoHeight < 1)
+                {
+                    m_lastErrMessage = tr("Transcoder error: for direct stream copy video frame size must exists");
+                    return -3;
+                }
             }
 
-            if (video->context->ctx()) {
+            if (video->context && video->context->ctx()) {
                 avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
             }
             else {
-                m_videoEncoderCodecCtx->width = video->width;
-                m_videoEncoderCodecCtx->height = video->height;
+                m_videoEncoderCodecCtx->width = videoWidth;
+                m_videoEncoderCodecCtx->height = videoHeight;
             }
-            m_videoEncoderCodecCtx->bit_rate = video->width * video->height; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
+            m_videoEncoderCodecCtx->bit_rate = videoWidth * videoHeight; // auto fill bitrate. 2Mbit for full HD, 1Mbit for 720x768
         }
         m_videoEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         m_videoEncoderCodecCtx->time_base.num = 1;
@@ -192,6 +207,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         cl_log.log(m_lastErrMessage, cl_logERROR);
         return -3;
     }
+    m_initialized = true;
     return 0;
 }
 
@@ -250,4 +266,20 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         }
     }
     return 0;
+}
+
+AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const 
+{ 
+    /*
+    QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
+    if (ffmpegVideoTranscoder)
+        return ffmpegVideoTranscoder->getCodecContext();
+    else
+    */
+        return m_videoEncoderCodecCtx; 
+}
+
+AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const 
+{ 
+    return m_videoEncoderCodecCtx; 
 }

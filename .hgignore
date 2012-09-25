@@ -43,6 +43,7 @@ appserver/entcontroller.conf
 appserver/setup/build
 appserver/version_maven.py
 
+client/bin
 client/build
 client/src/Info.plist
 client/src/client.pro
@@ -67,7 +68,10 @@ client/contrib/qtcolorpicker/examples/draw/debug
 client/contrib/qtcolorpicker/examples/simple/Makefile*
 client/contrib/qtcolorpicker/examples/simple/debug
 client/contrib/qtcolorpicker/lib/*.ilk
+client/src/*.vsp
 
+common/bin
+common/build
 common/src/common.pro
 common/src/plugins/resources/archive/filetypes.h
 common/src/Makefile
@@ -90,13 +94,18 @@ debsetup/appserver-deb/package
 debsetup/appserver-deb/x86
 debsetup/appserver-deb/x64
 
+mediaserver/bin
+mediaserver/build
 mediaserver/src/server.pro
 mediaserver/src/version.h
+mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
 mediaserver/x86
 mediaserver/x64
 
+mediaproxy/bin
+mediaproxy/build
 mediaproxy/src/version.h
 mediaproxy/src/mediaproxy.vcproj
 mediaproxy/src/mediaproxy.pro
@@ -104,6 +113,8 @@ mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
 
+testcamera/bin
+testcamera/build
 testcamera/src/version.h
 testcamera/src/testCamera.pro
 testcamera/src/testCamera.vcproj

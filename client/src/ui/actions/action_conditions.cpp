@@ -271,7 +271,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
-    if(!context()->workbench()->item(Qn::CentralRole))
+    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
