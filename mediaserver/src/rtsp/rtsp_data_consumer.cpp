@@ -540,22 +540,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             return true; // data for other live quality stream
     }
 
-
-
-    //QnRtspEncoderPtr codecEncoder = m_owner->getCodecEncoder(media->channelNumber);
-    //UDPSocket* mediaSocket = m_owner->getMediaSocket(media->channelNumber);
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
-    int rtpTcpChannel = trackInfo->clientPort;
-    if (rtpTcpChannel == -1) 
-        return true; // skip data (for example audio is disabled)
-
     if (trackInfo == 0 || trackInfo->encoder == 0)
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
-    UDPSocket* mediaSocket = 0;
-    if (!m_owner->isTcpMode())
-        mediaSocket = trackInfo->mediaSocket;
-
     {
         QMutexLocker lock(&m_mutex);
         int cseq = media->opaque;
@@ -616,28 +604,26 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
 
+        bool isRtcp = false;
         if (codecEncoder->isRtpHeaderExists()) 
         {
             RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
-            if(packet->payloadType >= 72 && packet->payloadType <= 76)
-            {   // RTCP packet
-                rtpTcpChannel = trackInfo->clientRtcpPort;
-                mediaSocket = trackInfo->rtcpSocket;
-            }
+            isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
         }
         else {
             buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
         
-        if (mediaSocket == 0) {
+        if (m_owner->isTcpMode()) {
             m_sendBuffer.data()[0] = '$';
-            m_sendBuffer.data()[1] = rtpTcpChannel;
+            m_sendBuffer.data()[1] = isRtcp ? trackInfo->clientRtcpPort : trackInfo->clientPort;
             quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
             *lenPtr = htons(m_sendBuffer.size() - 4);
             m_owner->sendBuffer(m_sendBuffer);
         }
         else {
             Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            UDPSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
             mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
         }
 
@@ -658,16 +644,16 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, newRange.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
             m_sendBuffer.write(newRange);
 
-            if (mediaSocket == 0) {
+            if (m_owner->isTcpMode()) {
                 m_sendBuffer.data()[0] = '$';
-                m_sendBuffer.data()[1] = metadataTcpChannel;
+                m_sendBuffer.data()[1] = trackInfo->clientPort;
                 quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
                 *lenPtr = htons(m_sendBuffer.size() - 4);
                 m_owner->sendBuffer(m_sendBuffer);
             }
             else  {
                 Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-                mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+                trackInfo->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
             }
 
             trackInfo->sequence++;
