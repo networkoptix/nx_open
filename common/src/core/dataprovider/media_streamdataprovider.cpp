@@ -1,6 +1,6 @@
 #include "media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"

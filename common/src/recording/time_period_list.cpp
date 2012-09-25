@@ -40,9 +40,9 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const
         lastPos++;
 
     for (const_iterator pos = firstPos; pos != lastPos; ++pos) {
-        QnTimePeriod period = pos->intersected(period);
-        if(!period.isEmpty())
-            result.push_back(period);
+        QnTimePeriod p = pos->intersected(period);
+        if(!p.isEmpty())
+            result.push_back(p);
     }
 
     return result;

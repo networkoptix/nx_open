@@ -5,7 +5,7 @@
 #include "utils/network/ping.h"
 #include "../dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 
 Q_DECLARE_METATYPE(QHostAddress);
 Q_DECLARE_METATYPE(QAuthenticator);
@@ -25,7 +25,7 @@ QnNetworkResource::QnNetworkResource()
         metaTypesInitialized = true;
     }
 
-    addFlags(network);
+    addFlags(network | motion);
 }
 
 QnNetworkResource::~QnNetworkResource()

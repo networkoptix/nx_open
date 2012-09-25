@@ -4,7 +4,7 @@ COMPANY_NAME=${deb.customization.company.name}
 
 #. ../common.sh
 PACKAGENAME=${COMPANY_NAME}-entcontroller
-VERSION=${project.version}
+VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 
 TARGET=/opt/${COMPANY_NAME}/entcontroller
@@ -17,7 +17,7 @@ INITTARGET=/etc/init
 INITDTARGET=/etc/init.d
 
 STAGEBASE=deb
-STAGE=$STAGEBASE/${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration}
+STAGE=$STAGEBASE/${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration}
 PKGSTAGE=$STAGE$TARGET
 BINSTAGE=$STAGE$BINTARGET
 LIBSTAGE=$STAGE$LIBTARGET
@@ -95,4 +95,4 @@ install -m 644 debian/conffiles $STAGE/DEBIAN
 (cd $STAGE; md5sum `find * -type f | grep -v '^DEBIAN/'` > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
 sudo chown -R root:root $STAGEBASE
-(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${project.version}.${buildNumber}-${arch}-${build.configuration})
+(cd $STAGEBASE; sudo dpkg-deb -b ${PACKAGENAME}-${release.version}.${buildNumber}-${arch}-${build.configuration})

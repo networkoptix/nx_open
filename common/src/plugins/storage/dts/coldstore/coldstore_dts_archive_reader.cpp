@@ -273,6 +273,7 @@ QnAbstractMediaDataPtr QnColdStoreDelegate::getNextData()
 
 qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 {
+    Q_UNUSED(findIFrame);
     int index = find_best_file(time);
 
     if (index!=m_current_file)
@@ -301,15 +302,15 @@ qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 
 }
 
-QnVideoResourceLayout* QnColdStoreDelegate::getVideoLayout()
+QnResourceVideoLayout* QnColdStoreDelegate::getVideoLayout()
 {
-    static  QnDefaultDeviceVideoLayout l;
+    static  QnDefaultResourceVideoLayout l;
     return &l;
 }
 
 QnResourceAudioLayout* QnColdStoreDelegate::getAudioLayout()
 {
-    static QnEmptyAudioLayout l;
+    static QnEmptyResourceAudioLayout l;
     return &l;
 }
 
@@ -446,10 +447,10 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
     if (m_csConnection->Seek(
         m_stream_no, 
         evnt.shift, 
-        0, //0 – Do step 1 (file_offset is relative to beginning of file).
+        0, //0 ï¿½ Do step 1 (file_offset is relative to beginning of file).
         0, //If (seek_whence != 0xff) then this parameter is ignored.
         0, //If (seek_direction == 0xff) then this parameter is ignored
-        0xff //seek_direction 0xff – Skip step 2
+        0xff //seek_direction 0xff ï¿½ Skip step 2
         ) != Veracity::ISFS::STATUS_SUCCESS)
     {
         //Q_ASSERT(false);

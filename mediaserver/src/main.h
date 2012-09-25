@@ -1,8 +1,8 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "utils/common/longrunnable.h"
-#include "core/resource/video_server_resource.h"
+#include "utils/common/long_runnable.h"
+#include "core/resource/media_server_resource.h"
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 
@@ -36,7 +36,7 @@ private:
     QnRestServer* m_restServer;
     QnProgressiveDownloadingServer* m_progressiveDownloadingServer;
     QnUniversalTcpListener* m_universalTcpListener;
-    QnVideoServerResourcePtr m_videoServer;
+    QnMediaServerResourcePtr m_mediaServer;
 };
 
 #endif // MAIN_H

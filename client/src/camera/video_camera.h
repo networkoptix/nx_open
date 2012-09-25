@@ -45,6 +45,11 @@ public:
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
 
+    /*
+    * Export motion stream to separate file
+    */
+    void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
+
     void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage = QnStorageResourcePtr());
 
     void setResource(QnMediaResourcePtr resource);
@@ -84,6 +89,7 @@ private:
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
+    QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 #endif //QN_VIDEO_CAMERA_H

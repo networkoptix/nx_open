@@ -10,10 +10,10 @@
 
 #include "rtsp_connection.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "core/dataconsumer/dataconsumer.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
@@ -31,6 +31,8 @@
 #include "device_plugins/server_archive/thumbnails_stream_reader.h"
 #include "rtsp_encoder.h"
 #include "rtsp_h264_encoder.h"
+#include "rtsp_ffmpeg_encoder.h"
+#include "rtp_universal_encoder.h"
 
 class QnTcpListener;
 
@@ -318,7 +320,7 @@ int QnRtspConnectionProcessor::numOfVideoChannels()
         return -1;
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnVideoResourceLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
+    const QnResourceVideoLayout* layout = d->mediaRes->getVideoLayout(currentDP.data());
     return layout ? layout->numberOfChannels() : -1;
 }
 
@@ -365,8 +367,35 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     Q_D(QnRtspConnectionProcessor);
     switch (media->compressionType)
     {
+        //case CODEC_ID_H264:
+        //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_H263:
+        case CODEC_ID_H263P:
         case CODEC_ID_H264:
-            return QnRtspEncoderPtr(new QnRtspH264Encoder());
+        case CODEC_ID_MPEG1VIDEO:
+        case CODEC_ID_MPEG2VIDEO:
+        case CODEC_ID_MPEG4:
+        case CODEC_ID_AAC:
+        case CODEC_ID_MP2:
+        case CODEC_ID_MP3:
+        case CODEC_ID_PCM_ALAW:
+        case CODEC_ID_PCM_MULAW:
+        case CODEC_ID_PCM_S8:
+        case CODEC_ID_PCM_S16BE:
+        case CODEC_ID_PCM_S16LE:
+        case CODEC_ID_PCM_U16BE:
+        case CODEC_ID_PCM_U16LE:
+        case CODEC_ID_PCM_U8:
+        case CODEC_ID_MPEG2TS:
+        case CODEC_ID_AMR_NB:
+        case CODEC_ID_AMR_WB:
+        case CODEC_ID_VORBIS:
+        case CODEC_ID_THEORA:
+        case CODEC_ID_VP8:
+        case CODEC_ID_ADPCM_G722:
+        case CODEC_ID_ADPCM_G726:
+            return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media, CODEC_ID_MPEG4)); // transcode src codec to MPEG4
+            //return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media)); // no transcode
         default:
             return QnRtspEncoderPtr();
     }
@@ -425,7 +454,7 @@ int QnRtspConnectionProcessor::composeDescribe()
     QTextStream sdp(&d->responseBody);
 
     
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
 
     
     int numAudio = 0;
@@ -475,8 +504,10 @@ int QnRtspConnectionProcessor::composeDescribe()
 
         sdp << "m=" << (i < numVideo ? "video " : "audio ") << i << " RTP/AVP " << encoder->getPayloadtype() << ENDL;
         sdp << "a=control:trackID=" << i << ENDL;
-        sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
-        sdp << encoder->getAdditionSDP();
+        QByteArray additionSDP = encoder->getAdditionSDP();
+        if (!additionSDP.contains("a=rtpmap:"))
+            sdp << "a=rtpmap:" << encoder->getPayloadtype() << ' ' << encoder->getName() << "/" << encoder->getFrequency() << ENDL;
+        sdp << additionSDP;
     }
 
     if (d->liveMode != Mode_ThumbNails)
@@ -535,7 +566,7 @@ int QnRtspConnectionProcessor::composeSetup()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
     
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(currentDP.data());
     if (trackId >= videoLayout->numberOfChannels()) {
         //QnAbstractMediaStreamDataProvider* dataProvider;
         if (d->archiveDP)
@@ -740,7 +771,7 @@ void QnRtspConnectionProcessor::createPredefinedTracks()
 {
     Q_D(QnRtspConnectionProcessor);
 
-    const QnVideoResourceLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
+    const QnResourceVideoLayout* videoLayout = d->mediaRes->getVideoLayout(d->liveDpHi.data());
     int trackNum = 0;
     for (; trackNum < videoLayout->numberOfChannels(); ++trackNum)
     {
@@ -835,6 +866,9 @@ int QnRtspConnectionProcessor::composePlay()
     QnResource::Status status = getResource()->getStatus();
 
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
+
+    if (!d->useProprietaryFormat)
+        d->quality = MEDIA_Quality_AlwaysHigh; // keep redAss for native client only
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 
@@ -869,14 +903,9 @@ int QnRtspConnectionProcessor::composePlay()
     {
         d->archiveDP->addDataProcessor(d->dataProcessor);
 
-        QnServerArchiveDelegate* serverArchive = dynamic_cast<QnServerArchiveDelegate*>(d->archiveDP->getArchiveDelegate());
-        if (serverArchive) 
-        {
-            QString sendMotion = d->requestHeaders.value("x-send-motion");
-            if (!sendMotion.isNull()) {
-                serverArchive->setSendMotion(sendMotion == "1" || sendMotion == "true");
-            }
-        }
+        QString sendMotion = d->requestHeaders.value("x-send-motion");
+        if (!sendMotion.isNull()) 
+            d->archiveDP->setSendMotion(sendMotion == "1" || sendMotion == "true");
 
         d->archiveDP->lock();
         d->archiveDP->setSpeed(d->rtspScale);

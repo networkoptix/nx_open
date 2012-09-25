@@ -1,7 +1,7 @@
 #ifndef axis_device_server_h_2219
 #define axis_device_server_h_2219
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 

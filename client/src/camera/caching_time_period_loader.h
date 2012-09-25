@@ -10,19 +10,19 @@
 
 
 class QnTimePeriodLoader;
-class QnMultiCameraTimePeriodLoader;
+class QnAbstractTimePeriodLoader;
 
 class QnCachingTimePeriodLoader: public QObject {
     Q_OBJECT;
     Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
 
 public:
-    QnCachingTimePeriodLoader(const QnNetworkResourcePtr &networkResource, QObject *parent = NULL);
+    QnCachingTimePeriodLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
     virtual ~QnCachingTimePeriodLoader();
 
     static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
 
-    QnNetworkResourcePtr resource();
+    QnResourcePtr resource();
 
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
@@ -54,16 +54,16 @@ protected:
     QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
 
 private:
-    QnCachingTimePeriodLoader(QnMultiCameraTimePeriodLoader **loaders, QObject *parent);
+    QnCachingTimePeriodLoader(QnAbstractTimePeriodLoader **loaders, QObject *parent);
 
     void init();
-    void initLoaders(QnMultiCameraTimePeriodLoader **loaders);
-    static bool createLoaders(const QnResourcePtr &resource, QnMultiCameraTimePeriodLoader **loaders);
+    void initLoaders(QnAbstractTimePeriodLoader **loaders);
+    static bool createLoaders(const QnResourcePtr &resource, QnAbstractTimePeriodLoader **loaders);
 
 private:
-    QnNetworkResourcePtr m_resource;
+    QnResourcePtr m_resource;
     QnTimePeriod m_loadedPeriod;
-    QnMultiCameraTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
+    QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
     int m_handles[Qn::TimePeriodRoleCount];
     QList<QRegion> m_motionRegions;
     QnTimePeriodList m_periods[Qn::TimePeriodRoleCount];

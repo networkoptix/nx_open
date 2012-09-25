@@ -64,63 +64,91 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IP Range</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Password:</source>
-        <translation type="unfinished">密码：</translation>
+        <translation type="obsolete">密码：</translation>
     </message>
     <message>
         <source>IP Address:</source>
-        <translation type="unfinished">IP地址：</translation>
-    </message>
-    <message>
-        <source>009.009.009.009;_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start IP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">IP地址：</translation>
     </message>
     <message>
         <source>Login:</source>
-        <translation type="unfinished">登陆：</translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Found cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">登陆：</translation>
     </message>
     <message>
         <source>Add</source>
         <translation type="unfinished">添加</translation>
     </message>
     <message>
-        <source>IP</source>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name</source>
+        <source>Add camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;tart IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;End IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Login:</source>
+        <translation type="unfinished">&amp;登陆：</translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Http P&amp;ort:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">自动</translation>
+    </message>
+    <message>
+        <source>&amp;Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel &amp;scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manuf.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished">地址</translation>
+    </message>
+    <message>
+        <source>&amp;Add selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -551,6 +579,43 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
         <source>&amp;Connection options:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Save...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished">删除</translation>
+    </message>
+    <message>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save connection as...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection with the same name already exists. Overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the connection
+%1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -758,6 +823,17 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br /&gt;&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br /&gt;&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAction</name>
+    <message>
+        <source>%n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1317,7 +1393,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Play / Pause</source>
-        <translation type="unfinished">播放／暂停</translation>
+        <translation type="obsolete">播放／暂停</translation>
     </message>
     <message>
         <source>Ctrl+-</source>
@@ -1405,14 +1481,30 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Toggle Sync</source>
-        <translation type="unfinished">切换同步</translation>
+        <translation type="obsolete">切换同步</translation>
     </message>
     <message>
         <source>F1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add camera...</source>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Stream Synchronization</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1445,44 +1537,78 @@ For easy instructions on how to install or update your video driver, follow inst
     <name>QnCameraAdditionDialog</name>
     <message>
         <source>Storage path must not be empty.</source>
-        <translation type="unfinished">存储路径不能为空</translation>
+        <translation type="obsolete">存储路径不能为空</translation>
     </message>
     <message>
         <source>Space limit must be a non-negative integer.</source>
-        <translation type="unfinished">空间限制必须是非负整数</translation>
+        <translation type="obsolete">空间限制必须是非负整数</translation>
     </message>
     <message>
         <source>Invalid storage path</source>
-        <translation type="unfinished">无效存储路径</translation>
+        <translation type="obsolete">无效存储路径</translation>
     </message>
     <message>
         <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
-        <translation type="unfinished">存储路径&apos;%1&apos;无效或无法写入</translation>
+        <translation type="obsolete">存储路径&apos;%1&apos;无效或无法写入</translation>
     </message>
     <message>
         <source>Can&apos;t verify storage path</source>
-        <translation type="unfinished">无法验证存储路径</translation>
+        <translation type="obsolete">无法验证存储路径</translation>
     </message>
     <message>
         <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
-        <translation type="unfinished">无法验证存储路径&apos;%1&apos;。无法建立与存储服务器的连接。</translation>
+        <translation type="obsolete">无法验证存储路径&apos;%1&apos;。无法建立与存储服务器的连接。</translation>
     </message>
     <message>
         <source>Not enough disk space</source>
-        <translation type="unfinished">没有足够的硬盘空间</translation>
-    </message>
-    <message>
-        <source>Storage &apos;1&apos;
-You have less storage space available than reserved free space value. Additional 2Gb are required.</source>
-        <translation type="unfinished"></translation>
+        <translation type="obsolete">没有足够的硬盘空间</translation>
     </message>
     <message>
         <source>Low space for archive</source>
-        <translation type="unfinished">存档空间小</translation>
+        <translation type="obsolete">存档空间小</translation>
     </message>
     <message>
-        <source>Storage &apos;%1&apos;
-You have only 2Gb left for video archive.</source>
+        <source>Camera &amp;IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First address in range is greater than last one</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please select at least one camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Success</source>
+        <translation type="unfinished">成功</translation>
+    </message>
+    <message>
+        <source>Camera(s) added successfully</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">错误</translation>
+    </message>
+    <message>
+        <source>Error while adding camera(s)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1530,6 +1656,13 @@ You have only 2Gb left for video archive.</source>
     <message>
         <source>On</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraSettingsDialog</name>
+    <message>
+        <source>Camera settings</source>
+        <translation type="unfinished">摄像机设定</translation>
     </message>
 </context>
 <context>
@@ -1905,7 +2038,7 @@ Try to activate your License manually.</source>
     <name>QnMediaResourceWidget</name>
     <message>
         <source>%1x%2 %3fps @ %4Mbps (%5)</source>
-        <translation type="unfinished">%1x%2 %3fps @ %4Mbps (%5)</translation>
+        <translation type="obsolete">%1x%2 %3fps @ %4Mbps (%5)</translation>
     </message>
     <message>
         <source>hh:mm:ss.zzz</source>
@@ -1925,6 +2058,18 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>	%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1x%2 %3fps @ %4Mbps%5%6</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1961,7 +2106,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Speed Down</source>
-        <translation type="obsolete">减速</translation>
+        <translation type="unfinished">减速</translation>
     </message>
     <message>
         <source>Ctrl+-</source>
@@ -1969,7 +2114,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Speed Up</source>
-        <translation type="obsolete">加速</translation>
+        <translation type="unfinished">加速</translation>
     </message>
     <message>
         <source>Ctrl++</source>
@@ -1977,7 +2122,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Previous Frame</source>
-        <translation type="obsolete">前一帧</translation>
+        <translation type="unfinished">前一帧</translation>
     </message>
     <message>
         <source>Ctrl+Left</source>
@@ -1985,7 +2130,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Next Frame</source>
-        <translation type="obsolete">下一帧</translation>
+        <translation type="unfinished">下一帧</translation>
     </message>
     <message>
         <source>Ctrl+Right</source>
@@ -1993,7 +2138,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>To Start</source>
-        <translation type="obsolete">到开始</translation>
+        <translation type="unfinished">到开始</translation>
     </message>
     <message>
         <source>Z</source>
@@ -2001,7 +2146,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>To End</source>
-        <translation type="obsolete">到结束</translation>
+        <translation type="unfinished">到结束</translation>
     </message>
     <message>
         <source>X</source>
@@ -2046,6 +2191,14 @@ Try to activate your License manually.</source>
     <message>
         <source>S</source>
         <translation type="obsolete">S</translation>
+    </message>
+    <message>
+        <source>Previuos Chunk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Chunk</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2851,10 +3004,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>at</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not perform thumbnails search</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2901,12 +3050,12 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchDisplay</name>
     <message>
-        <source>yyyy MMM dd	hh:mm:ss</source>
+        <source>yyyy MMM dd hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>	hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <source>hh:mm:ss</source>
+        <translation type="unfinished">hh:mm:ss</translation>
     </message>
 </context>
 <context>
@@ -3129,7 +3278,7 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>RTSP Port:</source>
-        <translation type="unfinished">RTSP端口：</translation>
+        <translation type="obsolete">RTSP端口：</translation>
     </message>
     <message>
         <source>9000</source>
@@ -3137,11 +3286,11 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>API Port:</source>
-        <translation type="unfinished">API端口：</translation>
+        <translation type="obsolete">API端口：</translation>
     </message>
     <message>
         <source>9001</source>
-        <translation type="unfinished">9001</translation>
+        <translation type="obsolete">9001</translation>
     </message>
     <message>
         <source>Name:</source>
@@ -3169,6 +3318,10 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>Panic mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

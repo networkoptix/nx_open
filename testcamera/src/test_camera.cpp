@@ -4,7 +4,7 @@
 #include "utils/media/nalUnits.h"
 #include "plugins/resources/test_camera/testcamera_const.h"
 #include "utils/common/sleep.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "utils/media/ffmpeg_helper.h"

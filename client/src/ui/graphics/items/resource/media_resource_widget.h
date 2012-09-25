@@ -3,7 +3,7 @@
 
 #include "resource_widget.h"
 
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 
@@ -151,7 +151,7 @@ private:
     QnVirtualCameraResourcePtr m_camera;
 
     /** Connection for camera's server */
-    QnVideoServerConnectionPtr m_connection; // TODO: move out?
+    QnMediaServerConnectionPtr m_connection; // TODO: move out?
 
     /** Display. */
     QnResourceDisplay *m_display;

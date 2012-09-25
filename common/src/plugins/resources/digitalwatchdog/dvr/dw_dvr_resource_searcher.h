@@ -1,7 +1,7 @@
 #ifndef dw_dwr_device_server_h_2219
 #define dw_dwr_device_server_h_2219
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 class DwDvrResourceSearcher : public QnAbstractNetworkResourceSearcher
 {

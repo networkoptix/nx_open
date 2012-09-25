@@ -23,7 +23,7 @@ public:
 
     static const int DEFAULT_RTSP_PORT = 554;
 
-    explicit QnUniversalTcpListener(const QHostAddress& address = QHostAddress::Any, int port = DEFAULT_RTSP_PORT);
+    explicit QnUniversalTcpListener(const QHostAddress& address = QHostAddress::Any, int port = DEFAULT_RTSP_PORT, int maxConnections = 100);
     virtual ~QnUniversalTcpListener();
     
     template <class T> 

@@ -7,9 +7,9 @@
 
 #include <ui/style/globals.h>
 
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 
-QnCameraAdditionDialog::QnCameraAdditionDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
+QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
     m_server(server),
@@ -223,7 +223,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
 
-    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraSearch(processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
                                                  startAddrStr, endAddrStr, username, password, port);
 
@@ -283,7 +283,7 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     connect(ui->closeButton, SIGNAL(clicked()), eventLoop.data(), SLOT(quit()));
     connect(ui->closeButton, SIGNAL(clicked()), processor.data(), SLOT(cancel()));
 
-    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraAdd(processor.data(), SLOT(processAddReply(int)),
                                               urls, manufacturers, username, password);
 

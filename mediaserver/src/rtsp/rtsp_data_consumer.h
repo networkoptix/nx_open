@@ -3,13 +3,13 @@
 
 #include <QHostAddress>
 #include <QTime>
-#include "core/dataconsumer/dataconsumer.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "core/datapacket/datapacket.h"
+#include "core/datapacket/abstract_data_packet.h"
 #include "utils/network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
 #include "rtsp_ffmpeg_encoder.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 
 class QnRtspConnectionProcessor;
 
@@ -61,7 +61,7 @@ public:
     void setUseUTCTime(bool value);
     void setAllowAdaptiveStreaming(bool value);
 protected:
-    void buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
+    void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
     bool canSwitchToHiQuality();
@@ -85,7 +85,7 @@ private:
     QnRtspConnectionProcessor* m_owner;
     qint64 m_lastSendTime;
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
-    char m_rtspTcpHeader[4 + RtpHeader::RTP_HEADER_SIZE];
+    //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
     QMutex m_mutex;
     int m_waitSCeq;
     bool m_liveMode;

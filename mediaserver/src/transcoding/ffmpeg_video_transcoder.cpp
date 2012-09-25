@@ -62,39 +62,45 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     return 0;
 }
 
+void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
+{
+    QnVideoTranscoder::open(video);
+
+    m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, false);
+
+    AVCodec* avCodec = avcodec_find_encoder(m_codecId);
+    if (avCodec == 0)
+    {
+        m_lastErrMessage = QObject::tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
+        return;
+    }
+
+    m_encoderCtx = avcodec_alloc_context3(avCodec);
+    m_encoderCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+    m_encoderCtx->codec_id = m_codecId;
+    m_encoderCtx->width = m_resolution.width();
+    m_encoderCtx->height = m_resolution.height();
+    m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
+    m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
+    //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
+
+    m_encoderCtx->bit_rate = m_bitrate;
+    m_encoderCtx->gop_size = 32;
+    m_encoderCtx->time_base.num = 1;
+    m_encoderCtx->time_base.den = 60;
+    m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
+    if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
+    {
+        m_lastErrMessage = QString("Can't initialize video encoder");
+    }
+}
+
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
 {
+    if (!m_lastErrMessage.isEmpty())
+        return -3;
+
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
-    if (!m_videoDecoder) {
-        m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, false);
-
-        AVCodec* avCodec = avcodec_find_encoder(m_codecId);
-        if (avCodec == 0)
-        {
-            m_lastErrMessage = QObject::tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
-            return -2;
-        }
-
-        m_encoderCtx = avcodec_alloc_context3(avCodec);
-        m_encoderCtx->codec_type = AVMEDIA_TYPE_VIDEO;
-        m_encoderCtx->codec_id = m_codecId;
-        m_encoderCtx->width = m_resolution.width();
-        m_encoderCtx->height = m_resolution.height();
-        m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
-        m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-        m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
-
-        m_encoderCtx->bit_rate = m_bitrate;
-        m_encoderCtx->gop_size = 32;
-        m_encoderCtx->time_base.num = 1;
-        m_encoderCtx->time_base.den = 60;
-        m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
-        if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
-        {
-            m_lastErrMessage = QString("Can't initialize video encoder");
-            return -3;
-        }
-    }
     if (m_videoDecoder->decode(video, &m_decodedVideoFrame)) 
     {
         CLVideoDecoderOutput* decodedFrame = &m_decodedVideoFrame;
@@ -128,4 +134,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         result = QnCompressedVideoDataPtr();
         return 0; // ignore decode error
     }
+}
+
+AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
+{
+    return m_encoderCtx;
 }

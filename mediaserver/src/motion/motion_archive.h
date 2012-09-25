@@ -5,10 +5,11 @@
 #include <QFile>
 #include <QSharedPointer>
 #include "core/resource/network_resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/media/sse_helper.h"
 #include "recorder/device_file_catalog.h"
 #include "core/resource/security_cam_resource.h"
+#include "motion/abstract_motion_archive.h"
 
 static const int MOTION_INDEX_HEADER_SIZE = 16;
 static const int MOTION_INDEX_RECORD_SIZE = 8;
@@ -32,7 +33,7 @@ struct IndexHeader
 };
 #pragma pack(pop)
 
-class QnMotionArchiveConnection
+class QnMotionArchiveConnection: public QnAbstractMotionArchiveConnection
 {
 public:
     QnMetaDataV1Ptr getMotionData(qint64 timeUsec);
@@ -77,7 +78,6 @@ public:
 private:
     QString getFilePrefix(const QDate& datetime);
     void dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate);
-    bool mathImage(const __m128i* data, const __m128i* mask, int maskStart, int maskEnd);
     void fillFileNames(qint64 datetimeMs, QFile* motionFile, QFile* indexFile);
     bool saveToArchiveInternal(QnMetaDataV1Ptr data);
     QString getChannelPrefix();

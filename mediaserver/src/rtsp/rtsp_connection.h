@@ -6,7 +6,7 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;

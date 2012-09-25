@@ -2,7 +2,7 @@
 #include <QDateTime>
 #include <QTextStream>
 #include <QTimer>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <utils/common/warnings.h>
 #include <utils/common/command_line_parser.h>
 #include "utils/common/synctime.h"

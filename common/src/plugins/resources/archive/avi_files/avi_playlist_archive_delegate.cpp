@@ -381,7 +381,7 @@ qint32 QnAVIPlaylistArchiveDelegate::writePacket(quint8* /*buf*/, int /*size*/)
     return 0; // not implemented
 }
 
-QnVideoResourceLayout* QnAVIPlaylistArchiveDelegate::getVideoLayout()
+QnResourceVideoLayout* QnAVIPlaylistArchiveDelegate::getVideoLayout()
 {
     return &m_defaultVideoLayout;
 }

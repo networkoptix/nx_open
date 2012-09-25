@@ -1,12 +1,13 @@
 #ifndef _STREAM_RECORDER_H__
 #define _STREAM_RECORDER_H__
 
+#include <QBuffer>
 #include <QtGui/QPixmap>
 
 #include <utils/common/cryptographic_hash.h>
 
-#include <core/dataconsumer/dataconsumer.h>
-#include <core/datapacket/mediadatapacket.h>
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <core/datapacket/media_data_packet.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
@@ -29,6 +30,12 @@ public:
     void setTruncateInterval(int seconds);
 
     void setFileName(const QString& fileName);
+    
+    /*
+    * Export motion stream to separate file
+    */
+    void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
+
     void close();
     
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
@@ -76,7 +83,7 @@ protected:
     int getPrebufferingUsec() const;
     virtual bool needSaveData(QnAbstractMediaDataPtr media);
 
-    virtual bool saveMotion(QnAbstractMediaDataPtr media);
+    virtual bool saveMotion(QnMetaDataV1Ptr media);
 
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
@@ -130,6 +137,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
+    QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 #endif // _STREAM_RECORDER_H__

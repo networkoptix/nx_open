@@ -1,7 +1,7 @@
 #include "workbench_context_aware.h"
 #include <QObject>
 #include <utils/common/warnings.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <ui/actions/action_manager.h>
 #include "workbench_context.h"
 

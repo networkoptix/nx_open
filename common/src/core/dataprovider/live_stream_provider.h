@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "../resource/media_resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "motion/motion_estimation.h"
 #include "../resource/motion_window.h"
 #include "core/resource/resource_fwd.h"
@@ -63,7 +63,7 @@ private:
     QnResource::ConnectionRole m_role;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
-    const QnVideoResourceLayout* m_layout;
+    const QnResourceVideoLayout* m_layout;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
 };

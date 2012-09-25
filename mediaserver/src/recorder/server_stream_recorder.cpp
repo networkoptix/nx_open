@@ -7,8 +7,8 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
@@ -24,7 +24,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
-    m_videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
     
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
@@ -64,9 +64,8 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     QnStreamRecorder::putData(data);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+bool QnServerStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
 {
-    QnMetaDataV1Ptr motion = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
     return true;
@@ -215,7 +214,7 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_videoServer && m_videoServer->isPanicMode())
+    if (m_mediaServer && m_mediaServer->isPanicMode())
     {
         if (!m_usedPanicMode)
         {

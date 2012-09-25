@@ -8,7 +8,7 @@ class QnAbstractArchiveReader;
 class QnArchiveSyncPlayWrapper;
 class QnAbstractArchiveDelegate;
 
-class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
+class QnSyncPlayArchiveDelegate: public QnAbstractArchiveDelegate
 {
     Q_OBJECT;
 
@@ -23,7 +23,7 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
     virtual bool isRealTimeSource() const;
     virtual void onReverseMode(qint64 /*displayTime*/, bool /*value*/);
@@ -31,11 +31,12 @@ public:
 
     virtual AVCodecContext* setAudioChannel(int num);
 
-    virtual void setMotionRegion(const QRegion& region);
-    virtual void setSendMotion(bool value);
+    //virtual void setMotionRegion(const QRegion& region);
+    //virtual void setSendMotion(bool value);
     virtual void beforeSeek(qint64 time);
     virtual void beforeChangeReverseMode(bool reverseMode);
     virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

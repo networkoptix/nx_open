@@ -13,8 +13,8 @@
 #include <mmsystem.h>
 
 #include <dsp_effects/speex/speex_preprocess.h>
-#include "core/datapacket/mediadatapacket.h"
-#include "utils/common/longrunnable.h"
+#include "core/datapacket/media_data_packet.h"
+#include "utils/common/long_runnable.h"
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
 

@@ -14,7 +14,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/color_transformations.h>
 #include <ui/animation/opacity_animator.h>
@@ -81,7 +81,7 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_resourceWidget_pausedPainterStorage);
 
-    Q_GLOBAL_STATIC(QnDefaultDeviceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
@@ -580,7 +580,7 @@ void QnResourceWidget::updateChannelOverlay(int channel) {
     setChannelOverlay(channel, calculateChannelOverlay(channel));
 }
 
-void QnResourceWidget::setChannelLayout(const QnVideoResourceLayout *channelLayout) {
+void QnResourceWidget::setChannelLayout(const QnResourceVideoLayout *channelLayout) {
     if(m_channelsLayout == channelLayout)
         return;
 

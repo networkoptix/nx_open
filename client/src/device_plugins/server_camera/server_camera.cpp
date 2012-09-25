@@ -1,13 +1,13 @@
 #include "server_camera.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 
 void QnServerCameraProcessor::at_serverIfFound(const QString &)
 {
-    QnVideoServerResource* server = dynamic_cast<QnVideoServerResource*>(sender());
+    QnMediaServerResource* server = dynamic_cast<QnMediaServerResource*>(sender());
     if (server)
         server->apiConnection()->setProxyAddr(QString(), 0);
 }
@@ -18,23 +18,23 @@ void QnServerCameraProcessor::processResources(const QnResourceList &resources)
 
     foreach(QnResourcePtr res, resources)
     {
-        QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-        if (videoServer)
-            determineOptimalIF(videoServer.data());
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(res);
+        if (mediaServer)
+            determineOptimalIF(mediaServer.data());
     }
 }
 
-void QnServerCameraProcessor::determineOptimalIF(QnVideoServerResource* videoServer)
+void QnServerCameraProcessor::determineOptimalIF(QnMediaServerResource* mediaServer)
 {
     // set proxy. If some media server IF will be found, proxy address will be cleared
     QString url = QnAppServerConnectionFactory::defaultUrl().host();
     if (url.isEmpty())
         url = QLatin1String("127.0.0.1");
     int port = QnAppServerConnectionFactory::defaultMediaProxyPort();
-    videoServer->apiConnection()->setProxyAddr(url, port);
-    videoServer->disconnect(this, SLOT(at_serverIfFound(const QString &)));
-    connect(videoServer, SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
-    videoServer->determineOptimalNetIF();
+    mediaServer->apiConnection()->setProxyAddr(url, port);
+    mediaServer->disconnect(this, SLOT(at_serverIfFound(const QString &)));
+    connect(mediaServer, SIGNAL(serverIFFound(const QString &)), this, SLOT(at_serverIfFound(const QString &)));
+    mediaServer->determineOptimalNetIF();
 }
 
 QnServerCamera::QnServerCamera()
@@ -68,7 +68,7 @@ void QnServerCamera::setCropingPhysical(QRect croping)
     Q_UNUSED(croping)
 }
 
-const QnVideoResourceLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     Q_UNUSED(dataProvider)
     // todo: layout must be loaded in resourceParams

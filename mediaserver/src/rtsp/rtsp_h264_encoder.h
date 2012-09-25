@@ -25,6 +25,8 @@ public:
     virtual quint32 getFrequency() override;
     virtual quint8 getPayloadtype() override;
     virtual QString getName() override;
+
+    virtual bool isRtpHeaderExists() const override { return false; }
 private:
     void goNextNal();
     bool isLastPacket();

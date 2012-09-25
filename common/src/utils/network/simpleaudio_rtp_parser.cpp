@@ -2,7 +2,7 @@
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "../common/math.h"
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():

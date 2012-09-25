@@ -2,8 +2,8 @@
 #include <cassert>
 #include <utils/common/checked_cast.h>
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <plugins/resources/archive/abstract_archive_resource.h>
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
@@ -88,7 +88,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
     if(QnAbstractArchiveResourcePtr archive = resource.dynamicCast<QnAbstractArchiveResource>())
         return calculatePermissions(archive);
 
-    if(QnVideoServerResourcePtr server = resource.dynamicCast<QnVideoServerResource>())
+    if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
         return calculatePermissions(server);
 
     return 0;
@@ -123,7 +123,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
     } if(isFileLayout(layout)) {
-        return Qn::ReadPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else {
@@ -155,7 +155,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstra
     return Qn::ReadPermission;
 }
 
-Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVideoServerResourcePtr &server) {
+Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
     assert(server);
 
     if(m_userPermissions & Qn::GlobalEditServersPermissions) {

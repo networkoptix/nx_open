@@ -29,10 +29,10 @@ public:
     virtual bool isSingleShotMode() const;
 
 
-    virtual const QnVideoResourceLayout* getDPVideoLayout() const;
+    virtual const QnResourceVideoLayout* getDPVideoLayout() const;
     virtual const QnResourceAudioLayout* getDPAudioLayout() const;
-    static bool deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr);
-    static QString serializeLayout(const QnVideoResourceLayout* layout);
+    static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
+    static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);
@@ -137,6 +137,7 @@ private:
     mutable QMutex m_jumpMtx;
     QWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
+    QnAbstractMediaDataPtr m_afterMotionData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
@@ -150,7 +151,9 @@ private:
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
+    QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
+    bool m_sendMotion;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

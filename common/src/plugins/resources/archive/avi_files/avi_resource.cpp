@@ -14,6 +14,7 @@ QnAviResource::QnAviResource(const QString& file)
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
+    memset(m_motionBuffer, 0, sizeof(m_motionBuffer));
 }
 
 QnAviResource::~QnAviResource()
@@ -54,7 +55,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     return result;
 }
 
-const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceVideoLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
@@ -75,4 +76,19 @@ const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMedia
 void QnAviResource::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+QnStorageResourcePtr QnAviResource::getStorage() const
+{
+    return m_storage;
+}
+
+void QnAviResource::setMotionBuffer(const QnMetaDataLightVector& data, int channel)
+{
+    m_motionBuffer[channel] = data;
+}
+
+const QnMetaDataLightVector& QnAviResource::getMotionBuffer(int channel) const
+{
+    return m_motionBuffer[channel];
 }

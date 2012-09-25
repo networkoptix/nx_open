@@ -4,7 +4,7 @@
 #include "decoders/audio/audio_struct.h"
 #include "openal/qtvsound.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class CLAbstractAudioDecoder;
 struct QnCompressedAudioData;

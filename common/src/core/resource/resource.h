@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QReadWriteLock>
 #include "utils/common/qnid.h"
-#include "core/datapacket/datapacket.h"
+#include "core/datapacket/abstract_data_packet.h"
 #include "resource_fwd.h"
 #include "param.h"
 #include "resource_type.h"
@@ -73,6 +73,8 @@ public:
         user = 0x2000,          /**< User resource. */
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
+        periods = 0x8000,           /**< Resource uses UTC-based timing. */
+        motion = 0x10000,           /**< Resource has motion */
 
         local_media = local | media,
 

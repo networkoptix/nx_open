@@ -1,8 +1,8 @@
 #ifndef QN_RESOURCE_COMMAND_PROCESSOR
 #define QN_RESOURCE_COMMAND_PROCESSOR
 
-#include "core/dataconsumer/dataconsumer.h"
-#include "core/datapacket/datapacket.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
+#include "core/datapacket/abstract_data_packet.h"
 
 #include "resource.h"
 #include "resource_consumer.h"

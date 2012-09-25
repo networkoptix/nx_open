@@ -6,7 +6,7 @@
 #include <QtGui/QKeyEvent>
 
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/warnings.h>
 
@@ -20,8 +20,8 @@
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
+    QnWorkbenchContextAware(context),
     ui(new Ui::UserSettingsDialog()),
-    m_context(context),
     m_user(0),
     m_hasChanges(false),
     m_editorRights(0)
@@ -193,7 +193,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
 
-        loadAccessRightsToUi(m_user->getPermissions());
+        loadAccessRightsToUi(context()->accessController()->calculateGlobalPermissions(m_user));
         updatePassword();
     }
     setHasChanges(false);
@@ -345,14 +345,14 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    quint64 rights = m_user->getPermissions();
+    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
 
     // show only for view of owner
-    if (rights & Qn::GlobalEditProtectedUserPermission)
+    if (permissions & Qn::GlobalEditProtectedUserPermission)
         ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermission);
 
     // show for an admin or for anyone opened by owner
-    if ((rights & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+    if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
         ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermission);
 
     ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermission);
@@ -366,25 +366,30 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     if (!m_user)
         return;
 
-    quint64 rights = m_user->getPermissions();
+    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
+    QWidget* previous = ui->advancedButton;
 
-    if (rights & Qn::GlobalEditProtectedUserPermission)
-        createAccessRightCheckBox(tr("Owner"), Qn::GlobalEditProtectedUserPermission);
-    if ((rights & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
-        createAccessRightCheckBox(tr("Administrator"), Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions);
-    createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission);
-    createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission);
+    if (permissions & Qn::GlobalEditProtectedUserPermission)
+        previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalEditProtectedUserPermission, previous);
+    if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
+        previous = createAccessRightCheckBox(tr("Administrator"),
+                     Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions,
+                     previous);
+    previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
+    createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
 }
 
-void QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right) {
+QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {
     QCheckBox *checkBox = new QCheckBox(text, this);
     ui->accessRightsGroupbox->layout()->addWidget(checkBox);
     m_advancedRights.insert(right, checkBox);
+    setTabOrder(previous, checkBox);
 
     if (isReadOnly(ui->accessRightsGroupbox))
         setReadOnly(checkBox, true);
     else
         connect(checkBox, SIGNAL(clicked()), this, SLOT(at_accessRights_changed()));
+    return checkBox;
 }
 
 void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {

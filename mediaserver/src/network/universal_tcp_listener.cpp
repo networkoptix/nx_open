@@ -65,8 +65,8 @@ void QnUniversalRequestProcessor::pleaseStop()
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
-QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port):
-    QnTcpListener(address, port)
+QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
+    QnTcpListener(address, port, maxConnections)
 {
 
 }

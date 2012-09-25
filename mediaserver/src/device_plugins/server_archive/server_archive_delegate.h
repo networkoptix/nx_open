@@ -18,7 +18,7 @@ public:
     QnServerArchiveDelegate();
     virtual ~QnServerArchiveDelegate();
 
-    void setSendMotion(bool value);
+    //virtual void setSendMotion(bool value) override;
 
     virtual bool open(QnResourcePtr resource);
     virtual void close();
@@ -26,13 +26,14 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
 
     virtual AVCodecContext* setAudioChannel(int num);
     virtual void onReverseMode(qint64 displayTime, bool value);
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
 
 private:
     bool switchToChunk(const DeviceFileCatalog::Chunk newChunk, DeviceFileCatalogPtr newCatalog);
@@ -65,8 +66,8 @@ private:
     QnTimePeriod m_lastTimePeriod;
     qint64 m_lastSeekTime;
     bool m_afterSeek;
-    QnMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
-    QnAbstractMediaDataPtr m_tmpData;
+    //QnMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
+    //QnAbstractMediaDataPtr m_tmpData;
 
     DeviceFileCatalog::Chunk m_newQualityChunk;
     DeviceFileCatalogPtr m_newQualityCatalog;

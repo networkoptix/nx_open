@@ -3,7 +3,7 @@
 
 #include <QGLContext>
 
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/media/frame_info.h"
 
 

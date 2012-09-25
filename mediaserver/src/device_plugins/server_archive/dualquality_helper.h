@@ -3,7 +3,7 @@
 
 #include "recorder/device_file_catalog.h"
 #include "core/resource/resource_fwd.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class QnDialQualityHelper
 {

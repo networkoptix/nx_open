@@ -3,7 +3,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 #include "../digitalwatchdog/digital_watchdog_resource.h"
 #include "../sony/sony_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 const char* OnvifResourceInformationFetcher::ONVIF_RT = "ONVIF";
 
