@@ -213,7 +213,9 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
         item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + path + QLatin1String(".mkv");
+        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + path;
+        if (!path.endsWith(QLatin1String(".mkv")))
+            item.resource.path += QLatin1String(".mkv");
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
@@ -227,7 +229,8 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
         {
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(path), QIODevice::ReadOnly);
+            QString motionUrl = path.mid(path.lastIndexOf(L'?')+1);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(motionUrl), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
