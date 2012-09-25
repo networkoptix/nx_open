@@ -1,7 +1,8 @@
 #include "security_cam_resource.h"
 
+#include "utils/common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "../dataprovider/live_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
 QnSecurityCamResource::QnSecurityCamResource()
@@ -9,17 +10,10 @@ QnSecurityCamResource::QnSecurityCamResource()
       m_dpFactory(0),
       m_motionType(MT_Default)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnMotionRegion>();
-        qRegisterMetaType<QnScheduleTask>();
-        qRegisterMetaType<QnScheduleTaskList>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
-    }
 
     addFlags(live_cam);
 }

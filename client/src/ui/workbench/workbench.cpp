@@ -2,6 +2,8 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/client_meta_types.h>
+
 #include <ui/style/globals.h>
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
@@ -11,11 +13,7 @@ QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
     m_currentLayout(NULL)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<Qn::ItemRole>("Qn::ItemRole");
-        metaTypesInitialized = true;
-    }
+    QnClientMetaTypes::initialize();
 
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         m_itemByRole[i] = NULL;

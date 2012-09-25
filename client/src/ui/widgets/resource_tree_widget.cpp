@@ -1,19 +1,20 @@
 #include "resource_tree_widget.h"
 
-#include <QAction>
-#include <QApplication>
-#include <QBoxLayout>
-#include <QItemSelectionModel>
-#include <QLineEdit>
-#include <QMenu>
-#include <QTabWidget>
-#include <QToolButton>
-#include <QTreeView>
-#include <QWheelEvent>
-#include <QStyledItemDelegate>
+#include <QtGui/QAction>
+#include <QtGui/QApplication>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QItemSelectionModel>
+#include <QtGui/QLineEdit>
+#include <QtGui/QMenu>
+#include <QtGui/QTabWidget>
+#include <QtGui/QToolButton>
+#include <QtGui/QTreeView>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QStyledItemDelegate>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/common_meta_types.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -35,9 +36,6 @@
 #include "ui/style/proxy_style.h"
 #include "ui/style/noptix_style.h"
 #include "ui/style/globals.h"
-
-Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
-Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
 
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";

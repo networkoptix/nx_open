@@ -368,6 +368,7 @@ class QnRecorder : public QnResource
 };
 
 
+Q_DECLARE_METATYPE(QnResource::Status);
 Q_DECLARE_METATYPE(QnResourcePtr);
 Q_DECLARE_METATYPE(QnResourceList);
 

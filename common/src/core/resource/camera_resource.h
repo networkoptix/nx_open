@@ -1,6 +1,8 @@
 #ifndef QN_CAMERA_RESOURCE_H
 #define QN_CAMERA_RESOURCE_H
 
+#include <QtCore/QMetaType>
+
 #include "network_resource.h"
 #include "security_cam_resource.h"
 
@@ -79,5 +81,6 @@ public:
 #endif
 };
 
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
 
 #endif // QN_CAMERA_RESOURCE_H

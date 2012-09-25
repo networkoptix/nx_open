@@ -36,7 +36,6 @@ struct QnThumbnailsSearchState {
     QnTimePeriod period;
     qint64 step;
 };
-
 Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 

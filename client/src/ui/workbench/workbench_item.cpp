@@ -1,11 +1,15 @@
 #include "workbench_item.h"
-#include <limits>
-#include <ui/common/geometry.h>
-#include <core/resource/layout_resource.h>
-#include "workbench_layout.h"
-#include "core/resource_managment/resource_pool.h"
 
-Q_DECLARE_METATYPE(QUuid) // TODO: move to global metatype initializer in core
+#include <limits>
+
+#include <utils/common/common_meta_types.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource_managment/resource_pool.h>
+
+#include <ui/common/geometry.h>
+
+#include "workbench_layout.h"
+
 
 QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QUuid &uuid, QObject *parent):
     QObject(parent),

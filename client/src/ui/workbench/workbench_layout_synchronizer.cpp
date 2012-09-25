@@ -17,8 +17,6 @@ namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
 }
 
-Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
-
 typedef QHash<QnLayoutResource *, QnWorkbenchLayoutSynchronizer *> LayoutResourceSynchronizerHash;
 Q_GLOBAL_STATIC(LayoutResourceSynchronizerHash, qn_synchronizerByLayoutResource)
 

@@ -168,9 +168,20 @@ namespace Qn {
         ToggleScreenRecordingAction,
 
         /**
+         * Maximizes/restores client's main window.
+         */ 
+        MaximizeAction,
+
+        /**
          * Toggles client's fullscreen state.
          */
         FullscreenAction,
+
+        /**
+         * Action to be invoked to toggle fullscreen/maximized state. 
+         * Actual action that will be invoked is platform-dependent.
+         */
+        EffectiveMaximizeAction,
 
         /**
          * Goes to fullscreen and slides out all panels.
@@ -181,11 +192,6 @@ namespace Qn {
          * Minimizes client's main window.
          */ 
         MinimizeAction,
-
-        /**
-         * Maximizes client's main window.
-         */ 
-        MaximizeAction,
 
         /**
          * Opens system settings dialog.

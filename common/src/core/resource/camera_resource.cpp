@@ -1,8 +1,7 @@
 #include "camera_resource.h"
-#include "../dataprovider/live_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
-
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+#include "utils/common/common_meta_types.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
@@ -10,13 +9,8 @@ QnVirtualCameraResource::QnVirtualCameraResource()
       m_manuallyAdded(false),
       m_advancedWorking(false),
       m_dtsFactory(0)
- 
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnVirtualCameraResourcePtr>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 }
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()

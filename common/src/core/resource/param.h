@@ -86,8 +86,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(QnParam)
-Q_DECLARE_TYPEINFO(QnParam, Q_COMPLEX_TYPE);
-
 
 class QN_EXPORT QnParamList
 {

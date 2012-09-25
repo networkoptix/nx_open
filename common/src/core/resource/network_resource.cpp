@@ -3,12 +3,10 @@
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
-#include "../dataprovider/live_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-
-Q_DECLARE_METATYPE(QHostAddress);
-Q_DECLARE_METATYPE(QAuthenticator);
+#include "utils/common/common_meta_types.h"
 
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
@@ -17,13 +15,7 @@ QnNetworkResource::QnNetworkResource()
       m_networkTimeout(3000),
       m_probablyNeedToUpdateStatus(false)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QHostAddress>();
-        qRegisterMetaType<QnMacAddress>();
-        qRegisterMetaType<QAuthenticator>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 
     addFlags(network | motion);
 }
