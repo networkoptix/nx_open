@@ -273,6 +273,7 @@ QnAbstractMediaDataPtr QnColdStoreDelegate::getNextData()
 
 qint64 QnColdStoreDelegate::seek(qint64 time, bool findIFrame)
 {
+    Q_UNUSED(findIFrame);
     int index = find_best_file(time);
 
     if (index!=m_current_file)

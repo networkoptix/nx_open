@@ -32,7 +32,7 @@
 #include "rtsp_encoder.h"
 #include "rtsp_h264_encoder.h"
 #include "rtsp_ffmpeg_encoder.h"
-#include "rtp_ffmpeg_encoder.h"
+#include "rtp_universal_encoder.h"
 
 class QnTcpListener;
 

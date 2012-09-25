@@ -75,9 +75,9 @@ public:
     /** This function used for thumbnails loader. Get data with specified media step from specified time interval*/
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) { Q_UNUSED(startTime); Q_UNUSED(endTime); Q_UNUSED(frameStep); }
 
-    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) { return QnAbstractMotionArchiveConnectionPtr(); }
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) { Q_UNUSED(channel); return QnAbstractMotionArchiveConnectionPtr(); }
 
-    virtual void setSendMotion(bool value) {}
+    virtual void setSendMotion(bool value) {Q_UNUSED(value); }
 protected:
     Flags m_flags;
 };
