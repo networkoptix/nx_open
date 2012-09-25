@@ -59,7 +59,6 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/events/system_menu_event.h>
-#include <ui/workaround/full_screen_action.h>
 
 #include <help/context_help.h>
 
@@ -77,8 +76,6 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 
-
-Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
 
@@ -384,7 +381,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->setSpacing(2);
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(QnFullScreenAction::get(context())));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
     m_windowButtonsWidget = new GraphicsWidget();
@@ -447,7 +444,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    QnFullScreenAction::get(context()), SLOT(toggle()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::EffectiveMaximizeAction), SLOT(toggle()));
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
 
 
@@ -1455,7 +1452,7 @@ bool QnWorkbenchUi::event(QEvent *event) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-    QAction *fullScreenAction = QnFullScreenAction::get(context());
+    QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
     bool isFullscreen = fullScreenAction->isChecked();
 

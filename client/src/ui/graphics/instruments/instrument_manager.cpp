@@ -17,7 +17,6 @@ namespace {
     const char *viewportWatcherName = "_qn_viewportWatcher";
 }
 
-/* For QVariant to work with it. */
 Q_DECLARE_METATYPE(QList<InstrumentManager *>);
 
 InstrumentManagerPrivate::InstrumentManagerPrivate():

@@ -15,8 +15,6 @@ namespace {
     const char *animatorPropertyName = "_qn_itemAnimator";
 }
 
-Q_DECLARE_METATYPE(VariantAnimator *);
-
 QnGridItem::QnGridItem(QGraphicsItem *parent):
     QGraphicsObject(parent),
     m_color(QColor(0, 0, 0, 0)),

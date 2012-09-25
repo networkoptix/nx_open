@@ -1,23 +1,26 @@
 #include "action_manager.h"
+
 #include <cassert>
-#include <QAction>
-#include <QMenu>
-#include <QGraphicsItem>
+
+#include <QtGui/QAction>
+#include <QtGui/QMenu>
+#include <QtGui/QGraphicsItem>
+
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource/resource.h>
+
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/screen_recording/screen_recorder.h>
+
 #include "action.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
-
-Q_DECLARE_METATYPE(QnAction *)
 
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
@@ -211,28 +214,27 @@ public:
         m_lastAction = parent;
     }
 
-    void enterSubMenu() {
+    void beginSubMenu() {
         m_actionStack.push_back(m_lastAction);
     }
 
-    void leaveSubMenu() {
+    void endSubMenu() {
         m_actionStack.pop_back();
     }
 
-    void beginGroup(){
+    void beginGroup() {
         m_currentGroup = new QActionGroup(m_manager);
     }
 
-    void endGroup(){
+    void endGroup() {
         m_currentGroup = NULL;
     }
 
     QnActionBuilder operator()(Qn::ActionId id) {
-        QnAction *action = m_manager->m_actionById.value(id);
+        QnAction *action = m_manager->action(id);
         if(action == NULL) {
             action = new QnAction(id, m_manager);
-            m_manager->m_actionById[id] = action;
-            m_manager->m_idByAction[action] = id;
+            m_manager->registerAction(action);
         }
 
         m_actionStack.back()->addChild(action);
@@ -403,7 +405,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main | Qn::TabBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory(Qn::NewUserLayoutAction).
             flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
             requiredPermissions(Qn::CreateLayoutPermission).
@@ -431,13 +433,13 @@ QnActionManager::QnActionManager(QObject *parent):
             requiredPermissions(Qn::CurrentUserParameter, Qn::GlobalEditUsersPermission).
             text(tr("User...")).
             pulledText(tr("New User..."));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Main | Qn::Scene).
         text(tr("Open..."));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory(Qn::OpenFileAction).
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
@@ -456,7 +458,7 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
         flags(Qn::Main | Qn::Scene | Qn::NoTarget).
@@ -504,17 +506,19 @@ QnActionManager::QnActionManager(QObject *parent):
 #endif
         icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png"));
 
+    registerAlias(Qn::EffectiveMaximizeAction, Qn::FullscreenAction);
+
     factory(Qn::MinimizeAction).
         flags(Qn::NoTarget).
         text(tr("Minimize")).
         icon(qnSkin->icon("titlebar/minimize.png"));
 
     factory(Qn::MaximizeAction).
-        flags(Qn::NoTarget).
+        flags(Qn::Main).
         text(tr("Maximize")).
         toggledText(tr("Restore Down")).
         autoRepeat(false).
-        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon
+        icon(qnSkin->icon("titlebar/fullscreen.png", "titlebar/unfullscreen.png")); // TODO: icon?
 
     factory(Qn::SystemSettingsAction).
         flags(Qn::Main).
@@ -707,7 +711,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
          text(tr("Rotate to..."));
 
-    factory.enterSubMenu();{
+    factory.beginSubMenu();{
         factory(Qn::Rotate0Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("0 degrees"));
@@ -723,7 +727,7 @@ QnActionManager::QnActionManager(QObject *parent):
         factory(Qn::Rotate270Action).
             flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
             text(tr("270 degrees"));
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -807,7 +811,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Cell Aspect Ratio"));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory.beginGroup();
 
         factory(Qn::SetCurrentLayoutAspectRatio4x3Action).
@@ -824,13 +828,13 @@ QnActionManager::QnActionManager(QObject *parent):
             checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
 
         factory.endGroup();
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Change Cell Spacing"));
 
-    factory.enterSubMenu(); {
+    factory.beginSubMenu(); {
         factory.beginGroup();
 
         factory(Qn::SetCurrentLayoutItemSpacing0Action).
@@ -859,7 +863,7 @@ QnActionManager::QnActionManager(QObject *parent):
             checkable();
         factory.endGroup();
 
-    } factory.leaveSubMenu();
+    } factory.endSubMenu();
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget).
@@ -1003,7 +1007,7 @@ QnActionManager::QnActionManager(QObject *parent):
 }
 
 QnActionManager::~QnActionManager() {
-    qDeleteAll(m_actionById);
+    qDeleteAll(m_idByAction.keys());
 }
 
 void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) {
@@ -1013,12 +1017,51 @@ void QnActionManager::setTargetProvider(QnActionTargetProvider *targetProvider) 
         m_targetProviderGuard = this;
 }
 
-QAction *QnActionManager::action(Qn::ActionId id) const {
+void QnActionManager::registerAction(QnAction *action) {
+    if(!action) {
+        qnNullWarning(action);
+        return;
+    }
+
+    if(m_idByAction.contains(action))
+        return; /* Re-registration is allowed. */
+
+    if(m_actionById.contains(action->id())) {
+        qnWarning("Action with id '%1' is already registered with this action manager.", action->id());
+        return;
+    }
+
+    m_actionById[action->id()] = action;
+    m_idByAction[action] = action->id();
+}
+
+void QnActionManager::registerAlias(Qn::ActionId id, Qn::ActionId targetId) {
+    if(id == targetId) {
+        qnWarning("Action cannot be an alias of itself.");
+        return;
+    }
+
+    QnAction *action = this->action(id);
+    if(action && action->id() == id) { /* Note that re-registration with different target is OK. */
+        qnWarning("Id '%1' is already taken by non-alias action '%2'.", id, action->text());
+        return;
+    }
+
+    QnAction *targetAction = this->action(targetId);
+    if(!targetAction) {
+        qnWarning("Action with id '%1' is not registered with this action manager.", targetId);
+        return;
+    }
+
+    m_actionById[id] = targetAction;
+}
+
+QnAction *QnActionManager::action(Qn::ActionId id) const {
     return m_actionById.value(id, NULL);
 }
 
 QList<QnAction *> QnActionManager::actions() const {
-    return m_actionById.values();
+    return m_idByAction.keys();
 }
 
 bool QnActionManager::canTrigger(Qn::ActionId id, const QnActionParameters &parameters) {
@@ -1153,16 +1196,16 @@ QnActionParameters QnActionManager::currentParameters(QObject *sender) const {
     }
 }
 
-void QnActionManager::redirectAction(QMenu *menu, Qn::ActionId targetId, QAction *targetAction) {
-    redirectActionRecursive(menu, targetId, targetAction);
+void QnActionManager::redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction) {
+    redirectActionRecursive(menu, sourceId, targetAction);
 }
 
-bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId, QAction *targetAction) {
+bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction) {
     QList<QAction *> actions = menu->actions();
 
     foreach(QAction *action, actions) {
         QnAction *storedAction = qnAction(action);
-        if(storedAction && storedAction->id() == targetId) {
+        if(storedAction && storedAction->id() == sourceId) {
             int index = actions.indexOf(action);
             QAction *before = index + 1 < actions.size() ? actions[index + 1] : NULL;
 
@@ -1177,7 +1220,7 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId targetId
         }
 
         if(action->menu() != NULL) {
-            bool success = redirectActionRecursive(action->menu(), targetId, targetAction);
+            bool success = redirectActionRecursive(action->menu(), sourceId, targetAction);
             
             if(success && action->menu()->isEmpty())
                 menu->removeAction(action);

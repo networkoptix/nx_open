@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
 #include <QtCore/QMutex>
+#include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
