@@ -70,11 +70,12 @@
 #include "ui/workbench/workbench_translation_manager.h"
 
 #ifdef Q_WS_X11
-    #include "utils/app_focus_listener.h"
+    #include "ui/workaround/app_focus_listener.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
+#include "ui/workaround/full_screen_action.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -411,8 +412,8 @@ int qnMain(int argc, char *argv[])
         }
     }
 
-    mainWindow->showFullScreen();
     mainWindow->show();
+    QnFullScreenAction::get(context.data())->trigger();
         
     /* Process input files. */
     for (int i = 1; i < argc; ++i)

@@ -25,7 +25,7 @@ public:
     * Function may be not implemented in derived classes and return NULL
     * In this case, all necessary information MUST be present in bitstream. For example, SPS/PPS blocks for H.264
     */
-    virtual AVCodecContext* getCodecContext();
+    //virtual AVCodecContext* getCodecContext();
 
     //!Set codec-specific params for output stream. For list of supported params please refer to derived class' doc
     virtual void setParams(const Params& params);
@@ -71,7 +71,7 @@ public:
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
 
-    void open(QnCompressedVideoDataPtr video);
+    virtual void open(QnCompressedVideoDataPtr video);
 protected:
     QSize m_resolution;
 };
@@ -139,7 +139,8 @@ public:
 
     // for internal use only. move to protectd!
     int writeBuffer(const char* data, int size);
-
+    void setPacketizedMode(bool value);
+    const QVector<int>& getPacketsSize();
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -157,15 +158,18 @@ protected:
     bool m_videoStreamCopy;
     bool m_audioStreamCopy;
     QnByteArray m_internalBuffer;
+    QVector<int> m_outputPacketSize;
     qint64 m_firstTime;
 private:
     int suggestBitrate(QSize resolution) const;
+protected:
+    bool m_initialized;
 private:
     QString m_lastErrMessage;
     QQueue<QnCompressedVideoDataPtr> m_delayedVideoQueue;
     QQueue<QnCompressedAudioDataPtr> m_delayedAudioQueue;
-    bool m_initialized;
     int m_eofCounter;
+    bool m_packetizedMode;
 };
 
 #endif  // __TRANSCODER_H

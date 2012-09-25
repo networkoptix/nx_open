@@ -1165,12 +1165,25 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         return;
 
     QnConnectionData connectionData;
+    connectionData.name = QnConnectionDataList::defaultLastUsedName();
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 
     QnConnectionDataList connections = qnSettings->customConnections();
-    if (connections.reorderByUrl(connectionData.url))
-        qnSettings->setCustomConnections(connections);
+
+    // remove previous "Last used connection"
+    connections.removeOne(connectionData.name);
+
+    // try to find selected stored connection
+    if (!connections.reorderByUrl(connectionData.url)){
+
+        // save "Last used connection"
+        QnConnectionData last(connectionData);
+        last.url.setPassword(QString());
+        connections.prepend(last);
+    }
+    qnSettings->setCustomConnections(connections);
+
     //updateStoredConnections(connectionData);
 
     menu()->trigger(Qn::ReconnectAction, QnActionParameters().withArgument(Qn::ConnectInfoParameter, dialog->currentInfo()));
