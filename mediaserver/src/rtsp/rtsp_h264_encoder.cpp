@@ -1,6 +1,7 @@
 #include "utils/network/socket.h"
 #include "rtsp_h264_encoder.h"
 #include "utils/media/nalUnits.h"
+#include "utils/network/rtp_stream_parser.h"
 
 QnRtspH264Encoder::QnRtspH264Encoder():
     m_currentData(0),
@@ -86,6 +87,8 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
     const quint8* dataEnd = (const quint8*) m_media->data.data() + m_media->data.size();
     if (m_currentData == dataEnd)
         return false;
+
+    sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
 
     if (!m_isFragmented)
     {

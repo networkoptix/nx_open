@@ -347,13 +347,9 @@ void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
     m_newLiveQuality = liveQuality;
 }
 
-void QnRtspDataConsumer::buildRtspTcpHeader(quint8 channelNum, quint32 ssrc, quint16 len, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence)
+void QnRtspDataConsumer::buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence)
 {
-    m_rtspTcpHeader[0] = '$';
-    m_rtspTcpHeader[1] = channelNum;
-    quint16* lenPtr = (quint16*) &m_rtspTcpHeader[2];
-    *lenPtr = htons(len+sizeof(RtpHeader));
-    RtpHeader* rtp = (RtpHeader*) &m_rtspTcpHeader[4];
+    RtpHeader* rtp = (RtpHeader*) buffer;
     rtp->version = RtpHeader::RTP_VERSION;
     rtp->padding = 0;
     rtp->extension = 0;
@@ -545,13 +541,13 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
 
 
-    int rtpTcpChannel = m_owner->getAVTcpChannel(media->channelNumber);
-    if (rtpTcpChannel == -1) 
-        return true; // skip data (for example audio is disabled)
 
     //QnRtspEncoderPtr codecEncoder = m_owner->getCodecEncoder(media->channelNumber);
     //UDPSocket* mediaSocket = m_owner->getMediaSocket(media->channelNumber);
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
+    int rtpTcpChannel = trackInfo->clientPort;
+    if (rtpTcpChannel == -1) 
+        return true; // skip data (for example audio is disabled)
 
     if (trackInfo == 0 || trackInfo->encoder == 0)
         return true; // skip data (for example audio is disabled)
@@ -605,7 +601,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
 
     codecEncoder->setDataPacket(media);
-    bool dataExists = true;
     if (trackInfo->firstRtpTime == -1)
         trackInfo->firstRtpTime = media->timestamp;
     static AVRational r = {1, 1000000};
@@ -615,42 +610,38 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         timeDiff -= trackInfo->firstRtpTime; // enumerate RTP time from 0 after seek
     qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
 
-    while(dataExists && !m_needStop) 
+    m_sendBuffer.resize(4); // reserve space for RTP TCP header
+    while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
     {
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
 
-        m_sendBuffer.clear();
-
-        if (codecEncoder->isRtpHeaderExists()) {
-            m_sendBuffer.write((quint8) '$');
-            m_sendBuffer.write((quint8) rtpTcpChannel);
-            m_sendBuffer.write((quint8) 0);
-            m_sendBuffer.write((quint8) 0);
+        if (codecEncoder->isRtpHeaderExists()) 
+        {
+            RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
+            if(packet->payloadType >= 72 && packet->payloadType <= 76)
+            {   // RTCP packet
+                rtpTcpChannel = trackInfo->clientRtcpPort;
+                mediaSocket = trackInfo->rtcpSocket;
+            }
         }
         else {
-            buildRtspTcpHeader(rtpTcpChannel, codecEncoder->getSSRC(), 0, codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence); 
-            m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+            buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
         }
-        RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
+        
+        if (mediaSocket == 0) {
+            m_sendBuffer.data()[0] = '$';
+            m_sendBuffer.data()[1] = rtpTcpChannel;
+            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
+            *lenPtr = htons(m_sendBuffer.size() - 4);
+            m_owner->sendBuffer(m_sendBuffer);
+        }
+        else {
+            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+        }
 
-        dataExists = codecEncoder->getNextPacket(m_sendBuffer);
-        //Q_ASSERT(rtpTcpChannel == 0);
-        if (dataExists) 
-        {
-            Q_ASSERT(m_sendBuffer.size() > 16);
-            if (mediaSocket == 0) {
-                quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
-                *lenPtr = htons(m_sendBuffer.size() - 4);
-                m_owner->sendBuffer(m_sendBuffer);
-            }
-            else {
-                Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-                mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
-            }
-            //Q_ASSERT(rtpTcpChannel == 0);
-            trackInfo->sequence++;
-        }
+        m_sendBuffer.resize(4); // reserve space for RTP TCP header
     }
     m_sendBuffer.clear();
 
@@ -661,13 +652,19 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     {
         int sendLen = newRange.size();
         int metadataTcpChannel = m_owner->getMetadataTcpChannel();
-        if (metadataTcpChannel >= 0) {
-            buildRtspTcpHeader(metadataTcpChannel, METADATA_SSRC, sendLen, 0, qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
-            m_sendBuffer.write(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
+        if (metadataTcpChannel >= 0) 
+        {
+            m_sendBuffer.resize(16);
+            buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, newRange.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
             m_sendBuffer.write(newRange);
 
-            if (mediaSocket == 0)
+            if (mediaSocket == 0) {
+                m_sendBuffer.data()[0] = '$';
+                m_sendBuffer.data()[1] = metadataTcpChannel;
+                quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
+                *lenPtr = htons(m_sendBuffer.size() - 4);
                 m_owner->sendBuffer(m_sendBuffer);
+            }
             else  {
                 Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
                 mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
