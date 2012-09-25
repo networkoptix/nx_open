@@ -10,7 +10,8 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_curDataBuffer(0),
     m_liveMarker(0),
     m_additionFlags(0),
-    m_eofReached(false)
+    m_eofReached(false),
+    m_isLastDataContext(false)
 {
 
 }    
@@ -69,8 +70,10 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         Q_ASSERT(!m_codecCtxData.isEmpty());
         sendBuffer.write(m_codecCtxData);
         m_codecCtxData.clear();
+        m_isLastDataContext = true;
         return true;
     }
+    m_isLastDataContext = false;
 
     quint16 flags = m_media->flags;
     flags |= m_additionFlags;
@@ -144,18 +147,13 @@ quint32 QnRtspFfmpegEncoder::getSSRC()
 {
     quint32 ssrc = BASIC_FFMPEG_SSRC + m_media->channelNumber * MAX_CONTEXTS_AT_VIDEO*2;
     ssrc += m_media->subChannelNumber*2;
-    return ssrc + (m_codecCtxData.isEmpty() ? 0 : 1);
+    return ssrc + (m_isLastDataContext ? 1 : 0);
 }
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    if (!m_codecCtxData.isEmpty())
-        return true;
-
     int dataRest = m_media->data.data() + m_media->data.size() - m_curDataBuffer;
-    int sendLen = qMin(MAX_RTSP_DATA_LEN - RTSP_FFMPEG_MAX_HEADER_SIZE, dataRest);
-
-    return sendLen >= dataRest ? 1 : 0;
+    return m_isLastDataContext || dataRest == 0;
 }
 
 quint32 QnRtspFfmpegEncoder::getFrequency()

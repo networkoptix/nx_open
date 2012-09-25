@@ -635,13 +635,14 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
         return false;
 
     RtpHeader* rtpHeader = (RtpHeader*) (m_outputBuffer.data() + m_outputPos);
+    /*
     if (rtpHeader->payloadType != getPayloadtype()) 
     {
         m_outputPos += packets[packetIndex];
         packetIndex++;
         return getNextPacket(sendBuffer); // skip RTCP packet
     }
-
+    */
     if (m_isFirstPacket)
     {
         m_isFirstPacket = false;

@@ -141,10 +141,7 @@ quint32 QnRtspH264Encoder::getSSRC()
 
 bool QnRtspH264Encoder::isLastPacket()
 {
-    if (m_isFragmented)
-        return m_nalEnd - m_currentData + 2 <= RTSP_H264_MAX_LEN;
-    else
-        return true;
+    return m_isFragmented || m_currentData == m_nalEnd;
 }
 
 bool QnRtspH264Encoder::getRtpMarker()

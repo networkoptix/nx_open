@@ -37,6 +37,7 @@ private:
     int m_liveMarker;
     quint16 m_additionFlags;
     bool m_eofReached;
+    bool m_isLastDataContext;
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;
