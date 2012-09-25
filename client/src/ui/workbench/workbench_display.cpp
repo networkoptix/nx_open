@@ -15,6 +15,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
 #include <utils/common/toggle.h>
+#include <utils/common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
@@ -66,8 +67,6 @@
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
 
-
-Q_DECLARE_METATYPE(QUuid) // TODO: move out
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {

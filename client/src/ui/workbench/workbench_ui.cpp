@@ -77,8 +77,6 @@
 #include "workbench_access_controller.h"
 
 
-Q_DECLARE_METATYPE(VariantAnimator *)
-
 namespace {
 
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {

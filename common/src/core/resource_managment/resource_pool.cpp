@@ -4,6 +4,7 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
+#include "utils/common/common_meta_types.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
@@ -22,9 +23,7 @@ QnResourcePool::QnResourcePool() : QObject(),
     m_resourcesMtx(QMutex::Recursive),
     m_updateLayouts(true)
 {
-    qRegisterMetaType<QnResourcePtr>("QnResourcePtr");
-    qRegisterMetaType<QnResourceList>("QnResourceList");
-    qRegisterMetaType<QnResource::Status>("QnResource::Status");
+    QnCommonMetaTypes::initilize();
 
     localServer = QnResourcePtr(new QnLocalMediaServerResource);
     addResource(localServer);

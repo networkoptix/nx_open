@@ -175,9 +175,5 @@ private:
 };
 
 
-namespace detail {
-
-} // namespace detail
-
 
 #endif // QN_INSTRUMENT_MANAGER_H

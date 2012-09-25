@@ -20,6 +20,8 @@ namespace QnResourceProperty {
 
     } // anonymous namespace
 
+    // TODO: #TEST
+
     /**
      * Tests that the QnResource actually exposes the properties defined in this file.
      */

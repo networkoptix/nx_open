@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QModelIndex>
+#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -114,5 +115,7 @@ private:
     /** Temporary object used for postponed updates. */
     QObject *m_updateListener;
 };
+
+Q_DECLARE_METATYPE(QnResourceSearchSynchronizer *);
 
 #endif // QN_RESOURCE_SEARCH_SYNCHRONIZER_H

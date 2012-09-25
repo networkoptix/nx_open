@@ -550,7 +550,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         return;
     }
 
-    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
+    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: evil!
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }

@@ -22,8 +22,6 @@
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
 
-Q_DECLARE_METATYPE(QnAction *)
-
 namespace {
     void copyIconPixmap(const QIcon &src, QIcon::Mode mode, QIcon::State state, QIcon *dst) {
         dst->addPixmap(src.pixmap(src.actualSize(QSize(1024, 1024), mode, state), mode, state), mode, state);
