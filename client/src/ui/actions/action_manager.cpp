@@ -889,18 +889,18 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection...")).
-        condition(new QnExportActionCondition(this));
+        condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
-         flags(Qn::Slider | Qn::SingleTarget). 
+        flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
         text(tr("Export Selection as Multi-Stream...")).
         //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
-        condition(new QnExportActionCondition(this));
+        condition(new QnExportActionCondition(false, this));
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Thumbnails Search...")).
-        condition(new QnExportActionCondition(this));
+        condition(new QnExportActionCondition(true, this));
 
     factory().
         flags(Qn::Slider).
