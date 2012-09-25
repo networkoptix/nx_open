@@ -219,13 +219,6 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     }
     
     bool isOpened = m_rtspSession.open(getUrl(resource));
-
-    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
-    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
-        m_globalMinArchiveTime = globalMinTime;
-    else if (globalTimeBlocked)
-        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
-
     if (isOpened)
     {
         qint64 endTime = m_position;
@@ -242,6 +235,14 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     }
     m_opened = m_rtspSession.isOpened();
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
+
+    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
+    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
+        m_globalMinArchiveTime = globalMinTime;
+    else if (globalTimeBlocked)
+        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
+
+
     return m_opened;
 }
 
