@@ -122,6 +122,13 @@ public:
         new (p) value_type(wert);
     }
 
+    /**
+     * C++11 extension member.
+     */
+    inline void construct(pointer p) {
+        new (p) value_type();
+    }
+
     inline void destroy(pointer p) {
         (void) p; /* Silence MSVC unused variable warnings. */
 
