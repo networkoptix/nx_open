@@ -12,6 +12,7 @@
 
 #include "version.h"
 #include "utils/common/util.h"
+#include "utils/common/module_resources.h"
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
@@ -60,7 +61,6 @@
 #include "rtsp/rtsp_connection.h"
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_handler.h"
-#include "utils/common/module_resources.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 
 #define USE_SINGLE_STREAMING_PORT

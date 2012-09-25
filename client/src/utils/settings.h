@@ -64,6 +64,11 @@ public:
      * \param base - base name of the connection
      */
     QString generateUniqueName(const QString &base);
+
+    /**
+     * Returns default name for the last used connection.
+     */
+    static QString defaultLastUsedName();
 };
 
 Q_DECLARE_METATYPE(QnConnectionData)

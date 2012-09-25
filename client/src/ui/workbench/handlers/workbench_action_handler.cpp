@@ -1165,7 +1165,7 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
         return;
 
     QnConnectionData connectionData;
-    connectionData.name = tr("* Last used connection *");
+    connectionData.name = QnConnectionDataList::defaultLastUsedName();
     connectionData.url = dialog->currentUrl();
     qnSettings->setLastUsedConnection(connectionData);
 

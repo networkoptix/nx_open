@@ -116,11 +116,10 @@ QnSystrayWindow::QnSystrayWindow():
 
 void QnSystrayWindow::handleMessage(const QString& message)
 {
-    if (message == "quit")
+    if (message == "quit") {
         qApp->quit();
-    else if (message == "activate")
-    {
-        ;
+    } else if (message == "activate") {
+        return;
     }
 }
 
@@ -222,20 +221,15 @@ void QnSystrayWindow::setIcon(int index)
 
 void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    CURSORINFO  pci;
-    pci.cbSize = sizeof(CURSORINFO);
-
-    switch (reason) 
-    {
-       case QSystemTrayIcon::DoubleClick:
-       case QSystemTrayIcon::Trigger:
-           if (GetCursorInfo(&pci))
-               trayIcon->contextMenu()->popup(QPoint(pci.ptScreenPos.x, pci.ptScreenPos.y));
-           break;
-       case QSystemTrayIcon::MiddleClick:
-           break;
-       default:
-           ;
+    switch (reason) {
+        case QSystemTrayIcon::DoubleClick:
+        case QSystemTrayIcon::Trigger:
+            trayIcon->contextMenu()->popup(QCursor::pos());
+            break;
+        case QSystemTrayIcon::MiddleClick:
+            break;
+        default:
+            break;
     }
 }
 
@@ -681,6 +675,8 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
             saveData();
             if (appServerParamChanged || mediaServerParamChanged)
             {
+                // TODO: #VASILENKO Untranslatable strings.
+
                 QString requestStr = tr("The changes you made require ");
                 if (appServerParamChanged)
                     requestStr += APP_SERVER_NAME;
