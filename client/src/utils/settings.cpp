@@ -74,6 +74,9 @@ QString QnConnectionDataList::generateUniqueName(const QString &base){
     return uniqueName;
 }
 
+QString QnConnectionDataList::defaultLastUsedName(){
+    return QObject::tr("* Last used connection *");
+}
 
 
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
