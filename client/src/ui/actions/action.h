@@ -159,6 +159,7 @@ public:
     QString toolTipFormat() const;
     void setToolTipFormat(const QString &toolTipFormat);
 
+
     /**
      * \param scope                     Scope in which action is to be executed.
      * \param parameters                Parameters for action execution.

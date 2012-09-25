@@ -39,7 +39,6 @@
 #include "ui/style/globals.h"
 #include "ui/style/proxy_style.h"
 #include "ui/events/system_menu_event.h"
-#include "ui/workaround/full_screen_action.h"
 
 #include "file_processor.h"
 #include "utils/settings.h"
@@ -212,7 +211,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(QnFullScreenAction::get(context)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
@@ -458,7 +457,7 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        QnFullScreenAction::get(context())->toggle();
+        action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
 }

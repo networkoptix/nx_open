@@ -42,15 +42,15 @@ public:
     /**
      * \param action                    New action to register with this action manager.
      */
-    void addAction(QnAction *action);
+    void registerAction(QnAction *action);
 
     /**
-     * Registers action id as an alias for another action id.
+     * Registers action id as an alias for another action id. 
      * 
-     * \param id                        Alias id.
+     * \param sourceId                  Alias id.
      * \param targetId                  Id of the target action.
      */
-    void addAlias(Qn::ActionId id, Qn::ActionId targetId);
+    void registerAlias(Qn::ActionId id, Qn::ActionId targetId);
 
     /**
      * \param id                        Id of the action to get.
@@ -125,7 +125,7 @@ public:
      * \param targetId                  Id of the action to be replaced.
      * \param targetAction              Replacement action.
      */
-    void redirectAction(QMenu *menu, Qn::ActionId targetId, QAction *targetAction);
+    void redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction);
 
 protected:
     friend class QnAction;

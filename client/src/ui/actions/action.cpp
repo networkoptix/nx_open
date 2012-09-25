@@ -118,6 +118,9 @@ void QnAction::setToolTipFormat(const QString &toolTipFormat) {
 }
 
 Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
+    if(!isVisible())
+        return Qn::InvisibleAction; // TODO: cheat!
+
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
