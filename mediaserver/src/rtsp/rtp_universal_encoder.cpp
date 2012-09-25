@@ -1,6 +1,8 @@
 #include "rtp_universal_encoder.h"
+
+#include <QtCore/QLibrary>
+
 #include "utils/network/rtp_stream_parser.h"
-#include "../src/corelib/plugin/qlibrary.h"
 
 extern "C" {
 #include <libavutil/opt.h>
