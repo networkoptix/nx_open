@@ -125,6 +125,9 @@ public:
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
             m_features |= QnGlFunctions::OpenGLBroken; /* OpenGL is declared but don't work. */
+        QDir atiProcDir(QString::fromAscii("/proc/ati"));
+        if( atiProcDir.exists() )    //checking for fglrx
+            m_features |= QnGlFunctions::NoOpenGLFullScreen;
     }
 
     virtual ~QnGlFunctionsPrivate() {}
