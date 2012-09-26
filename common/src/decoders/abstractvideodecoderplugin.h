@@ -24,7 +24,7 @@ class QnAbstractVideoDecoderPlugin
 public:
     //!Returns list of MIME types of supported formats
     virtual QList<CodecID> supportedCodecTypes() const = 0;
-    //!Returns true, if decoder CAN offer hardware acceleration
+    //!Returns true, if decoder CAN offer hardware acceleration. It does not mean it can decode every stream with hw acceleration
     /*!
         \note Actually, ability of hardware acceleration depends on stream parameters: resolution, bitrate, profile/level etc.
             And can only be found out by creation of decoder and parsing media stream header
