@@ -8,8 +8,8 @@
 #include "pluginmanager.h"
 
 #include <QAtomicPointer>
-#include <QDir>
 #include <QCoreApplication>
+#include <QDir>
 
 #include "../utils/common/log.h"
 
@@ -48,9 +48,11 @@ void PluginManager::loadPlugins()
     if( !m_pluginDir.isEmpty() )
         loadPlugins( m_pluginDir );
 
-    char* netOptixPluginDir = getenv("NET_OPTIX_PLUGIN_DIR");
+#ifndef Q_OS_WIN32
+    char* netOptixPluginDir = getenv("NETWORK_OPTIX_PLUGIN_DIR");
     if( netOptixPluginDir )
         loadPlugins( QString::fromAscii(netOptixPluginDir) );
+#endif
 
     loadPlugins( QDir::currentPath() );
     loadPlugins( QCoreApplication::applicationDirPath() );
