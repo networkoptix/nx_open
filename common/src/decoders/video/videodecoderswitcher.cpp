@@ -5,9 +5,10 @@
 #include "videodecoderswitcher.h"
 
 
-VideoDecoderSwitcher::VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder )
+VideoDecoderSwitcher::VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder, const QnCompressedVideoDataPtr& sequenceHeader )
 :
-    m_decoder( hwDecoder )
+    m_decoder( hwDecoder ),
+    m_mediaSequenceHeader( sequenceHeader )
 {
 }
 

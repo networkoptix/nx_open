@@ -18,9 +18,9 @@ class VideoDecoderSwitcher
 {
 public:
     /*!
-        \param hwDecoder Decoder. Non-NULL! VideoDecoderSwitcher object takes ownership of \a hwDecoder
+        \param hwDecoder Decoder. MUST not be NULL! VideoDecoderSwitcher object takes ownership of \a hwDecoder
     */
-    VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder );
+    VideoDecoderSwitcher( QnAbstractVideoDecoder* hwDecoder, const QnCompressedVideoDataPtr& sequenceHeader );
 
     //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
     virtual PixelFormat GetPixelFormat() const;
