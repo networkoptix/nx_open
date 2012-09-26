@@ -86,6 +86,9 @@ public:
         }
     }
 
+    QByteArray serialize() const;
+    QnTimePeriod& deserialize(const QByteArray& data);
+
     /** Start time in milliseconds. */
     qint64 startTimeMs;
 

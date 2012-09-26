@@ -9,7 +9,10 @@ public:
         m_file(QnLayoutFileStorageResource::removeProtocolPrefix(storageResource.getUrl())),
         m_storageResource(storageResource),
         m_fileOffset(0),
-        m_fileSize(0)
+        m_fileSize(0),
+        m_mutex(QMutex::Recursive),
+        m_storedPosition(0),
+        m_openMode(QIODevice::NotOpen)
     {
         m_fileName = fileName.mid(fileName.lastIndexOf(QLatin1Char('?'))+1);
     }
@@ -21,36 +24,45 @@ public:
 
     virtual bool seek(qint64 offset) override
     {
+        QMutexLocker lock(&m_mutex);
         return m_file.seek(offset + m_fileOffset);
     }
 
     virtual qint64 size() const
     {
+        QMutexLocker lock(&m_mutex);
         return m_fileSize;   
     }
 
     virtual qint64 pos() const
     {
+        QMutexLocker lock(&m_mutex);
         return m_file.pos() - m_fileOffset;
     }
 
     virtual qint64 readData(char *data, qint64 maxSize) override
     {
+        QMutexLocker lock(&m_mutex);
         return m_file.read(data, qMin(m_fileSize - pos(), maxSize));
     }
 
     virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
+        QMutexLocker lock(&m_mutex);
         return m_file.write(data, maxSize);
     }
 
     virtual void close() override
     {
+        QMutexLocker lock(&m_mutex);
         m_file.close();
+        m_storageResource.unregisterFile(this);
     }
 
     virtual bool open(QIODevice::OpenMode openMode) override
     {
+        QMutexLocker lock(&m_mutex);
+        m_openMode = openMode;
         if (openMode & QIODevice::WriteOnly) 
         {
             if (!m_storageResource.addFileEntry(m_fileName))
@@ -64,18 +76,47 @@ public:
         if (m_fileOffset == -1)
             return false;
         m_file.seek(m_fileOffset);
-
         return QIODevice::open(openMode);
+    }
+
+    void lockFile()
+    {
+        m_mutex.lock();
+    }
+
+    void unlockFile()
+    {
+        m_mutex.unlock();
+    }
+
+    void storeStateAndClose()
+    {
+        m_storedPosition = pos();
+        m_file.close();
+    }
+
+    void restoreState()
+    {
+        open(m_openMode);
+        seek(m_storedPosition);
     }
 
 private:
     QFile m_file;
+    mutable QMutex m_mutex;
     QnLayoutFileStorageResource& m_storageResource;
 
     qint64 m_fileOffset;
     qint64 m_fileSize;
     QString m_fileName;
+    qint64 m_storedPosition;
+    QIODevice::OpenMode m_openMode;
 };
+
+// -------------------------------- QnLayoutFileStorageResource ---------------------------
+
+QMutex QnLayoutFileStorageResource::m_storageSync;
+QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
@@ -92,14 +133,57 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         delete rez;
         return 0;
     }
+    registerFile(rez);
     return rez;
 }
 
+void QnLayoutFileStorageResource::registerFile(QnLayoutFile* file)
+{
+    QMutexLocker lock(&m_fileSync);
+    m_openedFiles.insert(file);
+}
 
+void QnLayoutFileStorageResource::unregisterFile(QnLayoutFile* file)
+{
+    QMutexLocker lock(&m_fileSync);
+    m_openedFiles.remove(file);
+}
+
+void QnLayoutFileStorageResource::closeOpenedFiles()
+{
+    QMutexLocker lock(&m_fileSync);
+    for (QSet<QnLayoutFile*>::Iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
+    {
+        QnLayoutFile* file = *itr;
+        file->lockFile();
+        file->storeStateAndClose();
+    }
+    m_index.entryCount = 0;
+}
+
+void QnLayoutFileStorageResource::restoreOpenedFiles()
+{
+    QMutexLocker lock(&m_fileSync);
+    for (QSet<QnLayoutFile*>::Iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
+    {
+        QnLayoutFile* file = *itr;
+        file->restoreState();
+        file->unlockFile();
+    }
+}
 
 QnLayoutFileStorageResource::QnLayoutFileStorageResource()
 {
-};
+    QMutexLocker lock(&m_storageSync);
+    m_allStorages.insert(this);
+}
+
+QnLayoutFileStorageResource::~QnLayoutFileStorageResource()
+{
+    QMutexLocker lock(&m_storageSync);
+    m_allStorages.remove(this);
+}
+
 
 bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
 {
@@ -114,7 +198,24 @@ bool QnLayoutFileStorageResource::removeFile(const QString& url)
 
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
-    return QFile::rename(oldName, newName);
+    QMutexLocker lock(&m_storageSync);
+    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
+    {
+        QnLayoutFileStorageResource* storage = *itr;
+        if (storage->getUrl() == newName)
+            storage->closeOpenedFiles();
+    }
+    QFile::remove(removeProtocolPrefix(newName));
+    bool rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
+    {
+        QnLayoutFileStorageResource* storage = *itr;
+        if (storage->getUrl() == newName)
+            storage->restoreOpenedFiles();
+    }
+    if (rez)
+        setUrl(newName);
+    return rez;
 }
 
 
@@ -207,8 +308,9 @@ void QnLayoutFileStorageResource::readIndexHeader()
         file.read((char*) &m_index, sizeof(m_index));
 }
 
-bool QnLayoutFileStorageResource::addFileEntry(const QString& fileName)
+bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 {
+    QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
 

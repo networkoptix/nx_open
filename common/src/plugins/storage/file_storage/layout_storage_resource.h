@@ -16,6 +16,7 @@ class QnLayoutFileStorageResource: public QnStorageResource
 {
 public:
     QnLayoutFileStorageResource();
+    virtual ~QnLayoutFileStorageResource();
 
     static QnStorageResource* instance();
 
@@ -44,6 +45,12 @@ private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     void readIndexHeader();
+    void registerFile(QnLayoutFile* file);
+    void unregisterFile(QnLayoutFile* file);
+
+    void closeOpenedFiles();
+    void restoreOpenedFiles();
+
 private:
     static const int MAX_FILES_AT_LAYOUT = 256;
     static const quint64 MAGIC_STATIC = 0xfed8260da9eebc04ll;
@@ -72,6 +79,10 @@ private:
 
     friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
+    QSet<QnLayoutFile*> m_openedFiles;
+    QMutex m_fileSync;
+    static QMutex m_storageSync;
+    static QSet<QnLayoutFileStorageResource*> m_allStorages;
 };
 
 typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;

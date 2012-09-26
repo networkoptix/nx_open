@@ -174,6 +174,16 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.unlock();
 }
 
+QnTimePeriod QnLayoutResource::getLocalRange() const
+{
+    return m_localRange;
+}
+
+void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
+{
+    m_localRange = value;
+}
+
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 {
     QnLayoutResourcePtr layout;
@@ -192,6 +202,15 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     } catch(...) {
         return layout;
     }
+
+    QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
+    if (rangeFile)
+    {
+        QByteArray data = rangeFile->readAll();
+        delete rangeFile;
+        layout->setLocalRange(QnTimePeriod().deserialize(data));
+    }
+
     layout->setGuid(QUuid::createUuid());
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());

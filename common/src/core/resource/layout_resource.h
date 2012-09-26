@@ -3,11 +3,10 @@
 
 #include <QtCore/QRectF>
 #include <QtCore/QUuid>
-
 #include <recording/time_period.h>
-
 #include "resource.h"
 #include "layout_item_data.h"
+#include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
     Q_OBJECT;
@@ -58,6 +57,9 @@ public:
 
     void requestStore() { emit storeRequested(); } // TODO: hack
 
+    QnTimePeriod getLocalRange() const;
+    void setLocalRange(const QnTimePeriod& value);
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);
@@ -79,6 +81,7 @@ private:
     qreal m_cellAspectRatio;
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
+    QnTimePeriod m_localRange;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

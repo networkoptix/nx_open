@@ -182,7 +182,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-
+signals:
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
@@ -283,6 +283,7 @@ protected slots:
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
+    void at_layout_exportFinished();
     void at_cameraCamera_exportFailed(QString errorMessage);
 
 
@@ -290,6 +291,7 @@ protected slots:
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, const QString& eofMessage);
    // void updateStoredConnections(QnConnectionData connectionData);
 
 private:
@@ -319,6 +321,7 @@ private:
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;
+    QString m_layoutExportMessage;
 
 
     QTimer *m_tourTimer;

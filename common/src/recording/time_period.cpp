@@ -164,6 +164,27 @@ QnTimePeriodList QnTimePeriod::mergeTimePeriods(const QVector<QnTimePeriodList>&
     return result;
 }
 
+QByteArray QnTimePeriod::serialize() const
+{
+    QByteArray rez;
+    qint64 val = htonll(startTimeMs);
+    rez.append((const char*) &val, sizeof(val));
+    val = htonll(durationMs);
+    rez.append((const char*) &val, sizeof(val));
+    return rez;
+}
+
+QnTimePeriod& QnTimePeriod::deserialize(const QByteArray& data)
+{
+    if (data.size() == 16)
+    {
+        quint64* val = (quint64*) data.data();
+        startTimeMs = ntohll(val[0]);
+        durationMs = ntohll(val[1]);
+    }
+    return *this;
+}
+
 bool QnTimePeriod::operator==(const QnTimePeriod &other) const
 {
     return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
