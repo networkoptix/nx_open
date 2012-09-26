@@ -183,7 +183,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     if (layoutFile == 0)
         return layout;
     QByteArray layoutData = layoutFile->readAll();
-
+    delete layoutFile;
     QnApiPbSerializer serializer;
     try {
         serializer.deserializeLayout(layout, layoutData);
