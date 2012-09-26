@@ -48,11 +48,11 @@ public:
         m_mtDecoding = value;
     }
     //!Returns true if decoder uses multiple threads
-    bool isMultiThreadedDecoding() const { return m_mtDecoding; }
+    virtual bool isMultiThreadedDecoding() const { return m_mtDecoding; }
 
     void setTryHardwareAcceleration(bool tryHardwareAcceleration);
     //!Returns true if hardware acceleration enabled
-    bool isHardwareAccelerationEnabled() const;
+    virtual bool isHardwareAccelerationEnabled() const;
     virtual int getWidth() const  { return 0; }
     virtual int getHeight() const { return 0; }
     virtual double getSampleAspectRatio() const { return 1; };
