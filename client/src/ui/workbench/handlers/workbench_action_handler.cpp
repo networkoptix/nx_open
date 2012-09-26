@@ -550,7 +550,7 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         return;
     }
 
-    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >");
+    qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: evil!
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
@@ -1959,6 +1959,7 @@ Do you want to continue?"),
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
     m_layoutExportResources.clear();
+    QSet<QString> uniqIdList;
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         (*itr).uuid = QUuid();
@@ -1970,8 +1971,10 @@ Do you want to continue?"),
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
-                //(*itr).resource.path = mediaRes->getUrl();
-                m_layoutExportResources << mediaRes;
+                if (!uniqIdList.contains(mediaRes->getUniqueId())) {
+                    m_layoutExportResources << mediaRes;
+                    uniqIdList << mediaRes->getUniqueId();
+                }
             }
         }
     }
@@ -1995,7 +1998,9 @@ Do you want to continue?"),
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
-        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
+        QString uniqId = m_layoutExportResources[i]->getUniqueId();
+        uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
+        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
         QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
         QByteArray data;
         periods.encode(data);
@@ -2021,8 +2026,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             {
                 m_motionFileBuffer[i]->close();
                 
-                QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(m_exportedMediaRes->getUniqueId());
-                //QString motionFileName = m_exportedMediaRes->getUniqueId() + QString(QLatin1String(".bin"));
+                QString uniqId = m_exportedMediaRes->getUniqueId();
+                uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
+                QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
                 device->write(m_motionFileBuffer[i]->buffer());
                 device->close();
@@ -2038,6 +2044,14 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->deleteLater();
         m_exportStorage.clear();
+
+        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
+        if (layout) {
+            layout->setStatus(QnResource::Online);
+            resourcePool()->addResource(layout);
+        }
+
+
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
     } else {
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
@@ -2049,13 +2063,10 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
             m_motionFileBuffer[i]->open(QIODevice::ReadWrite);
             m_layoutExportCamera->setMotionIODevice(m_motionFileBuffer[i], i);
         }
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, m_exportedMediaRes->getUniqueId(), QLatin1String("mkv"), m_exportStorage);
 
-        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
-        if (layout) {
-            layout->setStatus(QnResource::Online);
-            resourcePool()->addResource(layout);
-        }
+        QString uniqId = m_exportedMediaRes->getUniqueId();
+        uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));

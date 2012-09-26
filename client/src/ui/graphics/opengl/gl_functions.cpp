@@ -94,6 +94,9 @@ Q_GLOBAL_STATIC(QnGlFunctionsGlobal, qn_glFunctionsGlobal);
 // -------------------------------------------------------------------------- //
 // QnGlFunctionsPrivate
 // -------------------------------------------------------------------------- //
+/**
+ * A per-context object that contains OpenGL functions state.
+ */
 class QnGlFunctionsPrivate {
 public:
     QnGlFunctionsPrivate(const QGLContext *context): 
@@ -125,6 +128,12 @@ public:
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
         if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
             m_features |= QnGlFunctions::OpenGLBroken; /* OpenGL is declared but don't work. */
+        
+#ifdef Q_OS_LINUX
+        QDir atiProcDir(QString::fromAscii("/proc/ati"));
+        if(atiProcDir.exists()) /* Checking for fglrx driver. */
+            m_features |= QnGlFunctions::NoOpenGLFullScreen;
+#endif
     }
 
     virtual ~QnGlFunctionsPrivate() {}

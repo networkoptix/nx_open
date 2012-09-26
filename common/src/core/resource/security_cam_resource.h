@@ -86,6 +86,4 @@ private:
     MotionType m_motionType;
 };
 
-Q_DECLARE_METATYPE(QnMotionRegion)
-
 #endif //sequrity_cam_resource_h_1239

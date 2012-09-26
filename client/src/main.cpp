@@ -76,7 +76,7 @@
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
-#include "ui/workaround/full_screen_action.h"
+#include "ui/workaround/fglrx_full_screen.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -409,7 +409,11 @@ int qnMain(int argc, char *argv[])
     QnCameraHistoryPool::instance()->addCameraHistory(history1);
 #endif
 
+    /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
@@ -423,7 +427,7 @@ int qnMain(int argc, char *argv[])
     }
 
     mainWindow->show();
-    QnFullScreenAction::get(context.data())->trigger();
+    context->action(Qn::EffectiveMaximizeAction)->trigger();
         
     /* Process input files. */
     for (int i = 1; i < argc; ++i)

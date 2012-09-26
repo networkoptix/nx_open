@@ -61,9 +61,7 @@ namespace detail {
     {
         Q_OBJECT
     public:
-        QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {
-            qRegisterMetaType<QnStatisticsDataList>("QnStatisticsDataList");
-        }
+        QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString */ , int /*handle*/);
     signals:
@@ -74,9 +72,7 @@ namespace detail {
     {
         Q_OBJECT
     public:
-        QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {
-             qRegisterMetaType<QnCamerasFoundInfoList>("QnCamerasFoundInfoList");
-        }
+        QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {}
     public slots:
         void at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
         void at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);

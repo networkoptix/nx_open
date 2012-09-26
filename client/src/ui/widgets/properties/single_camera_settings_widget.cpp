@@ -183,7 +183,7 @@ void QnSingleCameraSettingsWidget::loadAdvancedSettings()
         }
 #endif
 
-        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >");
+        qRegisterMetaType<QList<QPair<QString, QVariant> > >("QList<QPair<QString, QVariant> >"); // TODO: evil!
         serverConnection->asyncGetParamList(m_camera, settings, this, SLOT(at_advancedSettingsLoaded(int, const QList<QPair<QString, QVariant> >&)) );
     }
 }

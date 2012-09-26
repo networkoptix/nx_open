@@ -1,6 +1,5 @@
 #include "rtp_universal_encoder.h"
 #include "utils/network/rtp_stream_parser.h"
-#include "../src/corelib/plugin/qlibrary.h"
 
 extern "C" {
 #include <libavutil/opt.h>

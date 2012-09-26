@@ -240,11 +240,15 @@ private:
 
 class QnExportActionCondition: public QnActionCondition {
 public:
-    QnExportActionCondition(QObject *parent = NULL):
-        QnActionCondition(parent)
+    QnExportActionCondition(bool centralItemRequired, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_centralItemRequired(centralItemRequired)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    bool m_centralItemRequired;
 };
 
 class QnPanicActionCondition: public QnActionCondition {

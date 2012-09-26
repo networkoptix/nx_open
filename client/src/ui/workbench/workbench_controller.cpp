@@ -94,8 +94,6 @@
 #   define TRACE(...)
 #endif
 
-Q_DECLARE_METATYPE(VariantAnimator *)
-
 namespace {
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
         QAction *result = new QAction(text, parent);

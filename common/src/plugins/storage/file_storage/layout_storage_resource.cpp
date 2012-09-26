@@ -11,7 +11,7 @@ public:
         m_fileOffset(0),
         m_fileSize(0)
     {
-        m_fileName = fileName.mid(fileName.indexOf(QLatin1Char('?'))+1);
+        m_fileName = fileName.mid(fileName.lastIndexOf(QLatin1Char('?'))+1);
     }
 
     virtual ~QnLayoutFile()

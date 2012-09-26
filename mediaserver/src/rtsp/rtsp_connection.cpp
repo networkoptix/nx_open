@@ -157,9 +157,10 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!d->requestHeaders.value("Scale").isNull())
         d->rtspScale = d->requestHeaders.value("Scale").toDouble();
 
+    QUrl url(d->requestHeaders.path());
     if (d->mediaRes == 0)
     {
-        QString resId = extractPath();
+        QString resId = url.path();
         if (resId.startsWith('/'))
             resId = resId.mid(1);
         QnResourcePtr resource = qnResPool->getResourceByUrl(resId);
@@ -171,7 +172,12 @@ void QnRtspConnectionProcessor::parseRequest()
 
     if (d->requestHeaders.value("user-agent").toLower().contains("network optix"))
         d->useProprietaryFormat = true;
-    processRangeHeader();
+
+    QString pos = url.queryItemValue("pos");
+    if (pos.isEmpty())
+        processRangeHeader();
+    else
+        d->startTime = pos.toLongLong();
 
     QString q = d->requestHeaders.value("x-media-quality");
     if (q == QString("alwaysHigh"))

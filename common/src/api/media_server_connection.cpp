@@ -2,7 +2,9 @@
 #include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QSharedPointer>
+
 #include "utils/common/util.h"
+#include "utils/common/common_meta_types.h"
 
 #include "media_server_connection.h"
 #include "media_server_connection_p.h"
@@ -227,6 +229,7 @@ QnMediaServerConnection::QnMediaServerConnection(const QUrl &url, QObject *paren
     m_url(url),
     m_proxyPort(0)
 {
+    QnCommonMetaTypes::initilize();
 }
 
 QnMediaServerConnection::~QnMediaServerConnection() {}

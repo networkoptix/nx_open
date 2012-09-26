@@ -1,7 +1,7 @@
 #ifndef QN_WORKBENCH_GLOBALS_H
 #define QN_WORKBENCH_GLOBALS_H
 
-#include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 
 namespace Qn {
 
@@ -243,5 +243,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
+Q_DECLARE_METATYPE(Qn::ItemRole);
 
 #endif // QN_WORKBENCH_GLOBALS_H

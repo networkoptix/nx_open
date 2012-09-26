@@ -1,6 +1,7 @@
 #ifndef QN_RESOURCE_SEARCH_PROXY_MODEL_H
 #define QN_RESOURCE_SEARCH_PROXY_MODEL_H
 
+#include <QtCore/QMetaType>
 #include <QtGui/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
@@ -51,5 +52,8 @@ private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;
 };
+
+Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
+
 
 #endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H
