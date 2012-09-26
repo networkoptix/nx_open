@@ -6,6 +6,7 @@
 
 #include "quicksyncvideodecoder.h"
 #include "../predefinedusagecalculator.h"
+#include "../videodecoderswitcher.h"
 
 
 static const char* QUICKSYNC_PLUGIN_ID = "45D92FCC-2B59-431e-BFF9-E11F2D6213DA";
@@ -43,15 +44,20 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const glContext ) const
 {
+    if( codecID != CODEC_ID_H264 )
+        return NULL;
+
     //TODO/IMPL filling stream parameters
     QList<MediaStreamParameter> mediaStreamParams;
 
     if( !m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( mediaStreamParams ) )
         return NULL;
 
+    std::auto_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder( data, m_usageWatcher.get() ) );
+    if( !decoder->isHardwareAccelerationEnabled() )
+        return NULL;
 
-    //TODO/IMPL
-    return NULL;
+    return new VideoDecoderSwitcher( decoder.release(), data );
 }
 
-Q_EXPORT_PLUGIN2( quicksyncplugin, QuicksyncDecoderPlugin );
+Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );

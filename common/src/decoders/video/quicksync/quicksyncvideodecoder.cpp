@@ -10,7 +10,7 @@
 #include <QDebug>
 
 #ifndef XVBA_TEST
-#include "../../utils/media/nalunits.h"
+#include "../../../utils/media/nalunits.h"
 #else
 #include "nalunits.h"
 #endif
@@ -83,8 +83,11 @@ QuickSyncVideoDecoder::AsyncOperationContext::AsyncOperationContext()
 }
 #endif
 
-QuickSyncVideoDecoder::QuickSyncVideoDecoder( const QnCompressedVideoDataPtr data )
+QuickSyncVideoDecoder::QuickSyncVideoDecoder(
+    const QnCompressedVideoDataPtr data,
+    PluginUsageWatcher* const pluginUsageWatcher )
 :
+    m_pluginUsageWatcher( pluginUsageWatcher ),
     m_state( decoding ),
     m_syncPoint( NULL ),
     m_initialized( false ),

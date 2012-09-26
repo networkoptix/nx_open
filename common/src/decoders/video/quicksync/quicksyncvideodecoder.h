@@ -16,7 +16,7 @@
 #ifdef XVBA_TEST
 #include "common.h"
 #else
-#include "abstractdecoder.h"
+#include "../abstractdecoder.h"
 #endif
 #include "mfxallocator.h"
 
@@ -25,6 +25,8 @@
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
+
+class PluginUsageWatcher;
 
 //!Holds picture as DXVA surface
 class D3DPictureData
@@ -49,7 +51,9 @@ class QuickSyncVideoDecoder
     public QnAbstractVideoDecoder
 {
 public:
-    QuickSyncVideoDecoder( const QnCompressedVideoDataPtr data );
+    QuickSyncVideoDecoder(
+        const QnCompressedVideoDataPtr data,
+        PluginUsageWatcher* const pluginUsageWatcher );
     virtual ~QuickSyncVideoDecoder();
 
     virtual PixelFormat GetPixelFormat() const;
@@ -150,6 +154,7 @@ private:
         const QRect m_cropRect;
     };
 
+    PluginUsageWatcher* const m_pluginUsageWatcher;
     MFXVideoSession m_mfxSession;
     SurfaceState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
