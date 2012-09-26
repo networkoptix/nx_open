@@ -17,7 +17,9 @@ public:
         //!Picture data is stored in memory
         pstSysMemPic,
         //!Picture is stored as OpenGL texture
-        pstOpenGL
+        pstOpenGL,
+        //!Picture is presented as \a IDirect3DSurface*
+        pstD3DSurface
     };
 
     virtual ~QnAbstractPictureData() {}
