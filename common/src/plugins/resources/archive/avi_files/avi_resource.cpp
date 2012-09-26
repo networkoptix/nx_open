@@ -49,7 +49,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     if (m_storage)
         aviDelegate->setStorage(m_storage);
     result->setArchiveDelegate(aviDelegate);
-    if (hasFlags(still_image))
+    if (hasFlags(still_image) || hasFlags(utc))
         result->setCycleMode(false);
 
     return result;
