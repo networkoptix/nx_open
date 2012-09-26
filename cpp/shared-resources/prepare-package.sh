@@ -1,5 +1,6 @@
 #!/bin/bash
 export buildlib=${buildLib}
+export QTDIR=`qmake -query QT_INSTALL_PREFIX`
 
 if [[ $buildlib != 'staticlib' ]]; then
 
@@ -8,8 +9,8 @@ if [[ $buildlib != 'staticlib' ]]; then
 
   for i in ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
   do
-    cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/debug
-    cp -P `find ${qt.dir} -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/release  
+    cp -P `find $QTDIR -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/debug
+    cp -P `find $QTDIR -iname 'libQt'"$i"'.so*'` ${libdir}/build/bin/release  
   done
 
 fi
