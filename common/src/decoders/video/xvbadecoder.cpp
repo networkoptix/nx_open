@@ -2,7 +2,7 @@
 // 15 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_OS_LINUX
+#ifdef Q_WS_X11
 
 #include <QDebug>
 
@@ -48,9 +48,6 @@ static const int MAX_MACROBLOCK_LINES_TO_IGNORE = 1;
 #error "JOIN_SLICES and IGNORE_BUT_LAST_SLICE cannot be defined at the same time"
 #endif
 
-
-//TODO/IMPL store static information about currently used decoding bandwidth (fps, produced pixels per second)
-//TODO/IMPL make glContext shared between QnXVBADecoder, working in one thread
 
 QGLContextDuplicate::~QGLContextDuplicate()
 {
@@ -545,12 +542,6 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     if( m_prevOperationStatus != Success )
     {
         cl_log.log( QString::fromAscii("QnXVBADecoder. Could not start picture decoding. %1").arg(lastErrorText()), cl_logERROR );
-        std::for_each(
-            targetSurfaceCtx->usedDecodeBuffers.begin(),
-            targetSurfaceCtx->usedDecodeBuffers.end(),
-            std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
-        targetSurfaceCtx->usedDecodeBuffers.clear();
-        destroyXVBASession();   //destroying session, since in case of such error usually we experience system lock-up in video driver
         return decodedPicSurface != NULL;
     }
 
@@ -564,7 +555,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
         	targetSurfaceCtx->usedDecodeBuffers.end(),
         	std::bind1st( std::mem_fun(&QnXVBADecoder::ungetBuffer), this ) );
         targetSurfaceCtx->usedDecodeBuffers.clear();
-        destroyXVBASession();   //destroying session, since in case of such error usually we experience system lock-up in video driver
+        destroyXVBASession();   //destroying session, since in case of such error usually we
         return decodedPicSurface != NULL;
     }
 
@@ -1106,12 +1097,11 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                     break;
                 }
 
-                //cl_log.log( QString::fromAscii("Found slice. disable_deblocking_filter_idc = %1").arg(slice.disable_deblocking_filter_idc), cl_logDEBUG1 );
-
                 //parsing slice_header
                 pictureDescriptor->picture_structure = pictureDescriptor->sps_info.avc.frame_mbs_only_flag || (slice.m_field_pic_flag == 0)
                     ? 3  //3 = Frame
                     : slice.bottom_field_flag;  //1 = Bottom field, 0 = Top field
+//                pictureDescriptor->picture_structure = 3;
 
                 pictureDescriptor->avc_frame_num = slice.frame_num;
                 //std::cout<<"Found slice pic_struct = "<<pictureDescriptor->picture_structure<<", slice.frame_num = "<<slice.frame_num<<"\n";
@@ -1126,6 +1116,8 @@ bool QnXVBADecoder::analyzeInputBufSlices(
 #ifdef DROP_SMALL_SECOND_SLICE
                 if( m_checkForDroppableSecondSlice && (analyzedSliceCount == 1) )
                 {
+//                    cl_log.log( QString::fromAscii("QnXVBADecoder. Checking slice for drop. first_mb_in_slice %1, pic_width_in_mbs %2, pic_height_in_map_units %3").
+//                                arg(slice.first_mb_in_slice).arg(m_sps.pic_width_in_mbs).arg(m_sps.pic_height_in_map_units), cl_logDEBUG1 );
                     //assuming source buf contains full AU
                     if( (slice.first_mb_in_slice % m_sps.pic_width_in_mbs == 0) &&  //slice contains integer number of lines
                         (m_sps.pic_height_in_map_units - slice.first_mb_in_slice / m_sps.pic_width_in_mbs <= MAX_MACROBLOCK_LINES_TO_IGNORE) )
@@ -1157,7 +1149,7 @@ bool QnXVBADecoder::analyzeInputBufSlices(
                 dataCtrlBuffer->SliceBitsInBuffer = dataCtrlBuffer->SliceBytesInBuffer << 3;
 
                 cl_log.log( QString::fromAscii( "Found NAL (%1) at %2, %3 bytes long. Total buffer %4 bytes" ).
-                		arg(*curNalu & 0x1f).arg(dataCtrlBuffer->SliceDataLocation).arg(dataCtrlBuffer->SliceBytesInBuffer).arg(data->data.size()), cl_logDEBUG2 );
+                		arg(*curNalu & 0x1f).arg(dataCtrlBuffer->SliceDataLocation).arg(dataCtrlBuffer->SliceBytesInBuffer).arg(data->data.size()), cl_logDEBUG1 );
 
                 dataCtrlBuffers->push_back( dataCtrlBufferDescriptor );
                 break;
@@ -1553,7 +1545,7 @@ XVBABufferDescriptor* QnXVBADecoder::getDecodeBuffer( XVBA_BUFFER bufferType )
     out.buffer_list->data_offset = 0;
 
     cl_log.log( QString::fromAscii("QnXVBADecoder. Allocated xvba decode buffer of type %1, size %2").
-        arg(bufferType).arg(out.buffer_list->buffer_size), cl_logDEBUG2 );
+        arg(bufferType).arg(out.buffer_list->buffer_size), cl_logDEBUG1 );
 
     m_xvbaDecodeBuffers.push_back( make_pair( out.buffer_list, false ) );
 

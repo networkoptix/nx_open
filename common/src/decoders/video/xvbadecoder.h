@@ -2,7 +2,7 @@
 // 15 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_OS_LINUX
+#ifdef Q_WS_X11
 
 #ifndef XVBADECODER_H
 #define XVBADECODER_H
