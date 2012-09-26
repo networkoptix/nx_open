@@ -1,5 +1,5 @@
 #include "server_archive_delegate.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "utils/common/util.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
@@ -17,12 +17,14 @@ QnServerArchiveDelegate::QnServerArchiveDelegate():
     m_selectedAudioChannel(0),
     m_lastSeekTime(AV_NOPTS_VALUE),
     m_afterSeek(false),
-    m_sendMotion(false),
+    //m_sendMotion(false),
     m_eof(false),
     m_quality(MEDIA_Quality_High)
 {
+    m_flags |= Flag_CanSendMotion;
     m_aviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
     m_aviDelegate->setUseAbsolutePos(false);
+    m_aviDelegate->setFastStreamFind(true);
 
     m_newQualityAviDelegate = QnAviArchiveDelegatePtr(0);
 }
@@ -144,11 +146,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
     if (newChunk.startTimeMs != m_currentChunk.startTimeMs || newChunkCatalog != m_currentChunkCatalog)
     {
-        bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
+        //bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
         if (!switchToChunk(newChunk, newChunkCatalog))
             return -1;
-        if (isStreamsFound)
-            m_aviDelegate->doNotFindStreamInfo(); // optimization
+        //if (isStreamsFound)
+        //    m_aviDelegate->doNotFindStreamInfo(); // optimization
     }
 
 
@@ -171,7 +173,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
 qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
 {
-    m_tmpData.clear();
+    //m_tmpData.clear();
     // change time by playback mask
     m_eof = false;
     if (!m_motionRegion.isEmpty()) 
@@ -209,12 +211,14 @@ QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
     if (m_eof)
         return QnAbstractMediaDataPtr();
 
+    /*
     if (m_tmpData)
     {
         QnAbstractMediaDataPtr rez = m_tmpData;
         m_tmpData.clear();
         return rez;
     }
+    */
 
     //int waitMotionCnt = 0;
 begin_label:
@@ -291,7 +295,8 @@ begin_label:
             data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
     }
     
-    if (data && m_sendMotion) 
+    /*
+    if (data && m_sendMotion)
     {
         int channel = data->channelNumber;
         if (!m_motionConnection[channel])
@@ -305,10 +310,16 @@ begin_label:
             return motion;
         }
     }
+    */
     return data;
 }
 
-QnVideoResourceLayout* QnServerArchiveDelegate::getVideoLayout()
+QnAbstractMotionArchiveConnectionPtr QnServerArchiveDelegate::getMotionConnection(int channel)
+{
+    return QnMotionHelper::instance()->createConnection(m_resource, channel);
+}
+
+QnResourceVideoLayout* QnServerArchiveDelegate::getVideoLayout()
 {
     return m_aviDelegate->getVideoLayout();
 }
@@ -346,10 +357,12 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::Chunk newCh
     return rez;
 }
 
+/*
 void QnServerArchiveDelegate::setSendMotion(bool value)
 {
     m_sendMotion = value;
 }
+*/
 
 bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 {
@@ -392,13 +405,14 @@ bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fast
         m_newQualityFileRes = QnAviResourcePtr(new QnAviResource(url));
         m_newQualityAviDelegate = QnAviArchiveDelegatePtr(new QnAviArchiveDelegate());
         m_newQualityAviDelegate->setUseAbsolutePos(false);
+        m_newQualityAviDelegate->setFastStreamFind(true);
 
         m_newQualityAviDelegate->setStorage(qnStorageMan->getStorageByUrl(m_newQualityFileRes->getUrl()));
         if (!m_newQualityAviDelegate->open(m_newQualityFileRes))
             return false;
         m_newQualityAviDelegate->setAudioChannel(m_selectedAudioChannel);
         qint64 chunkOffset = (timeMs - m_newQualityChunk.startTimeMs)*1000;
-        m_newQualityAviDelegate->doNotFindStreamInfo();
+        //m_newQualityAviDelegate->doNotFindStreamInfo();
         if (m_newQualityAviDelegate->seek(chunkOffset, false) == -1)
             return false;
 

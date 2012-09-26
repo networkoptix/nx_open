@@ -23,6 +23,8 @@ public:
     QHostAddress serverAddress;
     const SSL_METHOD *method;
     SSL_CTX *ctx;
+    int maxConnections;
+    bool ddosWarned;
 };
 
 // ------------------------ QnRtspListener ---------------------------
@@ -49,14 +51,15 @@ void QnTcpListener::setAuth(const QByteArray& userName, const QByteArray& passwo
     d->authDigest = digest.toBase64();
 }
 
-
-QnTcpListener::QnTcpListener(const QHostAddress& address, int port):
+QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConnections):
     d_ptr(new QnTcpListenerPrivate())
 {
     Q_D(QnTcpListener);
     try {
         d->serverAddress = address;
         d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
+        d->maxConnections = maxConnections;
+        d->ddosWarned = false;
         start();
         cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
     }
@@ -164,6 +167,16 @@ void QnTcpListener::run()
 
         TCPSocket* clientSocket = d->serverSocket->accept();
         if (clientSocket) {
+            if (d->connections.size() > d->maxConnections)
+            {
+                if (!d->ddosWarned) {
+                    qWarning() << "Too many TCP connections. Possible ddos attack! Ignore connection";
+                    d->ddosWarned = true;
+                }
+                delete clientSocket;
+                continue;
+            }
+            d->ddosWarned = false;
             qDebug() << "New client connection from " << clientSocket->getPeerAddress() << ':' << clientSocket->getForeignPort();
             QnTCPConnectionProcessor* processor = createRequestProcessor(clientSocket, this);
             clientSocket->setReadTimeOut(processor->getSocketTimeout());

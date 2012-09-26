@@ -17,6 +17,7 @@ m_softMotionLastChannel(0)
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_layout = m_cameraRes->getVideoLayout();
+    m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()

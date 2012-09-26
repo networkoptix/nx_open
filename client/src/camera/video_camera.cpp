@@ -198,6 +198,10 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
     }
+    if (m_motionFileList[0]) {
+        m_exportReader->setSendMotion(true);
+        m_exportRecorder->setMotionFileList(m_motionFileList);
+    }
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTime);
@@ -262,4 +266,9 @@ void QnVideoCamera::setExportProgressOffset(int value)
 int QnVideoCamera::getExportProgressOffset() const
 {
     return m_progressOffset;
+}
+
+void QnVideoCamera::setMotionIODevice(QSharedPointer<QBuffer> value, int channel)
+{
+    m_motionFileList[channel] = value;
 }

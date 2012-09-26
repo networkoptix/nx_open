@@ -17,8 +17,7 @@ message Resource {
         Offline      = 0;
         Unauthorized = 1;
         Online       = 2;
-        Disabled     = 3;
-        Recording    = 4;
+        Recording    = 3;
     }
 
     message Property {

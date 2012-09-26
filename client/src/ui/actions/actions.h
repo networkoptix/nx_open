@@ -12,7 +12,7 @@ namespace Qn {
     inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
     inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
     inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
-    inline QLatin1String qn_allVideoServersParameter()      { return QLatin1String("_qn_allVideoServers"); }
+    inline QLatin1String qn_allMediaServersParameter()      { return QLatin1String("_qn_allMediaServers"); }
     inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
     inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
     inline QLatin1String qn_timePeriodsParameter()          { return QLatin1String("_qn_timePeriodsParameter"); }
@@ -25,7 +25,7 @@ namespace Qn {
 #define LayoutParameter qn_layoutParameter()
 #define CurrentLayoutParameter qn_currentLayoutParameter()
 #define CurrentUserParameter qn_currentUserParameter()
-#define AllVideoServersParameter qn_allVideoServersParameter()
+#define AllMediaServersParameter qn_allMediaServersParameter()
 #define SerializedResourcesParameter qn_serializedResourcesParameter()
 #define TimePeriodParameter qn_timePeriodParameter()
 #define TimePeriodsParameter qn_timePeriodsParameter()
@@ -90,7 +90,7 @@ namespace Qn {
          * 
          * Parameters.
          * 
-         * <tt>QnVideoServerResourcePtr ServerParameter</tt> --- video server to
+         * <tt>QnMediaServerResourcePtr ServerParameter</tt> --- video server to
          * move cameras to.
          */
         MoveCameraAction,
@@ -168,9 +168,20 @@ namespace Qn {
         ToggleScreenRecordingAction,
 
         /**
+         * Maximizes/restores client's main window.
+         */ 
+        MaximizeAction,
+
+        /**
          * Toggles client's fullscreen state.
          */
         FullscreenAction,
+
+        /**
+         * Action to be invoked to toggle fullscreen/maximized state. 
+         * Actual action that will be invoked is platform-dependent.
+         */
+        EffectiveMaximizeAction,
 
         /**
          * Goes to fullscreen and slides out all panels.
@@ -181,11 +192,6 @@ namespace Qn {
          * Minimizes client's main window.
          */ 
         MinimizeAction,
-
-        /**
-         * Maximizes client's main window.
-         */ 
-        MaximizeAction,
 
         /**
          * Opens system settings dialog.

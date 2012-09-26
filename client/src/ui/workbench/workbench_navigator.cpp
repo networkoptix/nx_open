@@ -678,6 +678,9 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         if(m_currentWidget->resource().dynamicCast<QnSecurityCamResource>())
             flags |= WidgetSupportsLive | WidgetSupportsPeriods;
 
+        if(m_currentWidget->resource()->flags() & QnResource::periods)
+            flags |= WidgetSupportsPeriods;
+
         if(m_currentWidget->resource()->flags() & QnResource::utc)
             flags |= WidgetUsesUTC | WidgetSupportsSync;
 
@@ -699,7 +702,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
 void QnWorkbenchNavigator::updateSliderOptions() {
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
 
-    bool selectionEditable = workbench()->currentLayout()->resource() && (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
+    bool selectionEditable = workbench()->currentLayout()->resource(); //&& (workbench()->currentLayout()->resource()->flags() & QnResource::local_media) != QnResource::local_media;
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
     if(!selectionEditable)
         m_timeSlider->setSelectionValid(false);

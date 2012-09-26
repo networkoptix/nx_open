@@ -5,7 +5,7 @@ static const QByteArray ENDL("\r\n");
 
 #include <QHttpRequestHeader>
 #include "tcp_connection_processor.h"
-#include "utils/common/bytearray.h"
+#include "utils/common/byte_array.h"
 
 static const QByteArray STATIC_UNAUTHORIZED_HTML("\
         <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\

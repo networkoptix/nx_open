@@ -1,12 +1,13 @@
 #ifndef QN_ACTION_H
 #define QN_ACTION_H
 
-#include <QAction>
-#include <QWeakPointer>
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QMetaType>
+#include <QtGui/QAction>
+
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_globals.h>
-#include <core/resource/user_resource.h>
+
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -159,6 +160,7 @@ public:
     QString toolTipFormat() const;
     void setToolTipFormat(const QString &toolTipFormat);
 
+
     /**
      * \param scope                     Scope in which action is to be executed.
      * \param parameters                Parameters for action execution.
@@ -210,6 +212,8 @@ private:
     QList<QnAction *> m_children;
     QHash<QnActionCondition *, QString> m_textConditions;
 };
+
+Q_DECLARE_METATYPE(QnAction *)
 
 #endif // QN_ACTION_H
 

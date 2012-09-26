@@ -3,7 +3,7 @@
      xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
-    <Product Id="*" Name="${product.name}" Language="1033" Version="${project.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
+    <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
         <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
         
         <?include ControlPanel.wxi ?>
@@ -228,10 +228,10 @@
     
 <!--        <Upgrade Id="{CE572797-45BF-4f1c-A783-369EA79C597E}">
             <UpgradeVersion
-                Minimum="0.0.0.0" Maximum="${project.version}.${buildNumber}"
+                Minimum="0.0.0.0" Maximum="${release.version}.${buildNumber}"
                 Property="PREVIOUSVERSIONSINSTALLED"
                 IncludeMinimum="yes" IncludeMaximum="yes" />
-            <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='${project.version}.${buildNumber}' IncludeMinimum='no' />
+            <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='${release.version}.${buildNumber}' IncludeMinimum='no' />
         </Upgrade>
 -->
         <?define EcsNeedsGuid="(&AppServerFeature AND NOT APPSERVER_GUID)"?>
@@ -476,7 +476,10 @@
                                 <File Id="ServerAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ServerOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+								<File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+								<File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+								<File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -542,7 +545,10 @@
                                 <File Id="ClientAvformatDll" Name="avformat-54.dll" Source="${libdir}/bin/${build.configuration}/avformat-54.dll"/>
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
-                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ClientOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
+								<File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+								<File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+								<File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                                 <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
                             </Component>
                             

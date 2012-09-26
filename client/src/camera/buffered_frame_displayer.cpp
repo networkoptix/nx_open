@@ -1,6 +1,6 @@
 #include "buffered_frame_displayer.h"
 #include <utils/media/frame_info.h>
-#include <utils/common/adaptivesleep.h>
+#include <utils/common/adaptive_sleep.h>
 #include "video_stream_display.h"
 #include "abstract_renderer.h"
 

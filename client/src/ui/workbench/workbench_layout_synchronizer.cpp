@@ -3,7 +3,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include "workbench.h"
@@ -16,8 +16,6 @@
 namespace {
     const char *layoutSynchronizerPropertyName = "_qn_layoutSynchronizer";
 }
-
-Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
 
 typedef QHash<QnLayoutResource *, QnWorkbenchLayoutSynchronizer *> LayoutResourceSynchronizerHash;
 Q_GLOBAL_STATIC(LayoutResourceSynchronizerHash, qn_synchronizerByLayoutResource)

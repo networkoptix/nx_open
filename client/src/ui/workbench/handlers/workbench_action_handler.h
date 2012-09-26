@@ -36,7 +36,6 @@ struct QnThumbnailsSearchState {
     QnTimePeriod period;
     qint64 step;
 };
-
 Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 
@@ -291,7 +290,7 @@ protected slots:
 
 private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void updateStoredConnections(QnConnectionData connectionData);
+   // void updateStoredConnections(QnConnectionData connectionData);
 
 private:
     friend class detail::QnResourceStatusReplyProcessor;
@@ -317,7 +316,9 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QProgressDialog> m_exportProgressDialog;
-    QnStorageResourcePtr m_exportStorage;
+    QnStorageResourcePtr m_exportStorage;  
+    QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
+    QnMediaResourcePtr m_exportedMediaRes;
 
 
     QTimer *m_tourTimer;

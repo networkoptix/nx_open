@@ -1,5 +1,49 @@
 Regress Testing
 
+Common Tasks
+
+Connectivity
+
+Ability to connect client to EC (right, wrong: login, password, host, port). Password should not be displayed in client logs. Test connectivity. Reason of fail (redmine).
+Ability to connect media server to EC (right, wrong: login, password, host, port).
+Ability to store connection details
+ - store last used host, port and login
+ - load/save stored connection (try another language). Owerwrite existing (same name should be suggested - redmine).
+ 
+Version Compatibility.
+ - Connect components same version numbers (first 2 digits, 3rd is different). OK. 
+ - Connect components of different version numbers (all combinations). Fail. 
+
+Common Interface Items 
+
+ - Buttons. They are visible and highlighted when hovered and pressed
+ - Side panels. Top and bottom are always pinned Left can be pinned and unpinned.
+ - Fullscreen/window. Fullscreen app cannot be resized, windowed app cannot be shrinked less than 800*600 (context menu, hotkeys, buttons)
+ - Main Menu.
+ - Tab Navigator. Open/close tabs ( "+" button, main menu, context menu, hotkeys)
+ - About dialog (all libraries are properly listed as well as their versions)
+ 
+Scene
+
+Add items to scene:
+
+Selection
+ - Toggle item select/deselect – left click.
+ - If selecting an item it should be resized at n% towards the center of the scene (overriding nearby items).
+ - Next click reverts item’s size and position. Meanwhile the item is still selected unless clicked on another item or empty space.
+ - If the item is greater than m% of the screen its size remains the same.
+ - After selecting an item playback is switched to single mode. Deselect reverts playback to group mode (see the “Playback” spec for details).
+ - If item is in “preview mode” (video is not decoding) selection fires decoding video. In this case decoding of the 1st item in the scene is stopped and it turns into “preview mode”.
+ - If an item is selected selection can be moved to closer items using arrow keys (up, down, left, right). If the item is the last in row/column the focus should move to the first item in the next row/column.
+ - Only one item can be selected at a time.
+ - If change a position of any selected item is should be deselected first.
+
+
+
+Offline working
+
+
+
 + 1) Events and statuses (several clients ans servers)
 2) Playback (live, archive, RADASS, sync)
 3) Recording (motion, lo-hi streams, audio)

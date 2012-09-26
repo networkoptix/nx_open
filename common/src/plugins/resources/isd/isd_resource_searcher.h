@@ -1,7 +1,7 @@
 #ifndef isd_device_server_h_1936
 #define isd_device_server_h_1936
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 

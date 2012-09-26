@@ -1,21 +1,21 @@
 #include "main_window.h"
 
-#include <QApplication>
-#include <QBoxLayout>
-#include <QFileDialog>
-#include <QToolButton>
-#include <QMenu>
-#include <QMessageBox>
-#include <QFile>
-#include <QNetworkReply>
-#include <QFileOpenEvent>
+#include <QtCore/QFile>
+#include <QtGui/QApplication>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QFileDialog>
+#include <QtGui/QToolButton>
+#include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
+#include <QtGui/QFileOpenEvent>
+#include <QtNetwork/QNetworkReply>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
-#include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -79,7 +79,7 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
@@ -173,6 +173,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::DecrementDebugCounterAction));
     addAction(action(Qn::TogglePanicModeAction));
 
+    connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
@@ -210,7 +211,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
@@ -285,19 +286,26 @@ void QnMainWindow::setWindowButtonsVisible(bool visible) {
     }
 }
 
+void QnMainWindow::setMaximized(bool maximized) {
+    if(maximized == isMaximized())
+        return;
+
+    if(maximized) {
+        showMaximized();
+    } else if(isMaximized()) {
+        showNormal();
+    }
+}
+
 void QnMainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
 
     if(fullScreen) {
         showFullScreen();
-    } else {
+    } else if(isFullScreen()) {
         showNormal();
     }
-}
-
-void QnMainWindow::toggleFullScreen() {
-    setFullScreen(!isFullScreen());
 }
 
 void QnMainWindow::minimize() {
@@ -328,33 +336,21 @@ void QnMainWindow::setOptions(Options options) {
     m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
-void QnMainWindow::updateFullScreenState() {
+void QnMainWindow::updateDecorationsState() {
     bool fullScreen = isFullScreen();
+    bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
+    action(Qn::MaximizeAction)->setChecked(maximized);
 
-    setTitleVisible(!fullScreen);
-    m_ui->setTitleUsed(fullScreen);
-    m_view->setLineWidth(isFullScreen() ? 0 : 1);
+    setTitleVisible(!(fullScreen || maximized));
+    m_ui->setTitleUsed(fullScreen || maximized);
+    m_view->setLineWidth(fullScreen || maximized ? 0 : 1);
 
     updateDwmState();
 }
 
 void QnMainWindow::updateDwmState() {
-#if 0
-    if(!m_dwm->isSupported()) {
-        /* Non-windows systems where DWM is not supported. */
-
-        m_drawCustomFrame = false;
-
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
-
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else */
-#endif
-        
     if(isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
@@ -380,9 +376,9 @@ void QnMainWindow::updateDwmState() {
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
-        /* Windowed with aero glass. */
+        /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
-        m_frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -401,9 +397,9 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.bottom()
         );
     } else {
-        /* Windowed without aero glass. */
+        /* Windowed or maximized without aero glass. */
         m_drawCustomFrame = true;
-        m_frameMargins = m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8);
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
 
         if(m_dwm->isSupported()) {
             setAttribute(Qt::WA_NoSystemBackground, false);
@@ -413,6 +409,8 @@ void QnMainWindow::updateDwmState() {
             m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
             m_dwm->disableBlurBehindWindow();
         }
+
+        setContentsMargins(0, 0, 0, 0);
 
         m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
@@ -445,7 +443,6 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
 
@@ -460,14 +457,14 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        toggleFullScreen();
+        action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange)
-        updateFullScreenState();
+        updateDecorationsState();
 
     base_type::changeEvent(event);
 }
@@ -540,24 +537,6 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     }
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
-}
-
-void QnMainWindow::at_sessionManager_error(int error) {
-    switch (error) {
-    case QNetworkReply::ConnectionRefusedError:
-    case QNetworkReply::HostNotFoundError:
-    case QNetworkReply::TimeoutError: // ### remove ?
-    case QNetworkReply::ContentAccessDenied:
-    case QNetworkReply::AuthenticationRequiredError:
-    case QNetworkReply::UnknownNetworkError:
-        // Do not show popup box! It's annoying!
-        // Show something like color label in the main window.
-        // showAuthenticationDialog();
-        break;
-
-    default:
-        break;
-    }
 }
 
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {

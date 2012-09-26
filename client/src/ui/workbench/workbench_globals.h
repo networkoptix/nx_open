@@ -1,7 +1,7 @@
 #ifndef QN_WORKBENCH_GLOBALS_H
 #define QN_WORKBENCH_GLOBALS_H
 
-#include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
 
 namespace Qn {
 
@@ -195,7 +195,6 @@ namespace Qn {
         CreateLayoutPermission              = 0x08000000,
 
 
-
         /* Global permissions, applicable to current user only. */
 
         /** Root, can edit admins. */
@@ -222,13 +221,13 @@ namespace Qn {
         /** Can view live stream of available cameras. */
         GlobalViewLivePermission            = 0x00000080,
 
+
         /* Shortcuts. */
         GlobalLiveViewerPermission          = GlobalViewLivePermission,
         GlobalViewerPermission              = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
         GlobalAdvancedViewerPermission      = GlobalViewerPermission           | GlobalEditCamerasPermission,
         GlobalAdminPermission               = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
         GlobalOwnerPermission               = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
-
 
         AllPermissions                      = 0xFFFFFFFF
     };
@@ -244,5 +243,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
+Q_DECLARE_METATYPE(Qn::ItemRole);
 
 #endif // QN_WORKBENCH_GLOBALS_H

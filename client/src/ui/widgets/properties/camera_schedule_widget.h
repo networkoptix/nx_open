@@ -3,7 +3,7 @@
 
 #include <QtGui/QWidget>
 
-#include <core/misc/scheduleTask.h>
+#include <core/misc/schedule_task.h>
 
 class QnWorkbenchContext;
 

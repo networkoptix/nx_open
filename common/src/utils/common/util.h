@@ -1,7 +1,10 @@
 #ifndef _UNIVERSAL_CLIENT_UTIL_H
 #define _UNIVERSAL_CLIENT_UTIL_H
 
-#include <QString>
+#include "config.h"
+
+#include <QtCore/QString>
+
 #include "math.h" /* For INT64_MAX. */
 
 template <typename T, size_t N>
@@ -77,6 +80,82 @@ QN_EXPORT qint64 getDiskFreeSpace(const QString& root);
 #define MAX_AUDIO_FRAME_DURATION 150ll
 
 quint64 QN_EXPORT getUsecTimer();
+
+template <typename T, std::size_t N = CL_MEDIA_ALIGNMENT>
+class AlignmentAllocator {
+public:
+    typedef T value_type;
+    typedef std::size_t size_type;
+    typedef std::ptrdiff_t difference_type;
+
+    typedef T * pointer;
+    typedef const T * const_pointer;
+
+    typedef T & reference;
+    typedef const T & const_reference;
+
+public:
+    inline AlignmentAllocator() noexcept {}
+
+    template <typename T2>
+    inline AlignmentAllocator(const AlignmentAllocator<T2, N> &) noexcept {}
+
+    inline ~AlignmentAllocator() noexcept {}
+
+    inline pointer address(reference r) {
+        return &r;
+    }
+
+    inline const_pointer address(const_reference r) const {
+        return &r;
+    }
+
+    inline pointer allocate(size_type n) {
+        return (pointer) qMallocAligned(n * sizeof(value_type), N);
+    }
+
+    inline void deallocate(pointer p, size_type) {
+        qFreeAligned(p);
+    }
+
+    inline void construct(pointer p, const value_type &wert) {
+        new (p) value_type(wert);
+    }
+
+    /**
+     * C++11 extension member.
+     */
+    inline void construct(pointer p) {
+        new (p) value_type();
+    }
+
+    inline void destroy(pointer p) {
+        (void) p; /* Silence MSVC unused variable warnings. */
+
+        p->~value_type();
+    }
+
+    inline size_type max_size() const noexcept {
+        return size_type(-1) / sizeof(value_type);
+    }
+
+    template <typename T2>
+    struct rebind {
+        typedef AlignmentAllocator<T2, N> other;
+    };
+
+    bool operator!=(const AlignmentAllocator<T, N> &other) const  {
+        return !(*this == other);
+    }
+
+    // Returns true if and only if storage allocated from *this
+    // can be deallocated from other, and vice versa.
+    // Always returns true for stateless allocators.
+    bool operator==(const AlignmentAllocator<T,N>& other) const {
+        return true;
+    }
+};
+
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

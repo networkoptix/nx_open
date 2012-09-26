@@ -2,7 +2,7 @@
 #define __MULTI_CODEC_RTP_READER__
 
 #include "core/resource/resource_consumer.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/network/rtpsession.h"
 
 
@@ -11,6 +11,7 @@ class QnRtpStreamParser;
 class QnRtpAudioStreamParser;
 class QnRtpVideoStreamParser;
 class QnResourceAudioLayout;
+
 
 class QnMulticodecRtpReader : public QnResourceConsumer
 {
@@ -47,7 +48,7 @@ private:
 
     QString m_request;
 
-    //QList<QnAbstractMediaDataPtr> m_lastVideoData;
+    QVector<QnByteArray*> m_demuxedData;
     QnAbstractMediaDataPtr m_lastVideoData;
     QList<QnAbstractMediaDataPtr> m_lastAudioData;
     int m_numberOfVideoChannels;

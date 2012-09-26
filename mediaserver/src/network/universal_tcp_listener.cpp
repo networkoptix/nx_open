@@ -6,6 +6,7 @@ class QnUniversalRequestProcessor: public QnTCPConnectionProcessor
     QN_DECLARE_PRIVATE_DERIVED(QnUniversalRequestProcessor);
 public:
     QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner);
+    virtual ~QnUniversalRequestProcessor();
 protected:
     virtual void run() override;
     virtual void pleaseStop() override;
@@ -16,6 +17,11 @@ struct QnUniversalRequestProcessor::QnUniversalRequestProcessorPrivate: public Q
     QnTCPConnectionProcessor* processor;
     QMutex mutex;
 };
+
+QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
+{
+    stop();
+}
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(TCPSocket* socket, QnTcpListener* owner):
     QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
@@ -43,6 +49,7 @@ void QnUniversalRequestProcessor::run()
                 d->processor->execute(d->mutex);
             }
             delete d->processor;
+            d->processor = 0;
         }
     }
 }
@@ -58,8 +65,8 @@ void QnUniversalRequestProcessor::pleaseStop()
 
 // -------------------------------- QnUniversalListener ---------------------------------
 
-QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port):
-    QnTcpListener(address, port)
+QnUniversalTcpListener::QnUniversalTcpListener(const QHostAddress& address, int port, int maxConnections):
+    QnTcpListener(address, port, maxConnections)
 {
 
 }

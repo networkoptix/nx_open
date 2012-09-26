@@ -11,7 +11,12 @@ public:
         m_fileOffset(0),
         m_fileSize(0)
     {
-        m_fileName = fileName.mid(fileName.indexOf(QLatin1Char('?'))+1);
+        m_fileName = fileName.mid(fileName.lastIndexOf(QLatin1Char('?'))+1);
+    }
+
+    virtual ~QnLayoutFile()
+    {
+        close();
     }
 
     virtual bool seek(qint64 offset) override
@@ -37,6 +42,11 @@ public:
     virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
         return m_file.write(data, maxSize);
+    }
+
+    virtual void close() override
+    {
+        m_file.close();
     }
 
     virtual bool open(QIODevice::OpenMode openMode) override
@@ -118,6 +128,11 @@ bool QnLayoutFileStorageResource::isDirExists(const QString& url)
 {
     QDir d(url);
     return d.exists(removeProtocolPrefix(url));
+}
+
+bool QnLayoutFileStorageResource::isCatalogAccessible()
+{
+    return true;
 }
 
 bool QnLayoutFileStorageResource::isFileExists(const QString& url)

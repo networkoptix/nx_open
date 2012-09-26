@@ -16,7 +16,7 @@
 #endif
 
 #include "nettools.h"
-#include "utils/common/bytearray.h"
+#include "utils/common/byte_array.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -212,7 +212,7 @@ public:
      */
     unsigned short getForeignPort() ;
 
-    bool isConnected() const;
+    bool isConnected() const { return mConnected; }
 
 protected:
     CommunicatingSocket(int type, int protocol) ;

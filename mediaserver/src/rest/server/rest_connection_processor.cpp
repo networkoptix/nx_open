@@ -77,7 +77,8 @@ void QnRestConnectionProcessor::run()
                 }
             }
             else {
-                qWarning() << "Unknown REST path " << url.path();
+                if (url.path() != "/api/ping/")
+                    qWarning() << "Unknown REST path " << url.path();
                 encoding = "text/html";
                 d->responseBody.clear();
                 d->responseBody.append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n");

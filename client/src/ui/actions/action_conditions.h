@@ -5,7 +5,7 @@
 #include <QtCore/QWeakPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -240,11 +240,15 @@ private:
 
 class QnExportActionCondition: public QnActionCondition {
 public:
-    QnExportActionCondition(QObject *parent = NULL):
-        QnActionCondition(parent)
+    QnExportActionCondition(bool centralItemRequired, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_centralItemRequired(centralItemRequired)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    bool m_centralItemRequired;
 };
 
 class QnPanicActionCondition: public QnActionCondition {

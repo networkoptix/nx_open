@@ -3,9 +3,9 @@
 
 #include "decoders/video/abstractdecoder.h"
 #include "video_stream_display.h"
-#include "core/dataconsumer/dataconsumer.h"
+#include "core/dataconsumer/abstract_data_consumer.h"
 #include "core/resource/resource_media_layout.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 #include "utils/media/externaltimesource.h"
 
 class QnAbstractRenderer;

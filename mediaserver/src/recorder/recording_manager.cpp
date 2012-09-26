@@ -1,5 +1,5 @@
 #include "recording_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "core/resource/security_cam_resource.h"
 #include "recording/stream_recorder.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -7,14 +7,15 @@
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "camera/video_camera.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
 #include "utils/common/synctime.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/resource_fwd.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
+#include "plugins/storage/dts/abstract_dts_reader_factory.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -121,7 +122,7 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
             currentTime = qMin(currentTime,  archiveMinTime);
     }
 
-    QnVideoServerResourcePtr server = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(res->getParentId()));
+    QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
     QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
@@ -301,17 +302,17 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
         return;
     }
 
-    QnVideoServerResourcePtr videoServer = qSharedPointerDynamicCast<QnVideoServerResource>(res);
-    if (videoServer) {
-        connect(videoServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
+    QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(res);
+    if (mediaServer) {
+        connect(mediaServer.data(), SIGNAL(resourceChanged()), this, SLOT(at_updateStorage()), Qt::QueuedConnection);
     }
 }
 
 void QnRecordingManager::at_updateStorage()
 {
-    QnVideoServerResource* videoServer = dynamic_cast<QnVideoServerResource*> (sender());
-    qnStorageMan->removeAbsentStorages(videoServer->getStorages());
-    foreach(QnAbstractStorageResourcePtr storage, videoServer->getStorages())
+    QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (sender());
+    qnStorageMan->removeAbsentStorages(mediaServer->getStorages());
+    foreach(QnAbstractStorageResourcePtr storage, mediaServer->getStorages())
     {
         QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(storage);
         if (physicalStorage)
@@ -377,7 +378,26 @@ Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instan
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {
-    if (role == QnResource::Role_Archive)
+    QnVirtualCameraResourcePtr vcRes = qSharedPointerDynamicCast<QnVirtualCameraResource>(res);
+
+
+    bool sholdBeDts = (role == QnResource::Role_Archive) && vcRes && vcRes->getDTSFactory();
+    if (sholdBeDts)
+    {
+        QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
+        archiveReader->setCycleMode(false);
+
+        vcRes->lockDTSFactory();
+
+        QnAbstractArchiveDelegate* del = vcRes->getDTSFactory()->createDeligate(vcRes);
+
+        vcRes->unLockDTSFactory();
+
+        archiveReader->setArchiveDelegate(del);
+        return archiveReader;
+        
+    }
+    else  if (role == QnResource::Role_Archive)
     {
         QnArchiveStreamReader* archiveReader = new QnArchiveStreamReader(res);
         archiveReader->setCycleMode(false);

@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 
-#include <utils/common/longrunnable.h>
+#include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/actions/action_target_provider.h>
@@ -80,6 +80,7 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
+    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
@@ -109,7 +110,6 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
     QnCachingTimePeriodLoader *loader(QnResourceWidget *widget);
 
     QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);

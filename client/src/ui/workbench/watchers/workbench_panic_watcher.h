@@ -27,10 +27,10 @@ private slots:
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_resource_panicModeChanged(const QnVideoServerResourcePtr &resource);
+    void at_resource_panicModeChanged(const QnMediaServerResourcePtr &resource);
 
 private:
-    QSet<QnVideoServerResourcePtr> m_servers, m_panicServers;
+    QSet<QnMediaServerResourcePtr> m_servers, m_panicServers;
     bool m_panicMode;
 };
 

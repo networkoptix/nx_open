@@ -4,7 +4,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_dvd_resource.h"
 #include "plugins/resources/archive/avi_files/avi_bluray_resource.h"
 #include "plugins/resources/archive/filetypesupport.h"
@@ -170,11 +170,11 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& x
         return rez;
     }
 
-    /*if (FileTypeSupport::isLayoutFileExt(xfile))
+    if (FileTypeSupport::isLayoutFileExt(xfile))
     {
         QnLayoutResourcePtr layout = QnLayoutResource::fromFile(xfile);
         return layout;
-    }*/ // TODO
+    }
 
     return QnResourcePtr(0);
 }

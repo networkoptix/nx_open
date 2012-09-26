@@ -139,11 +139,11 @@ void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb
     }
 }
 
-void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_serverResource, QnResourceFactory &resourceFactory)
+void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_serverResource, QnResourceFactory &resourceFactory)
 {
     const pb::Server& pb_server = pb_serverResource.GetExtension(pb::Server::resource);
 
-    server = QnVideoServerResourcePtr(new QnVideoServerResource());
+    server = QnMediaServerResourcePtr(new QnMediaServerResource());
     server->setId(pb_serverResource.id());
     server->setName(QString::fromUtf8(pb_serverResource.name().c_str()));
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
@@ -201,13 +201,13 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     }
 }
 
-void parseServers(QnVideoServerResourceList &servers, const PbResourceList &pb_servers, QnResourceFactory &resourceFactory)
+void parseServers(QnMediaServerResourceList &servers, const PbResourceList &pb_servers, QnResourceFactory &resourceFactory)
 {
     for (PbResourceList::const_iterator ci = pb_servers.begin(); ci != pb_servers.end(); ++ci)
     {
         const pb::Resource& pb_serverResource = *ci;
 
-        QnVideoServerResourcePtr server;
+        QnMediaServerResourcePtr server;
         parseServer(server, pb_serverResource, resourceFactory);
         if (server)
             servers.append(server);
@@ -521,7 +521,7 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 {
     pb_cameraServerItem.set_physicalid(cameraServerItem.physicalId.toStdString());
     pb_cameraServerItem.set_timestamp(cameraServerItem.timestamp);
-    pb_cameraServerItem.set_serverguid(cameraServerItem.videoServerGuid.toStdString());
+    pb_cameraServerItem.set_serverguid(cameraServerItem.mediaServerGuid.toStdString());
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -570,7 +570,7 @@ void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras,
     parseCameras(cameras, pb_cameras.resource(), resourceFactory);
 }
 
-void QnApiPbSerializer::deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
+void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_servers;
     if (!pb_servers.ParseFromArray(data.data(), data.size())) {
@@ -722,7 +722,7 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
     data = QByteArray(str.data(), str.length());
 }
 
-void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
+void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPtr, QByteArray& data)
 {
     pb::Resources pb_servers;
 
@@ -837,7 +837,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
         }
         case pb::Resource_Type_Server:
         {
-            QnVideoServerResourcePtr server;
+            QnMediaServerResourcePtr server;
             parseServer(server, pb_resource, resourceFactory);
             resource = server;
             break;

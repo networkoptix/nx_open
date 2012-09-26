@@ -51,8 +51,8 @@ DEFINES += ${global.defines}
 
 QT += ${qtlib1} ${qtlib2} ${qtlib3} ${qtlib4} ${qtlib5} ${qtlib6} ${qtlib7} ${qtlib8} ${qtlib9}
 
-include(${environment.dir}/qt/custom/QtCore/private/qtcore.pri) 
-INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore 
+include(${environment.dir}/qt/custom/QtCore/private/qtcore.pri)
+INCLUDEPATH += ${project.build.sourceDirectory} ${project.build.directory}  ${basedir}/../common/src ${libdir}/build/include ${project.build.directory}/build/include ${environment.dir}/qt/custom ${environment.dir}/qt/custom/QtCore
 DEPENDPATH *= $${INCLUDEPATH}
 
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h
@@ -98,9 +98,10 @@ win* {
 unix {
   LIBS += ${linux.oslibs}
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -msse2
+  QMAKE_CXXFLAGS += -msse2 -std=c++0x -fpermissive
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas
   DEFINES += ${linux.defines}
+  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_LINUX
 }
 
 mac {
@@ -108,3 +109,7 @@ mac {
   LIBS += ${mac.oslibs}
   DEFINES += ${mac.defines}
 }
+
+
+
+

@@ -62,6 +62,13 @@
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                               	
+		<dependency>
+			<groupId>org.hyperic</groupId>
+			<artifactId>sigar</artifactId>
+			<version>1.6-SNAPSHOT</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
+		</dependency>                               	
 	</dependencies>		
 
 	<build>

@@ -5,7 +5,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -171,12 +171,12 @@ const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdv
     }
 }
 
-QnVideoServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
+QnMediaServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
 {
     switch(mode()) {
     case SingleMode: return m_singleWidget->getServerConnection();
     case MultiMode: return m_multiWidget->getServerConnection();
-    default: return QnVideoServerConnectionPtr(0);
+    default: return QnMediaServerConnectionPtr(0);
     }
 }
 

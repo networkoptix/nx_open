@@ -11,7 +11,7 @@
 #include <libavcodec/avcodec.h>
 
 #include "abstractclientplugin.h"
-#include "../core/datapacket/mediadatapacket.h"
+#include "../core/datapacket/media_data_packet.h"
 
 
 class QnAbstractVideoDecoder;

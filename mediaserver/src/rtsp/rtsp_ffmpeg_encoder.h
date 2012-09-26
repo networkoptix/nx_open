@@ -23,6 +23,8 @@ public:
 
     void setLiveMarker(int value);
     void setAdditionFlags(quint16 value);
+
+    virtual bool isRtpHeaderExists() const override { return false; }
 private:
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:
@@ -35,6 +37,7 @@ private:
     int m_liveMarker;
     quint16 m_additionFlags;
     bool m_eofReached;
+    bool m_isLastDataContext;
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;

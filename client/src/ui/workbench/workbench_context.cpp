@@ -3,11 +3,12 @@
 #include <utils/common/warnings.h>
 #include <utils/settings.h>
 
-#include <api/video_server_statistics_manager.h>
+#include <api/media_server_statistics_manager.h>
 
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/actions/action.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -23,6 +24,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnResourcePool *resourcePool, QObject *pa
     if(resourcePool == NULL) {
         qnNullWarning(resourcePool);
         resourcePool = new QnResourcePool();
+        resourcePool->setParent(this);
     }
 
     m_resourcePool = resourcePool;

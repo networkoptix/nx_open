@@ -89,6 +89,7 @@ public:
     bool compositionChangedEvent(MSG *message, long *result);
     bool activateEvent(MSG *message, long *result);
     bool ncPaintEvent(MSG *message, long *result);
+    bool getMinMaxInfoEvent(MSG *message, long *result);
 #endif // Q_OS_WIN
 
     static bool isSupported();
@@ -298,7 +299,7 @@ QMargins QnDwm::themeFrameMargins() const {
 
 #ifdef Q_OS_WIN
     int frameX, frameY;
-    if((d->widget->windowFlags() & Qt::FramelessWindowHint) || (d->widget->windowFlags() & Qt::X11BypassWindowManagerHint)) {
+    if(d->widget->windowFlags() & Qt::FramelessWindowHint) {
         frameX = 0;
         frameY = 0;
     } else if(d->widget->windowFlags() & Qt::MSWindowsFixedSizeDialogHint) {
@@ -444,6 +445,7 @@ bool QnDwm::widgetWinEvent(MSG *message, long *result) {
     case WM_DWMCOMPOSITIONCHANGED:  return d->compositionChangedEvent(message, result);
     case WM_NCACTIVATE:             return d->activateEvent(message, result);
     case WM_NCPAINT:                return d->ncPaintEvent(message, result);
+    case WM_GETMINMAXINFO:          return d->getMinMaxInfoEvent(message, result);
     default:                        return false;
     }
 }
@@ -571,6 +573,32 @@ bool QnDwmPrivate::ncPaintEvent(MSG *message, long *result) {
     /* An application should return zero if it processes this message. */
     *result = 0;
     return true;
+}
+
+bool QnDwmPrivate::getMinMaxInfoEvent(MSG *message, long *result) {
+    if(!overrideFrameMargins)
+        return false; /* Default codepath is OK. */
+
+    /* Adjust the maximized size and position to fit the work area of the correct monitor. 
+     * 
+     * If we don't do this, customized window will overlap the task bar when maximized. 
+     * See http://blogs.msdn.com/b/llobo/archive/2006/08/01/684535.aspx. */
+    HMONITOR monitor = MonitorFromWindow(message->hwnd, MONITOR_DEFAULTTONEAREST);
+    if(!monitor) 
+        return false;
+    
+    MONITORINFO monitorInfo;
+    monitorInfo.cbSize = sizeof(MONITORINFO);
+    if(GetMonitorInfoW(monitor, &monitorInfo) == 0)
+        return false;
+
+    MINMAXINFO *mmi = (MINMAXINFO *) message->lParam;
+    mmi->ptMaxPosition.x = (monitorInfo.rcWork.left - monitorInfo.rcMonitor.left) - userFrameMargins.left();
+    mmi->ptMaxPosition.y = (monitorInfo.rcWork.top - monitorInfo.rcMonitor.top) - userFrameMargins.top();
+    mmi->ptMaxSize.x = (monitorInfo.rcWork.right - monitorInfo.rcWork.left) - (userFrameMargins.left() + userFrameMargins.right());
+    mmi->ptMaxSize.y = (monitorInfo.rcWork.bottom - monitorInfo.rcWork.top) - (userFrameMargins.top() + userFrameMargins.bottom());
+
+    return false;
 }
 
 #endif // Q_OS_WIN

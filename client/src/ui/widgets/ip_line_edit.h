@@ -5,9 +5,12 @@
 
 class QnIpLineEdit: public QLineEdit{
     Q_OBJECT
+typedef QLineEdit base_type;
 
 public:
     explicit QnIpLineEdit(QWidget* parent=0);
+    QSize sizeHint() const;
+    QSize minimumSizeHint() const;
 protected:
     virtual void keyPressEvent(QKeyEvent *event) override;
 };

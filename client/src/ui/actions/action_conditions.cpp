@@ -1,8 +1,8 @@
 #include "action_conditions.h"
 
 #include <utils/common/warnings.h>
-#include <core/resourcemanagment/resource_criterion.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
 #include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -271,7 +271,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
-    if(!context()->workbench()->item(Qn::CentralRole))
+    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();

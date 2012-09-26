@@ -15,9 +15,10 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
 #include <utils/common/toggle.h>
+#include <utils/common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/video_camera.h>
 
@@ -66,8 +67,6 @@
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
 
-
-Q_DECLARE_METATYPE(QUuid) // TODO: move out
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -1224,7 +1223,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->channelLayout();
+    const QnResourceVideoLayout *videoLayout = widget->channelLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);

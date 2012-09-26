@@ -27,11 +27,9 @@
 #include "resource_widget.h"
 
 // TODO: remove
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
-
-#include "version.h" // TODO: remove
 
 namespace {
     template<class T>
@@ -222,6 +220,9 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
+    } else if(m_resource->flags() & QnResource::motion) {
+        for(int i = 0, count = channelCount(); i < count; i++)
+            m_motionSensitivity.push_back(QnMotionRegion());
     } else {
         m_motionSensitivity.clear();
     }
@@ -234,7 +235,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
     bool changed = false;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -260,7 +261,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     int channel =0;
     QPoint channelPos = gridPos;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
@@ -449,7 +450,7 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
         return;
 
     if(!m_connection) {
-        QnVideoServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnVideoServerResource>();
+        QnMediaServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
         if(server)
             m_connection = server->apiConnection();
     }
@@ -569,18 +570,19 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    //struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
-    //int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
-
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if(m_camera) {
+    if (resource()->flags() & QnResource::motion)
         result |= MotionSearchButton | InfoButton;
 
-        if(/*version >= 103010 &&*/ (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom))) {
+    if(m_camera) {
+        if(
+            (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) && 
+            accessController()->hasPermissions(m_resource, Qn::WritePermission) 
+        ) {
             result |= PtzButton;
 
             if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here

@@ -7,7 +7,7 @@
 #include <QtGui/QStandardItemModel>
 
 #include "core/resource/resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 #include "ui/style/skin.h"
 

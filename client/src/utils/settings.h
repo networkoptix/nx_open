@@ -5,6 +5,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
 #include <QtCore/QMutex>
+#include <QtCore/QMetaType>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
@@ -32,7 +33,44 @@ struct QnConnectionData {
     bool readOnly;
 };
 
-typedef QList<QnConnectionData> QnConnectionDataList;
+class QnConnectionDataList: public QList<QnConnectionData>{
+public:
+    QnConnectionDataList(): QList<QnConnectionData>(){}
+
+    /**
+     *  Returns true if the list contains a connection with the name provided;
+     *  otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool contains(const QString &name);
+
+    /**
+     * Removes the first occurrence of a connection in the list with the
+     * name provided and returns true on success; otherwise returns false.
+     * \param name - name of the connection
+     */
+    bool removeOne(const QString &name);
+
+    /**
+     * Finds the first occurrence of a connection with the url provided
+     * and places it in the head of the list.
+     * \param url - url of the connection (password is not used)
+     * \returns true if the reorder was successfull.
+     */
+    bool reorderByUrl(const QUrl &url);
+
+    /**
+     * Generates the unique name with the provided name as the base,
+     * appending number to the end of the string.
+     * \param base - base name of the connection
+     */
+    QString generateUniqueName(const QString &base);
+
+    /**
+     * Returns default name for the last used connection.
+     */
+    static QString defaultLastUsedName();
+};
 
 Q_DECLARE_METATYPE(QnConnectionData)
 Q_DECLARE_METATYPE(QnConnectionDataList)

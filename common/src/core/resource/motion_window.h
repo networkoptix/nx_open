@@ -17,6 +17,7 @@ struct QnMotionWindow
 
 //typedef QnMotionWindow[QnMotionWindow::MAX_SENSITIVITY-QnMotionWindow::MIN_SENSITIVITY+1] QnMotionRegion;
 
+// TODO: rename header
 
 class QnMotionRegion
 {
@@ -60,6 +61,8 @@ public:
 private:
     QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
 };
+
+Q_DECLARE_METATYPE(QnMotionRegion)
 
 
 #endif // __MOTION_WINDOW_H__

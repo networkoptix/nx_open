@@ -5,9 +5,9 @@
 #include "core/dataprovider/statistics.h"
 #include "../resource/media_resource.h"
 #include "abstract_streamdataprovider.h"
-#include "../datapacket/mediadatapacket.h"
+#include "../datapacket/media_data_packet.h"
 
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
 
@@ -55,6 +55,7 @@ protected:
 private:
     mutable int m_numberOfchannels;
     qint64 m_lastVideoTime[CL_MAX_CHANNELS];
+    bool m_isCamera;
 };
 
 typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamDataProviderPtr;

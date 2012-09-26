@@ -279,11 +279,6 @@ CommunicatingSocket::CommunicatingSocket(int newConnSD) : Socket(newConnSD),
 {
 }
 
-bool CommunicatingSocket::isConnected() const
-{
-    return mConnected;
-}
-
 void CommunicatingSocket::close()
 {
     Socket::close();

@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QFile>
 #include "utils/network/socket.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class QnTestCamera
 {

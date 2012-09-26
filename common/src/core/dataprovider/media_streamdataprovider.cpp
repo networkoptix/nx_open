@@ -1,6 +1,6 @@
 #include "media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
@@ -13,7 +13,7 @@ m_numberOfchannels(0)
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
     memset(m_lastVideoTime, 0, sizeof(m_lastVideoTime));
-
+    m_isCamera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (res) != 0;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }
@@ -153,8 +153,7 @@ float QnAbstractMediaStreamDataProvider::getBitrate() const
 
 void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
 {
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (getResource());
-    if (camera)
+    if (m_isCamera)
     {
         // correct packets timestamp if we have got several packets very fast
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);

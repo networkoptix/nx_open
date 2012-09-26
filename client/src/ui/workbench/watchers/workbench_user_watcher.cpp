@@ -2,20 +2,16 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
+#include <utils/client_meta_types.h>
 
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnUserResourcePtr>();
-
-        metaTypesInitialized = true;
-    }
+    QnClientMetaTypes::initialize();
 
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));

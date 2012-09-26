@@ -7,7 +7,7 @@
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
@@ -16,6 +16,7 @@
 #include <typeinfo>
 #include <limits.h>
 #include "utils/common/synctime.h"
+#include "utils/common/common_meta_types.h"
 
 QnResource::QnResource(): 
     QObject(),
@@ -27,14 +28,7 @@ QnResource::QnResource():
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnParam>();
-        qRegisterMetaType<QnId>();
-        metaTypesInitialized = true;
-
-        QnResourceProperty::test();
-    }
+    QnCommonMetaTypes::initilize();
 }
 
 QnResource::~QnResource()

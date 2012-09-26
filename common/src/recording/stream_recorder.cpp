@@ -1,7 +1,7 @@
 #include "stream_recorder.h"
 #include "core/resource/resource_consumer.h"
-#include "core/datapacket/datapacket.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/abstract_data_packet.h"
+#include "core/datapacket/media_data_packet.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "utils/common/util.h"
@@ -43,6 +43,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_isAudioPresent(false)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
+    memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
 
 QnStreamRecorder::~QnStreamRecorder()
@@ -83,6 +84,10 @@ void QnStreamRecorder::close()
             avformat_close_input(&m_formatCtx);
         m_formatCtx = 0;
 
+    }
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+        if (m_motionFileList[i])
+            m_motionFileList[i]->close();
     }
     m_packetWrited = false;
     m_endDateTime = m_startDateTime = AV_NOPTS_VALUE;
@@ -200,7 +205,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     
 
     if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md);
+        return saveMotion(md.dynamicCast<QnMetaDataV1>());
 
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
     //if (!vd)
@@ -328,7 +333,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     }
 
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
-    const QnVideoResourceLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
+    const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
 
     {
@@ -448,6 +453,12 @@ void QnStreamRecorder::setFileName(const QString& fileName)
     m_fixedFileName = fileName;
 }
 
+void QnStreamRecorder::setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS])
+{
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
+        m_motionFileList[i] = motionFileList[i];
+}
+
 void QnStreamRecorder::setStartOffset(qint64 value)
 {
     m_startOffset = value;
@@ -470,9 +481,10 @@ bool QnStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     return true;
 }
 
-bool QnStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+bool QnStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
 {
-    Q_UNUSED(media)
+    if (motion && !motion->isEmpty() && m_motionFileList[motion->channelNumber])
+        motion->serialize(m_motionFileList[motion->channelNumber].data());
     return true;
 }
 

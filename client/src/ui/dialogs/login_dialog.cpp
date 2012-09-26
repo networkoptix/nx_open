@@ -4,6 +4,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QDataWidgetMapper>
 #include <QtGui/QMessageBox>
+#include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
 
 #include <utils/settings.h>
@@ -74,6 +75,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
+    connect(ui->saveButton,                 SIGNAL(clicked()),                      this,   SLOT(at_saveButton_clicked()));
+    connect(ui->deleteButton,               SIGNAL(clicked()),                      this,   SLOT(at_deleteButton_clicked()));
     connect(ui->passwordLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->loginLineEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
     connect(ui->hostnameLineEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(updateAcceptibility()));
@@ -292,4 +295,62 @@ void LoginDialog::at_testButton_clicked() {
     dialog->exec();
 
     updateFocus();
+}
+
+void LoginDialog::at_saveButton_clicked() {
+    QUrl url = currentUrl();
+
+    if (!url.isValid()) {
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
+        return;
+    }
+
+    QnConnectionDataList connections = qnSettings->customConnections();
+
+    bool ok = false;
+
+    QString defaultName(ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex()));
+    if (defaultName == QnConnectionDataList::defaultLastUsedName()){
+        defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+        if (connections.contains(defaultName))
+            defaultName = connections.generateUniqueName(defaultName);
+    }
+    QString name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, defaultName, &ok);
+    if (!ok)
+        return;
+
+    QString password = ui->passwordLineEdit->text();
+
+    if (connections.contains(name)){
+       if (QMessageBox::warning(this, tr("Connection already exists"),
+                                      tr("Connection with the same name already exists. Overwrite it?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::No){
+           name = connections.generateUniqueName(name);
+       } else {
+           connections.removeOne(name);
+       }
+    }
+
+    QnConnectionData connectionData(name, currentUrl());
+    connectionData.url.setPassword(QString());
+    connections.prepend(connectionData);
+    qnSettings->setCustomConnections(connections);
+
+    resetConnectionsModel();
+
+    ui->passwordLineEdit->setText(password);
+
+}
+
+void LoginDialog::at_deleteButton_clicked() {
+    QnConnectionDataList connections = qnSettings->customConnections();
+    QString name = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+
+    if (QMessageBox::warning(this, tr("Delete connections"),
+                                   tr("Are you sure you want to delete the connection\n%1?").arg(name),
+                             QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
+        return;
+
+    connections.removeOne(name);
+    qnSettings->setCustomConnections(connections);
+    resetConnectionsModel();
 }

@@ -6,7 +6,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QStack>
 
-#include <utils/common/longrunnable.h>
+#include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
 
 #include "recording/time_period.h"

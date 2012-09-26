@@ -1,6 +1,6 @@
 #include "video_camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "core/resource/camera_resource.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "utils/media/frame_info.h"
@@ -43,7 +43,7 @@ QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource):
     m_gotIFramesMask(0),
     m_allChannelsMask(0)
 {
-    const QnVideoResourceLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
+    const QnResourceVideoLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
     m_allChannelsMask = (1 << layout->numberOfChannels()) - 1;
 }
 

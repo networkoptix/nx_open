@@ -57,63 +57,79 @@
 <context>
     <name>CameraAdditionDialog</name>
     <message>
-        <source>Add cameras...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Single Camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IP Range</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Password:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>IP Address:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>009.009.009.009;_</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Start IP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>End IP:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Login:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel scan</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Found cameras:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>IP</source>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Name</source>
+        <source>Add camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;tart IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;End IP:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S&amp;ubnet scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Http P&amp;ort:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel &amp;scan</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manuf.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Add selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -469,6 +485,43 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
         <source>&amp;Connection options:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Save...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 at %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save connection as...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection with the same name already exists. Overwrite it?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connections</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete the connection
+%1?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MultipleCameraSettingsWidget</name>
@@ -676,6 +729,17 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br /&gt;&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br /&gt;&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnAction</name>
+    <message>
+        <source>%n</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1230,10 +1294,6 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Play / Pause</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ctrl+-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1318,15 +1378,27 @@ For easy instructions on how to install or update your video driver, follow inst
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Toggle Sync</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>F1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add camera...</source>
+        <source>Add camera(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Stream Synchronization</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1358,45 +1430,47 @@ For easy instructions on how to install or update your video driver, follow inst
 <context>
     <name>QnCameraAdditionDialog</name>
     <message>
-        <source>Storage path must not be empty.</source>
+        <source>Camera &amp;IP:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Space limit must be a non-negative integer.</source>
+        <source>First address in range is greater than last one</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid storage path</source>
+        <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage path &apos;%1&apos; is invalid or is not accessible for writing.</source>
+        <source>Finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t verify storage path</source>
+        <source>No cameras found</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot verify storage path &apos;%1&apos;. Cannot establish connection to the media server.</source>
+        <source>No cameras selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Not enough disk space</source>
+        <source>Please select at least one camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage &apos;1&apos;
-You have less storage space available than reserved free space value. Additional 2Gb are required.</source>
+        <source>Success</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Low space for archive</source>
+        <source>Camera(s) added successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage &apos;%1&apos;
-You have only 2Gb left for video archive.</source>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while adding camera(s)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1443,6 +1517,13 @@ You have only 2Gb left for video archive.</source>
     </message>
     <message>
         <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraSettingsDialog</name>
+    <message>
+        <source>Camera settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1789,10 +1870,6 @@ Try to activate your License manually.</source>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
-        <source>%1x%2 %3fps @ %4Mbps (%5)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>hh:mm:ss.zzz</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1810,6 +1887,18 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>	%1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1x%2 %3fps @ %4Mbps%5%6</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1831,6 +1920,41 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnNavigationItem</name>
+    <message>
+        <source>Speed Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Speed Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previuos Chunk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Chunk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To End</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2618,10 +2742,6 @@ Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>at</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not perform thumbnails search</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2677,11 +2797,11 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchDisplay</name>
     <message>
-        <source>yyyy MMM dd	hh:mm:ss</source>
+        <source>yyyy MMM dd hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>	hh:mm:ss</source>
+        <source>hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2903,19 +3023,7 @@ hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>RTSP Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>9000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>API Port:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>9001</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2944,6 +3052,10 @@ hh:mm:ss</source>
     </message>
     <message>
         <source>Panic mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Port:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

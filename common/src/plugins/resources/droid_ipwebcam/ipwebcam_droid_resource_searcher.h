@@ -1,7 +1,7 @@
 #ifndef ipwebcam_droid_device_server_h_1657
 #define ipwebcam_droid_device_server_h_1657
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 class QnPlIpWebCamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {

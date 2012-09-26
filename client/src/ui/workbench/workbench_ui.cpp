@@ -64,7 +64,7 @@
 
 #include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include "watchers/workbench_render_watcher.h"
@@ -76,8 +76,6 @@
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
 
-
-Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
 
@@ -383,7 +381,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->setSpacing(2);
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::FullscreenAction)));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
     m_windowButtonsWidget = new GraphicsWidget();
@@ -446,7 +444,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_titleOpacityProcessor,    SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_titleOpacityProcessor,    SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
     connect(m_titleItem,                SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_titleItem_geometryChanged()));
-    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::FullscreenAction),   SLOT(toggle()));
+    connect(m_titleItem,                SIGNAL(doubleClicked()),                                                                    action(Qn::EffectiveMaximizeAction), SLOT(toggle()));
     connect(titleMenuSignalizer,        SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_titleItem_contextMenuRequested(QObject *, QEvent *)));
 
 
@@ -1454,14 +1452,16 @@ bool QnWorkbenchUi::event(QEvent *event) {
 }
 
 void QnWorkbenchUi::at_freespaceAction_triggered() {
-    bool isFullscreen = action(Qn::FullscreenAction)->isChecked();
+    QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
+
+    bool isFullscreen = fullScreenAction->isChecked();
 
     if(!m_inFreespace)
         m_inFreespace = isFullscreen && !isTreeOpened() && !isTitleOpened() && !isHelpOpened() && !isSliderOpened();
 
     if(!m_inFreespace) {
         if(!isFullscreen)
-            action(Qn::FullscreenAction)->setChecked(true);
+            fullScreenAction->setChecked(true);
         
         setTreeOpened(false, isFullscreen);
         setTitleOpened(false, isFullscreen);

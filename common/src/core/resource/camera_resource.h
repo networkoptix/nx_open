@@ -1,8 +1,12 @@
 #ifndef QN_CAMERA_RESOURCE_H
 #define QN_CAMERA_RESOURCE_H
 
+#include <QtCore/QMetaType>
+
 #include "network_resource.h"
 #include "security_cam_resource.h"
+
+class QnAbstractDTSFactory;
 
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
@@ -33,6 +37,11 @@ public:
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
+    QnAbstractDTSFactory* getDTSFactory();
+    void setDTSFactory(QnAbstractDTSFactory* factory);
+    void lockDTSFactory();
+    void unLockDTSFactory();
+
     // TODO: move to QnSecurityCamResource
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
@@ -45,6 +54,8 @@ private:
     bool m_audioEnabled;
     bool m_manuallyAdded;
     bool m_advancedWorking;
+
+    QnAbstractDTSFactory* m_dtsFactory;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
@@ -70,5 +81,6 @@ public:
 #endif
 };
 
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
 
 #endif // QN_CAMERA_RESOURCE_H

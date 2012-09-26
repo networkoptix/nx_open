@@ -16,7 +16,7 @@ QString defaultStoragePath()
 #endif
 }
 
-void syncStoragesToSettings(QnVideoServerResourcePtr server)
+void syncStoragesToSettings(QnMediaServerResourcePtr server)
 {
     const QnAbstractStorageResourceList& storages = server->getStorages();
 

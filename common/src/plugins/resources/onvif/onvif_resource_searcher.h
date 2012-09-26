@@ -3,7 +3,7 @@
 
 
 #include "core/resource/network_resource.h"
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "onvif_resource_searcher_wsdd.h"
 //#include "onvif_resource_searcher_mdns.h"
 

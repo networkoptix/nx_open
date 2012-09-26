@@ -3,7 +3,7 @@
 
 #include <QRegion>
 #include "media_resource.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "motion_window.h"
 
 class QnDataProviderFactory
@@ -85,7 +85,5 @@ private:
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
 };
-
-Q_DECLARE_METATYPE(QnMotionRegion)
 
 #endif //sequrity_cam_resource_h_1239

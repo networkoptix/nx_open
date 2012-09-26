@@ -16,7 +16,7 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
     QList<QByteArray> m_sdpSpsPps;
@@ -35,11 +35,12 @@ private:
     quint16 m_packetPerNal;
 
     QnCompressedVideoDataPtr m_videoData;
-    QnByteArray m_videoBuffer;
+    //QnByteArray m_videoBuffer;
+    int m_videoFrameSize;
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
-    QnCompressedVideoDataPtr createVideoData(quint32 rtpTime, const RtspStatistic& statistics);
+    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics);
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
     void updateNalFlags(int nalUnitType);
     int getSpsPpsSize() const;

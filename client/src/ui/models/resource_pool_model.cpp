@@ -6,11 +6,13 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/checked_cast.h>
+#include <utils/common/common_meta_types.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>
@@ -748,7 +750,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                     withArgument(Qn::NameParameter, layout->getName())
             );
         }
-    } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
+    } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 

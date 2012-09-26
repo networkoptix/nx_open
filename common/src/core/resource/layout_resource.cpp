@@ -3,19 +3,16 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
+#include "utils/common/common_meta_types.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnLayoutItemData>();
-        metaTypesInitialized = true;
-    }
-    
+    QnCommonMetaTypes::initilize();
+
     setStatus(Online, true);
     addFlags(QnResource::layout);
 }
@@ -186,7 +183,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     if (layoutFile == 0)
         return layout;
     QByteArray layoutData = layoutFile->readAll();
-
+    delete layoutFile;
     QnApiPbSerializer serializer;
     try {
         serializer.deserializeLayout(layout, layoutData);
@@ -210,9 +207,12 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
+        QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
         item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + item.resource.path + QLatin1String(".mkv");
+        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + path;
+        if (!path.endsWith(QLatin1String(".mkv")))
+            item.resource.path += QLatin1String(".mkv");
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
@@ -222,6 +222,27 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         aviResource->setStorage(storage);
         aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+
+        int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
+        for (int channel = 0; channel < numberOfChannels; ++channel)
+        {
+            QString motionUrl = path.mid(path.lastIndexOf(L'?')+1);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(motionUrl), QIODevice::ReadOnly);
+            if (motionIO) {
+                Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
+                QnMetaDataLightVector motionData;
+                int motionDataSize = motionIO->size() / sizeof(QnMetaDataV1Light);
+                if (motionDataSize > 0) {
+                    motionData.resize(motionDataSize);
+                    motionIO->read((char*) &motionData[0], motionIO->size());
+                }
+                delete motionIO;
+                for (int i = 0; i < motionData.size(); ++i)
+                    motionData[i].doMarshalling();
+                aviResource->setMotionBuffer(motionData, channel);
+            }
+        }
+
         qnResPool->addResource(aviResource);
     }
     layout->setItems(updatedItems);

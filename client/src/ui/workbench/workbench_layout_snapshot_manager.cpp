@@ -3,7 +3,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_storage.h"
 #include "workbench_layout_synchronizer.h"

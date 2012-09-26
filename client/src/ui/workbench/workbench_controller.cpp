@@ -26,7 +26,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -93,8 +93,6 @@
 #else
 #   define TRACE(...)
 #endif
-
-Q_DECLARE_METATYPE(VariantAnimator *)
 
 namespace {
     QAction *newAction(const QString &text, const QString &shortcut, QObject *parent = NULL) {
@@ -451,7 +449,7 @@ void QnWorkbenchController::updateGeometryDelta(QnResourceWidget *widget) {
 
 void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display) {
     foreach(QnResourceWidget *widget, widgets) {
-        if(!(widget->resource()->flags() & QnResource::network))
+        if(!(widget->resource()->flags() & QnResource::motion))
             continue;
 
         widget->setOption(QnResourceWidget::DisplayMotion, display);
@@ -1016,7 +1014,7 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(!(widget->resource()->flags() & QnResource::network)) {
+    if(!(widget->resource()->flags() & QnResource::motion)) { // TODO: #Elric maybe there is a better place for this check?
         m_motionSelectionInstrument->resetLater();
         return;
     }
@@ -1029,12 +1027,12 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
 }
 
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
         widget->clearMotionSelection();
 }
 
 void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region) {
-    if(widget->resource()->flags() & QnResource::network)
+    if(widget->resource()->flags() & QnResource::motion) // TODO: #Elric maybe there is a better place for this check?
         widget->addToMotionSelection(region);
 }
 
