@@ -108,15 +108,11 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         return 0;
     QnCameraTimePeriodList mediaServerList = history->getOnlineTimePeriods();
     QList<QnMediaServerResourcePtr> checkServers;
-    bool firstServer = true;
     for (int i = 0; i < mediaServerList.size(); ++i)
     {
         QnMediaServerResourcePtr otherMediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(mediaServerList[i].getServerId()));
         if (!otherMediaServer)
             continue;
-        if (firstServer && otherMediaServer == currentMediaServer && m_rtspSession.startTime() != DATETIME_NOW)
-            return 0; // archive starts with current server and archive is not empty
-        firstServer = false;
         if (otherMediaServer != currentMediaServer /*&& m_rtspSession.startTime() != AV_NOPTS_VALUE*/)
         {
             if (!checkServers.contains(otherMediaServer))
@@ -124,6 +120,7 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
         }
     }
 
+    qint64 minTime = DATETIME_NOW;
     foreach(QnMediaServerResourcePtr otherMediaServer, checkServers)
     {
         QnResourcePtr otherCamera = qnResPool->getResourceByUniqId(physicalId + otherMediaServer->getId().toString());
@@ -137,15 +134,17 @@ qint64 QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(QnResourcePtr re
                 if (otherRtspSession.open(getUrl(otherCamera))) {
                     if ((quint64)otherRtspSession.startTime() != AV_NOPTS_VALUE && otherRtspSession.startTime() != DATETIME_NOW)
                     {
-                        return otherRtspSession.startTime();
+                        minTime = qMin(minTime, otherRtspSession.startTime());
                     }
                 }
             }
         }
     }
-    return 0;
+    if (minTime != DATETIME_NOW && minTime < m_rtspSession.startTime())
+        return minTime;
+    else
+        return 0;
 }
-
 
 QnResourcePtr QnRtspClientArchiveDelegate::getResourceOnTime(QnResourcePtr resource, qint64 time)
 {
@@ -219,13 +218,6 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     }
     
     bool isOpened = m_rtspSession.open(getUrl(resource));
-
-    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
-    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
-        m_globalMinArchiveTime = globalMinTime;
-    else if (globalTimeBlocked)
-        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
-
     if (isOpened)
     {
         qint64 endTime = m_position;
@@ -242,6 +234,14 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     }
     m_opened = m_rtspSession.isOpened();
     m_sendedCSec = m_rtspSession.lastSendedCSeq();
+
+    qint64 globalMinTime = checkMinTimeFromOtherServer(resource);
+    if ((quint64)globalMinTime !=AV_NOPTS_VALUE)
+        m_globalMinArchiveTime = globalMinTime;
+    else if (globalTimeBlocked)
+        m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
+
+
     return m_opened;
 }
 

@@ -176,6 +176,7 @@
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
+				<qt.dir>${env.QTDIR}</qt.dir>				
 				<platform>linux</platform>
 				<compiler>gcc</compiler>
 			</properties>
@@ -189,7 +190,6 @@
 			</activation>
 			<properties>
 				<arch>x64</arch>
-				<qt.dir>/usr/lib/x86_64-linux-gnu</qt.dir>				
 			</properties>
 		</profile>
 		<profile>
@@ -202,7 +202,6 @@
 				</os> 
 			</activation>
 			<properties>
-				<qt.dir>/usr/lib/i386-linux-gnu</qt.dir>			
 				<arch>x86</arch>
 			</properties>
 		</profile>	

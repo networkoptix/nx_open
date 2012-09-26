@@ -1998,7 +1998,9 @@ Do you want to continue?"),
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
-        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(m_layoutExportResources[i]->getUniqueId()) , QIODevice::WriteOnly);
+        QString uniqId = m_layoutExportResources[i]->getUniqueId();
+        uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
+        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
         QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
         QByteArray data;
         periods.encode(data);
@@ -2025,7 +2027,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                 m_motionFileBuffer[i]->close();
                 
                 QString uniqId = m_exportedMediaRes->getUniqueId();
-                uniqId = uniqId.mid(uniqId.indexOf(QLatin1String("?"))+1); // simplify name if export from existing layout
+                uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
                 QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
                 device->write(m_motionFileBuffer[i]->buffer());
@@ -2063,7 +2065,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         }
 
         QString uniqId = m_exportedMediaRes->getUniqueId();
-        uniqId = uniqId.mid(uniqId.indexOf(QLatin1String("?"))+1); // simplify name if export from existing layout
+        uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage);
 
         if(m_exportProgressDialog)
