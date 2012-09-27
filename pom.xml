@@ -131,6 +131,7 @@
 				</os>
 			</activation>
 			<modules>
+				<module>quicksyncdecoder</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
