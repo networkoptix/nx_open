@@ -211,7 +211,17 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
-    layout->setGuid(QUuid::createUuid());
+    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    if (uuidFile)
+    {
+        QByteArray data = uuidFile->readAll();
+        delete uuidFile;
+        layout->setLocalRange(QnTimePeriod().deserialize(data));
+        layout->setGuid(QUuid(data));
+    }
+    else {
+        layout->setGuid(QUuid::createUuid());
+    }
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
     layout->setName(QFileInfo(xfile).fileName());

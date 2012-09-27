@@ -2017,6 +2017,10 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     device->write(m_exportPeriod.serialize());
     delete device;
 
+    device = m_exportStorage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
+    device->write(QUuid::createUuid().toString().toUtf8());
+    delete device;
+
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
         QString uniqId = m_layoutExportResources[i]->getUniqueId();
@@ -2049,7 +2053,7 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     }
     else {
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
-        if (layout) {
+        if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
             layout->setStatus(QnResource::Online);
             resourcePool()->addResource(layout);
         }
