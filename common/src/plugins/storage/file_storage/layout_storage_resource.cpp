@@ -120,7 +120,6 @@ QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
-    QMutexLocker lock(&m_fileSync);
     if (getUrl().isEmpty()) {
         int postfixPos = url.indexOf(QLatin1Char('?'));
         if (postfixPos == -1)
@@ -134,8 +133,14 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         delete rez;
         return 0;
     }
-    m_openedFiles.insert(rez);
+    registerFile(rez);
     return rez;
+}
+
+void QnLayoutFileStorageResource::registerFile(QnLayoutFile* file)
+{
+    QMutexLocker lock(&m_fileSync);
+    m_openedFiles.insert(file);
 }
 
 void QnLayoutFileStorageResource::unregisterFile(QnLayoutFile* file)
@@ -305,6 +310,8 @@ void QnLayoutFileStorageResource::readIndexHeader()
 
 bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 {
+    QMutexLocker lock(&m_fileSync);
+
     QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
@@ -332,6 +339,8 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
 qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint64* fileSize)
 {
+    QMutexLocker lock(&m_fileSync);
+
     *fileSize = 0;
     if (m_index.entryCount == 0)
         readIndexHeader();
