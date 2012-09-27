@@ -1,11 +1,15 @@
 #ifndef __NAL_UNITS_H
 #define __NAL_UNITS_H
 
+#include <inttypes.h>
+
 #include <QSet>
 #include <QVector>
 #include <memory.h>
 #include <map>
+
 #include "bitStream.h"
+
 
 const static int 	Extended_SAR = 255;
 const static double h264_ar_coeff[] = {0.0, 1.0, 12.0/11.0, 	10.0/11.0, 	16.0/11.0, 	40.0/33.0, 	24.0/11.0, 	20.0/11.0, 	

@@ -5,7 +5,7 @@
 #ifndef VIDEODECODERSWITCHER_H
 #define VIDEODECODERSWITCHER_H
 
-#include "abstractdecoder.h"
+#include <decoders/video/abstractdecoder.h>
 
 
 //!Delegates calls to video decoder. Supports switching between soft and hw decoder

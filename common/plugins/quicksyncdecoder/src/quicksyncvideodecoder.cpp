@@ -5,17 +5,22 @@
 
 #include <intrin.h>
 
+#include <Winsock2.h>
+
 #include <algorithm>
 
+#include <libavcodec/avcodec.h>
 #include <QDebug>
 
 #ifndef XVBA_TEST
-#include "../../../utils/media/nalunits.h"
+#include <utils/media/nalunits.h>
 #else
 #include "nalunits.h"
 #endif
 
 #include "quicksyncvideodecoder.h"
+
+//#define RETURN_D3D_SURFACE
 
 
 //TODO/IMPL make decoder asynchronous. Fix visual artifacts
@@ -95,7 +100,7 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_decodingInitialized( false ),
     m_totalBytesDropped( 0 ),
     m_prevTimestamp( 0 ),
-#ifndef XVBA_TEST
+#ifndef DISABLE_LAST_FRAME
     m_lastAVFrame( NULL ),
 #endif
 #ifdef USE_D3D
@@ -119,7 +124,7 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     }
 #endif
 
-#ifndef XVBA_TEST
+#ifndef DISABLE_LAST_FRAME
     m_lastAVFrame = avcodec_alloc_frame();
 #endif
 
@@ -157,7 +162,7 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
     if( m_vppAllocResponse.NumFrameActual > 0 )
         m_frameAllocator._free( &m_vppAllocResponse );
 
-#ifndef XVBA_TEST
+#ifndef DISABLE_LAST_FRAME
     av_free( m_lastAVFrame );
 #endif
 }
@@ -556,16 +561,18 @@ double QuickSyncVideoDecoder::getSampleAspectRatio() const
         : 1.0;
 }
 
-const AVFrame* QuickSyncVideoDecoder::lastFrame() const
-{
-    return m_lastAVFrame;
-}
-
 //!Reset decoder. Used for seek
 void QuickSyncVideoDecoder::resetDecoder( QnCompressedVideoDataPtr data )
 {
     if( m_decodingInitialized )
         m_decoder->Reset( &m_srcStreamParam );
+}
+#endif
+
+#ifndef DISABLE_LAST_FRAME
+const AVFrame* QuickSyncVideoDecoder::lastFrame() const
+{
+    return m_lastAVFrame;
 }
 #endif
 
@@ -1110,7 +1117,6 @@ bool QuickSyncVideoDecoder::processingNeeded() const
     return !m_outPictureSize.isNull();
 }
 
-#if 1
 inline void fastmemcpy_sse4( __m128i* dst, __m128i* src, size_t sz )
 {
     const __m128i* const src_end = src + sz / sizeof(__m128i);
@@ -1131,14 +1137,12 @@ inline void fastmemcpy_sse4( __m128i* dst, __m128i* src, size_t sz )
          dst += 4;
     }
 }
-#endif
 
 void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx )
 {
     const mfxFrameSurface1* const decodedFrame = &decodedFrameCtx->mfxSurface;
 
-#define SAVE_REF
-#ifdef SAVE_REF
+#ifdef RETURN_D3D_SURFACE
     outFrame->picData = QSharedPointer<QnAbstractPictureData>(
         new QuicksyncDXVAPictureData(
             &m_frameAllocator,
@@ -1201,9 +1205,9 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_BFF || 
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_REPEATED;
 
-#ifndef SAVE_REF
+#ifndef RETURN_D3D_SURFACE
 
-#ifndef XVBA_TEST
+#ifndef DISABLE_LAST_FRAME
     *m_lastAVFrame = *outFrame;
     m_lastAVFrame->data[0] = decodedFrameCtx->mfxSurface.Data.Y + m_frameCropTopActual * decodedFrame->Data.Pitch;
     m_lastAVFrame->data[1] = decodedFrameCtx->mfxSurface.Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch);

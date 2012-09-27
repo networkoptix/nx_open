@@ -7,8 +7,8 @@
 
 #include <QList>
 
-#include "abstractdecoder.h"
-#include "videodecoderplugintypes.h"
+#include <decoders/video/abstractdecoder.h>
+#include <common/videodecoderplugintypes.h>
 
 
 //!Monitors usage of video decoder plugin between all processes, using it

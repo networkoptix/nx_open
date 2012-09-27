@@ -7,8 +7,8 @@
 
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
-#include "quicksyncvideodecoder.h"
-#include "xvbadecoder.h"
+//#include "quicksyncvideodecoder.h"
+//#include "xvbadecoder.h"
 #include "../abstractvideodecoderplugin.h"
 #include "../../plugins/pluginmanager.h"
 
@@ -49,10 +49,10 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
         case FFMPEG:
         default:
         {
-            QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder( data );
-            if( decoder->isHardwareAccelerationEnabled() )
-                return decoder;
-            delete decoder;
+            //QuickSyncVideoDecoder* decoder = new QuickSyncVideoDecoder( data );
+            //if( decoder->isHardwareAccelerationEnabled() )
+            //    return decoder;
+            //delete decoder;
             return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding );
         }
     }

@@ -7,9 +7,9 @@
 
 #include <memory>
 
-#include "../abstractvideodecoderusagecalculator.h"
-#include "../pluginusagewatcher.h"
-#include "../../abstractvideodecoderplugin.h"
+#include <common/abstractvideodecoderusagecalculator.h>
+#include <common/pluginusagewatcher.h>
+#include <decoders/abstractvideodecoderplugin.h>
 
 
 //!Plugin of Intel Media SDK (Quicksync) based h.264 decoder

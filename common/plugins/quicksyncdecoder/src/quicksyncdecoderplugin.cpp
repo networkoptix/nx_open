@@ -4,9 +4,12 @@
 
 #include "quicksyncdecoderplugin.h"
 
+#include <QtPlugin>
+
+#include <common/predefinedusagecalculator.h>
+#include <common/videodecoderswitcher.h>
+
 #include "quicksyncvideodecoder.h"
-#include "../predefinedusagecalculator.h"
-#include "../videodecoderswitcher.h"
 
 
 static const char* QUICKSYNC_PLUGIN_ID = "45D92FCC-2B59-431e-BFF9-E11F2D6213DA";

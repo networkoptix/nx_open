@@ -207,7 +207,9 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#ifdef Q_WS_X11
 #include <X11/Xlib.h>
+#endif
 
 #ifndef API_TEST_MAIN
 
@@ -298,7 +300,9 @@ int qnMain(int argc, char *argv[])
     }
 
     //initializing plugin manager. TODO supply plugin dir (from settings)
-    PluginManager::instance( QString::fromAscii("./") );
+#ifdef _DEBUG
+    PluginManager::instance( QString::fromAscii("C:/develop/netoptix_vms/common/plugins/quicksyncdecoder/Win32/Debug/") );
+#endif
 
     /* Initialize connections. */
     initAppServerConnection();
@@ -346,7 +350,7 @@ int qnMain(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);

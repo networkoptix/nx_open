@@ -16,7 +16,7 @@
 #ifdef XVBA_TEST
 #include "common.h"
 #else
-#include "../abstractdecoder.h"
+#include <decoders/video/abstractdecoder.h>
 #endif
 #include "mfxallocator.h"
 
@@ -24,6 +24,11 @@
 #define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
+
+#ifdef XVBA_TEST
+#define DISABLE_LAST_FRAME
+#endif
+#define DISABLE_LAST_FRAME
 
 
 class PluginUsageWatcher;
@@ -71,10 +76,12 @@ public:
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const;
-    //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
-    virtual const AVFrame* lastFrame() const;
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
+#endif
+#ifndef DISABLE_LAST_FRAME
+    //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
+    virtual const AVFrame* lastFrame() const;
 #endif
     //!Hint decoder to scale decoded pictures (decoder is allowed to ignore this hint)
     /*!
