@@ -214,7 +214,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     layout->setGuid(QUuid::createUuid());
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
-    layout->setName(QFileInfo(xfile).fileName() + QLatin1String(" - ") + layout->getName());
+    layout->setName(QFileInfo(xfile).fileName());
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
