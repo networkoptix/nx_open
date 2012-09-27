@@ -3,7 +3,6 @@
 #include "filetypes.h"
 #include "utils/common/util.h"
 
-
 bool FileTypeSupport::isMovieFileExt(const QString &filename)
 {
     const QString lowerFilename = filename.toLower();
@@ -32,7 +31,22 @@ bool FileTypeSupport::isImageFileExt(const QString &filename)
 
 bool FileTypeSupport::isLayoutFileExt(const QString &filename)
 {
-    return filename.toLower().endsWith(QLatin1String(".nov"));
+    if (filename.toLower().endsWith(QLatin1String(".nov")))
+        return true;
+    if (filename.toLower().endsWith(QLatin1String(".exe")))
+    {
+        QFile f(filename);
+        if (f.open(QIODevice::ReadOnly))
+        {
+            qint64 pos = f.size() - sizeof(qint64)*3;
+            f.seek(f.size() - sizeof(qint64)*3);
+            quint64 magic;
+            f.read((char*) &magic, sizeof(qint64));
+            if (magic == NOV_EXE_MAGIC)
+                return true;
+        }
+    }
+    return false;
 }
 
 bool FileTypeSupport::isFileSupported(const QString &filename)

@@ -1,6 +1,7 @@
 #include "layout_storage_resource.h"
 #include "recording/file_deletor.h"
 #include "utils/common/util.h"
+#include "plugins/resources/archive/filetypesupport.h"
 
 class QnLayoutFile: public QIODevice
 {
@@ -175,6 +176,8 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
 QnLayoutFileStorageResource::QnLayoutFileStorageResource()
 {
     QMutexLocker lock(&m_storageSync);
+    m_novFileOffset = 0;
+    m_novFileLen = 0;
     m_allStorages.insert(this);
 }
 
@@ -304,8 +307,11 @@ bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
 void QnLayoutFileStorageResource::readIndexHeader()
 {
     QFile file(removeProtocolPrefix(getUrl()));
-    if (file.open(QIODevice::ReadOnly))
+    if (file.open(QIODevice::ReadOnly)) 
+    {
+        file.seek(m_novFileOffset);
         file.read((char*) &m_index, sizeof(m_index));
+    }
 }
 
 bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
@@ -327,7 +333,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return false;
-    file.seek(0);
+    file.seek(m_novFileOffset);
     file.write((const char*) &m_index, sizeof(m_index));
     file.seek(fileSize);
     QByteArray utf8FileName = fileName.toUtf8();
@@ -355,20 +361,46 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
     {
         if (m_index.entries[i].fileNameCrc == hash)
         {
-            file.seek(m_index.entries[i].offset);
+            file.seek(m_index.entries[i].offset + m_novFileOffset);
             char tmpBuffer[1024]; // buffer size is max file len
             int readed = file.read(tmpBuffer, sizeof(tmpBuffer));
             QByteArray readedFileName(tmpBuffer, qMin(readed, utf8FileName.length()));
             if (utf8FileName == readedFileName) 
             {
-                qint64 offset = m_index.entries[i].offset + fileName.toUtf8().length()+1;
+                qint64 offset = m_index.entries[i].offset + m_novFileOffset + fileName.toUtf8().length()+1;
                 if (i < m_index.entryCount-1)
-                    *fileSize = m_index.entries[i+1].offset - offset;
-                else
-                    *fileSize = file.size() - offset;
+                    *fileSize = m_index.entries[i+1].offset + m_novFileOffset - offset;
+                else {
+                    qint64 endPos = m_novFileOffset == 0 ? file.size() : m_novFileOffset + m_novFileLen;
+                    *fileSize = endPos - offset;
+                }
                 return offset;
             }
         }
     }
     return -1;
+}
+
+void QnLayoutFileStorageResource::setUrl(const QString& value)
+{
+    QnStorageResource::setUrl(value);
+    if (value.endsWith(QLatin1String(".exe")))
+    {
+        // find nov file inside binary
+        QFile f(removeProtocolPrefix(value));
+        if (f.open(QIODevice::ReadOnly))
+        {
+            qint64 postfixPos = f.size() - sizeof(quint64) * 3;
+            f.seek(postfixPos); // go to magic
+            quint64 magic;
+            f.read((char*) &magic, sizeof(qint64));
+            if (magic == FileTypeSupport::NOV_EXE_MAGIC) 
+            {
+                qint64 catalogOffset = 0;
+                f.read((char*) &m_novFileOffset, sizeof(qint64));
+                f.read((char*) &catalogOffset, sizeof(qint64));
+                m_novFileLen = catalogOffset - m_novFileOffset;
+            }
+        }
+    }
 }
