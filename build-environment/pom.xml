@@ -138,13 +138,6 @@
 			</activation>
 			<dependencies>
 				<dependency>
-					<groupId>com.digitalwatchdog</groupId>
-					<artifactId>dvr</artifactId>
-					<version>${dvr.version}</version>
-					<type>zip</type>
-					<classifier>${platform}-${arch}</classifier>
-				</dependency>
-				<dependency>
 					<groupId>org.ffmpeg</groupId>
 					<artifactId>ffmpeg-misc-headers-win32</artifactId>
 					<version>dev</version>
