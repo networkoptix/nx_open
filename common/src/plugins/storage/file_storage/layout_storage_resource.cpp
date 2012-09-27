@@ -120,6 +120,7 @@ QSet<QnLayoutFileStorageResource*> QnLayoutFileStorageResource::m_allStorages;
 
 QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
+    QMutexLocker lock(&m_fileSync);
     if (getUrl().isEmpty()) {
         int postfixPos = url.indexOf(QLatin1Char('?'));
         if (postfixPos == -1)
@@ -133,14 +134,8 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         delete rez;
         return 0;
     }
-    registerFile(rez);
+    m_openedFiles.insert(rez);
     return rez;
-}
-
-void QnLayoutFileStorageResource::registerFile(QnLayoutFile* file)
-{
-    QMutexLocker lock(&m_fileSync);
-    m_openedFiles.insert(file);
 }
 
 void QnLayoutFileStorageResource::unregisterFile(QnLayoutFile* file)

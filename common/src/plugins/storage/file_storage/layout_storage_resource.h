@@ -45,7 +45,6 @@ private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     void readIndexHeader();
-    void registerFile(QnLayoutFile* file);
     void unregisterFile(QnLayoutFile* file);
 
     void closeOpenedFiles();
