@@ -6,6 +6,8 @@
 #ifndef QUICKSYNCVIDEODECODER_H
 #define QUICKSYNCVIDEODECODER_H
 
+#include <intrin.h>
+
 #include <QSize>
 
 #include <fstream>
@@ -21,7 +23,7 @@
 #include "mfxallocator.h"
 
 #define USE_D3D
-#define WRITE_INPUT_STREAM_TO_FILE_1
+//#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
@@ -56,7 +58,11 @@ class QuickSyncVideoDecoder
     public QnAbstractVideoDecoder
 {
 public:
+    /*!
+        Newly created session joins session \a parentSession
+    */
     QuickSyncVideoDecoder(
+        MFXVideoSession* const parentSession,
         const QnCompressedVideoDataPtr data,
         PluginUsageWatcher* const pluginUsageWatcher );
     virtual ~QuickSyncVideoDecoder();
@@ -73,6 +79,8 @@ public:
     virtual int getWidth() const;
     //!Implementation of QnAbstractVideoDecoder::getHeight
     virtual int getHeight() const;
+    //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
+    virtual QSize getOriginalPictureSize() const;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const;
@@ -92,8 +100,13 @@ public:
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
 
 private:
-    enum SurfaceState
+    enum DecoderState
     {
+        //!waiting for some data to start initialization
+        notInitialized,
+        //!in process of initialization: decoding media stream header
+        decodingHeader,
+        //!initialied decoding data
         decoding,
         processing,
         done
@@ -161,15 +174,15 @@ private:
         const QRect m_cropRect;
     };
 
+    MFXVideoSession* const m_parentSession;
     PluginUsageWatcher* const m_pluginUsageWatcher;
     MFXVideoSession m_mfxSession;
-    SurfaceState m_state;
+    DecoderState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
     std::auto_ptr<MFXVideoVPP> m_processor;
     mfxVideoParam m_srcStreamParam;
     mfxSyncPoint m_syncPoint;
     mfxBitstream m_inputBitStream;
-    bool m_initialized;
     bool m_mfxSessionEstablished;
     bool m_decodingInitialized;
     unsigned int m_totalBytesDropped;
@@ -200,6 +213,8 @@ private:
     unsigned int m_frameCropTopActual;
     //!Number of lines to crop at bottom of resulting picture (may differ from \a m_originalFrameCropBottom because of scaling)
     unsigned int m_frameCropBottomActual;
+    bool m_reinitializeNeeded;
+    std::basic_string<mfxU8> m_cachedSequenceHeader;
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;
@@ -221,6 +236,7 @@ private:
     void initializeSurfacePoolFromAllocResponse(
         SurfacePool* const surfacePool,
         const mfxFrameAllocResponse& allocResponse );
+    void closeMFXSession();
 #ifdef USE_ASYNC_IMPL
     //!Iterates all async operations and checks, whether operation state has changed
     /*!
@@ -231,10 +247,19 @@ private:
     QSharedPointer<SurfaceContext> findUnlockedSurface( SurfacePool* const surfacePool );
     bool processingNeeded() const;
     void saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx );
-    void readSequenceHeader( mfxBitstream* const inputStream );
+    /*!
+        \return true if sequence header has been read successfully
+    */
+    bool readSequenceHeader( mfxBitstream* const inputStream );
     QString mfxStatusCodeToString( mfxStatus status ) const;
     QSharedPointer<SurfaceContext> getSurfaceCtxFromSurface( mfxFrameSurface1* const surf ) const;
     void resetMfxSession();
+    //!Copies interleaved UV plane \a nv12UVPlane stored in USWC memory to separate U- and V- buffers in system RAM
+    void deinterleaveUVPlane(
+        __m128i* nv12UVPlane,
+        size_t nv12UVPlaneSize,
+        __m128i* yv12YPlane,
+        __m128i* yv12VPlane );
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H

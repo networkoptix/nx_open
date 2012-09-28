@@ -9,8 +9,11 @@
 
 #include <algorithm>
 
+#ifndef XVBA_TEST
 #include <libavcodec/avcodec.h>
+#endif
 #include <QDebug>
+#include <QElapsedTimer>
 
 #ifndef XVBA_TEST
 #include <utils/media/nalunits.h>
@@ -21,12 +24,13 @@
 #include "quicksyncvideodecoder.h"
 
 //#define RETURN_D3D_SURFACE
+#define CONVERT_NV12_TO_YV12
 
 
 //TODO/IMPL make decoder asynchronous. Fix visual artifacts
 //TODO/IMPL take sequence header from extradata. Test on file
+//TODO/IMPL support last frame
 //TODO/IMPL implement shader NV12 -> RGB
-//TODO/IMPL frame cropping (based on sps settings)
 
 
 //!Implementation of QnAbstractPictureData
@@ -89,13 +93,14 @@ QuickSyncVideoDecoder::AsyncOperationContext::AsyncOperationContext()
 #endif
 
 QuickSyncVideoDecoder::QuickSyncVideoDecoder(
+    MFXVideoSession* const parentSession,
     const QnCompressedVideoDataPtr data,
     PluginUsageWatcher* const pluginUsageWatcher )
 :
+    m_parentSession( parentSession ),
     m_pluginUsageWatcher( pluginUsageWatcher ),
-    m_state( decoding ),
+    m_state( notInitialized ),
     m_syncPoint( NULL ),
-    m_initialized( false ),
     m_mfxSessionEstablished( false ),
     m_decodingInitialized( false ),
     m_totalBytesDropped( 0 ),
@@ -110,7 +115,8 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_originalFrameCropTop( 0 ),
     m_originalFrameCropBottom( 0 ),
     m_frameCropTopActual( 0 ),
-    m_frameCropBottomActual( 0 )
+    m_frameCropBottomActual( 0 ),
+    m_reinitializeNeeded( false )
 {
     memset( &m_srcStreamParam, 0, sizeof(m_srcStreamParam) );
     memset( &m_decodingAllocResponse, 0, sizeof(m_decodingAllocResponse) );
@@ -128,10 +134,6 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_lastAVFrame = avcodec_alloc_frame();
 #endif
 
-    //setOutPictureSize( QSize( 320, 180 ) );
-    //setOutPictureSize( QSize( 360, 200 ) );
-    //setOutPictureSize( QSize( 1920/4, 1080/4 ) );
-
 #if defined(WRITE_INPUT_STREAM_TO_FILE_1) || defined(WRITE_INPUT_STREAM_TO_FILE_2)
     m_inputStreamFile.open( "C:/temp/in.264", std::ios::binary );
 #endif
@@ -147,20 +149,13 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     inputStream.MaxLength = data->data.size();
 
     //TODO/IMPL extradata
-    init( MFX_CODEC_AVC, &inputStream );
+    //init( MFX_CODEC_AVC, &inputStream );
+    decode( &inputStream, NULL );
 }
 
 QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 {
-    m_processor.reset();
-    m_decoder.reset();
-    m_mfxSession.Close();
-
-    //free surface pool
-    if( m_decodingAllocResponse.NumFrameActual > 0 )
-        m_frameAllocator._free( &m_decodingAllocResponse );
-    if( m_vppAllocResponse.NumFrameActual > 0 )
-        m_frameAllocator._free( &m_vppAllocResponse );
+    closeMFXSession();
 
 #ifndef DISABLE_LAST_FRAME
     av_free( m_lastAVFrame );
@@ -169,7 +164,11 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 
 PixelFormat QuickSyncVideoDecoder::GetPixelFormat() const
 {
+#ifndef CONVERT_NV12_TO_YV12
     return PIX_FMT_NV12;
+#else
+    return PIX_FMT_YUV420P;
+#endif
 }
 
 #ifndef XVBA_TEST
@@ -191,7 +190,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
     inputStream.TimeStamp = data->timestamp;
 
 #ifndef XVBA_TEST
-    if( !m_initialized && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
+    if( (m_state < decoding) && data->context && data->context->ctx() && data->context->ctx()->extradata_size >= 7 && data->context->ctx()->extradata[0] == 1 )
     {
         std::basic_string<mfxU8> seqHeader;
         //sps & pps is in the extradata, parsing it...
@@ -243,7 +242,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
 {
     cl_log.log( QString("QuickSyncVideoDecoder::decode (async). data.size = %1").arg(inputStream->DataLength), cl_logDEBUG1 );
 
-    if( !m_initialized && !init( MFX_CODEC_AVC, inputStream ) )
+    if( (m_state < decoding) && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
 
     AsyncOperationContext* frameToDisplay = NULL;
@@ -366,7 +365,13 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
 {
     cl_log.log( QString::fromAscii("QuickSyncVideoDecoder::decode. data.size = %1").arg(inputStream->DataLength), cl_logDEBUG1 );
 
-    if( !m_initialized && !init( MFX_CODEC_AVC, inputStream ) )
+    if( m_reinitializeNeeded && readSequenceHeader( inputStream ) )
+    {
+        //have to wait for a sequence header and I-frame before reinitializing decoder
+        closeMFXSession();
+        m_reinitializeNeeded = false;
+    }
+    if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
 
     bool gotDisplayPicture = false;
@@ -543,13 +548,25 @@ void QuickSyncVideoDecoder::setLightCpuMode( DecodeMode /*val*/ )
 //!Implementation of QnAbstractVideoDecoder::getWidth
 int QuickSyncVideoDecoder::getWidth() const
 {
-    return m_srcStreamParam.mfx.FrameInfo.Width;
+    return m_outPictureSize.isEmpty()
+        ? m_srcStreamParam.mfx.FrameInfo.Width
+        : m_outPictureSize.width();
 }
 
 //!Implementation of QnAbstractVideoDecoder::getHeight
 int QuickSyncVideoDecoder::getHeight() const
 {
-    return m_srcStreamParam.mfx.FrameInfo.Height - (m_originalFrameCropTop + m_originalFrameCropBottom);
+    return m_outPictureSize.isEmpty()
+        ? m_srcStreamParam.mfx.FrameInfo.Height - (m_originalFrameCropTop + m_originalFrameCropBottom)
+        : m_outPictureSize.height();
+}
+
+//!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
+QSize QuickSyncVideoDecoder::getOriginalPictureSize() const
+{
+    return QSize(
+        m_srcStreamParam.mfx.FrameInfo.Width,
+        m_srcStreamParam.mfx.FrameInfo.Height - (m_originalFrameCropTop + m_originalFrameCropBottom) );
 }
 
 #ifndef XVBA_TEST
@@ -578,25 +595,34 @@ const AVFrame* QuickSyncVideoDecoder::lastFrame() const
 
 void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
 {
-    if( !m_outPictureSize.isEmpty() )
-    {
-        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Output picture size can be set only once. "
-            "Using picture size %1x%2").arg(m_outPictureSize.width(), m_outPictureSize.height()), cl_logDEBUG1 );
-        //TODO/IMPL support changing of output picture size
+    const QSize alignedNewPicSize = QSize( ALIGN16(outSize.width()), ALIGN32(outSize.height()) );
+    if( m_outPictureSize == alignedNewPicSize )
         return;
-    }
 
-    m_outPictureSize = QSize( ALIGN16(outSize.width()), ALIGN32(outSize.height()) );
+    m_outPictureSize = alignedNewPicSize;
+    cl_log.log( QString::fromAscii("Quicksync decoder. Setting up scaling to %1x%2").arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logINFO );
+    m_reinitializeNeeded = true;
 
-    //creating processing
-    m_processor.reset();
-    //if( m_vppAllocResponse.NumFrameActual > 0 )
+    //if( !m_outPictureSize.isEmpty() )
     //{
-    //    m_frameAllocator._free( &m_vppAllocResponse );
-    //    memset( &m_vppAllocResponse, 0, sizeof(m_vppAllocResponse) );
+    //    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Output picture size can be set only once. "
+    //        "Using picture size %1x%2").arg(m_outPictureSize.width(), m_outPictureSize.height()), cl_logDEBUG1 );
+    //    //TODO/IMPL support changing of output picture size
+    //    return;
     //}
-    if( m_decodingInitialized )
-        initProcessor();
+
+    //m_outPictureSize = QSize( ALIGN16(outSize.width()), ALIGN32(outSize.height()) );
+
+    ////creating processing
+    //m_processor.reset();
+    ////if( m_vppAllocResponse.NumFrameActual > 0 )
+    ////{
+    ////    m_frameAllocator._free( &m_vppAllocResponse );
+    ////    memset( &m_vppAllocResponse, 0, sizeof(m_vppAllocResponse) );
+    ////}
+    //if( m_decodingInitialized )
+    //    if( !initProcessor() )
+    //        m_outPictureSize = QSize();
 }
 
 QnAbstractPictureData::PicStorageType QuickSyncVideoDecoder::targetMemoryType() const
@@ -619,7 +645,7 @@ bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
     if( processingNeeded() && !m_processor.get() && !initProcessor() )
         return false;
 
-    m_initialized = true;
+    m_state = decoding;
 
     return true;
 }
@@ -636,6 +662,17 @@ bool QuickSyncVideoDecoder::initMfxSession()
         cl_log.log( QString::fromAscii("Failed to create Intel media SDK session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
         m_mfxSession.Close();
         return false;
+    }
+
+    if( m_parentSession )
+    {
+        status = MFXJoinSession( *m_parentSession, m_mfxSession );
+        if( status != MFX_ERR_NONE )
+        {
+            cl_log.log( QString::fromAscii("Failed to join Intel media SDK session with parent session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
+            //m_mfxSession.Close();
+            //return false;
+        }
     }
 
     m_mfxSessionEstablished = true;
@@ -657,6 +694,19 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     m_inputStreamFile.write( (const char*)seqHeader->Data, seqHeader->DataLength );
 #endif
 
+    m_state = decodingHeader;
+
+    mfxBitstream tmp;
+    if( m_cachedSequenceHeader.size() > 0 )
+    {
+        m_cachedSequenceHeader.append( seqHeader->Data, seqHeader->MaxLength );
+        memset( &tmp, 0, sizeof(tmp) );
+        tmp.Data = const_cast<mfxU8*>(m_cachedSequenceHeader.data());
+        tmp.MaxLength = m_cachedSequenceHeader.size();
+        tmp.DataLength = m_cachedSequenceHeader.size();
+        seqHeader = &tmp;
+    }
+
     mfxStatus status = MFX_ERR_NONE;
     m_srcStreamParam.mfx.CodecId = codecID;
     status = m_decoder->DecodeHeader( seqHeader, &m_srcStreamParam );
@@ -667,6 +717,8 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
 
         case MFX_ERR_MORE_DATA:
             cl_log.log( QString::fromAscii("Need more data to parse sequence header"), cl_logWARNING );
+            if( m_cachedSequenceHeader.empty() )
+                m_cachedSequenceHeader.append( seqHeader->Data, seqHeader->MaxLength );
             return false;
 
         default:
@@ -684,6 +736,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
             m_decoder.reset();
             return false;
     }
+    m_cachedSequenceHeader.clear();
 
     cl_log.log( QString::fromAscii("Successfully decoded stream header with Intel Media decoder! Picture resolution %1x%2, stream profile/level: %3/%4").
         arg(QString::number(m_srcStreamParam.mfx.FrameInfo.Width)).
@@ -723,7 +776,11 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     }
 
     //m_srcStreamParam.AsyncDepth = std::max<>( m_srcStreamParam.AsyncDepth, (mfxU16)1 );
-    m_srcStreamParam.AsyncDepth = 0;    //as in mfx example
+#ifdef USE_ASYNC_IMPL
+    m_srcStreamParam.AsyncDepth = 0;    //TODO
+#else
+    m_srcStreamParam.AsyncDepth = 1;
+#endif
     m_srcStreamParam.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
     m_srcStreamParam.mfx.FrameInfo.ChromaFormat = MFX_CHROMAFORMAT_YUV420;
 #ifdef USE_D3D
@@ -808,7 +865,11 @@ bool QuickSyncVideoDecoder::initProcessor()
 
     //setting up re-scaling and de-interlace (if apropriate)
     memset( &m_processingParams, 0, sizeof(m_processingParams) );
-    m_processingParams.AsyncDepth = 0;
+#ifdef USE_ASYNC_IMPL
+    m_processingParams.AsyncDepth = 0;  //TODO
+#else
+    m_processingParams.AsyncDepth = 1;
+#endif
 #ifdef USE_D3D
     m_processingParams.IOPattern = MFX_IOPATTERN_IN_VIDEO_MEMORY | MFX_IOPATTERN_OUT_VIDEO_MEMORY;
 #else
@@ -816,10 +877,10 @@ bool QuickSyncVideoDecoder::initProcessor()
 #endif
     m_processingParams.vpp.In = m_srcStreamParam.mfx.FrameInfo;
     m_processingParams.vpp.In.FourCC = MFX_FOURCC_NV12;
-    //m_processingParams.vpp.In.CropX = 0;
-    //m_processingParams.vpp.In.CropY = 0;
-    //m_processingParams.vpp.In.CropW = m_processingParams.vpp.In.Width;
-    //m_processingParams.vpp.In.CropH = m_processingParams.vpp.In.Height;
+    m_processingParams.vpp.In.CropX = 0;
+    m_processingParams.vpp.In.CropY = 0;
+    m_processingParams.vpp.In.CropW = m_processingParams.vpp.In.Width;
+    m_processingParams.vpp.In.CropH = m_processingParams.vpp.In.Height;
     m_processingParams.vpp.In.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;    //MFX_PICSTRUCT_UNKNOWN;
     m_processingParams.vpp.In.FrameRateExtD = 30;  //must be not null
     m_processingParams.vpp.In.FrameRateExtN = 1;
@@ -831,6 +892,8 @@ bool QuickSyncVideoDecoder::initProcessor()
     m_processingParams.vpp.Out.CropY = 0;
     m_processingParams.vpp.Out.CropW = m_processingParams.vpp.Out.Width;
     m_processingParams.vpp.Out.CropH = m_processingParams.vpp.Out.Height;
+    //m_processingParams.vpp.Out.CropW = m_srcStreamParam.mfx.FrameInfo.Width;
+    //m_processingParams.vpp.Out.CropH = m_srcStreamParam.mfx.FrameInfo.Height;
     m_processingParams.vpp.Out.PicStruct = MFX_PICSTRUCT_PROGRESSIVE;
     m_processingParams.vpp.Out.FrameRateExtD = m_processingParams.vpp.In.FrameRateExtD;
     m_processingParams.vpp.Out.FrameRateExtN = m_processingParams.vpp.In.FrameRateExtN;
@@ -839,18 +902,27 @@ bool QuickSyncVideoDecoder::initProcessor()
     memset( request, 0, sizeof(request) );
 
     mfxStatus status = m_processor->Query( &m_processingParams, &m_processingParams );
-    if( status != MFX_ERR_NONE )
+    if( status < MFX_ERR_NONE )
     {
-        cl_log.log( QString::fromAscii("Warning! Failed to query VPP. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
+        cl_log.log( QString::fromAscii("Failed to query VPP. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
+        m_processor.reset();
         return false;
+    }
+    else if( status > MFX_ERR_NONE )
+    {
+        cl_log.log( QString::fromAscii("Warning from quering VPP. Status %1").arg(mfxStatusCodeToString(status)), cl_logWARNING );
     }
 
     status = m_processor->QueryIOSurf( &m_processingParams, request );
-    if( status != MFX_ERR_NONE )
+    if( status < MFX_ERR_NONE )
     {
         cl_log.log( QString::fromAscii("Failed to query surface information for VPP from Intel media SDK session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
         m_processor.reset();
         return false;
+    }
+    else if( status > MFX_ERR_NONE )
+    {
+        cl_log.log( QString::fromAscii("Warning from quering VPP (io surf). Status %1").arg(mfxStatusCodeToString(status)), cl_logWARNING );
     }
 
     //U00, V00, U01, V01, U10, V10, U11, V11;
@@ -908,6 +980,27 @@ void QuickSyncVideoDecoder::initializeSurfacePoolFromAllocResponse(
         memcpy( &surfacePool->back()->mfxSurface.Info, &m_srcStreamParam.mfx.FrameInfo, sizeof(m_srcStreamParam.mfx.FrameInfo) );
         surfacePool->back()->mfxSurface.Data.MemId = allocResponse.mids[i];
     }
+}
+
+void QuickSyncVideoDecoder::closeMFXSession()
+{
+    m_processor.reset();
+
+    m_decoder.reset();
+    m_decodingInitialized = false;
+
+    m_mfxSession.Close();
+    m_mfxSessionEstablished = false;
+
+    //free surface pool
+    if( m_decodingAllocResponse.NumFrameActual > 0 )
+        m_frameAllocator._free( &m_decodingAllocResponse );
+    m_decoderSurfacePool.clear();
+    if( m_vppAllocResponse.NumFrameActual > 0 )
+        m_frameAllocator._free( &m_vppAllocResponse );
+    m_vppOutSurfacePool.clear();
+
+    m_state = notInitialized;
 }
 
 #ifdef USE_ASYNC_IMPL
@@ -1138,6 +1231,58 @@ inline void fastmemcpy_sse4( __m128i* dst, __m128i* src, size_t sz )
     }
 }
 
+//inline void deinterleave( __m128i i1, __m128i i2, __m128i* o1, __m128i* o2 )
+//{
+//}
+
+void QuickSyncVideoDecoder::deinterleaveUVPlane(
+    __m128i* nv12UVPlane,
+    size_t nv12UVPlaneSize,
+    __m128i* yv12UPlane,
+    __m128i* yv12VPlane )
+{
+    //static const __m128i MASK_LO = { 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff };
+    static const __m128i MASK_HI = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
+    static const __m128i AND_MASK = MASK_HI;
+    static const __m128i SHIFT_8 = { 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
+    const __m128i* const src_end = nv12UVPlane + nv12UVPlaneSize / sizeof(__m128i);
+    while( nv12UVPlane < src_end )
+    {
+        __m128i x1 = _mm_stream_load_si128( nv12UVPlane );
+        __m128i x2 = _mm_stream_load_si128( nv12UVPlane+1 );
+        __m128i x3 = _mm_stream_load_si128( nv12UVPlane+2 );
+        __m128i x4 = _mm_stream_load_si128( nv12UVPlane+3 );
+
+        __m128i x5 = _mm_packus_epi16( _mm_and_si128( x1, AND_MASK ), _mm_and_si128( x2, AND_MASK ) );   //U
+        __m128i x6 = _mm_packus_epi16( _mm_srl_epi16( x1, SHIFT_8 ), _mm_srl_epi16( x2, SHIFT_8 ) );   //V
+        _mm_store_si128( yv12UPlane, x5 );
+        _mm_store_si128( yv12VPlane, x6 );
+
+        x5 = _mm_packus_epi16( _mm_and_si128( x3, AND_MASK ), _mm_and_si128( x4, AND_MASK ) );   //U
+        x6 = _mm_packus_epi16( _mm_srl_epi16( x3, SHIFT_8 ), _mm_srl_epi16( x4, SHIFT_8 ) );   //V
+        _mm_store_si128( yv12UPlane+1, x5 );
+        _mm_store_si128( yv12VPlane+1, x6 );
+
+        yv12UPlane += 2;
+        yv12VPlane += 2;
+
+        nv12UVPlane += 4;
+    }
+
+    //__m128i x5, x6;
+    //x5 = _mm_unpacklo_epi8( x1, x2 );
+    //x6 = _mm_unpackhi_epi8( x1, x2 );
+    //x1 = _mm_unpacklo_epi16( x5, x6 );
+    //x2 = _mm_unpackhi_epi16( x5, x6 );
+    //x5 = _mm_unpacklo_epi32( x1, x2 );
+    //x6 = _mm_unpackhi_epi32( x1, x2 );
+    //x1 = _mm_unpacklo_epi64( x5, x6 );
+    //x2 = _mm_unpackhi_epi64( x5, x6 );
+    //_mm_store_si128( yv12UPlane, x1 );
+    //_mm_store_si128( yv12VPlane, x2 );
+}
+
 void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx )
 {
     const mfxFrameSurface1* const decodedFrame = &decodedFrameCtx->mfxSurface;
@@ -1158,27 +1303,35 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
         outFrame->reallocate(
             decodedFrame->Data.Pitch,
             decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual),
-            PIX_FMT_NV12 );
+#ifndef CONVERT_NV12_TO_YV12
+            PIX_FMT_NV12,
+#else
+            PIX_FMT_YUV420P,
+#endif
+            decodedFrame->Data.Pitch );
 
-#if 0
-        memcpy(
-            outFrame->data[0],
-            (decodedFrame->Data.Y + (m_frameCropTopActual * decodedFrame->Data.Pitch)),
+        fastmemcpy_sse4(
+            (__m128i*)outFrame->data[0],
+            (__m128i*)(decodedFrame->Data.Y + (m_frameCropTopActual * decodedFrame->Data.Pitch)),
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) );
-        memcpy(
-            outFrame->data[1],
-            (decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
+        //QElapsedTimer t1;
+        //t1.start();
+        //for( int i = 0; i < 10000; ++i )
+        //{
+#ifndef CONVERT_NV12_TO_YV12
+        fastmemcpy_sse4(
+            (__m128i*)outFrame->data[1],
+            (__m128i*)(decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2 );
 #else
-        fastmemcpy_sse4(
-            (__m128i *)outFrame->data[0],
-            (__m128i *)(decodedFrame->Data.Y + (m_frameCropTopActual * decodedFrame->Data.Pitch)),
-            decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) );
-        fastmemcpy_sse4(
-            (__m128i *)outFrame->data[1],
-            (__m128i *)(decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
-            decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2 );
+        deinterleaveUVPlane(
+            (__m128i*)(decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
+            decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2,
+            (__m128i*)outFrame->data[1],
+            (__m128i*)outFrame->data[2] );
 #endif
+        //}
+        //qDebug() << "!!!!!!!!!!!!!"<<t1.elapsed()<<"!!!!!!!!!!!!!1";
     }
     //else
     //{
@@ -1187,13 +1340,22 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
     //    outFrame->data[2] = decodedFrame->Data.V + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch);
     //}
     outFrame->linesize[0] = decodedFrame->Data.Pitch;       //y_stride
+#ifndef CONVERT_NV12_TO_YV12
     outFrame->linesize[1] = decodedFrame->Data.Pitch;       //uv_stride
     outFrame->linesize[2] = 0;
+#else
+    outFrame->linesize[1] = decodedFrame->Data.Pitch / 2;   //u_stride
+    outFrame->linesize[2] = decodedFrame->Data.Pitch / 2;   //v_stride
+#endif
 #endif
 
     outFrame->width = decodedFrame->Info.Width;
     outFrame->height = decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual);
+#ifndef CONVERT_NV12_TO_YV12
     outFrame->format = PIX_FMT_NV12;
+#else
+    outFrame->format = PIX_FMT_YUV420P;
+#endif
     //outFrame->key_frame = decodedFrame->Data.
     //outFrame->pts = av_rescale_q( decodedFrame->Data.TimeStamp, INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION, SRC_DATA_TIMESTAMP_RESOLUTION );
     outFrame->pts = decodedFrame->Data.TimeStamp;
@@ -1218,13 +1380,13 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #endif
 }
 
-void QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream )
+bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream )
 {
     SPSUnit m_sps;
     PPSUnit m_pps;
 
     if( inputStream->DataLength <= 4 )
-        return;
+        return false;
 
     //memset( &m_pictureDescriptor, 0, sizeof(m_pictureDescriptor) );
 
@@ -1332,7 +1494,7 @@ void QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
         }
     }
 
-    //return spsFound && ppsFound;
+    return spsFound && ppsFound;
 }
 
 QString QuickSyncVideoDecoder::mfxStatusCodeToString( mfxStatus status ) const
