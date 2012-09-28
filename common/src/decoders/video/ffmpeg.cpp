@@ -548,6 +548,11 @@ QnAbstractPictureData::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() c
 	return QnAbstractPictureData::pstSysMemPic;
 }
 
+QSize CLFFmpegVideoDecoder::getOriginalPictureSize() const
+{
+    return QSize( getWidth(), getHeight() );
+}
+
 void CLFFmpegVideoDecoder::setLightCpuMode(QnAbstractVideoDecoder::DecodeMode val)
 {
     if (m_decodeMode == val)
