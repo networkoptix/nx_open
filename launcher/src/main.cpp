@@ -81,8 +81,8 @@ int writeIndex(ofstream& dstFile, const vector<int64_t>& filePosList, vector<wst
         dstFile.write((const char*) fileNameList[i].c_str(), strLen*sizeof(wchar_t));
     }
 
-    dstFile.write((const char*) &MAGIC, sizeof(int64_t)); // nov file posf
-    dstFile.write((const char*) &filePosList[filePosList.size()-2], sizeof(int64_t)); // nov file start
+    //dstFile.write((const char*) &MAGIC, sizeof(int64_t)); // nov file posf
+    //dstFile.write((const char*) &filePosList[filePosList.size()-2], sizeof(int64_t)); // nov file start
     dstFile.write((const char*) &indexStartPos, sizeof(int64_t));
 
     return 0;
@@ -211,31 +211,34 @@ int launchFile(const wstring& executePath)
     if (!srcFile.is_open())
         return -1;
 
-    srcFile.seekg(-sizeof(int64_t)*3, std::ios::end); // skip magic, nov pos and catalog pos
-    int64_t fileSize = (int64_t)srcFile.tellg(); // + sizeof(int64_t);
+    srcFile.seekg(-sizeof(int64_t)*2, std::ios::end); // skip magic, and nov pos
     int64_t magic, novPos, indexTablePos;
+    
+    srcFile.read((char*) &novPos, sizeof(int64_t));
     srcFile.read((char*) &magic, sizeof(int64_t));
     if (magic != MAGIC)
         return -5;
-    srcFile.read((char*) &novPos, sizeof(int64_t));
+
+    srcFile.seekg(novPos-sizeof(int64_t)); // go to index_pos field
+    int64_t indexEofPos = (int64_t)srcFile.tellg(); // + sizeof(int64_t);
     srcFile.read((char*) &indexTablePos, sizeof(int64_t));
 
-    if (fileSize - indexTablePos > 1024*16)
+    if (indexEofPos - indexTablePos > 1024*16)
         return -3; // too long file catalog
 
     vector<int64_t> filePosList;
     vector<wstring> fileNameList;
 
-    char* buffer = new char[fileSize - indexTablePos];
+    char* buffer = new char[indexEofPos - indexTablePos];
     try 
     {
         srcFile.seekg(indexTablePos);
         int64_t curPos = indexTablePos;
-        while (srcFile.tellg() < fileSize)
+        while (srcFile.tellg() < indexEofPos)
         {
             int64_t builtinFilePos;
             srcFile.read((char*)&builtinFilePos, sizeof(int64_t));
-            if (builtinFilePos > fileSize)
+            if (builtinFilePos > indexEofPos)
                 return -3; // invalid catalog
             filePosList.push_back(builtinFilePos);
 
@@ -303,13 +306,20 @@ int createLaunchingFile(const wstring& launcherFile, const wstring& srcDataFolde
             fileNameList.push_back(srcMediaFiles[i]);
         }
     }
-    if (appendFile(dstFile, novFileName) != 0)
-        return -3;
+    //if (appendFile(dstFile, novFileName) != 0)
+    //    return -3;
     filePosList.push_back(dstFile.tellp());
     fileNameList.push_back(novFileName);
 
     if (writeIndex(dstFile, filePosList, fileNameList) != 0)
         return -4;
+
+    int64_t novPos = dstFile.tellp();
+    if (appendFile(dstFile, novFileName) != 0)
+        return -3;
+
+    dstFile.write((const char*) &novPos, sizeof(int64_t)); // nov file start
+    dstFile.write((const char*) &MAGIC, sizeof(int64_t)); // magic
 
     dstFile.close();
     return 0;

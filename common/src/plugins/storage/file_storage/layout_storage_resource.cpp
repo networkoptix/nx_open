@@ -390,16 +390,16 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
         QFile f(removeProtocolPrefix(value));
         if (f.open(QIODevice::ReadOnly))
         {
-            qint64 postfixPos = f.size() - sizeof(quint64) * 3;
-            f.seek(postfixPos); // go to magic
+            qint64 postfixPos = f.size() - sizeof(quint64) * 2;
+            f.seek(postfixPos); // go to nov index and magic
+            qint64 novOffset;
             quint64 magic;
+            f.read((char*) &novOffset, sizeof(qint64));
             f.read((char*) &magic, sizeof(qint64));
             if (magic == FileTypeSupport::NOV_EXE_MAGIC) 
             {
-                qint64 catalogOffset = 0;
-                f.read((char*) &m_novFileOffset, sizeof(qint64));
-                f.read((char*) &catalogOffset, sizeof(qint64));
-                m_novFileLen = catalogOffset - m_novFileOffset;
+                m_novFileOffset = novOffset;
+                m_novFileLen = f.size() - m_novFileOffset - sizeof(qint64)*2;
             }
         }
     }
