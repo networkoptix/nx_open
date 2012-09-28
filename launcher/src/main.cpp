@@ -21,7 +21,7 @@ wstring closeDirPath(const wstring& name)
 {
     if (name.empty())
         return name;
-    else if (name[name.length()-1] == L'/')
+    else if (name[name.length()-1] == L'/' || name[name.length()-1] == L'\\')
         return name;
     else
         return name + L'/';

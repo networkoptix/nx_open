@@ -50,14 +50,20 @@ public:
     virtual qint64 writeData(const char *data, qint64 maxSize) override
     {
         QMutexLocker lock(&m_mutex);
-        return m_file.write(data, maxSize);
+        qint64 rez = m_file.write(data, maxSize);
+        if (rez > 0)
+            m_fileSize = qMax(m_fileSize, m_file.pos() - m_fileOffset);
+        return rez;
     }
 
     virtual void close() override
     {
         QMutexLocker lock(&m_mutex);
-        if (m_storageResource.m_novFileOffset > 0)
+        if ((m_openMode & QIODevice::WriteOnly) && m_storageResource.m_novFileOffset > 0)
+        {
+            seek(size());
             m_storageResource.addBinaryPostfix(m_file);
+        }
         m_file.close();
         m_storageResource.unregisterFile(this);
     }
@@ -330,23 +336,24 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
         return false;
 
     QFile file(removeProtocolPrefix(getUrl()));
-    qint64 fileSize = file.size();
+    qint64 fileSize = file.size() -  getPostfixSize();
     if (fileSize > 0)
         readIndexHeader();
     else
         fileSize = sizeof(m_index);
 
-    m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize, qHash(fileName));
+    m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
         return false;
     file.seek(m_novFileOffset);
     file.write((const char*) &m_index, sizeof(m_index));
-    file.seek(fileSize - getPostfixSize());
+    file.seek(fileSize);
     QByteArray utf8FileName = fileName.toUtf8();
     utf8FileName.append('\0');
     file.write(utf8FileName);
-
+    if (m_novFileOffset > 0)
+        addBinaryPostfix(file);
     return true;
 }
 
@@ -372,7 +379,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
             char tmpBuffer[1024]; // buffer size is max file len
             int readed = file.read(tmpBuffer, sizeof(tmpBuffer));
             QByteArray readedFileName(tmpBuffer, qMin(readed, utf8FileName.length()));
-            if (utf8FileName == readedFileName) 
+            if (utf8FileName == readedFileName)
             {
                 qint64 offset = m_index.entries[i].offset + m_novFileOffset + fileName.toUtf8().length()+1;
                 if (i < m_index.entryCount-1)
@@ -391,7 +398,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
 void QnLayoutFileStorageResource::setUrl(const QString& value)
 {
     QnStorageResource::setUrl(value);
-    if (value.endsWith(QLatin1String(".exe")))
+    if (value.endsWith(QLatin1String(".exe")) || value.endsWith(QLatin1String(".exe.tmp")))
     {
         // find nov file inside binary
         QFile f(removeProtocolPrefix(value));

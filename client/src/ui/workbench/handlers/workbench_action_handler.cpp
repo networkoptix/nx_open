@@ -79,6 +79,7 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
 #include "camera/caching_time_period_loader.h"
+#include "launcher/nov_launcher.h"
 
 
 
@@ -1905,12 +1906,12 @@ Do you want to continue?"),
             this->widget(), 
             tr("Export Layout As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Network optix media file (*.nov)"),
+            tr("Network optix media file (*.nov);;Executable network optix media file(*.exe)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
 
-        selectedExtension = QLatin1String(".nov");
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
             return;
 
@@ -1995,7 +1996,23 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
             }
         }
     }
-    QFile::remove(fileName);
+
+    if (layoutFileName.endsWith(QLatin1String(".exe")))
+    {
+        if (QnNovLauncher::createLaunchingFile(fileName) != 0)
+        {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Can't write to file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
+                QMessageBox::Ok
+                );
+            return;
+        }
+    }
+    else {
+        QFile::remove(fileName);
+    }
     fileName = QLatin1String("layout://") + fileName;
 
     m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
