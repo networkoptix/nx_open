@@ -47,6 +47,11 @@ public:
         return foundPlugins;
     }
 
+    /*!
+        This method must be called implicitly
+    */
+    void loadPlugins();
+
     //!Guess what
     static PluginManager* instance( const QString& pluginDir = QString() );
 
@@ -58,7 +63,6 @@ private:
     PluginManager( const QString& pluginDir = QString() );
     ~PluginManager();
 
-    void loadPlugins();
     void loadPlugins( const QString& dirToSearchIn );
     void loadPlugin( const QString& fullFilePath );
 };

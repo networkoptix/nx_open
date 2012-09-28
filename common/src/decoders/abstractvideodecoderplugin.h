@@ -42,6 +42,6 @@ public:
             const QGLContext* const glContext ) const = 0;
 };
 
-Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.Plugin.VideoDecoder/0.1" );
+Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.plugin.videodecoder/0.1" );
 
 #endif //ABSTRACTVIDEODECODERPLUGIN_H

@@ -11,6 +11,8 @@
 #include <QCoreApplication>
 #include <QDir>
 
+#include "../decoders/abstractclientplugin.h"
+#include "../decoders/abstractvideodecoderplugin.h"
 #include "../utils/common/log.h"
 
 
@@ -24,6 +26,7 @@ PluginManager::~PluginManager()
 {
 }
 
+//Q_GLOBAL_STATIC(PluginManager, pluginManagerInstance);
 static QAtomicPointer<PluginManager> pluginManagerInstance;
 
 //!Guess what
@@ -32,10 +35,10 @@ PluginManager* PluginManager::instance( const QString& pluginDir )
     if( !pluginManagerInstance )
     {
         PluginManager* newInstance = new PluginManager( pluginDir );
-        if( pluginManagerInstance.testAndSetOrdered( NULL, newInstance ) )
-            newInstance->loadPlugins();
-        else
+        if( !pluginManagerInstance.testAndSetOrdered( NULL, newInstance ) )
             delete newInstance;
+        //else
+        //    newInstance->loadPlugins();
     }
     return pluginManagerInstance;
 }
@@ -75,9 +78,16 @@ void PluginManager::loadPlugin( const QString& fullFilePath )
     QSharedPointer<QPluginLoader> plugin( new QPluginLoader( fullFilePath ) );
     if( !plugin->load() )
     {
-        cl_log.log( QString::fromAscii("Library %1 is not plugin").arg(fullFilePath), cl_logWARNING );
+        cl_log.log( QString::fromAscii("Library %1 is not plugin").arg(fullFilePath), cl_logDEBUG1 );
         return;
     }
+
+    QObject* obj = plugin->instance();
+    QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
+    if( !clientPlugin )
+        return;
+
+    clientPlugin->initializeLog( QnLog::instance() );
 
     cl_log.log( QString::fromAscii("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
     m_loadedPlugins.push_back( plugin );
