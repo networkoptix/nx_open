@@ -174,7 +174,7 @@ void QnVideoCamera::onReachedTheEnd()
         emit reachedTheEnd();
 }
 
-void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage)
+void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, QnStreamRecorder::Role role)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -206,7 +206,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
-    m_exportRecorder->setRole(QnStreamRecorder::Role_FileExport);
+    m_exportRecorder->setRole(role);
     m_exportRecorder->setContainer(format);
 
 #ifndef _DEBUG

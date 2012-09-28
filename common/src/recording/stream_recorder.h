@@ -19,7 +19,7 @@ class QnStreamRecorder : public QnAbstractDataConsumer
     Q_OBJECT
 
 public:
-    enum Role {Role_ServerRecording, Role_FileExport};
+    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();

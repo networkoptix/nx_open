@@ -174,6 +174,16 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.unlock();
 }
 
+QnTimePeriod QnLayoutResource::getLocalRange() const
+{
+    return m_localRange;
+}
+
+void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
+{
+    m_localRange = value;
+}
+
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 {
     QnLayoutResourcePtr layout;
@@ -192,10 +202,33 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     } catch(...) {
         return layout;
     }
-    layout->setGuid(QUuid::createUuid());
+
+    QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
+    if (rangeFile)
+    {
+        QByteArray data = rangeFile->readAll();
+        delete rangeFile;
+        layout->setLocalRange(QnTimePeriod().deserialize(data));
+    }
+
+    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    if (uuidFile)
+    {
+        QByteArray data = uuidFile->readAll();
+        delete uuidFile;
+        layout->setLocalRange(QnTimePeriod().deserialize(data));
+        layout->setGuid(QUuid(data.data())); // TODO: #VASILENKO WTF? Deserializing two different values from the same byte array?
+
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            return existingLayout;
+    }
+    else {
+        layout->setGuid(QUuid::createUuid());
+    }
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
-    layout->setName(QFileInfo(xfile).fileName() + QLatin1String(" - ") + layout->getName());
+    layout->setName(QFileInfo(xfile).fileName());
 
     layout->addFlags(QnResource::url);
     layout->setUrl(xfile);
@@ -210,7 +243,6 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
         item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + path;
         if (!path.endsWith(QLatin1String(".mkv")))
             item.resource.path += QLatin1String(".mkv");
         updatedItems.insert(item.uuid, item);
@@ -226,8 +258,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
         {
-            QString motionUrl = path.mid(path.lastIndexOf(L'?')+1);
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(motionUrl), QIODevice::ReadOnly);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(path), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
@@ -239,7 +270,8 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
                 delete motionIO;
                 for (int i = 0; i < motionData.size(); ++i)
                     motionData[i].doMarshalling();
-                aviResource->setMotionBuffer(motionData, channel);
+                if (!motionData.empty())
+                    aviResource->setMotionBuffer(motionData, channel);
             }
         }
 

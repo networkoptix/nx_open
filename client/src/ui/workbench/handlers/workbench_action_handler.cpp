@@ -79,6 +79,7 @@
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
 #include "camera/caching_time_period_loader.h"
+#include "launcher/nov_launcher.h"
 
 
 
@@ -887,7 +888,13 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if(!(accessController()->permissions(layout) & Qn::SavePermission))
         return;
 
-    snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    if (layout->flags() & QnResource::local) {
+        m_exportPeriod = layout->getLocalRange();
+        saveLayoutToLocalFile(layout, layout->getUrl(), QString()); // override layout
+    }
+    else {
+        snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutAction_triggered() {
@@ -1866,11 +1873,9 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
     if (!layout)
         return;
 
-    QnLayoutItemDataMap items = layout->getItems();
-
     m_exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
-    if(m_exportPeriod.durationMs * items.size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
+    if(m_exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
         int button = QMessageBox::question(
             this->widget(),
             tr("Warning"),
@@ -1901,12 +1906,12 @@ Do you want to continue?"),
             this->widget(), 
             tr("Export Layout As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("Network optix media file (*.nov)"),
+            tr("Network optix media file (*.nov);;Executable network optix media file(*.exe)"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
 
-        selectedExtension = QLatin1String(".nov");
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
             return;
 
@@ -1940,6 +1945,18 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
+    saveLayoutToLocalFile(layout, fileName, tr("Export successfully finished"));
+}
+
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, const QString& eofMessage)
+{
+    m_layoutExportMessage = eofMessage;
+    QString fileName = layoutFileName;
+    if (fileName == layout->getUrl()) {
+        // can not override opened layout. save to tmp file, then rename
+        fileName += QLatin1String(".tmp");
+    }
+
     //QnLayoutFileStorageResource layoutStorage;
     //layoutStorage.setUrl(fileName);
     m_layoutFileName = fileName;
@@ -1960,6 +1977,7 @@ Do you want to continue?"),
 
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
+    QnLayoutItemDataMap items = layout->getItems();
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         (*itr).uuid = QUuid();
@@ -1978,7 +1996,23 @@ Do you want to continue?"),
             }
         }
     }
-    QFile::remove(fileName);
+
+    if (layoutFileName.endsWith(QLatin1String(".exe")))
+    {
+        if (QnNovLauncher::createLaunchingFile(fileName) != 0)
+        {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Can't write to file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
+                QMessageBox::Ok
+                );
+            return;
+        }
+    }
+    else {
+        QFile::remove(fileName);
+    }
     fileName = QLatin1String("layout://") + fileName;
 
     m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
@@ -1994,6 +2028,14 @@ Do you want to continue?"),
     QByteArray layoutData;
     serializer.serializeLayout(layout, layoutData);
     device->write(layoutData);
+    delete device;
+
+    device = m_exportStorage->open(QLatin1String("range.bin"), QIODevice::WriteOnly);
+    device->write(m_exportPeriod.serialize());
+    delete device;
+
+    device = m_exportStorage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
+    device->write(QUuid::createUuid().toString().toUtf8());
     delete device;
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
@@ -2013,6 +2055,31 @@ Do you want to continue?"),
     at_layoutCamera_exportFinished(fileName);
 }
 
+void QnWorkbenchActionHandler::at_layout_exportFinished()
+{
+    disconnect(sender(), NULL, this, NULL);
+    if(m_exportProgressDialog)
+        m_exportProgressDialog.data()->deleteLater();
+
+    QString fileName = m_exportStorage->getUrl();
+    if (fileName.endsWith(QLatin1String(".tmp")))
+    {
+        fileName.chop(4);
+        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+        m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
+    }
+    else {
+        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
+        if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
+            layout->setStatus(QnResource::Online);
+            resourcePool()->addResource(layout);
+        }
+    }
+    m_exportStorage.clear();
+
+    if (!m_layoutExportMessage.isEmpty())
+        QMessageBox::information(widget(), tr("Export finished"), m_layoutExportMessage, QMessageBox::Ok);
+}
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 {
@@ -2040,19 +2107,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     m_exportedMediaRes.clear();
 
     if (m_layoutExportResources.isEmpty()) {
-        disconnect(sender(), NULL, this, NULL);
-        if(m_exportProgressDialog)
-            m_exportProgressDialog.data()->deleteLater();
-        m_exportStorage.clear();
-
-        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_layoutFileName);
-        if (layout) {
-            layout->setStatus(QnResource::Online);
-            resourcePool()->addResource(layout);
-        }
-
-
-        QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+        at_layout_exportFinished();
     } else {
         m_layoutExportCamera->setExportProgressOffset(m_layoutExportCamera->getExportProgressOffset() + 100);
         m_exportedMediaRes = m_layoutExportResources.dequeue();
@@ -2066,7 +2121,8 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
         QString uniqId = m_exportedMediaRes->getUniqueId();
         uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
-        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage);
+        QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
+        m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, role);
 
         if(m_exportProgressDialog)
             m_exportProgressDialog.data()->setLabelText(tr("Exporting %1 to \"%2\"...").arg(m_exportedMediaRes->getUrl()).arg(m_layoutFileName));

@@ -558,7 +558,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 void QnStreamRecorder::setRole(Role role)
 {
     m_role = role;
-    m_forceDefaultCtx = m_role == Role_ServerRecording;
+    m_forceDefaultCtx = m_role == Role_ServerRecording || m_role == Role_FileExportWithEmptyContext;
 }
 
 void QnStreamRecorder::setSignLogo(QPixmap logo)

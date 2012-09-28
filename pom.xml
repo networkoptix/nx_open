@@ -14,7 +14,7 @@
 
 	<properties>
 		<ffmpeg.version>N-39672-g40b7a27-SNAPSHOT</ffmpeg.version>
-		<openssl.version>1.0.0j-custom</openssl.version>
+		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
 		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
 		<build.configuration>release</build.configuration>
