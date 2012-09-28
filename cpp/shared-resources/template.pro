@@ -44,7 +44,9 @@ CONFIG(release, debug|release) {
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
-LIBS += -lcommon	
+!contains(TARGET,common) {
+  LIBS += -lcommon	
+}
 
 LIBS += ${global.libs}
 DEFINES += ${global.defines}

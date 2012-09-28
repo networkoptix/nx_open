@@ -79,6 +79,7 @@ QString QnConnectionDataList::defaultLastUsedName(){
 }
 
 
+QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
 
 QnSettings::QnSettings():
