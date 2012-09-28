@@ -218,6 +218,10 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         delete uuidFile;
         layout->setLocalRange(QnTimePeriod().deserialize(data));
         layout->setGuid(QUuid(data.data())); // TODO: #VASILENKO WTF? Deserializing two different values from the same byte array?
+
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            return existingLayout;
     }
     else {
         layout->setGuid(QUuid::createUuid());
