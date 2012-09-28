@@ -23,7 +23,7 @@
 //
 #define USE_SOURCE_BUFFER
 //#define SAVE_DECODED_FRAME_TO_FILE
-#define DUMP_DECODER_INPUT
+//#define DUMP_DECODER_INPUT
 #ifdef DUMP_DECODER_INPUT
 //#define DUMP_BY_SLICES
 #endif
