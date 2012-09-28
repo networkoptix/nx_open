@@ -56,6 +56,13 @@
 			<classifier>${platform}-${arch}</classifier>
 		</dependency>
 		<dependency>
+			<groupId>com.microsoft</groupId>
+			<artifactId>redistributable</artifactId>
+			<version>vs2008</version>
+			<type>zip</type>
+			<classifier>${platform}-${arch}</classifier>
+		</dependency>		
+		<dependency>
 			<groupId>com.sourceforge.cloudcity</groupId>
 			<artifactId>bespin</artifactId>
 			<version>1.1-SNAPSHOT</version>
