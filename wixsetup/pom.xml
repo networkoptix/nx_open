@@ -22,8 +22,8 @@
 
 	<properties>
 		<arch>x86</arch>
-		<skiptest>true</skiptest>
-		<skip.upx>true</skip.upx>
+		<skip.test>true</skip.test>
+		<skip.compress>true</skip.compress>
 	</properties>
 
 	<build>
@@ -63,30 +63,6 @@
 			<build>
 				<plugins>
 					<plugin>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>upx</id>
-								<phase>generate-resources</phase>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<configuration>
-									<target>
-										<!--<exec dir="${libdir}/bin/${build.configuration}" executable="${environment.dir}/bin/upx" failifexecutionfails="false">
-											<arg line="-d *.exe *.dll"/>
-										</exec>		-->											
-										<exec dir="${libdir}/bin/${build.configuration}" executable="${environment.dir}/bin/upx" failifexecutionfails="false">
-											<arg line="--lzma *.exe *.dll"/>
-										</exec>													
-									</target>
-									<skip>${skip.upx}</skip>
-								</configuration>
-							</execution>	
-						</executions>
-					</plugin>
-					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>
 						<version>2.5</version>
@@ -124,6 +100,26 @@
 					</plugin>       
 
 					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>compress</id>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<exec dir="${libdir}/bin/${build.configuration}" executable="${project.build.directory}/pack.bat" failifexecutionfails="true" />
+									</target>
+									<skip>${skip.compress}</skip>
+								</configuration>
+							</execution>	
+						</executions>
+					</plugin>						
+
+					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.1.1</version>
@@ -152,11 +148,6 @@
 								<configuration>
 									<executable>${project.build.directory}/build.bat</executable>
 									<workingDirectory>${project.build.directory}/CustomActions/</workingDirectory>      
-									<arguments>
-										<argument>CustomActions.vcproj</argument>
-										<argument>/t:Rebuild</argument>
-										<argument>/p:Configuration=${build.configuration}</argument>
-									</arguments>
 								</configuration>
 							</execution>
 
@@ -284,7 +275,7 @@
 								<configuration>
 									<executable>${project.build.directory}/test.bat</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>
-									<skip>${skiptest}</skip>                        
+									<skip>${skip.test}</skip>                        
 								</configuration>    
 							</execution>
 						</executions> 
