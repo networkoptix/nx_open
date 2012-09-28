@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <tchar.h>
-#include "dirent.h"
+#include <Windows.h>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 typedef signed __int64 int64_t;
@@ -16,32 +16,6 @@ using namespace std;
 
 static const int IO_BUFFER_SIZE = 1024*1024;
 static const int64_t MAGIC = 0x73a0b934820d4055ll;
-
-int appendFile(ofstream& dstFile, const wstring& srcFileName)
-{
-    ifstream srcFile;
-    char* buffer = new char[IO_BUFFER_SIZE];
-    try 
-    {
-        srcFile.open(srcFileName.c_str(), std::ios_base::binary);
-        if (!srcFile.is_open())
-            return -2;
-    
-        srcFile.read(buffer, IO_BUFFER_SIZE);
-        while (srcFile.gcount() > 0) 
-        {
-            dstFile.write(buffer, srcFile.gcount());
-            srcFile.read(buffer, IO_BUFFER_SIZE);
-        }
-        srcFile.close();
-        delete [] buffer;
-        return 0;
-    }
-    catch(...) {
-        delete [] buffer;
-        return -2;
-    }
-}
 
 wstring closeDirPath(const wstring& name)
 {
@@ -64,49 +38,11 @@ wstring getFullFileName(const wstring& folder, const wstring& fileName)
         if (value[i] == L'\\')
             value[i] = L'/';
     }
-    if (value[value.length()] != L'/')
+    if (value[value.length()-1] != L'/')
         value += L'/';
     value += fileName;
 
     return value;
-}
-int writeIndex(ofstream& dstFile, const vector<int64_t>& filePosList, vector<wstring>& fileNameList)
-{
-    int64_t indexStartPos = dstFile.tellp();
-    for (int i = 1; i < filePosList.size(); ++i)
-    {
-        dstFile.write((const char*) &filePosList[i-1], sizeof(int64_t)); // no marsahling is required because of platform depending executable file
-        int strLen = fileNameList[i].length();
-        dstFile.write((const char*) &strLen, sizeof(int));
-        dstFile.write((const char*) fileNameList[i].c_str(), strLen*sizeof(wchar_t));
-    }
-
-    //dstFile.write((const char*) &MAGIC, sizeof(int64_t)); // nov file posf
-    //dstFile.write((const char*) &filePosList[filePosList.size()-2], sizeof(int64_t)); // nov file start
-    dstFile.write((const char*) &indexStartPos, sizeof(int64_t));
-
-    return 0;
-}
-
-void getSrcFileList(vector<wstring>& result, const wstring& srcDataFolder, const wstring& root)
-{
-    DIR *pDIR;
-    struct dirent *entry;
-    if( pDIR=opendir(srcDataFolder.c_str()))
-    {
-        while(entry = readdir(pDIR))
-        {
-            wstring name(entry->d_name);
-            if(name !=  L"." != 0 && name != L"..")
-            {
-                if (entry->d_type == DT_DIR)
-                    getSrcFileList(result, getFullFileName(srcDataFolder, name), closeDirPath(getFullFileName(root, name)));
-                else 
-                    result.push_back(root + name);
-            }
-        }
-        closedir(pDIR);
-    }
 }
 
 wstring getDstDir()
@@ -159,19 +95,12 @@ void checkDir(set<wstring>& checkedDirs, const wstring& dir)
         return;
     checkedDirs.insert(normalizedName);
 
-    struct dirent *entry;
-    DIR *pDIR;
-    if( pDIR=opendir(normalizedName.c_str()))
-        closedir(pDIR);
-    else
+    if(GetFileAttributes(normalizedName.c_str()) == INVALID_FILE_ATTRIBUTES)
         createDirectory(normalizedName);
 }
 
 int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int64_t fileSize)
 {
-    //wstring fullFileName = getFullFileName(dstDir, fileName);
-    //createDirectory(extractFilePath(fullFileName));
-
     srcFile.seekg(pos);
     ofstream dstFile;
     dstFile.open(fullFileName.c_str(), std::ios_base::binary);
@@ -278,54 +207,6 @@ int launchFile(const wstring& executePath)
     }
 }
 
-int createLaunchingFile(const wstring& launcherFile, const wstring& srcDataFolder, const wstring& novFileName, const wstring& dstName)
-{
-    vector<int64_t> filePosList;
-    vector<wstring> fileNameList;
-    vector<wstring> srcMediaFiles;
-    getSrcFileList(srcMediaFiles, srcDataFolder, wstring());
-
-    ofstream dstFile;
-    try {
-        dstFile.open(dstName.c_str(), std::ios_base::binary);
-    }
-    catch(...) {
-        return -1;
-    }
-
-    if (appendFile(dstFile, launcherFile) != 0)
-        return -2;
-    filePosList.push_back(dstFile.tellp());
-    fileNameList.push_back(launcherFile);
-
-    for (int i= 0; i < srcMediaFiles.size(); ++i)
-    {
-        if (appendFile(dstFile, getFullFileName(srcDataFolder, srcMediaFiles[i])) == 0)
-        {
-            filePosList.push_back(dstFile.tellp());
-            fileNameList.push_back(srcMediaFiles[i]);
-        }
-    }
-    //if (appendFile(dstFile, novFileName) != 0)
-    //    return -3;
-    filePosList.push_back(dstFile.tellp());
-    fileNameList.push_back(novFileName);
-
-    if (writeIndex(dstFile, filePosList, fileNameList) != 0)
-        return -4;
-
-    int64_t novPos = dstFile.tellp();
-    if (appendFile(dstFile, novFileName) != 0)
-        return -3;
-
-    dstFile.write((const char*) &novPos, sizeof(int64_t)); // nov file start
-    dstFile.write((const char*) &MAGIC, sizeof(int64_t)); // magic
-
-    dstFile.close();
-    return 0;
-}
-
-
 int _tmain(int argc, _TCHAR* argv[])
 {
     if (argc == 1)
@@ -335,10 +216,6 @@ int _tmain(int argc, _TCHAR* argv[])
     else if (argc == 2)
     {
         launchFile(argv[1]);
-    }
-    else if (argc == 4)
-    {
-        return createLaunchingFile(argv[0], argv[1], argv[2], argv[3]);
     }
 
 	return 0;

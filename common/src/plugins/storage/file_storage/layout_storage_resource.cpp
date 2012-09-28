@@ -56,6 +56,8 @@ public:
     virtual void close() override
     {
         QMutexLocker lock(&m_mutex);
+        if (m_storageResource.m_novFileOffset > 0)
+            m_storageResource.addBinaryPostfix(m_file);
         m_file.close();
         m_storageResource.unregisterFile(this);
     }
@@ -177,7 +179,7 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource()
 {
     QMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
-    m_novFileLen = 0;
+    //m_novFileLen = 0;
     m_allStorages.insert(this);
 }
 
@@ -314,6 +316,11 @@ void QnLayoutFileStorageResource::readIndexHeader()
     }
 }
 
+int QnLayoutFileStorageResource::getPostfixSize() const
+{
+    return m_novFileOffset == 0 ? 0 : sizeof(qint64)*2;
+}
+
 bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 {
     QMutexLocker lock(&m_fileSync);
@@ -335,7 +342,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
         return false;
     file.seek(m_novFileOffset);
     file.write((const char*) &m_index, sizeof(m_index));
-    file.seek(fileSize);
+    file.seek(fileSize - getPostfixSize());
     QByteArray utf8FileName = fileName.toUtf8();
     utf8FileName.append('\0');
     file.write(utf8FileName);
@@ -371,7 +378,7 @@ qint64 QnLayoutFileStorageResource::getFileOffset(const QString& fileName, qint6
                 if (i < m_index.entryCount-1)
                     *fileSize = m_index.entries[i+1].offset + m_novFileOffset - offset;
                 else {
-                    qint64 endPos = m_novFileOffset == 0 ? file.size() : m_novFileOffset + m_novFileLen;
+                    qint64 endPos = file.size() - getPostfixSize();
                     *fileSize = endPos - offset;
                 }
                 return offset;
@@ -399,8 +406,14 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
             if (magic == FileTypeSupport::NOV_EXE_MAGIC) 
             {
                 m_novFileOffset = novOffset;
-                m_novFileLen = f.size() - m_novFileOffset - sizeof(qint64)*2;
+                //m_novFileLen = f.size() - m_novFileOffset - sizeof(qint64)*2;
             }
         }
     }
+}
+
+void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
+{
+    file.write((char*) &m_novFileOffset, sizeof(qint64));
+    file.write((char*) &FileTypeSupport::NOV_EXE_MAGIC, sizeof(qint64));
 }
