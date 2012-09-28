@@ -7,6 +7,8 @@
 
 #include <memory>
 
+#include <mfxvideo++.h>
+
 #include <plugins/videodecoders/abstractvideodecoderusagecalculator.h>
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <decoders/abstractvideodecoderplugin.h>
@@ -26,6 +28,7 @@ public:
 
     //!Implementation of QnAbstractClientPlugin::minSupportedVersion
     virtual quint32 minSupportedVersion() const;
+    virtual void initializeLog( QnLog* logInstance );
 
     //!Implementation of QnAbstractVideoDecoderPlugin::supportedCodecTypes
     virtual QList<CodecID> supportedCodecTypes() const;
@@ -40,6 +43,7 @@ public:
 private:
     std::auto_ptr<PluginUsageWatcher> m_usageWatcher;
     std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
+    std::auto_ptr<MFXVideoSession> m_mfxSession;
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H

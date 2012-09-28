@@ -40,6 +40,8 @@ public:
     virtual int getWidth() const;
     //!Implementation of QnAbstractVideoDecoder::getHeight
     virtual int getHeight() const;
+    //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
+    virtual QSize getOriginalPictureSize() const;
     //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
     virtual double getSampleAspectRatio() const;
     //!Implementation of QnAbstractVideoDecoder::lastFrame

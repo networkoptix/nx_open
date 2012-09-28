@@ -5,8 +5,6 @@
 #ifndef ABSTRACTVIDEODECODERUSAGECALCULATOR_H
 #define ABSTRACTVIDEODECODERUSAGECALCULATOR_H
 
-#include <QList>
-
 #include "videodecoderplugintypes.h"
 
 
@@ -15,7 +13,7 @@ class AbstractVideoDecoderUsageCalculator
 {
 public:
     //!Returns true, if there are free resources to decode media stream with parameters \a mediaStreamParams
-    virtual bool isEnoughHWResourcesForAnotherDecoder( const QList<MediaStreamParameter>& mediaStreamParams ) const = 0;
+    virtual bool isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const = 0;
 };
 
 #endif  //ABSTRACTVIDEODECODERUSAGECALCULATOR_H

@@ -66,6 +66,11 @@ int VideoDecoderSwitcher::getHeight() const
     return m_decoder->getHeight();
 }
 
+QSize VideoDecoderSwitcher::getOriginalPictureSize() const
+{
+    return m_decoder->getOriginalPictureSize();
+}
+
 //!Implementation of QnAbstractVideoDecoder::getSampleAspectRatio
 double VideoDecoderSwitcher::getSampleAspectRatio() const
 {
