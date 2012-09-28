@@ -2,10 +2,10 @@
 // 22 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_OS_LINUX
-
 #ifndef XVBADECODERPLUGIN_H
 #define XVBADECODERPLUGIN_H
+
+#include <QObject>
 
 #include <plugins/videodecoders/abstractvideodecoderusagecalculator.h>
 #include <plugins/videodecoders/pluginusagewatcher.h>
@@ -24,6 +24,9 @@ class QnXVBADecoderPlugin
 public:
     //!Implementation of QnAbstractClientPlugin::minSupportedVersion
     virtual quint32 minSupportedVersion() const;
+    //!Implementation of QnAbstractClientPlugin::initializeLog
+    virtual void initializeLog( QnLog* );
+
     //!Implementation of QnAbstractDecoderPlugin::supportedCodecTypes
     virtual QList<CodecID> supportedCodecTypes() const;
     //!Implementation of QnAbstractDecoderPlugin::isHardwareAccelerated
@@ -36,5 +39,3 @@ public:
 };
 
 #endif  //XVBADECODERPLUGIN_H
-
-#endif

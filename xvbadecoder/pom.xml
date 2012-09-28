@@ -23,7 +23,7 @@
 	<properties>
 		<product.title>${xvbadecoder.name}</product.title>	
 		<!--Global libs-->
-		<global.libs></global.libs>
+		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
 		<linux.oslibs>-lXvBAW</linux.oslibs>
 		<!--Global defines-->

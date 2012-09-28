@@ -2,8 +2,6 @@
 // 15 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_WS_X11
-
 #ifndef XVBADECODER_H
 #define XVBADECODER_H
 
@@ -93,6 +91,12 @@ public:
     virtual PixelFormat GetPixelFormat() const;
     //!Implementation of AbstractDecoder::targetMemoryType
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
+    //!Implementation of AbstractDecoder::getWidth
+	virtual int getWidth() const;
+    //!Implementation of AbstractDecoder::getHeight
+	virtual int getHeight() const;
+    //!Implementation of AbstractDecoder::getOriginalPictureSize
+	virtual QSize getOriginalPictureSize() const;
     //!Implementation of AbstractDecoder::decode
     virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
     //!Implementation of AbstractDecoder::resetDecoder
@@ -308,5 +312,3 @@ private:
 };
 
 #endif  //XVBADECODER_H
-
-#endif

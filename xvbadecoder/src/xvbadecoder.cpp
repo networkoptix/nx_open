@@ -2,8 +2,6 @@
 // 15 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_WS_X11
-
 #include <QDebug>
 
 #include "xvbadecoder.h"
@@ -347,6 +345,21 @@ QnAbstractPictureData::PicStorageType QnXVBADecoder::targetMemoryType() const
 #endif
 }
 
+int QnXVBADecoder::getWidth() const
+{
+    return m_sps.getWidth();
+}
+
+int QnXVBADecoder::getHeight() const
+{
+    return m_sps.getHeight();
+}
+
+QSize QnXVBADecoder::getOriginalPictureSize() const
+{
+	return QSize( getWidth(), getHeight() );
+}
+
 //!Implementation of AbstractDecoder::decode
 bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
 {
@@ -634,9 +647,9 @@ void QnXVBADecoder::resetDecoder( QnCompressedVideoDataPtr /*data*/ )
 }
 
 //!Implementation of AbstractDecoder::setOutPictureSize
-void QnXVBADecoder::setOutPictureSize( const QSize& outSize )
+void QnXVBADecoder::setOutPictureSize( const QSize& /*outSize*/ )
 {
-    m_outPicSize = outSize;
+    //m_outPicSize = outSize;
 }
 
 #ifndef XVBA_TEST
@@ -2016,5 +2029,3 @@ int QnXVBADecoder::h264ProfileIdcToXVBAProfile( int profile_idc )
             return 3;	//high
     }
 }
-
-#endif

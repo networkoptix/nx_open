@@ -2,9 +2,9 @@
 // 22 aug 2012    Andrey kolesnikov
 ////////////////////////////////////////////////////////////
 
-#ifdef Q_OS_LINUX
-
 #include "xvbadecoderplugin.h"
+
+#include <QtPlugin>
 
 #include "xvbadecoder.h"
 
@@ -13,6 +13,11 @@ quint32 QnXVBADecoderPlugin::minSupportedVersion() const
 {
     //TODO/IMPL
     return 1<<24;   //1.0.0
+}
+
+void QnXVBADecoderPlugin::initializeLog( QnLog* externalLog )
+{
+    QnLog::initLog( externalLog );
 }
 
 QList<CodecID> QnXVBADecoderPlugin::supportedCodecTypes() const
@@ -38,6 +43,4 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
     return new QnXVBADecoder( glContext, data );
 }
 
-Q_EXPORT_PLUGIN2( xvbaplugin, QnXVBADecoderPlugin );
-
-#endif
+Q_EXPORT_PLUGIN2( xvbadecoderplugin, QnXVBADecoderPlugin );
