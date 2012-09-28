@@ -171,10 +171,10 @@
 				</os> 
 			</activation>
 			<modules>
+				<module>xvbadecoder</module>
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
-				<module>debsetup/xvbadecoder-deb</module>
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
