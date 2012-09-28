@@ -339,7 +339,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
         m_queueUsed = false;
     }
     
-
     if (m_needReinitDecoders) {
         QMutexLocker lock(&m_mtx);
         foreach(QnAbstractVideoDecoder* decoder, m_decoder)
@@ -386,6 +385,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     if (dec->getWidth() > 0)
         scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
+
+    //set scaling in decoder
+    if( scaleFactor != QnFrameScaler::factor_unknown &&
+        scaleFactor != QnFrameScaler::factor_1 &&
+        scaleFactor != QnFrameScaler::factor_any )
+    {
+        dec->setOutPictureSize( QSize( dec->getWidth() / scaleFactor, dec->getHeight() / scaleFactor ) );
+    }
 
     //if true, decoding to tmp frame which will be later scaled/converted to supported format
     const bool useTmpFrame =
