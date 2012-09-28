@@ -21,7 +21,8 @@
 	<name>HD Witness Common Lib</name>
 
 	<properties>
-		<buildLib>staticlib</buildLib>
+		<!-- <buildLib>staticlib</buildLib> -->
+		<buildLib>sharedlib</buildLib>
 		<!--Global libs-->
 		<global.libs/>      
 		<!--Specific os libs used-->
