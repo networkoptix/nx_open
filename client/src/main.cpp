@@ -299,11 +299,6 @@ int qnMain(int argc, char *argv[])
         }
     }
 
-    //initializing plugin manager. TODO supply plugin dir (from settings)
-#ifdef _DEBUG
-    PluginManager::instance( QString::fromAscii("C:/develop/netoptix_vms/common/plugins/quicksyncdecoder/Win32/Debug/") );
-#endif
-
     /* Initialize connections. */
     initAppServerConnection();
     qnSettings->save();
@@ -432,7 +427,10 @@ int qnMain(int argc, char *argv[])
 
     mainWindow->show();
     context->action(Qn::EffectiveMaximizeAction)->trigger();
-        
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance()->loadPlugins();
+
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
