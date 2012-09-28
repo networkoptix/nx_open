@@ -258,8 +258,8 @@ public:
 
 
 	QString getStreamDescr();
-	int getWidth() { return pic_width_in_mbs*16 - getCropX();}
-	int getHeight() { 
+	int getWidth() const { return pic_width_in_mbs*16 - getCropX();}
+	int getHeight() const {
 		return (2 - frame_mbs_only_flag) * pic_height_in_map_units*16 - getCropY();
 	}
 	double getFPS() const;
@@ -315,8 +315,8 @@ private:
 	bool m_ready;
 	void hrd_parameters();
 	void deserializeVuiParameters();
-	int getCropY();
-	int getCropX();
+	int getCropY() const;
+	int getCropX() const;
 	void serializeHDRParameters(BitStreamWriter& writer);
 };
 

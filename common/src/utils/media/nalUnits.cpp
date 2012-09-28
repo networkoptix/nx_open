@@ -752,7 +752,7 @@ void SPSUnit::hrd_parameters()
 	time_offset_length = bitReader.getBits(5);
 }
 
-int SPSUnit::getCropY() {
+int SPSUnit::getCropY() const {
 	if (chroma_format_idc == 0) 
 		return (2 - frame_mbs_only_flag) * (frame_crop_top_offset + frame_crop_bottom_offset);
 	else {
@@ -763,7 +763,7 @@ int SPSUnit::getCropY() {
 	}
 }
 
-int SPSUnit::getCropX() {
+int SPSUnit::getCropX() const {
 	if (chroma_format_idc == 0) 
 		return frame_crop_left_offset + frame_crop_right_offset;
 	else {
