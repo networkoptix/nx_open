@@ -21,11 +21,11 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org</groupId>
+			<groupId>org.openssl</groupId>
 			<artifactId>openssl</artifactId>
 			<version>${openssl.version}</version>
 			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
+			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>
 		<dependency>
 			<groupId>org.ffmpeg</groupId>
