@@ -54,14 +54,7 @@
 			<version>2.6.1-SNAPSHOT</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}</classifier>
-		</dependency>
-		<dependency>
-			<groupId>com.microsoft</groupId>
-			<artifactId>redistributable</artifactId>
-			<version>vs2008</version>
-			<type>zip</type>
-			<classifier>${platform}-${arch}</classifier>
-		</dependency>		
+		</dependency>	
 		<dependency>
 			<groupId>com.sourceforge.cloudcity</groupId>
 			<artifactId>bespin</artifactId>
@@ -171,7 +164,14 @@
 					<version>JUN2010</version>
 					<type>zip</type>
 					<classifier>${platform}-${arch}</classifier>
-				</dependency>   
+				</dependency>  
+				<dependency>
+					<groupId>com.microsoft</groupId>
+					<artifactId>redistributable</artifactId>
+					<version>vs2008</version>
+					<type>zip</type>
+					<classifier>${platform}-${arch}</classifier>
+				</dependency>	
 			</dependencies>			
 			<properties>
 				<qtlib9>multimedia</qtlib9>
