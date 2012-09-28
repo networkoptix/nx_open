@@ -415,5 +415,7 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
 void QnLayoutFileStorageResource::addBinaryPostfix(QFile& file)
 {
     file.write((char*) &m_novFileOffset, sizeof(qint64));
-    file.write((char*) &FileTypeSupport::NOV_EXE_MAGIC, sizeof(qint64));
+
+    const quint64 magic = FileTypeSupport::NOV_EXE_MAGIC;
+    file.write((char*) &magic, sizeof(qint64));
 }
