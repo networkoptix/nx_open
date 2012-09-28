@@ -2,6 +2,7 @@
 #include "abstractdecoder.h"
 
 #include <iostream>
+#include <memory>
 
 #include <libavcodec/avcodec.h>
 
