@@ -1,6 +1,8 @@
 cd ${libdir}//bin//${build.configuration}
-FOR /F %%G IN ('dir /b /s') DO ${environment.dir}\bin\mpress.exe -s %%G
-${environment.dir}\bin\upx --lzma *.*
+
+${environment.dir}\bin\mpress.exe -s client.exe 
+FOR /F %%G IN ('dir /b /s *.dll') DO ${environment.dir}\bin\upx -9 --lzma %%G
+FOR /F %%G IN ('dir /b /s *.exe') DO ${environment.dir}\bin\upx -9 --lzma %%G
 
 cd ${project.build.directory}
-FOR /F %%G IN ('dir /b /s *.dll') DO ${environment.dir}\bin\upx --lzma %%G
+FOR /F %%G IN ('dir /b /s *.dll') DO ${environment.dir}\bin\upx -9 --lzma %%G

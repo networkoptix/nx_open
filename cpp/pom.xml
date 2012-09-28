@@ -394,7 +394,7 @@
 								</configuration>
 							</execution>	
 							<execution>
-								<id>package-with-msbuild</id>
+								<id>default-cli</id>
 								<phase>process-classes</phase>
 								<goals>
 									<goal>exec</goal>
