@@ -340,8 +340,6 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     QMutexLocker lock(&m_fileSync);
 
     QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
-    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
-        return false;
 
     QFile file(removeProtocolPrefix(getUrl()));
     qint64 fileSize = file.size() -  getPostfixSize();
@@ -349,6 +347,9 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
         readIndexHeader();
     else
         fileSize = sizeof(m_index);
+
+    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
+        return false;
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
 

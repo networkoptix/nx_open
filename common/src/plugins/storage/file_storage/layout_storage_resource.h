@@ -63,9 +63,8 @@ public:
     };
 #pragma pack(pop)
 
-private:
     static QString removeProtocolPrefix(const QString& url);
-
+private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     void readIndexHeader();

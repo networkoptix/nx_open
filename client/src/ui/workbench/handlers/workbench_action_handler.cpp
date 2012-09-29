@@ -1966,15 +1966,12 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLayout(QnLayoutResourcePtr layo
 void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
 {
     m_layoutExportMode = mode;
-    QString fileName = layoutFileName;
-    if (fileName == layout->getUrl()) {
+    m_layoutFileName = QnLayoutFileStorageResource::removeProtocolPrefix(layoutFileName); 
+    QString fileName = m_layoutFileName;
+    if (fileName == QnLayoutFileStorageResource::removeProtocolPrefix(layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         fileName += QLatin1String(".tmp");
     }
-
-    //QnLayoutFileStorageResource layoutStorage;
-    //layoutStorage.setUrl(fileName);
-    m_layoutFileName = fileName;
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
     exportProgressDialog = new QProgressDialog(this->widget());
@@ -1990,10 +1987,26 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
-    if (!fileName.startsWith(QLatin1String("layout://")))
-        fileName = QLatin1String("layout://") + fileName;
-    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
-    m_exportStorage->setUrl(fileName);
+    if (m_layoutFileName.endsWith(QLatin1String(".exe")))
+    {
+        if (QnNovLauncher::createLaunchingFile(fileName) != 0)
+        {
+            QMessageBox::critical(
+                this->widget(), 
+                tr("Can't write to file"),
+                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
+                QMessageBox::Ok
+                );
+            return;
+        }
+    }
+    else {
+        QFile::remove(fileName);
+    }
+
+    QString fullName = QLatin1String("layout://") + fileName;
+    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fullName));
+    m_exportStorage->setUrl(fullName);
 
     QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
     QTextStream itemNames(itemNamesIO);
@@ -2022,23 +2035,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     }
     itemNames.flush();
     delete itemNamesIO;
-
-    if (layoutFileName.endsWith(QLatin1String(".exe")))
-    {
-        if (QnNovLauncher::createLaunchingFile(fileName) != 0)
-        {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Can't write to file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
-                QMessageBox::Ok
-                );
-            return;
-        }
-    }
-    else {
-        QFile::remove(fileName);
-    }
 
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
