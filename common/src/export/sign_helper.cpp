@@ -149,15 +149,16 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
     }
 
     QFont font;
+    font.setPointSize(1);
     QFontMetrics metric(font);
     for (int i = 0; i < 100; ++i)
     {
-        font.setPointSize(font.pointSize() + 1);
         metric = QFontMetrics(font);
         int width = metric.width(versionStr);
         int height = metric.height();
         if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
             break;
+        font.setPointSize(font.pointSize() + 1);
     }
     painter.setFont(font);
 
