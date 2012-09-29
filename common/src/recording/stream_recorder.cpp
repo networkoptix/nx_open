@@ -387,6 +387,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 else
                     videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
             }
+            if (m_needCalcSignature)
+                m_firstIFrame = mediaData;
+
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
             AVRational defaultFrameRate = {1, 60};
@@ -533,7 +536,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
     signHelper.setSign(getSignature());
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec);
+    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_firstIFrame);
 
     if (generatedFrame == 0)
     {

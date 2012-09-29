@@ -307,14 +307,14 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
 
 }
 
-void QnSignHelper::extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady)
+void QnSignHelper::extractSpsPpsFromPrivData(const quint8* buffer, int bufferSize, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady)
 {
     spsReady = false;
     ppsReady = false;
 
-    const quint8* spsPpsData = (quint8*) data.data();
-    const quint8* spsPpsEnd = spsPpsData + data.size();
-    if (data.size() >= 7)
+    const quint8* spsPpsData = buffer;
+    const quint8* spsPpsEnd = buffer + bufferSize;
+    if (bufferSize >= 7)
     {
         if (spsPpsData[0] == 1)
         {
@@ -364,7 +364,7 @@ void QnSignHelper::extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sp
     }
 }
 
-QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* /*avctx*/)
+QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* /*avctx*/)
 {
     QString result;
     SPSUnit sps;
@@ -372,7 +372,9 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     bool spsReady;
     bool ppsReady;
     QString profile;
-    extractSpsPpsFromPrivData(srcCodecExtraData, sps, pps, spsReady, ppsReady);
+    extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
+    if ((!spsReady || !ppsReady) && iFrame)
+        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -399,17 +401,21 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     return result;
 }
 
-int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* /*videoCodecCtx*/, quint8* videoBuf, int out_size, int videoBufSize)
+int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* /*videoCodecCtx*/, quint8* videoBuf, int out_size, int videoBufSize)
 {
     SPSUnit oldSps, newSps;
     PPSUnit oldPps, newPps;
     bool spsReady;
     bool ppsReady;
-    extractSpsPpsFromPrivData(srcCodecExtraData, oldSps, oldPps, spsReady, ppsReady);
+
+    extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
+    if ((!spsReady || !ppsReady) && iFrame)
+        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), oldSps, oldPps, spsReady, ppsReady);
+
     if (!spsReady || !ppsReady)
         return out_size;
     int oldLen = oldSps.log2_max_pic_order_cnt_lsb;
-    extractSpsPpsFromPrivData(QByteArray((const char*)videoBuf,out_size), newSps, newPps, spsReady, ppsReady);
+    extractSpsPpsFromPrivData(videoBuf,out_size, newSps, newPps, spsReady, ppsReady);
     if (!spsReady || !ppsReady)
         return -1;
 
@@ -539,7 +545,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
     return size;
 }
 
-QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec)
+QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
 {
     QnCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
@@ -578,7 +584,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     if (videoCodecCtx->codec_id == CODEC_ID_H264)
     {
         // To avoid X.264 GPL restriction run x264 as separate process
-        QString optionStr = fillH264EncoderParams(srcCodecExtraData, videoCodecCtx); // make X264 frame compatible with existing stream
+        QString optionStr = fillH264EncoderParams(srcCodecExtraData, iFrame, videoCodecCtx); // make X264 frame compatible with existing stream
         out_size = runX264Process(frame, optionStr, videoBuf);
         if (out_size == -1)
             goto error_label;
@@ -602,7 +608,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
         out_size = removeH264SeiMessage(videoBuf, out_size);
 
         // make X264 frame compatible with existing stream
-        out_size = correctX264Bitstream(srcCodecExtraData, videoCodecCtx, videoBuf, out_size, videoBufSize); 
+        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize); 
         if (out_size == -1)
             goto error_label;
             // change nal prefix if need

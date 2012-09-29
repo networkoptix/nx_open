@@ -137,6 +137,7 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
+    QnCompressedVideoDataPtr m_firstIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
 };
 
