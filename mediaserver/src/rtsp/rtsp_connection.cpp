@@ -245,6 +245,9 @@ void QnRtspConnectionProcessor::generateSessionId()
 QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
 {
     Q_D(QnRtspConnectionProcessor);
+    if (!d->mediaRes)
+        return QString(); // prevent deadlock
+
     QMutexLocker lock(&d->mutex);
 
     if (!d->archiveDP)
