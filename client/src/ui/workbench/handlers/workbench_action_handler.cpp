@@ -1990,6 +1990,14 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
+    if (!fileName.startsWith(QLatin1String("layout://")))
+        fileName = QLatin1String("layout://") + fileName;
+    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
+    m_exportStorage->setUrl(fileName);
+
+    QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
+    QTextStream itemNames(itemNamesIO);
+
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items = layout->getItems();
@@ -2001,6 +2009,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
             resource = qnResPool->getResourceByUniqId((*itr).resource.path);
         if (resource)
         {
+            itemNames << resource->getName() << QLatin1String("\n");
             QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
             if (mediaRes) {
                 (*itr).resource.id = 0;
@@ -2011,6 +2020,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
             }
         }
     }
+    itemNames.flush();
+    delete itemNamesIO;
 
     if (layoutFileName.endsWith(QLatin1String(".exe")))
     {
@@ -2028,14 +2039,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     else {
         QFile::remove(fileName);
     }
-    fileName = QLatin1String("layout://") + fileName;
 
-    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
-    m_exportStorage->setUrl(fileName);
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
     {
-        at_cameraCamera_exportFailed(fileName);
+        at_cameraCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
         return;
     }
 

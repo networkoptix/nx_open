@@ -235,6 +235,9 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
+    QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
+    QTextStream itemNames(itemNamesIO);
+
     // todo: here is bad place to add resources to pool. need rafactor
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
@@ -247,12 +250,15 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-        storage->setUrl(QLatin1String("layout://") + xfile);
+        storage->setUrl(xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->setStorage(storage);
         aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+        QString itemName(itemNames.readLine());
+        if (!itemName.isEmpty())
+            aviResource->setName(itemName);
 
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
@@ -276,6 +282,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 
         qnResPool->addResource(aviResource);
     }
+    delete itemNamesIO;
     layout->setItems(updatedItems);
     layout->addFlags(QnResource::local_media);
     return layout;

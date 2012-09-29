@@ -23,7 +23,7 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
     QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
         return 0;
-    QFileInfo fi(resource->getName());
+    QFileInfo fi(resource->getUrl());
     QIODevice* chunkData = storage->open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
     if (!chunkData)
         return 0;
