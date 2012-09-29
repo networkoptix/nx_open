@@ -290,11 +290,14 @@ protected slots:
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
 private:
-    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, const QString& eofMessage);
-   // void updateStoredConnections(QnConnectionData connectionData);
+    enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
+    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
+   // void updateStoredConnections(QnConnectionData connectionData);
+    bool doAskNameAndExportLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
 private:
+
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
@@ -321,7 +324,8 @@ private:
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;
-    QString m_layoutExportMessage;
+    //QString m_layoutExportMessage;
+    LayoutExportMode m_layoutExportMode;
 
 
     QTimer *m_tourTimer;

@@ -26,7 +26,9 @@ public:
     virtual bool seek(qint64 offset) override
     {
         QMutexLocker lock(&m_mutex);
-        return m_file.seek(offset + m_fileOffset);
+        int rez = m_file.seek(offset + m_fileOffset);
+        QIODevice::seek(offset);
+        return rez;
     }
 
     virtual qint64 size() const
@@ -78,7 +80,7 @@ public:
                 return false;
             openMode |= QIODevice::Append;
         }
-
+        m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
         if (!m_file.open(openMode))
             return false;
         m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
@@ -181,7 +183,8 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     }
 }
 
-QnLayoutFileStorageResource::QnLayoutFileStorageResource()
+QnLayoutFileStorageResource::QnLayoutFileStorageResource():
+    m_fileSync(QMutex::Recursive)
 {
     QMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
@@ -213,7 +216,8 @@ bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QStri
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        if (storage->getUrl() == newName)
+        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
     QFile::remove(removeProtocolPrefix(newName));
@@ -221,14 +225,18 @@ bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QStri
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        if (storage->getUrl() == newName)
+        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        if (storageUrl == removeProtocolPrefix(newName))
             storage->restoreOpenedFiles();
+        else if (storageUrl == removeProtocolPrefix(oldName)) {
+            storage->setUrl(newName);
+            storage->restoreOpenedFiles();
+        }
     }
     if (rez)
         setUrl(newName);
     return rez;
 }
-
 
 bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {

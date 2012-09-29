@@ -890,7 +890,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
 
     if (layout->flags() & QnResource::local) {
         m_exportPeriod = layout->getLocalRange();
-        saveLayoutToLocalFile(layout, layout->getUrl(), QString()); // override layout
+        saveLayoutToLocalFile(layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
     }
     else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -912,24 +912,25 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!user)
         return;
 
-    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
-    if(name.isEmpty()) {
-        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
-        dialog->setWindowTitle(tr("Save Layout As"));
-        dialog->setText(tr("Enter layout name:"));
-        dialog->setName(layout->getName());
-        dialog->exec();
-        if(dialog->clickedButton() != QDialogButtonBox::Save)
-            return;
-        name = dialog->name();
-    }
-
-    QnLayoutResourcePtr newLayout;
-    if(snapshotManager()->isLocal(layout) && !snapshotManager()->isBeingSaved(layout)) {
+    if(snapshotManager()->isLocal(layout)  /*`&& !snapshotManager()->isBeingSaved(layout) */ ) {
         /* Local layout that is not being saved should not be copied. */
-        newLayout = layout;
-        newLayout->setName(name);
+        m_exportPeriod = layout->getLocalRange();
+        doAskNameAndExportLayout(layout, LayoutExport_LocalSaveAs);
     } else {
+        QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
+        if(name.isEmpty()) {
+            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+            dialog->setWindowTitle(tr("Save Layout As"));
+            dialog->setText(tr("Enter layout name:"));
+            dialog->setName(layout->getName());
+            dialog->exec();
+            if(dialog->clickedButton() != QDialogButtonBox::Save)
+                return;
+            name = dialog->name();
+        }
+
+        QnLayoutResourcePtr newLayout;
+
         newLayout = QnLayoutResourcePtr(new QnLayoutResource());
         newLayout->setGuid(QUuid::createUuid());
         newLayout->setName(name);
@@ -951,9 +952,9 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
             snapshotManager()->restore(layout);
         }
-    }
 
-    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
@@ -1888,6 +1889,18 @@ Do you want to continue?"),
             return;
     }
 
+    doAskNameAndExportLayout(layout, LayoutExport_Export);
+}
+
+bool QnWorkbenchActionHandler::doAskNameAndExportLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
+{
+    QString dialogName;
+    if (mode == LayoutExport_LocalSaveAs)
+        dialogName = tr("Save Layout As...");
+    else if (mode == LayoutExport_Export)
+        dialogName = tr("Export Layout As...");
+    else
+        return false; // not used
 
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
@@ -1904,7 +1917,7 @@ Do you want to continue?"),
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
-            tr("Export Layout As..."),
+            dialogName,
             previousDir + QDir::separator() + suggestion,
             tr("Network optix media file (*.nov);;Executable network optix media file(*.exe)"),
             &selectedFilter,
@@ -1913,7 +1926,7 @@ Do you want to continue?"),
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
-            return;
+            return false;
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -1927,7 +1940,7 @@ Do you want to continue?"),
                     );
 
                 if(button == QMessageBox::Cancel || button == QMessageBox::No)
-                    return;
+                    return false;
             }
         }
 
@@ -1945,12 +1958,14 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    saveLayoutToLocalFile(layout, fileName, tr("Export successfully finished"));
+    saveLayoutToLocalFile(layout, fileName, mode);
+
+    return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, const QString& eofMessage)
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
 {
-    m_layoutExportMessage = eofMessage;
+    m_layoutExportMode = mode;
     QString fileName = layoutFileName;
     if (fileName == layout->getUrl()) {
         // can not override opened layout. save to tmp file, then rename
@@ -2034,8 +2049,10 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     device->write(m_exportPeriod.serialize());
     delete device;
 
+    // If current layout is database based layout generate new GUID, otherwise keep current local GUID
+    QString uuid = (layout->flags() & QnResource::local) ? layout->getGuid() : QUuid::createUuid().toString();
     device = m_exportStorage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(QUuid::createUuid().toString().toUtf8());
+    device->write(uuid.toUtf8());
     delete device;
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
@@ -2067,6 +2084,17 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         fileName.chop(4);
         QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
+        snapshotManager()->store(layout);
+    }
+    else if (m_layoutExportMode == LayoutExport_LocalSaveAs) 
+    {
+        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+        QString oldUrl = layout->getUrl();
+        QString newUrl = m_exportStorage->getUrl();
+        layout->setUrl(newUrl);
+        layout->setName(QFileInfo(newUrl).fileName());
+        m_exportStorage->renameFile(oldUrl, newUrl);
+        snapshotManager()->store(layout);
     }
     else {
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
@@ -2077,8 +2105,8 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     }
     m_exportStorage.clear();
 
-    if (!m_layoutExportMessage.isEmpty())
-        QMessageBox::information(widget(), tr("Export finished"), m_layoutExportMessage, QMessageBox::Ok);
+    if (m_layoutExportMode == LayoutExport_Export)
+        QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
@@ -2094,7 +2122,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                 m_motionFileBuffer[i]->close();
                 
                 QString uniqId = m_exportedMediaRes->getUniqueId();
-                uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
+                uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
                 QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
                 device->write(m_motionFileBuffer[i]->buffer());

@@ -203,6 +203,20 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         return layout;
     }
 
+    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    if (uuidFile)
+    {
+        QByteArray data = uuidFile->readAll();
+        delete uuidFile;
+        layout->setGuid(QUuid(data.data()));
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            return existingLayout;
+    }
+    else {
+        layout->setGuid(QUuid::createUuid());
+    }
+
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
     if (rangeFile)
     {
@@ -211,21 +225,6 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
-    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
-    if (uuidFile)
-    {
-        QByteArray data = uuidFile->readAll();
-        delete uuidFile;
-        layout->setLocalRange(QnTimePeriod().deserialize(data));
-        layout->setGuid(QUuid(data.data())); // TODO: #VASILENKO WTF? Deserializing two different values from the same byte array?
-
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
-        if (existingLayout)
-            return existingLayout;
-    }
-    else {
-        layout->setGuid(QUuid::createUuid());
-    }
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
     layout->setName(QFileInfo(xfile).fileName());
@@ -258,7 +257,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
         {
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(path), QIODevice::ReadOnly);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(path).baseName()), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
