@@ -889,6 +889,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         return;
 
     if (layout->flags() & QnResource::local) {
+        if (!validateItemTypes(layout))
+            return;
         m_exportPeriod = layout->getLocalRange();
         saveLayoutToLocalFile(layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
     }
@@ -1892,11 +1894,43 @@ Do you want to continue?"),
     doAskNameAndExportLocalLayout(layout, LayoutExport_Export);
 }
 
+bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
+{
+    bool nonUtcExists = false;
+    bool utcExists = false;
+
+    QnLayoutItemDataMap items = layout->getItems();
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        QnLayoutItemData& item = itr.value();
+        QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
+        if (layoutItemRes) {
+            if (layoutItemRes->hasFlags(QnResource::utc))
+                utcExists = true;
+            else
+                nonUtcExists = true;
+        }
+    }
+    if (nonUtcExists && utcExists) {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't create local layout"), 
+            tr("Current layout has several cameras and several local files. You have to keep only cameras or only local files"), 
+            QMessageBox::Ok
+            );
+        return false;
+    }
+    return true;
+}
+
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
+    if (!validateItemTypes(layout))
+        return false;
+
     QString dialogName;
     if (mode == LayoutExport_LocalSaveAs)
-        dialogName = tr("Save Layout As...");
+        dialogName = tr("Save local layout As...");
     else if (mode == LayoutExport_Export)
         dialogName = tr("Export Layout As...");
     else
