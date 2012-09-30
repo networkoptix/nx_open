@@ -1958,11 +1958,20 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    QnResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName);
+    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
-        existingLayout = qnResPool->getResourceByUrl(fileName);
-    if (existingLayout)
+        existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+    if (existingLayout) {
+        QnLayoutItemDataMap items = existingLayout->getItems();
+        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            QnLayoutItemData& item = itr.value();
+            QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+            if (layoutRes)
+                qnResPool->removeResource(layoutRes);
+        }
         qnResPool->removeResource(existingLayout);
+    }
 
 
     saveLayoutToLocalFile(layout, fileName, mode);
