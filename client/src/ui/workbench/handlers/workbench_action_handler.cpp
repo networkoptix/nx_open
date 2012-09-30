@@ -1972,6 +1972,14 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
         // can not override opened layout. save to tmp file, then rename
         fileName += QLatin1String(".tmp");
     }
+    else 
+    {
+        QnResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + layoutFileName);
+        if (!existingLayout)
+            existingLayout = qnResPool->getResourceByUrl(layoutFileName);
+        if (existingLayout)
+            qnResPool->removeResource(existingLayout);
+    }
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
     exportProgressDialog = new QProgressDialog(this->widget());
