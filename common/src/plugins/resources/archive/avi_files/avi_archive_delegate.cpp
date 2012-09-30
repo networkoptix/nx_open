@@ -106,6 +106,8 @@ public:
                     result.description += QLatin1String("mono");
                 else
                     result.description += QString::number(codecContext->channels);
+
+                break;
             }
         }
         return result;
