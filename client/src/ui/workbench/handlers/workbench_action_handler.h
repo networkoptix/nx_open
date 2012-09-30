@@ -295,7 +295,7 @@ private:
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
    // void updateStoredConnections(QnConnectionData connectionData);
-    bool doAskNameAndExportLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
+    bool doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
 private:
 
     friend class detail::QnResourceStatusReplyProcessor;

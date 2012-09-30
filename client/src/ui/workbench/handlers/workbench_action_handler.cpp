@@ -915,7 +915,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(snapshotManager()->isLocal(layout)  /*`&& !snapshotManager()->isBeingSaved(layout) */ ) {
         /* Local layout that is not being saved should not be copied. */
         m_exportPeriod = layout->getLocalRange();
-        doAskNameAndExportLayout(layout, LayoutExport_LocalSaveAs);
+        doAskNameAndExportLocalLayout(layout, LayoutExport_LocalSaveAs);
     } else {
         QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
         if(name.isEmpty()) {
@@ -1889,10 +1889,10 @@ Do you want to continue?"),
             return;
     }
 
-    doAskNameAndExportLayout(layout, LayoutExport_Export);
+    doAskNameAndExportLocalLayout(layout, LayoutExport_Export);
 }
 
-bool QnWorkbenchActionHandler::doAskNameAndExportLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
+bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
     QString dialogName;
     if (mode == LayoutExport_LocalSaveAs)
@@ -1958,6 +1958,13 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLayout(QnLayoutResourcePtr layo
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
+    QnResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName);
+    if (!existingLayout)
+        existingLayout = qnResPool->getResourceByUrl(fileName);
+    if (existingLayout)
+        qnResPool->removeResource(existingLayout);
+
+
     saveLayoutToLocalFile(layout, fileName, mode);
 
     return true;
@@ -1971,14 +1978,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     if (fileName == QnLayoutFileStorageResource::removeProtocolPrefix(layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         fileName += QLatin1String(".tmp");
-    }
-    else 
-    {
-        QnResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + layoutFileName);
-        if (!existingLayout)
-            existingLayout = qnResPool->getResourceByUrl(layoutFileName);
-        if (existingLayout)
-            qnResPool->removeResource(existingLayout);
     }
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
