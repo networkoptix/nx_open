@@ -19,7 +19,6 @@
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypes.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
 #include "connection_testing_dialog.h"

@@ -308,6 +308,16 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
 }
 
+void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());
+    if (itr != m_resources.end())
+        m_resources.erase(itr);
+    res->setUniqId(newUniqId);
+    m_resources.insert(newUniqId, res);
+}
+
 bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
 {
     return !getResourceByUniqId(uniqid).isNull();

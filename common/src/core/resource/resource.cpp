@@ -821,3 +821,8 @@ QnAbstractPtzController* QnResource::getPtzController()
 {
     return 0;
 }
+
+void QnResource::setUniqId(const QString& value)
+{
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented");
+}

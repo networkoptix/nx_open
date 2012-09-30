@@ -2098,7 +2098,18 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         QString oldUrl = layout->getUrl();
         QString newUrl = m_exportStorage->getUrl();
+
+        QnLayoutItemDataMap items = layout->getItems();
+        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            QnLayoutItemData& item = itr.value();
+            QnAviResourcePtr aviRes = qnResPool->getResourceByUniqId(item.resource.path).dynamicCast<QnAviResource>();
+            if (aviRes)
+                qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
+        }
         layout->setUrl(newUrl);
+
+
         layout->setName(QFileInfo(newUrl).fileName());
         m_exportStorage->renameFile(oldUrl, newUrl);
         snapshotManager()->store(layout);

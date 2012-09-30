@@ -106,6 +106,7 @@ public:
 
     // device unique identifier
     virtual QString getUniqueId() const = 0;
+    virtual void setUniqId(const QString& value);
 
 
     // TypeId unique string id for resource with SUCH list of params and CLASS

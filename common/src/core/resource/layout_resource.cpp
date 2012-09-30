@@ -46,6 +46,28 @@ QnLayoutItemDataMap QnLayoutResource::getItems() const {
     return m_itemByUuid;
 }
 
+static QString removeProtocolPrefix(const QString& url)
+{
+    int prefix = url.indexOf(QLatin1String("://"));
+    return prefix == -1 ? url : url.mid(prefix + 3);
+}
+
+void QnLayoutResource::setUrl(const QString& value)
+{
+    QString oldValue = removeProtocolPrefix(getUrl());
+    QnResource::setUrl(value);
+    QString newValue = removeProtocolPrefix(getUrl());
+    if (!oldValue.isEmpty() && oldValue != newValue)
+    {
+        // Local layout renamed
+        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
+        {
+            QnLayoutItemData& item = itr.value();
+            item.resource.path = updateNovParent(value, item.resource.path);
+        }
+    }
+}
+
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
     QMutexLocker locker(&m_mutex);
 
@@ -184,7 +206,7 @@ void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
     m_localRange = value;
 }
 
-QString updateNovParent(const QString& novName, const QString& itemName)
+QString QnLayoutResource::updateNovParent(const QString& novName, const QString& itemName)
 {
     QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
     QString normNovName = novName;
