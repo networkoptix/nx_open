@@ -468,19 +468,34 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCo
 int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int /*videoBufSize*/)
 {
     int x264PrefixLen = NALUnit::findNextNAL(videoBuf, videoBuf+out_size) - videoBuf;
+    int reqUnitSize = 4;
+    bool nalPrefixMode = true;
 
     const quint8* spsPpsData = (quint8*) srcCodecExtraData.data();
-    if (srcCodecExtraData.size() < 7)
-        return out_size;
-
-    if (spsPpsData[0] == 0)
+    if (srcCodecExtraData.size() > 0)
     {
+        if (srcCodecExtraData.size() < 7)
+            return out_size;
 
+        if (spsPpsData[0] == 0)
+        {
+            reqUnitSize = spsPpsData[2] == 1 ? 3 : 4;
+        }
+        else {
+            reqUnitSize = (spsPpsData[4] & 0x03) + 1;
+            nalPrefixMode = false;
+        }
+    }
+
+    memmove(videoBuf+reqUnitSize, videoBuf+x264PrefixLen, out_size - x264PrefixLen);
+    out_size += reqUnitSize - x264PrefixLen;
+    if (nalPrefixMode)
+    {
+        for (int i = 0; i < reqUnitSize-1; ++i)
+            videoBuf[i] = 0;
+        videoBuf[reqUnitSize-1] = 1;
     }
     else {
-        int reqUnitSize = (spsPpsData[4] & 0x03) + 1;
-        memmove(videoBuf+x264PrefixLen, videoBuf+reqUnitSize, out_size - x264PrefixLen);
-        out_size += reqUnitSize - x264PrefixLen;
         int tmp = out_size - reqUnitSize;
         for (int i = 0; i < reqUnitSize; ++i) 
         {

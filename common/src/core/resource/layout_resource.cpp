@@ -184,6 +184,15 @@ void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
     m_localRange = value;
 }
 
+QString updateNovParent(const QString& novName, const QString& itemName)
+{
+    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
+    QString normNovName = novName;
+    if (!normNovName.startsWith(QLatin1String("layout://")))
+        normNovName = QLatin1String("layout://") + normNovName;
+    return normNovName + QLatin1String("?") + normItemName;
+}
+
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 {
     QnLayoutResourcePtr layout;
@@ -247,6 +256,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         item.resource.id = QnId::generateSpecialId();
         if (!path.endsWith(QLatin1String(".mkv")))
             item.resource.path += QLatin1String(".mkv");
+        item.resource.path = updateNovParent(xfile,item.resource.path);
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());

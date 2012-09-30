@@ -2063,12 +2063,15 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     {
         QString uniqId = m_layoutExportResources[i]->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
-        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
-        QByteArray data;
-        periods.encode(data);
-        device->write(data);
-        delete device;
+        QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
+        if (loader) {
+            QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
+            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(m_exportPeriod);
+            QByteArray data;
+            periods.encode(data);
+            device->write(data);
+            delete device;
+        }
     }
 
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);

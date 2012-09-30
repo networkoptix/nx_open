@@ -281,7 +281,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_packetWrited = true;
         if (m_needCalcSignature) 
         {
-            AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
+            AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
         }
