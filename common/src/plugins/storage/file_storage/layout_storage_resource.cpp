@@ -226,7 +226,7 @@ bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QStri
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = removeProtocolPrefix(storage->getUrl());
-        storage->setUrl(storageUrl); // update binary offsetvalue
+        storage->setUrl(newName); // update binary offsetvalue
         if (storageUrl == removeProtocolPrefix(newName))
             storage->restoreOpenedFiles();
         else if (storageUrl == removeProtocolPrefix(oldName)) {
