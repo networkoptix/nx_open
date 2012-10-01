@@ -38,7 +38,7 @@ bool FileTypeSupport::isLayoutFileExt(const QString &filename)
         QFile f(filename);
         if (f.open(QIODevice::ReadOnly))
         {
-            qint64 pos = f.size() - sizeof(qint64)*3;
+            //qint64 pos = f.size() - sizeof(qint64)*3;
             f.seek(f.size() - sizeof(qint64));
             quint64 magic;
             f.read((char*) &magic, sizeof(qint64));

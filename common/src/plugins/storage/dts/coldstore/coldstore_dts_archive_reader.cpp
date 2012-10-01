@@ -55,11 +55,11 @@ void getFiles(QList<ColdstoreFile>& files, const QByteArray& indata)
 
 //================================================================================
 QnColdStoreDelegate::QnColdStoreDelegate(QHostAddress csAddr):
-m_opend(false),
-m_loggedError(false),
-m_startTime(0),
-m_endTime(0),
-m_csAddr(csAddr)
+    m_csAddr(csAddr),
+    m_opend(false),
+    m_loggedError(false),
+    m_startTime(0),
+    m_endTime(0)
 {
     
 }
@@ -458,7 +458,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
         return false;
     }
 
-    if (m_fileContent.capacity() < evnt.len)
+    if ((uint)m_fileContent.capacity() < evnt.len)
         m_fileContent.reserve(evnt.len);
 
     m_fileContent.resize(evnt.len);
@@ -488,7 +488,7 @@ bool QnColdStoreDelegate::openCSFile(int f_index, int event_index)
     FILE* f = fopen("C:/Users/Sergey/Desktop/tests/test.264", "wb");
     fwrite(m_fileContent.data(), m_fileContent.size(), 1, f);
     fclose(f);
-    /**/
+    */
 
     
     char* data = m_fileContent.data();
@@ -703,26 +703,22 @@ bool QnColdStoreDelegate::openEventFile(int f_index)
 }
 
 
-int QnColdStoreDelegate::find_best_file(qint64 time)
+int QnColdStoreDelegate::find_best_file(quint64 time)
 {
     int index = 0;
 
     while(index < m_datafileList.size() - 1 && time > m_datafileList.at(index+1).mks )
         ++index;
 
-    Q_ASSERT(index>=0 && index < m_datafileList.size());
-
     return index;
 }
 
-int QnColdStoreDelegate::find_best_event(qint64 time)
+int QnColdStoreDelegate::find_best_event(quint64 time)
 {
     int index = 0;
 
     while(index < m_eventInfo.size() - 1 && time > m_eventInfo.at(index+1).time)
         ++index;
-
-    Q_ASSERT(index>=0 && index < m_eventInfo.size());
 
     return index;
 }
@@ -761,4 +757,4 @@ The Extreme - Music for Space Travellers
 http://www.extreme-chillout.de
 http://www.myspace.com/extremechillout
 
-/**/
+*/

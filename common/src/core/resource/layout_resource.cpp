@@ -305,7 +305,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
                     motionIO->read((char*) &motionData[0], motionIO->size());
                 }
                 delete motionIO;
-                for (int i = 0; i < motionData.size(); ++i)
+                for (uint i = 0; i < motionData.size(); ++i)
                     motionData[i].doMarshalling();
                 if (!motionData.empty())
                     aviResource->setMotionBuffer(motionData, channel);

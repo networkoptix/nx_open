@@ -215,6 +215,7 @@ void QnColdStoreDTSSearcher::requestFileList(QList<QnDtsUnit>& result, QHostAddr
         0, //time_start
         resultBA.data(),
     &return_results_sizeI, &return_results_countI);
+    Q_UNUSED(status)
 
 //	cl_log.log(QLatin1String("CS checking for files, returned: "), (int)return_results_countI, cl_logALWAYS);
 

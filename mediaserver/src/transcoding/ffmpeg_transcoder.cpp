@@ -7,18 +7,25 @@ static const int IO_BLOCK_SIZE = 1024*16;
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
 {
+    Q_UNUSED(opaque)
+    Q_UNUSED(buf)
+    Q_UNUSED(size)
     Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }
 
 static qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size)
 {
+    Q_UNUSED(opaque)
     QnFfmpegTranscoder* transcoder = reinterpret_cast<QnFfmpegTranscoder*> (opaque);
     return transcoder->writeBuffer((char*) buf, size);
 }
 
 static int64_t ffmpegSeek(void* opaque, int64_t pos, int whence)
 {
+    Q_UNUSED(opaque)
+    Q_UNUSED(pos)
+    Q_UNUSED(whence)
     Q_ASSERT_X(false, Q_FUNC_INFO, "This class for streaming encoding! This function call MUST not exists!");
     return 0;
 }

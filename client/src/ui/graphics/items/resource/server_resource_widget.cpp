@@ -45,7 +45,7 @@ namespace {
     QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
         QPainterPath path;
         qreal maxValue = -1;
-        qreal value;
+        //qreal value;
         qreal lastValue = 0;
         const qreal x_step2 = x_step*.5;
         

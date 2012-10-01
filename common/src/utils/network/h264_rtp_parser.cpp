@@ -164,7 +164,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
             serializeSpsPps(result->data);
     }
     //result->data.write(m_videoBuffer);
-    for (int i = 0; i < m_chunks.size(); ++i) 
+    for (uint i = 0; i < m_chunks.size(); ++i)
     {
         if (m_chunks[i].nalStart)
             result->data.uncheckedWrite(H264_NAL_PREFIX, sizeof(H264_NAL_PREFIX));

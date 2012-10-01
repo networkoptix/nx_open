@@ -40,7 +40,7 @@ bool QnBufferedFrameDisplayer::addFrame(CLVideoDecoderOutput* outFrame)
         m_sync.lock();
         m_lastQueuedTime = outFrame->pkt_dts;
         needWait = !m_needStop && (m_queue.size() == m_queue.maxSize() 
-                    || m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME);
+                    || (m_queue.size() > 0 && outFrame->pkt_dts - m_queue.front()->pkt_dts >= MAX_QUEUE_TIME));
         m_sync.unlock();
         if (needWait) {
             wasWaiting = true;
@@ -84,14 +84,14 @@ void QnBufferedFrameDisplayer::run()
         {
             frame = m_queue.front();
 
-            if (m_expectedTime == AV_NOPTS_VALUE) {
+            if ((quint64)m_expectedTime == AV_NOPTS_VALUE) {
                 m_alignedTimer.restart();
                 m_expectedTime = frame->pkt_dts;
             }
 
             m_sync.lock();
             qint64 expectedTime = m_expectedTime  + m_alignedTimer.elapsed()*1000ll;
-            qint64 currentTime = m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
+            qint64 currentTime = (quint64)m_currentTime != AV_NOPTS_VALUE ? m_currentTime + m_timer.elapsed()*1000ll : expectedTime;
                 
             //cl_log.log("djitter:", qAbs(expectedTime - currentTime), cl_logALWAYS);
             // align to grid

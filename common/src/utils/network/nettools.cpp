@@ -524,10 +524,12 @@ QString getMacByIP(const QHostAddress& ip, bool /*net*/)
     return QString();
 }
 #else // Linux
-void removeARPrecord(const QHostAddress& /*ip*/) {}
+void removeARPrecord(const QHostAddress& ip) {Q_UNUSED(ip)}
 
-QString getMacByIP(const QHostAddress& ip, bool /*net*/)
+QString getMacByIP(const QHostAddress& ip, bool net)
 {
+    Q_UNUSED(ip)
+    Q_UNUSED(net)
     return QString();
 }
 

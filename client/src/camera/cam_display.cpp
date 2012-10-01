@@ -375,7 +375,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_realTimeHurryUp = 5;
             if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 1000000ll / 15) 
             {
-                bool isFCZ = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
+                // bool isFCZ = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
                 //if (needToSleep >= m_display[0]->getAvgDecodingTime())
                 //    setMTDecoding(true);                     
@@ -415,7 +415,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         {
             qint64 displayedTime = getCurrentTime();
             //bool isSingleShot = vd->flags & QnAbstractMediaData::MediaFlags_SingleShot;
-            if (speed != 0  && displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
+            if (speed != 0  && (quint64)displayedTime != AV_NOPTS_VALUE && m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed &&
                 !(vd->flags & QnAbstractMediaData::MediaFlags_BOF))
             {
                 Q_ASSERT(!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore));
@@ -472,7 +472,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 realSleepTime = m_delay.addQuant(needToSleep);
         }
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
-        if (realSleepTime != AV_NOPTS_VALUE)
+        if ((quint64)realSleepTime != AV_NOPTS_VALUE)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
     }
 
@@ -1342,7 +1342,7 @@ qint64 QnCamDisplay::getDisplayedMin() const
     for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i)
     {
         qint64 val = m_display[i]->getLastDisplayedTime();
-        if (val != AV_NOPTS_VALUE) {
+        if ((quint64)val != AV_NOPTS_VALUE) {
             rez = qMin(rez, val);
         }
     }
@@ -1364,7 +1364,7 @@ qint64 QnCamDisplay::getMinReverseTime() const
     qint64 rez = m_nextReverseTime[0];
     for (int i = 1; i < CL_MAX_CHANNELS && m_display[i]; ++i) 
     {
-        if (m_nextReverseTime[i] != AV_NOPTS_VALUE && m_nextReverseTime[i] < rez)
+        if ((quint64)m_nextReverseTime[i] != AV_NOPTS_VALUE && m_nextReverseTime[i] < rez)
             rez = m_nextReverseTime[i];
     }
     return rez;
@@ -1376,7 +1376,7 @@ qint64 QnCamDisplay::getNextTime() const
         return m_display[0]->getLastDisplayedTime();
     else {
         qint64 rez = m_speed < 0 ? getMinReverseTime() : m_lastDecodedTime;
-        return rez != AV_NOPTS_VALUE ? rez : m_display[0]->getLastDisplayedTime();
+        return (quint64)rez != AV_NOPTS_VALUE ? rez : m_display[0]->getLastDisplayedTime();
     }
 }
 

@@ -38,12 +38,11 @@ struct RtspServerTrackInfo
 
     int clientPort;
     int clientRtcpPort;
+    quint16 sequence;
+    qint64 firstRtpTime;
     UDPSocket* mediaSocket;
     UDPSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
-    quint16 sequence;
-    qint64 firstRtpTime;
-
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;

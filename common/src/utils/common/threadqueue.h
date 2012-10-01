@@ -42,7 +42,7 @@ public:
         QMutexLocker mutex(&m_cs);
 
 
-        if (m_bufferLen == m_buffer.size())
+        if ((uint)m_bufferLen == m_buffer.size())
             reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
 
@@ -92,7 +92,7 @@ public:
             val = m_buffer[m_headIndex]; //m_queue.dequeue();
             m_buffer[m_headIndex] = T();
             m_headIndex++;
-            if (m_headIndex >= m_buffer.size())
+            if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;
             m_bufferLen--;
             return true; 
@@ -230,7 +230,7 @@ public:
 
     bool push(const T& val) 
     { 
-        if (m_bufferLen == m_buffer.size())
+        if ((uint)m_bufferLen == m_buffer.size())
             reallocateBuffer(qMax(m_bufferLen + 1, m_bufferLen + m_bufferLen/4));
 
         // we can have 2 threads independetlly put data at the same queue; so we need to put data any way. client is responsible for max size of the quue
@@ -269,7 +269,7 @@ public:
             val = m_buffer[m_headIndex]; //m_queue.dequeue();
             m_buffer[m_headIndex] = T();
             m_headIndex++;
-            if (m_headIndex >= m_buffer.size())
+            if ((uint)m_headIndex >= m_buffer.size())
                 m_headIndex = 0;
             m_bufferLen--;
             return true; 

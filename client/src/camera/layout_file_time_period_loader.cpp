@@ -39,6 +39,7 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
 
 int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
 {
+    Q_UNUSED(period)
     ++m_handle;
     emit delayedReady(m_chunks, m_handle);
     return m_handle;
@@ -52,8 +53,8 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 
-    QnMetaDataV1Light startTime;
-    QnMetaDataV1Light endTime;
+    //QnMetaDataV1Light startTime;
+    //QnMetaDataV1Light endTime;
 
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)

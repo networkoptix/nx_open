@@ -188,8 +188,8 @@ struct QnMetaDataV1Light
     quint8 data[MD_WIDTH*MD_HEIGHT/8];
 };
 #pragma pack(pop)
-bool operator< (const QnMetaDataV1Light& data, const qint64 timeMs);
-bool operator< (const qint64 timeMs, const QnMetaDataV1Light& data);
+bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs);
+bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data);
 
 typedef std::vector<QnMetaDataV1Light, AlignmentAllocator<QnMetaDataV1Light> > QnMetaDataLightVector;
 

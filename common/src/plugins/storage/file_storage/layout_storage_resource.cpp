@@ -8,10 +8,10 @@ class QnLayoutFile: public QIODevice
 public:
     QnLayoutFile(QnLayoutFileStorageResource& storageResource, const QString& fileName):
         m_file(QnLayoutFileStorageResource::removeProtocolPrefix(storageResource.getUrl())),
+        m_mutex(QMutex::Recursive),
         m_storageResource(storageResource),
         m_fileOffset(0),
         m_fileSize(0),
-        m_mutex(QMutex::Recursive),
         m_storedPosition(0),
         m_openMode(QIODevice::NotOpen)
     {
