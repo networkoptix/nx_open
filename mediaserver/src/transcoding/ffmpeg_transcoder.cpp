@@ -1,6 +1,7 @@
 #include "ffmpeg_transcoder.h"
 #include <QDebug>
 #include "ffmpeg_video_transcoder.h"
+#include "ffmpeg_audio_transcoder.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024*16;
@@ -215,15 +216,12 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
         if (m_aTranscoder)
         {
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented!!!");
-            /*
             m_aTranscoder->open(audio);
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
             if (ffmpegAudioTranscoder->getCodecContext()) {
-                avcodec_copy_context(ffmpegAudioTranscoder, ffmpegAudioTranscoder->getCodecContext());
+                avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
-            */
         }
         else 
         {
@@ -234,6 +232,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         }
         m_audioEncoderCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         audioStream->first_dts = 0;
+        //audioStream->time_base = m_audioEncoderCodecCtx->time_base;
     }
 
     m_formatCtx->pb = m_ioContext = createFfmpegIOContext();
@@ -260,8 +259,6 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVPacket packet;
     av_init_packet(&packet);
-    packet.data = 0;
-    packet.size = 0;
 
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     QnAbstractMediaDataPtr transcodedData;
@@ -272,40 +269,47 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         transcoder = m_vTranscoder;
     else
         transcoder = m_aTranscoder;
-    if (transcoder)
-    {
-        // transcode media
-        int errCode = m_vTranscoder->transcodePacket(media, transcodedData);
-        if (errCode != 0)
-            return errCode;
-        if (transcodedData) {
-            packet.data = (quint8*) transcodedData->data.data();
-            packet.size = transcodedData->data.size();
-            packet.pts = av_rescale_q(transcodedData->timestamp, srcRate, stream->time_base);
-            if(transcodedData->flags & AV_PKT_FLAG_KEY)
+
+    do {
+        packet.data = 0;
+        packet.size = 0;
+
+        if (transcoder)
+        {
+            // transcode media
+            int errCode = transcoder->transcodePacket(media, transcodedData);
+            if (errCode != 0)
+                return errCode;
+            if (transcodedData) {
+                packet.data = (quint8*) transcodedData->data.data();
+                packet.size = transcodedData->data.size();
+                packet.pts = av_rescale_q(transcodedData->timestamp, srcRate, stream->time_base);
+                if(transcodedData->flags & AV_PKT_FLAG_KEY)
+                    packet.flags |= AV_PKT_FLAG_KEY;
+            }
+        }
+        else {
+            // direct stream copy
+            packet.pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
+            packet.data = (quint8*) media->data.data();
+            packet.size = media->data.size();
+            if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
                 packet.flags |= AV_PKT_FLAG_KEY;
         }
-    }
-    else {
-        // direct stream copy
-        packet.pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
-        packet.data = (quint8*) media->data.data();
-        packet.size = media->data.size();
-        if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
-            packet.flags |= AV_PKT_FLAG_KEY;
-    }
-    packet.stream_index = streamIndex;
-    packet.dts = packet.pts;
-    
-    if (packet.size > 0)
-    {
-        //qDebug() << "packet.pts=" << packet.pts;
+        packet.stream_index = streamIndex;
+        packet.dts = packet.pts;
+        
+        if (packet.size > 0)
+        {
+            //qDebug() << "packet.pts=" << packet.pts;
 
-        if (av_write_frame(m_formatCtx, &packet) < 0) {
-            qWarning() << QLatin1String("Transcoder error: can't write AV packet");
-            //return -1; // ignore error and continue
+            if (av_write_frame(m_formatCtx, &packet) < 0) {
+                qWarning() << QLatin1String("Transcoder error: can't write AV packet");
+                //return -1; // ignore error and continue
+            }
         }
-    }
+        media.clear();
+    } while (transcoder && packet.size > 0);
     return 0;
 }
 

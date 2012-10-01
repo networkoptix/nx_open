@@ -2,6 +2,7 @@
 #include "ffmpeg_transcoder.h"
 #include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
+#include "ffmpeg_audio_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -152,7 +153,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             m_aTranscoder = QnAudioTranscoderPtr();
             break;
         case TM_FfmpegTranscode:
-            m_lastErrMessage = "Audio transcoding is not implemented";
+            m_aTranscoder = QnAudioTranscoderPtr(new QnFfmpegAudioTranscoder(codec));
             break;
             /*
         case TM_QuickSyncTranscode:

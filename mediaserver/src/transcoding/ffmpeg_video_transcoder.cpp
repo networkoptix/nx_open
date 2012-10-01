@@ -26,6 +26,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
     }
+
+    delete m_videoDecoder;
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
@@ -97,6 +99,10 @@ void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
 {
+    result.clear();
+    if (!media)
+        return 0;
+
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
