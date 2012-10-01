@@ -325,7 +325,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         font.setPixelSize(20);
         bool scaleRequired = true;
 #else
-        qreal zoom(1.0)
+        qreal zoom(1.0);
         font.setPointSizeF(offset * 0.3);
         bool scaleRequired = false;
 #endif
