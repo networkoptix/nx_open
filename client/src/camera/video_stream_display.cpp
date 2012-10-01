@@ -172,6 +172,7 @@ void QnVideoStreamDisplay::reorderPrevFrames()
 
 void QnVideoStreamDisplay::checkQueueOverflow(QnAbstractVideoDecoder* dec)
 {
+    Q_UNUSED(dec)
     while (m_reverseSizeInBytes > MAX_REVERSE_QUEUE_SIZE)
     {
         // drop some frame at queue. Find max interval contains non-dropped frames (and drop frame from mid of this interval)
@@ -234,7 +235,7 @@ qint64 QnVideoStreamDisplay::nextReverseTime() const
 {
     for (int i = 0; i < m_reverseQueue.size(); ++i)
     {
-        if (m_reverseQueue[i]->pkt_dts != AV_NOPTS_VALUE)
+        if (quint64(m_reverseQueue[i]->pkt_dts) != AV_NOPTS_VALUE)
         {
             if (m_reverseQueue[i]->flags & AV_REVERSE_REORDERED)
                 return m_reverseQueue[i]->pkt_dts;
@@ -521,7 +522,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
 
 bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
-    if (outFrame->pkt_dts != AV_NOPTS_VALUE)
+    if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)
         setLastDisplayedTime(outFrame->pkt_dts);
     if (outFrame->data[0]) 
     {

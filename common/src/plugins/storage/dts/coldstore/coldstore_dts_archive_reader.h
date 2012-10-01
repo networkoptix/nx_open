@@ -55,8 +55,8 @@ private:
     bool openCSFile(int f_index, int event_index);
     bool openEventFile(int f_index);
 
-    int find_best_file(qint64 time);
-    int find_best_event(qint64 time);
+    int find_best_file(quint64 time);
+    int find_best_event(quint64 time);
 
 private:
 

@@ -20,7 +20,7 @@ namespace std { typedef __int32 intptr_t; }
  * Interface for monitoring performance in a platform-independent way.
  */
 class QnPlatformMonitor: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     /**
      * Description of an HDD.
@@ -89,7 +89,7 @@ public:
     virtual QList<HddLoad> totalHddLoad() { return QList<HddLoad>(); }
 
 private:
-    Q_DISABLE_COPY(QnPlatformMonitor);
+    Q_DISABLE_COPY(QnPlatformMonitor)
 };
 
 #endif // QN_PLATFORM_MONITOR_H

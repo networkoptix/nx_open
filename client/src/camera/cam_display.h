@@ -134,6 +134,7 @@ protected:
     qint64 m_lastAudioPacketTime;
     qint64 m_syncAudioTime;
     int m_totalFrames;
+    int m_fczFrames;
     int m_iFrames;
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDecodedTime;
@@ -173,7 +174,6 @@ protected:
     QnlTimeSource* m_extTimeSrc;
     
     //qint64 m_nextTime;
-    mutable QMutex m_timeMutex;
     bool m_useMtDecoding;
     int m_buffering;
     int m_executingJump;
@@ -198,9 +198,9 @@ protected:
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
-
-    int m_fczFrames;
     bool m_useMTRealTimeDecode;
+
+    mutable QMutex m_timeMutex;
 };
 
 #endif //QN_CAM_DISPLAY_H

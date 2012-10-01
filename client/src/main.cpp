@@ -70,7 +70,7 @@
 #include "ui/workbench/workbench_translation_manager.h"
 
 #ifdef Q_WS_X11
-    #include "ui/workaround/app_focus_listener.h"
+    #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
@@ -275,8 +275,8 @@ int qnMain(int argc, char *argv[])
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
 #ifdef Q_WS_X11
-    QnAppFocusListener appFocusListener;
-    application->installEventFilter(&appFocusListener);
+    QnX11LauncherWorkaround x11LauncherWorkaround;
+    application->installEventFilter(&x11LauncherWorkaround);
 #endif
 
     if(singleApplication) {

@@ -616,9 +616,9 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
 {
     float tx_array[8] = {
         0.0f, 0.0f,
-        tex0->texCoords().x(), 0.0f,
-        tex0->texCoords().x(), tex0->texCoords().y(),
-        0.0f, tex0->texCoords().y()
+        (float)tex0->texCoords().x(), 0.0f,
+        (float)tex0->texCoords().x(), (float)tex0->texCoords().y(),
+        0.0f, (float)tex0->texCoords().y()
     };
 
     glEnable(GL_TEXTURE_2D);
@@ -677,7 +677,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
         m_videoWidth = m_curImg->width;
         m_videoHeight = m_curImg->height;
         updateTexture();
-        if (m_curImg->pkt_dts != AV_NOPTS_VALUE)
+        if (quint64(m_curImg->pkt_dts) != AV_NOPTS_VALUE)
             m_lastDisplayedTime = m_curImg->pkt_dts;
         m_lastDisplayedMetadata[m_curImg->channel] = m_curImg->metadata;
         m_lastDisplayedFlags = m_curImg->flags;
@@ -717,7 +717,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
     else if(m_videoWidth > 0 && m_videoHeight > 0)
     {
         QRectF temp(r);
-        const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
+        const float v_array[] = { (float)temp.left(), (float)temp.top(),    (float)temp.right(), (float)temp.top(),
+                                  (float)temp.right(),(float)temp.bottom(), (float)temp.left(),  (float)temp.bottom() };
         drawVideoTexture(texture(0), texture(1), texture(2), v_array);
     }
     else

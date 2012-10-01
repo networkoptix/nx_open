@@ -861,7 +861,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
             return false;
 
         QString cseq = extractRTSPParam(QLatin1String(response), QLatin1String("CSeq:"));
-        if (cseq.toInt() == m_csec-1)
+        if (cseq.toInt() == (int)m_csec-1)
             break;
     }    
 

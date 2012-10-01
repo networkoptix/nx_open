@@ -380,12 +380,12 @@ void QnMetaDataV1::deserialize(QIODevice* ioDevice)
 }
 */
 
-bool operator< (const QnMetaDataV1Light& data, const qint64 timeMs)
+bool operator< (const QnMetaDataV1Light& data, const quint64 timeMs)
 {
     return data.startTimeMs < timeMs;
 }
 
-bool operator< (const qint64 timeMs, const QnMetaDataV1Light& data)
+bool operator< (const quint64 timeMs, const QnMetaDataV1Light& data)
 {
     return timeMs < data.startTimeMs;
 }

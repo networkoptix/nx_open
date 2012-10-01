@@ -192,7 +192,7 @@ bool QnColdStoreConnection::write(const char* data, int len)
 
     m_pos += returned_data_length;
 
-    Q_ASSERT(returned_data_length == len);
+    Q_ASSERT(returned_data_length == (Veracity::u64)len);
 
     return true;
 }
