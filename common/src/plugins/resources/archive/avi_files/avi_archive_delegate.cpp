@@ -368,13 +368,6 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
                             m_resource->addFlags(QnResource::utc | QnResource::periods | QnResource::motion); // use sync for exported layout only
-                            /*
-                            * Server used fast find, but client not
-                            * It is problem if export camera to nov file, then reexport nov to other nov.
-                            * At this case context appears becuase ffmpeg decodes first frame in 'slow' av_find_stream_info mode and create context manually if no context in headers.
-                            * So, keep using fast av_find_stream_info if it is camera
-                            */
-                            setFastStreamFind(true);
                         }
                     }
                 }
