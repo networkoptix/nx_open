@@ -4,6 +4,7 @@
 #include <fstream>
 #include <tchar.h>
 #include <Windows.h>
+#include <Msi.h>
 
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 typedef signed __int64 int64_t;
@@ -193,6 +194,21 @@ int launchFile(const wstring& executePath)
             extractFile(srcFile, fullFileName, filePosList[i], filePosList[i+1] - filePosList[i]);
         }
         srcFile.close();
+
+        // check if MSVC MSI exists
+        INSTALLSTATE state;
+        if (sizeof(char*) == 4)
+            state = MsiQueryProductState(L"{9A25302D-30C0-39D9-BD6F-21E6EC160475}");
+        else
+            state = MsiQueryProductState(L"{8220EEFE-38CD-377E-8595-13398D740ACE}");
+        if (state != INSTALLSTATE_DEFAULT)
+        {
+            wchar_t buffer[MAX_PATH + 16];
+            wsprintf(buffer, L"\"%s\\vcredist_x86.exe\" /q", toNativeSeparator(dstDir).c_str());
+            int result = _wsystem(buffer);
+        }
+
+        // start client
 
         wchar_t buffer[MAX_PATH*2 +3];
         wsprintf(buffer, L"\"%s\" \"%s\"", getFullFileName(dstDir, L"client").c_str(), executePath.c_str());
