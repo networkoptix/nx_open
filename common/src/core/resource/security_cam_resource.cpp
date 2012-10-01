@@ -1,6 +1,6 @@
 #include "security_cam_resource.h"
 
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/dataprovider/live_stream_provider.h"
 

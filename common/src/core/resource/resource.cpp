@@ -16,7 +16,7 @@
 #include <typeinfo>
 #include <limits.h>
 #include "utils/common/synctime.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 QnResource::QnResource(): 
     QObject(),

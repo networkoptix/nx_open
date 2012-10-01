@@ -1,6 +1,6 @@
 #include "client_meta_types.h"
 
-#include <utils/common/common_meta_types.h>
+#include <common/common_meta_types.h>
 
 #include <camera/thumbnail.h>
 

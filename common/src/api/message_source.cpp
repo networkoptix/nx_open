@@ -4,7 +4,7 @@
 #include "api/app_server_connection.h"
 #include <utils/common/warnings.h>
 #include "message.pb.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 #define QN_EVENT_SOURCE_DEBUG
 

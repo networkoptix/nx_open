@@ -15,7 +15,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
 #include <utils/common/toggle.h>
-#include <utils/common/common_meta_types.h>
+#include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource_managment/resource_pool.h>
