@@ -38,6 +38,7 @@ public:
     virtual qint64 getFreeSpace() override;
     virtual void setUrl(const QString& value) override;
 
+    bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 

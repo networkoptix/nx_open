@@ -2166,7 +2166,10 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
 
 
         layout->setName(QFileInfo(newUrl).fileName());
-        m_exportStorage->renameFile(oldUrl, newUrl);
+
+        QnLayoutFileStorageResourcePtr novStorage = m_exportStorage.dynamicCast<QnLayoutFileStorageResource>();
+        if (novStorage)
+            novStorage->switchToFile(oldUrl, newUrl, false);
         snapshotManager()->store(layout);
     }
     else {

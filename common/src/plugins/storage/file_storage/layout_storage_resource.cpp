@@ -212,6 +212,11 @@ bool QnLayoutFileStorageResource::removeFile(const QString& url)
 
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
+    return switchToFile(oldName, newName, true);
+}
+
+bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
+{
     QMutexLocker lock(&m_storageSync);
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
@@ -220,8 +225,16 @@ bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QStri
         if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
-    QFile::remove(removeProtocolPrefix(newName));
-    bool rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+
+    bool rez;
+    if (dataInOldFile) {
+        QFile::remove(removeProtocolPrefix(newName));
+        rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+    }
+    else {
+        QFile::remove(removeProtocolPrefix(oldName));
+    }
+
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
