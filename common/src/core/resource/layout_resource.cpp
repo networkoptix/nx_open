@@ -4,7 +4,7 @@
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_pool.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),

@@ -3,6 +3,11 @@
 
 #include <QtCore/QObject>
 
+/**
+ * Storage for common module's global state.
+ * 
+ * All singletons and initialization/deinitialization code goes here.
+ */
 class QnCommonModule: public QObject {
     Q_OBJECT
 public:

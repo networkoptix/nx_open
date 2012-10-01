@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/common/warnings.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManagerInstance);
 QAtomicInt QnSessionManager::m_handle(1);

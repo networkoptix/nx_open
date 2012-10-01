@@ -6,7 +6,7 @@
 #include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
 #include "utils/common/long_runnable.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 QnNetworkResource::QnNetworkResource()
     : QnResource(),
