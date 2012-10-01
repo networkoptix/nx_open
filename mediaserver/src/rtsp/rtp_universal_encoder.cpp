@@ -599,8 +599,13 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
     m_transcoder.setContainer("rtp");
     m_transcoder.setPacketizedMode(true);
     m_codec = transcodeToCodec != CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
-    QnTranscoder::TranscodeMethod method = transcodeToCodec != CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
+    QnTranscoder::TranscodeMethod method;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    if (m_isVideo)
+        method = transcodeToCodec != CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
+    else
+        method = QnTranscoder::TM_DirectStreamCopy; // do not transcode audio
+
     if (media->dataType == QnAbstractMediaData::VIDEO)
         m_transcoder.setVideoCodec(m_codec, method, videoSize);
     else
@@ -614,6 +619,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
 QByteArray QnUniversalRtpEncoder::getAdditionSDP()
 {
     char buffer[1024*16];
+    memset(buffer, 0, sizeof(buffer));
     AVCodecContext* ctx = m_isVideo ? m_transcoder.getVideoCodecContext() : m_transcoder.getAudioCodecContext();
     sdp_write_media_attributes(buffer, sizeof(buffer), ctx, getPayloadtype(), m_transcoder.getFormatContext());
     return QByteArray(buffer);

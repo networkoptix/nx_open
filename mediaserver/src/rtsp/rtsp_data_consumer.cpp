@@ -516,6 +516,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
 
+    if (media->dataType == QnAbstractMediaData::AUDIO)
+    {
+        int gg = 4;
+    }
+
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
     if (metadata == 0)
@@ -541,7 +546,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
-    if (trackInfo == 0 || trackInfo->encoder == 0)
+    if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
         return true; // skip data (for example audio is disabled)
     QnRtspEncoderPtr codecEncoder = trackInfo->encoder;
     {
@@ -593,10 +598,14 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         trackInfo->firstRtpTime = media->timestamp;
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, codecEncoder->getFrequency() };
+
+    /*
     qint64 timeDiff = media->timestamp;
     if (!m_useUTCTime)
         timeDiff -= trackInfo->firstRtpTime; // enumerate RTP time from 0 after seek
     qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
+    */
+    qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
 
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))

@@ -144,11 +144,26 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
 
 bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
-    Q_UNUSED(method)
-    m_aTranscoder = QnAudioTranscoderPtr();
+    Q_UNUSED(method);
     m_audioCodec = codec;
-    m_lastErrMessage = "Audio transcoding is not implemented";
-    return false;
+    switch (method)
+    {
+        case TM_DirectStreamCopy:
+            m_aTranscoder = QnAudioTranscoderPtr();
+            break;
+        case TM_FfmpegTranscode:
+            m_lastErrMessage = "Audio transcoding is not implemented";
+            break;
+            /*
+        case TM_QuickSyncTranscode:
+            m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
+            */
+            break;
+        case TM_OpenCLTranscode:
+            m_lastErrMessage = "OpenCLTranscode is not implemented";
+            return -1;
+    }
+    return m_lastErrMessage.isEmpty();
 }
 
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
