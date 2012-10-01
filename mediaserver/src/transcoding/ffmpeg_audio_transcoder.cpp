@@ -23,8 +23,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     }
 
     if (m_decoderContext) {
-        avcodec_close(m_encoderCtx);
-        av_free(m_encoderCtx);
+        avcodec_close(m_decoderContext);
+        av_free(m_decoderContext);
     }
 
 }

@@ -397,8 +397,12 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
 {
     Q_D(QnRtspConnectionProcessor);
 
-    //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : CODEC_ID_MP3;
-    CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
+    CodecID dstCodec;
+    if (media->dataType == QnAbstractMediaData::VIDEO)
+        dstCodec = CODEC_ID_MPEG4;
+    else
+        dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
+    //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
 
     switch (media->compressionType)
     {
