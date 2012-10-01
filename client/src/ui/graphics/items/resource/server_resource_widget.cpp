@@ -320,103 +320,64 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QFont font(this->font());
 
-        // TODO: #gdm there seems to be a lot of copypasta between these two blocks,
-        // so fixing them is a real hell for me. Factor out common parts and unify them.
-
-#ifndef Q_WS_X11
+#ifdef Q_OS_LINUX
+        qreal zoom(offset * 0.02);
+        font.setPixelSize(20);
+        bool scaleRequired = true;
+#else
+        qreal zoom(1.0)
         font.setPointSizeF(offset * 0.3);
+        bool scaleRequired = false;
+#endif
+        qreal unzoom = 1/zoom;
+
         painter->setFont(font);
         /* Draw text values */
         {
-            qreal x = offset * 1.1 + ow;
+            if (scaleRequired)
+                painter->scale(zoom, zoom);
+            qreal x = unzoom * (offset * 1.1 + ow);
             for (int i = 0; i < values.length(); i++){
                 qreal interValue = values[i];
                 main_pen.setColor(getColorById(i));
                 painter->setPen(main_pen);
-                qreal y = offset + oh * (1.0 - interValue);
+                qreal y = unzoom * (offset + oh * (1.0 - interValue));
                 painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
             }
+            if (scaleRequired)
+               painter->scale(unzoom, unzoom);
         }
 
         /* Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
-
-            QTransform legendTransform = painter->transform();
-            QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset * 0.2, -offset * 0.2);
-
-            legendTransform.translate(width * 0.5, oh + offset * 1.5);
-
+            painter->translate(width * 0.5, oh + offset * 1.5);
+            if (scaleRequired)
+                painter->scale(zoom, zoom);
             qreal legendOffset = 0.0;
             int space = offset; // space for the square drawing and between legend elements
             foreach(QString key, m_sortedKeys)
                 legendOffset += painter->fontMetrics().width(key) + space;
-            legendTransform.translate(-legendOffset * 0.5, 0.0);
-            painter->setTransform(legendTransform);
-
-            int counter = 0;
-            foreach(QString key, m_sortedKeys){
-                main_pen.setColor(getColorById(counter++));
-                painter->setPen(main_pen);
-                painter->strokePath(legend, main_pen);
-                painter->drawText(offset * 0.1, offset * 0.1, key);
-                legendTransform.translate(painter->fontMetrics().width(key) + space, 0.0);
-                painter->setTransform(legendTransform);
-            }
-        }
-#else // Q_WS_X11
-        font.setPixelSize(20);
-        painter->setFont(font);
-        /** Draw text values */
-        {
-            qreal c = offset * 0.02;
-            painter->scale(c, c);
-            c = 1/c;
-            qreal x = offset * 1.1 + ow;
-            for (int i = 0; i < values.length(); i++){
-                qreal interValue = values[i];
-                main_pen.setColor(getColorById(i));
-                painter->setPen(main_pen);
-                qreal y = offset + oh * (1.0 - interValue);
-                painter->drawText(x*c, y*c, tr("%1%").arg(qRound(interValue * 100.0)));
-            }
-            painter->scale(c, c);
-        }
-
-        /** Draw legend */
-        {
-            QnScopedPainterTransformRollback transformRollback(painter);
-            Q_UNUSED(transformRollback)
-            painter->translate(width * 0.5, oh + offset * 1.5);
-
-            qreal c = offset * 0.02;
-            painter->scale(c, c);
-
-            qreal legendOffset = 0.0;
-            int space = 50; // space for the square drawing and between legend elements
-            foreach(QString key, m_sortedKeys)
-                legendOffset += painter->fontMetrics().width(key) + space;
             painter->translate(-legendOffset * 0.5, 0.0);
 
-            c = 1 / c; // 50 / offset
-
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -10, -10);
-            main_pen.setWidthF(pen_width * 2 * c);
+            legend.addRect(0.0, 0.0, -offset * 0.2*unzoom, -offset * 0.2*unzoom);
+
+            QPen legendPen(main_pen);
+            legendPen.setWidthF(pen_width * 2 * unzoom);
 
             int counter = 0;
             foreach(QString key, m_sortedKeys){
-                main_pen.setColor(getColorById(counter++));
-                painter->setPen(main_pen);
-                painter->strokePath(legend, main_pen);
-                painter->drawText(5, 5, key);
+                legendPen.setColor(getColorById(counter++));
+                painter->setPen(legendPen);
+                painter->strokePath(legend, legendPen);
+                painter->drawText(offset * 0.1*unzoom, offset * 0.1*unzoom, key);
                 painter->translate(painter->fontMetrics().width(key) + space, 0.0);
             }
-            painter->scale(c, c);
+            if (scaleRequired)
+                painter->scale(unzoom, unzoom);
         }
-#endif // Q_WS_X11
     }
 }
 
