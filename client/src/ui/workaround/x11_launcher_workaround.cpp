@@ -1,26 +1,26 @@
-#include "app_focus_listener.h"
+#include "x11_launcher_workaround.h"
 #include "x11_win_control.h"
 
 #include <QEvent>
 
-QnAppFocusListener::QnAppFocusListener():
+QnX11LauncherWorkaround::QnX11LauncherWorkaround():
     QObject(){
     hideLauncher();
 }
 
-QnAppFocusListener::~QnAppFocusListener() {
+QnX11LauncherWorkaround::~QnX11LauncherWorkaround() {
     restoreLauncher();
 }
 
-void QnAppFocusListener::hideLauncher() {
+void QnX11LauncherWorkaround::hideLauncher() {
     x11_hideLauncher();
 }
 
-void QnAppFocusListener::restoreLauncher() {
+void QnX11LauncherWorkaround::restoreLauncher() {
     x11_showLauncher();
 }
 
-bool QnAppFocusListener::eventFilter(QObject *obj, QEvent *event) {
+bool QnX11LauncherWorkaround::eventFilter(QObject *obj, QEvent *event) {
     switch (event->type()) {
     case QEvent::ApplicationActivate:
         hideLauncher();
