@@ -92,7 +92,7 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &c
 
 QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
 {
-    static const int COLOR_THRESHOLD = 32;
+    static const int COLOR_THRESHOLD = 38;
 
     int signBits = signLen*8;
     int rowCnt = signBits / 16;
