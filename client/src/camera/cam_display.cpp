@@ -982,8 +982,11 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         // skip data (play current buffer
         flushCurrentBuffer = true;
     }
-    else if ((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) && vd) {
-        m_display[vd->channelNumber]->waitForFramesDisplaed();
+    else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
+    {
+        if (vd)
+            m_display[vd->channelNumber]->waitForFramesDisplaed();
+        afterJump(media);
     }
 
     if (ad && !flushCurrentBuffer)
