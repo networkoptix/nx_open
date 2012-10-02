@@ -516,12 +516,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true;
 
-
-    if (media->dataType == QnAbstractMediaData::AUDIO)
-    {
-        int gg = 4;
-    }
-
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
 
     if (metadata == 0)
