@@ -5,6 +5,10 @@
 #ifndef XVBADECODER_H
 #define XVBADECODER_H
 
+#include <deque>
+#include <fstream>
+#include <string>
+
 #include <QGLContext>
 #include <QScopedPointer>
 #include <QSharedPointer>
@@ -20,8 +24,7 @@
 #include "nalUnits.h"
 #endif
 
-#include <fstream>
-#include <string>
+#include <plugins/videodecoders/stree/resourcecontainer.h>
 
 #include <GL/glx.h>
 #include <X11/X.h>
@@ -70,6 +73,8 @@ public:
     QScopedPointer<QGLContextPrivateDuplicate> d_ptr;
 };
 
+class PluginUsageWatcher;
+
 //!Uses AMD XVBA API to decode h.264 stream
 /*!
     To use it system MUST have Radeon graphics card installed and AMD proprietary driver.
@@ -78,13 +83,17 @@ public:
 */
 class QnXVBADecoder
 :
-    public QnAbstractVideoDecoder
+    public QnAbstractVideoDecoder,
+    public stree::AbstractResourceReader
 {
 public:
     /*!
         \param data acces unit of media stream. MUST contain sequence header (sps & pps in case of h.264)
     */
-    QnXVBADecoder( const QGLContext* const glContext, const QnCompressedVideoDataPtr& data );
+    QnXVBADecoder(
+        const QGLContext* const glContext,
+        const QnCompressedVideoDataPtr& data,
+        PluginUsageWatcher* const usageWatcher );
     virtual ~QnXVBADecoder();
 
     //!Implementation of AbstractDecoder::GetPixelFormat
@@ -107,6 +116,17 @@ public:
     //!Implementation of AbstractDecoder::setLightCpuMode
     virtual void setLightCpuMode( QnAbstractVideoDecoder::DecodeMode );
 #endif
+    //!Implementation of stree::AbstractResourceReader::get
+    /*!
+        Following parameters are supported:\n
+            - framePictureWidth
+            - framePictureHeight
+            - framePictureSize
+            - fps
+            - pixelsPerSecond
+            - videoMemoryUsage
+    */
+    virtual bool get( int resID, QVariant* const value ) const;
 
 private:
     typedef void* XVBASurface;
@@ -202,6 +222,7 @@ private:
     void* m_context;
     void* m_decodeSession;
     GLXContext m_glContext;
+    PluginUsageWatcher* const m_usageWatcher;
     Display* m_display;
     unsigned int m_getCapDecodeOutputSize;
     std::list<QSharedPointer<XVBASurfaceContext> > m_commonSurfaces;
@@ -245,6 +266,12 @@ private:
     //!See comment to \a DROP_SMALL_SECOND_SLICE macro
     bool m_checkForDroppableSecondSlice;
     int m_mbLinesToIgnore;
+    //!Number of lines to crop at top of decoded picture
+    unsigned int m_originalFrameCropTop;
+    //!Number of lines to crop at bottom of decoded picture
+    unsigned int m_originalFrameCropBottom;
+    double m_sourceStreamFps;
+    std::deque<qint64> m_fpsCalcFrameTimestamps;
 
     //!Creates XVBA context
     /*!

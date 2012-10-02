@@ -16,6 +16,9 @@
 #include <QElapsedTimer>
 #include <QX11Info>
 
+#include <plugins/videodecoders/pluginusagewatcher.h>
+#include <plugins/videodecoders/videodecoderplugintypes.h>
+
 //decode to opengl texture
 #define USE_OPENGL_SURFACE
 //
@@ -230,12 +233,16 @@ QnXVBADecoder::H264PPocCalcAuxiliaryData::H264PPocCalcAuxiliaryData()
 /////////////////////////////////////////////////////
 //  class QnXVBADecoder
 /////////////////////////////////////////////////////
-QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompressedVideoDataPtr& data )
+QnXVBADecoder::QnXVBADecoder(
+    const QGLContext* const glContext,
+    const QnCompressedVideoDataPtr& data,
+    PluginUsageWatcher* const usageWatcher )
 :
     m_prevOperationStatus( Success ),
     m_context( NULL ),
     m_decodeSession( NULL ),
     m_glContext( NULL ),
+    m_usageWatcher( usageWatcher ),
     m_display( NULL ),
     m_getCapDecodeOutputSize( 0 ),
     m_decodedPictureRgbaBuf( NULL ),
@@ -251,18 +258,14 @@ QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompres
     ,m_checkForDroppableSecondSlice( false )
     ,m_mbLinesToIgnore(0)
 #endif
+    ,m_originalFrameCropTop(0)
+    ,m_originalFrameCropBottom(0)
+    ,m_sourceStreamFps( 0 )
 {
     cl_log.log( QString::fromAscii("Initializing XVBA decoder"), cl_logDEBUG1 );
 
-    int version = 0;
     m_display = QX11Info::display();    //retrieving display pointer
-    m_hardwareAccelerationEnabled = XVBAQueryExtension( m_display, &version );
-    if( !m_hardwareAccelerationEnabled )
-    {
-        cl_log.log( QString::fromAscii("XVBA decode acceleration is not supported on host system"), cl_logERROR );
-        return;
-    }
-    cl_log.log( QString::fromAscii("XVBA of version %1.%2 found").arg(version >> 16).arg(version & 0xffff), cl_logINFO );
+    m_hardwareAccelerationEnabled = true;
 
     if( !createContext() )
     {
@@ -304,6 +307,8 @@ QnXVBADecoder::QnXVBADecoder( const QGLContext* const glContext, const QnCompres
 
 QnXVBADecoder::~QnXVBADecoder()
 {
+    m_usageWatcher->decoderIsAboutToBeDestroyed( this );
+
     cl_log.log( QString::fromAscii("QnXVBADecoder. Destroying session..."), cl_logDEBUG1 );
     destroyXVBASession();
 
@@ -376,6 +381,19 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
 
     if( !m_decodeSession && !createDecodeSession() )
         return false;
+
+    static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
+    static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
+
+    //calculating m_sourceStreamFps
+    const double fpsCalcTimestampDiff = m_fpsCalcFrameTimestamps.empty()
+        ? 0
+        : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
+    if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
+        m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() / fpsCalcTimestampDiff;
+    m_fpsCalcFrameTimestamps.push_back( data->timestamp );
+    if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
+        m_fpsCalcFrameTimestamps.pop_front();
 
     XVBABufferDescriptor* pictureDescriptionBufferDescriptor = getDecodeBuffer( XVBA_PICTURE_DESCRIPTION_BUFFER );
     bool analyzeSrcDataResult = false;
@@ -659,6 +677,33 @@ void QnXVBADecoder::setLightCpuMode( QnAbstractVideoDecoder::DecodeMode )
 }
 #endif
 
+bool QnXVBADecoder::get( int resID, QVariant* const value ) const
+{
+    switch( resID )
+    {
+        case DecoderParameter::framePictureWidth:
+            *value = m_sps.getWidth();
+            return true;
+        case DecoderParameter::framePictureHeight:
+            *value = m_sps.getHeight();
+            return true;
+        case DecoderParameter::framePictureSize:
+            *value = m_sps.getWidth() * m_sps.getHeight();
+            return true;
+        case DecoderParameter::fps:
+            *value = m_sourceStreamFps;
+            return true;
+        case DecoderParameter::pixelsPerSecond:
+            *value = m_sourceStreamFps * m_sps.getWidth() * m_sps.getHeight();
+            return true;
+        case DecoderParameter::videoMemoryUsage:
+            *value = (qlonglong)m_glSurfaces.size() * m_sps.getWidth() * m_sps.getHeight() * 4; //texture uses 32-bit BGRA format
+            return true;
+        default:
+            return false;
+    }
+}
+
 bool QnXVBADecoder::createContext()
 {
     {
@@ -774,7 +819,7 @@ bool QnXVBADecoder::createDecodeSession()
     if( m_outPicSize.isEmpty() )
     {
         in.width = m_sps.pic_width_in_mbs*16;
-        in.height = m_sps.pic_height_in_map_units*16;
+        in.height = m_sps.getHeight();
         cl_log.log( QString::fromAscii("Creating XVBA decode session for pic %1x%2").arg(in.width).arg(in.height), cl_logDEBUG1 );
     }
     else
@@ -866,7 +911,11 @@ bool QnXVBADecoder::createDecodeSession()
     }
 #endif
 
-    return m_prevOperationStatus == Success;
+    if( m_prevOperationStatus != Success )
+        return false;
+
+    m_usageWatcher->decoderCreated( this );
+    return true;
 }
 
 bool QnXVBADecoder::createGLSurface()
@@ -910,7 +959,7 @@ bool QnXVBADecoder::createGLSurface()
     glTexImage2D( GL_TEXTURE_2D, 0,
     			  GL_RGBA,
     			  m_sps.pic_width_in_mbs*16,
-                  m_sps.pic_height_in_map_units*16,
+                  m_sps.getHeight(),
                   0,
                   GL_BGRA,
                   GL_UNSIGNED_BYTE,  //GL_UNSIGNED_SHORT_4_4_4_4,
@@ -921,9 +970,9 @@ bool QnXVBADecoder::createGLSurface()
     if( glErrorCode )
     {
         cl_log.log( QString::fromAscii("QnXVBADecoder. Failed to create gltexture with size %1x%2. %3").
-       		arg(m_sps.pic_width_in_mbs*16).arg(m_sps.pic_height_in_map_units*16).arg(glErrorCode), cl_logERROR );
+       		arg(m_sps.pic_width_in_mbs*16).arg(m_sps.getHeight()).arg(glErrorCode), cl_logERROR );
     }
-    cl_log.log( QString::fromAscii("Created opengl texture %1x%2").arg(m_sps.pic_width_in_mbs*16).arg(m_sps.pic_height_in_map_units*16), cl_logDEBUG1 );
+    cl_log.log( QString::fromAscii("Created opengl texture %1x%2").arg(m_sps.pic_width_in_mbs*16).arg(m_sps.getHeight()), cl_logDEBUG1 );
 
     XVBA_Create_GLShared_Surface_Input in;
     memset( &in, 0, sizeof(in) );
@@ -978,7 +1027,7 @@ bool QnXVBADecoder::createSurface()
     in.size = sizeof(in);
     in.session = m_decodeSession;
     in.width = m_pictureDescriptor.width_in_mb * 16;
-    in.height = m_pictureDescriptor.height_in_mb * 16;
+    in.height = m_sps.getHeight();
     in.surface_type = XVBA_NV12;
 
     XVBA_Create_Surface_Output out;
@@ -1397,7 +1446,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 			std::cerr<<"Error ("<<glErrorCode<<") reading tex image\n";
         //we have RGBA32 in m_decodedPictureRgbaBuf, but need ARGB32 for QImage...
         for( quint32* curPixel = (quint32*)m_decodedPictureRgbaBuf;
-             curPixel < (quint32*)(m_decodedPictureRgbaBuf + m_sps.pic_width_in_mbs*16*m_sps.pic_height_in_map_units*16*4);
+             curPixel < (quint32*)(m_decodedPictureRgbaBuf + m_sps.pic_width_in_mbs*16*m_sps.getHeight()*4);
              ++curPixel )
         {
 //            int r = *curPixel & 0xff;
@@ -1417,7 +1466,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 		QImage img(
 			m_decodedPictureRgbaBuf,
 			m_sps.pic_width_in_mbs*16,
-			m_sps.pic_height_in_map_units*16,
+			m_sps.getHeight(),
             QImage::Format_ARGB32_Premultiplied );	//QImage::Format_ARGB4444_Premultiplied );
         const QString& fileName = QString::fromAscii("/home/ak/pic_dump/%1.bmp").arg(fileNumber++, 3, 10, QChar('0'));
 		if( !img.save( fileName, "bmp" ) )
@@ -1435,7 +1484,7 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 #endif
 
     outFrame->width = m_sps.pic_width_in_mbs*16;
-    outFrame->height = m_sps.pic_height_in_map_units*16;
+    outFrame->height = m_sps.getHeight();
 
 #ifdef USE_OPENGL_SURFACE
     Q_ASSERT( !decodedPicSurface || decodedPicSurface->state <= XVBASurfaceContext::renderingInProgress );
@@ -1464,10 +1513,10 @@ void QnXVBADecoder::fillOutputFrame( CLVideoDecoderOutput* const outFrame, QShar
 	//    if( !outFrame->isExternalData() )
 //    {
 //        //copying frame data if needed
-//        outFrame->reallocate( m_sps.pic_width_in_mbs*16, m_sps.pic_height_in_map_units*16, PIX_FMT_NV12 );
-//        memcpy( outFrame->data[0], decodedFrame->Data.Y, decodedFrame->Data.Pitch * m_sps.pic_height_in_map_units*16 );
-//        memcpy( outFrame->data[1], decodedFrame->Data.U, decodedFrame->Data.Pitch / 2 * m_sps.pic_height_in_map_units*16 / 2 );
-//        memcpy( outFrame->data[2], decodedFrame->Data.V, decodedFrame->Data.Pitch / 2 * m_sps.pic_height_in_map_units*16 / 2 );
+//        outFrame->reallocate( m_sps.pic_width_in_mbs*16, m_sps.getHeight(), PIX_FMT_NV12 );
+//        memcpy( outFrame->data[0], decodedFrame->Data.Y, decodedFrame->Data.Pitch * m_sps.getHeight() );
+//        memcpy( outFrame->data[1], decodedFrame->Data.U, decodedFrame->Data.Pitch / 2 * m_sps.getHeight() / 2 );
+//        memcpy( outFrame->data[2], decodedFrame->Data.V, decodedFrame->Data.Pitch / 2 * m_sps.getHeight() / 2 );
 //    }
 //    else
 //    {
@@ -1586,6 +1635,14 @@ void QnXVBADecoder::readSPS( const quint8* curNalu, const quint8* nextNalu )
 {
 	m_sps.decodeBuffer( curNalu, nextNalu );
 	m_sps.deserialize();
+
+    //reading frame cropping settings
+    const unsigned int SubHeightC = m_sps.chroma_format_idc == 1 ? 2 : 1;
+    const unsigned int CropUnitY = (m_sps.chroma_format_idc == 0)
+        ? (2 - m_sps.frame_mbs_only_flag)
+        : (SubHeightC * (2 - m_sps.frame_mbs_only_flag));
+    m_originalFrameCropTop = CropUnitY * m_sps.frame_crop_top_offset;
+    m_originalFrameCropBottom = CropUnitY * m_sps.frame_crop_bottom_offset;
 
     //--m_sps.pic_height_in_map_units;
 #ifdef DROP_SMALL_SECOND_SLICE
