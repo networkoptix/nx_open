@@ -449,20 +449,27 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
     bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_AlwaysHigh;
  
     // 1. check packet in GOP keeper
-    QnVideoCamera* camera = qnCameraPool->getVideoCamera(getResource());
-    if (camera) {
-        if (dataType == QnAbstractMediaData::VIDEO)
-            rez =  camera->getLastVideoFrame(isHQ);
-        else
-            rez = camera->getLastAudioFrame(isHQ);
-        if (rez)
-            return rez;
+    // Do not check audio for live point if not proprietary client
+    bool canCheckLive = (dataType == QnAbstractMediaData::VIDEO) || (d->startTime == DATETIME_NOW);
+    if (canCheckLive)
+    {
+        QnVideoCamera* camera = qnCameraPool->getVideoCamera(getResource());
+        if (camera) {
+            if (dataType == QnAbstractMediaData::VIDEO)
+                rez =  camera->getLastVideoFrame(isHQ);
+            else
+                rez = camera->getLastAudioFrame(isHQ);
+            if (rez)
+                return rez;
+        }
     }
 
     // 2. find packet inside archive
     QnServerArchiveDelegate archive;
     if (!archive.open(getResource()))
         return rez;
+    if (d->startTime != DATETIME_NOW)
+        archive.seek(d->startTime, true);
     if (archive.getAudioLayout()->numberOfChannels() == 0 && dataType == QnAbstractMediaData::AUDIO)
         return rez;
 
@@ -531,6 +538,9 @@ int QnRtspConnectionProcessor::composeDescribe()
                     encoder->setMediaData(media);
                 else
                     qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
+            }
+            else if (i >= numVideo) {
+                continue; // if audio is not found do not report error. just skip track
             }
         }
         if (encoder == 0)
