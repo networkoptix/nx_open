@@ -81,7 +81,8 @@ typedef QSharedPointer<QnVideoTranscoder> QnVideoTranscoderPtr;
 class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
-    QnAudioTranscoder(CodecID codecId);
+    QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
+    virtual void open(QnCompressedAudioDataPtr video) {}
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 

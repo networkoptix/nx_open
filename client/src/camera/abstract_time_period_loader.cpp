@@ -1,6 +1,6 @@
 #include "abstract_time_period_loader.h"
 
-#include <utils/common/common_meta_types.h>
+#include <common/common_meta_types.h>
 
 QnAbstractTimePeriodLoader::QnAbstractTimePeriodLoader(QnResourcePtr resource, QObject *parent): 
     QObject(parent),

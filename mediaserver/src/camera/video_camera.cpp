@@ -273,10 +273,11 @@ QnCompressedVideoDataPtr QnVideoCamera::getLastVideoFrame(bool primaryLiveStream
 
 QnCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(bool primaryLiveStream)
 {
-    if (primaryLiveStream)
-        return m_primaryGopKeeper->getLastAudioFrame();
+    QnVideoCameraGopKeeper* gopKeeper = primaryLiveStream ? m_primaryGopKeeper : m_secondaryGopKeeper;
+    if (gopKeeper)
+        return gopKeeper->getLastAudioFrame();
     else
-        return m_secondaryGopKeeper->getLastAudioFrame();
+        return QnCompressedAudioDataPtr();
 }
 
 void QnVideoCamera::inUse(void* user)
