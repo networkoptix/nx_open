@@ -55,7 +55,7 @@ void QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
-    m_encoderCtx->bit_rate = m_encoderCtx->sample_rate * m_encoderCtx->channels;
+    m_encoderCtx->bit_rate = 64000 * m_encoderCtx->channels;
 
     //m_encoderCtx->channels = 2;
     //m_encoderCtx->sample_rate = 44100;
