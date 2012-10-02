@@ -30,6 +30,7 @@ public:
     virtual QString getName() override;
 
     virtual bool isRtpHeaderExists() const override { return true; }
+    virtual void setBaseTime(qint64 value) override;
 private:
     QnByteArray m_outputBuffer;
     int m_outputPos;

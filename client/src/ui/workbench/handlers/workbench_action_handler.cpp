@@ -889,8 +889,10 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
         return;
 
     if (layout->flags() & QnResource::local) {
+        if (!validateItemTypes(layout))
+            return;
         m_exportPeriod = layout->getLocalRange();
-        saveLayoutToLocalFile(layout, layout->getUrl(), QString()); // override layout
+        saveLayoutToLocalFile(layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
     }
     else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -912,24 +914,25 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!user)
         return;
 
-    QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
-    if(name.isEmpty()) {
-        QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
-        dialog->setWindowTitle(tr("Save Layout As"));
-        dialog->setText(tr("Enter layout name:"));
-        dialog->setName(layout->getName());
-        dialog->exec();
-        if(dialog->clickedButton() != QDialogButtonBox::Save)
-            return;
-        name = dialog->name();
-    }
-
-    QnLayoutResourcePtr newLayout;
-    if(snapshotManager()->isLocal(layout) && !snapshotManager()->isBeingSaved(layout)) {
+    if(snapshotManager()->isLocal(layout)  /*`&& !snapshotManager()->isBeingSaved(layout) */ ) {
         /* Local layout that is not being saved should not be copied. */
-        newLayout = layout;
-        newLayout->setName(name);
+        m_exportPeriod = layout->getLocalRange();
+        doAskNameAndExportLocalLayout(layout, LayoutExport_LocalSaveAs);
     } else {
+        QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
+        if(name.isEmpty()) {
+            QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Save | QDialogButtonBox::Cancel, widget()));
+            dialog->setWindowTitle(tr("Save Layout As"));
+            dialog->setText(tr("Enter layout name:"));
+            dialog->setName(layout->getName());
+            dialog->exec();
+            if(dialog->clickedButton() != QDialogButtonBox::Save)
+                return;
+            name = dialog->name();
+        }
+
+        QnLayoutResourcePtr newLayout;
+
         newLayout = QnLayoutResourcePtr(new QnLayoutResource());
         newLayout->setGuid(QUuid::createUuid());
         newLayout->setName(name);
@@ -951,9 +954,9 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
 
             snapshotManager()->restore(layout);
         }
-    }
 
-    snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+        snapshotManager()->save(newLayout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    }
 }
 
 void QnWorkbenchActionHandler::at_saveLayoutForCurrentUserAsAction_triggered() {
@@ -1888,6 +1891,50 @@ Do you want to continue?"),
             return;
     }
 
+    doAskNameAndExportLocalLayout(layout, LayoutExport_Export);
+}
+
+bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
+{
+    bool nonUtcExists = false;
+    bool utcExists = false;
+
+    QnLayoutItemDataMap items = layout->getItems();
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        QnLayoutItemData& item = itr.value();
+        QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
+        if (layoutItemRes) {
+            if (layoutItemRes->hasFlags(QnResource::utc))
+                utcExists = true;
+            else
+                nonUtcExists = true;
+        }
+    }
+    if (nonUtcExists && utcExists) {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't create local layout"), 
+            tr("Current layout has several cameras and several local files. You have to keep only cameras or only local files"), 
+            QMessageBox::Ok
+            );
+        return false;
+    }
+    return true;
+}
+
+bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
+{
+    if (!validateItemTypes(layout))
+        return false;
+
+    QString dialogName;
+    if (mode == LayoutExport_LocalSaveAs)
+        dialogName = tr("Save local layout As...");
+    else if (mode == LayoutExport_Export)
+        dialogName = tr("Export Layout As...");
+    else
+        return false; // not used
 
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
@@ -1900,20 +1947,25 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
+    QString binaryFilterName;
+    if (sizeof(char*) == 4)
+        binaryFilterName = tr("x86 executable network optix media file(*.exe)");
+    else
+        binaryFilterName = tr("x64 executable network optix media file(*.exe)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
-            tr("Export Layout As..."),
+            dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network optix media file (*.nov);;Executable network optix media file(*.exe)"),
+            tr("Network optix media file (*.nov);;")+ binaryFilterName,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
-            return;
+            return false;
 
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
@@ -1927,7 +1979,7 @@ Do you want to continue?"),
                     );
 
                 if(button == QMessageBox::Cancel || button == QMessageBox::No)
-                    return;
+                    return false;
             }
         }
 
@@ -1945,21 +1997,36 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    saveLayoutToLocalFile(layout, fileName, tr("Export successfully finished"));
+    QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
+    if (!existingLayout)
+        existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+    if (existingLayout) {
+        QnLayoutItemDataMap items = existingLayout->getItems();
+        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            QnLayoutItemData& item = itr.value();
+            QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+            if (layoutRes)
+                qnResPool->removeResource(layoutRes);
+        }
+        qnResPool->removeResource(existingLayout);
+    }
+
+
+    saveLayoutToLocalFile(layout, fileName, mode);
+
+    return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, const QString& eofMessage)
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
 {
-    m_layoutExportMessage = eofMessage;
-    QString fileName = layoutFileName;
-    if (fileName == layout->getUrl()) {
+    m_layoutExportMode = mode;
+    m_layoutFileName = QnLayoutFileStorageResource::removeProtocolPrefix(layoutFileName); 
+    QString fileName = m_layoutFileName;
+    if (fileName == QnLayoutFileStorageResource::removeProtocolPrefix(layout->getUrl())) {
         // can not override opened layout. save to tmp file, then rename
         fileName += QLatin1String(".tmp");
     }
-
-    //QnLayoutFileStorageResource layoutStorage;
-    //layoutStorage.setUrl(fileName);
-    m_layoutFileName = fileName;
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
     exportProgressDialog = new QProgressDialog(this->widget());
@@ -1975,29 +2042,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
-    m_layoutExportResources.clear();
-    QSet<QString> uniqIdList;
-    QnLayoutItemDataMap items = layout->getItems();
-    for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        (*itr).uuid = QUuid();
-        QnResourcePtr resource = qnResPool->getResourceById((*itr).resource.id);
-        if (resource == 0)
-            resource = qnResPool->getResourceByUniqId((*itr).resource.path);
-        if (resource)
-        {
-            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
-            if (mediaRes) {
-                (*itr).resource.id = 0;
-                if (!uniqIdList.contains(mediaRes->getUniqueId())) {
-                    m_layoutExportResources << mediaRes;
-                    uniqIdList << mediaRes->getUniqueId();
-                }
-            }
-        }
-    }
-
-    if (layoutFileName.endsWith(QLatin1String(".exe")))
+    if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
         {
@@ -2013,14 +2058,43 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     else {
         QFile::remove(fileName);
     }
-    fileName = QLatin1String("layout://") + fileName;
 
-    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileName));
-    m_exportStorage->setUrl(fileName);
+    QString fullName = QLatin1String("layout://") + fileName;
+    m_exportStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fullName));
+    m_exportStorage->setUrl(fullName);
+
+    QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
+    QTextStream itemNames(itemNamesIO);
+
+    m_layoutExportResources.clear();
+    QSet<QString> uniqIdList;
+    QnLayoutItemDataMap items = layout->getItems();
+    for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        (*itr).uuid = QUuid();
+        QnResourcePtr resource = qnResPool->getResourceById((*itr).resource.id);
+        if (resource == 0)
+            resource = qnResPool->getResourceByUniqId((*itr).resource.path);
+        if (resource)
+        {
+            itemNames << resource->getName() << QLatin1String("\n");
+            QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
+            if (mediaRes) {
+                (*itr).resource.id = 0;
+                if (!uniqIdList.contains(mediaRes->getUniqueId())) {
+                    m_layoutExportResources << mediaRes;
+                    uniqIdList << mediaRes->getUniqueId();
+                }
+            }
+        }
+    }
+    itemNames.flush();
+    delete itemNamesIO;
+
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
     {
-        at_cameraCamera_exportFailed(fileName);
+        at_cameraCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
         return;
     }
 
@@ -2034,20 +2108,25 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     device->write(m_exportPeriod.serialize());
     delete device;
 
+    // If current layout is database based layout generate new GUID, otherwise keep current local GUID
+    QString uuid = (layout->flags() & QnResource::local) ? layout->getGuid() : QUuid::createUuid().toString();
     device = m_exportStorage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
-    device->write(QUuid::createUuid().toString().toUtf8());
+    device->write(uuid.toUtf8());
     delete device;
 
     for (int i = 0; i < m_layoutExportResources.size(); ++i)
     {
         QString uniqId = m_layoutExportResources[i]->getUniqueId();
         uniqId = uniqId.mid(uniqId.lastIndexOf(L'?') + 1);
-        QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
-        QnTimePeriodList periods = navigator()->loader(m_layoutExportResources[i])->periods(Qn::RecordingRole).intersected(m_exportPeriod);
-        QByteArray data;
-        periods.encode(data);
-        device->write(data);
-        delete device;
+        QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
+        if (loader) {
+            QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
+            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(m_exportPeriod);
+            QByteArray data;
+            periods.encode(data);
+            device->write(data);
+            delete device;
+        }
     }
 
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
@@ -2067,6 +2146,31 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         fileName.chop(4);
         QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
+        snapshotManager()->store(layout);
+    }
+    else if (m_layoutExportMode == LayoutExport_LocalSaveAs) 
+    {
+        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
+        QString oldUrl = layout->getUrl();
+        QString newUrl = m_exportStorage->getUrl();
+
+        QnLayoutItemDataMap items = layout->getItems();
+        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+        {
+            QnLayoutItemData& item = itr.value();
+            QnAviResourcePtr aviRes = qnResPool->getResourceByUniqId(item.resource.path).dynamicCast<QnAviResource>();
+            if (aviRes)
+                qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
+        }
+        layout->setUrl(newUrl);
+
+
+        layout->setName(QFileInfo(newUrl).fileName());
+
+        QnLayoutFileStorageResourcePtr novStorage = m_exportStorage.dynamicCast<QnLayoutFileStorageResource>();
+        if (novStorage)
+            novStorage->switchToFile(oldUrl, newUrl, false);
+        snapshotManager()->store(layout);
     }
     else {
         QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
@@ -2077,8 +2181,8 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     }
     m_exportStorage.clear();
 
-    if (!m_layoutExportMessage.isEmpty())
-        QMessageBox::information(widget(), tr("Export finished"), m_layoutExportMessage, QMessageBox::Ok);
+    if (m_layoutExportMode == LayoutExport_Export)
+        QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
 }
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
@@ -2094,7 +2198,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
                 m_motionFileBuffer[i]->close();
                 
                 QString uniqId = m_exportedMediaRes->getUniqueId();
-                uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
+                uniqId = QFileInfo(uniqId.mid(uniqId.indexOf(L'?')+1)).baseName(); // simplify name if export from existing layout
                 QString motionFileName = QString(QLatin1String("motion%1_%2.bin")).arg(i).arg(uniqId);
                 QIODevice* device = m_exportStorage->open(motionFileName , QIODevice::WriteOnly);
                 device->write(m_motionFileBuffer[i]->buffer());
@@ -2121,7 +2225,10 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
         QString uniqId = m_exportedMediaRes->getUniqueId();
         uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
-        QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
+        //QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
+        QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
+        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
+            role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, role);
 
         if(m_exportProgressDialog)

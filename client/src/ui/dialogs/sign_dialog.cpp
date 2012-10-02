@@ -67,10 +67,9 @@ private:
 
 // ------------------------------------
 
-SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
+SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     QDialog(parent, Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint),
     ui(new Ui::SignDialog),
-    m_fileName(fileName),
     m_camDispay(NULL),
     m_reader(NULL),
     m_renderer(NULL),
@@ -89,7 +88,7 @@ SignDialog::SignDialog(const QString& fileName, QWidget *parent) :
     m_glWindow = new QnSignDialogGlWidget(glFormat);
     layout->addWidget(m_glWindow);
 
-    m_resource = QnAviResourcePtr(new QnAviResource(m_fileName));
+    m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
     m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
     m_reader->setCycleMode(false);
     m_camDispay = new QnSignDialogDisplay();

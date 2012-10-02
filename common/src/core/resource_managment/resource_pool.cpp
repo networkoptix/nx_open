@@ -4,7 +4,7 @@
 
 #include "utils/common/warnings.h"
 #include "utils/common/checked_cast.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
@@ -306,6 +306,16 @@ QnResourcePtr QnResourcePool::getResourceByUniqId(const QString &id) const
     QMutexLocker locker(&m_resourcesMtx);
     QHash<QString, QnResourcePtr>::const_iterator itr = m_resources.find(id);
     return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
+}
+
+void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
+{
+    QMutexLocker locker(&m_resourcesMtx);
+    QHash<QString, QnResourcePtr>::iterator itr = m_resources.find(res->getUniqueId());
+    if (itr != m_resources.end())
+        m_resources.erase(itr);
+    res->setUniqId(newUniqId);
+    m_resources.insert(newUniqId, res);
 }
 
 bool QnResourcePool::hasSuchResouce(const QString &uniqid) const

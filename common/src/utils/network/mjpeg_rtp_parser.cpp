@@ -344,7 +344,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
 
     //1. jpeg main header
 
-    /*int typeSpecific = */ *curPtr++;
+    int typeSpecific = *curPtr++;
+    Q_UNUSED(typeSpecific)
     int fragmentOffset = (curPtr[0] << 16) + (curPtr[1] << 8) + curPtr[2];
     curPtr += 3;
     int jpegType = *curPtr++;
@@ -375,7 +376,8 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         {
             if (bytesLeft < 4)
                 return false;
-            /*quint8 MBZ =*/ *curPtr++;
+            quint8 MBZ = *curPtr++;
+            Q_UNUSED(MBZ)
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;
@@ -459,7 +461,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         m_videoData = QnCompressedVideoDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
         m_videoData->data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
         //m_videoData->data.write(m_frameData);
-        for (int i = 0; i < m_chunks.size(); ++i) 
+        for (uint i = 0; i < m_chunks.size(); ++i)
             m_videoData->data.uncheckedWrite((const char*) rtpBufferBase + m_chunks[i].bufferOffset, m_chunks[i].len);
         if (needAddMarker)
             m_videoData->data.uncheckedWrite((const char*) jpeg_end, sizeof(jpeg_end));

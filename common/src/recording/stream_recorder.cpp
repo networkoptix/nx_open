@@ -281,7 +281,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_packetWrited = true;
         if (m_needCalcSignature) 
         {
-            AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
+            AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
         }
@@ -359,6 +359,13 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             }
 
             AVCodecContext* videoCodecCtx = videoStream->codec;
+            videoCodecCtx->codec_id = mediaData->compressionType;
+            videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
+            if (mediaData->compressionType == CODEC_ID_MJPEG)
+                videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
+            else
+                videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
+
 
             // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
             // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
@@ -368,25 +375,27 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 AVCodecContext* srcContext = mediaData->context->ctx();
                 avcodec_copy_context(videoCodecCtx, srcContext);
             }
-            else if (m_role == Role_FileExport)
+            else if (m_role == Role_FileExport || m_role == Role_FileExportWithEmptyContext)
             {
                 // determine real width and height
                 CLVideoDecoderOutput outFrame;
                 CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
-                avcodec_copy_context(videoStream->codec, decoder.getContext());
+                if (m_role == Role_FileExport) {
+                    avcodec_copy_context(videoStream->codec, decoder.getContext());
+                }
+                else {
+                    videoCodecCtx->width = decoder.getWidth();
+                    videoCodecCtx->height = decoder.getHeight();
+                }
             }
             else {
-                videoCodecCtx->codec_id = mediaData->compressionType;
-                videoCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
                 videoCodecCtx->width = qMax(8,mediaData->width);
                 videoCodecCtx->height = qMax(8,mediaData->height);
-                
-                if (mediaData->compressionType == CODEC_ID_MJPEG)
-                    videoCodecCtx->pix_fmt = PIX_FMT_YUVJ420P;
-                else
-                    videoCodecCtx->pix_fmt = PIX_FMT_YUV420P;
             }
+            if (m_needCalcSignature)
+                m_firstIFrame = mediaData;
+
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
             AVRational defaultFrameRate = {1, 60};
@@ -533,7 +542,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
     signHelper.setSign(getSignature());
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec);
+    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_firstIFrame);
 
     if (generatedFrame == 0)
     {

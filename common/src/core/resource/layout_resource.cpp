@@ -4,7 +4,7 @@
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_pool.h"
-#include "utils/common/common_meta_types.h"
+#include "common/common_meta_types.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
@@ -44,6 +44,28 @@ QnLayoutItemDataMap QnLayoutResource::getItems() const {
     QMutexLocker locker(&m_mutex);
 
     return m_itemByUuid;
+}
+
+static QString removeProtocolPrefix(const QString& url)
+{
+    int prefix = url.indexOf(QLatin1String("://"));
+    return prefix == -1 ? url : url.mid(prefix + 3);
+}
+
+void QnLayoutResource::setUrl(const QString& value)
+{
+    QString oldValue = removeProtocolPrefix(getUrl());
+    QnResource::setUrl(value);
+    QString newValue = removeProtocolPrefix(getUrl());
+    if (!oldValue.isEmpty() && oldValue != newValue)
+    {
+        // Local layout renamed
+        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
+        {
+            QnLayoutItemData& item = itr.value();
+            item.resource.path = updateNovParent(value, item.resource.path);
+        }
+    }
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
@@ -184,6 +206,15 @@ void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
     m_localRange = value;
 }
 
+QString QnLayoutResource::updateNovParent(const QString& novName, const QString& itemName)
+{
+    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
+    QString normNovName = novName;
+    if (!normNovName.startsWith(QLatin1String("layout://")))
+        normNovName = QLatin1String("layout://") + normNovName;
+    return normNovName + QLatin1String("?") + normItemName;
+}
+
 QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 {
     QnLayoutResourcePtr layout;
@@ -203,6 +234,20 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         return layout;
     }
 
+    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
+    if (uuidFile)
+    {
+        QByteArray data = uuidFile->readAll();
+        delete uuidFile;
+        layout->setGuid(QUuid(data.data()));
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            return existingLayout;
+    }
+    else {
+        layout->setGuid(QUuid::createUuid());
+    }
+
     QIODevice* rangeFile = layoutStorage.open(QLatin1String("range.bin"), QIODevice::ReadOnly);
     if (rangeFile)
     {
@@ -211,21 +256,6 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
-    QIODevice* uuidFile = layoutStorage.open(QLatin1String("uuid.bin"), QIODevice::ReadOnly);
-    if (uuidFile)
-    {
-        QByteArray data = uuidFile->readAll();
-        delete uuidFile;
-        layout->setLocalRange(QnTimePeriod().deserialize(data));
-        layout->setGuid(QUuid(data.data())); // TODO: #VASILENKO WTF? Deserializing two different values from the same byte array?
-
-        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByGuid(layout->getGuid()).dynamicCast<QnLayoutResource>();
-        if (existingLayout)
-            return existingLayout;
-    }
-    else {
-        layout->setGuid(QUuid::createUuid());
-    }
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
     layout->setName(QFileInfo(xfile).fileName());
@@ -236,6 +266,9 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     QnLayoutItemDataMap items = layout->getItems();
     QnLayoutItemDataMap updatedItems;
 
+    QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
+    QTextStream itemNames(itemNamesIO);
+
     // todo: here is bad place to add resources to pool. need rafactor
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
@@ -245,20 +278,24 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         item.resource.id = QnId::generateSpecialId();
         if (!path.endsWith(QLatin1String(".mkv")))
             item.resource.path += QLatin1String(".mkv");
+        item.resource.path = updateNovParent(xfile,item.resource.path);
         updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-        storage->setUrl(QLatin1String("layout://") + xfile);
+        storage->setUrl(xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->setStorage(storage);
         aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+        QString itemName(itemNames.readLine());
+        if (!itemName.isEmpty())
+            aviResource->setName(itemName);
 
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
         {
-            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(path), QIODevice::ReadOnly);
+            QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(path).baseName()), QIODevice::ReadOnly);
             if (motionIO) {
                 Q_ASSERT(motionIO->size() % sizeof(QnMetaDataV1Light) == 0);
                 QnMetaDataLightVector motionData;
@@ -268,7 +305,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
                     motionIO->read((char*) &motionData[0], motionIO->size());
                 }
                 delete motionIO;
-                for (int i = 0; i < motionData.size(); ++i)
+                for (uint i = 0; i < motionData.size(); ++i)
                     motionData[i].doMarshalling();
                 if (!motionData.empty())
                     aviResource->setMotionBuffer(motionData, channel);
@@ -277,6 +314,7 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
 
         qnResPool->addResource(aviResource);
     }
+    delete itemNamesIO;
     layout->setItems(updatedItems);
     layout->addFlags(QnResource::local_media);
     return layout;

@@ -649,6 +649,9 @@ void QnGLRenderer::drawVideoTextureDirectly(
         1, 0.0f,
         1, 1,
         0.0f, 1
+//        (float)tex0->texCoords().x(), 0.0f,
+//        (float)tex0->texCoords().x(), (float)tex0->texCoords().y(),
+//        0.0f, (float)tex0->texCoords().y()
     };
 
     glEnable(GL_TEXTURE_2D);
@@ -728,7 +731,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
         m_videoWidth = m_curImg->width;
         m_videoHeight = m_curImg->height;
         updateTexture();
-        if (m_curImg->pkt_dts != AV_NOPTS_VALUE)
+        if (quint64(m_curImg->pkt_dts) != AV_NOPTS_VALUE)
             m_lastDisplayedTime = m_curImg->pkt_dts;
         m_lastDisplayedMetadata[m_curImg->channel] = m_curImg->metadata;
         m_lastDisplayedFlags = m_curImg->flags;

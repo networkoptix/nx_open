@@ -17,7 +17,7 @@ class QnSignHelper
 public:
     QnSignHelper();
     void setLogo(QPixmap logo);
-    QnCompressedVideoDataPtr createSgnatureFrame(AVCodecContext* srcCodec);
+    QnCompressedVideoDataPtr createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
     QByteArray getSign(const AVFrame* frame, int signLen);
     void setSign(const QByteArray& sign);
     void draw(QImage& img, bool drawText);
@@ -31,9 +31,9 @@ public:
 
 private:
     void drawOnSignFrame(AVFrame* frame);
-    void extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
-    QString fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* avctx);
-    int correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
+    void extractSpsPpsFromPrivData(const quint8* buffer, int bufferSize, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady);
+    QString fillH264EncoderParams(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* avctx);
+    int correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* videoCodecCtx, quint8* videoBuf, int out_size, int videoBufSize);
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);

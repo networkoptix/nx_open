@@ -106,6 +106,8 @@ public:
                     result.description += QLatin1String("mono");
                 else
                     result.description += QString::number(codecContext->channels);
+
+                break;
             }
         }
         return result;
@@ -364,8 +366,9 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
-                        if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+                        if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
                             m_resource->addFlags(QnResource::utc | QnResource::periods | QnResource::motion); // use sync for exported layout only
+                        }
                     }
                 }
             }

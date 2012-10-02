@@ -189,6 +189,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
             emit recordingFailed(tr("Invalid resource type for data export."));
             return;
         }
+        m_exportReader->setCycleMode(false);
 
         m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);

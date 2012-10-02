@@ -156,7 +156,7 @@ QList<QnPlatformMonitor::HddLoad> QnSigarMonitor::totalHddLoad() {
     if(INVOKE(sigar_file_system_list_get(d->sigar, &fileSystems)) != SIGAR_OK)
         return result;
 
-    for(int i = 0; i < fileSystems.number; i++) {
+    for(uint i = 0; i < fileSystems.number; i++) {
         const sigar_file_system_t &fileSystem = fileSystems.data[i];
         if(fileSystem.type != SIGAR_FSTYPE_LOCAL_DISK)
             continue; /* Skip non-hdds. */

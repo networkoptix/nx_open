@@ -23,7 +23,9 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
     QnLayoutFileStorageResourcePtr storage = localFile->getStorage().dynamicCast<QnLayoutFileStorageResource>();
     if (!storage)
         return 0;
-    QFileInfo fi(resource->getName());
+    QString url = resource->getUrl();
+    url = url.mid(url.lastIndexOf(L'?')+1);
+    QFileInfo fi(url);
     QIODevice* chunkData = storage->open(QString(QLatin1String("chunk_%1.bin")).arg(fi.baseName()), QIODevice::ReadOnly);
     if (!chunkData)
         return 0;
@@ -37,6 +39,7 @@ QnLayoutFileTimePeriodLoader* QnLayoutFileTimePeriodLoader::newInstance(QnResour
 
 int QnLayoutFileTimePeriodLoader::loadChunks(const QnTimePeriod &period)
 {
+    Q_UNUSED(period)
     ++m_handle;
     emit delayedReady(m_chunks, m_handle);
     return m_handle;
@@ -50,8 +53,8 @@ int QnLayoutFileTimePeriodLoader::loadMotion(const QnTimePeriod &period, const Q
         QnMetaDataV1::createMask(motionRegions[i], masks.last());
     }
 
-    QnMetaDataV1Light startTime;
-    QnMetaDataV1Light endTime;
+    //QnMetaDataV1Light startTime;
+    //QnMetaDataV1Light endTime;
 
     QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
     if (!aviRes)

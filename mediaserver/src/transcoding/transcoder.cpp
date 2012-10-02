@@ -2,6 +2,7 @@
 #include "ffmpeg_transcoder.h"
 #include "core/resource/media_resource.h"
 #include "ffmpeg_video_transcoder.h"
+#include "ffmpeg_audio_transcoder.h"
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId):
@@ -110,6 +111,7 @@ int QnTranscoder::suggestBitrate(QSize resolution) const
 
 int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSize& resolution, int bitrate, const QnCodecTranscoder::Params& params)
 {
+    Q_UNUSED(params)
     if (bitrate == -1) {
         //bitrate = resolution.width() * resolution.height() * 5;
         bitrate = suggestBitrate(resolution);
@@ -143,10 +145,26 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
 
 bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
 {
-    m_aTranscoder = QnAudioTranscoderPtr();
+    Q_UNUSED(method);
     m_audioCodec = codec;
-    m_lastErrMessage = "Audio transcoding is not implemented";
-    return false;
+    switch (method)
+    {
+        case TM_DirectStreamCopy:
+            m_aTranscoder = QnAudioTranscoderPtr();
+            break;
+        case TM_FfmpegTranscode:
+            m_aTranscoder = QnAudioTranscoderPtr(new QnFfmpegAudioTranscoder(codec));
+            break;
+            /*
+        case TM_QuickSyncTranscode:
+            m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
+            */
+            break;
+        case TM_OpenCLTranscode:
+            m_lastErrMessage = "OpenCLTranscode is not implemented";
+            return -1;
+    }
+    return m_lastErrMessage.isEmpty();
 }
 
 int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& result)
@@ -165,7 +183,7 @@ int QnTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnByteArray& res
 
     m_eofCounter = 0;
 
-    if (m_firstTime == AV_NOPTS_VALUE)
+    if ((quint64)m_firstTime == AV_NOPTS_VALUE)
         m_firstTime = media->timestamp;
 
     if (!m_initialized)

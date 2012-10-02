@@ -37,6 +37,7 @@ public:
     virtual void beforeChangeReverseMode(bool reverseMode);
     virtual bool setQuality(MediaQuality quality, bool fastSwitch) override;
     virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    virtual void setSendMotion(bool value) override;
 protected:
     friend class QnArchiveSyncPlayWrapper;
     //void setPrebuffering(bool value);

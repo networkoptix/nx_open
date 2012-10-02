@@ -21,7 +21,8 @@ protected:
     void finilizeSign();
 private:
     QnCryptographicHash m_mdctx;
-    QnCompressedVideoDataPtr m_prevFrame;
+    QnAbstractMediaDataPtr m_prevFrame;
+    QnCompressedVideoDataPtr m_lastKeyFrame;
     bool m_eofProcessed;
     qint64 m_lastDisplayTime;
     qint64 m_lastDisplayTime2;

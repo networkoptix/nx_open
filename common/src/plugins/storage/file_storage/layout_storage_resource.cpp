@@ -8,10 +8,10 @@ class QnLayoutFile: public QIODevice
 public:
     QnLayoutFile(QnLayoutFileStorageResource& storageResource, const QString& fileName):
         m_file(QnLayoutFileStorageResource::removeProtocolPrefix(storageResource.getUrl())),
+        m_mutex(QMutex::Recursive),
         m_storageResource(storageResource),
         m_fileOffset(0),
         m_fileSize(0),
-        m_mutex(QMutex::Recursive),
         m_storedPosition(0),
         m_openMode(QIODevice::NotOpen)
     {
@@ -26,7 +26,9 @@ public:
     virtual bool seek(qint64 offset) override
     {
         QMutexLocker lock(&m_mutex);
-        return m_file.seek(offset + m_fileOffset);
+        int rez = m_file.seek(offset + m_fileOffset);
+        QIODevice::seek(offset);
+        return rez;
     }
 
     virtual qint64 size() const
@@ -78,7 +80,7 @@ public:
                 return false;
             openMode |= QIODevice::Append;
         }
-
+        m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
         if (!m_file.open(openMode))
             return false;
         m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
@@ -181,7 +183,8 @@ void QnLayoutFileStorageResource::restoreOpenedFiles()
     }
 }
 
-QnLayoutFileStorageResource::QnLayoutFileStorageResource()
+QnLayoutFileStorageResource::QnLayoutFileStorageResource():
+    m_fileSync(QMutex::Recursive)
 {
     QMutexLocker lock(&m_storageSync);
     m_novFileOffset = 0;
@@ -209,26 +212,45 @@ bool QnLayoutFileStorageResource::removeFile(const QString& url)
 
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
 {
+    return switchToFile(oldName, newName, true);
+}
+
+bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
+{
     QMutexLocker lock(&m_storageSync);
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        if (storage->getUrl() == newName)
+        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        if (storageUrl == removeProtocolPrefix(newName) || storageUrl == removeProtocolPrefix(oldName))
             storage->closeOpenedFiles();
     }
-    QFile::remove(removeProtocolPrefix(newName));
-    bool rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+
+    bool rez;
+    if (dataInOldFile) {
+        QFile::remove(removeProtocolPrefix(newName));
+        rez = QFile::rename(removeProtocolPrefix(oldName), removeProtocolPrefix(newName));
+    }
+    else {
+        QFile::remove(removeProtocolPrefix(oldName));
+    }
+
     for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
     {
         QnLayoutFileStorageResource* storage = *itr;
-        if (storage->getUrl() == newName)
+        QString storageUrl = removeProtocolPrefix(storage->getUrl());
+        storage->setUrl(newName); // update binary offsetvalue
+        if (storageUrl == removeProtocolPrefix(newName))
             storage->restoreOpenedFiles();
+        else if (storageUrl == removeProtocolPrefix(oldName)) {
+            storage->setUrl(newName);
+            storage->restoreOpenedFiles();
+        }
     }
     if (rez)
         setUrl(newName);
     return rez;
 }
-
 
 bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {
@@ -332,8 +354,6 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
     QMutexLocker lock(&m_fileSync);
 
     QString fileName = srcFileName.mid(srcFileName.lastIndexOf(L'?')+1);
-    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
-        return false;
 
     QFile file(removeProtocolPrefix(getUrl()));
     qint64 fileSize = file.size() -  getPostfixSize();
@@ -341,6 +361,9 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
         readIndexHeader();
     else
         fileSize = sizeof(m_index);
+
+    if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
+        return false;
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
 

@@ -210,7 +210,7 @@ bool QnArchiveStreamReader::init()
     {
         while (1)
         {
-            bool seekOk = m_delegate->seek(requiredJumpTime, false) >= 0;
+            bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
@@ -714,8 +714,9 @@ begin_label:
         {
             if (!exactJumpToSpecifiedFrame && channelCount > 1)
                 setNeedKeyData();
-            jumpTo(newTime, newTime);
-            m_BOF = true;
+            internalJumpTo(newTime);
+            setSkipFramesToTime(newTime, true);
+            m_eof = true;
             goto begin_label;
         }
     }

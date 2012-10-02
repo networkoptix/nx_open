@@ -17,6 +17,11 @@ QString QnAbstractArchiveResource::getUniqueId() const
     return getUrl();
 }
 
+void QnAbstractArchiveResource::setUniqId(const QString& value)
+{
+    setUrl(value);
+}
+
 
 void QnAbstractArchiveResource::setStatus(QnResource::Status /*newStatus*/, bool silenceMode)
 {

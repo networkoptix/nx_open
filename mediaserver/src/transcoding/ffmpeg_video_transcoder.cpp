@@ -26,6 +26,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
         avcodec_close(m_encoderCtx);
         av_free(m_encoderCtx);
     }
+
+    delete m_videoDecoder;
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
@@ -97,6 +99,10 @@ void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
 {
+    result.clear();
+    if (!media)
+        return 0;
+
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
@@ -114,7 +120,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
         if (m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
-        decodedFrame->pts -= m_firstEncodedPts;
+        //decodedFrame->pts -= m_firstEncodedPts;
 
 
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);

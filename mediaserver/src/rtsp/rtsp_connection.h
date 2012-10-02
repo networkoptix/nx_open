@@ -13,7 +13,7 @@ class QnAbstractStreamDataProvider;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(0), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
+    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
     {
 
     }
@@ -38,12 +38,11 @@ struct RtspServerTrackInfo
 
     int clientPort;
     int clientRtcpPort;
+    quint16 sequence;
+    qint64 firstRtpTime;
     UDPSocket* mediaSocket;
     UDPSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
-    quint16 sequence;
-    qint64 firstRtpTime;
-
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
@@ -104,7 +103,7 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media);
+    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution);
     QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();

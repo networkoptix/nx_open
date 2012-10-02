@@ -312,11 +312,11 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
     }
     if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
         displayedTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+    d->speed = value;
     qint64 et = expectedTime();
     int sign = d->speed >= 0 ? 1 : -1;
     if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS) 
         reinitTime(displayedTime);
-    d->speed = value;
 }
 
 qint64 QnArchiveSyncPlayWrapper::getNextTime() const

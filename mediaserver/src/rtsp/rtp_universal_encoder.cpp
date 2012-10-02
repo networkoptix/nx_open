@@ -37,7 +37,7 @@ static const struct
   {12, "QCELP",      AVMEDIA_TYPE_AUDIO,   CODEC_ID_QCELP, 8000, 1},
   {13, "CN",         AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
   {14, "MPA",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_MP2, -1, -1},
-  {14, "MPA",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_MP3, -1, -1},
+  {97, "mpa-robust",        AVMEDIA_TYPE_AUDIO,   CODEC_ID_MP3, -1, -1},
   {15, "G728",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 8000, 1},
   {16, "DVI4",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 11025, 1},
   {17, "DVI4",       AVMEDIA_TYPE_AUDIO,   CODEC_ID_NONE, 22050, 1},
@@ -599,8 +599,13 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
     m_transcoder.setContainer("rtp");
     m_transcoder.setPacketizedMode(true);
     m_codec = transcodeToCodec != CODEC_ID_NONE ? transcodeToCodec : media->compressionType;
-    QnTranscoder::TranscodeMethod method = transcodeToCodec != CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
+    QnTranscoder::TranscodeMethod method;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
+    if (m_isVideo)
+        method = transcodeToCodec != CODEC_ID_NONE ? QnTranscoder::TM_FfmpegTranscode : QnTranscoder::TM_DirectStreamCopy;
+    else
+        method = media->compressionType == transcodeToCodec ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode;
+
     if (media->dataType == QnAbstractMediaData::VIDEO)
         m_transcoder.setVideoCodec(m_codec, method, videoSize);
     else
@@ -614,9 +619,15 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
 QByteArray QnUniversalRtpEncoder::getAdditionSDP()
 {
     char buffer[1024*16];
+    memset(buffer, 0, sizeof(buffer));
     AVCodecContext* ctx = m_isVideo ? m_transcoder.getVideoCodecContext() : m_transcoder.getAudioCodecContext();
     sdp_write_media_attributes(buffer, sizeof(buffer), ctx, getPayloadtype(), m_transcoder.getFormatContext());
     return QByteArray(buffer);
+}
+
+void QnUniversalRtpEncoder::setBaseTime(qint64 value)
+{
+    m_transcoder.setBaseTime(value);
 }
 
 void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
@@ -642,12 +653,14 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
         return getNextPacket(sendBuffer); // skip RTCP packet
     }
     */
+    /*
     if (m_isFirstPacket)
     {
         m_isFirstPacket = false;
         m_firstTime = ntohl(rtpHeader->timestamp);
     }
     rtpHeader->timestamp = htonl(ntohl(rtpHeader->timestamp) - m_firstTime);
+    */
 
     sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[packetIndex]);
     m_outputPos += packets[packetIndex];
@@ -674,9 +687,18 @@ quint32 QnUniversalRtpEncoder::getFrequency()
 {
     for (int i = 0; AVRtpPayloadTypes[i].pt >= 0; ++i)
     {
-        if (AVRtpPayloadTypes[i].codec_id == m_codec)
+        if (AVRtpPayloadTypes[i].codec_id == m_codec && AVRtpPayloadTypes[i].clock_rate != -1)
             return AVRtpPayloadTypes[i].clock_rate;
     }
+    if (m_transcoder.getFormatContext())
+    {
+        //AVCodecContext* codecCtx =  m_transcoder.getFormatContext()->streams[0]->codec;
+        //if (codecCtx)
+        //    return codecCtx->time_base.den / codecCtx->time_base.num;
+        AVStream* stream = m_transcoder.getFormatContext()->streams[0];
+        return stream->time_base.den / stream->time_base.num;
+    }
+
     return 90000;
 }
 

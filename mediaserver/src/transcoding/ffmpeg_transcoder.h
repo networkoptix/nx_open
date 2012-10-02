@@ -23,6 +23,8 @@ public:
     AVFormatContext* getFormatContext() const { return m_formatCtx; }
 
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
+
+    void setBaseTime(qint64 value);
 protected:
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) override;
 private:
@@ -38,6 +40,7 @@ private:
    
     AVIOContext* m_ioContext;
     QString m_container;
+    qint64 m_baseTime;
 };
 
 #endif  // __FFMPEG_TRANSCODER_H

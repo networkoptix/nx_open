@@ -6,7 +6,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/checked_cast.h>
-#include <utils/common/common_meta_types.h>
+#include <common/common_meta_types.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>

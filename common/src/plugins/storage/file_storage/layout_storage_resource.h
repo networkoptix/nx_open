@@ -38,6 +38,7 @@ public:
     virtual qint64 getFreeSpace() override;
     virtual void setUrl(const QString& value) override;
 
+    bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
 public:
     static const int MAX_FILES_AT_LAYOUT = 256;
 
@@ -63,9 +64,8 @@ public:
     };
 #pragma pack(pop)
 
-private:
     static QString removeProtocolPrefix(const QString& url);
-
+private:
     bool addFileEntry(const QString& fileName);
     qint64 getFileOffset(const QString& fileName, qint64* fileSize);
     void readIndexHeader();

@@ -22,7 +22,7 @@ class SignDialog : public QDialog {
     Q_OBJECT;
 
 public:
-    explicit SignDialog(const QString& fileName, QWidget *parent = 0);
+    explicit SignDialog(QnResourcePtr resource, QWidget *parent = 0);
     virtual ~SignDialog();
 
     static QRect calcVideoRect(double windowWidth, double windowHeight, double textureWidth, double textureHeight);
@@ -42,7 +42,6 @@ private:
 
     QScopedPointer<Ui::SignDialog> ui;
     
-    QString m_fileName;
     QnAviResourcePtr m_resource;
 
     QnCamDisplay *m_camDispay;

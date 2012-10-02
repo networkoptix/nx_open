@@ -134,3 +134,8 @@ QnAbstractMotionArchiveConnectionPtr QnSyncPlayArchiveDelegate::getMotionConnect
 {
     return m_ownerDelegate->getMotionConnection(channel);
 }
+
+void QnSyncPlayArchiveDelegate::setSendMotion(bool value)
+{
+    m_ownerDelegate->setSendMotion(value);
+}
