@@ -38,6 +38,7 @@ private:
    
     AVIOContext* m_ioContext;
     QString m_container;
+    qint64 m_firstPacketTime[2];
 };
 
 #endif  // __FFMPEG_TRANSCODER_H

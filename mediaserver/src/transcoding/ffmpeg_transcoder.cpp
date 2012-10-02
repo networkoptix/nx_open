@@ -57,6 +57,7 @@ m_videoBitrate(0),
 m_formatCtx(0),
 m_ioContext(0)
 {
+    m_firstPacketTime[0] = m_firstPacketTime[1] = AV_NOPTS_VALUE;
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
@@ -290,7 +291,13 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
         }
         else {
             // direct stream copy
-            packet.pts = av_rescale_q(media->timestamp, srcRate, stream->time_base);
+            if (m_firstPacketTime[streamIndex] == AV_NOPTS_VALUE)
+            {
+                m_firstPacketTime[streamIndex] = media->timestamp;
+            }
+            qint64 mediaTimeStamp = media->timestamp - m_firstPacketTime[streamIndex];
+
+            packet.pts = av_rescale_q(mediaTimeStamp, srcRate, stream->time_base);
             packet.data = (quint8*) media->data.data();
             packet.size = media->data.size();
             if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
