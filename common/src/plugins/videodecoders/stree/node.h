@@ -74,7 +74,7 @@ namespace stree
 
         virtual ~ConditionNode()
         {
-            for( ConditionContainer::iterator
+            for( typename ConditionContainer::iterator
                 it = m_children.begin();
                 it != m_children.end();
                 )
@@ -91,8 +91,8 @@ namespace stree
             if( !in.get( m_matchResID, &value ) )
                 return;
 
-            const ConditionContainer::key_type& typedValue = value.value<ConditionContainer::key_type>();
-            ConditionContainer::const_iterator it = m_children.find( typedValue );
+            const typename ConditionContainer::key_type& typedValue = value.value<typename ConditionContainer::key_type>();
+            typename ConditionContainer::const_iterator it = m_children.find( typedValue );
             if( it == m_children.end() )
                 return;
 

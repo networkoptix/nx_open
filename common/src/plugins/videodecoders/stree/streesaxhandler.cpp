@@ -5,6 +5,7 @@
 #include "streesaxhandler.h"
 
 #include <map>
+#include <memory>
 
 #include "wildcardmatchcontainer.h"
 
