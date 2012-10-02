@@ -5,6 +5,8 @@
 #ifndef VIDEODECODERSWITCHER_H
 #define VIDEODECODERSWITCHER_H
 
+#include <memory>
+
 #include "../../decoders/video/abstractdecoder.h"
 
 
@@ -55,7 +57,7 @@ public:
     void switchToSoftwareDecoding();
 
 private:
-    QnAbstractVideoDecoder* m_decoder;
+    std::auto_ptr<QnAbstractVideoDecoder> m_decoder;
     //!Used to initialize new decoder object in case of decoder switching
     QnCompressedVideoDataPtr m_mediaSequenceHeader;
 };

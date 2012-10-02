@@ -204,7 +204,10 @@ class MFXDirect3DSurfaceAllocator
     public BaseMFXFrameAllocator
 {
 public:
-    MFXDirect3DSurfaceAllocator();
+    /*!
+        \param adapterNumber Graphics adapter to use (to create D3D device on). By default, default adapter is used
+    */
+    MFXDirect3DSurfaceAllocator( IDirect3D9Ex* direct3D9, unsigned int adapterNumber = 0 );
     virtual ~MFXDirect3DSurfaceAllocator();
 
     virtual mfxStatus alloc( mfxFrameAllocRequest* request, mfxFrameAllocResponse* response );
@@ -247,10 +250,10 @@ private:
     IDirect3D9Ex* m_direct3D9;
     IDirect3DDeviceManager9* m_d3d9manager;
     IDirect3DDevice9Ex* m_d3d9Device;
-    HANDLE m_d3DeviceHandle;
     IDirectXVideoDecoderService* m_decoderService;
     UINT m_deviceResetToken;
     HRESULT m_prevOperationResult;
+    unsigned int m_adapterNumber;
 
     bool openD3D9Device();
     void closeD3D9Device();

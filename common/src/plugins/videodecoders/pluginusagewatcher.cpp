@@ -16,7 +16,7 @@ PluginUsageWatcher::PluginUsageWatcher( const QByteArray& uniquePluginID )
 }
 
 //!Returns list of current decode sessions, using this plugin
-std::list<DecoderStreamDescription> PluginUsageWatcher::currentSessions() const
+std::set<stree::AbstractResourceReader*> PluginUsageWatcher::currentSessions() const
 {
     QMutexLocker lk( &m_mutex );
 
@@ -37,40 +37,50 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
     QMutexLocker lk( &m_mutex );
 
     stree::ResourceContainer rc;
-    for( DecoderToSessionDescriptionType::const_iterator
-        it = m_decoderToSessionDescription.begin();
-        it != m_decoderToSessionDescription.end();
+    quint64 totalFramePictureSize = 0;
+    double totalFPS = 0;
+    quint64 totalPixelsPerSecond = 0;
+    quint64 totalVideoMemoryUsage = 0;
+    for( std::set<stree::AbstractResourceReader*>::const_iterator
+        it = m_currentSessions.begin();
+        it != m_currentSessions.end();
         ++it )
     {
-        //TODO/IMPL
+        unsigned int framePictureSize = 0;
+        if( (*it)->getTypedVal( DecoderParameter::framePictureSize, &framePictureSize ) )
+            totalFramePictureSize += framePictureSize;
+
+        double fps = 0;
+        if( (*it)->getTypedVal( DecoderParameter::fps, &fps ) )
+            totalFPS += fps;
+
+        quint64 pixelsPerSecond = 0;
+        if( (*it)->getTypedVal( DecoderParameter::pixelsPerSecond, &pixelsPerSecond ) )
+            totalPixelsPerSecond += pixelsPerSecond;
+
+        quint64 videoMemoryUsage = 0;
+        if( (*it)->getTypedVal( DecoderParameter::videoMemoryUsage, &videoMemoryUsage ) )
+            totalVideoMemoryUsage += videoMemoryUsage;
     }
 
+    rc.put( DecoderParameter::framePictureSize, totalFramePictureSize );
+    rc.put( DecoderParameter::fps, totalFPS );
+    rc.put( DecoderParameter::pixelsPerSecond, totalPixelsPerSecond );
+    rc.put( DecoderParameter::videoMemoryUsage, totalVideoMemoryUsage );
+    rc.put( DecoderParameter::simultaneousStreamCount, m_currentSessions.size() );
     return rc;
 }
 
-void PluginUsageWatcher::decoderCreated( QnAbstractVideoDecoder* const decoder )
+void PluginUsageWatcher::decoderCreated( stree::AbstractResourceReader* const decoder )
 {
     QMutexLocker lk( &m_mutex );
 
-    DecoderStreamDescription desc;
-    //TODO/IMPL filling DecoderStreamDescription
-    desc.put( DecoderParameter::framePictureSize, decoder->getWidth()*decoder->getHeight() );
-
-    std::pair<DecoderToSessionDescriptionType::iterator, bool>
-        p = m_decoderToSessionDescription.insert( std::make_pair( decoder, m_currentSessions.end() ) );
-    if( !p.second )
-        return; //such decoder already registered
-    m_currentSessions.push_back( desc );
-    p.first->second = --m_currentSessions.end();
+    m_currentSessions.insert( decoder );
 }
 
-void PluginUsageWatcher::decoderIsAboutToBeDestroyed( QnAbstractVideoDecoder* const decoder )
+void PluginUsageWatcher::decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder )
 {
     QMutexLocker lk( &m_mutex );
 
-    DecoderToSessionDescriptionType::iterator it = m_decoderToSessionDescription.find( decoder );
-    if( it == m_decoderToSessionDescription.end() )
-        return; //decoder not found
-    m_currentSessions.erase( it->second );
-    m_decoderToSessionDescription.erase( it );
+    m_currentSessions.erase( decoder );
 }

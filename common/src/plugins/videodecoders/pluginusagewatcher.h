@@ -5,8 +5,7 @@
 #ifndef PLUGINUSAGEWATCHER_H
 #define PLUGINUSAGEWATCHER_H
 
-#include <list>
-#include <map>
+#include <set>
 
 #include <QMutex>
 
@@ -35,9 +34,15 @@ public:
     /*!
         \note Returned data is actual for the moment of calling this method
     */
-    std::list<DecoderStreamDescription> currentSessions() const;
+    std::set<stree::AbstractResourceReader*> currentSessions() const;
     //!Returns parameters, describing total plugin usage (total pixels per second, total fps, etc...)
     /*!
+        Method returns following resources:\n
+            - framePictureSize
+            - fps
+            - pixelsPerSecond
+            - videoMemoryUsage
+        Every value is a sum of values of all active sessions
         \note Returned data is actual for the moment of calling this method
     */
     stree::ResourceContainer currentTotalUsage() const;
@@ -45,18 +50,14 @@ public:
     /*!
         Before \a decoder destruction one MUST call method \a decoderIsAboutToBeDestroyed
     */
-    void decoderCreated( QnAbstractVideoDecoder* const decoder );
+    void decoderCreated( stree::AbstractResourceReader* const decoder );
     //!Removes \a decoder from current session list
-    void decoderIsAboutToBeDestroyed( QnAbstractVideoDecoder* const decoder );
+    void decoderIsAboutToBeDestroyed( stree::AbstractResourceReader* const decoder );
 
 private:
-    typedef std::map<QnAbstractVideoDecoder*, std::list<DecoderStreamDescription>::iterator> DecoderToSessionDescriptionType;
-
     mutable QMutex m_mutex;
     QByteArray m_uniquePluginID;
-    //std::map<QnAbstractVideoDecoder*, DecoderStreamDescription> m_currentSessions;
-    std::list<DecoderStreamDescription> m_currentSessions;
-    DecoderToSessionDescriptionType m_decoderToSessionDescription;
+    std::set<stree::AbstractResourceReader*> m_currentSessions;
 };
 
 #endif  //PLUGINUSAGEWATCHER_H

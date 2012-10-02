@@ -22,6 +22,8 @@ class QnAbstractVideoDecoderPlugin
     public QnAbstractClientPlugin
 {
 public:
+    virtual ~QnAbstractVideoDecoderPlugin() {}
+
     //!Returns list of MIME types of supported formats
     virtual QList<CodecID> supportedCodecTypes() const = 0;
     //!Returns true, if decoder CAN offer hardware acceleration. It does not mean it can decode every stream with hw acceleration

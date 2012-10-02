@@ -10,6 +10,7 @@
 
 #include <QSize>
 
+#include <deque>
 #include <fstream>
 #include <vector>
 
@@ -55,7 +56,8 @@ public:
 */
 class QuickSyncVideoDecoder
 :
-    public QnAbstractVideoDecoder
+    public QnAbstractVideoDecoder,
+    public stree::AbstractResourceReader
 {
 public:
     /*!
@@ -63,8 +65,10 @@ public:
     */
     QuickSyncVideoDecoder(
         MFXVideoSession* const parentSession,
+        IDirect3D9Ex* direct3D9,
         const QnCompressedVideoDataPtr data,
-        PluginUsageWatcher* const pluginUsageWatcher );
+        PluginUsageWatcher* const pluginUsageWatcher,
+        unsigned int adapterNumber );
     virtual ~QuickSyncVideoDecoder();
 
     virtual PixelFormat GetPixelFormat() const;
@@ -99,6 +103,18 @@ public:
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
 
+    //!Implementation of stree::AbstractResourceReader::get
+    /*!
+        Following parameters are supported:\n
+            - framePictureWidth
+            - framePictureHeight
+            - framePictureSize
+            - fps
+            - pixelsPerSecond
+            - videoMemoryUsage
+    */
+    virtual bool get( int resID, QVariant* const value ) const;
+
 private:
     enum DecoderState
     {
@@ -106,9 +122,11 @@ private:
         notInitialized,
         //!in process of initialization: decoding media stream header
         decodingHeader,
-        //!initialied decoding data
+        //!decoding data initialized, performing decoding...
         decoding,
+        //!performing post-processing
         processing,
+        //!done decoding and post-processing of current frame
         done
     };
 
@@ -201,6 +219,8 @@ private:
 #endif
     SurfacePool m_decoderSurfacePool;
     SurfacePool m_vppOutSurfacePool;
+    size_t m_decoderSurfaceSizeInBytes;
+    size_t m_vppSurfaceSizeInBytes;
     mfxFrameAllocResponse m_decodingAllocResponse;
     mfxFrameAllocResponse m_vppAllocResponse;
     QSize m_outPictureSize;
@@ -215,6 +235,8 @@ private:
     unsigned int m_frameCropBottomActual;
     bool m_reinitializeNeeded;
     std::basic_string<mfxU8> m_cachedSequenceHeader;
+    double m_sourceStreamFps;
+    std::deque<qint64> m_fpsCalcFrameTimestamps;
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;

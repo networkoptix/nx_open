@@ -5,10 +5,15 @@
 #include "predefinedusagecalculator.h"
 
 #include "pluginusagewatcher.h"
+#include "stree/streesaxhandler.h"
 
 
-PredefinedUsageCalculator::PredefinedUsageCalculator( const QString& predefinedDataFilePath, PluginUsageWatcher* const usageWatcher )
+PredefinedUsageCalculator::PredefinedUsageCalculator(
+    const stree::ResourceNameSet& rns,
+    const QString& predefinedDataFilePath,
+    PluginUsageWatcher* const usageWatcher )
 :
+    m_rns( rns ),
     m_predefinedDataFilePath( predefinedDataFilePath ),
     m_usageWatcher( usageWatcher ),
     m_currentTree( NULL )
@@ -19,35 +24,48 @@ PredefinedUsageCalculator::PredefinedUsageCalculator( const QString& predefinedD
 //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
 bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const
 {
-    //TODO/IMPL retrieving existing sessions' info
+    //retrieving existing sessions' info
     const stree::ResourceContainer& curUsageParams = m_usageWatcher->currentTotalUsage();
 
-    stree::ResourceContainer inputParams;
-    //TODO/IMPL summarizing current sessions' parameters and new session parameters
-
-    //TODO/IMPL searching output
+    //summarizing current sessions' parameters and new session parameters
+    MediaStreamParameterSumContainer inputParams(
+        m_rns,
+        curUsageParams,
+        mediaStreamParams );
     stree::ResourceContainer rc;
     {
         QMutexLocker lk( &m_treeMutex );
         if( m_currentTree )
             m_currentTree->get( inputParams, &rc );
+        else
+            return false;
     }
 
     //analyzing output
-    QVariant maxPixelsPerSecond;
-    QVariant currentPixelsPerSecond;
-    if( rc.get( DecoderParameter::pixelsPerSecond, &maxPixelsPerSecond ) &&
-        inputParams.get( DecoderParameter::pixelsPerSecond, &currentPixelsPerSecond ) )
+    qlonglong maxPixelsPerSecond = 0;
+    qlonglong currentPixelsPerSecond = 0;
+    if( rc.getTypedVal( DecoderParameter::pixelsPerSecond, &maxPixelsPerSecond ) &&
+        inputParams.getTypedVal( DecoderParameter::pixelsPerSecond, &currentPixelsPerSecond ) )
     {
-        if( currentPixelsPerSecond.toLongLong() >= maxPixelsPerSecond.toLongLong() )
+        if( currentPixelsPerSecond >= maxPixelsPerSecond )
             return false;
     }
-    QVariant maxVideoMemoryUsage;
-    QVariant currentVideoMemoryUsage;
-    if( rc.get( DecoderParameter::videoMemoryUsage, &maxVideoMemoryUsage ) &&
-        inputParams.get( DecoderParameter::videoMemoryUsage, &currentVideoMemoryUsage ) )
+
+    qlonglong maxVideoMemoryUsage = 0;
+    qlonglong currentVideoMemoryUsage = 0;
+    if( rc.getTypedVal( DecoderParameter::videoMemoryUsage, &maxVideoMemoryUsage ) &&
+        inputParams.getTypedVal( DecoderParameter::videoMemoryUsage, &currentVideoMemoryUsage ) )
     {
-        if( currentVideoMemoryUsage.toLongLong() >= maxVideoMemoryUsage.toLongLong() )
+        if( currentVideoMemoryUsage >= maxVideoMemoryUsage )
+            return false;
+    }
+
+    int maxSimultaneousStreamCount = 0;
+    int currentSimultaneousStreamCount = 0;
+    if( rc.getTypedVal( DecoderParameter::simultaneousStreamCount, &maxSimultaneousStreamCount ) &&
+        inputParams.getTypedVal( DecoderParameter::simultaneousStreamCount, &currentSimultaneousStreamCount ) )
+    {
+        if( currentSimultaneousStreamCount >= maxSimultaneousStreamCount )
             return false;
     }
 
@@ -57,9 +75,9 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder( const stre
 void PredefinedUsageCalculator::updateTree()
 {
     stree::AbstractNode* newTree = NULL;
-    loadXml( QString(), &newTree );
+    loadXml( m_predefinedDataFilePath, &newTree );
     if( !newTree )
-        return ;
+        return;
 
     stree::AbstractNode* oldTree = m_currentTree;
     {
@@ -71,5 +89,25 @@ void PredefinedUsageCalculator::updateTree()
 
 void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::AbstractNode** const treeRoot )
 {
-    //TODO/IMPL
+    stree::SaxHandler xmlHandler( m_rns );
+
+    QXmlSimpleReader reader;
+    reader.setContentHandler( &xmlHandler );
+    reader.setErrorHandler( &xmlHandler );
+
+    QFile xmlFile( filePath );
+    if( !xmlFile.open( QIODevice::ReadOnly ) )
+    {
+        cl_log.log( QString::fromAscii( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
+        return;
+    }
+    QXmlInputSource input( &xmlFile );
+    cl_log.log( QString::fromAscii( "Parsing stree xml file (%1)" ).arg(filePath), cl_logDEBUG1 );
+    if( !reader.parse( &input ) )
+    {
+        cl_log.log( QString::fromAscii( "Failed to parse stree xml (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
+        return;
+    }
+
+    *treeRoot = xmlHandler.releaseTree();
 }

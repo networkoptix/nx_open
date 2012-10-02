@@ -11,6 +11,7 @@
 #include "abstractvideodecoderusagecalculator.h"
 #include "videodecoderplugintypes.h"
 #include "stree/node.h"
+#include "stree/resourcenameset.h"
 
 
 class PluginUsageWatcher;
@@ -24,12 +25,16 @@ public:
     /*!
         \param usageWatcher
     */
-    PredefinedUsageCalculator( const QString& predefinedDataFilePath, PluginUsageWatcher* const usageWatcher );
+    PredefinedUsageCalculator(
+        const stree::ResourceNameSet& rns,
+        const QString& predefinedDataFilePath,
+        PluginUsageWatcher* const usageWatcher );
     
     //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
     virtual bool isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const;
 
 private:
+    const stree::ResourceNameSet& m_rns;
     const QString m_predefinedDataFilePath;
     PluginUsageWatcher* const m_usageWatcher;
     stree::AbstractNode* m_currentTree;
