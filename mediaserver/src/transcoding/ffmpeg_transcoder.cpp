@@ -55,9 +55,9 @@ m_videoEncoderCodecCtx(0),
 m_audioEncoderCodecCtx(0),
 m_videoBitrate(0),
 m_formatCtx(0),
-m_ioContext(0)
+m_ioContext(0),
+m_baseTime(0)
 {
-    m_firstPacketTime[0] = m_firstPacketTime[1] = AV_NOPTS_VALUE;
 }
 
 QnFfmpegTranscoder::~QnFfmpegTranscoder()
@@ -284,20 +284,14 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
             if (transcodedData) {
                 packet.data = (quint8*) transcodedData->data.data();
                 packet.size = transcodedData->data.size();
-                packet.pts = av_rescale_q(transcodedData->timestamp, srcRate, stream->time_base);
+                packet.pts = av_rescale_q(transcodedData->timestamp - m_baseTime, srcRate, stream->time_base);
                 if(transcodedData->flags & AV_PKT_FLAG_KEY)
                     packet.flags |= AV_PKT_FLAG_KEY;
             }
         }
         else {
             // direct stream copy
-            if (m_firstPacketTime[streamIndex] == AV_NOPTS_VALUE)
-            {
-                m_firstPacketTime[streamIndex] = media->timestamp;
-            }
-            qint64 mediaTimeStamp = media->timestamp - m_firstPacketTime[streamIndex];
-
-            packet.pts = av_rescale_q(mediaTimeStamp, srcRate, stream->time_base);
+            packet.pts = av_rescale_q(media->timestamp - m_baseTime, srcRate, stream->time_base);
             packet.data = (quint8*) media->data.data();
             packet.size = media->data.size();
             if((media->dataType == QnAbstractMediaData::AUDIO) || (media->flags & AV_PKT_FLAG_KEY))
@@ -334,4 +328,11 @@ AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const
 AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const 
 { 
     return m_audioEncoderCodecCtx; 
+}
+
+void QnFfmpegTranscoder::setBaseTime(qint64 value)
+{
+    // absolute value is not important. Important relative value for av sync only
+    // reduce base time value to
+    m_baseTime = value - 1000*1000;
 }

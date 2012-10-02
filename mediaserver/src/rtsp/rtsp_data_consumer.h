@@ -117,5 +117,6 @@ private:
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
+    qint64 m_firstRtpTime;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

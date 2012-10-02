@@ -49,7 +49,8 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_firstLiveTime(AV_NOPTS_VALUE),
   m_lastLiveTime(AV_NOPTS_VALUE),
   m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
-  m_allowAdaptiveStreaming(true)
+  m_allowAdaptiveStreaming(true),
+  m_firstRtpTime(AV_NOPTS_VALUE)
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
@@ -592,6 +593,10 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             }
         }
     }
+
+    if (m_firstRtpTime == AV_NOPTS_VALUE)
+        m_firstRtpTime = media->timestamp;
+    codecEncoder->setBaseTime(m_firstRtpTime);
 
     codecEncoder->setDataPacket(media);
     if (trackInfo->firstRtpTime == -1)

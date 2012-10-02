@@ -625,6 +625,11 @@ QByteArray QnUniversalRtpEncoder::getAdditionSDP()
     return QByteArray(buffer);
 }
 
+void QnUniversalRtpEncoder::setBaseTime(qint64 value)
+{
+    m_transcoder.setBaseTime(value);
+}
+
 void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
 {
     m_outputBuffer.clear();
@@ -648,12 +653,14 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
         return getNextPacket(sendBuffer); // skip RTCP packet
     }
     */
+    /*
     if (m_isFirstPacket)
     {
         m_isFirstPacket = false;
         m_firstTime = ntohl(rtpHeader->timestamp);
     }
     rtpHeader->timestamp = htonl(ntohl(rtpHeader->timestamp) - m_firstTime);
+    */
 
     sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[packetIndex]);
     m_outputPos += packets[packetIndex];

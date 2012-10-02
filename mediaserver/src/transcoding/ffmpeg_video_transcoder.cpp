@@ -120,7 +120,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
         if (m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
-        decodedFrame->pts -= m_firstEncodedPts;
+        //decodedFrame->pts -= m_firstEncodedPts;
 
 
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);

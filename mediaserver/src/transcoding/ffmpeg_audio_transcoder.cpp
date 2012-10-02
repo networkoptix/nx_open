@@ -121,9 +121,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     result->compressionType = m_codecId;
     static AVRational r = {1, 1000000};
     
-    //result->timestamp  = m_lastTimestamp;
-    qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size/m_encoderCtx->channels;
-    result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r);
+    result->timestamp  = m_lastTimestamp;
+    //qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size/m_encoderCtx->channels;
+    //result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r);
 
 
     result->data.write((const char*) m_audioEncodingBuffer, encoded);
