@@ -572,7 +572,11 @@
                             </Component>
                             
                             <Component Id="ClientQtColorPicker" Guid="{A8E0F358-198A-4D79-A6F0-607D60F524EE}">
-                                <File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll " Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                                <File Id="ColorPicker26dll" Name="QtSolutions_ColorPicker-2.6.dll" Source="${libdir}/bin/${build.configuration}\QtSolutions_ColorPicker-2.6$(var.suffix).dll"/>
+                            </Component>
+
+                            <Component Id="ClientVsRedistributable" Guid="{09c370a0-fa49-482f-9082-94d0fcff4ffc}">
+                                <File Id="VcRedistexe" Name="vcredist_${arch}.exe" Source="${libdir}/bin/${build.configuration}\vcredist_${arch}.exe"/>
                             </Component>
                             
                             <Directory Id="styles" Name="styles">
@@ -670,6 +674,7 @@
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientQtColorPicker"/>
+			<ComponentRef Id="ClientVsRedistributable"/>
             <ComponentRef Id="bespin" />
             
             <ComponentRef Id='ClientDirectoryComponent'/>
