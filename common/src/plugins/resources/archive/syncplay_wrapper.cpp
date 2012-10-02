@@ -412,7 +412,8 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
     Q_D(QnArchiveSyncPlayWrapper);
 
     QMutexLocker lock(&d->timeMutex);
-    d->inJumpCount--;
+    if (d->inJumpCount > 0)
+        d->inJumpCount--;
     Q_ASSERT(d->inJumpCount >= 0);
     if (d->inJumpCount == 0) 
     {

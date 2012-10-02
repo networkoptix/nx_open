@@ -636,7 +636,8 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
 
-    m_executingJump--;
+    if (m_executingJump > 0)
+        m_executingJump--;
     m_processedPackets = 0;
     m_delayedFrameCount = 0;
 }
