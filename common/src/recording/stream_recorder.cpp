@@ -281,6 +281,8 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_packetWrited = true;
         if (m_needCalcSignature) 
         {
+            if (vd && (vd->flags & AV_PKT_FLAG_KEY))
+                m_lastIFrame = vd;
             AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
@@ -393,8 +395,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 videoCodecCtx->width = qMax(8,mediaData->width);
                 videoCodecCtx->height = qMax(8,mediaData->height);
             }
-            if (m_needCalcSignature)
-                m_firstIFrame = mediaData;
 
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -542,7 +542,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
     signHelper.setSign(getSignature());
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_firstIFrame);
+    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_lastIFrame);
 
     if (generatedFrame == 0)
     {
