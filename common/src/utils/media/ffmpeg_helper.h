@@ -2,6 +2,7 @@
 #define __FFMPEG_HELPER_H
 
 QString codecIDToString(CodecID codecID);
+QString getAudioCodecDescription(AVCodecContext* codecContext);
 
 class VC1SequenceHeader;
 

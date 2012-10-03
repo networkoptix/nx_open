@@ -86,27 +86,7 @@ public:
                     result.description += QLatin1String(" - ");
                 }
 
-                QString codecStr = codecIDToString(codecContext->codec_id);
-                if (!codecStr.isEmpty())
-                {
-                    result.description += codecStr;
-                    result.description += QLatin1Char(' ');
-                }
-
-                //str += QString::number(codecContext->sample_rate / 1000)+ QLatin1String("Khz ");
-                if (codecContext->channels == 3)
-                    result.description += QLatin1String("2.1");
-                else if (codecContext->channels == 6)
-                    result.description += QLatin1String("5.1");
-                else if (codecContext->channels == 8)
-                    result.description += QLatin1String("7.1");
-                else if (codecContext->channels == 2)
-                    result.description += QLatin1String("stereo");
-                else if (codecContext->channels == 1)
-                    result.description += QLatin1String("mono");
-                else
-                    result.description += QString::number(codecContext->channels);
-
+                result.description = getAudioCodecDescription(codecContext);
                 break;
             }
         }
