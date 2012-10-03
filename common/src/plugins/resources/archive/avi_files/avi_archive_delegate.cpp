@@ -237,7 +237,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->timestamp = packetTimestamp(packet);
 
     while (packet.stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << 0;
+        m_lastPacketTimes << m_startTime;
     if ((quint64)data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
