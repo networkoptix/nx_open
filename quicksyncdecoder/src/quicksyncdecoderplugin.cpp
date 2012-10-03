@@ -17,9 +17,10 @@
 
 static const char* QUICKSYNC_PLUGIN_ID = "45D92FCC-2B59-431e-BFF9-E11F2D6213DA";
 //{ 0x45d92fcc, 0x2b59, 0x431e, { 0xbf, 0xf9, 0xe1, 0x1f, 0x2d, 0x62, 0x13, 0xda } };
+static const char* DECODER_NAME = "quicksync";
 
 //!name of xml file with quicksync decoder usage parameters
-static QString quicksyncXmlFileName = "quicksync.xml";
+static QString quicksyncXmlFileName = "hw_decoding_conf.xml";
 
 QuicksyncDecoderPlugin::QuicksyncDecoderPlugin()
 :
@@ -28,6 +29,11 @@ QuicksyncDecoderPlugin::QuicksyncDecoderPlugin()
     m_direct3D9( NULL ),
     m_initialized( false )
 {
+    OSVERSIONINFOEX osVersionInfo;
+    memset( &osVersionInfo, 0, sizeof(osVersionInfo) );
+    osVersionInfo.dwOSVersionInfoSize = sizeof(osVersionInfo);
+    GetVersionEx( (LPOSVERSIONINFO)&osVersionInfo );
+    m_osName = winVersionToName( osVersionInfo );
 }
 
 QuicksyncDecoderPlugin::~QuicksyncDecoderPlugin()
@@ -100,6 +106,8 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     desc.put( DecoderParameter::pixelsPerSecond, 30 * std::max<>( data->width*data->height, 0 ) );
     desc.put( DecoderParameter::videoMemoryUsage, 0 );
     desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
+    desc.put( DecoderParameter::decoderName, DECODER_NAME );
+    desc.put( DecoderParameter::osName, m_osName );
 
     //joining media stream parameters with GPU description
     if( !m_usageCalculator->isEnoughHWResourcesForAnotherDecoder( stree::MultiSourceResourceReader( &desc, m_graphicsDesc.get() ) ) )
@@ -168,6 +176,64 @@ void QuicksyncDecoderPlugin::initialize() const
     m_hardwareAccelerationEnabled = true;
 
     m_graphicsDesc.reset( new D3DGraphicsAdapterDescription( m_direct3D9, m_adapterNumber ) );
+}
+
+QString QuicksyncDecoderPlugin::winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const
+{
+//Windows 8	                6.2	    6	2	OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+//Windows Server 2012	    6.2	    6	2	OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+//Windows 7	                6.1	    6	1	OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+//Windows Server 2008 R2	6.1	    6	1	OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+//Windows Server 2008	    6.0 	6	0	OSVERSIONINFOEX.wProductType != VER_NT_WORKSTATION
+//Windows Vista	            6.0 	6	0	OSVERSIONINFOEX.wProductType == VER_NT_WORKSTATION
+//Windows Server 2003 R2	5.2	    5	2	GetSystemMetrics(SM_SERVERR2) != 0
+//Windows Server 2003	    5.2 	5	2	GetSystemMetrics(SM_SERVERR2) == 0
+//Windows XP	            5.1	    5	1	Not applicable
+//Windows 2000	            5.0	    5	0	Not applicable
+
+    QString osName;
+    switch( osVersionInfo.dwMajorVersion )
+    {
+        case 6:
+            switch( osVersionInfo.dwMinorVersion )
+            {
+                case 2:
+                    osName = osVersionInfo.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012";
+                    break;
+                case 1:
+                    osName = osVersionInfo.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2";
+                    break;
+                case 0:
+                    osName = osVersionInfo.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008";
+                    break;
+                default:
+                    return QString("%1.%2 %3").arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion));
+            }
+            break;
+
+        case 5:
+            switch( osVersionInfo.dwMinorVersion )
+            {
+                case 2:
+                    osName = GetSystemMetrics(SM_SERVERR2) != 0 ? "Windows Server 2003 R2" : "Windows Server 2003";
+                    break;
+                case 1:
+                    osName = "Windows XP";
+                    break;
+                case 0:
+                    osName = "Windows 2000";
+                    break;
+                default:
+                    return QString("%1.%2 %3").arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion));
+            }
+            break;
+
+        default:
+            return QString("%1.%2 %3").arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion));
+    }
+
+    return QString("%1 %2 (%3.%4)").arg(osName).arg(QString::fromWCharArray(osVersionInfo.szCSDVersion)).
+        arg(osVersionInfo.dwMajorVersion).arg(osVersionInfo.dwMinorVersion);
 }
 
 Q_EXPORT_PLUGIN2( quicksyncdecoderplugin, QuicksyncDecoderPlugin );

@@ -8,6 +8,7 @@
 
 #include <intrin.h>
 
+#include <QElapsedTimer>
 #include <QSize>
 
 #include <deque>
@@ -18,8 +19,10 @@
 
 #ifdef XVBA_TEST
 #include "common.h"
+#include "nalunits.h"
 #else
 #include <decoders/video/abstractdecoder.h>
+#include <utils/media/nalunits.h>
 #endif
 #include "mfxallocator.h"
 
@@ -237,6 +240,14 @@ private:
     std::basic_string<mfxU8> m_cachedSequenceHeader;
     double m_sourceStreamFps;
     std::deque<qint64> m_fpsCalcFrameTimestamps;
+    size_t m_totalInputFrames;
+    size_t m_totalOutputFrames;
+    QElapsedTimer m_elapsedTimer;
+    qint64 m_prevInputFrameMs;
+    std::auto_ptr<SPSUnit> m_sps;
+    std::auto_ptr<PPSUnit> m_pps;
+    qint64 m_prevOutPictureClock;
+    int m_recursionDepth;
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;

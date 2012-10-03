@@ -15,11 +15,6 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-#ifndef XVBA_TEST
-#include <utils/media/nalunits.h>
-#else
-#include "nalunits.h"
-#endif
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/videodecoderplugintypes.h>
 
@@ -124,11 +119,17 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_frameCropTopActual( 0 ),
     m_frameCropBottomActual( 0 ),
     m_reinitializeNeeded( false ),
-    m_sourceStreamFps( 0 )
+    m_sourceStreamFps( 0 ),
+    m_totalInputFrames( 0 ),
+    m_totalOutputFrames( 0 ),
+    m_prevInputFrameMs( 0 ),
+    m_prevOutPictureClock( 0 ),
+    m_recursionDepth( 0 )
 {
     memset( &m_srcStreamParam, 0, sizeof(m_srcStreamParam) );
     memset( &m_decodingAllocResponse, 0, sizeof(m_decodingAllocResponse) );
     memset( &m_vppAllocResponse, 0, sizeof(m_vppAllocResponse) );
+    m_elapsedTimer.invalidate();
 
 #ifdef USE_D3D
     if( !m_d3dFrameAllocator.initialize() )
@@ -185,10 +186,16 @@ PixelFormat QuickSyncVideoDecoder::GetPixelFormat() const
 static const AVRational SRC_DATA_TIMESTAMP_RESOLUTION = {1, 1000000};
 static const AVRational INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION = {1, 90000};
 #endif
+static const int MICROS_IN_SECOND = 1000*1000;
 
 bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
 {
     Q_ASSERT( data->compressionType == CODEC_ID_H264 );
+
+    cl_log.log( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, millis since prev input frame %3").
+        arg(data->data.size()).arg(m_sourceStreamFps).arg(m_elapsedTimer.isValid() ? (m_elapsedTimer.elapsed() - m_prevInputFrameMs) : 0), cl_logDEBUG1 );
+
+    ++m_totalInputFrames;
 
     static const size_t FRAME_COUNT_TO_CALC_FPS = 20;
     static const size_t MIN_FRAME_COUNT_TO_CALC_FPS = FRAME_COUNT_TO_CALC_FPS / 2;
@@ -198,7 +205,7 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
         ? 0
         : m_fpsCalcFrameTimestamps.back() - m_fpsCalcFrameTimestamps.front(); //TODO overflow?
     if( (m_fpsCalcFrameTimestamps.size() >= MIN_FRAME_COUNT_TO_CALC_FPS) && (fpsCalcTimestampDiff > 0) )
-        m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() / fpsCalcTimestampDiff;
+        m_sourceStreamFps = m_fpsCalcFrameTimestamps.size() * MICROS_IN_SECOND / fpsCalcTimestampDiff;
     m_fpsCalcFrameTimestamps.push_back( data->timestamp );
     if( m_fpsCalcFrameTimestamps.size() > FRAME_COUNT_TO_CALC_FPS )
         m_fpsCalcFrameTimestamps.pop_front();
@@ -257,14 +264,31 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
     inputStream.MaxLength = data->data.size();
     //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
 
-    return decode( &inputStream, outFrame );
+    if( !m_elapsedTimer.isValid() )
+    {
+        m_elapsedTimer.restart();
+        m_prevOutPictureClock = m_elapsedTimer.elapsed();
+    }
+    const qint64 currentClock = m_elapsedTimer.elapsed();
+    m_prevInputFrameMs = currentClock;
+
+    if( decode( &inputStream, outFrame ) )
+    {
+        if( m_totalOutputFrames == 0 )
+            cl_log.log( QString::fromAscii( "QuickSyncVideoDecoder. First decoded frame delayed for %1 input frame(s)" ).arg(m_totalInputFrames-1), cl_logDEBUG1 );
+        ++m_totalOutputFrames;
+        if( currentClock - m_prevOutPictureClock > 1000 )
+            cl_log.log( QString::fromAscii( "QuickSyncVideoDecoder. Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock), cl_logDEBUG1 );
+        m_prevOutPictureClock = currentClock;
+        return true;
+    }
+
+    return false;
 }
 
 #ifdef USE_ASYNC_IMPL
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDecoderOutput* outFrame )
 {
-    cl_log.log( QString("QuickSyncVideoDecoder::decode (async). data.size = %1, current fps = %2").arg(inputStream->DataLength).arg(m_sourceStreamFps), cl_logDEBUG1 );
-
     if( (m_state < decoding) && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
 
@@ -386,9 +410,8 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
 #else
 bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDecoderOutput* outFrame )
 {
-    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder::decode. data.size = %1").arg(inputStream->DataLength), cl_logDEBUG1 );
-
-    if( m_reinitializeNeeded && readSequenceHeader( inputStream ) )
+    const bool isSeqHeaderPresent = readSequenceHeader( inputStream );
+    if( m_reinitializeNeeded && isSeqHeaderPresent )
     {
         //have to wait for a sequence header and I-frame before reinitializing decoder
         closeMFXSession();
@@ -421,12 +444,13 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
                         &workingSurface->mfxSurface,
                         &decodedFrame,
                         &m_syncPoint );
+
 #if defined(WRITE_INPUT_STREAM_TO_FILE_2)
                     if( inputStream->DataLength > 0 )
                         m_inputStreamFile.write( (const char*)inputStream->Data + inputStream->DataOffset, inputStream->DataLength );
 #endif
                     cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. starting frame (pts %1) decoding. Result %2").
-                        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)), cl_logDEBUG1 );
+                        arg(inputStream->TimeStamp).arg(mfxStatusCodeToString(opStatus)), opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
                     break;  
                 }
 
@@ -438,15 +462,16 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
                     opStatus = m_processor->RunFrameVPPAsync( &in->mfxSurface, &decodedFrameCtx->mfxSurface, NULL, &m_syncPoint );
                     m_state = done;
                     cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. starting frame (pts %1) processing. Result %2").
-                        arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(mfxStatusCodeToString(opStatus)), cl_logDEBUG1 );
+                        arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(mfxStatusCodeToString(opStatus)), opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
                     break;
                 }
             }
 
             if( opStatus >= MFX_ERR_NONE && m_syncPoint )
             {
-                opStatus = MFXVideoCORE_SyncOperation( m_mfxSession, m_syncPoint, INFINITE );
-                cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. sync operation result %1").arg(mfxStatusCodeToString(opStatus)), cl_logDEBUG1 );
+                opStatus = m_mfxSession.SyncOperation( m_syncPoint, INFINITE );
+                cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. sync operation result %1").arg(mfxStatusCodeToString(opStatus)), 
+                    opStatus == MFX_ERR_NONE ? cl_logDEBUG2 : cl_logDEBUG1 );
 
                 if( decodedFrame && !decodedFrameCtx.data() )
                     decodedFrameCtx = getSurfaceCtxFromSurface( decodedFrame );
@@ -529,9 +554,29 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
             case MFX_ERR_DEVICE_FAILED:
             case MFX_ERR_INCOMPATIBLE_VIDEO_PARAM:
             default:
-                cl_log.log( QString::fromAscii("Critical error occured during Quicksync decode session %1").arg(mfxStatusCodeToString(opStatus)), cl_logERROR );
-                resetMfxSession();
-                return false;
+            {
+                //limiting recursion depth
+                if( m_recursionDepth > 0 )
+                {
+                    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Recursion detected!"), cl_logERROR );
+                    return false;
+                }
+                cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Critical error occured during Quicksync decode session %1").
+                    arg(mfxStatusCodeToString(opStatus)), cl_logERROR );
+                //draining decoded frames from decoder
+                mfxBitstream emptyBuffer;
+                memset( &emptyBuffer, 0, sizeof(emptyBuffer) );
+                //NOTE There can be more than one frame in decoder buffer. It will be good to drain them all...
+                ++m_recursionDepth;
+                const bool decoderDrainResult = decode( &emptyBuffer, outFrame );
+                closeMFXSession();
+                m_state = notInitialized;
+                //the bitstream pointer is at first bit of new sequence header (mediasdk-man, p.11)
+                const bool newSequenceFrameDecodeResult = decode( inputStream, outFrame );
+                --m_recursionDepth;
+                //if no frame from new sequence, returning drained frame
+                return newSequenceFrameDecodeResult || decoderDrainResult;
+            }
         }
 
         if( inputStream->DataLength > 0 )
@@ -618,13 +663,27 @@ const AVFrame* QuickSyncVideoDecoder::lastFrame() const
 
 void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
 {
+    //return;
+
     const QSize alignedNewPicSize = QSize( ALIGN16(outSize.width()), ALIGN32(outSize.height()) );
     if( m_outPictureSize == alignedNewPicSize )
         return;
 
     m_outPictureSize = alignedNewPicSize;
     cl_log.log( QString::fromAscii("Quicksync decoder. Setting up scaling to %1x%2").arg(m_outPictureSize.width()).arg(m_outPictureSize.height()), cl_logINFO );
-    m_reinitializeNeeded = true;
+    if( m_state < decoding )
+        return;
+
+    if( m_processor.get() )
+    {
+        //have to reinitialize whole session because after destruction of processor decoder does not want to work properly
+        m_reinitializeNeeded = true;
+    }
+    else
+    {
+        //just creating processor
+        initProcessor();
+    }
 }
 
 QnAbstractPictureData::PicStorageType QuickSyncVideoDecoder::targetMemoryType() const
@@ -678,6 +737,9 @@ bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
 
     m_pluginUsageWatcher->decoderCreated( this );
 
+    m_totalInputFrames = 0;
+    m_totalOutputFrames = 0;
+
     return true;
 }
 
@@ -714,6 +776,8 @@ bool QuickSyncVideoDecoder::initMfxSession()
 bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader )
 {
     Q_ASSERT( m_mfxSessionEstablished );
+
+    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Initializing decoder..."), cl_logDEBUG1 );
 
     if( !m_decoder.get() )
     {
@@ -883,6 +947,8 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
 bool QuickSyncVideoDecoder::initProcessor()
 {
     Q_ASSERT( m_decodingInitialized );
+
+    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Initializing VPP processor..."), cl_logDEBUG1 );
 
     if( m_outPictureSize == QSize(m_srcStreamParam.mfx.FrameInfo.Width, m_srcStreamParam.mfx.FrameInfo.Height - (m_originalFrameCropTop + m_originalFrameCropBottom)) )
     {
@@ -1425,16 +1491,14 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 
 bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream )
 {
-    SPSUnit m_sps;
-    PPSUnit m_pps;
+    std::auto_ptr<SPSUnit> sps;
+    std::auto_ptr<PPSUnit> pps;
 
     if( inputStream->DataLength <= 4 )
         return false;
 
     //memset( &m_pictureDescriptor, 0, sizeof(m_pictureDescriptor) );
 
-    bool spsFound = false;
-    bool ppsFound = false;
     const quint8* dataStart = reinterpret_cast<const quint8*>(inputStream->Data + inputStream->DataOffset);
     const quint8* dataEnd = dataStart + inputStream->DataLength;
     for( const quint8
@@ -1450,85 +1514,44 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
             case nuSPS:
             {
                 //qDebug()<<"Parsing sps\n";
-                m_sps.decodeBuffer( curNalu, nextNalu );
-                m_sps.deserialize();
-                spsFound = true;
+                sps.reset( new SPSUnit() );
+                sps->decodeBuffer( curNalu, nextNalu );
+                sps->deserialize();
 
                 //reading frame cropping settings
-                const unsigned int SubHeightC = m_sps.chroma_format_idc == 1 ? 2 : 1;
-                const unsigned int CropUnitY = (m_sps.chroma_format_idc == 0)
-                    ? (2 - m_sps.frame_mbs_only_flag)
-                    : (SubHeightC * (2 - m_sps.frame_mbs_only_flag));
-                m_originalFrameCropTop = CropUnitY * m_sps.frame_crop_top_offset;
-                m_originalFrameCropBottom = CropUnitY * m_sps.frame_crop_bottom_offset;
+                const unsigned int SubHeightC = sps->chroma_format_idc == 1 ? 2 : 1;
+                const unsigned int CropUnitY = (sps->chroma_format_idc == 0)
+                    ? (2 - sps->frame_mbs_only_flag)
+                    : (SubHeightC * (2 - sps->frame_mbs_only_flag));
+                m_originalFrameCropTop = CropUnitY * sps->frame_crop_top_offset;
+                m_originalFrameCropBottom = CropUnitY * sps->frame_crop_bottom_offset;
 
-                //m_srcStreamParam.mfx.CodecId = MFX_CODEC_AVC;
-                //m_srcStreamParam.mfx.CodecProfile = m_sps.profile_idc;
-                //m_srcStreamParam.mfx.CodecLevel = m_sps.level_idc;
+                if( m_sps.get() )
+                    if( m_sps->seq_parameter_set_id != sps->seq_parameter_set_id )
+                    {
+                        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. SPS id changed from %1 to %2. Reinitializing...").
+                            arg(m_sps->seq_parameter_set_id).arg(sps->seq_parameter_set_id), cl_logDEBUG1 );
+                        m_reinitializeNeeded = true;
+                    }
+                    else if( (m_sps->pic_width_in_mbs != sps->pic_width_in_mbs) || (m_sps->pic_height_in_map_units != sps->pic_height_in_map_units) )
+                    {
+                        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Picture size in SPS has changed from %1.%2 to %3.%4. Reinitializing...").
+                            arg(m_sps->getWidth()).arg(m_sps->getHeight()).arg(sps->getWidth()).arg(sps->getHeight()), cl_logDEBUG1 );
+                        m_reinitializeNeeded = true;
+                    }
 
-                //m_srcStreamParam.mfx.TimeStampCalc = MFX_TIMESTAMPCALC_UNKNOWN;
-                //m_srcStreamParam.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
-                //m_srcStreamParam.mfx.FrameInfo.Width = m_sps.pic_width_in_mbs * 16;
-                //m_srcStreamParam.mfx.FrameInfo.Height = m_sps.pic_height_in_map_units * 16;
-                //m_srcStreamParam.mfx.FrameInfo.CropX = 0;
-                //m_srcStreamParam.mfx.FrameInfo.CropY = 0;
-                //m_srcStreamParam.mfx.FrameInfo.CropW = m_srcStreamParam.mfx.FrameInfo.Width;
-                //m_srcStreamParam.mfx.FrameInfo.CropH = m_srcStreamParam.mfx.FrameInfo.Height;
-                //m_srcStreamParam.mfx.FrameInfo.FrameRateExtN = 0;
-                //m_srcStreamParam.mfx.FrameInfo.FrameRateExtD = 0;
-                //m_srcStreamParam.mfx.FrameInfo.ChromaFormat = m_sps.chroma_format_idc;
-                //m_srcStreamParam.mfx.FrameInfo.AspectRatioW = m_srcStreamParam.mfx.FrameInfo.Width;
-                //m_srcStreamParam.mfx.FrameInfo.AspectRatioH = m_srcStreamParam.mfx.FrameInfo.Height;
-
-                //m_pictureDescriptor.profile = m_sps.profile_idc;
-                //m_pictureDescriptor.level = m_sps.level_idc;
-                //m_pictureDescriptor.width_in_mb = m_sps.pic_width_in_mbs;
-                //m_pictureDescriptor.height_in_mb = m_sps.pic_height_in_map_units;
-                //m_pictureDescriptor.sps_info.avc.residual_colour_transform_flag = m_sps.residual_colour_transform_flag;
-                //m_pictureDescriptor.sps_info.avc.delta_pic_always_zero_flag = m_sps.delta_pic_order_always_zero_flag;
-                //m_pictureDescriptor.sps_info.avc.gaps_in_frame_num_value_allowed_flag = m_sps.gaps_in_frame_num_value_allowed_flag;
-                //m_pictureDescriptor.sps_info.avc.frame_mbs_only_flag = m_sps.frame_mbs_only_flag;
-                //m_pictureDescriptor.sps_info.avc.mb_adaptive_frame_field_flag = m_sps.mb_adaptive_frame_field_flag;
-                //m_pictureDescriptor.sps_info.avc.direct_8x8_inference_flag = m_sps.direct_8x8_inference_flag;
-
-                //m_pictureDescriptor.chroma_format = m_sps.chroma_format_idc;
-                //m_pictureDescriptor.avc_bit_depth_luma_minus8 = m_sps.bit_depth_luma - 8;
-                //m_pictureDescriptor.avc_bit_depth_chroma_minus8 = m_sps.bit_depth_chroma - 8;
-                //m_pictureDescriptor.avc_log2_max_frame_num_minus4 = m_sps.log2_max_frame_num - 4;
-
-                //m_pictureDescriptor.avc_pic_order_cnt_type = m_sps.pic_order_cnt_type;
-                //m_pictureDescriptor.avc_log2_max_pic_order_cnt_lsb_minus4 = m_sps.log2_max_pic_order_cnt_lsb;
-                //m_pictureDescriptor.avc_num_ref_frames = m_sps.num_ref_frames;
+                m_sps = sps;
                 break;
             }
 
             case nuPPS:
             {
                 //qDebug()<<"Parsing pps\n";
-                m_pps.decodeBuffer( curNalu, nextNalu );
-                m_pps.deserialize();
-                ppsFound = true;
+                pps.reset( new PPSUnit() );
+                pps->decodeBuffer( curNalu, nextNalu );
+                pps->deserialize();
 
-                //m_pictureDescriptor.avc_num_slice_groups_minus1 = m_pps.num_slice_groups_minus1;
-                //m_pictureDescriptor.avc_slice_group_map_type = m_pps.slice_group_map_type;
-                //m_pictureDescriptor.avc_num_ref_idx_l0_active_minus1 = m_pps.num_ref_idx_l0_active_minus1;
-                //m_pictureDescriptor.avc_num_ref_idx_l1_active_minus1 = m_pps.num_ref_idx_l1_active_minus1;
-
-                //m_pictureDescriptor.avc_pic_init_qp_minus26 = m_pps.pic_init_qp_minus26;
-                //m_pictureDescriptor.avc_pic_init_qs_minus26 = m_pps.pic_init_qs_minus26;
-                //m_pictureDescriptor.avc_chroma_qp_index_offset = m_pps.chroma_qp_index_offset;
-                //m_pictureDescriptor.avc_second_chroma_qp_index_offset = m_pps.second_chroma_qp_index_offset;
-
-                //m_pictureDescriptor.avc_slice_group_change_rate_minus1 = m_pps.slice_group_change_rate - 1;
-
-                //m_pictureDescriptor.pps_info.avc.entropy_coding_mode_flag = m_pps.entropy_coding_mode_flag;
-                //m_pictureDescriptor.pps_info.avc.pic_order_present_flag = m_pps.pic_order_present_flag;
-                //m_pictureDescriptor.pps_info.avc.weighted_pred_flag = m_pps.weighted_pred_flag;
-                //m_pictureDescriptor.pps_info.avc.weighted_bipred_idc = m_pps.weighted_bipred_idc;
-                //m_pictureDescriptor.pps_info.avc.deblocking_filter_control_present_flag = m_pps.deblocking_filter_control_present_flag;
-                //m_pictureDescriptor.pps_info.avc.constrained_intra_pred_flag = m_pps.constrained_intra_pred_flag;
-                //m_pictureDescriptor.pps_info.avc.redundant_pic_cnt_present_flag = m_pps.redundant_pic_cnt_present_flag;
-                //m_pictureDescriptor.pps_info.avc.transform_8x8_mode_flag = m_pps.transform_8x8_mode_flag;
+                m_pps = pps;
                 break;
             }
 
@@ -1537,7 +1560,13 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
         }
     }
 
-    return spsFound && ppsFound;
+    if( sps.get() && pps.get() )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Found and parsed sequence header. Reinitializing..."), cl_logDEBUG1 );
+        return true;
+    }
+
+    return false;
 }
 
 QString QuickSyncVideoDecoder::mfxStatusCodeToString( mfxStatus status ) const

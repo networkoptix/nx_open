@@ -59,9 +59,11 @@ private:
     mutable IDirect3D9Ex* m_direct3D9;
     mutable QString m_sdkVersionStr;
     mutable bool m_initialized;
+    QString m_osName;
 
     void initializeResourceNameset();
     void initialize() const;
+    QString winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const;
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H

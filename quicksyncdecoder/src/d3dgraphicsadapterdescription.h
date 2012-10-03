@@ -14,9 +14,12 @@
 
 /*!
     Provides resources:\n
+    - architecture
     - gpuDeviceString
-    - gpuName
-    - sdkVersion
+    - driverVersion
+    - gpuVendorId
+    - gpuDeviceId
+    - gpuRevision
 */
 class D3DGraphicsAdapterDescription
 :

@@ -11,6 +11,12 @@ namespace DecoderParameter
     {
         switch( val )
         {
+            case decoderName:
+                return "decoderName";
+            case osName:
+                return "osName";
+            case architecture:
+                return "architecture";
             case gpuDeviceString:
                 return "gpuDeviceString";
             case driverVersion:
@@ -23,8 +29,6 @@ namespace DecoderParameter
                 return "gpuRevision";
             case sdkVersion:
                 return "sdkVersion";
-            case architecture:
-                return "architecture";
             case framePictureWidth:
                 return "framePictureWidth";
             case framePictureHeight:
@@ -46,7 +50,13 @@ namespace DecoderParameter
 
     Value fromString( const std::string& name )
     {
-        if( name == "gpuDeviceString" )
+        if( name == "decoderName" )
+            return decoderName;
+        else if( name == "osName" )
+            return osName;
+        else if( name == "architecture" )
+            return architecture;
+        else if( name == "gpuDeviceString" )
             return gpuDeviceString;
         else if( name == "driverVersion" )
             return driverVersion;
@@ -58,8 +68,6 @@ namespace DecoderParameter
             return gpuRevision;
         else if( name == "sdkVersion" )
             return sdkVersion;
-        else if( name == "architecture" )
-            return architecture;
         else if( name == "framePictureWidth" )
             return framePictureWidth;
         else if( name == "framePictureHeight" )
@@ -81,13 +89,15 @@ namespace DecoderParameter
 
 DecoderResourcesNameset::DecoderResourcesNameset()
 {
+    registerResource( DecoderParameter::decoderName, QString::fromAscii("decoderName"), QVariant::String );
+    registerResource( DecoderParameter::osName, QString::fromAscii("osName"), QVariant::String );
+    registerResource( DecoderParameter::architecture, QString::fromAscii("architecture"), QVariant::String );
     registerResource( DecoderParameter::gpuDeviceString, QString::fromAscii("gpuDeviceString"), QVariant::String );
     registerResource( DecoderParameter::driverVersion, QString::fromAscii("driverVersion"), QVariant::String );
     registerResource( DecoderParameter::gpuVendorId, QString::fromAscii("gpuVendorId"), QVariant::UInt );
     registerResource( DecoderParameter::gpuDeviceId, QString::fromAscii("gpuDeviceId"), QVariant::UInt );
     registerResource( DecoderParameter::gpuRevision, QString::fromAscii("gpuRevision"), QVariant::UInt );
     registerResource( DecoderParameter::sdkVersion, QString::fromAscii("sdkVersion"), QVariant::String );
-    registerResource( DecoderParameter::architecture, QString::fromAscii("architecture"), QVariant::String );
     registerResource( DecoderParameter::framePictureWidth, QString::fromAscii("framePictureWidth"), QVariant::Int );
     registerResource( DecoderParameter::framePictureHeight, QString::fromAscii("framePictureHeight"), QVariant::Int );
     registerResource( DecoderParameter::framePictureSize, QString::fromAscii("framePictureSize"), QVariant::UInt );

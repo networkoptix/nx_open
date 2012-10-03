@@ -16,7 +16,13 @@ namespace DecoderParameter
     enum Value
     {
         //string
-        gpuDeviceString = 1,
+        decoderName = 1,
+        //string
+        osName,
+        //string. CPU archtecture (x64 or x86)
+        architecture,
+        //string
+        gpuDeviceString,
         //string. e.g. 1.2.3.4 (Product.Version.SubVersion.Build)
         driverVersion,
         //unsigned int
@@ -27,8 +33,6 @@ namespace DecoderParameter
         gpuRevision,
         //string
         sdkVersion,
-        //string. CPU archtecture (x64 or x86)
-        architecture,
         //int. Width of decoded frame picture in pixels (before any post-processing)
         framePictureWidth,
         //int. Height of decoded frame picture in pixels (before any post-processing)
