@@ -47,6 +47,7 @@
     <Compile Include="PortIsBusyDlg.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="SelectionWarning.wxs" />
+    <Compile Include="UninstallOptionsDlg.wxs" />
     <Compile Include="UpgradeDlg.wxs" />
   </ItemGroup>
   <ItemGroup>
