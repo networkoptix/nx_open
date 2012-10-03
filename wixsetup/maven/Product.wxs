@@ -803,7 +803,7 @@
             <ComponentRef Id="AppServerExecutable" />
             <ComponentRef Id="ecs.log" />           
             <ComponentRef Id="AppServerConfiguration"/>
-           <ComponentRef Id="AppServerConfigurationPassword"/>
+            <ComponentRef Id="AppServerConfigurationPassword"/>
             <ComponentRef Id="AppServerConfigurationGuid"/>
             
             <ComponentRef Id="ProxyExecutable" />
@@ -811,14 +811,17 @@
             <ComponentRef Id="ProxyOpenSSL" />
         </Feature>
         
+        <Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
+            <ComponentRef Id="ARPAltRegistryEntries"/>            
+            <ComponentRef Id="UninstallProgramMenuFolder"/>
+        </Feature>
+        
         <Feature Id="TrayToolFeature" Title="Tray Tool" AllowAdvertise="no" Display="hidden" Level="1">
 <!--            <Condition Level="0"><![CDATA[ $(var.VmsUpgrading) AND !TrayToolFeature <> 3 ]]> </Condition>-->
             
-            <ComponentRef Id="ARPAltRegistryEntries"/>            
             <ComponentRef Id="traytool.exe"/>
             <ComponentRef Id="TrayToolQTLibraries"/>
             <ComponentRef Id="TrayToolOpenSSL"/>
-            <ComponentRef Id="UninstallProgramMenuFolder"/>
         </Feature>
         
         <Feature Id="ServerFeature" Title="${product.name} Media Server" Level="1"
@@ -941,11 +944,14 @@
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
             
             <?define SomeFeaturesSelected="(!ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+            <?define NeedTrayTool="(&AppServerFeature = 3 OR !AppServerFeature = 3 OR &ServerFeature = 3 OR (!ServerFeature = 3 AND &ServerFeature <> 2))"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature=3]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature<>3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature"><![CDATA[ $(var.NeedTrayTool) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature"><![CDATA[ NOT $(var.NeedTrayTool) ]]></Publish>
             
             <!-- Reset values in case when user returns to this dialog after AppServerDlg -->
 
