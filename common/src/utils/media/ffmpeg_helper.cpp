@@ -688,3 +688,30 @@ error_label:
     av_free(ctx);
     return 0;
 }
+
+QString getAudioCodecDescription(AVCodecContext* codecContext)
+{
+    QString result;
+    QString codecStr = codecIDToString(codecContext->codec_id);
+    if (!codecStr.isEmpty())
+    {
+        result += codecStr;
+        result += QLatin1Char(' ');
+    }
+
+    //str += QString::number(codecContext->sample_rate / 1000)+ QLatin1String("Khz ");
+    if (codecContext->channels == 3)
+        result += QLatin1String("2.1");
+    else if (codecContext->channels == 6)
+        result += QLatin1String("5.1");
+    else if (codecContext->channels == 8)
+        result += QLatin1String("7.1");
+    else if (codecContext->channels == 2)
+        result += QLatin1String("stereo");
+    else if (codecContext->channels == 1)
+        result += QLatin1String("mono");
+    else
+        result += QString::number(codecContext->channels);
+
+    return result;
+}

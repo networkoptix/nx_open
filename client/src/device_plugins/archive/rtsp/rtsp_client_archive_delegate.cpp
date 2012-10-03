@@ -31,7 +31,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_lastMinTimeTime(0),
     m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_forcedEndTime(AV_NOPTS_VALUE),
-    m_isMultiserverAllowed(true)
+    m_isMultiserverAllowed(true),
+    m_audioLayout(0)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -53,6 +54,7 @@ QnRtspClientArchiveDelegate::~QnRtspClientArchiveDelegate()
 {
     close();
     delete [] m_rtpDataBuffer;
+    delete m_audioLayout;
 }
 
 QnResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime(QnResourcePtr resource, qint64 time)
@@ -263,6 +265,8 @@ void QnRtspClientArchiveDelegate::close()
     m_nextDataPacket.clear();
     m_contextMap.clear();
     m_opened = false;
+    delete m_audioLayout;
+    m_audioLayout = 0;
 }
 
 qint64 QnRtspClientArchiveDelegate::startTime()
@@ -555,9 +559,16 @@ QnResourceVideoLayout* QnRtspClientArchiveDelegate::getVideoLayout()
 
 QnResourceAudioLayout* QnRtspClientArchiveDelegate::getAudioLayout()
 {
-    // todo: implement me
-    static QnEmptyResourceAudioLayout emptyAudioLayout;
-    return &emptyAudioLayout;
+    if (m_audioLayout == 0) {
+        m_audioLayout = new QnResourceCustomAudioLayout();
+        for (QMap<int, QnMediaContextPtr>::const_iterator itr = m_contextMap.begin(); itr != m_contextMap.end(); ++itr)
+        {
+            QnMediaContextPtr context = itr.value();
+            if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+                m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
+        }
+    }
+    return m_audioLayout;
 }
 
 void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSize)

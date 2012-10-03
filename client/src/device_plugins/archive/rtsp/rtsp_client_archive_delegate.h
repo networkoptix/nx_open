@@ -95,6 +95,7 @@ private:
 
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
+    QnResourceCustomAudioLayout* m_audioLayout;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

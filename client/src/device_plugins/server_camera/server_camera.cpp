@@ -77,9 +77,11 @@ const QnResourceVideoLayout* QnServerCamera::getVideoLayout(const QnAbstractMedi
 
 const QnResourceAudioLayout* QnServerCamera::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
-    Q_UNUSED(dataProvider)
-    // todo: layout must be loaded in resourceParams
-    return QnMediaResource::getAudioLayout();
+    const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
+    if (archive)
+        return archive->getDPAudioLayout();
+    else
+        return QnMediaResource::getAudioLayout();
 }
 
 

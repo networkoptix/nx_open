@@ -424,6 +424,14 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
             audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
             audioStream->first_dts = 0;
+
+            if (audioStream->codec->codec_id == CODEC_ID_AAC && m_container == QLatin1String("avi"))
+            {
+                // ffmpeg bug for AAC in avi (there are invalid pts values for AAC). Disable it.
+                m_lastErrMessage = tr("AAC audio codec is not allowed for avi files. Please change file format.");
+                cl_log.log(m_lastErrMessage, cl_logERROR);
+                return false;
+            }
         }
 
         m_formatCtx->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::WriteOnly);
