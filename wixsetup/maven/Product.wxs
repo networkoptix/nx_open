@@ -38,6 +38,12 @@
         
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
          
+        <?if $(var.arch)=x86 ?>
+            <Condition Message="This package is designed for 32-bit OS">
+                <![CDATA[VersionNT64]]>
+            </Condition>
+        <?endif?>
+        
         <SystemTools:DeleteFile Id="test1" File="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db" DeleteOnUnInstall="yes" CheckIfExists="yes" > REMOVE_DATABASE = "1" </SystemTools:DeleteFile>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
