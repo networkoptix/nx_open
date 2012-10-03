@@ -333,6 +333,7 @@ void QnAviArchiveDelegate::close()
     m_streamsFound = false;
     m_startMksec = 0;
     m_storage.clear();
+    m_lastPacketTimes.clear();
 }
 
 static QnDefaultResourceVideoLayout defaultVideoLayout;
