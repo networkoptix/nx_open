@@ -4,10 +4,18 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension"
      xmlns:SystemTools="http://schemas.appsecinc.com/wix/SystemToolsExtension">
     <Product Id="*" Name="${product.name}" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.upgradeCode}">
-        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine" />
+        <Package Id="*" InstallerVersion="300" Compressed="yes" Keywords="Installer" Comments="${company.name} ${product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
         
+        <?define arch = "${arch}"?>
+              
         <?include ControlPanel.wxi ?>
 
+        <?if $(var.arch) = x86?>
+        <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+        <?else?>
+        <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+        <?endif?>
+        
         <!-- Wix Variables -->
         
         <?ifdef env.CommonProgramFiles(x86) ?>
@@ -35,7 +43,21 @@
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
         <SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
-        <SetProperty Id="SERVER_APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
+
+        <SetProperty Id="APPSERVER_GUID" Value="[APPSERVER_GUID32]" After="AppSearch"><![CDATA[ APPSERVER_GUID = "" ]]></SetProperty>
+        <SetProperty Id="APPSERVER_PORT" Value="[APPSERVER_PORT32]" After="AppSearch"><![CDATA[ APPSERVER_PORT = "" ]]></SetProperty>        
+        <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch"><![CDATA[ PROXY_PORT = "" ]]></SetProperty>
+        <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch"><![CDATA[ APPSERVER_PASSWORD_REG = "" ]]></SetProperty>
+        
+        <SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_HOST = "" ]]></SetProperty>
+        <SetProperty Id="SERVER_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PORT = "" ]]></SetProperty>
+        <SetProperty Id="SERVER_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_LOGIN = "" ]]></SetProperty>
+        <SetProperty Id="SERVER_APPSERVER_PASSWORD" Value="[SERVER_APPSERVER_PASSWORD32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PASSWORD = "" ]]></SetProperty>
+        
+        <SetProperty Id="SERVER_PORT" Value="[SERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_PORT = "" ]]></SetProperty>
+        <SetProperty Id="SERVER_DIRECTORY_REG" Value="[SERVER_DIRECTORY_REG32]" After="AppSearch"><![CDATA[ SERVER_DIRECTORY_REG = "" ]]></SetProperty>
+        <SetProperty Id="SERVER_GUID" Value="[SERVER_GUID32]" After="AppSearch"><![CDATA[ SERVER_GUID = "" ]]></SetProperty>
+        <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch"><![CDATA[ CLIENT_DIRECTORY_REG = "" ]]></SetProperty>        
 
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
@@ -70,11 +92,29 @@
                             Key="Software\${company.name}\${appserver.name}"
                             Name="ecsGuid"
                             Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="APPSERVER_GUID32" Secure="yes">
+            <RegistrySearch Id="EcsGuidReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="ecsGuid"
+                            Type="raw"
                             Win64="no"/>
         </Property>
         
         <Property Id="APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="AppServerPortReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="port"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="APPSERVER_PORT32" Secure="yes">
+            <RegistrySearch Id="AppServerPortReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${appserver.name}"
                             Name="port"
@@ -88,12 +128,30 @@
                             Key="Software\${company.name}\${appserver.name}"
                             Name="proxyPort"
                             Type="raw"
-                            Win64="no"/>
+                            Win64="yes"/>
         </Property>
 
+        <Property Id="PROXY_PORT32" Secure="yes">
+            <RegistrySearch Id="ProxyPortReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="proxyPort"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
         <!-- We use ecs password only when doing repair -->
         <Property Id="APPSERVER_PASSWORD_REG" Secure="yes">
             <RegistrySearch Id="AppServerPasswordReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${appserver.name}"
+                            Name="password"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="APPSERVER_PASSWORD_REG32" Secure="yes">
+            <RegistrySearch Id="AppServerPasswordReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${appserver.name}"
                             Name="password"
@@ -106,12 +164,89 @@
         <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
-        <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost"/>
-        <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000"/>
-        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin"/>
-        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes"/>
+        <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost">
+            <RegistrySearch Id="ServerEcsHostReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverHost"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="SERVER_APPSERVER_HOST32" Secure="yes" Value="localhost">
+            <RegistrySearch Id="ServerEcsHostReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverHost"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
+        <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000">
+            <RegistrySearch Id="ServerEcsPortReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverPort"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+            
+        <Property Id="SERVER_APPSERVER_PORT32" Secure="yes" Value="8000">
+            <RegistrySearch Id="ServerEcsPortReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverPort"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
+        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin">
+            <RegistrySearch Id="ServerEcsLoginReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverLogin"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+            
+        <Property Id="SERVER_APPSERVER_LOGIN32" Secure="yes" Value="admin">
+            <RegistrySearch Id="ServerEcsLoginReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverLogin"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
+        <Property Id="SERVER_APPSERVER_PASSWORD" Secure="yes">
+            <RegistrySearch Id="ServerEcsPasswordReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverPassword"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="SERVER_APPSERVER_PASSWORD32" Secure="yes">
+            <RegistrySearch Id="ServerEcsPasswordReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="appserverPassword"
+                            Type="raw"
+                            Win64="no"/>
+        </Property>
+        
         <Property Id="SERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerPortReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="rtspPort"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="SERVER_PORT32" Secure="yes">
+            <RegistrySearch Id="ServerPortReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="rtspPort"
@@ -127,12 +262,31 @@
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="mediaDir"
                             Type="raw"
-                            Win64="no">
+                            Win64="yes">
             </RegistrySearch>
         </Property>
 
+        <Property Id="SERVER_DIRECTORY_REG32" Secure="yes">
+            <RegistrySearch Id="ServerDirectoryReg32"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="mediaDir"
+                            Type="raw"
+                            Win64="no">
+            </RegistrySearch>
+        </Property>
+        
         <Property Id="SERVER_GUID" Secure="yes">
             <RegistrySearch Id="ServerGuidReg"
+                            Root="HKLM"
+                            Key="Software\${company.name}\${mediaserver.name}"
+                            Name="serverGuid"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="SERVER_GUID32" Secure="yes">
+            <RegistrySearch Id="ServerGuidReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
                             Name="serverGuid"
@@ -152,6 +306,15 @@
         <Property Id="CLIENT_VMS_MODE" Value="1"/>
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
+                            Root="HKCU"
+                            Key="Software\[Manufacturer]\${client.name}"
+                            Name="mediaRoot"
+                            Type="raw"
+                            Win64="yes"/>
+        </Property>
+        
+        <Property Id="CLIENT_DIRECTORY_REG32" Secure="yes">
+            <RegistrySearch Id="ClientDirectoryReg32"
                             Root="HKCU"
                             Key="Software\[Manufacturer]\${client.name}"
                             Name="mediaRoot"
@@ -306,7 +469,7 @@
                 </Component>
             </Directory>
 
-            <Directory Id="ProgramFilesFolder">
+            <Directory Id="$(var.ProgramFilesFolder)">
                 <Directory Id="NetworkOptix" Name="${company.name}">
                     <Directory Id="INSTALLDIR" Name="${product.name}">
                         <Directory Id="${installer.customization}AppServerDir" Name="${appserver.name}">
@@ -451,10 +614,6 @@
                             </Component>
                             
                             <Component Id="ServerConfiguration" Guid="{C3BA240A-2D18-4723-B084-D2774F51D1B0}" Permanent="yes">
-                                <Condition>
-                                    NOT PREVIOUSVERSIONSINSTALLED
-                                </Condition>
-
                                 <RegistryKey Root="HKLM"
                                              Key="Software\[Manufacturer]\${mediaserver.name}"
                                              Action="create">
@@ -463,9 +622,7 @@
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[SERVER_APPSERVER_LOGIN]"/>
                                     <RegistryValue Type="string" Name="appserverPassword" Value="[SERVER_APPSERVER_PASSWORD]"/>
                                     <RegistryValue Type="string" Name="rtspPort" Value="[SERVER_PORT]"/>
-                                    <RegistryValue Type="string" Name="apiPort" Value="[SERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="mediaDir" Value="[SERVER_DIRECTORY]"/>
-                                    <RegistryValue Type="string" Name="serverGuid" Value="[SERVER_GUID]"/>
                                 </RegistryKey>
                             </Component>
                             
@@ -493,6 +650,10 @@
                             <Component Id="ServerOpenSSL" Guid="{DC94094B-CA8C-4be0-9A8A-6DA35FCC77E6}">
                                 <File Id="Serverlibeay32.dll" Name="libeay32.dll" Source="${libdir}/bin/${build.configuration}\libeay32.dll"/>
                                 <File Id="Serverssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
+                            </Component>
+                        
+                            <Component Id="ServerSigar" Guid="{15E53052-24D8-4c7f-ACBB-2D404BE06A03}">
+                                <File Id="ServerSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
                             </Component>
                         </Directory>
                         
@@ -601,12 +762,19 @@
             <Directory Id="StartupFolder" Name="Startup"/>
         </Directory>
         
+        <?if $(var.arch) = x86 ?>
+        <?define archSuffix = "x86" ?>
+        <?else?>
+        <?define archSuffix = "x86_x64" ?>
+        <?endif?>
+        
+
         <DirectoryRef Id="TARGETDIR">
-            <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_CRT_x86.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist1" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_CRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist2" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_CRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
             <?if ${build.configuration} = Debug ?>
-            <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
-            <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_DebugCRT_x86.msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist3" SourceFile="$(var.commonProgramFiles)Merge Modules\Microsoft_VC90_DebugCRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
+            <Merge Id="VCRedist4" SourceFile="$(var.commonProgramFiles)Merge Modules\policy_9_0_Microsoft_VC90_DebugCRT_$(var.archSuffix).msm" DiskId="1" Language="0"/>
             <?endif?>
         </DirectoryRef>
         
@@ -657,6 +825,7 @@
             <ComponentRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
+            <ComponentRef Id="ServerSigar"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
