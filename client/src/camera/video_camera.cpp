@@ -4,6 +4,7 @@
 #include "utils/client_util.h"
 #include "ui/style/skin.h"
 #include "core/resource/security_cam_resource.h"
+#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 
 QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
@@ -190,6 +191,14 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
             return;
         }
         m_exportReader->setCycleMode(false);
+        QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
+        if (rtspClient) {
+            // 'slow' open mode. send DESCRIBE and SETUP to server.
+            // it is required for av_streams in output file - we should know all codec context imediatly
+            rtspClient->setResource(m_resource);
+            rtspClient->setPlayNowModeAllowed(false); 
+        }
+        
 
         m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);

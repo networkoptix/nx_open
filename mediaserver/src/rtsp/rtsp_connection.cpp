@@ -526,7 +526,14 @@ int QnRtspConnectionProcessor::composeDescribe()
         QnRtspEncoderPtr encoder;
         if (d->useProprietaryFormat)
         {
-            encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+            QnRtspFfmpegEncoder* ffmpegEncoder = new QnRtspFfmpegEncoder();
+            encoder = QnRtspEncoderPtr(ffmpegEncoder);
+            if (i >= numVideo) 
+            {
+                QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+                if (media)
+                    ffmpegEncoder->setCodecContext(media->context);
+            }
 
         }
         else {

@@ -168,7 +168,13 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
-    return QByteArray();
+    if (!m_codecCtxData.isEmpty()) {
+        QString result("a=fmtp:%1 config=%2\r\n");
+        return result.arg((int)getPayloadtype()).arg(QString(m_codecCtxData.toBase64())).toLocal8Bit();
+    }
+    else {
+        return QByteArray();
+    }
 }
 
 QString QnRtspFfmpegEncoder::getName()
@@ -184,4 +190,9 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
+}
+
+void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
+{
+    QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
 }

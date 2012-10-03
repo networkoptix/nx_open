@@ -50,6 +50,8 @@ public:
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     void setMultiserverAllowed(bool value);
+
+    void setPlayNowModeAllowed(bool value);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
     void processMetadata(const quint8* data, int dataSize);
@@ -63,6 +65,7 @@ private:
     QString getUrl(QnResourcePtr server);
     qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
     void updateRtpParam(QnResourcePtr resource);
+    void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
@@ -96,6 +99,7 @@ private:
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
     QnResourceCustomAudioLayout* m_audioLayout;
+    bool m_playNowModeAllowed; // fast open mode without DESCRIBE
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
