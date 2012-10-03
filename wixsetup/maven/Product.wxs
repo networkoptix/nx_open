@@ -76,7 +76,7 @@
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
-        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" />
        
         <!-- Properties -->
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
@@ -912,8 +912,9 @@
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
-           <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
 
+            <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
