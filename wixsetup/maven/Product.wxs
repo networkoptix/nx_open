@@ -73,6 +73,8 @@
         <Icon Id="icon_menu.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         <Icon Id="icon_desktop.exe" SourceFile="Binary\eve\eve_logo.ico"/>
         
+        <!-- Add property to access from custom actions -->
+        <Property Id="ARCHITECTURE" Value="$(var.arch)" />
         <Property Id="MSIRESTARTMANAGERCONTROL" Value="Disable" Secure="yes"/>
 
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
@@ -1059,9 +1061,10 @@
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstalling) AND &ServerFeature <> 3)) ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg" Order="2"><![CDATA[ $(var.VmsRemoving) ]]></Publish>        	
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg" Order="2"><![CDATA[ $(var.VmsRemoving) AND !AppServerFeature = 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[ $(var.VmsRemoving) AND !AppServerFeature <> 3 ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3"><![CDATA[ Installed ]]></Publish>
-            
+                        
 <!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>
 -->            
@@ -1069,7 +1072,8 @@
             <Publish Dialog="MaintenanceTypeDlg" Control="ChangeButton" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Property="REMOVE" Value="ALL">1</Publish>
-            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg">1</Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="UninstallOptionsDlg"><![CDATA[ !AppServerFeature = 3 ]]></Publish>
+            <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ !AppServerFeature <> 3 ]]></Publish>
             <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
