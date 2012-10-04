@@ -2029,7 +2029,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     }
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
-    exportProgressDialog = new QProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
