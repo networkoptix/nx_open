@@ -8,6 +8,7 @@ static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
+static const int AUDIO_CAUPTURE_ALT_FREQUENCY = 48000;
 static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
 
 static const int MAX_VIDEO_JITTER = 2;
@@ -305,8 +306,11 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
         m_audioFormat.setChannels(1);
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
-            errMessage = QLatin1String("Unsupported audio format specified for capturing!");
-            return false;
+            m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
+            if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
+                errMessage = tr("Unsupported audio format specified for capturing!");
+                return false;
+            }
         }
     }
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
