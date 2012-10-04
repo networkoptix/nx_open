@@ -2367,6 +2367,27 @@ Do you want to continue?"),
             }
         }
 
+        if (fileName.endsWith(QLatin1String(".avi")))
+        {
+            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
+            const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
+            if (loader && archive) 
+            {
+                QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
+                if (periods.size() > 1 && archive->getDPAudioLayout()->numberOfChannels() > 0)
+                {
+                    int result = QMessageBox::warning(
+                        this->widget(), 
+                        tr("AVI format is not recommended"), 
+                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
+                        QMessageBox::Yes | QMessageBox::No
+                        );
+                    if (result != QMessageBox::Yes)
+                        continue;
+                }
+            }
+        }
+
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 this->widget(), 
