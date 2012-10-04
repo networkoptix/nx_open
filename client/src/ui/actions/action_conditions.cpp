@@ -177,7 +177,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::layout))
+        if(resource->hasFlags(QnResource::layout) && !resource->hasFlags(QnResource::local))
             continue; /* OK to remove. */
 
         if(resource->hasFlags(QnResource::user))

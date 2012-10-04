@@ -113,7 +113,7 @@ public:
     ~RTPSession();
 
     // returns true if stream was opened, false in case of some error
-    bool open(const QString& url);
+    bool open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -207,6 +207,7 @@ public:
 signals:
     void gotTextResponse(QByteArray text);
 private:
+    void addRangeHeader(QByteArray& request, qint64 startPos, qint64 endPos);
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();

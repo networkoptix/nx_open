@@ -32,6 +32,11 @@ QnMediaContext::QnMediaContext(CodecID codecId)
     }
 }
 
+QnMediaContext::QnMediaContext(const QByteArray& payload)
+{
+    m_ctx = QnFfmpegHelper::deserializeCodecContext(payload.data(), payload.size());
+}
+
 QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 {

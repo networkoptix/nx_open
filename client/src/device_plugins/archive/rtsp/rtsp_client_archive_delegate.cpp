@@ -32,7 +32,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_globalMinArchiveTime(AV_NOPTS_VALUE),
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
-    m_audioLayout(0)
+    m_audioLayout(0),
+    m_playNowModeAllowed(true)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -219,7 +220,7 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
         globalTimeBlocked = true;
     }
     
-    bool isOpened = m_rtspSession.open(getUrl(resource));
+    bool isOpened = m_rtspSession.open(getUrl(resource), m_lastSeekTime);
     if (isOpened)
     {
         qint64 endTime = m_position;
@@ -243,8 +244,28 @@ bool QnRtspClientArchiveDelegate::openInternal(QnResourcePtr resource)
     else if (globalTimeBlocked)
         m_globalMinArchiveTime = 0; // unblock min time value. So, get value from current server (left point can be changed because of server delete some files)
 
+    QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
+    parseAudioSDP(audioSDP);
 
     return m_opened;
+}
+
+void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSDP)
+{
+    for (int i = 0; i < audioSDP.size(); ++i)
+    {
+        if (audioSDP[i].startsWith("a=fmtp")) {
+            int configPos = audioSDP[i].indexOf("config=");
+            if (configPos > 0) {
+                delete m_audioLayout;
+                m_audioLayout = new QnResourceCustomAudioLayout();
+                QByteArray contextData = QByteArray::fromBase64(audioSDP[i].mid(configPos + 7));
+                QnMediaContextPtr context(new QnMediaContext(contextData));
+                if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
+                    m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
+            }
+        }
+    }
 }
 
 void QnRtspClientArchiveDelegate::beforeClose()
@@ -854,6 +875,8 @@ void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
 
 void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
 {
+    if (!m_playNowModeAllowed)
+        return;
     int numOfVideoChannels = 1;
     QnMediaResourcePtr mediaRes = qSharedPointerDynamicCast<QnMediaResource> (resource);
     if (mediaRes) {
@@ -862,4 +885,11 @@ void QnRtspClientArchiveDelegate::updateRtpParam(QnResourcePtr resource)
             numOfVideoChannels = videoLayout->numberOfChannels();
     }
     m_rtspSession.setUsePredefinedTracks(numOfVideoChannels); // ommit DESCRIBE and SETUP requests
+}
+
+void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
+{
+    m_playNowModeAllowed = value;
+    if (!value)
+        m_rtspSession.setUsePredefinedTracks(0);
 }
