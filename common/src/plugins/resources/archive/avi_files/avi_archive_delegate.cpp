@@ -246,8 +246,8 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (m_eofReached)
         return time;
 
-    time = qMax(time-m_startTime, 0ll);
-    avformat_seek_file(m_formatContext, -1, 0, time + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+    qint64 relTime = qMax(time-m_startTime, 0ll);
+    avformat_seek_file(m_formatContext, -1, 0, relTime + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     return time;
 }
 
