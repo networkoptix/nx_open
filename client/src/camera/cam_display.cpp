@@ -949,6 +949,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
         if (m_emptyPacketCounter >= 3)
         {
+            m_buffering = 0; // if no any media data received after jump, reset buffering info
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
             bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(emptyData->dataProvider->getResource()) != 0;
             if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended) {
@@ -1319,6 +1320,8 @@ void QnCamDisplay::onRealTimeStreamHint(bool value)
             QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(archive->getResource());
             if (camera)
                 m_hadAudio = camera->isAudioEnabled();
+            else
+                m_isRealTimeSource = false; // realtime mode allowed for cameras only
         }
         setMTDecoding(m_playAudio && m_useMTRealTimeDecode);
     }
@@ -1428,9 +1431,11 @@ bool QnCamDisplay::isNoData() const
         return false;
 
     qint64 ct = m_extTimeSrc->getCurrentTime();
-    bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && (m_jumpTime != DATETIME_NOW || m_speed < 0);
-    if (!useSync || ct == DATETIME_NOW)
-        return false;
+    if (m_isRealTimeSource) {
+        bool useSync = m_extTimeSrc && m_extTimeSrc->isEnabled() && (m_jumpTime != DATETIME_NOW || m_speed < 0);
+        if (!useSync || ct == DATETIME_NOW)
+            return false;
+    }
 
     return m_isLongWaiting || m_emptyPacketCounter >= 3;
     /*
