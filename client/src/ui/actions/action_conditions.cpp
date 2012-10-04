@@ -274,13 +274,14 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
-    QnResourcePtr resource = parameters.resource();
-    if(resource->flags() & QnResource::utc) {
-        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-        if(!periods.intersects(period))
-            return Qn::DisabledAction;
-    }
-    
+    if (m_centralItemRequired) {
+        QnResourcePtr resource = parameters.resource();
+        if(resource->flags() & QnResource::utc) {
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+            if(!periods.intersects(period))
+                return Qn::DisabledAction;
+        }
+    }    
     return Qn::EnabledAction;
 }
 
