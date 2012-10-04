@@ -921,10 +921,29 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
     }
 
-
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
 
-    if (emptyData)
+    bool flushCurrentBuffer = false;
+    int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
+    QnCodecAudioFormat currentAudioFormat;
+    bool audioParamsChanged = ad && (m_playingFormat != currentAudioFormat.fromAvStream(ad->context) || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
+    if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
+        m_videoQueue[0].size() > 0)
+    {
+        // skip data (play current buffer
+        flushCurrentBuffer = true;
+    }
+    else if (emptyData && m_videoQueue[0].size() > 0) {
+        flushCurrentBuffer = true;
+    }
+    else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
+    {
+        if (vd)
+            m_display[vd->channelNumber]->waitForFramesDisplaed();
+        afterJump(media);
+    }
+
+    if (emptyData && !flushCurrentBuffer)
     {
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
@@ -971,23 +990,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_eofSignalSended = false;
         }
         m_emptyPacketCounter = 0;
-    }
-
-    bool flushCurrentBuffer = false;
-    int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
-    QnCodecAudioFormat currentAudioFormat;
-    bool audioParamsChanged = ad && (m_playingFormat != currentAudioFormat.fromAvStream(ad->context) || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
-    if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
-        m_videoQueue[0].size() > 0)
-    {
-        // skip data (play current buffer
-        flushCurrentBuffer = true;
-    }
-    else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 
-    {
-        if (vd)
-            m_display[vd->channelNumber]->waitForFramesDisplaed();
-        afterJump(media);
     }
 
     if (ad && !flushCurrentBuffer)
