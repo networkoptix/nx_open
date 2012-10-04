@@ -2433,7 +2433,7 @@ Do you want to continue?"),
 
     camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
 
-    exportProgressDialog->exec();
+    //exportProgressDialog->exec();
 }
 
 
