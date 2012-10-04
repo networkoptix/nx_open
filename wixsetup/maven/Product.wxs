@@ -38,9 +38,9 @@
         
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
          
-        <?if $(var.arch)=x86 ?>
-            <Condition Message="This package is designed for 32-bit OS">
-                <![CDATA[VersionNT64]]>
+        <?if $(var.arch) = x86 ?>
+            <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
+                <![CDATA[ NOT VersionNT64 ]]>
             </Condition>
         <?endif?>
         
@@ -55,8 +55,8 @@
         <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch"><![CDATA[ PROXY_PORT = "" ]]></SetProperty>
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch"><![CDATA[ APPSERVER_PASSWORD_REG = "" ]]></SetProperty>
         
-        <SetProperty Id="INSTALL_SERVER" Value="1" After="AppSearch"><![CDATA[ &ServerFeature]]></SetProperty>
-        <SetProperty Id="INSTALL_CLIENT" Value="1" After="AppSearch"><![CDATA[ &ClientFeature]]></SetProperty>
+        <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ !ServerFeature = 3 ]]></SetProperty>
+        <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ !ClientFeature = 3 ]]></SetProperty>
 
         <SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_HOST = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PORT = "" ]]></SetProperty>
