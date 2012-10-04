@@ -1,10 +1,12 @@
 #include "ffmpeg_audio_transcoder.h"
 
+static const int MAX_AUDIO_JITTER = 1000 * 200;
 
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
 QnAudioTranscoder(codecId),
 m_encoderCtx(0),
-m_firstEncodedPts(AV_NOPTS_VALUE)
+m_firstEncodedPts(AV_NOPTS_VALUE),
+m_lastTimestamp(AV_NOPTS_VALUE)
 {
     m_bitrate = 128*1000;
     m_audioEncodingBuffer = (quint8*) qMallocAligned(AVCODEC_MAX_AUDIO_FRAME_SIZE, 32);
@@ -91,8 +93,11 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         return -3;
 
     if (media) {
-        if (m_firstEncodedPts == AV_NOPTS_VALUE)
+        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER)
+        {
+            m_encoderCtx->frame_number = 0;
             m_firstEncodedPts = media->timestamp;
+        }
 
         m_lastTimestamp = media->timestamp;
         QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(media);
