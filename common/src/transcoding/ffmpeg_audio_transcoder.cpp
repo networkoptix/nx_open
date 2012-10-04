@@ -91,6 +91,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         return -3;
 
     if (media) {
+        if (m_firstEncodedPts == AV_NOPTS_VALUE)
+            m_firstEncodedPts = media->timestamp;
+
         m_lastTimestamp = media->timestamp;
         QnCompressedAudioDataPtr audio = qSharedPointerDynamicCast<QnCompressedAudioData>(media);
         AVPacket avpkt;
@@ -125,9 +128,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context));
     result->compressionType = m_codecId;
     static AVRational r = {1, 1000000};
-    result->timestamp  = m_lastTimestamp;
-    //qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size/m_encoderCtx->channels;
-    //result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r);
+    //result->timestamp  = m_lastTimestamp;
+    qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size/m_encoderCtx->channels;
+    result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r) + m_firstEncodedPts;
     result->data.write((const char*) m_audioEncodingBuffer, encoded);
 }
 
