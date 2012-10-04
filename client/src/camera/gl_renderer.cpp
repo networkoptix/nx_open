@@ -325,8 +325,6 @@ QnGLRenderer::QnGLRenderer(const QGLContext *context)
 
     m_forceSoftYUV = false;
     m_textureUploaded = false;
-    m_stride_old = 0;
-    m_height_old = 0;
     m_brightness = 0;
     m_contrast = 0;
     m_hue = 0;
@@ -384,22 +382,12 @@ void QnGLRenderer::beforeDestroy()
 void QnGLRenderer::draw(CLVideoDecoderOutput *img)
 {
     QMutexLocker locker(&m_displaySync);
-
-    //m_imageList.enqueue(img);
     if (m_curImg) 
         m_curImg->setDisplaying(false);
+    
+    img->setDisplaying(true);
+    m_format = img->format;
     m_curImg = img;
-    m_format = m_curImg->format;
-
-
-    m_curImg->setDisplaying(true);
-    if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
-    {
-        m_stride_old = m_curImg->linesize[0];
-        m_height_old = m_curImg->height;
-        m_color_old = (PixelFormat) m_curImg->format;
-    }
-
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -458,19 +446,19 @@ bool QnGLRenderer::isYuvFormat() const
     return m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV444P;
 }
 
-void QnGLRenderer::updateTexture()
+void QnGLRenderer::updateTexture(CLVideoDecoderOutput *img)
 {
-    unsigned int w[3] = { m_curImg->linesize[0], m_curImg->linesize[1], m_curImg->linesize[2] };
-    unsigned int r_w[3] = { m_curImg->width, m_curImg->width / 2, m_curImg->width / 2 }; // real_width / visible
-    unsigned int h[3] = { m_curImg->height, m_curImg->height / 2, m_curImg->height / 2 };
+    unsigned int w[3] = { img->linesize[0], img->linesize[1], img->linesize[2] };
+    unsigned int r_w[3] = { img->width, img->width / 2, img->width / 2 }; // real_width / visible
+    unsigned int h[3] = { img->height, img->height / 2, img->height / 2 };
 
-    switch (m_curImg->format)
+    switch (img->format)
     {
     case PIX_FMT_YUV444P:
-        r_w[1] = r_w[2] = m_curImg->width;
+        r_w[1] = r_w[2] = img->width;
     // fall through
     case PIX_FMT_YUV422P:
-        h[1] = h[2] = m_curImg->height;
+        h[1] = h[2] = img->height;
         break;
     default:
         break;
@@ -485,7 +473,7 @@ void QnGLRenderer::updateTexture()
             texture->ensureInitialized(r_w[i], h[i], w[i], 1, GL_LUMINANCE, 1, i == 0 ? 0x10 : 0x80);
 
             glBindTexture(GL_TEXTURE_2D, texture->id());
-            const uchar *pixels = m_curImg->data[i];
+            const uchar *pixels = img->data[i];
 
             glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
 
@@ -518,7 +506,7 @@ void QnGLRenderer::updateTexture()
 
         int bytesPerPixel = 1;
         if (!isYuvFormat()) {
-            if (m_curImg->format == PIX_FMT_RGB24 || m_curImg->format == PIX_FMT_BGR24)
+            if (img->format == PIX_FMT_RGB24 || img->format == PIX_FMT_BGR24)
                 bytesPerPixel = 3;
             else
                 bytesPerPixel = 4;
@@ -527,10 +515,10 @@ void QnGLRenderer::updateTexture()
         texture->ensureInitialized(r_w[0], h[0], w[0], bytesPerPixel, GL_RGBA, 4, 0);
         glBindTexture(GL_TEXTURE_2D, texture->id());
 
-        uchar *pixels = m_curImg->data[0];
+        uchar *pixels = img->data[0];
         if (isYuvFormat())
         {
-            int size = 4 * m_curImg->linesize[0] * h[0];
+            int size = 4 * img->linesize[0] * h[0];
             if (m_yuv2rgbBufferLen < size)
             {
                 m_yuv2rgbBufferLen = size;
@@ -540,17 +528,17 @@ void QnGLRenderer::updateTexture()
             pixels = m_yuv2rgbBuffer;
         }
 
-        int lineInPixelsSize = m_curImg->linesize[0];
-        switch (m_curImg->format)
+        int lineInPixelsSize = img->linesize[0];
+        switch (img->format)
         {
         case PIX_FMT_YUV420P:
             if (useSSE2())
             {
-                yuv420_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv420_argb32_sse2_intr(pixels, img->data[0], img->data[2], img->data[1],
                     qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
-                    4 * m_curImg->linesize[0],
-                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+                    4 * img->linesize[0],
+                    img->linesize[0], img->linesize[1], m_painterOpacity*255);
             }
             else {
                 cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
@@ -560,11 +548,11 @@ void QnGLRenderer::updateTexture()
         case PIX_FMT_YUV422P:
             if (useSSE2())
             {
-                yuv422_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv422_argb32_sse2_intr(pixels, img->data[0], img->data[2], img->data[1],
                     qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
-                    4 * m_curImg->linesize[0],
-                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+                    4 * img->linesize[0],
+                    img->linesize[0], img->linesize[1], m_painterOpacity*255);
             }
             else {
                 cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
@@ -574,11 +562,11 @@ void QnGLRenderer::updateTexture()
         case PIX_FMT_YUV444P:
             if (useSSE2())
             {
-                yuv444_argb32_sse2_intr(pixels, m_curImg->data[0], m_curImg->data[2], m_curImg->data[1],
+                yuv444_argb32_sse2_intr(pixels, img->data[0], img->data[2], img->data[1],
                     qPower2Ceil(r_w[0],ROUND_COEFF),
                     h[0],
-                    4 * m_curImg->linesize[0],
-                    m_curImg->linesize[0], m_curImg->linesize[1], m_painterOpacity*255);
+                    4 * img->linesize[0],
+                    img->linesize[0], img->linesize[1], m_painterOpacity*255);
             }
             else {
                 cl_log.log("CPU does not contains SSE2 module. Color space convert is not implemented", cl_logWARNING);
@@ -671,20 +659,22 @@ void QnGLRenderer::drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTextu
 
 CLVideoDecoderOutput *QnGLRenderer::update()
 {
-    QMutexLocker locker(&m_displaySync);
+    m_displaySync.lock();
+    CLVideoDecoderOutput* img = m_curImg;
+    m_displaySync.unlock();
 
-    if (m_curImg && m_curImg->linesize[0]) {
-        m_videoWidth = m_curImg->width;
-        m_videoHeight = m_curImg->height;
-        updateTexture();
-        if (quint64(m_curImg->pkt_dts) != AV_NOPTS_VALUE)
-            m_lastDisplayedTime = m_curImg->pkt_dts;
-        m_lastDisplayedMetadata[m_curImg->channel] = m_curImg->metadata;
-        m_lastDisplayedFlags = m_curImg->flags;
+    if (img && img->linesize[0]) {
+        m_videoWidth = img->width;
+        m_videoHeight = img->height;
+        updateTexture(img);
+        if (quint64(img->pkt_dts) != AV_NOPTS_VALUE)
+            m_lastDisplayedTime = img->pkt_dts;
+        m_lastDisplayedMetadata[img->channel] = img->metadata;
+        m_lastDisplayedFlags = img->flags;
         m_newtexture = true;
     } 
 
-    return m_curImg;
+    return img;
 }
 
 Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)

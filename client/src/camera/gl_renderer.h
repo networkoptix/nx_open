@@ -50,7 +50,7 @@ public:
 
 private:
     void drawVideoTexture(QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float *v_array);
-    void updateTexture();
+    void updateTexture(CLVideoDecoderOutput *img);
     bool isYuvFormat() const;
     int glRGBFormat() const;
     QnGlRendererTexture *texture(int index);
@@ -86,10 +86,6 @@ private:
     int m_yuv2rgbBufferLen;
 
     bool m_textureUploaded;
-
-    int m_stride_old;
-    int m_height_old;
-    PixelFormat m_color_old;
 
     qreal m_brightness;
     qreal m_contrast;
