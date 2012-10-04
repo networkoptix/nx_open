@@ -9,7 +9,7 @@ class QnSignDialogDisplay: public QnCamDisplay
 {
     Q_OBJECT
 public:
-    QnSignDialogDisplay();
+    QnSignDialogDisplay(QnMediaResourcePtr resource);
     virtual ~QnSignDialogDisplay();
 signals:
     void gotSignature(QByteArray calculatedSign, QByteArray signFromPicture);

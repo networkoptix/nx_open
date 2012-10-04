@@ -6,12 +6,11 @@
 #include "core/resource/security_cam_resource.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 
-QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
+QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
-    m_camdispay(generateEndOfStreamSignal),
+    m_camdispay(resource),
     m_recorder(0),
     m_reader(reader),
-    m_generateEndOfStreamSignal(generateEndOfStreamSignal),
     m_extTimeSrc(NULL),
     m_isVisible(true),
     m_exportRecorder(0),
@@ -33,8 +32,6 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStre
         connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
     }    
 
-    if (m_generateEndOfStreamSignal)
-        connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
 }
 
 QnVideoCamera::~QnVideoCamera()
@@ -166,13 +163,6 @@ void QnVideoCamera::setQuality(QnStreamQuality q, bool increase)
     else
         m_reader->setQuality(q);
         */
-}
-
-
-void QnVideoCamera::onReachedTheEnd()
-{
-    if (m_generateEndOfStreamSignal)
-        emit reachedTheEnd();
 }
 
 void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, QnStreamRecorder::Role role)

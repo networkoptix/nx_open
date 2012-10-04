@@ -91,7 +91,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
     m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
     m_reader->setCycleMode(false);
-    m_camDispay = new QnSignDialogDisplay();
+    m_camDispay = new QnSignDialogDisplay(m_resource);
 
     connect(m_camDispay, SIGNAL(gotSignature(QByteArray, QByteArray)), ui->signInfoLabel, SLOT(at_gotSignature(QByteArray, QByteArray)));
     connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), ui->signInfoLabel, SLOT(at_calcSignInProgress(QByteArray, int)));

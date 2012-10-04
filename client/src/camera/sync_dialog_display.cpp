@@ -3,8 +3,8 @@
 #include "utils/common/synctime.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 
-QnSignDialogDisplay::QnSignDialogDisplay(): 
-    QnCamDisplay(false),
+QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
+    QnCamDisplay(resource),
     m_mdctx(EXPORT_SIGN_METHOD)
 {
     m_firstFrameDisplayed = false;
