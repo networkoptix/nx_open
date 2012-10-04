@@ -2323,19 +2323,6 @@ Do you want to continue?"),
     QnNetworkResourcePtr networkResource = widget->resource().dynamicCast<QnNetworkResource>();
     QnSecurityCamResourcePtr cameraResource = widget->resource().dynamicCast<QnSecurityCamResource>();
 
-    bool disableAviFormat = false;
-    const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
-    if (archive)
-    {
-        const QnResourceAudioLayout* audioLayout = archive->getDPAudioLayout();
-        for (int i = 0; i < audioLayout->numberOfChannels(); ++i) {
-            QnResourceAudioLayout::AudioTrack aTrack = audioLayout->getAudioTrackInfo(i);
-            if (aTrack.codecContext && aTrack.codecContext->ctx() && aTrack.codecContext->ctx()->codec_id == CODEC_ID_AAC)
-                disableAviFormat = true;
-        }
-    }
-
-
     QSettings settings;
     settings.beginGroup(QLatin1String("export"));
     QString previousDir = settings.value(QLatin1String("previousDir")).toString();
@@ -2387,27 +2374,6 @@ Do you want to continue?"),
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
             );
-            continue;
-        }
-
-        if (disableAviFormat && fileName.toLower().endsWith(QLatin1String(".avi")))
-        {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Can't export to specified file format"), 
-                tr("Current video contains AAC audio codec. But AAC audio codec is not allowed for avi files. Please change file format to mkv."),
-                QMessageBox::Ok
-                );
-            QStringList filterList = allowedFormatFilter.split(QLatin1String(";;"));
-            allowedFormatFilter.clear();
-            for (int i = 0; i < filterList.size(); ++i)
-            {
-                if (!filterList[i].contains(QLatin1String(".avi"))) {
-                    if (!allowedFormatFilter.isEmpty())
-                        allowedFormatFilter += QLatin1String(";;");
-                    allowedFormatFilter += filterList[i];
-                }
-            }
             continue;
         }
 

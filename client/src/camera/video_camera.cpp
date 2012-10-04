@@ -207,6 +207,10 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
+        if (fileName.toLower().endsWith(QLatin1String(".avi")))
+        {
+            m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
+        }
     }
     if (m_motionFileList[0]) {
         m_exportReader->setSendMotion(true);

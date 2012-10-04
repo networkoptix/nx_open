@@ -132,7 +132,7 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
             */
             break;
         case TM_OpenCLTranscode:
-            m_lastErrMessage = "OpenCLTranscode is not implemented";
+            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
             return -1;
     }
     if (m_vTranscoder)
@@ -161,7 +161,7 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             */
             break;
         case TM_OpenCLTranscode:
-            m_lastErrMessage = "OpenCLTranscode is not implemented";
+            m_lastErrMessage = tr("OpenCLTranscode is not implemented");
             return -1;
     }
     return m_lastErrMessage.isEmpty();

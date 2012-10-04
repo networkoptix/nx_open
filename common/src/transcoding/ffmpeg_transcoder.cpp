@@ -105,7 +105,7 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
     global_ffmpeg_mutex.unlock();
     if (err != 0)
     {
-        m_lastErrMessage = QString("Can't create output context for format") + container;
+        m_lastErrMessage = tr("Can't create output context for format %1").arg(container);
         qWarning() << m_lastErrMessage;
         return -2;
     }

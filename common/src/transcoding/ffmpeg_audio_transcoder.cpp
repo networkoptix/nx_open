@@ -33,12 +33,17 @@ void QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
 {
     if (!audio->context)
     {
-        m_lastErrMessage = "Audio context must be specified";
+        m_lastErrMessage = QObject::tr("Audio context must be specified");
         return;
     }
 
     QnAudioTranscoder::open(audio);
 
+    open(audio->context);
+}
+
+void QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
+{
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
@@ -50,8 +55,8 @@ void QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
     //m_encoderCtx->codec_id = m_codecId;
     //m_encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_S16; //avCodec->sample_fmts[0];
-    m_encoderCtx->channels = audio->context->ctx()->channels;
-    m_encoderCtx->sample_rate = audio->context->ctx()->sample_rate;
+    m_encoderCtx->channels = codecCtx->ctx()->channels;
+    m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
 
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     m_encoderCtx->strict_std_compliance = FF_COMPLIANCE_EXPERIMENTAL;
@@ -63,18 +68,19 @@ void QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = QString("Can't initialize audio encoder");
+        m_lastErrMessage = QObject::tr("Can't initialize audio encoder");
         return;
     }
 
-    avCodec = avcodec_find_decoder(audio->compressionType);
+    avCodec = avcodec_find_decoder(codecCtx->ctx()->codec_id);
     m_decoderContext = avcodec_alloc_context3(0);
-    avcodec_copy_context(m_decoderContext, audio->context->ctx());
+    avcodec_copy_context(m_decoderContext, codecCtx->ctx());
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
-        m_lastErrMessage = QString("Can't initialize audio decoder");
+        m_lastErrMessage = QObject::tr("Can't initialize audio decoder");
         return;
     }
+    m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
@@ -98,14 +104,12 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             return -3;
         if (out_size > 0)
             m_decodedBufferSize += out_size;
+        Q_ASSERT(m_decodedBufferSize < AVCODEC_MAX_AUDIO_FRAME_SIZE);
     }
 
     int encoderFrameSize = m_encoderCtx->frame_size*sizeof(short);
     if (m_decodedBufferSize < encoderFrameSize)
         return 0;
-
-    //for (int j = 0; j < m_decodedBufferSize; ++j)
-    //    m_decodedBuffer[j] = rand();
 
     int encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
     if (encoded < 0)
@@ -117,17 +121,14 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     if (encoded == 0)
         return 0;
 
-    result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded));
+
+    result = QnCompressedAudioDataPtr(new QnCompressedAudioData(CL_MEDIA_ALIGNMENT, encoded, m_context));
     result->compressionType = m_codecId;
     static AVRational r = {1, 1000000};
-    
     result->timestamp  = m_lastTimestamp;
     //qint64 audioPts = m_encoderCtx->frame_number*m_encoderCtx->frame_size/m_encoderCtx->channels;
     //result->timestamp  = av_rescale_q(audioPts, m_encoderCtx->time_base, r);
-
-
     result->data.write((const char*) m_audioEncodingBuffer, encoded);
-    return 0;
 }
 
 AVCodecContext* QnFfmpegAudioTranscoder::getCodecContext()

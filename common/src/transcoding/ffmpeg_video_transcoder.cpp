@@ -48,7 +48,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
         scaleContext = sws_getContext(m_decodedVideoFrame.width, m_decodedVideoFrame.height, (PixelFormat) m_decodedVideoFrame.format, 
                                       m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
-            m_lastErrMessage = QString("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
+            m_lastErrMessage = QObject::tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
             return -4;
         }
         m_scaledVideoFrame.reallocate(m_resolution.width(), m_resolution.height(), PIX_FMT_YUV420P);
@@ -93,7 +93,7 @@ void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = QString("Can't initialize video encoder");
+        m_lastErrMessage = QObject::tr("Can't initialize video encoder");
     }
 }
 
