@@ -188,6 +188,7 @@
                                         <argument>InvalidPasswordDlg.wxs</argument>
                                         <argument>MediaDirDlg.wxs</argument>
                                         <argument>MediaServerDlg.wxs</argument>
+                                        <argument>ClientDlg.wxs</argument>
                                         <argument>MyFeaturesDlg.wxs</argument>
                                         <argument>SelectionWarning.wxs</argument>
                                         <argument>DowngradeWarningDlg.wxs</argument>

@@ -55,8 +55,8 @@
         <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch"><![CDATA[ PROXY_PORT = "" ]]></SetProperty>
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch"><![CDATA[ APPSERVER_PASSWORD_REG = "" ]]></SetProperty>
         
-        <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ !ServerFeature = 3 ]]></SetProperty>
-        <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ !ClientFeature = 3 ]]></SetProperty>
+        <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ServerFeature = 3 ]]></SetProperty>
+        <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ClientFeature = 3 ]]></SetProperty>
 
         <SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_HOST = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PORT = "" ]]></SetProperty>
@@ -95,6 +95,8 @@
         <Property Id="MEDIASERVER_REGISTRY_PATH" Value="Software\${company.name}\${mediaserver.name}"/>
         
         <Property Id="REMOVE_DATABASE" Secure="yes"/>
+        
+        <Property Id="INSTALL_SHORTCUT_DESKTOP" Value="1"/>
 
         <!-- AppServer properties-->
         <Property Id="APPSERVER_GUID" Secure="yes">
@@ -676,11 +678,17 @@
                                     <Shortcut Id="StartmenuClient" Directory="ProgramMenuDir" Name="${product.name}"
                                               WorkingDirectory='${installer.customization}ClientDir' Advertise="yes" Icon="icon_menu.exe" >
                                     </Shortcut>
-                                    <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
-                                              WorkingDirectory='${installer.customization}ClientDir' Advertise="yes" Icon="icon_desktop.exe">
-                                    </Shortcut>
-                                
                                 </File>
+                            </Component>
+                            
+                            <Component Id="clientShortcutDesktop" Guid="{56799FF5-5B77-442e-9A39-3F27F0FC8307}">
+                                <Condition>INSTALL_SHORTCUT_DESKTOP</Condition>
+
+                                <RegistryValue Root="HKCU" Key="Software\[Manufacturer]\${client.name}" Name="clientShortcutDesktop" Type="integer" Value="1" KeyPath="yes"/>
+                                
+                                <Shortcut Id="DesktopClient" Directory="DesktopFolder" Name="${product.name}"
+                                          WorkingDirectory='${installer.customization}ClientDir' Target="[#client.exe]" Icon="icon_desktop.exe">
+                                </Shortcut>
                             </Component>
                             
                             <Component Id="ClientConfiguration" Guid="{8AC01524-8F3A-46ba-8A85-24B3709CEDDE}" Permanent="yes">
@@ -770,7 +778,7 @@
             </Directory>
             
             <Directory Id="DesktopFolder" Name="Desktop"/>
-            <Directory Id="StartupFolder" Name="Startup"/>
+            <Directory Id="StartupFolder" Name="Startup"/>            
         </Directory>
         
         <?if $(var.arch) = x86 ?>
@@ -849,6 +857,7 @@
             <ComponentRef Id="NovFileAssociation"/>
  
             <ComponentRef Id="ClientExecutable" />
+            <ComponentRef Id="clientShortcutDesktop"/>
             <ComponentRef Id="ClientConfiguration" />
             <ComponentRef Id="ClientConfigurationPassword" />
             <ComponentRef Id="ClientFFmpegLibraries"/>
@@ -989,7 +998,7 @@
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[(&AppServerFeature=3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature=3)]]></Publish>
+            <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature = 3)]]></Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDriveLowSpace">1</Publish>
@@ -1012,7 +1021,8 @@
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3 AND &ClientFeature = 3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3 AND &ClientFeature <> 3)]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
@@ -1042,7 +1052,10 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)]]></Publish>
+            
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND &ClientFeature <> 3 ]]></Publish>
+            
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             
@@ -1062,14 +1075,20 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="2"><![CDATA[ &ServerFeature <> 3 AND &AppServerFeature <> 3  ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[ &ServerFeature <> 3 AND &AppServerFeature = 3 ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[ &ServerFeature = 3 ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
+            
             <?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
             <?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 ]]></Publish>          
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 AND &ClientFeature <> 3]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) AND &ClientFeature <> 3]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstalling) AND &ServerFeature <> 3)) ]]></Publish>
