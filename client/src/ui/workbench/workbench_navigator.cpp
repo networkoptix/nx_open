@@ -682,7 +682,10 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
             flags |= WidgetSupportsPeriods;
 
         if(m_currentWidget->resource()->flags() & QnResource::utc)
-            flags |= WidgetUsesUTC | WidgetSupportsSync;
+            flags |= WidgetUsesUTC;
+
+        if(m_currentWidget->resource()->flags() & QnResource::sync)
+            flags |= WidgetSupportsSync;
 
         QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
         if(searchState.step > 0) /* Is a thumbnails search layout. */
@@ -1182,7 +1185,7 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {
-    if(widget->resource()->flags() & QnResource::utc)
+    if(widget->resource()->flags() & QnResource::sync)
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)){
             addSyncedWidget(mediaWidget);
             connect(mediaWidget, SIGNAL(motionSelectionChanged()), this, SLOT(at_widget_motionSelectionChanged()));
@@ -1196,7 +1199,7 @@ void QnWorkbenchNavigator::at_display_widgetAboutToBeRemoved(QnResourceWidget *w
     disconnect(widget, NULL, this, NULL);
     disconnect(widget->resource().data(), NULL, this, NULL);
 
-    if(widget->resource()->flags() & QnResource::utc)
+    if(widget->resource()->flags() & QnResource::sync)
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
             removeSyncedWidget(mediaWidget);
 }

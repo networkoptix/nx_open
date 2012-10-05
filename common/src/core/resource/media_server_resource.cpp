@@ -11,6 +11,7 @@ QnLocalMediaServerResource::QnLocalMediaServerResource()
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
     removeFlags(QnResource::media);
+
     setName(QLatin1String("Local"));
     setStatus(Online);
 }
@@ -28,6 +29,8 @@ QnMediaServerResource::QnMediaServerResource():
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
     removeFlags(QnResource::media);
+    setName(tr("Server"));
+
     m_primaryIFSelected = false;
 }
 
@@ -164,10 +167,16 @@ void QnMediaServerResource::setPrimaryIF(const QString& primaryIF)
     QUrl url(getUrl());
     url.setHost(primaryIF);
     setUrl(url.toString());
-    if (getName().isEmpty())
-        setName(QLatin1String("Server ") + primaryIF);
 
+    m_primaryIf = primaryIF;
     emit serverIFFound(primaryIF);
+}
+
+QString QnMediaServerResource::getPrimaryIF() const 
+{
+    QMutexLocker lock(&m_mutex);
+
+    return m_primaryIf;
 }
 
 void QnMediaServerResource::setReserve(bool reserve)

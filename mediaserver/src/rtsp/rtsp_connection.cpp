@@ -596,7 +596,7 @@ int QnRtspConnectionProcessor::extractTrackId(const QString& path)
 bool QnRtspConnectionProcessor::isSecondaryLiveDPSupported() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return d->liveDpLow && !d->liveDpLow->onPause();
+    return d->liveDpLow && !d->liveDpLow->isPaused();
 }
 
 int QnRtspConnectionProcessor::composeSetup()
@@ -818,7 +818,7 @@ void QnRtspConnectionProcessor::checkQuality()
             d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
         }
-        else if (d->liveDpLow->onPause()) {
+        else if (d->liveDpLow->isPaused()) {
             d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->getUniqueId() << ". Secondary stream is disabled.";
         }

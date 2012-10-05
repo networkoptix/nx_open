@@ -149,7 +149,6 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
     if(!m_camera) {
         m_resourceWidget = 0;
-        m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
     } else {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
@@ -163,27 +162,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
         m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
-
-        /* Find best value for sensitivity. */
-        int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];
-        memset(counts, 0, sizeof(counts));
-
-        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
-            foreach(const QnMotionRegion &motionRegion, m_resourceWidget->motionSensitivity())
-                foreach(const QRect &rect, motionRegion.getRectsBySens(sensitivity))
-                    counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
-
-        int bestCount = std::numeric_limits<int>::min();
-        int bestSensitivity = 0;
-        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++) {
-            if(counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] > bestCount) {
-                bestCount = counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY];
-                bestSensitivity = sensitivity;
-            }
-        }
-
-        m_motionSensitivity = bestSensitivity;
     }
+    m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
 
     /* Consider motion mask list changed. */
     emit motionRegionListChanged();

@@ -50,6 +50,7 @@ public:
 
     void determineOptimalNetIF();
     void setPrimaryIF(const QString& primaryIF);
+    QString getPrimaryIF() const;
 
     void setReserve(bool reserve = true);
     bool getReserve() const;
@@ -71,6 +72,7 @@ protected:
 private:
     QnMediaServerConnectionPtr m_restConnection;
     QString m_apiUrl;
+    QString m_primaryIf;
     QString m_streamingUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;

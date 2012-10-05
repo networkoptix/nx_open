@@ -60,4 +60,17 @@
 #endif
 
 
+// -------------------------------------------------------------------------- //
+// Useful utility definitions
+// -------------------------------------------------------------------------- //
+/* Macros to avoid using #ifdef _DEBUG. */
+#ifdef _DEBUG
+#   define DEBUG_CODE(...) __VA_ARGS__
+#   define RELEASE_CODE(...)
+#else
+#   define DEBUG_CODE(...)
+#   define RELEASE_CODE(...) __VA_ARGS__
+#endif
+
+
 #endif // QN_COMMON_CONFIG_H

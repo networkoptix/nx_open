@@ -871,15 +871,6 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_lastMetadata[vd->channelNumber] && m_lastMetadata[vd->channelNumber]->containTime(vd->timestamp))
             vd->motion = m_lastMetadata[vd->channelNumber];
     }
-    else if (ad)
-    {
-        if (speed < 0) {
-            m_lastAudioPacketTime = ad->timestamp;
-            return true; // ignore audio packet to prevent after jump detection
-        }
-    }
-    //else
-    //    return true;
     
     bool oldIsStillImage = m_isStillImage;
     m_isStillImage = media->flags & QnAbstractMediaData::MediaFlags_StillImage;
@@ -923,6 +914,15 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
         if (m_extTimeSrc)
             m_extTimeSrc->reinitTime(AV_NOPTS_VALUE);
     }
+
+    if (ad)
+    {
+        if (speed < 0) {
+            m_lastAudioPacketTime = ad->timestamp;
+            return true; // ignore audio packet to prevent after jump detection
+        }
+    }
+
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
 
@@ -970,7 +970,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             m_timeMutex.lock();
             m_lastDecodedTime = AV_NOPTS_VALUE;
             for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                m_display[i]->setLastDisplayedTime(AV_NOPTS_VALUE);
+                m_display[i]->setLastDisplayedTime(emptyData->timestamp);
                 m_nextReverseTime[i] = AV_NOPTS_VALUE;
             }
 

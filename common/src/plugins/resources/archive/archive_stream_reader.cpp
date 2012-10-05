@@ -218,10 +218,7 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
                 m_jumpMtx.unlock();
-                if (seekOk)
-                    emit jumpOccured(requiredJumpTime);
-                else
-                    emit jumpCanceled(requiredJumpTime);
+                emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
@@ -627,7 +624,6 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-            videoData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
 
 
@@ -688,6 +684,9 @@ begin_label:
         */
 
     }
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
 
