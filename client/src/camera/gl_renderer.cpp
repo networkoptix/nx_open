@@ -661,7 +661,6 @@ CLVideoDecoderOutput *QnGLRenderer::update()
 {
     m_displaySync.lock();
     CLVideoDecoderOutput* img = m_curImg;
-    m_displaySync.unlock();
 
     if (img && img->linesize[0]) {
         m_videoWidth = img->width;
@@ -673,6 +672,7 @@ CLVideoDecoderOutput *QnGLRenderer::update()
         m_lastDisplayedFlags = img->flags;
         m_newtexture = true;
     } 
+    m_displaySync.unlock();
 
     return img;
 }
