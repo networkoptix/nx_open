@@ -276,7 +276,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 
     if (m_centralItemRequired) {
         QnResourcePtr resource = parameters.resource();
-        if(resource->flags() & QnResource::utc) {
+        if(resource->flags() & QnResource::sync) {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;

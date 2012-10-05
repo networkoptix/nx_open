@@ -114,7 +114,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
 
     connect(mediaWidget->resource().data(), SIGNAL(flagsChanged()), this, SLOT(at_resource_flagsChanged()));
 
-    if(!mediaWidget->resource()->hasFlags(QnResource::utc)) {
+    if(!mediaWidget->resource()->hasFlags(QnResource::sync)) {
         m_queuedWidgets.insert(mediaWidget);
         return;
     }
@@ -149,7 +149,7 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAboutToBeRemoved(QnResource
 
     m_queuedWidgets.remove(mediaWidget);
 
-    if(!mediaWidget->resource()->hasFlags(QnResource::utc))
+    if(!mediaWidget->resource()->hasFlags(QnResource::sync))
         return;
 
     if(mediaWidget->display()->archiveReader() == NULL) 
@@ -178,7 +178,7 @@ void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged() {
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged(const QnResourcePtr &resource) {
-    if(!(resource->flags() & QnResource::utc))
+    if(!(resource->flags() & QnResource::sync))
         return; // TODO: implement reverse handling?
 
     foreach(QnMediaResourceWidget *widget, m_queuedWidgets) {
