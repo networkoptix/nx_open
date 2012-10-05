@@ -37,7 +37,7 @@ private:
     void checkIfNeedKeyData();
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
-    void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize);
+    void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
 private:
     
     RTPSession m_RtpSession;

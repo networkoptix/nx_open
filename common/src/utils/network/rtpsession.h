@@ -199,7 +199,7 @@ public:
     void sendBynaryResponse(quint8* buffer, int size);
 
     RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
-    int buildClientRTCPReport(quint8 *dstBuffer);
+    int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
 

@@ -118,7 +118,7 @@ void RTPIODevice::processRtcpData()
                 }
             }
             m_statistic = m_owner->parseServerRTCPReport(rtcpBuffer, readed);
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer);
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->sendTo(sendBuffer, outBufSize);
@@ -993,10 +993,11 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
 }
 
 
-int RTPSession::buildClientRTCPReport(quint8* dstBuffer)
+int RTPSession::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
     QByteArray esDescr("netoptix");
 
+    Q_ASSERT(bufferLen >= 24 + esDescr.size());
 
     quint8* curBuffer = dstBuffer;
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
@@ -1166,7 +1167,7 @@ quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int c
     if (demuxedData.size() <= channel)
         demuxedData.resize(channel+1);
     if (demuxedData[channel] == 0)
-        demuxedData[channel] = new QnByteArray(16, 0);
+        demuxedData[channel] = new QnByteArray(16, 32);
     QnByteArray* dataVect = demuxedData[channel];
     //dataVect->resize(dataVect->size() + reserve);
     dataVect->reserve(dataVect->size() + reserve);
