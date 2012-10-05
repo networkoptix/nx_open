@@ -483,7 +483,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Record before motion</string>
+             <string>Pre-recording</string>
             </property>
            </widget>
           </item>
@@ -512,7 +512,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Record after motion</string>
+             <string>Post-recording</string>
             </property>
            </widget>
           </item>
