@@ -218,10 +218,7 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
                 m_jumpMtx.unlock();
-                if (seekOk)
-                    emit jumpOccured(requiredJumpTime);
-                else
-                    emit jumpCanceled(requiredJumpTime);
+                emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
