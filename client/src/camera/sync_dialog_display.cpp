@@ -51,7 +51,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 
         if (m_lastKeyFrame)
         {
-            m_display[0]->dispay(m_lastKeyFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
+            m_display[0]->display(m_lastKeyFrame, true, QnFrameScaler::factor_any); // repeat last frame on the screen (may be skipped because of time check)
             finilizeSign();
         }
         else {
@@ -71,7 +71,7 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
             video->channelNumber = 0; // ignore layout info
             if (!m_firstFrameDisplayed || ((video->flags & AV_PKT_FLAG_KEY) && qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime > 100)) // max display rate 10 fps
             {
-                QnVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->dispay(video, true, QnFrameScaler::factor_any);
+                QnVideoStreamDisplay::FrameDisplayStatus status = m_display[0]->display(video, true, QnFrameScaler::factor_any);
                 if (!m_firstFrameDisplayed)
                     m_firstFrameDisplayed = status == QnVideoStreamDisplay::Status_Displayed;
                 QSize imageSize = m_display[0]->getImageSize();

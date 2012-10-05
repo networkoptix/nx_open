@@ -25,7 +25,7 @@ public:
     QnVideoStreamDisplay(bool can_downscale);
     ~QnVideoStreamDisplay();
     void setDrawer(QnAbstractRenderer* draw);
-    FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
+    FrameDisplayStatus display(QnCompressedVideoDataPtr data, bool draw,
                 QnFrameScaler::DownscaleFactor force_factor = QnFrameScaler::factor_any);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
@@ -80,6 +80,7 @@ private:
     int m_outputWidth;
     int m_outputHeight;
     bool m_enableFrameQueue;
+    bool m_enableMTDecoding;
     bool m_queueUsed;
     bool m_needReinitDecoders;
     bool m_reverseMode;
