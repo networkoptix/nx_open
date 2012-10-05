@@ -531,7 +531,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             m_lastDecodedTime = vd->timestamp;
         }
 
-        m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
+        m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
         {
@@ -561,7 +561,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
 
-        //m_display[channel]->dispay(vd, sleep, scale_factor);
+        //m_display[channel]->display(vd, sleep, scale_factor);
         //cl_log.log(" video queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
     }
     return true;

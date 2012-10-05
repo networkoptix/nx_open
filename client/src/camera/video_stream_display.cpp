@@ -366,7 +366,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (data->compressionType == CODEC_ID_NONE)
     {
-        cl_log.log(QLatin1String("QnVideoStreamDisplay::dispay: unknown codec type..."), cl_logERROR);
+        cl_log.log(QLatin1String("QnVideoStreamDisplay::display: unknown codec type..."), cl_logERROR);
         return Status_Displayed; // true to prevent 100% cpu usage on unknown codec
     }
 
