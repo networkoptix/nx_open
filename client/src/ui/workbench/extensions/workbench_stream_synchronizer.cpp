@@ -133,8 +133,8 @@ void QnWorkbenchStreamSynchronizer::at_display_widgetAdded(QnResourceWidget *wid
     m_widgetCount++;
     if(m_widgetCount == 1) 
     {
-        if(!mediaWidget->resource().dynamicCast<QnSecurityCamResource>())
-            mediaWidget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
+        //if(!mediaWidget->resource().dynamicCast<QnSecurityCamResource>())
+            //mediaWidget->display()->archiveReader()->jumpTo(0, 0); // change current position from live to left edge if it is not camera
 
         emit effectiveChanged();
     }

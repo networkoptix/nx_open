@@ -624,7 +624,6 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-            videoData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
 
 
@@ -685,6 +684,9 @@ begin_label:
         */
 
     }
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
 
