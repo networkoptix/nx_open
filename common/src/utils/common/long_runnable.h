@@ -79,6 +79,8 @@ public slots:
             if(m_type) {
                 const std::type_info *type = &typeid(*this);
                 assert(*type == *m_type); /* You didn't call stop() from derived class's destructor! Die! */
+
+                m_type = NULL; /* So that we don't check it again. */
             }
         );
 
