@@ -39,13 +39,13 @@ class QN_EXPORT QnResource : public QObject
     Q_PROPERTY(QnId id READ getId WRITE setId)
     Q_PROPERTY(QnId typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
-    Q_PROPERTY(QString name READ getName WRITE setName DESIGNABLE false)
+    Q_PROPERTY(QString name READ getName WRITE setName NOTIFY nameChanged)
     Q_PROPERTY(QString searchString READ toSearchString)
     Q_PROPERTY(QnId parentId READ getParentId WRITE setParentId)
     Q_PROPERTY(Status status READ getStatus WRITE setStatus)
     Q_PROPERTY(bool disabled READ isDisabled WRITE setDisabled)
     Q_PROPERTY(Flags flags READ flags WRITE setFlags)
-    Q_PROPERTY(QString url READ getUrl WRITE setUrl)
+    Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ tagList WRITE setTags)
 
@@ -191,7 +191,7 @@ public:
     //virtual const CLDeviceVideoLayout* getVideoLayout(QnAbstractStreamDataProvider* reader);
 
     QString getUrl() const;
-    virtual void setUrl(const QString& value);
+    virtual void setUrl(const QString &url);
 
     void addTag(const QString& tag);
     void setTags(const QStringList& tags);
@@ -213,6 +213,7 @@ signals:
     void parentIdChanged();
     void idChanged(const QnId &oldId, const QnId &newId);
     void flagsChanged();
+    void urlChanged();
 
     //!Emitted on completion of every async get started with getParamAsync
     /*!
@@ -263,7 +264,10 @@ private:
     void disconnectAllConsumers();
     void initAndEmit();
 
+    void updateUrlName(const QString &oldUrl, const QString &newUrl);
+
     friend class InitAsyncTask;
+
 private:
     /* Private API for QnSharedResourcePointer. */
 

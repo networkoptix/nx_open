@@ -40,6 +40,16 @@ namespace {
         return false;
     }
 
+    QString extractHost(const QString &url) {
+        /* Try it as a host address first. */
+        QHostAddress hostAddress(url);
+        if(!hostAddress.isNull())
+            return hostAddress.toString();
+
+        /* Then go default QUrl route. */
+        return QUrl(url).host();
+    }
+
 } // namespace
 
 
@@ -72,18 +82,18 @@ public:
 
         switch(type) {
         case Qn::RootNode:
-            m_name = tr("Root");
+            m_displayName = m_name = tr("Root");
             break;
         case Qn::LocalNode:
-            m_name = tr("Local");
+            m_displayName = m_name = tr("Local");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
             break;
         case Qn::ServersNode:
-            m_name = tr("Servers");
+            m_displayName = m_name = tr("Servers");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
             break;
         case Qn::UsersNode:
-            m_name = tr("Users");
+            m_displayName = m_name = tr("Users");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
             break;
         default:
@@ -159,17 +169,23 @@ public:
         /* Update stored fields. */
         if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode) {
             if(m_resource.isNull()) {
-                m_name = QString();
+                m_displayName = m_name = QString();
                 m_flags = 0;
                 m_status = QnResource::Online;
                 m_searchString = QString();
                 m_icon = QIcon();
             } else {
-                m_name = m_resource->getName();
+                m_displayName = m_name = m_resource->getName();
                 m_flags = m_resource->flags();
                 m_status = m_resource->getStatus();
                 m_searchString = m_resource->toSearchString();
                 m_icon = qnResIconCache->icon(m_flags, m_status);
+
+                if((m_flags & QnResource::network) || (m_flags & QnResource::server && m_flags & QnResource::remote)) {
+                    QString host = extractHost(m_resource->getUrl());
+                    if(!host.isEmpty())
+                        m_displayName = tr("%1 (%2)").arg(m_name).arg(host);
+                }
             }
         }
 
@@ -340,7 +356,7 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_name + (m_modified ? QLatin1String("*") : QString());
+            return m_displayName + (m_modified ? QLatin1String("*") : QString());
         case Qt::DecorationRole:
             if (column == 0)
                 return m_icon;
@@ -467,6 +483,9 @@ private:
 
     /** Resource flags. */
     QnResource::Flags m_flags;
+
+    /** Display name of this node */
+    QString m_displayName;
 
     /** Name of this node. */
     QString m_name;
@@ -778,6 +797,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(disabledChanged(bool, bool)),                           this, SLOT(at_resource_resourceChanged()));
+    connect(resource.data(), SIGNAL(urlChanged()),                                          this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
