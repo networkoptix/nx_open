@@ -1301,9 +1301,10 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            qint64 time = mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : mediaWidget->display()->currentTimeUSec() / 1000;
+            qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
+            if(timeUSec != AV_NOPTS_VALUE)
+                mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
-            mediaWidget->item()->setData(Qn::ItemTimeRole, time);
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
     }
@@ -1363,7 +1364,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(!thumbnailed && time != -1) {
-            qreal timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
+            qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
             widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
         }
 
