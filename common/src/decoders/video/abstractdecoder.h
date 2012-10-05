@@ -28,6 +28,16 @@ public:
         DecodeMode_Fastest
     };
 
+    //!Decoder capabilities
+    enum DecoderCaps
+    {
+        //!if this not supported, decoder ignores \a setOutPictureSize call
+        decodedPictureScaling = 1,
+        multiThreadedMode = 2,
+        //!decoder has internal frame pool and does not require to wait for decoded picture to be processed before it can start decoding next frame
+        tracksDecodedPictureBuffer = 4
+    };
+
     explicit QnAbstractVideoDecoder();
 
     virtual ~QnAbstractVideoDecoder() {}
@@ -81,6 +91,8 @@ public:
             This means one cannot rely than next generated frame after this call will be scaled
     */
     virtual void setOutPictureSize( const QSize& outSize ) = 0;
+    //!Get decoder capabilities
+    virtual unsigned int getDecoderCaps() const = 0;
 
 private:
     QnAbstractVideoDecoder(const QnAbstractVideoDecoder&) {}

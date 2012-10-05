@@ -52,6 +52,8 @@ public:
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
     //!Implementation of QnAbstractVideoDecoder::setOutPictureSize
     virtual void setOutPictureSize( const QSize& outSize );
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    virtual unsigned int getDecoderCaps() const;
 
     //!Switches to ffmpeg decoder, destroys hardware decoder object
     void switchToSoftwareDecoding();

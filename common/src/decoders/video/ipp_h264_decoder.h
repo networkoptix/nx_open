@@ -20,6 +20,8 @@ public:
     void setLightCpuMode(DecodeMode) {}
 
     QnAbstractPictureData::PicStorageType targetMemoryType() const { return QnAbstractPictureData::pstSysMemPic; }
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    virtual unsigned int getDecoderCaps() const;
 
 private:
     unsigned long m_decoder;

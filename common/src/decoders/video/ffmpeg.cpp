@@ -259,6 +259,11 @@ void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
     //TODO/IMPL
 }
 
+unsigned int CLFFmpegVideoDecoder::getDecoderCaps() const
+{
+    return QnAbstractVideoDecoder::multiThreadedMode;
+}
+
 int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
 {
     for (int i = 0; i < m_motionMap.size(); ++i) {

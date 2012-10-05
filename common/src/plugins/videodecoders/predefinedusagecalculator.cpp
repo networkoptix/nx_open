@@ -98,7 +98,7 @@ void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::Abstrac
     QFile xmlFile( filePath );
     if( !xmlFile.open( QIODevice::ReadOnly ) )
     {
-        cl_log.log( QString::fromAscii( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlHandler.errorString()), cl_logERROR );
+        cl_log.log( QString::fromAscii( "Failed to open stree xml file (%1). %2" ).arg(filePath).arg(xmlFile.errorString()), cl_logERROR );
         return;
     }
     QXmlInputSource input( &xmlFile );

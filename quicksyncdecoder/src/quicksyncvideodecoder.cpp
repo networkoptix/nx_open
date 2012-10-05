@@ -122,14 +122,13 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_sourceStreamFps( 0 ),
     m_totalInputFrames( 0 ),
     m_totalOutputFrames( 0 ),
-    m_prevInputFrameMs( 0 ),
+    m_prevInputFrameMs( (quint64)-1 ),
     m_prevOutPictureClock( 0 ),
     m_recursionDepth( 0 )
 {
     memset( &m_srcStreamParam, 0, sizeof(m_srcStreamParam) );
     memset( &m_decodingAllocResponse, 0, sizeof(m_decodingAllocResponse) );
     memset( &m_vppAllocResponse, 0, sizeof(m_vppAllocResponse) );
-    m_elapsedTimer.invalidate();
 
 #ifdef USE_D3D
     if( !m_d3dFrameAllocator.initialize() )
@@ -192,8 +191,9 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
 {
     Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
-    cl_log.log( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, millis since prev input frame %3").
-        arg(data->data.size()).arg(m_sourceStreamFps).arg(m_elapsedTimer.isValid() ? (m_elapsedTimer.elapsed() - m_prevInputFrameMs) : 0), cl_logDEBUG1 );
+    cl_log.log( QString("QuickSyncVideoDecoder::decode. data.size = %1, current fps = %2, timer %3, millis since prev input frame %4").
+        arg(data->data.size()).arg(m_sourceStreamFps).arg(getUsecTimer()/1000).
+        arg((m_prevInputFrameMs != (quint64)-1) ? (getUsecTimer()/1000 - m_prevInputFrameMs) : 0), cl_logDEBUG1 );
 
     ++m_totalInputFrames;
 
@@ -264,12 +264,9 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
     inputStream.MaxLength = data->data.size();
     //inputStream.DataFlag = MFX_BITSTREAM_COMPLETE_FRAME;
 
-    if( !m_elapsedTimer.isValid() )
-    {
-        m_elapsedTimer.restart();
-        m_prevOutPictureClock = m_elapsedTimer.elapsed();
-    }
-    const qint64 currentClock = m_elapsedTimer.elapsed();
+    if( m_prevInputFrameMs == (quint64)-1 )
+        m_prevOutPictureClock = getUsecTimer() / 1000;
+    const quint64 currentClock = getUsecTimer() / 1000;
     m_prevInputFrameMs = currentClock;
 
     if( decode( &inputStream, outFrame ) )
@@ -280,8 +277,11 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideo
         if( currentClock - m_prevOutPictureClock > 1000 )
             cl_log.log( QString::fromAscii( "QuickSyncVideoDecoder. Warning! There was no out picture for %1 ms" ).arg(currentClock - m_prevOutPictureClock), cl_logDEBUG1 );
         m_prevOutPictureClock = currentClock;
+        cl_log.log( QString::fromAscii( "QuickSyncVideoDecoder::decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()), cl_logDEBUG1 );
         return true;
     }
+
+    cl_log.log( QString::fromAscii( "QuickSyncVideoDecoder::decode. exit. timer %1, lr-timer %2" ).arg(currentClock).arg(GetTickCount()), cl_logDEBUG1 );
 
     return false;
 }
@@ -509,11 +509,11 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
             {
                 if( !gotDisplayPicture )
                 {
-                    cl_log.log( QString::fromAscii("Providing picture at output. Out frame timestamp %1, frame order %2, corrupted %3").
+                    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Providing picture at output. Out frame timestamp %1, frame order %2, corrupted %3").
                         arg(decodedFrameCtx->mfxSurface.Data.TimeStamp).arg(decodedFrameCtx->mfxSurface.Data.FrameOrder).arg(decodedFrameCtx->mfxSurface.Data.Corrupted), cl_logDEBUG1 );
                     if( m_prevTimestamp > decodedFrameCtx->mfxSurface.Data.TimeStamp )
                     {
-                        cl_log.log( QString::fromAscii("Warning! timestamp decreased by %1. Current 90KHz timestamp %2, previous %3. Ignoring frame...").
+                        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Warning! timestamp decreased by %1. Current 90KHz timestamp %2, previous %3. Ignoring frame...").
                             arg(QString::number(m_prevTimestamp - decodedFrameCtx->mfxSurface.Data.TimeStamp)).
                             arg(QString::number(decodedFrameCtx->mfxSurface.Data.TimeStamp)).
                             arg(QString::number(m_prevTimestamp)),
@@ -531,7 +531,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
                 else
                 {
                     //decoder returned second picture for same input. Enqueue?
-                    cl_log.log( QString::fromAscii("Warning! Got second picture from Intel media decoder during single decoding step! Ignoring..."), cl_logWARNING );
+                    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Warning! Got second picture from Intel media decoder during single decoding step! Ignoring..."), cl_logWARNING );
                 }
 
                 gotDisplayPicture = true;
@@ -663,8 +663,6 @@ const AVFrame* QuickSyncVideoDecoder::lastFrame() const
 
 void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
 {
-    //return;
-
     const QSize alignedNewPicSize = QSize( ALIGN16(outSize.width()), ALIGN32(outSize.height()) );
     if( m_outPictureSize == alignedNewPicSize )
         return;
@@ -689,6 +687,11 @@ void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
 QnAbstractPictureData::PicStorageType QuickSyncVideoDecoder::targetMemoryType() const
 {
     return QnAbstractPictureData::pstSysMemPic;
+}
+
+unsigned int QuickSyncVideoDecoder::getDecoderCaps() const
+{
+    return QnAbstractVideoDecoder::decodedPictureScaling | QnAbstractVideoDecoder::tracksDecodedPictureBuffer;
 }
 
 bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const

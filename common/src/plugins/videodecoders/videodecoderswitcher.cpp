@@ -95,6 +95,11 @@ void VideoDecoderSwitcher::setOutPictureSize( const QSize& outSize )
     return m_decoder->setOutPictureSize( outSize );
 }
 
+unsigned int VideoDecoderSwitcher::getDecoderCaps() const
+{
+    return m_decoder->getDecoderCaps();
+}
+
 //!Switches to ffmpeg decoder, destroys hardware decoder object
 void VideoDecoderSwitcher::switchToSoftwareDecoding()
 {

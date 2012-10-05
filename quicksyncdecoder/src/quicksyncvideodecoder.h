@@ -8,7 +8,6 @@
 
 #include <intrin.h>
 
-#include <QElapsedTimer>
 #include <QSize>
 
 #include <deque>
@@ -105,6 +104,11 @@ public:
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    /*!
+        Supports \a decodedPictureScaling and \a tracksDecodedPictureBuffer
+    */
+    virtual unsigned int getDecoderCaps() const;
 
     //!Implementation of stree::AbstractResourceReader::get
     /*!
@@ -242,8 +246,7 @@ private:
     std::deque<qint64> m_fpsCalcFrameTimestamps;
     size_t m_totalInputFrames;
     size_t m_totalOutputFrames;
-    QElapsedTimer m_elapsedTimer;
-    qint64 m_prevInputFrameMs;
+    quint64 m_prevInputFrameMs;
     std::auto_ptr<SPSUnit> m_sps;
     std::auto_ptr<PPSUnit> m_pps;
     qint64 m_prevOutPictureClock;

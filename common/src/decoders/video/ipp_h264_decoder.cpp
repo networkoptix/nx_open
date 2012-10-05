@@ -62,4 +62,9 @@ void IPPH264Decoder::setOutPictureSize( const QSize& /*outSize*/ )
     //TODO/IMPL
 }
 
+unsigned int IPPH264Decoder::getDecoderCaps() const
+{
+    return 0;
+}
+
 #endif

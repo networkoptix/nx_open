@@ -17,7 +17,6 @@ struct MpegEncContext;
 
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
-
 class CLFFmpegVideoDecoder
 :
     public QnAbstractVideoDecoder
@@ -52,6 +51,11 @@ public:
     virtual void setMTDecoding(bool value);
     virtual void resetDecoder(QnCompressedVideoDataPtr data);
     virtual void setOutPictureSize( const QSize& outSize );
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    /*!
+        Supports \a multiThreadedMode
+    */
+    virtual unsigned int getDecoderCaps() const;
 
 private:
     static AVCodec* findCodec(CodecID codecId);

@@ -104,7 +104,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     desc.put( DecoderParameter::framePictureSize, std::max<>( data->width*data->height, 0 ) );
     desc.put( DecoderParameter::fps, 30 );
     desc.put( DecoderParameter::pixelsPerSecond, 30 * std::max<>( data->width*data->height, 0 ) );
-    desc.put( DecoderParameter::videoMemoryUsage, 0 );
+    desc.put( DecoderParameter::videoMemoryUsage, 0 );  //TODO
     desc.put( DecoderParameter::sdkVersion, m_sdkVersionStr );
     desc.put( DecoderParameter::decoderName, DECODER_NAME );
     desc.put( DecoderParameter::osName, m_osName );
