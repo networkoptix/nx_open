@@ -15,6 +15,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
 #include <utils/common/toggle.h>
+#include <utils/client_meta_types.h>
 #include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
@@ -502,6 +503,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
     }
 
     return m_widgetByRole[role];
+}
+
+QnResourceWidget *QnWorkbenchDisplay::widget(const QUuid &uuid) const {
+    return widget(workbench()->currentLayout()->item(uuid));
 }
 
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
@@ -1299,6 +1304,12 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
+    QVector<QUuid> selectedUuids;
+    foreach(QnResourceWidget *widget, widgets())
+        if(widget->isSelected())
+            selectedUuids.push_back(widget->item()->uuid());
+    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QUuid> >(selectedUuids));
+
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
@@ -1382,6 +1393,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
     }
+
+    QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();
+    foreach(const QUuid &selectedUuid, selectedUuids)
+        if(QnResourceWidget *widget = this->widget(selectedUuid))
+            widget->setSelected(true);
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));

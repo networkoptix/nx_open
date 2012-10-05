@@ -1,6 +1,8 @@
 #include "checked_button.h"
 
+#include <QtCore/QEvent>
 #include <QtGui/QPainter>
+
 #include "ui/common/color_transformations.h"
 
 QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked) 
@@ -12,7 +14,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     painter.setPen(QColor(Qt::black));
     
     QColor brushClr(hovered ? color.lighter() : color);
-    if (!m_isEnabled)
+    if (!isEnabled())
         brushClr = shiftColor(brushClr, -64, -64, -64);
     painter.setBrush(brushClr);
     int offset = checked ? 4 : 0;
@@ -21,7 +23,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     if (insideColor.toRgb() != color.toRgb()) 
     {
         brushClr = QColor(hovered ? insideColor.lighter() : insideColor);
-        if (!m_isEnabled)
+        if (!isEnabled())
             brushClr = shiftColor(brushClr, -64, -64, -64);
         painter.setBrush(brushClr);
         //offset = result.width()/3;
@@ -45,10 +47,10 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
     return result;
 }
 
-QnCheckedButton::QnCheckedButton(QWidget* parent): QToolButton(parent)
+QnCheckedButton::QnCheckedButton(QWidget* parent): 
+    QToolButton(parent),
+    m_insideColorDefined(false)
 {
-    m_insideColorDefined = false;
-    m_isEnabled = isEnabled();
     updateIcon();
 }
 
@@ -89,13 +91,6 @@ void QnCheckedButton::setColor(const QColor& color)
     updateIcon();
 }
 
-void QnCheckedButton::setEnabled(bool value)
-{
-    QToolButton::setEnabled(value);
-    m_isEnabled = value;
-    updateIcon();
-}
-
 void QnCheckedButton::setInsideColor(const QColor& color)
 {
     if(m_insideColor == color)
@@ -121,3 +116,15 @@ void QnCheckedButton::setCheckedColor(const QColor& color)
 
     updateIcon();
 }
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+bool QnCheckedButton::event(QEvent *event) {
+    if(event->type() == QEvent::EnabledChange)
+        updateIcon();
+
+    return base_type::event(event);
+}
+
