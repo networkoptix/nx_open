@@ -347,8 +347,9 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+                        m_resource->addFlags(QnResource::utc);
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
-                            m_resource->addFlags(QnResource::utc | QnResource::periods | QnResource::motion); // use sync for exported layout only
+                            m_resource->addFlags(QnResource::sync | QnResource::periods | QnResource::motion); // use sync for exported layout only
                         }
                     }
                 }

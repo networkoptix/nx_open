@@ -73,14 +73,15 @@ public:
         user = 0x2000,          /**< User resource. */
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
-        periods = 0x8000,           /**< Resource uses UTC-based timing. */
-        motion = 0x10000,           /**< Resource has motion */
+        periods = 0x8000,       /**< Resource uses UTC-based timing. */
+        motion = 0x10000,       /**< Resource has motion */
+        sync = 0x20000,         /**< Resource can be used in sync playback mode. */
 
         local_media = local | media,
 
         local_server = local | server,
         remote_server = remote | server,
-        live_cam = utc | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
+        live_cam = utc | sync | live | media | video | streamprovider, // don't set w/o `local` or `remote` flag
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
