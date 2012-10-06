@@ -997,7 +997,7 @@ int RTPSession::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
     QByteArray esDescr("netoptix");
 
-    Q_ASSERT(bufferLen >= 24 + esDescr.size());
+    Q_ASSERT(bufferLen >= 20 + esDescr.size());
 
     quint8* curBuffer = dstBuffer;
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
