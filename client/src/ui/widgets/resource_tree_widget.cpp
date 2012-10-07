@@ -258,7 +258,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
-    connect(qnSettings->notifier(QnSettings::URL_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
+    connect(qnSettings->notifier(QnSettings::IP_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
 
     /* Run handlers. */
     updateFilter();
@@ -650,7 +650,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 }
 
 void QnResourceTreeWidget::at_showUrlsInTree_changed() {
-    bool urlsShown = qnSettings->isUrlShownInTree();
+    bool urlsShown = qnSettings->isIpShownInTree();
 
     m_resourceModel->setUrlsShown(urlsShown);
 }

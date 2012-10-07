@@ -91,7 +91,7 @@ public:
         OPEN_LAYOUTS_ON_LOGIN,
         SOFTWARE_YUV,
 
-        URL_SHOWN_IN_TREE,
+        IP_SHOWN_IN_TREE,
 
         BACKGROUND_EDITABLE,
         BACKGROUND_ANIMATED,
@@ -134,7 +134,7 @@ private:
         QN_DECLARE_RW_PROPERTY(qreal,                   audioVolume,            setAudioVolume,             AUDIO_VOLUME,               1.0)
         QN_DECLARE_RW_PROPERTY(QString,                 mediaFolder,            setMediaFolder,             MEDIA_FOLDER,               QString())
         QN_DECLARE_RW_PROPERTY(QStringList,             extraMediaFolders,      setExtraMediaFolders,       EXTRA_MEDIA_FOLDERS,        QStringList())
-        QN_DECLARE_RW_PROPERTY(bool,                    isUrlShownInTree,       setUrlShownInTree,          URL_SHOWN_IN_TREE,          true)
+        QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundEditable,   setBackgroundEditable,      BACKGROUND_EDITABLE,        false)
         QN_DECLARE_RW_PROPERTY(bool,                    isBackgroundAnimated,   setBackgroundAnimated,      BACKGROUND_ANIMATED,        true)
         QN_DECLARE_RW_PROPERTY(QColor,                  backgroundColor,        setBackgroundColor,         BACKGROUND_COLOR,           QColor())
