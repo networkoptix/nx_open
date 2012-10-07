@@ -106,6 +106,8 @@ private slots:
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
 
+    void at_showUrlsInTree_changed();
+
 private:
     QScopedPointer<Ui::ResourceTreeWidget> ui;
 

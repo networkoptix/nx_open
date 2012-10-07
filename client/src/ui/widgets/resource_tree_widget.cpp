@@ -1,4 +1,4 @@
-#include "resource_tree_widget.h"
+﻿#include "resource_tree_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -14,6 +14,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/settings.h>
 #include <common/common_meta_types.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -257,10 +258,12 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
     connect(workbench(),        SIGNAL(itemChanged(Qn::ItemRole)),                  this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
+    connect(qnSettings->notifier(QnSettings::URL_SHOWN_IN_TREE), SIGNAL(valueChanged(int)), this, SLOT(at_showUrlsInTree_changed()));
 
     /* Run handlers. */
     updateFilter();
 
+    at_showUrlsInTree_changed();
     at_workbench_currentLayoutChanged();
     at_resourceProxyModel_rowsInserted(QModelIndex());
 }
@@ -646,5 +649,9 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
 
+void QnResourceTreeWidget::at_showUrlsInTree_changed() {
+    bool urlsShown = qnSettings->isUrlShownInTree();
 
+    m_resourceModel->setUrlsShown(urlsShown);
+}
 
