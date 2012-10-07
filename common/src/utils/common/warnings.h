@@ -6,10 +6,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
 
-#ifndef QT_STRINGIFY
-#   define QT_STRINGIFY2(x) #x
-#   define QT_STRINGIFY(x) QT_STRINGIFY2(x)
-#endif
+#include "preprocessor.h"
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -167,7 +164,7 @@ namespace detail {
 
 #define QN_NULL_PARAMETER_I(MACRO, PARAMETER) {                                 \
     (void) (PARAMETER); /* Show compilation error if parameter name is mistyped. */ \
-    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QT_STRINGIFY(PARAMETER)); \
+    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QN_STRINGIZE(PARAMETER)); \
 }
 
 /**

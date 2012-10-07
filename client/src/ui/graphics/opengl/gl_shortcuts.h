@@ -4,6 +4,13 @@
 #include <QtOpenGL>
 #include <cmath> /* For std::sin & std::cos. */
 
+template<class T> T polar(float alpha, float r);
+
+template<>
+QVector2D polar<QVector2D>(float alpha, float r) {
+    return QVector2D(r * std::cos(alpha), r * std::sin(alpha));
+}
+
 inline void glColor(float r, float g, float b, float a) {
     glColor4f(r, g, b, a);
 }
@@ -29,7 +36,7 @@ inline void glVertex(const QPointF &point) {
 }
 
 inline void glVertexPolar(qreal alpha, qreal r) {
-    glVertex(r * std::cos(alpha), r * std::sin(alpha));
+    glVertex(polar(alpha, r));
 }
 
 inline void glVertices(const QRectF &rect) {

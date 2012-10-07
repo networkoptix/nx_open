@@ -1,20 +1,34 @@
 #ifndef QN_GL_FUNCTIONS_H
 #define QN_GL_FUNCTIONS_H
 
+#include <cstddef> /* For std::ptrdiff_t. */
+
 #include <QtOpenGL>
 
 class QGLContext;
 
 class QnGlFunctionsPrivate;
 
+#ifndef GL_ARB_vertex_buffer_object
+typedef std::ptrdiff_t GLintptrARB;
+typedef std::ptrdiff_t GLsizeiptrARB;
+#endif
+
+#ifndef GL_VERSION_2_0
+typedef char GLchar;
+#endif
+
+
 class QnGlFunctions {
 public:
     enum Feature {
-        ArbPrograms = 0x1,          /**< Supports ARB shader programs. */
-        OpenGL1_3 = 0x2,            /**< Implements OpenGL1.3 spec. */
-        ShadersBroken = 0x4,        /**< Vendor has messed something up, and shaders are not supported. */
-        OpenGLBroken = 0x8,         /**< Vendor has messed something up, and videodriver dies using OpenGL. */
-        NoOpenGLFullScreen = 0x10   /**< There are some artifacts in fullscreen mode. */
+        ArbPrograms = 0x1,              /**< Supports ARB shader programs. */
+        OpenGL1_3 = 0x2,                /**< Implements OpenGL1.3 spec. */
+        OpenGL1_5 = 0x4,                /**< Implements OpenGL1.5 spec. */
+        
+        ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
+        OpenGLBroken = 0x00020000,      /**< Vendor has messed something up, and videodriver dies using OpenGL. */
+        NoOpenGLFullScreen = 0x0004000  /**< There are some artifacts in fullscreen mode. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 
@@ -71,6 +85,13 @@ public:
     /* OpenGL1_3 group. */
 
     void glActiveTexture(GLenum texture);
+
+    /* OpenGL1_5 group. */
+    
+    void glGenBuffers(GLsizei n, GLuint *buffers);
+    void glBindBuffer(GLenum target, GLuint buffer);
+    void glDeleteBuffers(GLsizei n, const GLuint *buffers);
+    void glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
 
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;

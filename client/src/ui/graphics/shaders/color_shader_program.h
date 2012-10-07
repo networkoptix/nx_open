@@ -20,8 +20,17 @@ public:
         setUniformValue(m_colorMultiplierLocation, value);
     }
 
+    template<class T>
+    void setColor(const T &value) {
+        setAttributeValue(m_colorLocation, value);
+    }
+
+    void setColorBuffer(GLenum type, int offset, int tupleSize, int stride = 0) {
+        setAttributeBuffer(m_colorLocation, type, offset, tupleSize, stride);
+    }
+
 private:
-    int m_colorMultiplierLocation;
+    int m_colorMultiplierLocation, m_colorLocation;
 };
 
 #endif // QN_COLOR_SHADER_PROGRAM_H
