@@ -71,7 +71,7 @@ public:
     //!Returns picture size (in pixels) of output video stream
     QSize getResolution() const;
 
-    virtual void open(QnCompressedVideoDataPtr video);
+    virtual bool open(QnCompressedVideoDataPtr video);
 protected:
     QSize m_resolution;
 };
@@ -82,7 +82,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual void open(QnCompressedAudioDataPtr video) {}
+    virtual bool open(QnCompressedAudioDataPtr video) { return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 

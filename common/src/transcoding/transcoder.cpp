@@ -58,7 +58,7 @@ QSize QnVideoTranscoder::getResolution() const
     return m_resolution;
 }
 
-void QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
+bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     CLVideoDecoderOutput decodedVideoFrame;
@@ -70,6 +70,7 @@ void QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         float ar = decodedVideoFrame.width / (float) decodedVideoFrame.height;
         m_resolution.setWidth(m_resolution.height() * ar);
     }
+    return true;
 }
 
 // ---------------------- QnTranscoder -------------------------
