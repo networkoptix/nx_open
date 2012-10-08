@@ -3,11 +3,13 @@
 
 #include <QtCore/QSharedPointer>
 
+#include <ui/graphics/opengl/gl_functions.h>
+
 class QGLContext;
 
 class QnColorShaderProgram;
 
-class QnPausedPainter {
+class QnPausedPainter: public QnGlFunctions {
 public:
     QnPausedPainter(const QGLContext *context);
 
@@ -18,8 +20,9 @@ public:
     void paint();
 
 private:
-    unsigned m_list;
-    QSharedPointer<QnColorShaderProgram> m_program;
+    GLuint m_buffer;
+    int m_vertexOffset, m_colorOffset, m_vertexCount;
+    QSharedPointer<QnColorShaderProgram> m_shader;
 };
 
 #endif // QN_PAUSED_PAINTER_H
