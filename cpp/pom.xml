@@ -63,6 +63,7 @@
 									<useDefaultExcludes>true</useDefaultExcludes>
 									<excludes>
 										<exclude>**/*.user</exclude>
+										<exclude>**/launcher.exe</exclude>
 									</excludes>
 								</fileset>
 								<fileset>
@@ -83,6 +84,8 @@
 									<includes>
 										<include>**/${project.artifactId}.lib</include>
 										<include>**/${project.artifactId}.exe</include>
+										<include>**/${project.artifactId}.pdb</include>
+										<include>**/${project.artifactId}.ilk</include>											
 										<include>**/${project.artifactId}.so</include>
 										<include>**/${project.artifactId}</include>
 										<include>**/${project.artifactId}-bin</include>

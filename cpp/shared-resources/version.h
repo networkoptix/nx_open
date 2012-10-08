@@ -22,7 +22,7 @@ static const char *const BOOST_VERSION="${boost.version}";
 #define VER_COMPANYNAME_STR         "${company.name}"
 #define VER_FILEDESCRIPTION_STR     "${product.title}"
 #define VER_INTERNALNAME_STR        "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 Network Optix"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright 2011 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
