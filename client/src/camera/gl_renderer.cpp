@@ -25,7 +25,13 @@
 #   include <utils/common/performance.h>
 #endif
 
-#define QN_GL_RENDERER_DEBUG
+/**
+ * \def QN_GL_RENDERER_DEBUG
+ * 
+ * Enable OpenGL error reporting. Note that this will result in a LOT of
+ * redundant <tt>glGetError</tt> calls, which may affect performance.
+ */
+//#define QN_GL_RENDERER_DEBUG
 
 #ifdef QN_GL_RENDERER_DEBUG
 #   define glCheckError glCheckError
