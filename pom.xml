@@ -41,7 +41,6 @@
 		<module>common</module>
 		<module>mediaserver</module>
 		<module>mediaproxy</module>
-		<module>client</module>
 		<module>testcamera</module>
 	</modules>
 	<build>
@@ -131,6 +130,8 @@
 				</os>
 			</activation>
 			<modules>
+				<module>launcher</module>
+				<module>client</module>
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
@@ -170,6 +171,7 @@
 				</os> 
 			</activation>
 			<modules>
+				<module>client</module>
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
@@ -207,3 +209,4 @@
 		</profile>	
 	</profiles>	
 </project>
+
