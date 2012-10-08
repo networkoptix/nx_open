@@ -26,7 +26,6 @@ public:
         return m_target->size();
     }
 
-    template<class T>
     friend QnGlBufferStream<T> &operator<<(QnGlBufferStream<T> &stream, const T &value) {
         stream.m_target->resize(stream.m_target->size() + sizeof(T));
 

@@ -16,7 +16,7 @@ QnPausedPainter::QnPausedPainter(const QGLContext *context):
     /* Generate vertex data. */
     QnGlBufferStream<GLfloat> vertexStream(&data);
     m_vertexOffset = vertexStream.offset();
-    GLfloat d = 1.0 / 3.0;
+    GLfloat d = 1.0f / 3.0f;
     vertexStream 
         << -1.0 << -1.0
         << -d   << -1.0
