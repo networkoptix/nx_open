@@ -4,13 +4,14 @@
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
-QnVideoTranscoder(codecId),
-m_videoDecoder(0),
-scaleContext(0),
-m_encoderCtx(0),
-m_firstEncodedPts(AV_NOPTS_VALUE),
-m_lastSrcWidth(-1),
-m_lastSrcHeight(-1)
+    QnVideoTranscoder(codecId),
+    m_videoDecoder(0),
+    m_decodedVideoFrame(new CLVideoDecoderOutput()),
+    scaleContext(0),
+    m_encoderCtx(0),
+    m_firstEncodedPts(AV_NOPTS_VALUE),
+    m_lastSrcWidth(-1),
+    m_lastSrcHeight(-1)
 
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
@@ -32,11 +33,11 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
 {
-    if (m_decodedVideoFrame.width != m_lastSrcWidth ||  m_decodedVideoFrame.height != m_lastSrcHeight)
+    if (m_decodedVideoFrame->width != m_lastSrcWidth ||  m_decodedVideoFrame->height != m_lastSrcHeight)
     {
         // src resolution is changed
-        m_lastSrcWidth = m_decodedVideoFrame.width;
-        m_lastSrcHeight = m_decodedVideoFrame.height;
+        m_lastSrcWidth = m_decodedVideoFrame->width;
+        m_lastSrcHeight = m_decodedVideoFrame->height;
         if (scaleContext) {
             sws_freeContext(scaleContext);
             scaleContext = 0;
@@ -45,7 +46,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
 
     if (scaleContext == 0)
     {
-        scaleContext = sws_getContext(m_decodedVideoFrame.width, m_decodedVideoFrame.height, (PixelFormat) m_decodedVideoFrame.format, 
+        scaleContext = sws_getContext(m_decodedVideoFrame->width, m_decodedVideoFrame->height, (PixelFormat) m_decodedVideoFrame->format, 
                                       m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
             m_lastErrMessage = QString("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
@@ -55,12 +56,12 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     }
 
     sws_scale(scaleContext,
-        m_decodedVideoFrame.data, m_decodedVideoFrame.linesize, 
-        0, m_decodedVideoFrame.height, 
+        m_decodedVideoFrame->data, m_decodedVideoFrame->linesize, 
+        0, m_decodedVideoFrame->height, 
         m_scaledVideoFrame.data, m_scaledVideoFrame.linesize);
-    //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame.pkt_dts;
-    //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame.pkt_pts;
-    m_scaledVideoFrame.pts = m_decodedVideoFrame.pts;
+    //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
+    //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame->pkt_pts;
+    m_scaledVideoFrame.pts = m_decodedVideoFrame->pts;
     return 0;
 }
 
@@ -109,9 +110,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     if (m_videoDecoder->decode(video, &m_decodedVideoFrame)) 
     {
-        CLVideoDecoderOutput* decodedFrame = &m_decodedVideoFrame;
-        m_decodedVideoFrame.pts = m_decodedVideoFrame.pkt_dts;
-        if (m_decodedVideoFrame.width != m_resolution.width() || m_decodedVideoFrame.height != m_resolution.height() || m_decodedVideoFrame.format != PIX_FMT_YUV420P) {
+        CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
+        m_decodedVideoFrame->pts = m_decodedVideoFrame->pkt_dts;
+        if (m_decodedVideoFrame->width != m_resolution.width() || m_decodedVideoFrame->height != m_resolution.height() || m_decodedVideoFrame->format != PIX_FMT_YUV420P) {
             rescaleFrame();
             decodedFrame = &m_scaledVideoFrame;
         }

@@ -25,7 +25,7 @@ QnAbstractPictureData::PicStorageType VideoDecoderSwitcher::targetMemoryType() c
 }
 
 //!Implementation of QnAbstractVideoDecoder::decode
-bool VideoDecoderSwitcher::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
+bool VideoDecoderSwitcher::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     return m_decoder->decode( data, outFrame );
 }

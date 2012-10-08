@@ -6,6 +6,8 @@
 #ifndef QUICKSYNCVIDEODECODER_H
 #define QUICKSYNCVIDEODECODER_H
 
+//#define USE_OPENCL
+
 #include <intrin.h>
 
 #include <QSize>
@@ -14,12 +16,19 @@
 #include <fstream>
 #include <vector>
 
+#ifdef USE_OPENCL
+#define DX9_SHARING
+#define DX9_MEDIA_SHARING
+#include <CL/cl.h>
+#include <CL/cl_ext.h>
+#endif
 #include <mfxvideo++.h>
 
 #ifdef XVBA_TEST
 #include "common.h"
 #include "nalunits.h"
 #else
+#include <plugins/videodecoders/stree/resourcecontainer.h>
 #include <decoders/video/abstractdecoder.h>
 #include <utils/media/nalunits.h>
 #endif
@@ -29,11 +38,6 @@
 //#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
-
-#ifdef XVBA_TEST
-#define DISABLE_LAST_FRAME
-#endif
-#define DISABLE_LAST_FRAME
 
 
 class PluginUsageWatcher;
@@ -58,8 +62,10 @@ public:
 */
 class QuickSyncVideoDecoder
 :
-    public QnAbstractVideoDecoder,
-    public stree::AbstractResourceReader
+    public QnAbstractVideoDecoder
+#ifndef XVBA_TEST
+    ,public stree::AbstractResourceReader
+#endif
 {
 public:
     /*!
@@ -76,7 +82,7 @@ public:
     virtual PixelFormat GetPixelFormat() const;
 
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
+    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 #ifndef XVBA_TEST
     //!Not implemented yet
     virtual void setLightCpuMode( DecodeMode val );
@@ -93,10 +99,8 @@ public:
     //!Reset decoder. Used for seek
     virtual void resetDecoder( QnCompressedVideoDataPtr data );
 #endif
-#ifndef DISABLE_LAST_FRAME
     //!Implementation of QnAbstractVideoDecoder::lastFrame. Returned frame is valid only until next \a decode call
     virtual const AVFrame* lastFrame() const;
-#endif
     //!Hint decoder to scale decoded pictures (decoder is allowed to ignore this hint)
     /*!
         \note \a outSize.width is aligned to 16, \a outSize.height is aligned to 32 because of limitation of underlying API
@@ -104,12 +108,15 @@ public:
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
+#ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
         Supports \a decodedPictureScaling and \a tracksDecodedPictureBuffer
     */
     virtual unsigned int getDecoderCaps() const;
+#endif
 
+#ifndef XVBA_TEST
     //!Implementation of stree::AbstractResourceReader::get
     /*!
         Following parameters are supported:\n
@@ -121,6 +128,7 @@ public:
             - videoMemoryUsage
     */
     virtual bool get( int resID, QVariant* const value ) const;
+#endif
 
 private:
     enum DecoderState
@@ -212,9 +220,7 @@ private:
     bool m_decodingInitialized;
     unsigned int m_totalBytesDropped;
     mfxU64 m_prevTimestamp;
-#ifndef XVBA_TEST
-    AVFrame* m_lastAVFrame;
-#endif
+    QSharedPointer<CLVideoDecoderOutput> m_lastAVFrame;
 
     MFXBufferAllocator m_bufAllocator;
 #ifdef USE_D3D
@@ -251,6 +257,14 @@ private:
     std::auto_ptr<PPSUnit> m_pps;
     qint64 m_prevOutPictureClock;
     int m_recursionDepth;
+#ifdef USE_OPENCL
+    cl_context m_clContext;
+    cl_int m_prevCLStatus;
+    clGetDeviceIDsFromDX9INTEL_fn m_clGetDeviceIDsFromDX9INTEL;
+    clCreateFromDX9MediaSurfaceINTEL_fn m_clCreateFromDX9MediaSurfaceINTEL;
+    HDC m_glContextDevice;
+    HGLRC m_glContext;
+#endif
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;
@@ -260,11 +274,14 @@ private:
     std::ofstream m_inputStreamFile;
 #endif
 
-    bool decode( mfxBitstream* const inputStream, CLVideoDecoderOutput* outFrame );
+    bool decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
     bool init( mfxU32 codecID, mfxBitstream* seqHeader );
     bool initMfxSession();
     bool initDecoder( mfxU32 codecID, mfxBitstream* seqHeader );
     bool initProcessor();
+#ifdef USE_OPENCL
+    bool initOpenCL();
+#endif
     void allocateSurfacePool(
         SurfacePool* const surfacePool,
         mfxFrameAllocRequest* const decodingAllocRequest,
@@ -291,11 +308,14 @@ private:
     QSharedPointer<SurfaceContext> getSurfaceCtxFromSurface( mfxFrameSurface1* const surf ) const;
     void resetMfxSession();
     //!Copies interleaved UV plane \a nv12UVPlane stored in USWC memory to separate U- and V- buffers in system RAM
-    void deinterleaveUVPlane(
+    void loadAndDeinterleaveUVPlane(
         __m128i* nv12UVPlane,
         size_t nv12UVPlaneSize,
         __m128i* yv12YPlane,
         __m128i* yv12VPlane );
+#ifdef USE_OPENCL
+    QString prevCLErrorText() const;
+#endif
 };
 
 #endif  //QUICKSYNCVIDEODECODER_H

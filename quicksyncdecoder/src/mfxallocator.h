@@ -222,11 +222,12 @@ public:
     //!Returns true if D3D9 device was created and initialized successfully
     bool initialized() const;
     //!Return value is not NULL only if \a initialized() returns \a true
-    IDirect3DDevice9* d3d9Device() const;
+    IDirect3DDevice9Ex* d3d9Device() const;
     //!Return value is not NULL only if \a initialized() returns \a true
     IDirect3DDeviceManager9* d3d9DeviceManager() const;
     HRESULT getLastError() const;
     QString getLastErrorText() const;
+    HDC dc() const;
 
     //!Returns response from previous \a alloc call
     //const mfxFrameAllocResponse& prevResponse() const;
@@ -254,6 +255,7 @@ private:
     UINT m_deviceResetToken;
     HRESULT m_prevOperationResult;
     unsigned int m_adapterNumber;
+    HDC m_dc;
 
     bool openD3D9Device();
     void closeD3D9Device();

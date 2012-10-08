@@ -12,7 +12,7 @@ public:
     IPPH264Decoder();
     ~IPPH264Decoder();
 
-    virtual bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
+    virtual bool decode(const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame);
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
     virtual QSize getOriginalPictureSize() const;
     virtual void resetDecoder( QnCompressedVideoDataPtr data );

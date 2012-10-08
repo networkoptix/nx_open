@@ -49,10 +49,11 @@ public:
     /**
       * Decode video frame.
       * Set hardwareAccelerationEnabled flag if hardware acceleration was used
+      * \param outFrame Made a pointer to pointer to allow in future return internal object to increase performance
       * \return true If \a outFrame is filled, false if no output frame
       * \note No error information is returned!
       */
-    virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame ) = 0;
+    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame ) = 0;
 
     virtual void setLightCpuMode( DecodeMode val ) = 0;
 
@@ -77,7 +78,7 @@ public:
     //!Returns size of picture as it present in media stream (before performing scaling)
     virtual QSize getOriginalPictureSize() const = 0;
     virtual double getSampleAspectRatio() const { return 1; };
-    virtual const AVFrame* lastFrame() const { return 0; }
+    virtual const AVFrame* lastFrame() const { return NULL; }
     //!Reset decoder state (e.g. to reposition source stream)
     /*!
         \param data First encoded frame of new stream. It is recommended that this frame be IDR and contain sequence header

@@ -33,11 +33,11 @@ public:
     static void clearGarbage();
     static bool isPixelFormatSupported(PixelFormat pixfmt);
 
-    void draw(CLVideoDecoderOutput *image);
+    void draw( const QSharedPointer<CLVideoDecoderOutput>& img );
     void waitForFrameDisplayed(int channel);
     
     
-    CLVideoDecoderOutput *update();
+    QSharedPointer<CLVideoDecoderOutput> update();
     Qn::RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;
@@ -117,10 +117,6 @@ private:
 
     bool m_textureUploaded;
 
-    int m_stride_old;
-    int m_height_old;
-    PixelFormat m_color_old;
-
     qreal m_brightness;
     qreal m_contrast;
     qreal m_hue;
@@ -130,7 +126,7 @@ private:
     bool m_needwait;
     bool m_newtexture;
 
-    CLVideoDecoderOutput *m_curImg;
+    QSharedPointer<CLVideoDecoderOutput> m_curImg;
     
     int m_format;
 

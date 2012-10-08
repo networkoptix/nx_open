@@ -22,7 +22,7 @@ public:
 
     void update();
 
-    virtual void draw(CLVideoDecoderOutput *image) override;
+    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image) override;
 
     virtual void waitForFrameDisplayed(int channel) override;
 

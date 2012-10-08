@@ -275,8 +275,10 @@ int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
-bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame)
+bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
+    CLVideoDecoderOutput* const outFrame = outFramePtr->data();
+
     if (m_codec==0)
     {
         if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {

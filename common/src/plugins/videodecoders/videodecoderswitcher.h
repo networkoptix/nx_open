@@ -29,7 +29,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
     virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
     //!Implementation of QnAbstractVideoDecoder::decode
-    virtual bool decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame );
+    virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
     //!Implementation of QnAbstractVideoDecoder::setLightCpuMode
     virtual void setLightCpuMode( DecodeMode val );
     //!Implementation of QnAbstractVideoDecoder::setMTDecoding

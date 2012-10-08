@@ -65,8 +65,8 @@ private:
       * to reduce image size for weak video cards 
       */
 
-    CLVideoDecoderOutput* m_frameQueue[MAX_FRAME_QUEUE_SIZE];
-    CLVideoDecoderOutput* m_prevFrameToDelete;
+    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    QSharedPointer<CLVideoDecoderOutput> m_prevFrameToDelete;
     int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
@@ -85,7 +85,7 @@ private:
     bool m_needReinitDecoders;
     bool m_reverseMode;
     bool m_prevReverseMode;
-    QQueue<CLVideoDecoderOutput*> m_reverseQueue;
+    QQueue<QSharedPointer<CLVideoDecoderOutput> > m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
     qint64 m_reverseSizeInBytes;
@@ -97,7 +97,7 @@ private:
     float m_speed;
     bool m_queueWasFilled;
     bool m_needResetDecoder;
-    CLVideoDecoderOutput* m_lastDisplayedFrame;
+    QSharedPointer<CLVideoDecoderOutput> m_lastDisplayedFrame;
     QSize m_imageSize;
     mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
@@ -114,10 +114,14 @@ private:
         int srcWidth, 
         int srcHeight, 
         QnFrameScaler::DownscaleFactor force_factor);
-    bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
-    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame );
+    /*!
+        \param outFrame MUST contain initialized \a CLVideoDecoderOutput object, but method is allowed to return just reference 
+            to another frame and not copy data to this object (TODO)
+    */
+    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H

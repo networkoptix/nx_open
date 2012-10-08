@@ -57,7 +57,7 @@ Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &rect
     return renderer->paint(rect);
 }
 
-void QnResourceWidgetRenderer::draw(CLVideoDecoderOutput *image) {
+void QnResourceWidgetRenderer::draw(const QSharedPointer<CLVideoDecoderOutput>& image) {
     m_channelRenderers[image->channel]->draw(image);
 
     QSize sourceSize = QSize(image->width * image->sample_aspect_ratio, image->height);

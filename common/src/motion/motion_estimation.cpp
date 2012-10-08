@@ -580,8 +580,8 @@ QnMotionEstimation::QnMotionEstimation()
     m_decoder = 0;
     //m_outFrame.setUseExternalData(false);
     //m_prevFrame.setUseExternalData(false);
-    m_frames[0] = new CLVideoDecoderOutput();
-    m_frames[1] = new CLVideoDecoderOutput();
+    m_frames[0] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
+    m_frames[1] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
     m_frames[0]->setUseExternalData(false);
     m_frames[1]->setUseExternalData(false);
 
@@ -626,8 +626,6 @@ QnMotionEstimation::~QnMotionEstimation()
     qFreeAligned(m_motionSensMask);
     qFreeAligned(m_linkedNums);
     delete [] m_resultMotion;
-    delete m_frames[0];
-    delete m_frames[1];
 }
 
 // rescale motion mask width (mask rotated, so actually remove or duplicate some lines)
@@ -886,7 +884,7 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     int idx = m_totalFrames % FRAMES_BUFFER_SIZE;
     int prevIdx = (m_totalFrames-1) % FRAMES_BUFFER_SIZE;
 
-    if (!m_decoder->decode(videoData, m_frames[idx]))
+    if (!m_decoder->decode(videoData, &m_frames[idx]))
         return;
     if (m_firstFrameTime == qint64(AV_NOPTS_VALUE))
         m_firstFrameTime = m_frames[idx]->pkt_dts;
@@ -916,11 +914,11 @@ void QnMotionEstimation::analizeFrame(QnCompressedVideoDataPtr videoData)
     {
         // calculate difference between frames
         if (m_xStep == 8)
-            getFrame_avgY_array_8_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx]);
+            getFrame_avgY_array_8_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
         else if (m_xStep == 16)
-            getFrame_avgY_array_16_x(m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx]);
+            getFrame_avgY_array_16_x(m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx]);
         else
-            getFrame_avgY_array_x_x (m_frames[idx], m_frames[prevIdx], m_frameBuffer[idx], m_xStep);
+            getFrame_avgY_array_x_x (m_frames[idx].data(), m_frames[prevIdx].data(), m_frameBuffer[idx], m_xStep);
 
 
         analizeMotionAmount(m_frameBuffer[idx]);

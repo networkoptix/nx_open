@@ -23,7 +23,7 @@ class CLFFmpegVideoDecoder
 {
 public:
     CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
-    bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
+    bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
     ~CLFFmpegVideoDecoder();
 
     void showMotion(bool show);

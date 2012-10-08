@@ -61,13 +61,13 @@ QSize QnVideoTranscoder::getResolution() const
 void QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-    CLVideoDecoderOutput decodedVideoFrame;
+    QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() == 0)
-        m_resolution = QSize(decodedVideoFrame.width, decodedVideoFrame.height);
+        m_resolution = QSize(decodedVideoFrame->width, decodedVideoFrame->height);
     else if (m_resolution.width() == 0)
     {
-        float ar = decodedVideoFrame.width / (float) decodedVideoFrame.height;
+        float ar = decodedVideoFrame->width / (float) decodedVideoFrame->height;
         m_resolution.setWidth(m_resolution.height() * ar);
     }
 }

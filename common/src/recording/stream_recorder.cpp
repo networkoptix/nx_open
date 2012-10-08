@@ -378,7 +378,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             else if (m_role == Role_FileExport || m_role == Role_FileExportWithEmptyContext)
             {
                 // determine real width and height
-                CLVideoDecoderOutput outFrame;
+                QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
                 CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
                 if (m_role == Role_FileExport) {

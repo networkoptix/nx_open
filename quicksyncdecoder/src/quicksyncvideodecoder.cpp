@@ -3,22 +3,36 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include "quicksyncvideodecoder.h"
+
 #include <intrin.h>
 
 #include <Winsock2.h>
 
 #include <algorithm>
 
+#ifdef USE_OPENCL
+#define DX9_SHARING
+#define DX9_MEDIA_SHARING
+#include <CL/cl.h>
+#include <CL/cl_d3d9.h>
+#include <CL/cl_gl.h>
+#endif
 #ifndef XVBA_TEST
 #include <libavcodec/avcodec.h>
 #endif
 #include <QDebug>
 #include <QElapsedTimer>
 
+#ifndef XVBA_TEST
 #include <plugins/videodecoders/pluginusagewatcher.h>
 #include <plugins/videodecoders/videodecoderplugintypes.h>
-
-#include "quicksyncvideodecoder.h"
+#else
+quint64 getUsecTimer()
+{
+    return 0;
+}
+#endif
 
 //#define RETURN_D3D_SURFACE
 #define CONVERT_NV12_TO_YV12
@@ -28,6 +42,16 @@
 //TODO/IMPL take sequence header from extradata. Test on file
 //TODO/IMPL support last frame
 //TODO/IMPL implement shader NV12 -> RGB
+
+/*
+TODO: direct copy dxvasurface -> opengl texture:
+
+TODO creating CL context from d3d device
+
+clCreateFromDX9MediaSurfaceINTEL  - creating cl_mem from d3d_surface
+TODO copy to GL texture
+
+*/
 
 
 //!Implementation of QnAbstractPictureData
@@ -104,9 +128,6 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_decodingInitialized( false ),
     m_totalBytesDropped( 0 ),
     m_prevTimestamp( 0 ),
-#ifndef DISABLE_LAST_FRAME
-    m_lastAVFrame( NULL ),
-#endif
     m_decoderSurfaceSizeInBytes( 0 ),
     m_vppSurfaceSizeInBytes( 0 ),
 #ifdef USE_D3D
@@ -125,6 +146,14 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_prevInputFrameMs( (quint64)-1 ),
     m_prevOutPictureClock( 0 ),
     m_recursionDepth( 0 )
+#ifdef USE_OPENCL
+    ,m_clContext( NULL ),
+    m_prevCLStatus( CL_SUCCESS ),
+    m_clGetDeviceIDsFromDX9INTEL( NULL ),
+    m_clCreateFromDX9MediaSurfaceINTEL( NULL ),
+    m_glContextDevice( NULL ),
+    m_glContext( NULL )
+#endif
 {
     memset( &m_srcStreamParam, 0, sizeof(m_srcStreamParam) );
     memset( &m_decodingAllocResponse, 0, sizeof(m_decodingAllocResponse) );
@@ -136,10 +165,29 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
         cl_log.log( QString::fromAscii("Failed to initialize DXVA frame surface allocator. %1").arg(m_d3dFrameAllocator.getLastErrorText()), cl_logERROR );
         return;
     }
-#endif
 
-#ifndef DISABLE_LAST_FRAME
-    m_lastAVFrame = avcodec_alloc_frame();
+#ifdef USE_OPENCL
+    m_glContextDevice = m_d3dFrameAllocator.dc();
+    m_glContext = wglCreateContext( m_glContextDevice );
+    if( m_glContext == NULL )
+    {
+        DWORD errorCode = GetLastError();
+        LPVOID lpMsgBuf = NULL;
+        if( FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                errorCode,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&lpMsgBuf,
+                0,
+                NULL ) == 0 )
+        {
+            errorCode = GetLastError();
+        }
+        LocalFree(lpMsgBuf);
+        return;
+    }
+#endif
 #endif
 
 #if defined(WRITE_INPUT_STREAM_TO_FILE_1) || defined(WRITE_INPUT_STREAM_TO_FILE_2)
@@ -165,10 +213,12 @@ QuickSyncVideoDecoder::~QuickSyncVideoDecoder()
 {
     closeMFXSession();
 
-    m_pluginUsageWatcher->decoderIsAboutToBeDestroyed( this );
+#ifdef USE_OPENCL
+    clReleaseContext( m_clContext );
+#endif
 
-#ifndef DISABLE_LAST_FRAME
-    av_free( m_lastAVFrame );
+#ifndef XVBA_TEST
+    m_pluginUsageWatcher->decoderIsAboutToBeDestroyed( this );
 #endif
 }
 
@@ -187,7 +237,7 @@ static const AVRational INTEL_MEDIA_SDK_TIMESTAMP_RESOLUTION = {1, 90000};
 #endif
 static const int MICROS_IN_SECOND = 1000*1000;
 
-bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame )
+bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     Q_ASSERT( data->compressionType == CODEC_ID_H264 );
 
@@ -408,7 +458,7 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
     return frameToDisplay != NULL;
 }
 #else
-bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDecoderOutput* outFrame )
+bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const bool isSeqHeaderPresent = readSequenceHeader( inputStream );
     if( m_reinitializeNeeded && isSeqHeaderPresent )
@@ -526,7 +576,10 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
 
                     //outFrame = decodedFrame
                     if( outFrame )
-                        saveToAVFrame( outFrame, decodedFrameCtx );
+                    {
+                        saveToAVFrame( outFrame->data(), decodedFrameCtx );
+                        m_lastAVFrame = *outFrame;
+                    }
                 }
                 else
                 {
@@ -654,12 +707,10 @@ void QuickSyncVideoDecoder::resetDecoder( QnCompressedVideoDataPtr data )
 }
 #endif
 
-#ifndef DISABLE_LAST_FRAME
 const AVFrame* QuickSyncVideoDecoder::lastFrame() const
 {
-    return m_lastAVFrame;
+    return m_lastAVFrame.data();
 }
-#endif
 
 void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
 {
@@ -689,6 +740,7 @@ QnAbstractPictureData::PicStorageType QuickSyncVideoDecoder::targetMemoryType() 
     return QnAbstractPictureData::pstSysMemPic;
 }
 
+#ifndef XVBA_TEST
 unsigned int QuickSyncVideoDecoder::getDecoderCaps() const
 {
     return QnAbstractVideoDecoder::decodedPictureScaling | QnAbstractVideoDecoder::tracksDecodedPictureBuffer;
@@ -720,6 +772,7 @@ bool QuickSyncVideoDecoder::get( int resID, QVariant* const value ) const
             return false;
     }
 }
+#endif
 
 bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
 {
@@ -736,9 +789,15 @@ bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
     if( processingNeeded() && !m_processor.get() && !initProcessor() )
         return false;
 
+#ifdef USE_OPENCL
+    initOpenCL();
+#endif
+
     m_state = decoding;
 
+#ifndef XVBA_TEST
     m_pluginUsageWatcher->decoderCreated( this );
+#endif
 
     m_totalInputFrames = 0;
     m_totalOutputFrames = 0;
@@ -1075,6 +1134,110 @@ bool QuickSyncVideoDecoder::initProcessor()
     return true;
 }
 
+#ifdef USE_OPENCL
+bool QuickSyncVideoDecoder::initOpenCL()
+{
+    static const size_t MAX_PLATFORMS_NUMBER = 8;
+    cl_platform_id platforms[MAX_PLATFORMS_NUMBER];
+    memset( platforms, 0, sizeof(platforms) );
+    cl_uint numPlatforms = 0;
+    m_prevCLStatus = clGetPlatformIDs( MAX_PLATFORMS_NUMBER, platforms, &numPlatforms );
+    if( m_prevCLStatus != CL_SUCCESS )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. clGetPlatformIDs failed. %1").arg(prevCLErrorText()), cl_logERROR );
+        return false;
+    }
+    if( numPlatforms == 0 )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. No OpenCL platform IDs found"), cl_logERROR );
+        return false;
+    }
+
+    //TODO/IMPL select intel platform
+    size_t intelCLPlatformIndex = 1;
+
+    //unfortunately, CL_PLATFORM_EXTENSIONS platform info is unavailable on intel
+
+    //char platformExtensionsStr[256];
+    //size_t actualPlatformExtensionsStrSize = 0;
+    //m_prevCLStatus = clGetPlatformInfo(
+    //    platforms[intelCLPlatformIndex],
+    //    CL_PLATFORM_EXTENSIONS,
+    //    sizeof(platformExtensionsStr),
+    //    platformExtensionsStr,
+    //    &actualPlatformExtensionsStrSize );
+    //platformExtensionsStr[std::min<size_t>(actualPlatformExtensionsStrSize, sizeof(platformExtensionsStr)/sizeof(*platformExtensionsStr))] = 0;
+    //if( m_prevCLStatus != CL_SUCCESS )
+    //{
+    //    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. clGetPlatformInfo failed. %1").arg(prevCLErrorText()), cl_logERROR );
+    //    return false;
+    //}
+    //cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Supported CL extension: %1").arg(QString::fromAscii(platformExtensionsStr)), cl_logDEBUG1 );
+
+    if( !m_clGetDeviceIDsFromDX9INTEL )
+        m_clGetDeviceIDsFromDX9INTEL = (clGetDeviceIDsFromDX9INTEL_fn)clGetExtensionFunctionAddress( "clGetDeviceIDsFromDX9INTEL" );
+    if( !m_clCreateFromDX9MediaSurfaceINTEL )
+        m_clCreateFromDX9MediaSurfaceINTEL= (clCreateFromDX9MediaSurfaceINTEL_fn)clGetExtensionFunctionAddress( "clCreateFromDX9MediaSurfaceINTEL" );
+    //clGetGLContextInfoKHR_fn clGetGLContextInfoKHR = (clGetGLContextInfoKHR_fn)clGetExtensionFunctionAddress( "clGetGLContextInfoKHR" );
+    if( !m_clGetDeviceIDsFromDX9INTEL || !m_clCreateFromDX9MediaSurfaceINTEL )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Seems like no cl_intel_dx9_media_sharing extension on this platform... %1"), cl_logERROR );
+        return false;
+    }
+
+    static const size_t MAX_DEVICES_NUMBER = 8;
+    cl_device_id clDevices[MAX_DEVICES_NUMBER];
+    memset( clDevices, 0, sizeof(clDevices) );
+    cl_uint numOfDevices = 0;
+    m_prevCLStatus = clGetDeviceIDs(
+        platforms[intelCLPlatformIndex],
+        CL_DEVICE_TYPE_ALL,
+        MAX_DEVICES_NUMBER,
+        clDevices,
+        &numOfDevices );
+    //m_prevCLStatus = clGetDeviceIDsFromDX9INTEL(
+    //    platforms[intelCLPlatformIndex],
+    //    CL_D3D9EX_DEVICE_INTEL,
+    //    m_d3dFrameAllocator.d3d9Device(),
+    //    CL_ALL_DEVICES_FOR_DX9_INTEL,   //CL_PREFERRED_DEVICES_FOR_DX9_INTEL,
+    //    MAX_DEVICES_NUMBER,
+    //    clDevices,
+    //    &numOfDevices );
+    if( m_prevCLStatus != CL_SUCCESS )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. clGetDeviceIDs failed. %1").arg(prevCLErrorText()), cl_logERROR );
+        return false;
+    }
+    if( numOfDevices == 0 )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. No OpenCL device IDs found"), cl_logERROR );
+        return false;
+    }
+
+    cl_context_properties properties[] = {
+        CL_CONTEXT_PLATFORM,            (cl_context_properties)(platforms[intelCLPlatformIndex]),
+        CL_CONTEXT_D3D9EX_DEVICE_INTEL, (cl_context_properties)m_d3dFrameAllocator.d3d9Device(),
+        //CL_GL_CONTEXT_KHR,              (cl_context_properties)m_glContext,
+        //CL_WGL_HDC_KHR,                 (cl_context_properties)m_glContextDevice,
+        0 };
+    m_clContext = clCreateContext(
+        properties,
+        1,
+        clDevices,  //TODO/IMPL take appropriate device
+        NULL,
+        NULL,
+        &m_prevCLStatus );
+    if( m_prevCLStatus != CL_SUCCESS )
+    {
+        cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. clCreateContext failed. %1").arg(prevCLErrorText()), cl_logERROR );
+        return false;
+    }
+
+    //TODO/IMPL
+    return true;
+}
+#endif
+
 void QuickSyncVideoDecoder::allocateSurfacePool(
     SurfacePool* const surfacePool,
     mfxFrameAllocRequest* const allocRequest,
@@ -1347,57 +1510,108 @@ inline void fastmemcpy_sse4( __m128i* dst, __m128i* src, size_t sz )
     }
 }
 
-void QuickSyncVideoDecoder::deinterleaveUVPlane(
+inline void fastmemcpy_sse4_buffered( __m128i* dst, __m128i* src, size_t sz )
+{
+    static const size_t TMP_BUF_SIZE = 1*1024 / sizeof(__m128i);
+    __m128i tmpBuf[TMP_BUF_SIZE];
+
+    const __m128i* const src_end = src + sz / sizeof(__m128i);
+    while( src < src_end )
+    {
+        //reading to tmp buffer
+        const size_t bytesToCopy = std::min<size_t>( (src_end - src)*sizeof(*src), sizeof(tmpBuf) );
+        fastmemcpy_sse4( tmpBuf, src, bytesToCopy );
+        src += bytesToCopy / sizeof(*src);
+
+        //storing
+        const __m128i* const tmpBufEnd = tmpBuf + bytesToCopy / sizeof(*tmpBuf);
+        for( __m128i* srcTmp = tmpBuf; srcTmp < tmpBufEnd; )
+        {
+            __m128i x1 = *srcTmp;
+            __m128i x2 = *(srcTmp+1);
+            __m128i x3 = *(srcTmp+2);
+            __m128i x4 = *(srcTmp+3);
+            srcTmp += 4;
+
+             _mm_store_si128( dst, x1 );
+             _mm_store_si128( dst+1, x2 );
+             _mm_store_si128( dst+2, x3 );
+             _mm_store_si128( dst+3, x4 );
+             dst += 4;
+        }
+    }
+}
+
+void QuickSyncVideoDecoder::loadAndDeinterleaveUVPlane(
     __m128i* nv12UVPlane,
     size_t nv12UVPlaneSize,
     __m128i* yv12UPlane,
     __m128i* yv12VPlane )
 {
+    static const size_t TMP_BUF_SIZE = 4*1024 / sizeof(__m128i);
+    __m128i tmpBuf[TMP_BUF_SIZE];
+
     //static const __m128i MASK_LO = { 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff };
     static const __m128i MASK_HI = { 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00 };
     static const __m128i AND_MASK = MASK_HI;
     static const __m128i SHIFT_8 = { 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-    const __m128i* const src_end = nv12UVPlane + nv12UVPlaneSize / sizeof(__m128i);
-    while( nv12UVPlane < src_end )
+    const __m128i* const nv12UVPlaneEnd = nv12UVPlane + nv12UVPlaneSize / sizeof(__m128i);
+    while( nv12UVPlane < nv12UVPlaneEnd )
     {
-        __m128i x1 = _mm_stream_load_si128( nv12UVPlane );
-        __m128i x2 = _mm_stream_load_si128( nv12UVPlane+1 );
-        __m128i x3 = _mm_stream_load_si128( nv12UVPlane+2 );
-        __m128i x4 = _mm_stream_load_si128( nv12UVPlane+3 );
+        //reading to tmp buffer
+        const size_t bytesToCopy = std::min<size_t>( (nv12UVPlaneEnd - nv12UVPlane)*sizeof(*nv12UVPlane), sizeof(tmpBuf) );
+        fastmemcpy_sse4( tmpBuf, nv12UVPlane, bytesToCopy );
+        nv12UVPlane += bytesToCopy / sizeof(*nv12UVPlane);
 
-        __m128i x5 = _mm_packus_epi16( _mm_and_si128( x1, AND_MASK ), _mm_and_si128( x2, AND_MASK ) );   //U
-        __m128i x6 = _mm_packus_epi16( _mm_srl_epi16( x1, SHIFT_8 ), _mm_srl_epi16( x2, SHIFT_8 ) );   //V
-        _mm_store_si128( yv12UPlane, x5 );
-        _mm_store_si128( yv12VPlane, x6 );
+        //converting
+        const __m128i* const tmpBufEnd = tmpBuf + bytesToCopy / sizeof(*tmpBuf);
+        for( __m128i* nv12UVPlaneTmp = tmpBuf; nv12UVPlaneTmp < tmpBufEnd; )
+        {
+            __m128i x1 = *nv12UVPlaneTmp;
+            __m128i x2 = *(nv12UVPlaneTmp+1);
+            __m128i x3 = *(nv12UVPlaneTmp+2);
+            __m128i x4 = *(nv12UVPlaneTmp+3);
 
-        x5 = _mm_packus_epi16( _mm_and_si128( x3, AND_MASK ), _mm_and_si128( x4, AND_MASK ) );   //U
-        x6 = _mm_packus_epi16( _mm_srl_epi16( x3, SHIFT_8 ), _mm_srl_epi16( x4, SHIFT_8 ) );   //V
-        _mm_store_si128( yv12UPlane+1, x5 );
-        _mm_store_si128( yv12VPlane+1, x6 );
+            __m128i x5 = _mm_packus_epi16( _mm_and_si128( x1, AND_MASK ), _mm_and_si128( x2, AND_MASK ) );   //U
+            __m128i x6 = _mm_packus_epi16( _mm_srl_epi16( x1, SHIFT_8 ), _mm_srl_epi16( x2, SHIFT_8 ) );   //V
+            _mm_store_si128( yv12UPlane, x5 );
+            _mm_store_si128( yv12VPlane, x6 );
 
-        yv12UPlane += 2;
-        yv12VPlane += 2;
+            x5 = _mm_packus_epi16( _mm_and_si128( x3, AND_MASK ), _mm_and_si128( x4, AND_MASK ) );   //U
+            x6 = _mm_packus_epi16( _mm_srl_epi16( x3, SHIFT_8 ), _mm_srl_epi16( x4, SHIFT_8 ) );   //V
+            _mm_store_si128( yv12UPlane+1, x5 );
+            _mm_store_si128( yv12VPlane+1, x6 );
 
-        nv12UVPlane += 4;
+            yv12UPlane += 2;
+            yv12VPlane += 2;
+
+            nv12UVPlaneTmp += 4;
+        }
     }
-
-    //__m128i x5, x6;
-    //x5 = _mm_unpacklo_epi8( x1, x2 );
-    //x6 = _mm_unpackhi_epi8( x1, x2 );
-    //x1 = _mm_unpacklo_epi16( x5, x6 );
-    //x2 = _mm_unpackhi_epi16( x5, x6 );
-    //x5 = _mm_unpacklo_epi32( x1, x2 );
-    //x6 = _mm_unpackhi_epi32( x1, x2 );
-    //x1 = _mm_unpacklo_epi64( x5, x6 );
-    //x2 = _mm_unpackhi_epi64( x5, x6 );
-    //_mm_store_si128( yv12UPlane, x1 );
-    //_mm_store_si128( yv12VPlane, x2 );
 }
 
 void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx )
 {
     const mfxFrameSurface1* const decodedFrame = &decodedFrameCtx->mfxSurface;
+
+#if defined(USE_D3D) && defined(USE_OPENCL)
+    mfxHDL handle = NULL;
+    if( m_clContext && m_frameAllocator.gethdl( decodedFrameCtx->mfxSurface.Data.MemId, &handle ) == MFX_ERR_NONE )
+    {
+        cl_mem clFrame = m_clCreateFromDX9MediaSurfaceINTEL(
+           m_clContext,
+           CL_MEM_READ_ONLY,
+           static_cast<IDirect3DSurface9*>(handle),
+           NULL,
+           0,
+           &m_prevCLStatus );
+        if( m_prevCLStatus != CL_SUCCESS )
+        {
+            cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. clCreateFromDX9MediaSurfaceINTEL failed. %1").arg(prevCLErrorText()), cl_logERROR );
+        }
+    }
+#endif
 
 #ifdef RETURN_D3D_SURFACE
     outFrame->picData = QSharedPointer<QnAbstractPictureData>(
@@ -1426,9 +1640,9 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
             (__m128i*)outFrame->data[0],
             (__m128i*)(decodedFrame->Data.Y + (m_frameCropTopActual * decodedFrame->Data.Pitch)),
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) );
-        //QElapsedTimer t1;
-        //t1.start();
-        //for( int i = 0; i < 10000; ++i )
+
+        //const DWORD t1 = GetTickCount();
+        //for( int i = 0; i < 5000; ++i )
         //{
 #ifndef CONVERT_NV12_TO_YV12
         fastmemcpy_sse4(
@@ -1436,14 +1650,15 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
             (__m128i*)(decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2 );
 #else
-        deinterleaveUVPlane(
+        loadAndDeinterleaveUVPlane(
             (__m128i*)(decodedFrame->Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch)),
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2,
             (__m128i*)outFrame->data[1],
             (__m128i*)outFrame->data[2] );
 #endif
         //}
-        //qDebug() << "!!!!!!!!!!!!!"<<t1.elapsed()<<"!!!!!!!!!!!!!1";
+        //const DWORD t2 = GetTickCount();
+        //qDebug() << "!!!!!!!!!!!!!"<<(t2 - t1)<<"!!!!!!!!!!!!!1";
     }
     //else
     //{
@@ -1480,14 +1695,6 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
         decodedFrame->Info.PicStruct == MFX_PICSTRUCT_FIELD_REPEATED;
 
 #ifndef RETURN_D3D_SURFACE
-
-#ifndef DISABLE_LAST_FRAME
-    *m_lastAVFrame = *outFrame;
-    m_lastAVFrame->data[0] = decodedFrameCtx->mfxSurface.Data.Y + m_frameCropTopActual * decodedFrame->Data.Pitch;
-    m_lastAVFrame->data[1] = decodedFrameCtx->mfxSurface.Data.U + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch);
-    m_lastAVFrame->data[2] = decodedFrameCtx->mfxSurface.Data.V + (m_frameCropTopActual/2 * decodedFrame->Data.Pitch);
-#endif
-
     m_frameAllocator.unlock( decodedFrameCtx->mfxSurface.Data.MemId, &decodedFrameCtx->mfxSurface.Data );
 #endif
 }
@@ -1496,6 +1703,8 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
 {
     std::auto_ptr<SPSUnit> sps;
     std::auto_ptr<PPSUnit> pps;
+    bool spsFound = false;
+    bool ppsFound = false;
 
     if( inputStream->DataLength <= 4 )
         return false;
@@ -1544,6 +1753,7 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
                     }
 
                 m_sps = sps;
+                spsFound = true;
                 break;
             }
 
@@ -1555,6 +1765,7 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
                 pps->deserialize();
 
                 m_pps = pps;
+                ppsFound = true;
                 break;
             }
 
@@ -1563,7 +1774,7 @@ bool QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream 
         }
     }
 
-    if( sps.get() && pps.get() )
+    if( spsFound && ppsFound )
     {
         cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Found and parsed sequence header. Reinitializing..."), cl_logDEBUG1 );
         return true;
@@ -1701,3 +1912,114 @@ void QuickSyncVideoDecoder::resetMfxSession()
     m_currentOperations.clear();
 #endif
 }
+
+#ifdef USE_OPENCL
+QString QuickSyncVideoDecoder::prevCLErrorText() const
+{
+    switch( m_prevCLStatus )
+    {
+        case CL_SUCCESS:
+            return QString::fromAscii("CL_SUCCESS");
+        case CL_DEVICE_NOT_FOUND:
+            return QString::fromAscii("CL_DEVICE_NOT_FOUND");
+        case CL_DEVICE_NOT_AVAILABLE:
+            return QString::fromAscii("CL_DEVICE_NOT_AVAILABLE");
+        case CL_COMPILER_NOT_AVAILABLE:
+            return QString::fromAscii("CL_COMPILER_NOT_AVAILABLE");
+        case CL_MEM_OBJECT_ALLOCATION_FAILURE:
+            return QString::fromAscii("CL_MEM_OBJECT_ALLOCATION_FAILURE");
+        case CL_OUT_OF_RESOURCES:
+            return QString::fromAscii("CL_OUT_OF_RESOURCES");
+        case CL_OUT_OF_HOST_MEMORY:
+            return QString::fromAscii("CL_OUT_OF_HOST_MEMORY");
+        case CL_PROFILING_INFO_NOT_AVAILABLE:
+            return QString::fromAscii("CL_PROFILING_INFO_NOT_AVAILABLE");
+        case CL_MEM_COPY_OVERLAP:
+            return QString::fromAscii("CL_MEM_COPY_OVERLAP");
+        case CL_IMAGE_FORMAT_MISMATCH:
+            return QString::fromAscii("CL_IMAGE_FORMAT_MISMATCH");
+        case CL_IMAGE_FORMAT_NOT_SUPPORTED:
+            return QString::fromAscii("CL_IMAGE_FORMAT_NOT_SUPPORTED");
+        case CL_BUILD_PROGRAM_FAILURE:
+            return QString::fromAscii("CL_BUILD_PROGRAM_FAILURE");
+        case CL_MAP_FAILURE:
+            return QString::fromAscii("CL_MAP_FAILURE");
+        case CL_MISALIGNED_SUB_BUFFER_OFFSET:
+            return QString::fromAscii("CL_MISALIGNED_SUB_BUFFER_OFFSET");
+        case CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST:
+            return QString::fromAscii("CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST");
+        case CL_INVALID_VALUE:
+            return QString::fromAscii("CL_INVALID_VALUE");
+        case CL_INVALID_DEVICE_TYPE:
+            return QString::fromAscii("CL_INVALID_DEVICE_TYPE");
+        case CL_INVALID_PLATFORM:
+            return QString::fromAscii("CL_INVALID_PLATFORM");
+        case CL_INVALID_DEVICE:
+            return QString::fromAscii("CL_INVALID_DEVICE");
+        case CL_INVALID_CONTEXT:
+            return QString::fromAscii("CL_INVALID_CONTEXT");
+        case CL_INVALID_QUEUE_PROPERTIES:
+            return QString::fromAscii("CL_INVALID_QUEUE_PROPERTIES");
+        case CL_INVALID_COMMAND_QUEUE:
+            return QString::fromAscii("CL_INVALID_COMMAND_QUEUE");
+        case CL_INVALID_HOST_PTR:
+            return QString::fromAscii("CL_INVALID_HOST_PTR");
+        case CL_INVALID_MEM_OBJECT:
+            return QString::fromAscii("CL_INVALID_MEM_OBJECT");
+        case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:
+            return QString::fromAscii("CL_INVALID_IMAGE_FORMAT_DESCRIPTOR");
+        case CL_INVALID_IMAGE_SIZE:
+            return QString::fromAscii("CL_INVALID_IMAGE_SIZE");
+        case CL_INVALID_SAMPLER:
+            return QString::fromAscii("CL_INVALID_SAMPLER");
+        case CL_INVALID_BINARY:
+            return QString::fromAscii("CL_INVALID_BINARY");
+        case CL_INVALID_BUILD_OPTIONS:
+            return QString::fromAscii("CL_INVALID_BUILD_OPTIONS");
+        case CL_INVALID_PROGRAM:
+            return QString::fromAscii("CL_INVALID_PROGRAM");
+        case CL_INVALID_PROGRAM_EXECUTABLE:
+            return QString::fromAscii("CL_INVALID_PROGRAM_EXECUTABLE");
+        case CL_INVALID_KERNEL_NAME:
+            return QString::fromAscii("CL_INVALID_KERNEL_NAME");
+        case CL_INVALID_KERNEL_DEFINITION:
+            return QString::fromAscii("CL_INVALID_KERNEL_DEFINITION");
+        case CL_INVALID_KERNEL:
+            return QString::fromAscii("CL_INVALID_KERNEL");
+        case CL_INVALID_ARG_INDEX:
+            return QString::fromAscii("CL_INVALID_ARG_INDEX");
+        case CL_INVALID_ARG_VALUE:
+            return QString::fromAscii("CL_INVALID_ARG_VALUE");
+        case CL_INVALID_ARG_SIZE:
+            return QString::fromAscii("CL_INVALID_ARG_SIZE");
+        case CL_INVALID_KERNEL_ARGS:
+            return QString::fromAscii("CL_INVALID_KERNEL_ARGS");
+        case CL_INVALID_WORK_DIMENSION:
+            return QString::fromAscii("CL_INVALID_WORK_DIMENSION");
+        case CL_INVALID_WORK_GROUP_SIZE:
+            return QString::fromAscii("CL_INVALID_WORK_GROUP_SIZE");
+        case CL_INVALID_WORK_ITEM_SIZE:
+            return QString::fromAscii("CL_INVALID_WORK_ITEM_SIZE");
+        case CL_INVALID_GLOBAL_OFFSET:
+            return QString::fromAscii("CL_INVALID_GLOBAL_OFFSET");
+        case CL_INVALID_EVENT_WAIT_LIST:
+            return QString::fromAscii("CL_INVALID_EVENT_WAIT_LIST");
+        case CL_INVALID_EVENT:
+            return QString::fromAscii("CL_INVALID_EVENT");
+        case CL_INVALID_OPERATION:
+            return QString::fromAscii("CL_INVALID_OPERATION");
+        case CL_INVALID_GL_OBJECT:
+            return QString::fromAscii("CL_INVALID_GL_OBJECT");
+        case CL_INVALID_BUFFER_SIZE:
+            return QString::fromAscii("CL_INVALID_BUFFER_SIZE");
+        case CL_INVALID_MIP_LEVEL:
+            return QString::fromAscii("CL_INVALID_MIP_LEVEL");
+        case CL_INVALID_GLOBAL_WORK_SIZE:
+            return QString::fromAscii("CL_INVALID_GLOBAL_WORK_SIZE");
+        case CL_INVALID_PROPERTY:
+            return QString::fromAscii("CL_INVALID_PROPERTY");
+        default:
+            return QString();
+    }
+}
+#endif

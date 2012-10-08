@@ -6,6 +6,7 @@
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 
+
 class QnAbstractRenderer;
 class CLVideoDecoderOutput;
 
@@ -22,7 +23,7 @@ public:
 
     qint64 bufferedDuration();
 
-    bool addFrame(CLVideoDecoderOutput* outFrame);
+    bool addFrame(const QSharedPointer<CLVideoDecoderOutput>& outFrame);
 
     void setCurrentTime(qint64 time);
 
@@ -36,7 +37,7 @@ protected:
     virtual void run() override;
 
 private:
-    CLThreadQueue<CLVideoDecoderOutput *> m_queue;
+    CLThreadQueue<QSharedPointer<CLVideoDecoderOutput>> m_queue;
     QnAbstractRenderer *m_drawer;
     qint64 m_lastQueuedTime;
     qint64 m_expectedTime;

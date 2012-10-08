@@ -320,7 +320,8 @@ MFXDirect3DSurfaceAllocator::MFXDirect3DSurfaceAllocator( IDirect3D9Ex* direct3D
     m_decoderService( NULL ),
     m_deviceResetToken( 0 ),
     m_prevOperationResult( S_OK ),
-    m_adapterNumber( adapterNumber )
+    m_adapterNumber( adapterNumber ),
+    m_dc( NULL )
 {
     //memset( &m_prevResponse, 0, sizeof(m_prevResponse) );
 }
@@ -487,7 +488,7 @@ bool MFXDirect3DSurfaceAllocator::initialized() const
     return m_initialized;
 }
 
-IDirect3DDevice9* MFXDirect3DSurfaceAllocator::d3d9Device() const
+IDirect3DDevice9Ex* MFXDirect3DSurfaceAllocator::d3d9Device() const
 {
     return m_d3d9Device;
 }
@@ -507,6 +508,11 @@ QString MFXDirect3DSurfaceAllocator::getLastErrorText() const
     return QString::fromWCharArray( DXGetErrorDescription( m_prevOperationResult ) );
 }
 
+HDC MFXDirect3DSurfaceAllocator::dc() const
+{
+    return m_dc;
+}
+
 void MFXDirect3DSurfaceAllocator::deinitializeFrame( BaseFrameContext* const frameCtx )
 {
     static_cast<Direct3DSurfaceContext*>(frameCtx)->surface->Release();
@@ -524,13 +530,17 @@ void MFXDirect3DSurfaceAllocator::deinitializeFrame( BaseFrameContext* const fra
 
 static BOOL CALLBACK enumWindowsProc( HWND hwnd, LPARAM lParam )
 {
-    HWND* foundHwnd = (HWND*)lParam;
+    //HWND* foundHwnd = (HWND*)lParam;
+    std::list<HWND>* processTopLevelWindows = (std::list<HWND>*)lParam;
+
     DWORD processId = 0;
     GetWindowThreadProcessId( hwnd, &processId );
     if( processId == GetCurrentProcessId() )
     {
-        *foundHwnd = hwnd;
-        return FALSE;
+        //*foundHwnd = hwnd;
+        //return FALSE;
+        //HWND parentWnd = GetAncestor( hwnd, GA_PARENT );
+        processTopLevelWindows->push_back( hwnd );
     }
     return TRUE;
 }
@@ -538,10 +548,13 @@ static BOOL CALLBACK enumWindowsProc( HWND hwnd, LPARAM lParam )
 bool MFXDirect3DSurfaceAllocator::openD3D9Device()
 {
     //searching for a window handle
-    HWND foundHwnd = NULL;
-    EnumWindows( enumWindowsProc, (LPARAM)&foundHwnd );
-    if( foundHwnd == NULL )
+    std::list<HWND> processTopLevelWindows;
+    HWND processWindow = NULL;
+    EnumWindows( enumWindowsProc, (LPARAM)&processTopLevelWindows );
+    if( processTopLevelWindows.empty() )
         return false;   //could not find window
+    processWindow = processTopLevelWindows.front();
+    m_dc = GetDC( processWindow );
 
     //creating device
     D3DPRESENT_PARAMETERS presentationParameters;
@@ -553,7 +566,7 @@ bool MFXDirect3DSurfaceAllocator::openD3D9Device()
     //presentationParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
     //presentationParameters.MultiSampleQuality = 0;
     presentationParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;  //D3DSWAPEFFECT_COPY;
-    presentationParameters.hDeviceWindow = foundHwnd;
+    presentationParameters.hDeviceWindow = processWindow;
     presentationParameters.Windowed = TRUE;
     presentationParameters.EnableAutoDepthStencil = FALSE;
     presentationParameters.Flags = D3DPRESENTFLAG_VIDEO;
@@ -562,7 +575,7 @@ bool MFXDirect3DSurfaceAllocator::openD3D9Device()
     m_prevOperationResult = m_direct3D9->CreateDeviceEx(
         m_adapterNumber,
         D3DDEVTYPE_HAL,
-        foundHwnd,
+        processWindow,
         D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
         &presentationParameters,
         NULL,

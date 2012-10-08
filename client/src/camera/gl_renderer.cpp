@@ -325,15 +325,12 @@ QnGLRenderer::QnGLRenderer(const QGLContext *context)
 
     m_forceSoftYUV = false;
     m_textureUploaded = false;
-    m_stride_old = 0;
-    m_height_old = 0;
     m_brightness = 0;
     m_contrast = 0;
     m_hue = 0;
     m_saturation = 0;
     m_painterOpacity = 1.0;
     m_needwait = true;
-    m_curImg = 0;
     m_videoWidth = 0;
     m_videoHeight = 0;
     m_newtexture = false;
@@ -381,23 +378,17 @@ void QnGLRenderer::beforeDestroy()
     m_waitCon.wakeAll();
 }
 
-void QnGLRenderer::draw(CLVideoDecoderOutput *img)
+void QnGLRenderer::draw( const QSharedPointer<CLVideoDecoderOutput>& img )
 {
-	 QMutexLocker locker(&m_displaySync);
+    QMutexLocker locker(&m_displaySync);
 
     //m_imageList.enqueue(img);
-    if (m_curImg) 
+    if( m_curImg )
         m_curImg->setDisplaying(false);
     m_curImg = img;
     m_format = m_curImg->format;
 
     m_curImg->setDisplaying(true);
-    if (m_curImg->linesize[0] != m_stride_old || m_curImg->height != m_height_old || m_curImg->format != m_color_old)
-    {
-        m_stride_old = m_curImg->linesize[0];
-        m_height_old = m_curImg->height;
-        m_color_old = (PixelFormat) m_curImg->format;
-    }
 }
 
 void QnGLRenderer::waitForFrameDisplayed(int channel)
@@ -722,7 +713,7 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
     glCheckError("glDisableClientState");
 }
 
-CLVideoDecoderOutput *QnGLRenderer::update()
+QSharedPointer<CLVideoDecoderOutput> QnGLRenderer::update()
 {
     QMutexLocker locker(&m_displaySync);
 
@@ -756,12 +747,8 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
 
     Qn::RenderStatus result;
 
-    CLVideoDecoderOutput *curImg = update();
-    if(m_newtexture) {
-        result = Qn::NewFrameRendered;
-    } else {
-        result = Qn::OldFrameRendered;
-    }
+    const QSharedPointer<CLVideoDecoderOutput>& curImg = update();
+    result = m_newtexture ? Qn::NewFrameRendered : Qn::OldFrameRendered;
     m_newtexture = false;
 
     const bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
@@ -799,9 +786,10 @@ Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
     }
 
     QMutexLocker locker( &m_displaySync );
-    if (curImg && curImg == m_curImg && curImg->isDisplaying()) {
+    if( curImg && curImg == m_curImg && curImg->isDisplaying() )
+    {
         curImg->setDisplaying(false);
-        m_curImg = 0;
+        m_curImg.clear();
         m_waitCon.wakeAll();
     }
 
