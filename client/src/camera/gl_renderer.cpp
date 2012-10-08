@@ -25,7 +25,13 @@
 #   include <utils/common/performance.h>
 #endif
 
-#define QN_GL_RENDERER_DEBUG
+/**
+ * \def QN_GL_RENDERER_DEBUG
+ * 
+ * Enable OpenGL error reporting. Note that this will result in a LOT of
+ * redundant <tt>glGetError</tt> calls, which may affect performance.
+ */
+//#define QN_GL_RENDERER_DEBUG
 
 #ifdef QN_GL_RENDERER_DEBUG
 #   define glCheckError glCheckError
@@ -76,13 +82,8 @@ public:
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP;
-        if (extensions.contains("GL_EXT_texture_edge_clamp")) {
-            clampConstant = GL_CLAMP_TO_EDGE_EXT;
-        } else if (extensions.contains("GL_SGIS_texture_edge_clamp")) {
-            clampConstant = GL_CLAMP_TO_EDGE_SGIS;
-        } else if (version >= QByteArray("1.2.0")) {
+        if (extensions.contains("GL_EXT_texture_edge_clamp") || extensions.contains("GL_SGIS_texture_edge_clamp") || version >= QByteArray("1.2.0"))
             clampConstant = GL_CLAMP_TO_EDGE;
-        }
 
         /* Check for non-power of 2 textures. */
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");

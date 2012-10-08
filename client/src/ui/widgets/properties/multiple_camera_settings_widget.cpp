@@ -60,13 +60,11 @@ Qn::CameraSettingsTab QnMultipleCameraSettingsWidget::currentTab() const {
     
     QWidget *tab = ui->tabWidget->currentWidget();
 
-    if(tab == ui->tabNetwork) {
-        return Qn::NetworkSettingsTab;
-    } else if(tab == ui->tabRecording) {
+    if(tab == ui->tabRecording) {
         return Qn::RecordingSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
-        return Qn::NetworkSettingsTab;
+        return Qn::GeneralSettingsTab;
     }
 }
 
@@ -75,8 +73,7 @@ void QnMultipleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
 
     switch(tab) {
     case Qn::GeneralSettingsTab:
-    case Qn::NetworkSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabNetwork);
+        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
         break;
     case Qn::RecordingSettingsTab:
     case Qn::MotionSettingsTab:
