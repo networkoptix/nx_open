@@ -53,7 +53,7 @@ public:
 
     void setPlayNowModeAllowed(bool value);
 private:
-    QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
+    QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal(QnResourcePtr resource);
     void reopen();
