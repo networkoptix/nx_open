@@ -3,41 +3,56 @@
 #include <cmath> /* For std::fmod. */
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
+#include <ui/graphics/opengl/gl_buffer_stream.h>
 #include <ui/graphics/shaders/color_shader_program.h>
 #include <ui/common/linear_combination.h>
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
-    m_sectorCount(sectorCount),
-    m_program(QnColorShaderProgram::instance(context))
+    QnGlFunctions(context),
+    m_shader(QnColorShaderProgram::instance(context)),
+    m_sectorCount(sectorCount)
 {
     if(context != QGLContext::currentContext())
         qnWarning("Invalid current OpenGL context.");
 
-    /* Create display list. */
-    m_list = glGenLists(1);
+    QByteArray data;
 
-    /* Compile the display list. */
-    glNewList(m_list, GL_COMPILE);
-    glBegin(GL_QUADS);
+    /* Generate vertex data. */
+    QnGlBufferStream<GLfloat> vertexStream(&data);
+    m_vertexOffset = vertexStream.offset();
     for(int i = 0; i < sectorCount; i++) {
         qreal a0 = 2 * M_PI / sectorCount * i;
         qreal a1 = 2 * M_PI / sectorCount * (i + sectorFill);
         qreal r0 = innerRadius;
         qreal r1 = 1;
 
-        qreal k = static_cast<qreal>(i) / (sectorCount - 1);
-        glColor(linearCombine(1 - k, startColor, k, endColor));
-        glVertexPolar(a0, r0);
-        glVertexPolar(a1, r0);
-        glVertexPolar(a1, r1);
-        glVertexPolar(a0, r1);
+
+        vertexStream 
+            << polar<QVector2D>(a0, r0)
+            << polar<QVector2D>(a1, r0)
+            << polar<QVector2D>(a1, r1)
+            << polar<QVector2D>(a0, r1);
     }
-    glEnd();
-    glEndList();
+    m_vertexCount = sectorCount * 4;
+
+    /* Generate color data. */
+    QnGlBufferStream<GLfloat> colorStream(&data);
+    m_colorOffset = colorStream.offset();
+    for(int i = 0; i < sectorCount; i++) {
+        qreal k = static_cast<qreal>(i) / (sectorCount - 1);
+        QColor color = linearCombine(1 - k, startColor, k, endColor);
+        colorStream << color << color << color << color;
+    }
+
+    /* Push data to GPU. */
+    glGenBuffers(1, &m_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
+    glBufferData(GL_ARRAY_BUFFER, data.size(), data.data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 QnLoadingProgressPainter::~QnLoadingProgressPainter() {
-    glDeleteLists(m_list, 1);
+    glDeleteBuffers(1, &m_buffer);
 }
 
 void QnLoadingProgressPainter::paint() {
@@ -47,9 +62,23 @@ void QnLoadingProgressPainter::paint() {
 void QnLoadingProgressPainter::paint(qreal progress, qreal opacity) {
     glPushMatrix();
     glRotate(360.0 * static_cast<int>(std::fmod(progress, 1.0) * m_sectorCount) / m_sectorCount, 0.0, 0.0, 1.0);
-    m_program->bind();
-    m_program->setColorMultiplier(QVector4D(1.0, 1.0, 1.0, opacity));
-    glCallList(m_list);
-    m_program->release();
+
+    m_shader->bind();
+    m_shader->setColorMultiplier(QVector4D(1.0, 1.0, 1.0, opacity));
+    
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableVertexAttribArray(m_shader->colorLocation());
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_buffer);
+    glVertexPointer(2, GL_FLOAT, 0, reinterpret_cast<const GLvoid *>(m_vertexOffset));
+    glVertexAttribPointer(m_shader->colorLocation(), 4, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const GLvoid *>(m_colorOffset));
+    glDrawArrays(GL_QUADS, 0, m_vertexCount);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(m_shader->colorLocation());
+    glDisableClientState(GL_VERTEX_ARRAY);
+
+    m_shader->release();
+
     glPopMatrix();
 }

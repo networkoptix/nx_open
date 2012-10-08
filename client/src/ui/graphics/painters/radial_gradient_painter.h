@@ -4,11 +4,13 @@
 #include <QtCore/QSharedPointer>
 #include <QtGui/QColor>
 
+#include <ui/graphics/opengl/gl_functions.h>
+
 class QGLContext;
 
 class QnColorShaderProgram;
 
-class QnRadialGradientPainter {
+class QnRadialGradientPainter: public QnGlFunctions {
 public:
     QnRadialGradientPainter(int sectorCount, const QColor &innerColor, const QColor &outerColor, const QGLContext *context);
     ~QnRadialGradientPainter();
@@ -17,7 +19,8 @@ public:
     void paint();
 
 private:
-    unsigned m_list;
+    GLuint m_buffer;
+    int m_vertexOffset, m_colorOffset, m_vertexCount;
     QSharedPointer<QnColorShaderProgram> m_shader;
 };
 

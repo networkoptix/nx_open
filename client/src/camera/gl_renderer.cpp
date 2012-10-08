@@ -76,13 +76,8 @@ public:
 
         /* Clamp constant. */
         clampConstant = GL_CLAMP;
-        if (extensions.contains("GL_EXT_texture_edge_clamp")) {
-            clampConstant = GL_CLAMP_TO_EDGE_EXT;
-        } else if (extensions.contains("GL_SGIS_texture_edge_clamp")) {
-            clampConstant = GL_CLAMP_TO_EDGE_SGIS;
-        } else if (version >= QByteArray("1.2.0")) {
+        if (extensions.contains("GL_EXT_texture_edge_clamp") || extensions.contains("GL_SGIS_texture_edge_clamp") || version >= QByteArray("1.2.0"))
             clampConstant = GL_CLAMP_TO_EDGE;
-        }
 
         /* Check for non-power of 2 textures. */
         supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");

@@ -4,6 +4,45 @@
 #include <QtOpenGL>
 #include <cmath> /* For std::sin & std::cos. */
 
+template<class T>
+struct coord_type;
+
+template<>
+struct coord_type<QVector2D> {
+    typedef float type;
+};
+
+template<>
+struct coord_type<QVector3D> {
+    typedef float type;
+};
+
+template<>
+struct coord_type<QVector4D> {
+    typedef float type;
+};
+
+template<>
+struct coord_type<QPointF> {
+    typedef qreal type;
+};
+
+
+template<class T> 
+inline T polar(typename coord_type<T>::type alpha, typename coord_type<T>::type r);
+
+template<>
+inline QVector2D polar<QVector2D>(float alpha, float r) {
+    return QVector2D(r * std::cos(alpha), r * std::sin(alpha));
+}
+
+template<>
+inline QPointF polar<QPointF>(qreal alpha, qreal r) {
+    return QPointF(r * std::cos(alpha), r * std::sin(alpha));
+}
+
+
+
 inline void glColor(float r, float g, float b, float a) {
     glColor4f(r, g, b, a);
 }
@@ -29,7 +68,7 @@ inline void glVertex(const QPointF &point) {
 }
 
 inline void glVertexPolar(qreal alpha, qreal r) {
-    glVertex(r * std::cos(alpha), r * std::sin(alpha));
+    glVertex(polar<QPointF>(alpha, r));
 }
 
 inline void glVertices(const QRectF &rect) {
