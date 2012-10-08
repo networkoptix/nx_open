@@ -1,4 +1,5 @@
 #include "x11_win_control.h"
+#include "qglobal.h"
 
 #ifdef Q_WS_X11
 

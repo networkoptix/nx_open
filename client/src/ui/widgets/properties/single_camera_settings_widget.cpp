@@ -5,6 +5,10 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QProcess>
+#ifdef Q_OS_WIN
+    #include <QtCore/QSettings>
+#endif
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -57,6 +61,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
+    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButtonClicked()));
 
     updateFromResource();
 }
@@ -208,8 +213,6 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
     
     if(tab == ui->tabGeneral) {
         return Qn::GeneralSettingsTab;
-    } else if(tab == ui->tabNetwork) {
-        return Qn::NetworkSettingsTab;
     } else if(tab == ui->tabRecording) {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->tabMotion) {
@@ -228,9 +231,6 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     switch(tab) {
     case Qn::GeneralSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabGeneral);
-        break;
-    case Qn::NetworkSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabNetwork);
         break;
     case Qn::RecordingSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabRecording);
@@ -586,6 +586,16 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     //}
 }
 
+void QnSingleCameraSettingsWidget::at_pingButtonClicked(){
+#ifdef Q_OS_WIN
+    QString cmd = QLatin1String("start ping %1 -t");
+#else
+    QString cmd = QLatin1String("xterm -e ping %1");
+#endif
+    QString ipAddress = m_camera->getUrl();
+    QProcess::execute(cmd.arg(ipAddress));
+}
+
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
     if (m_inUpdateMaxFps)
         return; /* Do not show message twice. */
@@ -616,9 +626,20 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
+
+    bool canAuth = !m_readOnly;
+
+#ifdef Q_OS_WIN
+    if (canAuth){
+        QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
+        QString defaultBrowser = settings.value(QLatin1String("HKEY_CLASSES_ROOT\\http\\shell\\open\\command")).toString();
+        canAuth = !defaultBrowser.contains(QLatin1String("iexplore"));
+    }
+#endif
+
     QUrl url(urlString);
 
-    if (!m_readOnly) {
+    if (canAuth) {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
     }
