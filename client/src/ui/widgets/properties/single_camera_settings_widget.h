@@ -83,6 +83,7 @@ private slots:
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
     void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
+    void at_pingButtonClicked();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();

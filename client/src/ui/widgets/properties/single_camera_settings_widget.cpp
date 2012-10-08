@@ -5,6 +5,7 @@
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
+#include <QtCore/QProcess>
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -57,6 +58,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
+    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButtonClicked()));
 
     updateFromResource();
 }
@@ -579,6 +581,16 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     //if (changesFound) {
         m_widgetsRecreator->proceed(&m_cameraSettings);
     //}
+}
+
+void QnSingleCameraSettingsWidget::at_pingButtonClicked(){
+#ifdef Q_OS_WIN
+    QString cmd = QLatin1String("start ping %1 -t");
+#else
+    QString cmd = QLatin1String("xterm -e ping %1");
+#endif
+    QString ipAddress = m_camera->getUrl();
+    QProcess::execute(cmd.arg(ipAddress));
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
