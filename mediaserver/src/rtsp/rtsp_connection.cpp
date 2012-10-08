@@ -404,6 +404,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
         //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
+    QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 
     switch (media->compressionType)
     {
@@ -434,7 +435,11 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            if (universalEncoder->isOpened())
+                return universalEncoder;
+            else
+                return QnRtspEncoderPtr();
         default:
             return QnRtspEncoderPtr();
     }
@@ -544,8 +549,12 @@ int QnRtspConnectionProcessor::composeDescribe()
                 encoder = createEncoderByMediaData(media, d->transcodedVideoSize);
                 if (encoder)
                     encoder->setMediaData(media);
-                else
+                else 
+                {
                     qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
+                    if (i >= numVideo)
+                        continue; // if audio is not found do not report error. just skip track
+                }
             }
             else if (i >= numVideo) {
                 continue; // if audio is not found do not report error. just skip track

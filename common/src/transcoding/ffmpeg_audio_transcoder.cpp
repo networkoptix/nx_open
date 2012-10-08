@@ -5,6 +5,7 @@ static const int MAX_AUDIO_JITTER = 1000 * 200;
 QnFfmpegAudioTranscoder::QnFfmpegAudioTranscoder(CodecID codecId):
 QnAudioTranscoder(codecId),
 m_encoderCtx(0),
+m_decoderContext(0),
 m_firstEncodedPts(AV_NOPTS_VALUE),
 m_lastTimestamp(AV_NOPTS_VALUE)
 {
@@ -31,26 +32,26 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
 }
 
-void QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
+bool QnFfmpegAudioTranscoder::open(QnCompressedAudioDataPtr audio)
 {
     if (!audio->context)
     {
         m_lastErrMessage = QObject::tr("Audio context must be specified");
-        return;
+        return false;
     }
 
     QnAudioTranscoder::open(audio);
 
-    open(audio->context);
+    return open(audio->context);
 }
 
-void QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
+bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
 {
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
         m_lastErrMessage = QObject::tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
-        return;
+        return false;
     }
 
     m_encoderCtx = avcodec_alloc_context3(avCodec);
@@ -71,7 +72,7 @@ void QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize audio encoder");
-        return;
+        return false;
     }
 
     avCodec = avcodec_find_decoder(codecCtx->ctx()->codec_id);
@@ -80,9 +81,10 @@ void QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize audio decoder");
-        return;
+        return false;
     }
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
+    return true;
 }
 
 int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)

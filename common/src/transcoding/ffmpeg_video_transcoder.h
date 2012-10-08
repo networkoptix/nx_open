@@ -12,7 +12,7 @@ public:
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
-    virtual void open(QnCompressedVideoDataPtr video) override;
+    virtual bool open(QnCompressedVideoDataPtr video) override;
     AVCodecContext* getCodecContext();
 private:
     int rescaleFrame();

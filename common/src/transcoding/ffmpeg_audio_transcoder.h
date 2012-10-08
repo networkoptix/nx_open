@@ -11,8 +11,8 @@ public:
     ~QnFfmpegAudioTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
-    virtual void open(QnCompressedAudioDataPtr audio) override;
-    void open(QnMediaContextPtr codecCtx);
+    virtual bool open(QnCompressedAudioDataPtr audio) override;
+    bool open(QnMediaContextPtr codecCtx);
     AVCodecContext* getCodecContext();
 private:
     quint8* m_audioEncodingBuffer;
