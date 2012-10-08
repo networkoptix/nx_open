@@ -9,7 +9,8 @@ static const char *const APPLICATION_NAME="${product.title}";
 static const char *const APPLICATION_VERSION="${project.version}.${buildNumber}";
 static const char *const APPLICATION_REVISION="${changeSet}";
 static const char *const FFMPEG_VERSION="${ffmpeg.version}";
-static const char *const SIGAR_VERSION="${sigar.version}"
+static const char *const SIGAR_VERSION="${sigar.version}";
+static const char *const BOOST_VERSION="${boost.version}";
 
 // These constans are here for windows resouce file.
 #define VER_CUSTOMIZATION           "${installer.customization}"
