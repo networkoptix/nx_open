@@ -9,6 +9,8 @@ static const char *const APPLICATION_NAME="${product.title}";
 static const char *const APPLICATION_VERSION="${project.version}.${buildNumber}";
 static const char *const APPLICATION_REVISION="${changeSet}";
 static const char *const FFMPEG_VERSION="${ffmpeg.version}";
+static const char *const SIGAR_VERSION="${sigar.version}";
+static const char *const BOOST_VERSION="${boost.version}";
 
 // These constans are here for windows resouce file.
 #define VER_CUSTOMIZATION           "${installer.customization}"
@@ -20,7 +22,7 @@ static const char *const FFMPEG_VERSION="${ffmpeg.version}";
 #define VER_COMPANYNAME_STR         "${company.name}"
 #define VER_FILEDESCRIPTION_STR     "${product.title}"
 #define VER_INTERNALNAME_STR        "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 Network Optix"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright 2011 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"

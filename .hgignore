@@ -144,3 +144,6 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
+
+launcher/x86
+launcher/x64

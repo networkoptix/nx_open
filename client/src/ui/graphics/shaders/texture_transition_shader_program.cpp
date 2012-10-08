@@ -14,6 +14,7 @@ QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLCont
         uniform sampler2D texture0;                                             \
         uniform sampler2D texture1;                                             \
         uniform float progress;                                                 \
+                                                                                \
         void main() {                                                           \
             vec4 color0 = texture2D(texture0, gl_TexCoord[0].st);               \
             vec4 color1 = texture2D(texture1, gl_TexCoord[0].st);               \
@@ -27,14 +28,3 @@ QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLCont
     m_progressLocation = uniformLocation("progress");
 }
 
-void QnTextureTransitionShaderProgram::setTexture0(int target) {
-    setUniformValue(m_texture0Location, target);
-}
-
-void QnTextureTransitionShaderProgram::setTexture1(int target) {
-    setUniformValue(m_texture1Location, target);
-}
-
-void QnTextureTransitionShaderProgram::setProgress(qreal progress) {
-    setUniformValue(m_progressLocation, static_cast<GLfloat>(progress));
-}
