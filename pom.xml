@@ -17,6 +17,7 @@
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
 		<dvr.version>openAPI_19_2.5.8.35-SNAPSHOT</dvr.version>
+        <sigar.version>1.6-SNAPSHOT</sigar.version>
 		<build.configuration>release</build.configuration>
 		<buildNumber>0</buildNumber>
 		<customization>default</customization>
