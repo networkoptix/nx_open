@@ -79,7 +79,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
 void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity)
 {
-    ioDevice->setStatistic(m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4));
+    bool gotValue = false;
+    RtspStatistic stats = m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4, &gotValue);
+    if (gotValue)
+        ioDevice->setStatistic(stats);
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {

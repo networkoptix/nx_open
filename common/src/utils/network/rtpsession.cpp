@@ -117,7 +117,10 @@ void RTPIODevice::processRtcpData()
                     qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << m_rtcpSocket->lastError();
                 }
             }
-            m_statistic = m_owner->parseServerRTCPReport(rtcpBuffer, readed);
+            bool gotValue = false;
+            RtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, readed, &gotValue);
+            if (gotValue)
+                m_statistic = stats;
             int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
@@ -956,12 +959,13 @@ static const int RTCP_SENDER_REPORT = 200;
 static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
-RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize)
+RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
     static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
         .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
 
     RtspStatistic stats;
+    *gotStatistics = false;
     try {
         BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
         reader.skipBits(8); // skip version
@@ -979,11 +983,11 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
                 stats.timestamp = reader.getBits(32);
                 stats.receivedPackets = reader.getBits(32);
                 stats.receivedOctets = reader.getBits(32);
+                *gotStatistics = true;
                 break;
             }
             else {
-                for (int i = 0; i < messageLen; ++i)
-                    reader.skipBits(32);
+                break;
             }
         }
     } catch(...)
