@@ -208,8 +208,6 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
     
     if(tab == ui->tabGeneral) {
         return Qn::GeneralSettingsTab;
-    } else if(tab == ui->tabNetwork) {
-        return Qn::NetworkSettingsTab;
     } else if(tab == ui->tabRecording) {
         return Qn::RecordingSettingsTab;
     } else if(tab == ui->tabMotion) {
@@ -228,9 +226,6 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
     switch(tab) {
     case Qn::GeneralSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabGeneral);
-        break;
-    case Qn::NetworkSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabNetwork);
         break;
     case Qn::RecordingSettingsTab:
         ui->tabWidget->setCurrentWidget(ui->tabRecording);
