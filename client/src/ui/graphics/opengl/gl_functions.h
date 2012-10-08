@@ -3,7 +3,7 @@
 
 #include <cstddef> /* For std::ptrdiff_t. */
 
-#include <QtOpenGL>
+#include <QtOpenGL/QGLContext>
 
 class QGLContext;
 
@@ -25,6 +25,7 @@ public:
         ArbPrograms = 0x1,              /**< Supports ARB shader programs. */
         OpenGL1_3 = 0x2,                /**< Implements OpenGL1.3 spec. */
         OpenGL1_5 = 0x4,                /**< Implements OpenGL1.5 spec. */
+        OpenGL2_0 = 0x8,                /**< Implements OpenGL2.0 spec. */
         
         ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
         OpenGLBroken = 0x00020000,      /**< Vendor has messed something up, and videodriver dies using OpenGL. */
@@ -44,7 +45,9 @@ public:
      */
     virtual ~QnGlFunctions();
 
-
+    /**
+     * \returns                         OpenGL context that this functions instance works with.
+     */
     QGLContext *context() const;
 
     /**
@@ -67,7 +70,7 @@ public:
     /**
      * \param enable                    Whether warnings related to unsupported function calls are to be enabled.
      */
-    static void enableWarnings(bool enable);
+    static void setWarningsEnabled(bool enable);
 
     /**
      * \returns                         Whether warnings related to unsupported function calls are enabled.
@@ -93,6 +96,12 @@ public:
     void glDeleteBuffers(GLsizei n, const GLuint *buffers);
     void glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage);
 
+    /* OpenGL2_0 group. */
+    
+    void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+    void glEnableVertexAttribArray(GLuint index);
+    void glDisableVertexAttribArray(GLuint index);
+
 private:
     QSharedPointer<QnGlFunctionsPrivate> d;
 };
@@ -110,12 +119,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features);
 #ifndef GL_CLAMP_TO_EDGE
 #   define GL_CLAMP_TO_EDGE                     0x812F
 #endif
-#ifndef GL_CLAMP_TO_EDGE_SGIS
-#   define GL_CLAMP_TO_EDGE_SGIS                0x812F
-#endif
-#ifndef GL_CLAMP_TO_EDGE_EXT
-#   define GL_CLAMP_TO_EDGE_EXT                 0x812F
-#endif
 
 #ifndef GL_TEXTURE0
 #   define GL_TEXTURE0                          0x84C0
@@ -127,5 +130,18 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnGlFunctions::Features);
 #   define GL_TEXTURE2                          0x84C2
 #endif
 
+#ifndef GL_VERSION_1_5
+#   define GL_ARRAY_BUFFER                      0x8892
+#   define GL_ELEMENT_ARRAY_BUFFER              0x8893
+#   define GL_STREAM_DRAW                       0x88E0
+#   define GL_STREAM_READ                       0x88E1
+#   define GL_STREAM_COPY                       0x88E2
+#   define GL_STATIC_DRAW                       0x88E4
+#   define GL_STATIC_READ                       0x88E5
+#   define GL_STATIC_COPY                       0x88E6
+#   define GL_DYNAMIC_DRAW                      0x88E8
+#   define GL_DYNAMIC_READ                      0x88E9
+#   define GL_DYNAMIC_COPY                      0x88EA
+#endif
 
 #endif // QN_GL_FUNCTIONS_H

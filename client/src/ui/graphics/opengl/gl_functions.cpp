@@ -20,6 +20,10 @@ typedef void (APIENTRY *PFNDeleteBuffers) (GLsizei, const GLuint *);
 typedef void (APIENTRY *PFNGenBuffers) (GLsizei, GLuint *);
 typedef void (APIENTRY *PFNBufferData) (GLenum, GLsizeiptrARB, const GLvoid *, GLenum);
 
+typedef void (APIENTRY *PFNVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *);
+typedef void (APIENTRY *PFNDisableVertexAttribArray) (GLuint);
+typedef void (APIENTRY *PFNEnableVertexAttribArray) (GLuint);
+
 namespace {
     bool qn_warnOnInvalidCalls = false;
 
@@ -48,6 +52,10 @@ namespace QnGl {
     void APIENTRY glDeleteBuffers(GLsizei, const GLuint *) { WARN(); }
     void APIENTRY glGenBuffers(GLsizei, GLuint *) { WARN(); }
     void APIENTRY glBufferData(GLenum, GLsizeiptrARB, const GLvoid *, GLenum) { WARN(); }
+
+    void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
+    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
+    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
 
 #undef WARN
 
@@ -142,6 +150,13 @@ public:
         RESOLVE(BufferData);
         if(status)
             m_features |= QnGlFunctions::OpenGL1_5;
+
+        status = true;
+        RESOLVE(VertexAttribPointer);
+        RESOLVE(DisableVertexAttribArray);
+        RESOLVE(EnableVertexAttribArray);
+        if(status)
+            m_features |= QnGlFunctions::OpenGL2_0;
 #undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
@@ -177,6 +192,10 @@ public:
     PFNDeleteBuffers glDeleteBuffers;
     PFNGenBuffers glGenBuffers;
     PFNBufferData glBufferData;
+
+    PFNVertexAttribPointer glVertexAttribPointer;
+    PFNDisableVertexAttribArray glDisableVertexAttribArray;
+    PFNEnableVertexAttribArray glEnableVertexAttribArray;
 
 private:
     template<class Function>
@@ -221,7 +240,7 @@ QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
 }
 
-void QnGlFunctions::enableWarnings(bool enable) {
+void QnGlFunctions::setWarningsEnabled(bool enable) {
     qn_warnOnInvalidCalls = enable;
 }
 
@@ -267,6 +286,18 @@ void QnGlFunctions::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
 
 void QnGlFunctions::glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage) {
     d->glBufferData(target, size, data, usage);
+}
+
+void QnGlFunctions::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
+    d->glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+}
+
+void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
+    d->glEnableVertexAttribArray(index);
+}
+
+void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
+    d->glDisableVertexAttribArray(index);
 }
 
 #ifdef Q_OS_WIN

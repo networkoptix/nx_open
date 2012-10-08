@@ -15,7 +15,7 @@ Target convert(const Source &source) {
     using ::convert;
 
     Target result;
-    convert(source, &target);
+    convert(source, &result);
     return result;
 }
 

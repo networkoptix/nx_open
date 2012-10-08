@@ -20,12 +20,7 @@ public:
 
 private:
     GLuint m_buffer;
-
-    int m_vertexOffset, m_colorOffset;
-
-
-    int m_sectorCount;
-    QColor m_innerColor, m_outerColor;
+    int m_vertexOffset, m_colorOffset, m_vertexCount;
     QSharedPointer<QnColorShaderProgram> m_shader;
 };
 

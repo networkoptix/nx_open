@@ -33,7 +33,7 @@ class QnEmptyResourceAudioLayout: public QnResourceAudioLayout
 public:
     QnEmptyResourceAudioLayout(): QnResourceAudioLayout() {}
     virtual int numberOfChannels() const override { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int index) const override { return AudioTrack(); }
+    virtual AudioTrack getAudioTrackInfo(int index) const override { Q_UNUSED(index); return AudioTrack(); }
 };
 
 class QnResourceCustomAudioLayout: public QnResourceAudioLayout

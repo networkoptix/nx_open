@@ -25,8 +25,12 @@ public:
         setAttributeValue(m_colorLocation, value);
     }
 
-    void setColorBuffer(GLenum type, int offset, int tupleSize, int stride = 0) {
-        setAttributeBuffer(m_colorLocation, type, offset, tupleSize, stride);
+    int colorMultiplierLocation() const {
+        return m_colorMultiplierLocation;
+    }
+
+    int colorLocation() const {
+        return m_colorLocation;
     }
 
 private:

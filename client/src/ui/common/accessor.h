@@ -1,7 +1,7 @@
 #ifndef QN_ACCESSOR_H
 #define QN_ACCESSOR_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 /**
  * Abstract accessor class. 

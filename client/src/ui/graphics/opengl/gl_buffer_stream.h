@@ -39,19 +39,23 @@ private:
     QByteArray *m_target;
 };
 
-QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector2D &value) {
+inline QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, qreal value) {
+    return stream << static_cast<float>(value);
+}
+
+inline QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector2D &value) {
     return stream << value.x() << value.y();
 }
 
-QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector3D &value) {
+inline QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector3D &value) {
     return stream << value.x() << value.y() << value.z();
 }
 
-QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector4D &value) {
+inline QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QVector4D &value) {
     return stream << value.x() << value.y() << value.z() << value.w();
 }
 
-QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QColor &value) {
+inline QnGlBufferStream<float> &operator<<(QnGlBufferStream<float> &stream, const QColor &value) {
     return stream << convert<QVector4D>(value);
 }
 
