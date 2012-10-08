@@ -30,6 +30,8 @@
 #include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
+#define QN_MEDIA_RESOURCE_WIDGET_SHOW_HQ_LQ
+
 namespace {
     template<class T>
     void resizeList(QList<T> &list, int size) {
@@ -564,6 +566,11 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             codecString = tr(" (%1)").arg(codecString);
     }
 
+    QString hqLqString;
+#ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HQ_LQ
+    hqLqString = (m_renderer->lastFrameMetadata(0) && (m_renderer->lastFrameMetadata(0)->flags & QnAbstractMediaData::MediaFlags_LowQuality)) ? tr(" LQ") : tr(" HQ");
+#endif
+
     QString timeString;
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         timeString = tr("\t%1").arg(
@@ -573,7 +580,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         );
     }
     
-    return tr("%1x%2 %3fps @ %4Mbps%5%6").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(timeString);
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(hqLqString).arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
