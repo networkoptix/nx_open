@@ -311,10 +311,17 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    qreal opacity = effectiveOpacity();
+    bool opaque = qFuzzyCompare(opacity, 1.0);
+    if(!opaque) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
-    glDisable(GL_BLEND);
+    
+    /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
