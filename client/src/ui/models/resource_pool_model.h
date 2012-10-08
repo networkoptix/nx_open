@@ -41,6 +41,9 @@ public:
 
     QnResourcePtr resource(const QModelIndex &index) const;
 
+    bool isUrlsShown();
+    void setUrlsShown(bool urlsShown);
+
 private:
     class Node;
 
@@ -84,6 +87,9 @@ private:
 
     /** Mapping for item nodes, by resource id. Is managed by nodes. */
     QHash<QnResource *, QList<Node *> > m_itemNodesByResource;
+
+    /** Whether item urls should be shown. */
+    bool m_urlsShown;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

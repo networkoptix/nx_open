@@ -181,10 +181,12 @@ public:
                 m_searchString = m_resource->toSearchString();
                 m_icon = qnResIconCache->icon(m_flags, m_status);
 
-                if((m_flags & QnResource::network) || (m_flags & QnResource::server && m_flags & QnResource::remote)) {
-                    QString host = extractHost(m_resource->getUrl());
-                    if(!host.isEmpty())
-                        m_displayName = tr("%1 (%2)").arg(m_name).arg(host);
+                if(m_model->m_urlsShown) {
+                    if((m_flags & QnResource::network) || (m_flags & QnResource::server && m_flags & QnResource::remote)) {
+                        QString host = extractHost(m_resource->getUrl());
+                        if(!host.isEmpty())
+                            m_displayName = tr("%1 (%2)").arg(m_name).arg(host);
+                    }
                 }
             }
         }
@@ -222,6 +224,13 @@ public:
 
         /* Notify views. */
         changeInternal();
+    }
+
+    void updateRecursive() {
+        update();
+
+        foreach(Node *child, m_children)
+            child->updateRecursive();
     }
 
     Qn::NodeType type() const {
@@ -509,7 +518,8 @@ private:
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
     QAbstractItemModel(parent), 
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_urlsShown(true)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
@@ -624,6 +634,19 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     } else {
         return this->node(parentResource);
     }
+}
+
+bool QnResourcePoolModel::isUrlsShown() {
+    return m_urlsShown;
+}
+
+void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
+    if(urlsShown == m_urlsShown)
+        return;
+
+    m_urlsShown = urlsShown;
+
+    m_rootNode->updateRecursive();
 }
 
 
