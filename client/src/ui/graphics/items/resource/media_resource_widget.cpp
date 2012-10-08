@@ -565,8 +565,13 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
 
     QString timeString;
-    if (m_resource->flags() & QnResource::utc) /* Do not show time for regular media files. */
-        timeString = tr("\t%1").arg(QDateTime::fromMSecsSinceEpoch(m_renderer->lastDisplayedTime(0) / 1000).toString(tr("hh:mm:ss.zzz")));
+    if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
+        timeString = tr("\t%1").arg(
+            m_display->camDisplay()->isRealTimeSource() ? 
+            tr("LIVE") :
+            QDateTime::fromMSecsSinceEpoch(m_renderer->lastDisplayedTime(0) / 1000).toString(tr("hh:mm:ss.zzz"))
+        );
+    }
     
     return tr("%1x%2 %3fps @ %4Mbps%5%6").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(timeString);
 }
