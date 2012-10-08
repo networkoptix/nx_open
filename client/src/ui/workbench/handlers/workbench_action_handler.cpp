@@ -1949,9 +1949,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     QString selectedExtension;
     QString binaryFilterName;
     if (sizeof(char*) == 4)
-        binaryFilterName = tr("x86 executable network optix media file(*.exe)");
+        binaryFilterName = tr("executable network optix media file (x86) (*.exe)");
     else
-        binaryFilterName = tr("x64 executable network optix media file(*.exe)");
+        binaryFilterName = tr("executable network optix media file (x64) (*.exe)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
