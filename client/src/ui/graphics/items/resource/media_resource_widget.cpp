@@ -568,7 +568,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
 
     QString hqLqString;
 #ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HQ_LQ
-    hqLqString = (m_renderer->lastFrameMetadata(0) && (m_renderer->lastFrameMetadata(0)->flags & QnAbstractMediaData::MediaFlags_LowQuality)) ? tr(" LQ") : tr(" HQ");
+    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" LQ") : tr(" HQ");
 #endif
 
     QString timeString;
