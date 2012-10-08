@@ -110,7 +110,7 @@ int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int
     int64_t bytesLeft = fileSize;
     
     do {
-        srcFile.read(buffer, min(bytesLeft, 1024*1024));
+        srcFile.read(buffer, min(bytesLeft, 1024*1024ll));
         dstFile.write(buffer, srcFile.gcount());
         bytesLeft -= srcFile.gcount();
     } while (srcFile.gcount() > 0 && bytesLeft > 0);
@@ -226,11 +226,11 @@ int _tmain(int argc, _TCHAR* argv[])
 {
     if (argc == 1)
     {
-        launchFile(argv[0]);
+        launchFile(wstring(argv[0]));
     }
     else if (argc == 2)
     {
-        launchFile(argv[1]);
+        launchFile(wstring(argv[1]));
     }
 
 	return 0;
