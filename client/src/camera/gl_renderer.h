@@ -36,8 +36,7 @@ public:
     void draw( const QSharedPointer<CLVideoDecoderOutput>& img );
     void waitForFrameDisplayed(int channel);
     
-    
-    QSharedPointer<CLVideoDecoderOutput> update();
+    void update();
     Qn::RenderStatus paint(const QRectF &r);
 
     qreal opacity() const;
@@ -53,6 +52,7 @@ public:
     const QGLContext* context() const;
 
 private:
+    void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draw texture to screen
     /*!
      * 	If not using shader than calls \a drawVideoTextureDirectly with texture \a tex0, otherwise calls \a drawVideoTextureWithShader
@@ -80,7 +80,7 @@ private:
      * 	\param tx_array texture vertexes array
      * */
     void drawBindedTexture( const float* v_array, const float* tx_array );
-    void updateTexture();
+    void updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool isYuvFormat() const;
     int glRGBFormat() const;
     QnGlRendererTexture *texture(int index);
