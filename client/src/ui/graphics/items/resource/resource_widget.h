@@ -390,6 +390,7 @@ private:
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
+    QStaticText m_loadingStaticText;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
