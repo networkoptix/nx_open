@@ -401,8 +401,10 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     if (media->dataType == QnAbstractMediaData::VIDEO)
         dstCodec = CODEC_ID_MPEG4;
     else
-        dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
+        //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
+        dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
+    QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 
     switch (media->compressionType)
     {
@@ -433,7 +435,11 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
         case CODEC_ID_VP8:
         case CODEC_ID_ADPCM_G722:
         case CODEC_ID_ADPCM_G726:
-            return QnRtspEncoderPtr(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution)); // transcode src codec to MPEG4/AAC
+            if (universalEncoder->isOpened())
+                return universalEncoder;
+            else
+                return QnRtspEncoderPtr();
         default:
             return QnRtspEncoderPtr();
     }
@@ -526,7 +532,14 @@ int QnRtspConnectionProcessor::composeDescribe()
         QnRtspEncoderPtr encoder;
         if (d->useProprietaryFormat)
         {
-            encoder = QnRtspEncoderPtr(new QnRtspFfmpegEncoder());
+            QnRtspFfmpegEncoder* ffmpegEncoder = new QnRtspFfmpegEncoder();
+            encoder = QnRtspEncoderPtr(ffmpegEncoder);
+            if (i >= numVideo) 
+            {
+                QnAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
+                if (media)
+                    ffmpegEncoder->setCodecContext(media->context);
+            }
 
         }
         else {
@@ -536,8 +549,12 @@ int QnRtspConnectionProcessor::composeDescribe()
                 encoder = createEncoderByMediaData(media, d->transcodedVideoSize);
                 if (encoder)
                     encoder->setMediaData(media);
-                else
+                else 
+                {
                     qWarning() << "no RTSP encoder for codec " << media->compressionType << "skip track";
+                    if (i >= numVideo)
+                        continue; // if audio is not found do not report error. just skip track
+                }
             }
             else if (i >= numVideo) {
                 continue; // if audio is not found do not report error. just skip track
@@ -588,7 +605,7 @@ int QnRtspConnectionProcessor::extractTrackId(const QString& path)
 bool QnRtspConnectionProcessor::isSecondaryLiveDPSupported() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return d->liveDpLow && !d->liveDpLow->onPause();
+    return d->liveDpLow && !d->liveDpLow->isPaused();
 }
 
 int QnRtspConnectionProcessor::composeSetup()
@@ -810,7 +827,7 @@ void QnRtspConnectionProcessor::checkQuality()
             d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
         }
-        else if (d->liveDpLow->onPause()) {
+        else if (d->liveDpLow->isPaused()) {
             d->quality = MEDIA_Quality_AlwaysHigh;
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->getUniqueId() << ". Secondary stream is disabled.";
         }

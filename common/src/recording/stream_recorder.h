@@ -13,6 +13,7 @@
 #include <core/resource/storage_resource.h>
 
 class QnAbstractMediaStreamDataProvider;
+class QnFfmpegAudioTranscoder;
 
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
@@ -68,6 +69,11 @@ public:
     void setContainer(const QString& container);
     void setNeedReopen();
     bool isAudioPresent() const;
+
+    /*
+    * Transcode to specified audio codec is source codec is different
+    */
+    void setAudioCodec(CodecID codec);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -98,6 +104,7 @@ private:
     bool saveData(QnAbstractMediaDataPtr md);
 private:
     void markNeedKeyData();
+    void writeData(QnAbstractMediaDataPtr md, int streamIndex);
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
@@ -137,8 +144,10 @@ private:
     AVIOContext* m_ioContext;
     bool m_needReopen;
     bool m_isAudioPresent;
-    QnCompressedVideoDataPtr m_firstIFrame;
+    QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
+    QnFfmpegAudioTranscoder* m_audioTranscoder;
+    CodecID m_dstAudioCodec;
 };
 
 #endif // _STREAM_RECORDER_H__

@@ -14,16 +14,26 @@ UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
     CRegKey RegKey;
 
     CAtlString registryPath;
+    CAtlString arch;
 
     hr = WcaInitialize(hInstall, "FindConfiguredStorages");
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
+    arch = GetProperty(hInstall, L"ARCHITECTURE");
+
     registryPath = GetProperty(hInstall, L"MEDIASERVER_REGISTRY_PATH");
     registryPath += L"\\storages";
 
-    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ|KEY_WOW64_32KEY) != ERROR_SUCCESS) {
+    int flags = KEY_READ;
+    if (arch == "x86") {
+        flags |= KEY_WOW64_32KEY;
+    } else {
+        flags |= KEY_WOW64_64KEY;
+    }
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, flags) != ERROR_SUCCESS) {
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
         goto LExit;
     }
@@ -263,7 +273,7 @@ LExit:
 
 void fixPath(CString& path)
 {
-	path.Replace(L"/", L"\\");
+    path.Replace(L"/", L"\\");
 }
 
 UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
@@ -276,11 +286,11 @@ UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-	{
-		CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
-		fixPath(serverFolder);
-		MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
-	}
+    {
+        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
+        fixPath(serverFolder);
+        MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
+    }
 
 LExit:
     
@@ -298,11 +308,11 @@ UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-	{
-		CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
-		fixPath(clientFolder);
-		MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
-	}
+    {
+        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+        fixPath(clientFolder);
+        MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+    }
 
 LExit:
     

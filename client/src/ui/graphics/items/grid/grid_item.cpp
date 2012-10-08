@@ -1,13 +1,19 @@
 #include "grid_item.h"
-#include <limits>
+
 #include <cmath>
-#include <QPainter>
+#include <limits>
+
+#include <QtGui/QPainter>
+
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+
 #include <ui/common/geometry.h>
+#include <ui/common/color_to_vector_converter.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/animation/variant_animator.h>
+
 #include "grid_highlight_item.h"
 
 namespace {

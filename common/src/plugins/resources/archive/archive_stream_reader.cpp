@@ -58,7 +58,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_isStillImage(false),
     m_speed(1.0),
     m_pausedStart(false),
-    m_sendMotion(false)
+    m_sendMotion(false),
+    m_jumpInSilenceMode(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -110,7 +111,9 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
         return;
     }
     emit prevFrameOccured();
+    m_jumpInSilenceMode = true;
     jumpToPreviousFrame(mksec);
+    m_jumpInSilenceMode = false;
 }
 
 void QnArchiveStreamReader::resumeMedia()
@@ -215,10 +218,7 @@ bool QnArchiveStreamReader::init()
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
                 m_jumpMtx.unlock();
-                if (seekOk)
-                    emit jumpOccured(requiredJumpTime);
-                else
-                    emit jumpCanceled(requiredJumpTime);
+                emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
@@ -624,7 +624,6 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-            videoData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
 
 
@@ -685,6 +684,9 @@ begin_label:
         */
 
     }
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
+
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
 
@@ -707,8 +709,10 @@ begin_label:
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
 
-        if (newTime == DATETIME_NOW)
+        if (newTime == DATETIME_NOW) {
+            internalJumpTo(newTime); // seek to end. 
             return createEmptyPacket(reverseMode); // EOF reached
+        }
 
         if (newTime != m_currentData->timestamp)
         {
@@ -717,6 +721,7 @@ begin_label:
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
             m_eof = true;
+            m_BOF = true;
             goto begin_label;
         }
     }
@@ -969,7 +974,8 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
     if (m_requiredJumpTime != qint64(AV_NOPTS_VALUE))
         emit jumpCanceled(m_requiredJumpTime);
-    emit beforeJump(mksec);
+    if (!m_jumpInSilenceMode)
+        emit beforeJump(mksec);
     m_delegate->beforeSeek(mksec);
 }
 

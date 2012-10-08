@@ -6,6 +6,7 @@
 #include <QtGui/QRadialGradient>
 
 #include <ui/common/linear_combination.h>
+#include <ui/common/color_to_vector_converter.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>

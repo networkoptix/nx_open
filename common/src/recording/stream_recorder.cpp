@@ -8,6 +8,7 @@
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
+#include "transcoding/ffmpeg_audio_transcoder.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -40,7 +41,9 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_videoChannels(0),
     m_ioContext(0),
     m_needReopen(false),
-    m_isAudioPresent(false)
+    m_isAudioPresent(false),
+    m_audioTranscoder(0),
+    m_dstAudioCodec(CODEC_ID_NONE)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -50,6 +53,7 @@ QnStreamRecorder::~QnStreamRecorder()
 {
     stop();
     close();
+    delete m_audioTranscoder;
 }
 
 void QnStreamRecorder::close()
@@ -257,23 +261,42 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     if ((uint)streamIndex >= m_formatCtx->nb_streams)
         return true; // skip packet
 
-    AVPacket avPkt;
-    av_init_packet(&avPkt);
-    AVStream* stream = m_formatCtx->streams[streamIndex];
+    m_endDateTime = md->timestamp;
+
+    if (md->dataType == QnAbstractMediaData::AUDIO && m_audioTranscoder)
+    {
+        QnAbstractMediaDataPtr result;
+        do {
+            m_audioTranscoder->transcodePacket(md, result);
+            if (result && result->data.size() > 0)
+                writeData(result, streamIndex);
+            md.clear();
+        } while (result);
+    }
+    else {
+        writeData(md, streamIndex);
+    }
+
+    return true;
+}
+
+void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
+{
     AVRational srcRate = {1, 1000000};
+    AVStream* stream = m_formatCtx->streams[streamIndex];
     Q_ASSERT(stream->time_base.num && stream->time_base.den);
 
     Q_ASSERT(md->timestamp >= 0);
 
-    m_endDateTime = md->timestamp;
-
+    AVPacket avPkt;
+    av_init_packet(&avPkt);
     avPkt.pts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
     avPkt.dts = avPkt.pts;
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
-    avPkt.stream_index= streamIndex;
     avPkt.data = (quint8*) md->data.data();
     avPkt.size = md->data.size();
+    avPkt.stream_index= streamIndex;
 
     if (av_write_frame(m_formatCtx, &avPkt) < 0) 
         cl_log.log(QLatin1String("AV packet write error"), cl_logWARNING);
@@ -281,14 +304,14 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_packetWrited = true;
         if (m_needCalcSignature) 
         {
+            if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
+                m_lastIFrame = md.dynamicCast<QnCompressedVideoData>();
             AVCodecContext* srcCodec = m_formatCtx->streams[streamIndex]->codec;
             QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
             //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
         }
     }
-
-    return true;
-};
+}
 
 void QnStreamRecorder::endOfRun()
 {
@@ -393,8 +416,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 videoCodecCtx->width = qMax(8,mediaData->width);
                 videoCodecCtx->height = qMax(8,mediaData->height);
             }
-            if (m_needCalcSignature)
-                m_firstIFrame = mediaData;
 
             videoCodecCtx->bit_rate = 1000000 * 6;
             videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
@@ -421,7 +442,17 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 return false;
             }
 
-            avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+            CodecID srcAudioCodec = audioLayout->getAudioTrackInfo(i).codecContext->ctx()->codec_id;
+            if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
+            {
+                avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+            }
+            else {
+                // transcode audio
+                m_audioTranscoder = new QnFfmpegAudioTranscoder(m_dstAudioCodec);
+                m_audioTranscoder->open(audioLayout->getAudioTrackInfo(i).codecContext);
+                avcodec_copy_context(audioStream->codec, m_audioTranscoder->getCodecContext());
+            }
             audioStream->codec->flags |= CODEC_FLAG_GLOBAL_HEADER;
             audioStream->first_dts = 0;
         }
@@ -542,7 +573,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
     signHelper.setSign(getSignature());
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_firstIFrame);
+    QnCompressedVideoDataPtr generatedFrame = signHelper.createSgnatureFrame(srcCodec, m_lastIFrame);
 
     if (generatedFrame == 0)
     {
@@ -596,4 +627,9 @@ void QnStreamRecorder::setNeedReopen()
 bool QnStreamRecorder::isAudioPresent() const
 {
     return m_isAudioPresent;
+}
+
+void QnStreamRecorder::setAudioCodec(CodecID codec)
+{
+    m_dstAudioCodec = codec;
 }

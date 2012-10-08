@@ -43,6 +43,7 @@ namespace Qn {
         LayoutSearchStateRole,                      /**< */
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
+        LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QUuid>. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QUuid. */

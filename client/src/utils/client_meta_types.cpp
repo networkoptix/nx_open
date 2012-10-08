@@ -20,7 +20,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();
-
+    qRegisterMetaType<QVector<QUuid> >();
 
     qn_clientMetaTypes_initialized = true;
 }

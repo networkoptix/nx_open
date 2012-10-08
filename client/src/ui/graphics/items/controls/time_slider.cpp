@@ -1478,6 +1478,8 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
     for(; minStepIndex < stepCount; minStepIndex++)
         if(!qFuzzyIsNull(m_stepData[minStepIndex].currentHeight))
             break;
+    if(minStepIndex >= stepCount)
+        minStepIndex = stepCount - 1; /* Tests show that we can actually get here. */
 
     /* Find initial and maximal positions. */
     QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);

@@ -25,6 +25,8 @@ public:
     void setAdditionFlags(quint16 value);
 
     virtual bool isRtpHeaderExists() const override { return false; }
+
+    void setCodecContext(QnMediaContextPtr context);
 private:
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:

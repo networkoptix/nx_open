@@ -86,27 +86,7 @@ public:
                     result.description += QLatin1String(" - ");
                 }
 
-                QString codecStr = codecIDToString(codecContext->codec_id);
-                if (!codecStr.isEmpty())
-                {
-                    result.description += codecStr;
-                    result.description += QLatin1Char(' ');
-                }
-
-                //str += QString::number(codecContext->sample_rate / 1000)+ QLatin1String("Khz ");
-                if (codecContext->channels == 3)
-                    result.description += QLatin1String("2.1");
-                else if (codecContext->channels == 6)
-                    result.description += QLatin1String("5.1");
-                else if (codecContext->channels == 8)
-                    result.description += QLatin1String("7.1");
-                else if (codecContext->channels == 2)
-                    result.description += QLatin1String("stereo");
-                else if (codecContext->channels == 1)
-                    result.description += QLatin1String("mono");
-                else
-                    result.description += QString::number(codecContext->channels);
-
+                result.description = getAudioCodecDescription(codecContext);
                 break;
             }
         }
@@ -237,7 +217,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->timestamp = packetTimestamp(packet);
 
     while (packet.stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << 0;
+        m_lastPacketTimes << m_startTime;
     if ((quint64)data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
@@ -266,8 +246,8 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (m_eofReached)
         return time;
 
-    time = qMax(time-m_startTime, 0ll);
-    avformat_seek_file(m_formatContext, -1, 0, time + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+    qint64 relTime = qMax(time-m_startTime, 0ll);
+    avformat_seek_file(m_formatContext, -1, 0, relTime + m_startMksec, LLONG_MAX, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     return time;
 }
 
@@ -333,6 +313,7 @@ void QnAviArchiveDelegate::close()
     m_streamsFound = false;
     m_startMksec = 0;
     m_storage.clear();
+    m_lastPacketTimes.clear();
 }
 
 static QnDefaultResourceVideoLayout defaultVideoLayout;
@@ -366,8 +347,9 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
                 if (start_time) {
                     m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
                     if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+                        m_resource->addFlags(QnResource::utc);
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
-                            m_resource->addFlags(QnResource::utc | QnResource::periods | QnResource::motion); // use sync for exported layout only
+                            m_resource->addFlags(QnResource::sync | QnResource::periods | QnResource::motion); // use sync for exported layout only
                         }
                     }
                 }

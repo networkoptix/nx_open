@@ -28,6 +28,7 @@ public:
     QnMediaContext(AVCodecContext* ctx);
     QnMediaContext(CodecID codecId);
     QnMediaContext(const quint8* payload, int dataSize);
+    QnMediaContext(const QByteArray& payload);
     ~QnMediaContext();
     AVCodecContext* ctx() const;
     QString codecName() const;

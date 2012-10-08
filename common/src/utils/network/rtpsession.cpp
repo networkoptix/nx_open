@@ -117,8 +117,11 @@ void RTPIODevice::processRtcpData()
                     qWarning() << "RTPIODevice::processRtcpData(): setDestAddr() failed: " << m_rtcpSocket->lastError();
                 }
             }
-            m_statistic = m_owner->parseServerRTCPReport(rtcpBuffer, readed);
-            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer);
+            bool gotValue = false;
+            RtspStatistic stats = m_owner->parseServerRTCPReport(rtcpBuffer, readed, &gotValue);
+            if (gotValue)
+                m_statistic = stats;
+            int outBufSize = m_owner->buildClientRTCPReport(sendBuffer, MAX_RTCP_PACKET_SIZE);
             if (outBufSize > 0)
             {
                 m_rtcpSocket->sendTo(sendBuffer, outBufSize);
@@ -376,8 +379,10 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
     return true;
 }
 
-bool RTPSession::open(const QString& url)
+bool RTPSession::open(const QString& url, qint64 startTime)
 {
+    if (startTime != AV_NOPTS_VALUE)
+        m_startTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
     mUrl = url;
@@ -545,6 +550,7 @@ bool RTPSession::sendDescribe()
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
+    addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += "User-Agent: Network Optix\r\n";
     request += "Accept: application/sdp\r\n\r\n";
 
@@ -810,23 +816,8 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     */
 }
 
-bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
+void RTPSession::addRangeHeader(QByteArray& request, qint64 startPos, qint64 endPos)
 {
-    QByteArray request;
-    QByteArray response;
-
-    m_scale = scale;
-
-    request += "PLAY ";
-    request += m_contentBase;
-    request += " RTSP/1.0\r\n";
-    request += "CSeq: ";
-    request += QByteArray::number(m_csec++);
-    request += "\r\n";
-    addAuth(request);
-    request += "Session: ";
-    request += m_SessionId;
-    request += "\r\n";
     if (startPos != qint64(AV_NOPTS_VALUE))
     {
         if (startPos != DATETIME_NOW)
@@ -844,6 +835,26 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
         request += QLatin1String("\r\n");
     }
 
+}
+
+bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
+{
+    QByteArray request;
+    QByteArray response;
+
+    m_scale = scale;
+
+    request += "PLAY ";
+    request += m_contentBase;
+    request += " RTSP/1.0\r\n";
+    request += "CSeq: ";
+    request += QByteArray::number(m_csec++);
+    request += "\r\n";
+    addAuth(request);
+    request += "Session: ";
+    request += m_SessionId;
+    request += "\r\n";
+    addRangeHeader(request, startPos, endPos);
     request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
     if (m_numOfPredefinedChannels)
         request += "x-play-now: true\r\n";
@@ -948,12 +959,13 @@ static const int RTCP_SENDER_REPORT = 200;
 static const int RTCP_RECEIVER_REPORT = 201;
 static const int RTCP_SOURCE_DESCRIPTION = 202;
 
-RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize)
+RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics)
 {
     static quint32 rtspTimeDiff = QDateTime::fromString(QLatin1String("1900-01-01"), Qt::ISODate)
         .secsTo(QDateTime::fromString(QLatin1String("1970-01-01"), Qt::ISODate));
 
     RtspStatistic stats;
+    *gotStatistics = false;
     try {
         BitStreamReader reader(srcBuffer, srcBuffer + srcBufferSize);
         reader.skipBits(8); // skip version
@@ -971,10 +983,11 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
                 stats.timestamp = reader.getBits(32);
                 stats.receivedPackets = reader.getBits(32);
                 stats.receivedOctets = reader.getBits(32);
+                *gotStatistics = true;
                 break;
             }
             else {
-                reader.skipBits(32 * messageLen);
+                break;
             }
         }
     } catch(...)
@@ -985,10 +998,11 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
 }
 
 
-int RTPSession::buildClientRTCPReport(quint8* dstBuffer)
+int RTPSession::buildClientRTCPReport(quint8* dstBuffer, int bufferLen)
 {
     QByteArray esDescr("netoptix");
 
+    Q_ASSERT(bufferLen >= 20 + esDescr.size());
 
     quint8* curBuffer = dstBuffer;
     *curBuffer++ = (RtpHeader::RTP_VERSION << 6);
@@ -1158,7 +1172,7 @@ quint8* RTPSession::prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int c
     if (demuxedData.size() <= channel)
         demuxedData.resize(channel+1);
     if (demuxedData[channel] == 0)
-        demuxedData[channel] = new QnByteArray(16, 0);
+        demuxedData[channel] = new QnByteArray(16, 32);
     QnByteArray* dataVect = demuxedData[channel];
     //dataVect->resize(dataVect->size() + reserve);
     dataVect->reserve(dataVect->size() + reserve);

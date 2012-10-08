@@ -144,9 +144,9 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (providerHi)
         {
             if (!recorderHiRes->isRunning()) {
-                cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
                 if (!updateCameraHistory(res))
                     return;
+                cl_log.log("Recording started for camera ", res->getUniqueId(), cl_logINFO);
             }
             recorderHiRes->start();
             providerHi->start();

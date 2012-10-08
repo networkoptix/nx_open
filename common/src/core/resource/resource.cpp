@@ -614,6 +614,8 @@ void QnResource::setId(QnId id) {
     QnId oldId = m_id;
     m_id = id;
 
+    mutexLocker.unlock();
+
     emit idChanged(oldId, id);
 }
 
@@ -623,10 +625,19 @@ QString QnResource::getUrl() const
     return m_url;
 }
 
-void QnResource::setUrl(const QString& value)
+void QnResource::setUrl(const QString &url)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_url = value;
+
+    if(m_url == url)
+        return;
+
+    QString oldUrl = m_url;
+    m_url = url;
+
+    mutexLocker.unlock();
+
+    emit urlChanged();
 }
 
 void QnResource::addTag(const QString& tag)

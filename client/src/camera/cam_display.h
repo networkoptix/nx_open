@@ -7,6 +7,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "utils/common/adaptive_sleep.h"
 #include "utils/media/externaltimesource.h"
+#include "core/resource/resource_fwd.h"
 
 class QnAbstractRenderer;
 class QnVideoStreamDisplay;
@@ -20,7 +21,7 @@ class QnCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
-    QnCamDisplay(bool generateEndOfStreamSignal);
+    QnCamDisplay(QnMediaResourcePtr resource);
     ~QnCamDisplay();
 
     void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
@@ -73,7 +74,6 @@ public slots:
     void onNextFrameOccured();
 
 signals:
-    void reachedTheEnd();
     void liveMode(bool value);
     void stillImageChanged();
 
@@ -153,8 +153,6 @@ protected:
 
     bool m_ignoringVideo;
 
-    bool m_generateEndOfStreamSignal;
-
     bool m_isRealTimeSource;
     QnAudioFormat m_expectedAudioFormat;
     QMutex m_audioChangeMutex;
@@ -201,6 +199,7 @@ protected:
     bool m_useMTRealTimeDecode;
 
     mutable QMutex m_timeMutex;
+    QnMediaResourcePtr m_resource;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -15,7 +15,7 @@ class QnAbstractArchiveReader;
 class QnVideoCamera : public QObject {
     Q_OBJECT
 public:
-    QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal = false, QnAbstractMediaStreamDataProvider* reader = 0);
+    QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnVideoCamera();
 
     void startRecording();
@@ -57,7 +57,6 @@ public:
     int getExportProgressOffset() const;
 
 signals:
-    void reachedTheEnd();
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
     void exportFailed(const QString &errMessage);
@@ -73,7 +72,6 @@ public slots:
     void onExportFailed(QString fileName);
 
 protected slots:
-    void onReachedTheEnd();
     void at_exportProgress(int value);
 
 private:
@@ -82,8 +80,6 @@ private:
     QnStreamRecorder* m_recorder;
     QnAbstractMediaStreamDataProvider* m_reader;
 
-    bool m_generateEndOfStreamSignal;
-    
     QnlTimeSource* m_extTimeSrc;
     bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;

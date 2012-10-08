@@ -35,7 +35,9 @@
     <Compile Include="AppServerDlg.wxs" />
     <Compile Include="AppServerFiles.wxs" />
     <Compile Include="ClientDlg.wxs" />
+    <Compile Include="ControlPanel.wxi" />
     <Compile Include="DowngradeWarningDlg.wxs" />
+    <Compile Include="FeaturesDlg.wxs" />
     <Compile Include="FileAssociations.wxs" />
     <Compile Include="InstallTypeDlg.wxs" />
     <Compile Include="InvalidPasswordDlg.wxs" />
@@ -46,6 +48,7 @@
     <Compile Include="PortIsBusyDlg.wxs" />
     <Compile Include="Product.wxs" />
     <Compile Include="SelectionWarning.wxs" />
+    <Compile Include="UninstallOptionsDlg.wxs" />
     <Compile Include="UpgradeDlg.wxs" />
   </ItemGroup>
   <ItemGroup>

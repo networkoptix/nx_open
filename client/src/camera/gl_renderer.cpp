@@ -18,6 +18,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
 #include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
+#include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 
 #include "video_camera.h"
 
@@ -25,7 +26,13 @@
 #   include <utils/common/performance.h>
 #endif
 
-#define QN_GL_RENDERER_DEBUG
+/**
+ * \def QN_GL_RENDERER_DEBUG
+ * 
+ * Enable OpenGL error reporting. Note that this will result in a LOT of
+ * redundant <tt>glGetError</tt> calls, which may affect performance.
+ */
+//#define QN_GL_RENDERER_DEBUG
 
 #ifdef QN_GL_RENDERER_DEBUG
 #   define glCheckError glCheckError

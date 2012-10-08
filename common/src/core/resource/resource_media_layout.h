@@ -19,6 +19,7 @@ public:
     struct AudioTrack
     {
         AudioTrack() {} 
+        AudioTrack(QnMediaContextPtr ctx, const QString& descr): codecContext(ctx), description(descr) {}
 
         QnMediaContextPtr codecContext;
         QString description;
@@ -32,8 +33,27 @@ class QnEmptyResourceAudioLayout: public QnResourceAudioLayout
 public:
     QnEmptyResourceAudioLayout(): QnResourceAudioLayout() {}
     virtual int numberOfChannels() const override { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return AudioTrack(); }
+    virtual AudioTrack getAudioTrackInfo(int index) const override { Q_UNUSED(index); return AudioTrack(); }
 };
+
+class QnResourceCustomAudioLayout: public QnResourceAudioLayout
+{
+public:
+    
+
+    QnResourceCustomAudioLayout(): QnResourceAudioLayout() {}
+
+    void addAudioTrack(const AudioTrack& audioTrack) {m_audioTracks << audioTrack; }
+    void setNumberOfChannels(int value) { m_audioTracks.resize(value); }
+    void setAudioTrackInfo(const AudioTrack& audioTrack, int index) {m_audioTracks[index] = audioTrack; }
+
+    virtual int numberOfChannels() const override { return m_audioTracks.size(); }
+    virtual AudioTrack getAudioTrackInfo(int index) const override { return m_audioTracks[index]; }
+private:
+    QVector<AudioTrack> m_audioTracks;
+    
+};
+
 
 class QnResourceVideoLayout: public QnResourceLayout
 {

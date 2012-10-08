@@ -75,11 +75,11 @@
 #include "file_processor.h"
 
 // TODO: remove this include
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
 #include "camera/caching_time_period_loader.h"
 #include "launcher/nov_launcher.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 
 
@@ -1949,9 +1949,9 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     QString selectedExtension;
     QString binaryFilterName;
     if (sizeof(char*) == 4)
-        binaryFilterName = tr("x86 executable network optix media file(*.exe)");
+        binaryFilterName = tr("executable network optix media file (x86) (*.exe)");
     else
-        binaryFilterName = tr("x64 executable network optix media file(*.exe)");
+        binaryFilterName = tr("executable network optix media file (x64) (*.exe)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
@@ -2029,7 +2029,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     }
 
     QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
-    exportProgressDialog = new QProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
@@ -2227,7 +2226,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
         //QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
+        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::sync)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, role);
 
@@ -2336,13 +2335,14 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             tr("Export Video As..."),
             previousDir + QDir::separator() + suggestion,
-            tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)"),
+            allowedFormatFilter,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
@@ -2367,6 +2367,27 @@ Do you want to continue?"),
             }
         }
 
+        if (fileName.endsWith(QLatin1String(".avi")))
+        {
+            QnCachingTimePeriodLoader* loader = navigator()->loader(widget->resource());
+            const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
+            if (loader && archive) 
+            {
+                QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(period);
+                if (periods.size() > 1 && archive->getDPAudioLayout()->numberOfChannels() > 0)
+                {
+                    int result = QMessageBox::warning(
+                        this->widget(), 
+                        tr("AVI format is not recommended"), 
+                        tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
+                        QMessageBox::Yes | QMessageBox::No
+                        );
+                    if (result != QMessageBox::Yes)
+                        continue;
+                }
+            }
+        }
+
         if (QFile::exists(fileName) && !QFile::remove(fileName)) {
             QMessageBox::critical(
                 this->widget(), 
@@ -2375,7 +2396,7 @@ Do you want to continue?"),
                 QMessageBox::Ok
             );
             continue;
-        } 
+        }
 
         break;
     }
@@ -2399,7 +2420,7 @@ Do you want to continue?"),
 
     camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
 
-    exportProgressDialog->exec();
+    //exportProgressDialog->exec();
 }
 
 

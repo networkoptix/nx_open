@@ -41,16 +41,30 @@ namespace {
     }
 
     void glDrawTexturedRect(const QRectF &rect) {
-        glBegin(GL_QUADS);
-            glTexCoord(0.0, 0.0);
-            glVertex(rect.topLeft());
-            glTexCoord(1.0, 0.0);
-            glVertex(rect.topRight());
-            glTexCoord(1.0, 1.0);
-            glVertex(rect.bottomRight());
-            glTexCoord(0.0, 1.0);
-            glVertex(rect.bottomLeft());
-        glEnd();
+        GLfloat vertices[] = {
+            rect.left(), rect.top(),
+            rect.right(), rect.top(), 
+            rect.right(), rect.bottom(),
+            rect.left(), rect.bottom()
+        };
+
+        GLfloat texCoords[] = {
+            0.0, 0.0,
+            1.0, 0.0,
+            1.0, 1.0,
+            0.0, 1.0
+        };
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
+        glTexCoordPointer(2, GL_FLOAT, 0, texCoords);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_VERTEX_ARRAY);
     }
 
     typedef QnGlContextData<QnTextureTransitionShaderProgram, QnGlContextDataForwardingFactory<QnTextureTransitionShaderProgram> > QnTextureTransitionShaderProgramStorage;

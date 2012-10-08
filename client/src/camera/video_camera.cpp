@@ -4,13 +4,13 @@
 #include "utils/client_util.h"
 #include "ui/style/skin.h"
 #include "core/resource/security_cam_resource.h"
+#include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
 
-QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal, QnAbstractMediaStreamDataProvider* reader) :
+QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
-    m_camdispay(generateEndOfStreamSignal),
+    m_camdispay(resource),
     m_recorder(0),
     m_reader(reader),
-    m_generateEndOfStreamSignal(generateEndOfStreamSignal),
     m_extTimeSrc(NULL),
     m_isVisible(true),
     m_exportRecorder(0),
@@ -32,8 +32,6 @@ QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStre
         connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
     }    
 
-    if (m_generateEndOfStreamSignal)
-        connect(&m_camdispay, SIGNAL( reachedTheEnd() ), this, SLOT( onReachedTheEnd() ));
 }
 
 QnVideoCamera::~QnVideoCamera()
@@ -167,13 +165,6 @@ void QnVideoCamera::setQuality(QnStreamQuality q, bool increase)
         */
 }
 
-
-void QnVideoCamera::onReachedTheEnd()
-{
-    if (m_generateEndOfStreamSignal)
-        emit reachedTheEnd();
-}
-
 void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, QnStreamRecorder::Role role)
 {
     if (startTime > endTime)
@@ -190,6 +181,14 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
             return;
         }
         m_exportReader->setCycleMode(false);
+        QnRtspClientArchiveDelegate* rtspClient = dynamic_cast<QnRtspClientArchiveDelegate*> (m_exportReader->getArchiveDelegate());
+        if (rtspClient) {
+            // 'slow' open mode. send DESCRIBE and SETUP to server.
+            // it is required for av_streams in output file - we should know all codec context imediatly
+            rtspClient->setResource(m_resource);
+            rtspClient->setPlayNowModeAllowed(false); 
+        }
+        
 
         m_exportRecorder = new QnStreamRecorder(m_resource);
         m_exportRecorder->disconnect(this);
@@ -198,6 +197,10 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
         connect(m_exportRecorder, SIGNAL(recordingFailed(QString)), this, SLOT(onExportFailed(QString)));
         connect(m_exportRecorder, SIGNAL(recordingFinished(QString)), this, SLOT(onExportFinished(QString)));
         connect(m_exportRecorder, SIGNAL(recordingProgress(int)), this, SLOT(at_exportProgress(int)));
+        if (fileName.toLower().endsWith(QLatin1String(".avi")))
+        {
+            m_exportRecorder->setAudioCodec(CODEC_ID_MP3); // transcode audio to MP3
+        }
     }
     if (m_motionFileList[0]) {
         m_exportReader->setSendMotion(true);

@@ -15,6 +15,15 @@ typedef void (APIENTRY *PFNProgramLocalParameter4fARB) (GLenum, GLuint, GLfloat,
 
 typedef void (APIENTRY *PFNActiveTexture) (GLenum);
 
+typedef void (APIENTRY *PFNBindBuffer) (GLenum, GLuint);
+typedef void (APIENTRY *PFNDeleteBuffers) (GLsizei, const GLuint *);
+typedef void (APIENTRY *PFNGenBuffers) (GLsizei, GLuint *);
+typedef void (APIENTRY *PFNBufferData) (GLenum, GLsizeiptrARB, const GLvoid *, GLenum);
+
+typedef void (APIENTRY *PFNVertexAttribPointer) (GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *);
+typedef void (APIENTRY *PFNDisableVertexAttribArray) (GLuint);
+typedef void (APIENTRY *PFNEnableVertexAttribArray) (GLuint);
+
 namespace {
     bool qn_warnOnInvalidCalls = false;
 
@@ -26,8 +35,10 @@ namespace {
 
 namespace QnGl {
 #define WARN()                                                                  \
+    {                                                                           \
         if(qn_warnOnInvalidCalls)                                               \
-            qnWarning("This function is not supported for current OpenGL context.");
+            qnWarning("This function is not supported for current OpenGL context."); \
+    }
 
     void APIENTRY glProgramStringARB(GLenum, GLenum, GLsizei, const GLvoid *) { WARN(); }
     void APIENTRY glBindProgramARB(GLenum, GLuint) { WARN(); }
@@ -36,6 +47,15 @@ namespace QnGl {
     void APIENTRY glProgramLocalParameter4fARB(GLenum, GLuint, GLfloat, GLfloat, GLfloat, GLfloat) { WARN(); }
 
     void APIENTRY glActiveTexture(GLenum) { WARN(); }
+
+    void APIENTRY glBindBuffer(GLenum, GLuint) { WARN(); }
+    void APIENTRY glDeleteBuffers(GLsizei, const GLuint *) { WARN(); }
+    void APIENTRY glGenBuffers(GLsizei, GLuint *) { WARN(); }
+    void APIENTRY glBufferData(GLenum, GLsizeiptrARB, const GLvoid *, GLenum) { WARN(); }
+
+    void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
+    void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
+    void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
 
 #undef WARN
 
@@ -106,21 +126,38 @@ public:
         qn_glFunctionsGlobal()->initialize(context);
 
         bool status;
+#define RESOLVE(FUNCTION)                                                       \
+        status &= resolve<QN_CAT(PFN, FUNCTION)>("gl" QN_STRINGIZE(FUNCTION), &QnGl::QN_CAT(gl, FUNCTION), &QN_CAT(gl, FUNCTION))
 
         status = true;
-        status &= resolve<PFNProgramStringARB>          ("glProgramStringARB",              &QnGl::glProgramStringARB,              &glProgramStringARB);
-        status &= resolve<PFNBindProgramARB>            ("glBindProgramARB",                &QnGl::glBindProgramARB,                &glBindProgramARB);
-        status &= resolve<PFNDeleteProgramsARB>         ("glDeleteProgramsARB",             &QnGl::glDeleteProgramsARB,             &glDeleteProgramsARB);
-        status &= resolve<PFNGenProgramsARB>            ("glGenProgramsARB",                &QnGl::glGenProgramsARB,                &glGenProgramsARB);
-        status &= resolve<PFNProgramLocalParameter4fARB>("glProgramLocalParameter4fARB",    &QnGl::glProgramLocalParameter4fARB,    &glProgramLocalParameter4fARB);
-
+        RESOLVE(ProgramStringARB);
+        RESOLVE(BindProgramARB);
+        RESOLVE(DeleteProgramsARB);
+        RESOLVE(GenProgramsARB);
+        RESOLVE(ProgramLocalParameter4fARB);
         if(status)
             m_features |= QnGlFunctions::ArbPrograms;
 
         status = true;
-        status &= resolve<PFNActiveTexture>             ("glActiveTexture",                 &QnGl::glActiveTexture,                 &glActiveTexture);
+        RESOLVE(ActiveTexture);
         if(status)
             m_features |= QnGlFunctions::OpenGL1_3;
+
+        status = true;
+        RESOLVE(BindBuffer);
+        RESOLVE(DeleteBuffers);
+        RESOLVE(GenBuffers);
+        RESOLVE(BufferData);
+        if(status)
+            m_features |= QnGlFunctions::OpenGL1_5;
+
+        status = true;
+        RESOLVE(VertexAttribPointer);
+        RESOLVE(DisableVertexAttribArray);
+        RESOLVE(EnableVertexAttribArray);
+        if(status)
+            m_features |= QnGlFunctions::OpenGL2_0;
+#undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
@@ -150,6 +187,15 @@ public:
     PFNProgramLocalParameter4fARB glProgramLocalParameter4fARB;
 
     PFNActiveTexture glActiveTexture;
+
+    PFNBindBuffer glBindBuffer;
+    PFNDeleteBuffers glDeleteBuffers;
+    PFNGenBuffers glGenBuffers;
+    PFNBufferData glBufferData;
+
+    PFNVertexAttribPointer glVertexAttribPointer;
+    PFNDisableVertexAttribArray glDisableVertexAttribArray;
+    PFNEnableVertexAttribArray glEnableVertexAttribArray;
 
 private:
     template<class Function>
@@ -194,7 +240,7 @@ QnGlFunctions::Features QnGlFunctions::features() const {
     return d->features();
 }
 
-void QnGlFunctions::enableWarnings(bool enable) {
+void QnGlFunctions::setWarningsEnabled(bool enable) {
     qn_warnOnInvalidCalls = enable;
 }
 
@@ -224,6 +270,34 @@ void QnGlFunctions::glProgramLocalParameter4fARB(GLenum target, GLuint index, GL
 
 void QnGlFunctions::glActiveTexture(GLenum texture) {
     d->glActiveTexture(texture);
+}
+
+void QnGlFunctions::glGenBuffers(GLsizei n, GLuint *buffers) {
+    d->glGenBuffers(n, buffers);
+}
+
+void QnGlFunctions::glBindBuffer(GLenum target, GLuint buffer) {
+    d->glBindBuffer(target, buffer);
+}
+
+void QnGlFunctions::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
+    d->glDeleteBuffers(n, buffers);
+}
+
+void QnGlFunctions::glBufferData(GLenum target, GLsizeiptrARB size, const GLvoid *data, GLenum usage) {
+    d->glBufferData(target, size, data, usage);
+}
+
+void QnGlFunctions::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer) {
+    d->glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+}
+
+void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
+    d->glEnableVertexAttribArray(index);
+}
+
+void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
+    d->glDisableVertexAttribArray(index);
 }
 
 #ifdef Q_OS_WIN

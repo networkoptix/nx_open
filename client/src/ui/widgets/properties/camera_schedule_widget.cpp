@@ -496,10 +496,15 @@ void QnCameraScheduleWidget::updateMotionButtons() {
         hasMotion &= camera->supportedMotionType() != MT_NoMotion;
     }
 
-    ui->recordMotionButton->setEnabled(m_motionAvailable && hasMotion);
-    ui->labelMotionOnly->setEnabled(ui->recordMotionButton->isEnabled());
-    ui->recordMotionPlusLQButton->setEnabled(m_motionAvailable && hasDualStreaming && hasMotion);
-    ui->labelMotionPlusLQ->setEnabled(ui->recordMotionPlusLQButton->isEnabled());
+    bool enabled;
+
+    enabled = m_motionAvailable && hasMotion;
+    ui->recordMotionButton->setEnabled(enabled);
+    ui->labelMotionOnly->setEnabled(enabled);
+
+    enabled = m_motionAvailable && hasDualStreaming && hasMotion;
+    ui->recordMotionPlusLQButton->setEnabled(enabled);
+    ui->labelMotionPlusLQ->setEnabled(enabled);
 
     if(ui->recordMotionButton->isChecked() && !ui->recordMotionButton->isEnabled())
         ui->recordAlwaysButton->setChecked(true);
