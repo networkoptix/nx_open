@@ -982,7 +982,8 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
                 break;
             }
             else {
-                reader.skipBits(32 * messageLen);
+                for (int i = 0; i < messageLen; ++i)
+                    reader.skipBits(32);
             }
         }
     } catch(...)
