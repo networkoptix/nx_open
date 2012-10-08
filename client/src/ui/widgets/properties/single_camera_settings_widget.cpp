@@ -6,6 +6,9 @@
 
 #include <QtCore/QUrl>
 #include <QtCore/QProcess>
+#ifdef Q_OS_WIN
+    #include <QtCore/QSettings>
+#endif
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -623,9 +626,20 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
+
+    bool canAuth = !m_readOnly;
+
+#ifdef Q_OS_WIN
+    if (canAuth){
+        QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
+        QString defaultBrowser = settings.value(QLatin1String("HKEY_CLASSES_ROOT\\http\\shell\\open\\command")).toString();
+        canAuth = !defaultBrowser.contains(QLatin1String("iexplore"));
+    }
+#endif
+
     QUrl url(urlString);
 
-    if (!m_readOnly) {
+    if (canAuth) {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
     }
