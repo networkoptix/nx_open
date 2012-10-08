@@ -424,7 +424,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
         }
         else if (format == QLatin1String("ffmpeg")) {
-            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize));
+            result = qSharedPointerDynamicCast<QnAbstractMediaData>(processFFmpegRtpPayload(data, blockSize, rtpChannelNum/2));
         }
         else if (format == QLatin1String("ffmpeg-metadata")) {
             processMetadata(data, blockSize);
@@ -601,7 +601,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
         m_rtspSession.parseRangeHeader(QLatin1String(ba));
 }
 
-QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize)
+QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum)
 {
     QMutexLocker lock(&m_mutex);
 
@@ -615,16 +615,15 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
     RtpHeader* rtpHeader = (RtpHeader*) data;
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     dataSize -= RtpHeader::RTP_HEADER_SIZE;
-    quint32 ssrc = ntohl(rtpHeader->ssrc);
-    const bool isCodecContext = ssrc & 1; // odd numbers - codec context, even numbers - data
+    const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
         QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
-        m_contextMap[ssrc] = context;
+        m_contextMap[channelNum] = context;
     }
     else
     {
-        QMap<int, QnMediaContextPtr>::iterator itr = m_contextMap.find(ssrc + 1);
+        QMap<int, QnMediaContextPtr>::iterator itr = m_contextMap.find(channelNum);
         QnMediaContextPtr context;
         if (itr != m_contextMap.end())
             context = itr.value();
@@ -636,7 +635,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
         if (dataSize < 1)
             return result;
 
-        QnAbstractDataPacketPtr nextPacket = m_nextDataPacket.value(ssrc);
+        QnAbstractDataPacketPtr nextPacket = m_nextDataPacket.value(channelNum);
         QnAbstractMediaDataPtr mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
         if (!nextPacket)
         {
@@ -718,7 +717,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 return result;
             }
 
-            m_nextDataPacket[ssrc] = nextPacket;
+            m_nextDataPacket[channelNum] = nextPacket;
             mediaPacket = qSharedPointerDynamicCast<QnAbstractMediaData>(nextPacket);
             if (mediaPacket) 
             {
@@ -728,9 +727,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
                 if (context && context->ctx())
                     mediaPacket->compressionType = context->ctx()->codec_id;
                 mediaPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
-                int ssrcTmp = (ssrc - BASIC_FFMPEG_SSRC) / 2;
-                mediaPacket->channelNumber = ssrcTmp / MAX_CONTEXTS_AT_VIDEO;
-                mediaPacket->subChannelNumber = ssrcTmp % MAX_CONTEXTS_AT_VIDEO;
+                mediaPacket->channelNumber = channelNum;
                 /*
                 if (mediaPacket->timestamp < 0x40000000 && m_prevTimestamp[ssrc] > 0xc0000000)
                     m_timeStampCycles[ssrc]++;
@@ -744,7 +741,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(con
         if (rtpHeader->marker)
         {
             result = nextPacket;
-            m_nextDataPacket[ssrc] = QnAbstractDataPacketPtr(0); // EOF video frame reached
+            m_nextDataPacket[channelNum] = QnAbstractDataPacketPtr(0); // EOF video frame reached
             if (mediaPacket)
             {
                 if (mediaPacket->flags & QnAbstractMediaData::MediaFlags_LIVE)

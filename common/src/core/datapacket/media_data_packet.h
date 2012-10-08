@@ -77,7 +77,6 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         compressionType(CODEC_ID_NONE),
         flags(MediaFlags_None),
         channelNumber(0),
-        subChannelNumber(0),
         context(0),
         opaque(0)
     {
@@ -92,7 +91,6 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
         compressionType(CODEC_ID_NONE),
         flags(MediaFlags_None),
         channelNumber(0),
-        subChannelNumber(0),
         context(0),
         opaque(0)
     {
@@ -107,7 +105,6 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     CodecID compressionType;
     unsigned flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more that one sensor.
-    quint32 subChannelNumber; // video camera can provide combination of different context at single channel (H.264 hi-res and low-res for example)
     QnMediaContextPtr context;
     int opaque;
 protected:
