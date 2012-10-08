@@ -193,6 +193,11 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         videoStream->first_dts = 0;
     }
 
+    if (m_aTranscoder && !m_aTranscoder->open(audio))
+    {
+        m_audioCodec = CODEC_ID_NONE; // can't open transcoder. disable audio
+    }
+
     if (m_audioCodec != CODEC_ID_NONE)
     {
         //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
@@ -217,7 +222,6 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
         if (m_aTranscoder)
         {
-            m_aTranscoder->open(audio);
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
             if (ffmpegAudioTranscoder->getCodecContext()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
@@ -235,6 +239,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         audioStream->first_dts = 0;
         //audioStream->time_base = m_audioEncoderCodecCtx->time_base;
     }
+    if (m_formatCtx->nb_streams == 0)
+        return -4;
 
     m_formatCtx->pb = m_ioContext = createFfmpegIOContext();
 

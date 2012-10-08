@@ -594,7 +594,8 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
     m_outputPos(0),
     packetIndex(0),
     m_firstTime(0),
-    m_isFirstPacket(true)
+    m_isFirstPacket(true),
+    m_isOpened(false)
 {
     m_transcoder.setContainer("rtp");
     m_transcoder.setPacketizedMode(true);
@@ -611,9 +612,9 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnAbstractMediaDataPtr media, Codec
     else
         m_transcoder.setAudioCodec(m_codec, method);
     if (m_isVideo)
-        m_transcoder.open(media.dynamicCast<QnCompressedVideoData>(), QnCompressedAudioDataPtr());
+        m_isOpened = m_transcoder.open(media.dynamicCast<QnCompressedVideoData>(), QnCompressedAudioDataPtr()) == 0;
     else
-        m_transcoder.open(QnCompressedVideoDataPtr(), media.dynamicCast<QnCompressedAudioData>());
+        m_isOpened = m_transcoder.open(QnCompressedVideoDataPtr(), media.dynamicCast<QnCompressedAudioData>()) == 0;
 }
 
 QByteArray QnUniversalRtpEncoder::getAdditionSDP()
@@ -722,4 +723,9 @@ QString QnUniversalRtpEncoder::getName()
             return AVRtpPayloadTypes[i].enc_name;
     }
     return QString();
+}
+
+bool QnUniversalRtpEncoder::isOpened() const
+{
+    return m_isOpened;
 }

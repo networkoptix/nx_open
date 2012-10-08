@@ -31,6 +31,7 @@ public:
 
     virtual bool isRtpHeaderExists() const override { return true; }
     virtual void setBaseTime(qint64 value) override;
+    bool isOpened() const;
 private:
     QnByteArray m_outputBuffer;
     int m_outputPos;
@@ -40,6 +41,7 @@ private:
     bool m_isVideo;
     quint32 m_firstTime;
     bool m_isFirstPacket;
+    bool m_isOpened;
 };
 
 

@@ -64,7 +64,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     return 0;
 }
 
-void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
+bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
     QnVideoTranscoder::open(video);
 
@@ -74,7 +74,7 @@ void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     if (avCodec == 0)
     {
         m_lastErrMessage = QObject::tr("Transcoder error: can't find encoder for codec %1").arg(m_codecId);
-        return;
+        return false;
     }
 
     m_encoderCtx = avcodec_alloc_context3(avCodec);
@@ -94,7 +94,9 @@ void QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize video encoder");
+        return false;
     }
+    return true;
 }
 
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)

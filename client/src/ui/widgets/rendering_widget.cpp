@@ -38,34 +38,16 @@ QnRenderingWidget::~QnRenderingWidget() {
 }
 
 QnMediaResourcePtr QnRenderingWidget::resource() const {
-    if(!m_display)
-        return QnMediaResourcePtr();
-
-    return m_display->mediaResource();
+    return m_resource;
 }
 
 void QnRenderingWidget::setResource(const QnMediaResourcePtr &resource) {
-    if(resource == this->resource())
+    if(resource == m_resource)
         return;
 
-    if(m_display) {
-        delete m_display;
-        m_display = NULL;
-        m_renderer = NULL;
-    }
-    
-    if(resource) {
-        m_display = new QnResourceDisplay(resource, this);
-        m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
-        updateChannelScreenSize();
+    invalidateDisplay();
 
-        m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */
-        m_display->start();
-
-        if(m_display->archiveReader())
-            m_display->archiveReader()->setCycleMode(false);
-        m_display->camDisplay()->setMTDecoding(true);
-    }
+    m_resource = resource;
 }
 
 void QnRenderingWidget::updateChannelScreenSize() {
@@ -80,11 +62,37 @@ void QnRenderingWidget::updateChannelScreenSize() {
     }
 }
 
+void QnRenderingWidget::invalidateDisplay() {
+    if(m_display) {
+        delete m_display;
+        m_display = NULL;
+        m_renderer = NULL;
+    }
+}
+
+void QnRenderingWidget::ensureDisplay() {
+    if(m_display || !m_resource)
+        return;
+
+    m_display = new QnResourceDisplay(m_resource, this);
+    m_renderer = new QnResourceWidgetRenderer(1, NULL, context());
+    updateChannelScreenSize();
+
+    m_display->addRenderer(m_renderer); /* Ownership of the renderer is transferred to the display. */
+    m_display->start();
+
+    if(m_display->archiveReader())
+        m_display->archiveReader()->setCycleMode(false);
+    m_display->camDisplay()->setMTDecoding(true);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnRenderingWidget::initializeGL() {
+    invalidateDisplay(); /* OpenGL context may have changed. */
+
     glClearColor(0, 0, 0, 0);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -103,10 +111,11 @@ void QnRenderingWidget::resizeGL(int width, int height) {
 void QnRenderingWidget::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    ensureDisplay();
+
     if (m_renderer) {
         updateChannelScreenSize();
 
-        /* Paint frame. */
         QSize sourceSize = m_renderer->sourceSize();
         if(sourceSize.isEmpty())
             sourceSize = size();
