@@ -163,8 +163,6 @@ public:
         QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
         if (vendor.contains("Tungsten Graphics") && renderer.contains("Gallium 0.1, Poulsbo on EMGD"))
             m_features |= QnGlFunctions::ShadersBroken; /* Shaders are declared but don't work. */
-        if (vendor.contains("Intel") && renderer.contains("Intel(R) HD Graphics 3000"))
-            m_features |= QnGlFunctions::OpenGLBroken; /* OpenGL is declared but don't work. */
         
 #ifdef Q_OS_LINUX
         QDir atiProcDir(QString::fromAscii("/proc/ati"));
@@ -305,16 +303,12 @@ namespace {
     QnGlFunctions::Features estimateFeatures() {
         QnGlFunctions::Features result(0);
 
-        DISPLAY_DEVICE dd; 
+        DISPLAY_DEVICEW dd; 
         dd.cb = sizeof(dd); 
         DWORD dev = 0; 
-        while (EnumDisplayDevices(0, dev, &dd, 0))
-        {
-            if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE){
+        while (EnumDisplayDevices(0, dev, &dd, 0)) {
+            if (dd.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
                 QString v = QString::fromWCharArray(dd.DeviceString);
-                if (v.contains(QLatin1String("Intel(R) HD Graphics 3000")))
-                    result |= QnGlFunctions::OpenGLBroken;
-                else
                 if (v.contains(QLatin1String("Gallium 0.1, Poulsbo on EMGD")))
                     result |= QnGlFunctions::ShadersBroken;
                 break;

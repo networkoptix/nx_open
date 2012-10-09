@@ -629,34 +629,29 @@ void QnImageButtonWidget::invalidatePixmapCache() {
 }
 
 
-// -------------------------------------------------------------------------- //
-// QnZoomingImageButtonWidget
-// -------------------------------------------------------------------------- //
-QnZoomingImageButtonWidget::QnZoomingImageButtonWidget(QGraphicsItem *parent):
-    QnImageButtonWidget(parent),
-    m_scaleFactor(1.0)
-{}
 
-bool QnZoomingImageButtonWidget::isScaledState(StateFlags state) {
-    return !(state & HOVERED) || (state & PRESSED);
+
+// -------------------------------------------------------------------------- //
+// QnRotatingImageButtonWidget
+// -------------------------------------------------------------------------- //
+QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent):
+    base_type(parent),
+    m_rotationSpeed(360.0),
+    m_rotation(0.0)
+{
+    registerAnimation(this);
+    startListening();
 }
 
-void QnZoomingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
-#ifdef QN_USE_ZOOMING_BUTTONS
-    qreal startScale = isScaledState(startState) ? m_scaleFactor : 1.0;
-    qreal endScale = isScaledState(endState) ? m_scaleFactor : 1.0;
-    qreal scale = startScale * progress + endScale * (1.0 - progress);
-
-    if(!qFuzzyCompare(scale, 1.0)) {
-        QnScopedPainterTransformRollback guard(painter);
-        painter->translate(rect().center());
-        painter->scale(scale, scale);
-        painter->translate(-rect().center());
-        QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
-    } else {
-        QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
-    }
-#else
+void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+    QnScopedPainterTransformRollback guard(painter);
+    painter->translate(rect().center());
+    painter->rotate(m_rotation);
+    painter->translate(-rect().center());
     QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
-#endif
+}
+
+void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
+    if(state() & CHECKED)
+        m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
 }

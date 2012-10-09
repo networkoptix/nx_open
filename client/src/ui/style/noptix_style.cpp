@@ -49,7 +49,8 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnNoptixStyle::QnNoptixStyle(QStyle *style): 
     base_type(style),
-    m_animator(new QnNoptixStyleAnimator(this)),
+    m_hoverAnimator(new QnNoptixStyleAnimator(this)),
+    m_rotationAnimator(new QnNoptixStyleAnimator(this)),
     m_skin(qnSkin),
     m_globals(qnGlobals)
 {
@@ -388,13 +389,13 @@ bool QnNoptixStyle::drawProgressBarControl(const QStyleOption *option, QPainter 
     const qreal progress = busy ? 1.0 : pb->progress / qreal(pb->maximum - pb->minimum);
 
     qreal animationProgress = 0.0;
-    if (!m_animator->isRunning(widget)) {
-        m_animator->start(widget, 0.5, animationProgress);
+    if (!m_hoverAnimator->isRunning(widget)) {
+        m_hoverAnimator->start(widget, 0.5, animationProgress);
     } else {
-        animationProgress = m_animator->value(widget);
+        animationProgress = m_hoverAnimator->value(widget);
         if (animationProgress >= 1.0){
             animationProgress = std::fmod(animationProgress, 1.0);
-            m_animator->setValue(widget, animationProgress);
+            m_hoverAnimator->setValue(widget, animationProgress);
         }
     }
 
@@ -563,11 +564,6 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     qreal k = hoverProgress(option, widget, 1000.0 / qnGlobals->opacityChangePeriod());
     QRectF rect = option->rect;
 
-#ifdef QN_USE_ZOOMING_BUTTONS
-    qreal d = sunken ? 0.1 : (0.1 - k * 0.1);
-    rect.adjust(rect.width() * d, rect.height() * d, rect.width() * -d, rect.height() * -d);
-#endif
-
     QIcon::Mode mode;
     if(!(option->state & State_Enabled)) {
         mode = QIcon::Disabled;
@@ -584,8 +580,25 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
     }
     QIcon::State state = option->state & State_On ? QIcon::On : QIcon::Off;
 
+    /* Is it a rotating button? */
+    qreal rotation = m_rotationAnimator->value(widget);
+    if(state == QIcon::On) {
+        qreal rotationSpeed = widget->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
+        if(!qFuzzyIsNull(rotationSpeed) && !m_rotationAnimator->isRunning(widget))
+            m_rotationAnimator->start(widget, rotationSpeed, m_rotationAnimator->value(widget));
+    } else {
+        m_rotationAnimator->stop(widget);
+    }
+
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true);
     QnScopedPainterSmoothPixmapTransformRollback pixmapRollback(painter, true);
+    QnScopedPainterTransformRollback transformRollback(painter);
+    if(!qFuzzyIsNull(rotation)) {
+        painter->translate(QRectF(option->rect).center());
+        painter->rotate(rotation);
+        painter->translate(-QRectF(option->rect).center());
+    }
+
     if(mode == QIcon::Active || (mode == QIcon::Normal && !qFuzzyIsNull(k))) {
         QPixmap pixmap0 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Normal, state);
         QPixmap pixmap1 = buttonOption->icon.pixmap(rect.toAlignedRect().size(), QIcon::Active, state);
@@ -607,21 +620,21 @@ bool QnNoptixStyle::drawToolButtonComplexControl(const QStyleOptionComplex *opti
 // Hover animations
 // -------------------------------------------------------------------------- //
 void QnNoptixStyle::setHoverProgress(const QWidget *widget, qreal value) const {
-    m_animator->setValue(widget, value);
+    m_hoverAnimator->setValue(widget, value);
 }
 
 void QnNoptixStyle::stopHoverTracking(const QWidget *widget) const {
-    m_animator->stop(widget);
+    m_hoverAnimator->stop(widget);
 }
 
 qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *widget, qreal speed) const {
     bool hovered = (option->state & State_Enabled) && (option->state & State_MouseOver);
 
     /* Get animation progress & stop animation if necessary. */
-    qreal progress = m_animator->value(widget, 0.0);
+    qreal progress = m_hoverAnimator->value(widget, 0.0);
     if(progress < 0.0 || progress > 1.0) {
         progress = qBound(0.0, progress, 1.0);
-        m_animator->stop(widget);
+        m_hoverAnimator->stop(widget);
     }
 
     /* Update animation if needed. */
@@ -629,9 +642,9 @@ qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *wi
     const_cast<QWidget *>(widget)->setProperty(qn_hoveredPropertyName, hovered);
     if(hovered != wasHovered) {
         if(hovered) {
-            m_animator->start(widget, speed, progress);
+            m_hoverAnimator->start(widget, speed, progress);
         } else {
-            m_animator->start(widget, -speed, progress);
+            m_hoverAnimator->start(widget, -speed, progress);
         }
     }
 
