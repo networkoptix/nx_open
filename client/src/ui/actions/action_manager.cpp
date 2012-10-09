@@ -869,6 +869,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
+        shortcut(tr("Alt+T")).
         condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).
