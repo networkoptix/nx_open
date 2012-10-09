@@ -9,7 +9,7 @@ public:
     QnLightMotionArchiveConnection(const QnMetaDataLightVector& data, int channel);
     virtual QnMetaDataV1Ptr getMotionData(qint64 timeUsec) override;
 private:
-    const QnMetaDataLightVector& m_motionData;
+    const QnMetaDataLightVector m_motionData;
     int m_channel;
     QnMetaDataV1Ptr m_lastResult;
 };

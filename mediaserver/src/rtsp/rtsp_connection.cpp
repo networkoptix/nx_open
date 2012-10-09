@@ -361,22 +361,41 @@ QString QnRtspConnectionProcessor::getRangeStr()
     QString range;
     if (d->archiveDP) 
     {
-        range = "npt=";
         d->archiveDP->open();
-        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->startTime());
         d->prevStartTime = d->archiveDP->startTime();
-
-        range += "-";
-        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) {
-            range += "now";
+        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
             d->prevEndTime = DATETIME_NOW;
-        }
-        else {
-            range += QString::number(d->archiveDP->endTime());
+        else
             d->prevEndTime = d->archiveDP->endTime();
+        if (d->useProprietaryFormat)
+        {
+            // range in usecs since UTC
+            range = "npt=";
+            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+                range += "now";
+            else
+                range += QString::number(d->archiveDP->startTime());
+
+            range += "-";
+            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+                range += "now";
+            else 
+                range += QString::number(d->archiveDP->endTime());
+        }
+        else 
+        {
+            // use 'clock' attrubute. see RFC 2326
+            range = "clock=";
+            const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
+            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+            else
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+            range += "-";
+            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+            else
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
         }
     }
     return range;
@@ -399,7 +418,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
 
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        dstCodec = CODEC_ID_MPEG4;
+        dstCodec = CODEC_ID_H263P;
     else
         //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
@@ -924,7 +943,8 @@ int QnRtspConnectionProcessor::composePlay()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
 
-    addResponseRangeHeader();
+    if (d->useProprietaryFormat)
+        addResponseRangeHeader();
 
     if (!currentDP)
         return CODE_NOT_FOUND;
