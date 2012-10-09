@@ -79,13 +79,14 @@
 
 namespace {
 
+    template<class Button>
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
         qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
-        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+        QnImageButtonWidget *button = new Button(parent);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setMaximumSize(width, height);
         button->setMinimumSize(width, height);
@@ -93,6 +94,10 @@ namespace {
         button->setCached(true);
 
         return button;
+    }
+
+    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
+        return newActionButton<QnImageButtonWidget>(action, sizeMultiplier, parent);
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
@@ -405,6 +410,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
     m_titleRightButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
+    m_titleRightButtonsLayout->addItem(newActionButton<QnRotatingImageButtonWidget>(action(Qn::ToggleScreenRecordingAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);

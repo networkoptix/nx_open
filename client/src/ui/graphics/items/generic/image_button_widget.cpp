@@ -628,3 +628,30 @@ void QnImageButtonWidget::invalidatePixmapCache() {
     m_pixmapCacheValid = false;
 }
 
+
+
+
+// -------------------------------------------------------------------------- //
+// QnRotatingImageButtonWidget
+// -------------------------------------------------------------------------- //
+QnRotatingImageButtonWidget::QnRotatingImageButtonWidget(QGraphicsItem *parent):
+    base_type(parent),
+    m_rotationSpeed(360.0),
+    m_rotation(0.0)
+{
+    registerAnimation(this);
+    startListening();
+}
+
+void QnRotatingImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+    QnScopedPainterTransformRollback guard(painter);
+    painter->translate(rect().center());
+    painter->rotate(m_rotation);
+    painter->translate(-rect().center());
+    QnImageButtonWidget::paint(painter, startState, endState, progress, widget);
+}
+
+void QnRotatingImageButtonWidget::tick(int deltaMSecs) {
+    if(state() & CHECKED)
+        m_rotation += m_rotationSpeed * deltaMSecs / 1000.0;
+}

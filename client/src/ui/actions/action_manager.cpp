@@ -480,8 +480,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-
-    if (QnScreenRecorder::isSupported()){
+    if (QnScreenRecorder::isSupported()) {
         factory(Qn::ToggleScreenRecordingAction).
             flags(Qn::Main).
             text(tr("Start Screen Recording")).
@@ -489,7 +488,8 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(tr("Alt+R")).
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
-            autoRepeat(false);
+            autoRepeat(false).
+            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png"));
     }
 
     factory(Qn::FullscreenAction).
