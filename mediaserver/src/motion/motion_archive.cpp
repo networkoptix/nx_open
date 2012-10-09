@@ -48,7 +48,7 @@ QnMetaDataV1Ptr QnMotionArchiveConnection::getMotionData(qint64 timeUsec)
         m_owner->dateBounds(timeMs, m_minDate, m_maxDate);
         if (prevMaxDate != m_maxDate)
         {
-            m_lastTimeMs = AV_NOPTS_VALUE;
+            m_lastTimeMs = AV_NOPTS_VALUE; // reset value. We are going to find iterator from vector begin() next time
             m_motionLoadedStart = m_motionLoadedEnd = -1;
             if (!m_owner->loadIndexFile(m_index, m_indexHeader, timeMs))
             {
