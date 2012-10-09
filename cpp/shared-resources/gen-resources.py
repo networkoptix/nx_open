@@ -14,7 +14,7 @@ def platform():
     elif sys.platform == 'linux2':
         return 'linux'
 
-def genqrc(qrcname, qrcprefix, path, extensions, additions=''):
+def genqrc(qrcname, qrcprefix, path, extensions, exclusion, additions=''):
   os.path = posixpath
 
   qrcfile = open(qrcname, 'w')
@@ -30,7 +30,7 @@ def genqrc(qrcname, qrcprefix, path, extensions, additions=''):
 
     for f in files:
       for extension in extensions:
-        if f.endswith(extension):
+        if f.endswith(extension) and not f.endswith(exclusion):
           print >> qrcfile, '<file alias="%s">%s</file>' % (os.path.join(parent, f), os.path.join(root, f))
   
   print >> qrcfile, additions
@@ -45,9 +45,9 @@ if __name__ == '__main__':
   
   os.system('lrelease ${project.build.directory}/${project.artifactId}-specifics.pro')
   
-  genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'])  
-  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'])
-  genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''])
-  genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''])
-  genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''])  
+  genqrc('build/${project.artifactId}-translations.qrc','/translations',    '${basedir}/translations', ['.qm'],'.ts')  
+  genqrc('build/${project.artifactId}-custom.qrc',      '/skin',    '${basedir}/resource/custom/${custom.skin}/skin', ['.png', '.mkv', '.jpg', '.jpeg'],'.psd')
+  genqrc('build/${project.artifactId}.qrc',             '/',        '${basedir}/../cpp/shared-resources/icons/${custom.skin}', [''],'.psd')
+  genqrc('build/${project.artifactId}-common.qrc',      '/',        '${basedir}/resource/common', [''],'.pdb')
+  genqrc('build/${project.artifactId}-generated.qrc',   '/',        '${project.build.directory}/resource', [''],'.pdb')  
   

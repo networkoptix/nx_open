@@ -104,7 +104,7 @@
 				<executions>
 					<execution>
 						<id>prepare-qt-project</id>
-						<phase>generate-sources</phase>
+						<phase>initialize</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>

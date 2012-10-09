@@ -57,7 +57,7 @@
 						<executions>
 							<execution>
 								<id>launcher-compile</id>
-								<phase>process-sources</phase>
+								<phase>generate-sources</phase>
 								<goals>
 									<goal>exec</goal>
 								</goals>
