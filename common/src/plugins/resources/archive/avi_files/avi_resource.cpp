@@ -14,7 +14,6 @@ QnAviResource::QnAviResource(const QString& file)
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
-    memset(m_motionBuffer, 0, sizeof(m_motionBuffer));
 }
 
 QnAviResource::~QnAviResource()
