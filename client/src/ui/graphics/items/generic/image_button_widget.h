@@ -149,33 +149,4 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
 
 
-/**
- * An image button widget that "raises" when hovered.
- */
-class QnZoomingImageButtonWidget: public QnImageButtonWidget {
-    Q_OBJECT
-
-    typedef QnImageButtonWidget base_type;
-
-public:
-    QnZoomingImageButtonWidget(QGraphicsItem *parent = NULL);
-
-    qreal scaleFactor() const {
-        return m_scaleFactor;
-    }
-
-    void setScaleFactor(qreal scaleFactor) {
-        m_scaleFactor = scaleFactor;
-    }
-
-protected:
-    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) override;
-
-    bool isScaledState(StateFlags state);
-
-private:
-    qreal m_scaleFactor;
-};
-
-
 #endif // QN_IMAGE_BUTTON_WIDGET_H

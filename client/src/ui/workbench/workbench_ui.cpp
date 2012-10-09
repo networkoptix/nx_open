@@ -85,7 +85,7 @@ namespace {
         qreal height = baseSize * sizeMultiplier;
         qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
-        QnZoomingImageButtonWidget *button = new QnZoomingImageButtonWidget(parent);
+        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setMaximumSize(width, height);
         button->setMinimumSize(width, height);
