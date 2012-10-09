@@ -2578,6 +2578,7 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     if(!checked) {
         m_tourTimer->stop();
+        context()->workbench()->setItem(Qn::ZoomedRole, NULL);
     } else {
         m_tourTimer->start(qnSettings->tourCycleTime());
         at_tourTimer_timeout();

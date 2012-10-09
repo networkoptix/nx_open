@@ -172,6 +172,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::IncrementDebugCounterAction));
     addAction(action(Qn::DecrementDebugCounterAction));
     addAction(action(Qn::TogglePanicModeAction));
+    addAction(action(Qn::ToggleTourModeAction));
 
     connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
