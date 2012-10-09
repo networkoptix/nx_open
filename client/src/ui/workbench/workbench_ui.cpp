@@ -1434,6 +1434,21 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
     m_sliderItem->setGeometry(geometry);
 }
 
+QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
+    return 
+        (m_treeOpened ? TreePanel : 0) |
+        (m_titleOpened ? TitlePanel : 0) |
+        (m_sliderOpened ? SliderPanel : 0) |
+        (m_helpOpened ? HelpPanel : 0);
+}
+
+void QnWorkbenchUi::setOpenedPanels(Panels panels) {
+    setTreeOpened(panels & TreePanel);
+    setTitleOpened(panels & TitlePanel);
+    setSliderOpened(panels & SliderPanel);
+    setHelpOpened(panels & HelpPanel);
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -1516,11 +1531,23 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     QnResourceWidget *newWidget = display()->widget(role);
     m_widgetByRole[role] = newWidget;
 
-    /* Tune activity listener instrument. */
+    /* Update activity listener instrument. */
     if(role == Qn::ZoomedRole) {
         updateActivityInstrumentState();
         updateViewportMargins();
     }
+
+    if(role == Qn::ZoomedRole) {
+        if(newWidget) {
+            m_unzoomedOpenedPanels = openedPanels();
+            setOpenedPanels(NoPanel);
+        } else {
+            /* User may have opened some panels while zoomed, 
+             * we want to leave them opened even if they were closed before. */
+            setOpenedPanels(m_unzoomedOpenedPanels | openedPanels());
+        }
+    }
+
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {

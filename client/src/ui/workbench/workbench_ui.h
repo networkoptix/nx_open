@@ -60,7 +60,16 @@ public:
         /** Whether controls affect viewport margins. */
         AdjustMargins = 0x4,
     };
-    Q_DECLARE_FLAGS(Flags, Flag)
+    Q_DECLARE_FLAGS(Flags, Flag);
+
+    enum Panel {
+        NoPanel = 0x0,
+        TreePanel = 0x1,
+        TitlePanel = 0x2,
+        SliderPanel = 0x4,
+        HelpPanel = 0x8
+    };
+    Q_DECLARE_FLAGS(Panels, Panel);
 
     QnWorkbenchUi(QObject *parent = NULL);
 
@@ -191,7 +200,11 @@ protected:
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
-protected slots:
+private:
+    Panels openedPanels() const;
+    void setOpenedPanels(Panels panels);
+
+private slots:
     void updateHelpContext();
     
     void updateTreeOpacity(bool animate = true);
@@ -315,6 +328,7 @@ private:
     /* In freespace mode? */
     bool m_inFreespace;
 
+    Panels m_unzoomedOpenedPanels;
 
 
     /* Slider-related state. */
@@ -445,5 +459,6 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels);
 
 #endif // QN_WORKBENCH_UI_H

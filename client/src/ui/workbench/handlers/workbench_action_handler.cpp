@@ -1948,16 +1948,16 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     QString selectedExtension;
     QString binaryFilterName;
     if (sizeof(char*) == 4)
-        binaryFilterName = tr("executable network optix media file (x86) (*.exe)");
+        binaryFilterName = tr("Executable Network Optix Media File (x86) (*.exe)");
     else
-        binaryFilterName = tr("executable network optix media file (x64) (*.exe)");
+        binaryFilterName = tr("Executable Network Optix Media File (x64) (*.exe)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network optix media file (*.nov);;")+ binaryFilterName,
+            tr("Network Optix Media File (*.nov);;")+ binaryFilterName,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
@@ -2578,6 +2578,7 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {
     if(!checked) {
         m_tourTimer->stop();
+        context()->workbench()->setItem(Qn::ZoomedRole, NULL);
     } else {
         m_tourTimer->start(qnSettings->tourCycleTime());
         at_tourTimer_timeout();

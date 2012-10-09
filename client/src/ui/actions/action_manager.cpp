@@ -771,7 +771,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::EditTagsAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
         text(tr("Edit tags...")).
-        shortcut(tr("Alt+T")).
+        //shortcut(tr("Alt+T")).
         autoRepeat(false).
         condition(hasFlags(QnResource::media));
 
@@ -869,6 +869,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
+        shortcut(tr("Alt+T")).
         condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).
@@ -897,7 +898,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Multi-Stream...")).
+        text(tr("Export Selection as Multi-View...")).
         //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
         condition(new QnExportActionCondition(false, this));
 
