@@ -37,6 +37,7 @@
 #include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
+#include "ui/style/noptix_style.h"
 #include "ui/style/proxy_style.h"
 #include "ui/events/system_menu_event.h"
 
@@ -57,6 +58,8 @@ namespace {
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
         int iconWidth = iconHeight * aspectRatio;
         button->setFixedSize(iconWidth, iconHeight);
+
+        button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
 
         return button;
     }
@@ -226,6 +229,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
     m_titleLayout->addSpacing(6);
+    m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 

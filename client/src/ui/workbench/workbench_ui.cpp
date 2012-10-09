@@ -58,6 +58,7 @@
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
+#include <ui/style/noptix_style.h>
 #include <ui/events/system_menu_event.h>
 
 #include <help/context_help.h>
@@ -79,14 +80,23 @@
 
 namespace {
 
-    template<class Button>
     QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
         qreal width = height * QnGeometry::aspectRatio(action->icon().actualSize(QSize(1024, 1024)));
 
-        QnImageButtonWidget *button = new Button(parent);
+        QnImageButtonWidget *button;
+
+        qreal rotationSpeed = action->property(Qn::ToolButtonCheckedRotationSpeed).toReal();
+        if(!qFuzzyIsNull(rotationSpeed)) {
+            QnRotatingImageButtonWidget *rotatingButton = new QnRotatingImageButtonWidget(parent);
+            rotatingButton->setRotationSpeed(rotationSpeed);
+            button = rotatingButton;
+        } else {
+            button = new QnImageButtonWidget(parent);
+        }
+
         button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed, QSizePolicy::ToolButton);
         button->setMaximumSize(width, height);
         button->setMinimumSize(width, height);
@@ -94,10 +104,6 @@ namespace {
         button->setCached(true);
 
         return button;
-    }
-
-    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
-        return newActionButton<QnImageButtonWidget>(action, sizeMultiplier, parent);
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
@@ -410,7 +416,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
     m_titleRightButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
-    m_titleRightButtonsLayout->addItem(newActionButton<QnRotatingImageButtonWidget>(action(Qn::ToggleScreenRecordingAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);

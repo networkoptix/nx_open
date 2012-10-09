@@ -194,6 +194,10 @@ public:
         m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_manager));
     }
 
+    void rotationSpeed(qreal rotationSpeed) {
+        m_action->setProperty(Qn::ToolButtonCheckedRotationSpeed, rotationSpeed);
+    }
+
 private:
     QnActionManager *m_manager;
     QnAction *m_action;
@@ -489,7 +493,8 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
             autoRepeat(false).
-            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png"));
+            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png")).
+            rotationSpeed(180.0);
     }
 
     factory(Qn::FullscreenAction).
