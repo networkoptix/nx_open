@@ -7,6 +7,11 @@
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 #for f in ${project.build.directory}/bin/${build.configuration}/${project.artifactId}*; do mv "$f" "$f-bin"; done
 
+#cp -P `find ${qt.dir} -iname 'libQtDBus.so*'` ${libdir}/build/bin/debug
+#cp -P `find ${qt.dir} -iname 'libQtDBus.so*'` ${libdir}/build/bin/release
+#cp -P `find ${qt.dir} -iname 'libqgenericbearer.so*'` ${libdir}/build/bin/debug
+#cp -P `find ${qt.dir} -iname 'libqgenericbearer.so*'` ${libdir}/build/bin/release
+
 sudo chown -R $USER:sudo ${project.build.directory}
 
 chmod 755 ./init.d/*
