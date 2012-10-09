@@ -67,8 +67,13 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         m_resolution = QSize(decodedVideoFrame.width, decodedVideoFrame.height);
     else if (m_resolution.width() == 0)
     {
+        m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
+        m_resolution.setHeight(qMin(decodedVideoFrame.height, m_resolution.height())); // strict to source frame height
+
         float ar = decodedVideoFrame.width / (float) decodedVideoFrame.height;
         m_resolution.setWidth(m_resolution.height() * ar);
+        m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
+        m_resolution.setWidth(qMin(decodedVideoFrame.width, m_resolution.width())); // strict to source frame width
     }
     return true;
 }
