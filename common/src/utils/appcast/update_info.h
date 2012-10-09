@@ -15,9 +15,9 @@ struct QnVersion {
     bool operator<(const QnVersion& other) const;
     QString toString() const;
 
-    int major;
-    int minor;
-    int build;
+    int major_;
+    int minor_;
+    int build_;
 };
 
 struct QnUpdateInfoItem {

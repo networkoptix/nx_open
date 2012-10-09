@@ -1,36 +1,36 @@
 #include "update_info.h"
 
 QnVersion::QnVersion()
-    : major(0), minor(0), build(0) {
+    : major_(0), minor_(0), build_(0) {
 }
 
 QnVersion::QnVersion(const QString& strVersion) {
-    major = minor = build = 0;
+    major_ = minor_ = build_ = 0;
 
     QStringList versionList = strVersion.split(QLatin1Char('.'));
 
     if (versionList.size() > 0)
-        major = versionList[0].toInt();
+        major_ = versionList[0].toInt();
 
     if (versionList.size() > 1)
-        minor = versionList[1].toInt();
+        minor_ = versionList[1].toInt();
 
     if (versionList.size() > 2)
-        build = versionList[2].toInt();
+        build_ = versionList[2].toInt();
 }
 
 bool QnVersion::isEmpty() const {
-    return major == minor == build == 0;
+    return major_ == minor_ == build_ == 0;
 }
 
 bool QnVersion::operator<(const QnVersion& other) const {
-    if (major < other.major) {
+    if (major_ < other.major_) {
         return true;
-    } else if (major == other.major) {
-        if (minor < other.minor) {
+    } else if (major_ == other.major_) {
+        if (minor_ < other.minor_) {
             return true;
-        } else if (minor == other.minor) {
-            return build < other.build;
+        } else if (minor_ == other.minor_) {
+            return build_ < other.build_;
         }
     }
 
@@ -38,8 +38,8 @@ bool QnVersion::operator<(const QnVersion& other) const {
 }
 
 QString QnVersion::toString() const {
-    if (build)
-        return QString(QLatin1String("%1.%2.%3")).arg(major).arg(minor).arg(build);
+    if (build_)
+        return QString(QLatin1String("%1.%2.%3")).arg(major_).arg(minor_).arg(build_);
     else
-        return QString(QLatin1String("%1.%2")).arg(major).arg(minor);
+        return QString(QLatin1String("%1.%2")).arg(major_).arg(minor_);
 }
