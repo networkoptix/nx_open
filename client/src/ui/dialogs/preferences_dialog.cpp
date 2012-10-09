@@ -110,8 +110,8 @@ void QnPreferencesDialog::initLanguages() {
     }
 
     //TODO: #gdm remove after release
-    ui->languageLabel->setVisible(false);
-    ui->languageComboBox->setVisible(false);
+    //ui->languageLabel->setVisible(false);
+    //ui->languageComboBox->setVisible(false);
 }
 
 void QnPreferencesDialog::accept() {
