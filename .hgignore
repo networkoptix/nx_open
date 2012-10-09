@@ -18,6 +18,7 @@ syntax: glob
 *.xcodeproj
 *.qm
 *.vcproj
+!launcher*.vcproj
 compatibility_info.cpp
 
 .DS_Store
