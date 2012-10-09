@@ -898,7 +898,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Multi-Stream...")).
+        text(tr("Export Selection as Multi-View...")).
         //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
         condition(new QnExportActionCondition(false, this));
 
