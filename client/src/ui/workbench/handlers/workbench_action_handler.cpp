@@ -914,8 +914,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
     if(!user)
         return;
 
-    if(snapshotManager()->isLocal(layout)  /*`&& !snapshotManager()->isBeingSaved(layout) */ ) {
-        /* Local layout that is not being saved should not be copied. */
+    if(snapshotManager()->isFile(layout)) {
         m_exportPeriod = layout->getLocalRange();
         doAskNameAndExportLocalLayout(layout, LayoutExport_LocalSaveAs);
     } else {

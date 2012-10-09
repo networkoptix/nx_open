@@ -1,20 +1,17 @@
 #include "workbench_access_controller.h"
+
 #include <cassert>
+
 #include <utils/common/checked_cast.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource_managment/resource_criterion.h>
+
 #include <plugins/resources/archive/abstract_archive_resource.h>
+
 #include "workbench_context.h"
 #include "workbench_layout_snapshot_manager.h"
-
-namespace {
-    bool isFileLayout(const QnLayoutResourcePtr &layout) {
-        return (layout->flags() & QnResource::url) && !layout->getUrl().isEmpty();
-    }
-
-} // anonymous namespace
-
 
 QnWorkbenchAccessController::QnWorkbenchAccessController(QObject *parent):
     QObject(parent),
@@ -122,7 +119,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);
     if(permissions.isValid() && permissions.canConvert<int>()) {
         return static_cast<Qn::Permissions>(permissions.toInt()); // TODO: listen to changes
-    } if(isFileLayout(layout)) {
+    } if(QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
