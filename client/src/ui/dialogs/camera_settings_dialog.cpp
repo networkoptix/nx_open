@@ -9,7 +9,8 @@
 #include <ui/workbench/workbench_context.h>
 
 QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags windowFlags):
-    QDialog(parent, windowFlags)
+    QDialog(parent, windowFlags),
+    mIgnoreAccept(false)
 {
     setWindowTitle(tr("Camera settings"));
 
@@ -24,7 +25,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     layout->addWidget(m_settingsWidget);
     layout->addWidget(m_buttonBox);
 
-    connect(m_buttonBox,        SIGNAL(accepted()),                 this,   SLOT(accept()));
+    connect(m_buttonBox,        SIGNAL(accepted()),                 this,   SLOT(acceptIfSafe()));
     connect(m_buttonBox,        SIGNAL(rejected()),                 this,   SLOT(reject()));
     connect(m_buttonBox,        SIGNAL(clicked(QAbstractButton *)), this,   SLOT(at_buttonBox_clicked(QAbstractButton *)));
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
@@ -58,3 +59,9 @@ void QnCameraSettingsDialog::at_buttonBox_clicked(QAbstractButton *button) {
     emit buttonClicked(m_buttonBox->standardButton(button));
 }
 
+void QnCameraSettingsDialog::acceptIfSafe(){
+    if (mIgnoreAccept)
+        mIgnoreAccept = false;
+    else
+        accept();
+}

@@ -293,10 +293,10 @@ void QnRtspConnectionProcessor::sendResponse(int code)
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
 }
 
-int QnRtspConnectionProcessor::getMetadataTcpChannel() const
+int QnRtspConnectionProcessor::getMetadataChannelNum() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return getAVTcpChannel(d->metadataChannelNum);
+    return d->metadataChannelNum;
 }
 
 int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const

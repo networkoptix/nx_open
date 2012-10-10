@@ -78,8 +78,10 @@ void QnFfmpegTranscoder::closeFfmpegContext()
     }
     if (m_ioContext)
     {
-        m_ioContext->opaque = 0;
-        avio_close(m_ioContext);
+        //m_ioContext->opaque = 0;
+        //avio_close(m_ioContext);
+        av_free(m_ioContext->buffer);
+        av_free(m_ioContext);
         m_ioContext = 0;
         if (m_formatCtx)
             m_formatCtx->pb = 0;

@@ -35,6 +35,11 @@ public:
         return m_hasDbChanges;
     }
 
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const {
+        return m_hasControlsChanges;
+    }
+
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
         //Currently this ability avaible only for single camera settings
         Q_ASSERT(false);
@@ -58,6 +63,7 @@ private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
+    void at_cameraScheduleWidget_gridParamsChanged();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
 private:
@@ -71,6 +77,10 @@ private:
     bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
+
+    /** Indicates that the user changed controls but not applied them to the schedule */
+    bool m_hasControlsChanges;
+
     bool m_readOnly;
     bool m_inUpdateMaxFps;
 };
