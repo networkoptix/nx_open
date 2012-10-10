@@ -118,6 +118,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
+	stop();
 }
 
 QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& streamingFormat)
