@@ -170,7 +170,13 @@ protected:
 
     void openNewWindow(const QStringList &args);
 
-    void saveCameraSettingsFromDialog();
+    /**
+     * Save modified camera settings to resources.
+     * \param checkControls - if set then additional check will occur.
+     * If user modified some of control elements but did not apply changes he will be asked to fix it.
+     * \see Feature #1195
+     */
+    void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
     
@@ -288,7 +294,6 @@ protected slots:
 
 
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 

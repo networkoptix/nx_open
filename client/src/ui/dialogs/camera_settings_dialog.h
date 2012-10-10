@@ -23,6 +23,10 @@ public:
         return m_settingsWidget;
     }
 
+    void ignoreAcceptOnce(){
+        mIgnoreAccept = true;
+    }
+
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
@@ -33,11 +37,14 @@ private slots:
     void at_settingsWidget_modeChanged();
     void at_advancedSettingChanged();
 
+    void acceptIfSafe();
+
 private:
     QWeakPointer<QnWorkbenchContext> m_context;
     QnCameraSettingsWidget *m_settingsWidget;
     QDialogButtonBox *m_buttonBox;
     QPushButton *m_applyButton, *m_okButton;
+    bool mIgnoreAccept;
 };
 
 

@@ -372,6 +372,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     setHasDbChanges(false);
     setHasCameraChanges(false);
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::updateMotionWidgetFromResource() {
@@ -680,14 +681,12 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_dbDataChanged();
     at_cameraDataChanged();
 
-    qDebug() << "schedule task changed";
-
     m_hasScheduleChanges = true;
-    m_hasControlsChanges = true;
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
-    m_hasControlsChanges = false;
+    m_hasControlsChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
