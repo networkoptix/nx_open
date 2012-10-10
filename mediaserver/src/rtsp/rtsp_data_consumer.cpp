@@ -650,8 +650,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!newRange.isEmpty())
     {
         int sendLen = newRange.size();
-        int metadataTcpChannel = m_owner->getMetadataTcpChannel();
-        if (metadataTcpChannel >= 0) 
+        trackInfo = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
+        if (trackInfo) 
         {
             m_sendBuffer.resize(16);
             buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, newRange.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
