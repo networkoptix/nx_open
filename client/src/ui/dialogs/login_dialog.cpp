@@ -114,6 +114,10 @@ QUrl LoginDialog::currentUrl() const {
     return url;
 }
 
+QString LoginDialog::currentName() const {
+    return ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+}
+
 QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
 }
@@ -279,16 +283,12 @@ void LoginDialog::at_saveButton_clicked() {
 
     bool ok = false;
 
-    QString defaultName(ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex()));
-    if (defaultName == QnConnectionDataList::defaultLastUsedName()){
-        defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-        if (connections.contains(defaultName))
-            defaultName = connections.generateUniqueName(defaultName);
-    }
-    QString name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, defaultName, &ok);
+    QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
     if (!ok)
         return;
 
+    // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
 
     if (connections.contains(name)){
@@ -312,14 +312,14 @@ void LoginDialog::at_saveButton_clicked() {
 }
 
 void LoginDialog::at_deleteButton_clicked() {
-    QnConnectionDataList connections = qnSettings->customConnections();
-    QString name = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    QString name = currentName();
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
+    QnConnectionDataList connections = qnSettings->customConnections();
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

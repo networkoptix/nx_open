@@ -43,6 +43,14 @@ bool QnConnectionDataList::contains(const QString &name){
     return false;
 }
 
+QnConnectionData QnConnectionDataList::getByName(const QString &name){
+    foreach(QnConnectionData data, *this){
+        if (data.name == name)
+            return data;
+    }
+    return QnConnectionData();
+}
+
 bool QnConnectionDataList::removeOne(const QString &name){
     foreach(QnConnectionData data, *this){
         if (data.name != name)
