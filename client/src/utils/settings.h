@@ -45,6 +45,13 @@ public:
     bool contains(const QString &name);
 
     /**
+     * Returns the first occurrence of a connection in the list with the
+     * name provided. Retuns empty connection if no such connection was found.
+     * \param name - name of the connection
+     */
+    QnConnectionData getByName(const QString &name);
+
+    /**
      * Removes the first occurrence of a connection in the list with the
      * name provided and returns true on success; otherwise returns false.
      * \param name - name of the connection

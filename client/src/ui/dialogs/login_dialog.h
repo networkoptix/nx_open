@@ -27,6 +27,7 @@ public:
     virtual ~LoginDialog();
 
     QUrl currentUrl() const;
+    QString currentName() const;
     QnConnectInfoPtr currentInfo() const;
 
 public slots:
