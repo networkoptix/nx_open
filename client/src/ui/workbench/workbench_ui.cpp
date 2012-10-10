@@ -60,6 +60,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/events/system_menu_event.h>
+#include <ui/screen_recording/screen_recorder.h>
 
 #include <help/context_help.h>
 
@@ -415,7 +416,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
+    if (QnScreenRecorder::isSupported())
+        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
