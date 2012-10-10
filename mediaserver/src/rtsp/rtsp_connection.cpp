@@ -906,6 +906,8 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->requestHeaders.value("x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
+        d->sessionTimeOut = 0;
+        d->socket->setReadTimeOut(d->socketTimeout);
         createPredefinedTracks();
     }
 

@@ -23,6 +23,7 @@ static const quint32 CSRC_CONST = 0xe8a9552a;
 static const int TCP_CONNECT_TIMEOUT = 1000*2;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
+static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
 
 //#define DEBUG_RTSP
 
@@ -551,7 +552,7 @@ bool RTPSession::sendDescribe()
     request += "\r\n";
     addAuth(request);
     addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
-    request += "User-Agent: Network Optix\r\n";
+    request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
 
     //qDebug() << request;
@@ -854,6 +855,7 @@ bool RTPSession::sendPlay(qint64 startPos, qint64 endPos, double scale)
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
+    request += USER_AGENT_STR;
     addRangeHeader(request, startPos, endPos);
     request += QLatin1String("Scale: ") + QString::number(scale) + QLatin1String("\r\n");
     if (m_numOfPredefinedChannels)
