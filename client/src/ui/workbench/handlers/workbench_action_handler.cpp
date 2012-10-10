@@ -2131,6 +2131,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
         }
     }
 
+	// TODO: exoprt progres dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     at_layoutCamera_exportFinished(fileName);
