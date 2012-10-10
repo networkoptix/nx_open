@@ -303,3 +303,6 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
     // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
 }
 
+Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
+    return action(Qn::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
+}

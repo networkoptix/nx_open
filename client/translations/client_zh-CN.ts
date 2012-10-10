@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="zh-CN" sourcelanguage="en">
+<TS version="2.0" language="zh_CN" sourcelanguage="en">
 <context>
     <name>AVSettingsDlg</name>
     <message>
@@ -81,23 +81,23 @@
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">名称</translation>
     </message>
     <message>
         <source>Add camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加摄像机</translation>
     </message>
     <message>
         <source>S&amp;tart IP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始IP：</translation>
     </message>
     <message>
         <source>&amp;End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">结束IP：</translation>
     </message>
     <message>
         <source>S&amp;ubnet scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">子网搜索</translation>
     </message>
     <message>
         <source>&amp;Login:</source>
@@ -105,11 +105,11 @@
     </message>
     <message>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">密码：</translation>
     </message>
     <message>
         <source>Http P&amp;ort:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HTTP端口：</translation>
     </message>
     <message>
         <source>Auto</source>
@@ -117,27 +117,27 @@
     </message>
     <message>
         <source>&amp;Scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">搜索</translation>
     </message>
     <message>
         <source>Scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">搜索中</translation>
     </message>
     <message>
         <source>Cancel &amp;scan</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">取消搜索</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP地址区间太大，最大允许255个地址</translation>
     </message>
     <message>
         <source>&lt;b&gt;Discovered Cameras:&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;发现摄像机:&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Manuf.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">厂商</translation>
     </message>
     <message>
         <source>Address</source>
@@ -145,11 +145,11 @@
     </message>
     <message>
         <source>&amp;Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加选中</translation>
     </message>
     <message>
         <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">关闭</translation>
     </message>
 </context>
 <context>
@@ -244,7 +244,7 @@
     </message>
     <message>
         <source>Panic mode: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">危机模式：</translation>
     </message>
 </context>
 <context>
@@ -453,7 +453,11 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto://support@networkoptix.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#00a2ff;&quot;&gt;support@networkoptix.com&lt;/span&gt;&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Please send E-Mail with the Serial Key and the Hardware ID provided to &lt;a href=&quot;mailto://support@networkoptix.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#00a2ff;&quot;&gt;support@networkoptix.com&lt;/span&gt;&lt;/a&gt;. Then we&apos;ll send you an Activation Key which should be filled in the field below.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <source>Serial key:</source>
@@ -577,11 +581,11 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     </message>
     <message>
         <source>&amp;Connection options:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">连接选项：</translation>
     </message>
     <message>
         <source>Save...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -589,32 +593,32 @@ The Enterprise Controller is incompatible with this client. Please upgrade your 
     </message>
     <message>
         <source>%1 at %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1 在 %2</translation>
     </message>
     <message>
         <source>Save connection as...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存连接为</translation>
     </message>
     <message>
         <source>Enter name:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">输入名称</translation>
     </message>
     <message>
         <source>Connection already exists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">连接已存在</translation>
     </message>
     <message>
         <source>Connection with the same name already exists. Overwrite it?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">连接名称已存在。需要覆盖？</translation>
     </message>
     <message>
         <source>Delete connections</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">删除连接</translation>
     </message>
     <message>
         <source>Are you sure you want to delete the connection
 %1?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">确认要删除连接%1？</translation>
     </message>
 </context>
 <context>
@@ -769,11 +773,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Tour cycle time:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">巡游周期：</translation>
     </message>
     <message>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">秒</translation>
     </message>
 </context>
 <context>
@@ -815,26 +819,30 @@ For easy instructions on how to install or update your video driver, follow inst
 &lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br /&gt;
 &lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 the FFmpeg developers.&lt;br /&gt;
 &lt;b&gt;Color Picker v2.6 Qt Solution&lt;/b&gt; - Copyright (c) 2009 Nokia Corporation.&lt;br /&gt;&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 the LAME developers.&lt;br /&gt;&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;%1 %2&lt;/b&gt; uses the following external libraries:&lt;br /&gt;
+&lt;br /&gt;
+&lt;b&gt;Qt v.%3&lt;/b&gt; - Copyright (c) 2012 Nokia Corporation.&lt;br /&gt;
+&lt;b&gt;FFMpeg %4&lt;/b&gt; - Copyright (c) 2000-2012 the FFmpeg developers.&lt;br /&gt;
+&lt;b&gt;Color Picker v2.6 Qt Solution&lt;/b&gt; - Copyright (c) 2009 Nokia Corporation.&lt;br /&gt;&lt;b&gt;LAME 3.99.0&lt;/b&gt; - Copyright (c) 1998-2012 the LAME developers.&lt;br /&gt;&lt;b&gt;OpenAL %5&lt;/b&gt; - Copyright (c) 2000-2006 %6&lt;br /&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;Bespin style&lt;/b&gt; - Copyright (c) 2007-2010 Thomas Luebking.&lt;br /&gt;</translation>
     </message>
     <message>
         <source>&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br /&gt;&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br /&gt;&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;b&gt;OpenGL version&lt;/b&gt;: %1.&lt;br /&gt;&lt;b&gt;OpenGL renderer&lt;/b&gt;: %2.&lt;br/&gt;&lt;b&gt;OpenGL vendor&lt;/b&gt;: %3.&lt;br /&gt;&lt;b&gt;OpenGL max texture size&lt;/b&gt;: %4.&lt;br /&gt;</translation>
     </message>
 </context>
 <context>
     <name>QnAction</name>
     <message>
         <source>%n</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%n</translation>
     </message>
     <message>
         <source>%n (&lt;b&gt;%s&lt;/b&gt;)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%n (&lt;b&gt;%s&lt;/b&gt;)</translation>
     </message>
 </context>
 <context>
@@ -1361,31 +1369,31 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Start Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始危机录像</translation>
     </message>
     <message>
         <source>Stop Panic Recording</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">结束危机录像</translation>
     </message>
     <message>
         <source>Start Tour</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始巡游</translation>
     </message>
     <message>
         <source>Stop Tour</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">结束巡游</translation>
     </message>
     <message>
         <source>Thumbnails Search...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">小图标搜索</translation>
     </message>
     <message>
         <source>Show Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">显示日历</translation>
     </message>
     <message>
         <source>Hide Calendar</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">隐藏日历</translation>
     </message>
     <message>
         <source>Space</source>
@@ -1473,7 +1481,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Jump to Live</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">转到实时</translation>
     </message>
     <message>
         <source>S</source>
@@ -1485,27 +1493,27 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>F1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">F1</translation>
     </message>
     <message>
         <source>Add camera(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加摄像机</translation>
     </message>
     <message>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">播放</translation>
     </message>
     <message>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">暂停</translation>
     </message>
     <message>
         <source>Synchronize Streams</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">同步码流</translation>
     </message>
     <message>
         <source>Disable Stream Synchronization</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">禁用码流同步</translation>
     </message>
 </context>
 <context>
@@ -1569,31 +1577,31 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Camera &amp;IP:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机IP</translation>
     </message>
     <message>
         <source>First address in range is greater than last one</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">范围内的地址第一个大于最后一个</translation>
     </message>
     <message>
         <source>Ip address range is too big, maximum of 255 addresses is allowed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IP地址范围太大，最大允许255个地址</translation>
     </message>
     <message>
         <source>Finished</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">完成</translation>
     </message>
     <message>
         <source>No cameras found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">没有发现摄像机</translation>
     </message>
     <message>
         <source>No cameras selected</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">没有选中的摄像机</translation>
     </message>
     <message>
         <source>Please select at least one camera</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">请选择至少一个摄像机</translation>
     </message>
     <message>
         <source>Success</source>
@@ -1601,7 +1609,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Camera(s) added successfully</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">摄像机添加成功</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1609,7 +1617,7 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Error while adding camera(s)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">添加摄像机时发生错误</translation>
     </message>
 </context>
 <context>
@@ -1651,11 +1659,11 @@ For easy instructions on how to install or update your video driver, follow inst
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">关</translation>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开</translation>
     </message>
 </context>
 <context>
@@ -2046,31 +2054,31 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Smart Search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">智能搜索</translation>
     </message>
     <message>
         <source>PTZ</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">PTZ</translation>
     </message>
     <message>
         <source>Zoom In</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">放大</translation>
     </message>
     <message>
         <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">缩小</translation>
     </message>
     <message>
         <source> (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished"> (%1)</translation>
     </message>
     <message>
         <source>	%1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">	%1</translation>
     </message>
     <message>
         <source>%1x%2 %3fps @ %4Mbps%5%6</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%1x%2 %3fps @ %4Mbps%5%6</translation>
     </message>
 </context>
 <context>
@@ -2078,12 +2086,12 @@ Try to activate your License manually.</source>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>LoginEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;multiple values&gt;</translation>
     </message>
     <message>
         <source>&lt;multiple values&gt;</source>
         <comment>PasswordEdit</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;multiple values&gt;</translation>
     </message>
     <message>
         <source>FPS value is too high</source>
@@ -2194,11 +2202,11 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Previuos Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">上一块</translation>
     </message>
     <message>
         <source>Next Chunk</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">下一块</translation>
     </message>
 </context>
 <context>
@@ -2320,7 +2328,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Very powerful machine is required for Best quality and high resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高质量和分辨率需要强劲的电脑</translation>
     </message>
 </context>
 <context>
@@ -2370,7 +2378,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>Rotate</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">旋转</translation>
     </message>
 </context>
 <context>
@@ -2430,23 +2438,23 @@ You have only %2Gb left for video archive.</source>
     </message>
     <message>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开</translation>
     </message>
     <message>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">关</translation>
     </message>
     <message>
         <source>No storages specified</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">没有指定的存储</translation>
     </message>
     <message>
         <source>At least one storage must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">至少需要指定一个存储</translation>
     </message>
     <message>
         <source>Invalid space limit</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无效空间限制</translation>
     </message>
 </context>
 <context>
@@ -2472,7 +2480,7 @@ You have only %2Gb left for video archive.</source>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
         <source>&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;</translation>
     </message>
     <message>
         <source>Hardware (Camera built-in)</source>
@@ -2671,27 +2679,27 @@ AVAILABLE</source>
     </message>
     <message>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">拥有者</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高级浏览者</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">实时浏览者</translation>
     </message>
     <message>
         <source>Custom...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">自定义</translation>
     </message>
     <message>
         <source>Can adjust camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">可以调整摄像机设定</translation>
     </message>
     <message>
         <source>Can view video archives</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">可以浏览视频存档</translation>
     </message>
 </context>
 <context>
@@ -2996,24 +3004,24 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Currently parameters can&apos;t be saved.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">当前参数无法保存</translation>
     </message>
     <message>
         <source>Failed to save the following parameters (%1):
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存以下参数失败(%1):%2</translation>
     </message>
     <message>
         <source>Could not perform thumbnails search</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法执行小图标搜索</translation>
     </message>
     <message>
         <source>Selected time period is too short to perform thumbnails search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">选择的时间区间太短无法执行小图标搜索。请选择一个较长的时间区间。</translation>
     </message>
     <message>
         <source>Thumbnail Search for %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">小图标搜素%1</translation>
     </message>
 </context>
 <context>
@@ -3051,7 +3059,7 @@ Error description: &apos;%2&apos;</source>
     <name>QnWorkbenchDisplay</name>
     <message>
         <source>yyyy MMM dd hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy MMM dd hh:mm:ss</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
@@ -3318,11 +3326,11 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>Panic mode:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">危机模式</translation>
     </message>
     <message>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">端口：</translation>
     </message>
 </context>
 <context>
@@ -3444,7 +3452,7 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高级</translation>
     </message>
 </context>
 <context>
@@ -3518,11 +3526,11 @@ hh:mm:ss</translation>
     </message>
     <message>
         <source>Access rights</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">门禁权限</translation>
     </message>
     <message>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">高级</translation>
     </message>
 </context>
 <context>

@@ -194,6 +194,10 @@ public:
         m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_manager));
     }
 
+    void rotationSpeed(qreal rotationSpeed) {
+        m_action->setProperty(Qn::ToolButtonCheckedRotationSpeed, rotationSpeed);
+    }
+
 private:
     QnActionManager *m_manager;
     QnAction *m_action;
@@ -402,7 +406,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory().
-        flags(Qn::Main | Qn::TabBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        flags(Qn::Main | Qn::TitleBar | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("New..."));
 
     factory.beginSubMenu(); {
@@ -414,7 +418,7 @@ QnActionManager::QnActionManager(QObject *parent):
             condition(hasFlags(QnResource::user));
 
         factory(Qn::OpenNewTabAction).
-            flags(Qn::Main | Qn::TabBar | Qn::SingleTarget | Qn::NoTarget).
+            flags(Qn::Main | Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
             text(tr("Tab")).
             pulledText(tr("New Tab")).
             shortcut(tr("Ctrl+T")).
@@ -480,8 +484,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-
-    if (QnScreenRecorder::isSupported()){
+    if (QnScreenRecorder::isSupported()) {
         factory(Qn::ToggleScreenRecordingAction).
             flags(Qn::Main).
             text(tr("Start Screen Recording")).
@@ -489,7 +492,9 @@ QnActionManager::QnActionManager(QObject *parent):
             shortcut(tr("Alt+R")).
             shortcut(Qt::Key_MediaRecord).
             shortcutContext(Qt::ApplicationShortcut).
-            autoRepeat(false);
+            autoRepeat(false).
+            icon(qnSkin->icon("titlebar/recording.png", "titlebar/recording.png")).
+            rotationSpeed(180.0);
     }
 
     factory(Qn::FullscreenAction).
@@ -554,17 +559,17 @@ QnActionManager::QnActionManager(QObject *parent):
 
     /* Tab bar actions. */
     factory().
-        flags(Qn::TabBar).
+        flags(Qn::TitleBar).
         separator();
 
     factory(Qn::CloseLayoutAction).
-        flags(Qn::TabBar | Qn::ScopelessHotkey | Qn::SingleTarget).
+        flags(Qn::TitleBar | Qn::ScopelessHotkey | Qn::SingleTarget).
         text(tr("Close")).
         shortcut(tr("Ctrl+W")).
         autoRepeat(false);
 
     factory(Qn::CloseAllButThisLayoutAction).
-        flags(Qn::TabBar | Qn::SingleTarget).
+        flags(Qn::TitleBar | Qn::SingleTarget).
         text(tr("Close All But This")).
         condition(new QnLayoutCountActionCondition(2, this));
 
@@ -907,14 +912,7 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Thumbnails Search...")).
         condition(new QnExportActionCondition(true, this));
 
-    factory().
-        flags(Qn::Slider).
-        separator();
 
-    factory(Qn::ToggleThumbnailsAction).
-        flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Show Thumbnails")).
-        toggledText(tr("Hide Thumbnails"));
 
     factory(Qn::IncrementDebugCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
@@ -1001,10 +999,36 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Disable Stream Synchronization")).
         condition(new QnArchiveActionCondition(this));
 
+
+    factory().
+        flags(Qn::Slider | Qn::TitleBar | Qn::Tree).
+        separator();
+
+    factory(Qn::ToggleThumbnailsAction).
+        flags(Qn::Slider | Qn::SingleTarget).
+        text(tr("Show Thumbnails")).
+        toggledText(tr("Hide Thumbnails"));
+
     factory(Qn::ToggleCalendarAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Show Calendar")).
         toggledText(tr("Hide Calendar"));
+
+    factory(Qn::ToggleTitleBarAction).
+        flags(Qn::TitleBar | Qn::NoTarget | Qn::SingleTarget).
+        text(tr("Show Title Bar")).
+        toggledText(tr("Hide Title Bar")).
+        condition(new QnToggleTitleBarActionCondition(this));
+
+    factory(Qn::ToggleTreeAction).
+        flags(Qn::Tree | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        text(tr("Show Tree")).
+        toggledText(tr("Hide Tree"));
+
+    factory(Qn::ToggleSliderAction).
+        flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
+        text(tr("Show Timeline")).
+        toggledText(tr("Hide Timeline"));
 }
 
 QnActionManager::~QnActionManager() {

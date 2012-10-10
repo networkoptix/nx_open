@@ -74,15 +74,20 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
     {
         QMutexLocker lock(&m_allConsumersMutex);
         m_allConsumers.remove(this);
-        foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+        if (m_firstLiveTime != AV_NOPTS_VALUE)
         {
-            if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+            // If some data was transfered and camera is closing, some bandwidth appears.
+            // Try to switch some camera(s) to high quality
+            foreach(QnRtspDataConsumer* consumer, m_allConsumers)
             {
-                if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
                 {
-                    consumer->resetQualityStatistics();
-                    if (m_liveQuality == MEDIA_Quality_Low)
-                        break;
+                    if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                    {
+                        consumer->resetQualityStatistics();
+                        if (m_liveQuality == MEDIA_Quality_Low)
+                            break; // try only one camera is current quality is low
+                    }
                 }
             }
         }

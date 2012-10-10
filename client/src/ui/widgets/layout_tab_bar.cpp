@@ -66,11 +66,11 @@ void QnLayoutTabBar::checkInvariants() const {
 }
 
 Qn::ActionScope QnLayoutTabBar::currentScope() const {
-    return Qn::TabBarScope;
+    return Qn::TitleBarScope;
 }
 
 QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
-    if(scope != Qn::TabBarScope)
+    if(scope != Qn::TitleBarScope)
         return QVariant();
 
     QnWorkbenchLayoutList result;
@@ -138,7 +138,7 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
     
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, target));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, target));
     if(menu->isEmpty())
         return;
 

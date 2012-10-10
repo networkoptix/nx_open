@@ -234,18 +234,21 @@ private slots:
     void at_sliderShowButton_toggled(bool checked);
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
-
+    void at_toggleSliderAction_toggled(bool checked);
+    
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
     void at_treePinButton_toggled(bool checked);
+    void at_toggleTreeAction_toggled(bool checked);
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
     void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
     void at_titleShowButton_toggled(bool checked);
+    void at_toggleTitleBarAction_toggled(bool checked);
 
     void at_helpPinButton_toggled(bool checked);
     void at_helpShowButton_toggled(bool checked);

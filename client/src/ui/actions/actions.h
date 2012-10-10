@@ -512,11 +512,6 @@ namespace Qn {
         ExportLayoutAction,
 
         /**
-         * Shows/hides thumbnails.
-         */
-        ToggleThumbnailsAction,
-
-        /**
          * Opens new layout for Quick Search.
          * 
          * Parameters:
@@ -526,9 +521,29 @@ namespace Qn {
         ThumbnailsSearchAction,
 
         /**
+         * Shows/hides thumbnails.
+         */
+        ToggleThumbnailsAction,
+
+        /**
          * Shows/hides calendar.
          */
         ToggleCalendarAction,
+
+        /** 
+         * Shows/hides title bar.
+         */
+        ToggleTitleBarAction,
+
+        /**
+         * Shows/hides tree.
+         */
+        ToggleTreeAction,
+
+        /**
+         * Shows/hides slider.
+         */
+        ToggleSliderAction,
 
 
         /* Playback actions. */
@@ -577,7 +592,7 @@ namespace Qn {
         SceneScope              = 0x2,              /**< Action appears in scene context menu and its parameters are taken from the scene. */
         TreeScope               = 0x4,              /**< Action appears in tree context menu. */
         SliderScope             = 0x8,              /**< Action appears in slider context menu. */
-        TabBarScope             = 0x10,             /**< Action appears tab bar context menu. */
+        TitleBarScope           = 0x10,             /**< Action appears title bar context menu. */
         ScopeMask               = 0xFF
     };
     Q_DECLARE_FLAGS(ActionScopes, ActionScope);
@@ -649,8 +664,8 @@ namespace Qn {
         /** Action can appear in slider context menu. */
         Slider                  = Qn::SliderScope | WidgetTarget,    
 
-        /** Action can appear in tab bar context menu. */
-        TabBar                  = Qn::TabBarScope | LayoutTarget,      
+        /** Action can appear in title bar context menu. */
+        TitleBar                = Qn::TitleBarScope | LayoutTarget,      
     };
 
     Q_DECLARE_FLAGS(ActionFlags, ActionFlag);

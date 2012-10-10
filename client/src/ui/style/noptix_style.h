@@ -57,7 +57,7 @@ private:
     void drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
 
 private:
-    QnNoptixStyleAnimator *m_animator;
+    QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnGlobals *m_globals;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
@@ -84,9 +84,16 @@ namespace Qn { namespace {
      */
     const char *SliderLength                    = "_qn_sliderLength";
 
+    /**
+     * Name of a property to set on a <tt>QToolButton</tt> to make it rotate
+     * when checked. Value defines rotation speed in degrees per second.
+     */
+    const char *ToolButtonCheckedRotationSpeed  = "_qn_toolButtonCheckedRotationSpeed";
+
 #define HideCheckBoxInMenu HideCheckBoxInMenu
 #define ItemViewItemBackgroundOpacity ItemViewItemBackgroundOpacity
 #define SliderLength SliderLength
+#define ToolButtonCheckedRotationSpeed ToolButtonCheckedRotationSpeed
 }}
 
 #endif // QN_NOPTIX_STYLE_H

@@ -110,7 +110,7 @@ private:
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
     void setAudioBufferSize(int bufferSize, int prebufferMs);
-
+    bool isLastVideoQualityLow() const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -200,6 +200,7 @@ protected:
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;
+    bool m_isLastVideoQualityLow;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -150,32 +150,32 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)
 
 
 /**
- * An image button widget that "raises" when hovered.
+ * An image button widget that rotates when checked.
  */
-class QnZoomingImageButtonWidget: public QnImageButtonWidget {
+class QnRotatingImageButtonWidget: public QnImageButtonWidget, public AnimationTimerListener {
     Q_OBJECT
-
+    
     typedef QnImageButtonWidget base_type;
-
+    
 public:
-    QnZoomingImageButtonWidget(QGraphicsItem *parent = NULL);
-
-    qreal scaleFactor() const {
-        return m_scaleFactor;
+    QnRotatingImageButtonWidget(QGraphicsItem *parent = NULL);
+    
+    qreal rotationSpeed() const {
+        return m_rotationSpeed;
     }
-
-    void setScaleFactor(qreal scaleFactor) {
-        m_scaleFactor = scaleFactor;
+    
+    void setRotationSpeed(qreal rotationSpeed) {
+        m_rotationSpeed = rotationSpeed;
     }
-
+    
 protected:
     virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) override;
-
-    bool isScaledState(StateFlags state);
-
+    
+    virtual void tick(int deltaMSecs) override;
+    
 private:
-    qreal m_scaleFactor;
+    qreal m_rotationSpeed;
+    qreal m_rotation;
 };
-
 
 #endif // QN_IMAGE_BUTTON_WIDGET_H
