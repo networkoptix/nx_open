@@ -37,6 +37,7 @@
 		<qtplugin2>enter its name here...</qtplugin2>
 		<qtplugin3>enter its name here...</qtplugin3>	
 	</properties>
+
 	<modules>
 		<module>build-environment</module>
 		<module>appserver</module>
