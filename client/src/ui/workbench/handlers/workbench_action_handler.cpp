@@ -199,6 +199,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::CameraSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
     connect(action(Qn::OpenInCameraSettingsDialogAction),       SIGNAL(triggered()),    this,   SLOT(at_cameraSettingsAction_triggered()));
+    connect(action(Qn::ClearCameraSettingsAction),              SIGNAL(triggered()),    this,   SLOT(at_clearCameraSettingsAction_triggered()));
     connect(action(Qn::SelectionChangeAction),                  SIGNAL(triggered()),    this,   SLOT(at_selectionChangeAction_triggered()));
     connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::ServerSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_serverSettingsAction_triggered()));
@@ -453,6 +454,10 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
     }
 }
 
+bool QnWorkbenchActionHandler::closeAllLayouts(bool waitForReply) {
+    return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply);
+}
+
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
@@ -695,10 +700,12 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
         return;
 
     /* Open all user's layouts. */
-    if(qnSettings->isLayoutsOpenedOnLogin()) {
-        QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
-        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    }
+    //if(qnSettings->isLayoutsOpenedOnLogin()) {
+        //QnLayoutResourceList layouts = context()->resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
+        //menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
+    //}
+    QnWorkbenchState state = qnSettings->userWorkbenchStates().value(user->getName());
+    workbench()->update(state);
     
     /* Delete empty orphaned layouts, move non-empty to the new user. */
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(QnId())) {
@@ -1180,8 +1187,25 @@ void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
 
     QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
     dialog->setModal(true);
-    if (!dialog->exec())
-        return;
+    while(true) {
+        if(!dialog->exec())
+            return;
+
+        if(!context()->user())
+            break; /* We weren't connected, so layouts cannot be saved. */
+
+        QnWorkbenchState state;
+        workbench()->submit(state);
+
+        if(!closeAllLayouts(true))
+            continue;
+            
+        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
+        states[context()->user()->getName()] = state;
+        qnSettings->setUserWorkbenchStates(states);
+        break;
+    }
+    menu()->trigger(Qn::ClearCameraSettingsAction);
 
     QnConnectionDataList connections = qnSettings->customConnections();
 
@@ -1256,8 +1280,8 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     }
 #endif
 
-    if(context()->user()) /* If we were connected... */
-        workbench()->clear(); // TODO: ask to save?
+    //if(context()->user()) /* If we were connected... */
+        //workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1467,6 +1491,11 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
 
 }
 
+void QnWorkbenchActionHandler::at_clearCameraSettingsAction_triggered() {
+    if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
+        menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
+}
+
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
     switch(button) {
     case QDialogButtonBox::Ok:
@@ -1634,7 +1663,11 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
 
     if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         bool changed = snapshotManager()->isChanged(layout);
+
         resource->setName(name);
+        if(QnWorkbenchLayout::instance(layout))
+            QnWorkbenchLayout::instance(layout)->setName(name); // TODO: hack
+
         if(!changed)
             snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
     } else {
@@ -1730,10 +1763,8 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
-    if(cameraSettingsDialog() && cameraSettingsDialog()->isVisible())
-        menu()->trigger(Qn::OpenInCameraSettingsDialogAction, QnResourceList());
-
-    if(closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), true))
+    menu()->trigger(Qn::ClearCameraSettingsAction);
+    if(closeAllLayouts(true))
         qApp->closeAllWindows();
 }
 

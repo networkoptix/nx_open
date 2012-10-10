@@ -102,7 +102,7 @@ public:
     QnId getParentId() const;
     void setParentId(QnId parent);
 
-    void setGuid(const QString& guid);
+    void setGuid(const QString& guid); // TODO: UUID! 
     QString getGuid() const;
 
     // device unique identifier

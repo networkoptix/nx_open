@@ -589,7 +589,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     //}
 }
 
-void QnSingleCameraSettingsWidget::at_pingButtonClicked(){
+void QnSingleCameraSettingsWidget::at_pingButtonClicked() {
 #ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
