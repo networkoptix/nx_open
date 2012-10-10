@@ -466,7 +466,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${environment.dir}/qt/bin/qmake</executable>
+									<executable>qmake</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-spec</commandlineArgs>
