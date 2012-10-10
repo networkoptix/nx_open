@@ -352,13 +352,6 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
     if (m_disableUpdateGridParams)
         return;
 
-    if (!fromUserInput){
-        qDebug() << "grid params changed";
-    } else {
-        qDebug() << "grid params changed from user";
-    }
-
-
     QColor color;
     if (ui->recordAlwaysButton->isChecked())
         color = ui->recordAlwaysButton->color();

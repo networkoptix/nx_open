@@ -1315,7 +1315,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
-            if(timeUSec != AV_NOPTS_VALUE)
+            if((quint64)timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());

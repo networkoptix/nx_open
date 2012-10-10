@@ -471,12 +471,22 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QProcess::startDetached(qApp->applicationFilePath(), arguments);
 }
 
-void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
+void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) {
     if(!cameraSettingsDialog())
         return;
 
     bool hasDbChanges = cameraSettingsDialog()->widget()->hasDbChanges();
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
+
+    if (checkControls && cameraSettingsDialog()->widget()->hasControlsChanges()){
+        QString message = tr("Recording schedule is not changed! Pick desired Recording Type, FPS and Quality and click on schedule to change it!");
+        int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
+                             QMessageBox::Retry, QMessageBox::Ignore);
+        if (button == QMessageBox::Retry){
+            cameraSettingsDialog()->ignoreAcceptOnce();
+            return;
+        }
+    }
 
     if (!hasDbChanges && !hasCameraChanges && !cameraSettingsDialog()->widget()->hasAnyCameraChanges()) {
         return;
@@ -489,10 +499,6 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     /* Dialog will be shown inside */
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return; 
-
-    if (cameraSettingsDialog()->widget()->hasControlsChanges()){
-        QMessageBox::warning(widget(), tr("not saved controls"), tr("test"));
-    }
 
     /* Limit the number of active cameras. */
     int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
@@ -1422,12 +1428,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
 void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     QnVirtualCameraResourceList resources = menu()->currentParameters(sender()).resources().filtered<QnVirtualCameraResource>();
-
     bool newlyCreated = false;
     if(!cameraSettingsDialog()) {
         m_cameraSettingsDialog = new QnCameraSettingsDialog(widget());
         newlyCreated = true;
-        
+
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
@@ -1438,9 +1443,9 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
            cameraSettingsDialog()->widget()->hasDbChanges() || cameraSettingsDialog()->widget()->hasCameraChanges()))
         {
             QDialogButtonBox::StandardButton button = QnResourceListDialog::exec(
-                widget(), 
+                widget(),
                 QnResourceList(cameraSettingsDialog()->widget()->resources()),
-                tr("Camera(s) not Saved"), 
+                tr("Camera(s) not Saved"),
                 tr("Save changes to the following %n camera(s)?", NULL, cameraSettingsDialog()->widget()->resources().size()),
                 QDialogButtonBox::Yes | QDialogButtonBox::No
             );
@@ -1455,11 +1460,14 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
     cameraSettingsDialog()->show();
     if(!newlyCreated)
         cameraSettingsDialog()->setGeometry(oldGeometry);
+
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button) {
     switch(button) {
     case QDialogButtonBox::Ok:
+        saveCameraSettingsFromDialog(true);
+        break;
     case QDialogButtonBox::Apply:
         saveCameraSettingsFromDialog();
         break;
