@@ -2118,8 +2118,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     device->write(m_exportPeriod.serialize());
     delete device;
 
-    // If current layout is database based layout generate new GUID, otherwise keep current local GUID
-    QString uuid = (layout->flags() & QnResource::local) ? layout->getGuid() : QUuid::createUuid().toString();
+    // If layout export create new guid. If layout just renamed (local save or local saveAs) keep guid
+    QString uuid = (mode != LayoutExport_Export) ? layout->getGuid() : QUuid::createUuid().toString();
     device = m_exportStorage->open(QLatin1String("uuid.bin"), QIODevice::WriteOnly);
     device->write(uuid.toUtf8());
     delete device;
