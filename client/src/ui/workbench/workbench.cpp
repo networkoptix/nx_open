@@ -4,13 +4,17 @@
 #include <utils/common/checked_cast.h>
 #include <utils/client_meta_types.h>
 
+#include <core/resource_managment/resource_pool.h>
+
 #include <ui/style/globals.h>
+
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_item.h"
 
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
+    QnWorkbenchContextAware(parent),
     m_currentLayout(NULL)
 {
     QnClientMetaTypes::initialize();
@@ -248,6 +252,34 @@ void QnWorkbench::updateSingleRoleItem() {
     }
 }
 
+void QnWorkbench::update(const QnWorkbenchState &state) {
+    clear();
+
+    for(int i = 0; i < state.layoutUuids.size(); i++) {
+        QnLayoutResourcePtr resource = resourcePool()->getResourceByGuid(state.layoutUuids[i]).dynamicCast<QnLayoutResource>();
+        if(!resource)
+            continue;
+
+        QnWorkbenchLayout *layout = new QnWorkbenchLayout(resource, this);
+        addLayout(layout);
+        if(i == state.currentLayoutIndex)            
+            setCurrentLayout(layout);
+    }
+}
+
+void QnWorkbench::submit(QnWorkbenchState &state) {
+    state = QnWorkbenchState();
+
+    state.currentLayoutIndex = currentLayoutIndex();
+    foreach(QnWorkbenchLayout *layout, m_layouts)
+        if(layout->resource())
+            state.layoutUuids.push_back(layout->resource()->getGuid());
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
 void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
     Q_UNUSED(item)
     updateSingleRoleItem();
@@ -280,3 +312,5 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
 
     emit cellSpacingChanged();
 }
+
+

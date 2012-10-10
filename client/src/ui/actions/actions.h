@@ -218,10 +218,9 @@ namespace Qn {
         CloseLayoutAction,
 
         /**
-         * Closes all layouts but selected.
+         * Closes all layouts but the one provided.
          */
         CloseAllButThisLayoutAction,
-
 
 
         /* Resource actions. */
@@ -359,6 +358,11 @@ namespace Qn {
          * Opens provided resources in an existing camera settings dialog.
          */
         OpenInCameraSettingsDialogAction,
+
+        /**
+         * Clears the resource that is currently open in camera settings dialog.
+         */
+        ClearCameraSettingsAction,
 
         /**
          * Opens server settings dialog.

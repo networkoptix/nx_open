@@ -1,12 +1,19 @@
 #ifndef QN_WORKBENCH_H
 #define QN_WORKBENCH_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
+#include <core/resource/layout_resource.h>
+
 #include "workbench_globals.h"
+#include "workbench_state.h"
+#include "workbench_context_aware.h"
 
 class QnWorkbenchLayout;
 class QnWorkbenchGridMapper;
 class QnWorkbenchItem;
+
+// TODO: doxydoc is out of date
 
 /**
  * Workbench ties layout, items and current UI-related "state" together.
@@ -28,7 +35,7 @@ class QnWorkbenchItem;
  * <li>Currently zoomed item - an item that is shown in full screen.</li>
  * </ul>
  */
-class QnWorkbench: public QObject {
+class QnWorkbench: public QObject, public QnWorkbenchContextAware { // TODO: remove context-aware
     Q_OBJECT;
 public:
     /**
@@ -150,6 +157,9 @@ public:
      * \param item                      New item for the given role.
      */
     void setItem(Qn::ItemRole role, QnWorkbenchItem *item);
+
+    void update(const QnWorkbenchState &state);
+    void submit(QnWorkbenchState &state);
 
 signals:
     /**

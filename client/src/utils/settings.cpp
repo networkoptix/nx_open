@@ -8,6 +8,8 @@
 
 #include <ui/style/globals.h>
 
+#include "client_meta_types.h"
+
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)
     {
@@ -85,6 +87,8 @@ QnSettings::QnSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
+    QnClientMetaTypes::initialize();
+
     init();
 
     /* Set default values. */
