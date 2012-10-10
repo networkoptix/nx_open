@@ -352,6 +352,13 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
     if (m_disableUpdateGridParams)
         return;
 
+    if (!fromUserInput){
+        qDebug() << "grid params changed";
+    } else {
+        qDebug() << "grid params changed from user";
+    }
+
+
     QColor color;
     if (ui->recordAlwaysButton->isChecked())
         color = ui->recordAlwaysButton->color();
@@ -548,6 +555,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
 void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
+
     QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
     double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
     QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());
