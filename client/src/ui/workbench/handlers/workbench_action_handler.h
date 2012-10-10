@@ -300,9 +300,9 @@ private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
+    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
    // void updateStoredConnections(QnConnectionData connectionData);
-    bool doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
+    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
     QString getBinaryFilterName() const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
 private:

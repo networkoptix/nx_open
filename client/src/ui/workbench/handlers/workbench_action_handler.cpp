@@ -908,8 +908,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if (layout->flags() & QnResource::local) {
         if (!validateItemTypes(layout))
             return;
-        m_exportPeriod = layout->getLocalRange();
-        saveLayoutToLocalFile(layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
     }
     else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -932,8 +931,7 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         return;
 
     if(snapshotManager()->isFile(layout)) {
-        m_exportPeriod = layout->getLocalRange();
-        doAskNameAndExportLocalLayout(layout, LayoutExport_LocalSaveAs);
+        doAskNameAndExportLocalLayout(layout->getLocalRange(), layout, LayoutExport_LocalSaveAs);
     } else {
         QString name = menu()->currentParameters(sender()).argument(Qn::NameParameter).toString();
         if(name.isEmpty()) {
@@ -1914,9 +1912,9 @@ void QnWorkbenchActionHandler::at_exportLayoutAction_triggered()
     if (!layout)
         return;
 
-    m_exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
+    QnTimePeriod exportPeriod = parameters.argument<QnTimePeriod>(Qn::TimePeriodParameter);
 
-    if(m_exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
+    if(exportPeriod.durationMs * layout->getItems().size() > 1000 * 60 * 30) { // TODO: implement more precise estimation
         int button = QMessageBox::question(
             this->widget(),
             tr("Warning"),
@@ -1929,7 +1927,7 @@ Do you want to continue?"),
             return;
     }
 
-    doAskNameAndExportLocalLayout(layout, LayoutExport_Export);
+    doAskNameAndExportLocalLayout(exportPeriod, layout, LayoutExport_Export);
 }
 
 bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
@@ -1969,7 +1967,7 @@ QString QnWorkbenchActionHandler::getBinaryFilterName() const
         return tr("Executable Network Optix Media File (x64) (*.exe)");
 }
 
-bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
+bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
     if (!validateItemTypes(layout))
         return false;
@@ -2055,12 +2053,12 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     }
 
 
-    saveLayoutToLocalFile(layout, fileName, mode);
+    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode);
 
     return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
 {
     m_layoutExportMode = mode;
     m_layoutFileName = QnLayoutFileStorageResource::removeProtocolPrefix(layoutFileName); 
@@ -2146,7 +2144,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
     delete device;
 
     device = m_exportStorage->open(QLatin1String("range.bin"), QIODevice::WriteOnly);
-    device->write(m_exportPeriod.serialize());
+    device->write(exportPeriod.serialize());
     delete device;
 
     // If layout export create new guid. If layout just renamed (local save or local saveAs) keep guid
@@ -2162,7 +2160,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
         QnCachingTimePeriodLoader* loader = navigator()->loader(m_layoutExportResources[i]);
         if (loader) {
             QIODevice* device = m_exportStorage->open(QString(QLatin1String("chunk_%1.bin")).arg(QFileInfo(uniqId).baseName()) , QIODevice::WriteOnly);
-            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(m_exportPeriod);
+            QnTimePeriodList periods = loader->periods(Qn::RecordingRole).intersected(exportPeriod);
             QByteArray data;
             periods.encode(data);
             device->write(data);
@@ -2173,6 +2171,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
 	// TODO: exoprt progres dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
+    m_exportPeriod = exportPeriod;
     at_layoutCamera_exportFinished(fileName);
 }
 
@@ -2452,8 +2451,7 @@ Do you want to continue?"),
         QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
-        m_exportPeriod = period;
-        saveLayoutToLocalFile(newLayout, fileName, LayoutExport_Export);
+        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export);
     }
     else {
         QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
