@@ -415,7 +415,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
-    m_titleRightButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
