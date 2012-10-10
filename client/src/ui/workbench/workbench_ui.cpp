@@ -415,7 +415,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
-    m_titleRightButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
@@ -1457,10 +1456,10 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
     return 
-        (m_treeOpened ? TreePanel : 0) |
-        (m_titleOpened ? TitlePanel : 0) |
-        (m_sliderOpened ? SliderPanel : 0) |
-        (m_helpOpened ? HelpPanel : 0);
+        (m_treeOpened ? TreePanel : NoPanel) |
+        (m_titleOpened ? TitlePanel : NoPanel) |
+        (m_sliderOpened ? SliderPanel : NoPanel) |
+        (m_helpOpened ? HelpPanel : NoPanel);
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels) {
