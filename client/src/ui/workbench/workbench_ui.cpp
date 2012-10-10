@@ -1456,10 +1456,10 @@ void QnWorkbenchUi::setThumbnailsVisible(bool visible) {
 
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const {
     return 
-        (m_treeOpened ? TreePanel : 0) |
-        (m_titleOpened ? TitlePanel : 0) |
-        (m_sliderOpened ? SliderPanel : 0) |
-        (m_helpOpened ? HelpPanel : 0);
+        (m_treeOpened ? TreePanel : NoPanel) |
+        (m_titleOpened ? TitlePanel : NoPanel) |
+        (m_sliderOpened ? SliderPanel : NoPanel) |
+        (m_helpOpened ? HelpPanel : NoPanel);
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels) {
