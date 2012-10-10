@@ -1961,6 +1961,14 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
+QString QnWorkbenchActionHandler::getBinaryFilterName() const
+{
+    if (sizeof(char*) == 4)
+        return tr("Executable Network Optix Media File (x86) (*.exe)");
+    else
+        return tr("Executable Network Optix Media File (x64) (*.exe)");
+}
+
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
     if (!validateItemTypes(layout))
@@ -1986,17 +1994,13 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(QnLayoutResourcePtr
     QString fileName;
     QString selectedExtension;
     QString binaryFilterName;
-    if (sizeof(char*) == 4)
-        binaryFilterName = tr("Executable Network Optix Media File (x86) (*.exe)");
-    else
-        binaryFilterName = tr("Executable Network Optix Media File (x64) (*.exe)");
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov);;")+ binaryFilterName,
+            tr("Network Optix Media File (*.nov);;")+ getBinaryFilterName(),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
             );
@@ -2374,7 +2378,7 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv)");
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + getBinaryFilterName();
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
@@ -2385,13 +2389,13 @@ Do you want to continue?"),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
-        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')) + 1, 3);
+        selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
 
         if (fileName.isEmpty())
             return;
 
-        if (!fileName.toLower().endsWith(QLatin1String(".mkv")) && !fileName.toLower().endsWith(QLatin1String(".avi"))) {
-            fileName += QLatin1Char('.') + selectedExtension;
+        if (!fileName.toLower().endsWith(selectedExtension)) {
+            fileName += selectedExtension;
 
             if (QFile::exists(fileName)) {
                 QMessageBox::StandardButton button = QMessageBox::information(
@@ -2441,25 +2445,36 @@ Do you want to continue?"),
     }
     settings.setValue(QLatin1String("previousDir"), QFileInfo(fileName).absolutePath());
 
-    QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
-    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
-    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setRange(0, 100);
-    exportProgressDialog->setMinimumDuration(1000);
+    if (selectedExtension.toLower() == QLatin1String(".exe")) 
+    {
+        QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
-    QnVideoCamera *camera = widget->display()->camera();
+        QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
+        itemData.uuid = QUuid::createUuid();
+        newLayout->addItem(itemData);
+        m_exportPeriod = period;
+        saveLayoutToLocalFile(newLayout, fileName, LayoutExport_Export);
+    }
+    else {
+        QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+        exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+        exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+        exportProgressDialog->setRange(0, 100);
+        exportProgressDialog->setMinimumDuration(1000);
 
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-    connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
-    connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
-    connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+        QnVideoCamera *camera = widget->display()->camera();
 
-    camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension);
+        connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+        connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
+        connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+        connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+        connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+        connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
+        connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-    //exportProgressDialog->exec();
+        camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
+        //exportProgressDialog->exec();
+    }
 }
 
 

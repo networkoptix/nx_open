@@ -303,6 +303,7 @@ private:
     void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
    // void updateStoredConnections(QnConnectionData connectionData);
     bool doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
+    QString getBinaryFilterName() const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
 private:
 
