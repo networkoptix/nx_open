@@ -5,6 +5,7 @@
 #include <camera/thumbnail.h>
 
 #include <ui/workbench/workbench_globals.h>
+#include <ui/workbench/workbench_state.h>
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
@@ -21,6 +22,10 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<Qn::ItemRole>();
     qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QVector<QUuid> >();
+    qRegisterMetaType<QnWorkbenchState>();
+    qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
+    qRegisterMetaType<QnWorkbenchStateHash>();
+    qRegisterMetaTypeStreamOperators<QnWorkbenchStateHash>();
 
     qn_clientMetaTypes_initialized = true;
 }

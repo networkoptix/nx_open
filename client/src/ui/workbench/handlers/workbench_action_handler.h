@@ -165,6 +165,7 @@ protected:
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
+    bool closeAllLayouts(bool waitForReply = false);
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
@@ -237,6 +238,7 @@ protected slots:
     void at_reconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
