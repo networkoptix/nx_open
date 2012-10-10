@@ -46,6 +46,12 @@ public:
         return m_hasDbChanges;
     }
 
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const {
+        return m_hasControlsChanges;
+    }
+
+
     QnMediaServerConnectionPtr getServerConnection() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {

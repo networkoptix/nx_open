@@ -490,6 +490,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return; 
 
+    if (cameraSettingsDialog()->widget()->hasControlsChanges()){
+        QMessageBox::warning(widget(), tr("not saved controls"), tr("test"));
+    }
+
     /* Limit the number of active cameras. */
     int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
     foreach (const QnVirtualCameraResourcePtr &camera, cameras)

@@ -590,12 +590,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
 
 void QnSingleCameraSettingsWidget::at_pingButtonClicked(){
 #ifdef Q_OS_WIN
-    QString cmd = QLatin1String("start ping %1 -t");
+    QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
 #endif
     QString ipAddress = m_camera->getUrl();
-    QProcess::execute(cmd.arg(ipAddress));
+    QProcess::startDetached(cmd.arg(ipAddress));
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
@@ -687,7 +687,7 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
-    m_hasControlsChanges = true;
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)
