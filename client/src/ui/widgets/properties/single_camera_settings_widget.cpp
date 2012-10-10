@@ -30,6 +30,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     m_anyCameraChanges(false),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
+    m_hasControlsChanges(false),
     m_readOnly(false),
     m_motionWidget(NULL),
     m_inUpdateMaxFps(false),
@@ -51,6 +52,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
@@ -588,12 +590,12 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
 
 void QnSingleCameraSettingsWidget::at_pingButtonClicked(){
 #ifdef Q_OS_WIN
-    QString cmd = QLatin1String("start ping %1 -t");
+    QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
 #endif
     QString ipAddress = m_camera->getUrl();
-    QProcess::execute(cmd.arg(ipAddress));
+    QProcess::startDetached(cmd.arg(ipAddress));
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
@@ -678,7 +680,14 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     at_dbDataChanged();
     at_cameraDataChanged();
 
+    qDebug() << "schedule task changed";
+
     m_hasScheduleChanges = true;
+    m_hasControlsChanges = true;
+}
+
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)

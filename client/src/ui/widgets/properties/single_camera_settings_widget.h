@@ -46,6 +46,12 @@ public:
         return m_hasDbChanges;
     }
 
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const {
+        return m_hasControlsChanges;
+    }
+
+
     QnMediaServerConnectionPtr getServerConnection() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
@@ -79,6 +85,7 @@ private slots:
     void at_dbDataChanged();
     void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_gridParamsChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
@@ -117,7 +124,13 @@ private:
     bool m_hasCameraChanges;
     bool m_anyCameraChanges;
     bool m_hasDbChanges;
+
+    /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
+
+    /** Indicates that the user changed controls but not applied them to the schedule */
+    bool m_hasControlsChanges;
+
     bool m_readOnly;
 
     QnCameraMotionMaskWidget *m_motionWidget;

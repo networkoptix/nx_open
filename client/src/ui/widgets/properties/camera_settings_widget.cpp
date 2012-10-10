@@ -162,6 +162,14 @@ bool QnCameraSettingsWidget::hasAnyCameraChanges() const {
     }
 }
 
+bool QnCameraSettingsWidget::hasControlsChanges() const {
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->hasControlsChanges();
+    case MultiMode: return false; //TODO: gdm
+    default: return false;
+    }
+}
+
 const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdvancedParams() const
 {
     switch(mode()) {

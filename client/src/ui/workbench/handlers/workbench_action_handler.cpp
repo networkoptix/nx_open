@@ -490,6 +490,10 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog() {
     if (!cameraSettingsDialog()->widget()->isValidMotionRegion())
         return; 
 
+    if (cameraSettingsDialog()->widget()->hasControlsChanges()){
+        QMessageBox::warning(widget(), tr("not saved controls"), tr("test"));
+    }
+
     /* Limit the number of active cameras. */
     int activeCameras = resourcePool()->activeCameras() + cameraSettingsDialog()->widget()->activeCameraCount();
     foreach (const QnVirtualCameraResourcePtr &camera, cameras)
@@ -2127,6 +2131,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(QnLayoutResourcePtr layout,
         }
     }
 
+	// TODO: exoprt progres dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     at_layoutCamera_exportFinished(fileName);
