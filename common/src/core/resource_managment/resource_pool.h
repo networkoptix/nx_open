@@ -59,6 +59,7 @@ public:
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
     QnNetworkResourcePtr getNetResourceByPhysicalId(const QString &physicalId) const;
+    QnNetworkResourcePtr getResourceByMacAddress(const QString &mac) const;
 
     QnNetworkResourceList getAllNetResourceByPhysicalId(const QString &mac) const;
     QnNetworkResourcePtr getEnabledResourceByPhysicalId(const QString &mac) const;
