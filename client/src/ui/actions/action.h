@@ -15,6 +15,7 @@ class QGraphicsItem;
 
 class QnWorkbenchContext;
 class QnActionCondition;
+class QnActionFactory;
 class QnActionManager;
 class QnActionParameters;
 
@@ -145,6 +146,12 @@ public:
      */
     void setCondition(QnActionCondition *condition);
 
+    QnActionFactory *childFactory() const {
+        return m_childFactory.data();
+    }
+
+    void setChildFactory(QnActionFactory *childFactory);
+
     /**
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
@@ -208,6 +215,7 @@ private:
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     QWeakPointer<QnActionCondition> m_condition;
+    QWeakPointer<QnActionFactory> m_childFactory;
 
     QList<QnAction *> m_children;
     QHash<QnActionCondition *, QString> m_textConditions;

@@ -18,6 +18,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "action.h"
+#include "action_factories.h"
 #include "action_conditions.h"
 #include "action_target_provider.h"
 #include "action_parameter_types.h"
@@ -45,8 +46,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 class QnActionBuilder {
 public:
-    QnActionBuilder(QnActionManager *manager, QnAction *action): 
-        m_manager(manager), 
+    QnActionBuilder(QnAction *action): 
         m_action(action)
     {
         action->setShortcutContext(Qt::WindowShortcut);
@@ -162,7 +162,7 @@ public:
     }
 
     QnActionBuilder conditionalText(const QString &text, const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All){
-        m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_manager), text);
+        m_action->addConditionalText(new QnResourceActionCondition(criterion, matchMode, m_action), text);
         return *this;
     }
 
@@ -191,7 +191,11 @@ public:
     void condition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All) {
         assert(m_action->condition() == NULL);
 
-        m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_manager));
+        m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
+    }
+
+    void childFactory(QnActionFactory *childFactory) {
+        m_action->setChildFactory(childFactory);
     }
 
     void rotationSpeed(qreal rotationSpeed) {
@@ -199,17 +203,16 @@ public:
     }
 
 private:
-    QnActionManager *m_manager;
     QnAction *m_action;
 };
 
 
 // -------------------------------------------------------------------------- //
-// QnActionFactory 
+// QnMenuFactory 
 // -------------------------------------------------------------------------- //
-class QnActionFactory {
+class QnMenuFactory {
 public:
-    QnActionFactory(QnActionManager *menu, QnAction *parent): 
+    QnMenuFactory(QnActionManager *menu, QnAction *parent): 
         m_manager(menu),
         m_lastFreeActionId(Qn::ActionCount),
         m_currentGroup(0)
@@ -246,7 +249,7 @@ public:
         if (m_currentGroup)
             m_currentGroup->addAction(action);
 
-        return QnActionBuilder(m_manager, action);
+        return QnActionBuilder(action);
     }
 
     QnActionBuilder operator()() {
@@ -298,7 +301,7 @@ QnActionManager::QnActionManager(QObject *parent):
     m_actionById[Qn::NoAction] = m_root;
     m_idByAction[m_root] = Qn::NoAction;
 
-    QnActionFactory factory(this, m_root);
+    QnMenuFactory factory(this, m_root);
 
     using namespace QnResourceCriterionExpressions;
 
@@ -438,6 +441,11 @@ QnActionManager::QnActionManager(QObject *parent):
             text(tr("User...")).
             pulledText(tr("New User..."));
     } factory.endSubMenu();
+
+    factory(Qn::OpenCurrentUserLayoutMenu).
+        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::RequiresChildren).
+        text(tr("Open Layout...")).
+        childFactory(new QnOpenCurrentUserLayoutActionFactory(this));
 
     factory().
         flags(Qn::Main | Qn::Scene).
@@ -1182,7 +1190,17 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
             if(menu)
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
+        } else if(action->childFactory()) {
+            QList<QAction *> children = action->childFactory()->newActions(result);
+            if(!children.isEmpty()) {
+                menu = new QMenu();
+                foreach(QAction *action, children)
+                    menu->addAction(action);
+            }
         }
+
+        if((action->flags() & Qn::RequiresChildren) && !menu)
+            continue;
 
         QAction *newAction = NULL;
         if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
