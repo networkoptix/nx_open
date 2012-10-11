@@ -438,7 +438,7 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 
-    switch (media->compressionType)
+    switch (dstCodec)
     {
         //case CODEC_ID_H264:
         //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
