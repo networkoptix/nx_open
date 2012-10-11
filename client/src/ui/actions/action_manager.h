@@ -16,7 +16,7 @@ class QAction;
 class QMenu;
 class QGraphicsItem;
 
-class QnActionFactory;
+class QnMenuFactory;
 class QnActionBuilder;
 class QnWorkbenchContext;
 

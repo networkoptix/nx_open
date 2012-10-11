@@ -17,6 +17,7 @@
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
+#include "action_factories.h"
 #include "action_parameter_types.h"
 
 QnAction::QnAction(Qn::ActionId id, QObject *parent): 
@@ -86,6 +87,10 @@ void QnAction::setPulledText(const QString &pulledText) {
 
 void QnAction::setCondition(QnActionCondition *condition) {
     m_condition = condition;
+}
+
+void QnAction::setChildFactory(QnActionFactory *childFactory) {
+    m_childFactory = childFactory;
 }
 
 void QnAction::addChild(QnAction *action) {
