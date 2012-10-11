@@ -664,7 +664,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                 *lenPtr = htons(m_sendBuffer.size() - 4);
                 m_owner->sendBuffer(m_sendBuffer);
             }
-            else  {
+            else  if (trackInfo->mediaSocket) {
                 Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
                 trackInfo->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
             }
