@@ -41,7 +41,8 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
     QByteArray errStr;
     QByteArray errStrPhysicalId;
     bool urlFound = false;
-    bool useBinary = false;
+    
+	ChunkFormat format = ChunkFormat_Unknown;
     QList<QRegion> motionRegions;
     QString callback;
 
@@ -70,8 +71,17 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
         }
         else if (params[i].first == "detail")
             detailLevel = params[i].second.toLongLong();
-        else if (params[i].first == "format")
-            useBinary = params[i].second == "bin";
+		else if (params[i].first == "format") 
+		{
+            if (params[i].second == "bin")
+				format = ChunkFormat_Binary;
+			else if (params[i].second == "xml")
+				format = ChunkFormat_XML;
+			else if (params[i].second == "txt")
+				format = ChunkFormat_Text;
+			else
+				format = ChunkFormat_Jason;
+		}
         else if (params[i].first == "callback")
             callback = params[i].second;
     }
@@ -100,35 +110,49 @@ int QnRecordedChunksHandler::executeGet(const QString& path, const QnRequestPara
         periods = qnStorageMan->getRecordedPeriods(resList, startTime, endTime, detailLevel);
     else
         periods = QnMotionHelper::instance()->mathImage(motionRegions, resList, startTime, endTime, detailLevel);
-    if (useBinary) {
-        result.append("BIN");
-        periods.encode(result);
-    }
-    else {
-#if 0 // Roma asked to not remove this wonderful piece of code
-        result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
-        foreach(QnTimePeriod period, periods)
-            result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
-        result.append("</recordedTimePeriods>\n");
-#else
-        contentType = "application/json";
+    
+	switch(format) 
+	{
+		case ChunkFormat_Binary:
+			result.append("BIN");
+			periods.encode(result);
+			break;
+		case ChunkFormat_XML:
+			result.append("<recordedTimePeriods xmlns=\"http://www.networkoptix.com/xsd/api/recordedTimePeriods\">\n");
+			foreach(QnTimePeriod period, periods)
+				result.append(QString("<timePeriod startTime=\"%1\" duration=\"%2\" />\n").arg(period.startTimeMs).arg(period.durationMs));
+			result.append("</recordedTimePeriods>\n");
+			break;
+		case ChunkFormat_Text:
+			result.append("<root>\n");
+			foreach(QnTimePeriod period, periods) {
+				result.append("<chunk>");
+				result.append(QDateTime::fromMSecsSinceEpoch(period.startTimeMs).toString(QLatin1String("dd-MM-yyyy hh:mm:ss.zzz")));
+				result.append("    ");
+				result.append(QString::number(period.durationMs));
+				result.append("</chunk>\n");
+			}
+			result.append("</root>\n");
+			break;
+		case ChunkFormat_Jason:
+		default:
+			contentType = "application/json";
 
-        result.append(callback);
-        result.append("([");
-        int nSize = periods.size();
-        for (int n = 0; n < nSize; ++n)
-        {
-            if (n)
-                result.append(", ");
+			result.append(callback);
+			result.append("([");
+			int nSize = periods.size();
+			for (int n = 0; n < nSize; ++n)
+			{
+				if (n)
+					result.append(", ");
 
-            const QnTimePeriod& period = periods[n];
-            result.append("[")
-                .append(QByteArray::number(period.startTimeMs)).append(", ").append(QByteArray::number(period.durationMs))
-                .append("]");
-        }
-            
-        result.append("]);");
-#endif
+				const QnTimePeriod& period = periods[n];
+				result.append("[")
+					.append(QByteArray::number(period.startTimeMs)).append(", ").append(QByteArray::number(period.durationMs))
+					.append("]");
+			}
+	            
+			result.append("]);");
     }
 
     return CODE_OK;

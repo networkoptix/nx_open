@@ -7,6 +7,8 @@
 
 class QnRecordedChunksHandler: public QnRestRequestHandler
 {
+	enum ChunkFormat {ChunkFormat_Unknown, ChunkFormat_Binary, ChunkFormat_XML, ChunkFormat_Jason, ChunkFormat_Text};
+
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType);
     virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType);
     virtual QString description(TCPSocket* tcpSocket) const;
