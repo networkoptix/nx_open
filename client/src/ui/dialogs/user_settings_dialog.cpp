@@ -156,7 +156,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
         return;
 
     m_user = user;
-    if (m_editorRights){
+    if (m_editorRights) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
@@ -335,9 +335,19 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
+void QnUserSettingsDialog::updateCheckBoxEnabled() {
+    bool canViewArchive = m_advancedRights[Qn::GlobalViewArchivePermission] ? m_advancedRights[Qn::GlobalViewArchivePermission]->isChecked() : false;
+    if(QCheckBox *exportArchiveCheckBox = m_advancedRights[Qn::GlobalExportArchivePermission]) {
+        exportArchiveCheckBox->setEnabled(canViewArchive);
+        if(!canViewArchive)
+            exportArchiveCheckBox->setChecked(false);
+    }
+}
+
 void QnUserSettingsDialog::at_accessRights_changed() {
     setHasChanges(true);
     selectAccessRightsPreset(readAccessRightsAdvanced());
+    updateCheckBoxEnabled();
 }
 
 
@@ -379,6 +389,8 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportArchivePermission, previous);
+
+    updateCheckBoxEnabled();
 }
 
 QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {
@@ -396,7 +408,7 @@ QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64
 
 void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
     bool custom = true;
-    for (int i = 0; i < ui->accessRightsComboBox->count(); i++){
+    for (int i = 0; i < ui->accessRightsComboBox->count(); i++) {
         if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights) {
             ui->accessRightsComboBox->setCurrentIndex(i);
             custom = false;
@@ -404,7 +416,7 @@ void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
         }
     }
 
-    if (custom){
+    if (custom) {
         ui->advancedButton->setChecked(true);
         ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
     }
@@ -416,17 +428,15 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
         i.next();
         i.value()->setChecked(i.key() & rights);
     }
+    updateCheckBoxEnabled(); // TODO: rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
-    quint64 rights = Qn::GlobalViewLivePermission;
-    QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
-    while (i.hasNext()) {
-        i.next();
-        if (i.value()->isChecked())
-            rights |= i.key();
-    }
-    return rights;
+    quint64 result = Qn::GlobalViewLivePermission;
+    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+        if(pos.value()->isChecked())
+            result |= pos.key();
+    return result;
 }
 
 void QnUserSettingsDialog::at_advancedButton_toggled() {
