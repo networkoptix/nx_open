@@ -155,7 +155,8 @@ mfxStatus BaseMFXFrameAllocator::_free( mfxFrameAllocResponse* response )
     --responseIter->refCount;
     if( responseIter->refCount == 0 )
     {
-        releaseFrameSurfaces( responseIter->response );
+        releaseFrameSurfaces( &responseIter->response );
+        *response = responseIter->response;
         m_responses.erase( responseIter );
     }
 
@@ -181,7 +182,7 @@ void BaseMFXFrameAllocator::releaseRemainingFrames()
          )
     {
         it->refCount = 1;   //ignoring refcount, since MUST release all resources
-        releaseFrameSurfaces( it->response );
+        releaseFrameSurfaces( &it->response );
         m_responses.erase( it++ );
     }
 }
@@ -204,15 +205,16 @@ bool BaseMFXFrameAllocator::getCachedResponse( mfxFrameAllocRequest* const reque
     return false;
 }
 
-void BaseMFXFrameAllocator::releaseFrameSurfaces( const mfxFrameAllocResponse& response )
+void BaseMFXFrameAllocator::releaseFrameSurfaces( mfxFrameAllocResponse* const response )
 {
-    for( int i = 0; i < response.NumFrameActual; ++i )
+    for( int i = 0; i < response->NumFrameActual; ++i )
     {
-        BaseFrameContext* ctx = ((BaseFrameContext**)response.mids)[i];
+        BaseFrameContext* ctx = ((BaseFrameContext**)response->mids)[i];
         deinitializeFrame( ctx );
         delete ctx;
     }
-    delete[] (BaseFrameContext**)response.mids;
+    delete[] (BaseFrameContext**)response->mids;
+    response->NumFrameActual = 0;
 }
 
 
@@ -239,24 +241,35 @@ mfxStatus MFXSysMemFrameAllocator::alloc( mfxFrameAllocRequest* request, mfxFram
         return MFX_ERR_UNSUPPORTED;
     if( (request->Info.FourCC != MFX_FOURCC_NV12) && (request->Info.FourCC != MFX_FOURCC_YV12) )
         return MFX_ERR_UNSUPPORTED;
-    response->NumFrameActual = request->NumFrameMin;
-    //response->mids = (mfxMemId*)malloc( response->NumFrameActual * sizeof(SysMemoryFrameContext*) );
-    response->mids = (mfxMemId*)(new SysMemoryFrameContext*[response->NumFrameActual]);
-    for( int i=0; i<request->NumFrameMin; ++i )
+    //response->mids = (mfxMemId*)malloc( request->NumFrameSuggested * sizeof(SysMemoryFrameContext*) );
+    response->mids = (mfxMemId*)(new SysMemoryFrameContext*[request->NumFrameSuggested]);
+    response->NumFrameActual = 0;
+    try
     {
-        SysMemoryFrameContext* mmid = new SysMemoryFrameContext();
-        mmid->width = ALIGN16( request->Info.Width );
-        mmid->height = ALIGN32( request->Info.Height );
-        mmid->chromaFormat = request->Info.ChromaFormat;
-        mmid->fourCC = request->Info.FourCC;
-        if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV420 )
-            mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*3/2);
-        else if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV422 )
-            mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*2);
-        response->mids[i] = mmid;
-    }
+        for( int i=0; i<request->NumFrameSuggested; ++i )
+        {
+            SysMemoryFrameContext* mmid = new SysMemoryFrameContext();
+            mmid->width = ALIGN16( request->Info.Width );
+            mmid->height = ALIGN32( request->Info.Height );
+            mmid->chromaFormat = request->Info.ChromaFormat;
+            mmid->fourCC = request->Info.FourCC;
+            if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV420 )
+                mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*3/2);
+            else if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV422 )
+                mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*2);
+            response->mids[i] = mmid;
+            ++response->NumFrameActual;
+        }
 
-    allocationResponseSuccessfullyProcessed( *request, *response );
+        allocationResponseSuccessfullyProcessed( *request, *response );
+    }
+    catch( ... )
+    {
+        //cleaning up...
+        for( int i=0; i<response->NumFrameActual; ++i )
+            delete reinterpret_cast<SysMemoryFrameContext*>(response->mids[i]);
+        delete[] reinterpret_cast<SysMemoryFrameContext**>(response->mids);
+    }
 
     return MFX_ERR_NONE;
 }
@@ -349,7 +362,7 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     {
         if( response->NumFrameActual < request->NumFrameMin )
         {
-            releaseFrameSurfaces( *response );
+            releaseFrameSurfaces( response );
             return MFX_ERR_MEMORY_ALLOC;
         }
         return MFX_ERR_NONE;

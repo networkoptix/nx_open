@@ -139,7 +139,7 @@ protected:
 
     //!Deinitializes frame, must not release memory \a frameCtx!
     virtual void deinitializeFrame( BaseFrameContext* const frameCtx ) = 0;
-    void releaseFrameSurfaces( const mfxFrameAllocResponse& response );
+    void releaseFrameSurfaces( mfxFrameAllocResponse* const response );
 
 private:
     struct AllocResponseCtx
