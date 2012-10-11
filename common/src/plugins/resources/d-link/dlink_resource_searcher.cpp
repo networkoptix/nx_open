@@ -9,6 +9,7 @@ QByteArray barequest(reinterpret_cast<char *>(request), sizeof(request));
 
 char DCS[] = {'D', 'C', 'S', '-'};
 
+extern QString getValueFromString(const QString& line);
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -163,8 +164,58 @@ QString QnPlDlinkResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    return QnResourcePtr(0);
+    QString host = url.host();
+    int port = url.port();
+
+    int timeout = 2000;
+
+
+    if (port < 0)
+        port = 80;
+
+    CLHttpStatus status;
+    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), QHostAddress(host), port, timeout, auth)));
+
+    if (response.length()==0)
+        return QnResourcePtr(0);
+
+    QStringList lines = response.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
+
+
+    QString name;
+    QString mac;
+
+    foreach(QString line, lines)
+    {
+        if (line.contains(QLatin1String("name=")))
+        {
+            name = getValueFromString(line);
+        }
+        else if (line.contains(QLatin1String("macaddr=")))
+        {
+            mac = getValueFromString(line);
+            mac.replace(QLatin1Char(':'),QLatin1Char('-'));
+        }
+
+    }
+
+    if (mac.isEmpty() || name.isEmpty())
+        return QnResourcePtr(0);
+
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return QnResourcePtr(0);;
+
+    QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
+
+    resource->setTypeId(rt);
+    resource->setName(name);
+    resource->setMAC(mac);
+    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+
+    //resource->setDiscoveryAddr(iface.address);
+
+    return resource;
 }
 
