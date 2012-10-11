@@ -21,7 +21,7 @@ qint64 QnPlaybackMaskHelper::findTimeAtPlaybackMask(qint64 timeUsec, bool isForw
             return m_curPlaybackPeriod.startTimeMs*1000;
         else {
             if (m_curPlaybackPeriod.startTimeMs*1000 > timeUsec)
-                return 0; // BOF reached
+                return -1; // BOF reached
             else
                 return (m_curPlaybackPeriod.startTimeMs + m_curPlaybackPeriod.durationMs)*1000 - BACKWARD_SEEK_STEP;
         }
