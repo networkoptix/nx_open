@@ -27,7 +27,6 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
     m_outputWidth(0),
     m_outputHeight(0),
     m_enableFrameQueue(false),
-    m_enableMTDecoding(false),
     m_queueUsed(false),
     m_needReinitDecoders(false),
     m_reverseMode(false),
@@ -303,25 +302,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     // use only 1 frame for non selected video
     const bool reverseMode = m_reverseMode;
 
-    if( m_needReinitDecoders )
-    {
-        QMutexLocker lock( &m_mtx );
-        bool frameQueueIsAppropriateForDecoders = false;
-        foreach( QnAbstractVideoDecoder* decoder, m_decoder )
-        {
-            //reverse mode not connected to MT decoding, but this condition was here for ages...
-            decoder->setMTDecoding(reverseMode || m_enableMTDecoding);
-            if( !reverseMode && m_enableFrameQueue )
-            {
-                //checking, whether frame queue is appropriate for this decoder
-                frameQueueIsAppropriateForDecoders |= !(decoder->getDecoderCaps() & QnAbstractVideoDecoder::tracksDecodedPictureBuffer);
-            }
-        }
-        m_needReinitDecoders = false;
-        m_enableFrameQueue &= frameQueueIsAppropriateForDecoders;
-    }
     const bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
-
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
@@ -330,7 +311,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_queueWasFilled = false;
         }
     }
-    else
+    else 
     {
         if (m_bufferedFrameDisplayer) 
         {
@@ -344,9 +325,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (!enableFrameQueue && m_queueUsed)
     {
-        cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_drawer->waitForFrameDisplayed(data->channelNumber);
-        cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(0). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_frameQueueIndex = 0;
         for (int i = 1; i < MAX_FRAME_QUEUE_SIZE; ++i)
         {
@@ -354,6 +335,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 m_frameQueue[i]->clean();
         }
         m_queueUsed = false;
+    }
+    
+    if (m_needReinitDecoders) {
+        QMutexLocker lock(&m_mtx);
+        foreach(QnAbstractVideoDecoder* decoder, m_decoder)
+            decoder->setMTDecoding(enableFrameQueue);
+        m_needReinitDecoders = false;
     }
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
@@ -373,12 +361,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL );
+        if (dec == 0) {
+            cl_log.log(QString::fromAscii("Can't find create decoder for compression type %1").arg(data->compressionType), cl_logDEBUG2);
+            return Status_Displayed;
+        }
+
         dec->setLightCpuMode(m_decodeMode);
         m_decoder.insert(data->compressionType, dec);
-    }
-    if (dec == 0) {
-        CL_LOG(cl_logDEBUG2) cl_log.log(QLatin1String("Can't find video decoder"), cl_logDEBUG2);
-        return Status_Displayed;
     }
 
     if (reverseMode != m_prevReverseMode || m_needResetDecoder) 
@@ -393,6 +382,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0)
+        //scaleFactor = determineScaleFactor(data->channelNumber, dec->getOriginalPictureSize().width(), dec->getOriginalPictureSize().height(), force_factor);
         scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
 
@@ -406,35 +396,17 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     //if true, decoding to tmp frame which will be later scaled/converted to supported format
     const bool useTmpFrame =
-        (dec->targetMemoryType() == QnAbstractPictureData::pstSysMemPic) &&
+        (dec->targetMemoryType() == QnAbstractPictureDataRef::pstSysMemPic) &&
     	(!QnGLRenderer::isPixelFormatSupported(pixFmt) ||
          !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
          scaleFactor != QnFrameScaler::factor_1);
 
-    QSharedPointer<CLVideoDecoderOutput> outFrame;
-    for( int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i )
-    {
-        if( m_frameQueue[m_frameQueueIndex]->isDisplaying() )
-        {
-            m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE;
-            continue;
-        }
-        outFrame = m_frameQueue[m_frameQueueIndex];
-        break;
-    }
-    if( !outFrame )
-    {
-        outFrame = m_frameQueue[m_frameQueueIndex];
-        if (outFrame->isDisplaying())
-        {
-            cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(1). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
-            m_drawer->waitForFrameDisplayed(data->channelNumber);
-            cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(1). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
-        }
-    }
-
+    QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = data->channelNumber;
 
+    if (outFrame->isDisplaying()) 
+        m_drawer->waitForFrameDisplayed(data->channelNumber);
+    
     if (!useTmpFrame)
         outFrame->setUseExternalData(!enableFrameQueue);
 
@@ -442,9 +414,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (data->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
     {
-        cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         m_drawer->waitForFrameDisplayed(0);
-        cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+        //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(2). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         dec->resetDecoder(data);
     }
 
@@ -476,9 +448,9 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         reorderPrevFrames();
         if (!m_queueUsed)
         {
-            cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+            //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). enter. timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
             m_drawer->waitForFrameDisplayed(0); // codec frame may be displayed now
-            cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
+            //cl_log.log( QString::fromAscii("m_drawer->waitForFrameDisplayed(3). exit.  timer %1").arg(getUsecTimer()/1000), cl_logDEBUG1 );
         }
         dec->resetDecoder(data);
     }
@@ -605,18 +577,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, cons
             m_queueUsed = true;
         }
         else {
-            //const quint64 t1 = getUsecTimer()/1000;
-            //cl_log.log( QString::fromAscii("draw started. timer %1").arg(t1), cl_logDEBUG1 );
-            m_drawer->draw( outFrame );
-            //const quint64 t2 = getUsecTimer()/1000;
-            //cl_log.log( QString::fromAscii("draw finish.  timer %1, took %2").arg(t2).arg(t2 - t1), cl_logDEBUG1 );
-            //if( !reverseMode && !(dec->getDecoderCaps() & QnAbstractVideoDecoder::tracksDecodedPictureBuffer) )
-            {
-                //cl_log.log( QString::fromAscii("waitForFrameDisplayed started. timer %1, lr-timer %2").arg(t2).arg(GetTickCount()), cl_logDEBUG1 );
-                m_drawer->waitForFrameDisplayed(outFrame->channel);
-                //const quint64 t3 = getUsecTimer()/1000;
-                //cl_log.log( QString::fromAscii("waitForFrameDisplayed finish.  timer %1, took %2, lr-timer %3").arg(t3).arg(t3 - t2).arg(GetTickCount()), cl_logDEBUG1 );
-            }
+            m_drawer->draw(outFrame);
+            m_drawer->waitForFrameDisplayed(outFrame->channel);
         }
 
         if (m_prevFrameToDelete)
@@ -690,7 +652,6 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::findScaleFactor(int width, 
 void QnVideoStreamDisplay::setMTDecoding(bool value)
 {
     m_enableFrameQueue = value;
-    m_enableMTDecoding = value;
     m_needReinitDecoders = true;
 }
 
