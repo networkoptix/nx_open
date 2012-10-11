@@ -618,13 +618,6 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isNoData()) {
         return NoDataOverlay;
-    } if(m_display->isPaused()) {
-        Qn::RenderStatus status = channelRenderStatus(channel);
-        if(status == Qn::NothingRendered || status == Qn::CannotRender) {
-            return NoDataOverlay;
-        } else {
-            return EmptyOverlay;
-        }
     } else {
         return base_type::calculateChannelOverlay(channel, QnResource::Online);
     }

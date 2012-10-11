@@ -60,10 +60,18 @@ public:
     }
 
     /**
-     * \returns                         Global permissions of the current user. 
+     * \returns                         Global permissions of the current user,
+     *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
      */
     Qn::Permissions globalPermissions() const;
+
+    /**
+     * \param user                      User to get global permissions for.
+     * \returns                         Global permissions of the given user,
+     *                                  adjusted to take deprecation and superuser status into account.
+     */
+    Qn::Permissions globalPermissions(const QnUserResourcePtr &user);
 
     /**
      * \param requiredPermissions       Global permissions to check.
@@ -78,9 +86,6 @@ public:
      *                                  the given resource.
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
-
-    // TODO: #Elric rename and add sane comment
-    Qn::Permissions calculateGlobalPermissions(const QnUserResourcePtr &user);
 
 signals:
     /**
