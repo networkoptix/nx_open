@@ -7,22 +7,35 @@
 #include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 
+#include "decodedpicturetoopengluploader.h"
+
+
 class QThread;
 class QGLContext;
 
 class QnGLRenderer;
 
 
-class QnResourceWidgetRenderer: public QObject, public QnAbstractRenderer {
+class QnResourceWidgetRenderer
+:
+    public QObject,
+    public QnAbstractRenderer
+{
     Q_OBJECT;
+
 public:
-    QnResourceWidgetRenderer(int channelCount, QObject *parent = NULL, const QGLContext *context = NULL);
+    /*!
+        \param context MUST not be NULL
+    */
+    QnResourceWidgetRenderer( int channelCount, QObject* parent, const QGLContext* context );
 
     virtual ~QnResourceWidgetRenderer();
 
     void update();
-
-    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image) override;
+    /*!
+        \note This method is not thread-safe and must be called from decoder thread only
+    */
+    virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image ) override;
 
     virtual void waitForFrameDisplayed(int channel) override;
 
@@ -55,8 +68,21 @@ signals:
     void sourceSizeChanged(const QSize &newSourceSize);
 
 private:
+    struct RenderingTools
+    {
+        QnGLRenderer* renderer;
+        DecodedPictureToOpenGLUploader* uploader;
+
+        RenderingTools()
+        :
+            renderer( NULL ),
+            uploader( NULL )
+        {
+        }
+    };
+
     /** Renderers that are used to render the channels. */
-    QList<QnGLRenderer *> m_channelRenderers;
+    std::vector<RenderingTools> m_channelRenderers;
 
     /** Current source size, in square pixels. */
     QSize m_sourceSize;

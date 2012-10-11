@@ -14,13 +14,10 @@
 #include <utils/yuvconvert.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
-#include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/shaders/yuy2_to_rgb_shader_program.h>
-#include <ui/graphics/shaders/yv12_to_rgb_shader_program.h>
-#include <ui/graphics/shaders/nv12_to_rgb_shader_program.h>
 
 #include "video_camera.h"
+#include "../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
 
 #ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
 #   include <utils/common/performance.h>
@@ -55,388 +52,65 @@ namespace {
 
 
 // -------------------------------------------------------------------------- //
-// QnGLRendererPrivate
-// -------------------------------------------------------------------------- //
-class QnGLRendererPrivate: public QnGlFunctions
-{
-    Q_DECLARE_TR_FUNCTIONS(QnGLRendererPrivate);
-
-public:
-    static int getMaxTextureSize() { return maxTextureSize; }
-
-    QnGLRendererPrivate(const QGLContext *context):
-        QnGlFunctions(context),
-        status(QnGLRenderer::SUPPORTED),
-        supportsNonPower2Textures(false)
-    {
-        QByteArray extensions = reinterpret_cast<const char *>(glGetString(GL_EXTENSIONS));
-        QByteArray version = reinterpret_cast<const char *>(glGetString(GL_VERSION));
-        QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
-        QByteArray vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
-
-        if(!(features() & QnGlFunctions::ArbPrograms))
-            status = QnGLRenderer::NOT_SUPPORTED; /* In this first revision we do not support software color transform. */
-
-        /* Maximal texture size. */
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-        cl_log.log(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
-
-        /* Clamp constant. */
-        clampConstant = GL_CLAMP;
-        if (extensions.contains("GL_EXT_texture_edge_clamp") || extensions.contains("GL_SGIS_texture_edge_clamp") || version >= QByteArray("1.2.0"))
-            clampConstant = GL_CLAMP_TO_EDGE;
-
-        /* Check for non-power of 2 textures. */
-        supportsNonPower2Textures = extensions.contains("GL_ARB_texture_non_power_of_two");
-
-        /* Prepare shaders. */
-        m_yuy2ToRgbShaderProgram.reset(new QnYuy2ToRgbShaderProgram(context));
-        m_yv12ToRgbShaderProgram.reset(new QnYv12ToRgbShaderProgram(context));
-    }
-
-    uchar *filler(uchar value, int size) {
-        QMutexLocker locker(&fillerMutex);
-
-        QVector<uchar> &filler = fillers[value];
-
-        if(filler.size() < size) {
-            filler.resize(size);
-            filler.fill(value);
-        }
-
-        return &filler[0];
-    }
-
-public:
-    QnGLRenderer::HardwareStatus status;
-
-    GLint clampConstant;
-    bool supportsNonPower2Textures;
-    static int maxTextureSize;
-
-    QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
-    QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
-
-private:
-    QMutex fillerMutex;
-    QVector<uchar> fillers[256];
-};
-
-int QnGLRendererPrivate::maxTextureSize = 0;
-
-typedef QnGlContextData<QnGLRendererPrivate, QnGlContextDataForwardingFactory<QnGLRendererPrivate> > QnGLRendererPrivateStorage;
-Q_GLOBAL_STATIC(QnGLRendererPrivateStorage, qn_glRendererPrivateStorage);
-
-
-// -------------------------------------------------------------------------- //
-// QnGlRendererTexture
-// -------------------------------------------------------------------------- //
-class QnGlRendererTexture {
-public:
-    QnGlRendererTexture(): 
-        m_allocated(false),
-        m_internalFormat(-1),
-        m_textureSize(QSize(0, 0)),
-        m_contentSize(QSize(0, 0)),
-        m_id(-1),
-        m_fillValue(-1),
-        m_renderer(NULL)
-    {}
-
-    ~QnGlRendererTexture() {
-        //glDeleteTextures(3, m_textures);
-
-        // TODO
-        // I do not know why but if I glDeleteTextures here some items on the other view might become green( especially if we animate them a lot )
-        // not sure I i do something wrong with opengl or it's bug of QT. for now can not spend much time on it. but it needs to be fixed.
-        if(m_allocated)
-            QnGLRenderer::m_garbage.append(m_id); /* To delete later. */
-    }
-
-    void setRenderer(QnGLRenderer *renderer) {
-        m_renderer = renderer;
-    }
-
-    const QVector2D &texCoords() const {
-        return m_texCoords;
-    }
-
-    const QSize &textureSize() const {
-        return m_textureSize;
-    }
-
-    const QSize &contentSize() const {
-        return m_contentSize;
-    }
-
-    GLuint id() const {
-        return m_id;
-    }
-
-    void ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
-        assert(m_renderer != NULL);
-
-        ensureAllocated();
-
-        QSize contentSize = QSize(width, height);
-
-        if(m_internalFormat == internalFormat && m_fillValue == fillValue && m_contentSize == contentSize)
-            return;
-
-        m_contentSize = contentSize;
-
-        QSharedPointer<QnGLRendererPrivate> d = m_renderer->d;
-
-        QSize textureSize = QSize(
-            d->supportsNonPower2Textures ? qPower2Ceil((unsigned)stride / pixelSize, ROUND_COEFF) : minPow2(stride / pixelSize),
-            d->supportsNonPower2Textures ? height                                   : minPow2(height)
-        );
-
-        if(m_textureSize.width() < textureSize.width() || m_textureSize.height() < textureSize.height() || m_internalFormat != internalFormat) {
-            m_textureSize = textureSize;
-            m_internalFormat = internalFormat;
-
-            glBindTexture(GL_TEXTURE_2D, m_id);
-            glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, textureSize.width(), textureSize.height(), 0, internalFormat, GL_UNSIGNED_BYTE, 0);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, d->clampConstant);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, d->clampConstant);
-        } else {
-            textureSize = m_textureSize;
-        }
-
-        int roundedWidth = qPower2Ceil((unsigned) width, ROUND_COEFF);
-        m_texCoords = QVector2D(
-            static_cast<float>(roundedWidth) / textureSize.width(),
-            static_cast<float>(height) / textureSize.height()
-        );
-
-        if(fillValue != -1) {
-            m_fillValue = fillValue;
-
-            /* To prevent uninitialized pixels on the borders of the image from
-             * leaking into the rendered quad due to linear filtering, 
-             * we fill them with black. 
-             * 
-             * Note that this also must be done when contents size changes because
-             * in this case even though the border pixels are initialized, they are
-             * initialized with old contents, which is probably not what we want. */
-            int fillSize = qMax(textureSize.height(), textureSize.width()) * ROUND_COEFF * internalFormatPixelSize;
-            uchar *filler = d->filler(fillValue, fillSize);
-
-            if (roundedWidth < textureSize.width()) {
-                glBindTexture(GL_TEXTURE_2D, m_id);
-                glTexSubImage2D(
-                    GL_TEXTURE_2D, 
-                    0,
-                    roundedWidth,
-                    0,
-                    qMin(ROUND_COEFF, textureSize.width() - roundedWidth),
-                    textureSize.height(),
-                    internalFormat, 
-                    GL_UNSIGNED_BYTE, 
-                    filler
-                );
-                glCheckError("glTexSubImage2D");
-            }
-
-            if (height < textureSize.height()) {
-                glBindTexture(GL_TEXTURE_2D, m_id);
-                glTexSubImage2D(
-                    GL_TEXTURE_2D, 
-                    0,
-                    0, 
-                    height,
-                    textureSize.width(),
-                    qMin(ROUND_COEFF, textureSize.height() - height),
-                    internalFormat, 
-                    GL_UNSIGNED_BYTE, 
-                    filler
-                );
-                glCheckError("glTexSubImage2D");
-            }
-        }
-    }
-
-    void ensureAllocated() {
-        if(m_allocated)
-            return;
-
-        glGenTextures(1, &m_id);
-        glCheckError("glGenTextures");
-
-        m_allocated = true;
-    }
-
-private:
-    bool m_allocated;
-    int m_internalFormat;
-    QSize m_textureSize;
-    QSize m_contentSize;
-    QVector2D m_texCoords;
-    GLubyte m_fillColor;
-    GLuint m_id;
-    int m_fillValue;
-    QnGLRenderer *m_renderer;
-};
-
-
-// -------------------------------------------------------------------------- //
 // QnGLRenderer
 // -------------------------------------------------------------------------- //
-QList<GLuint> QnGLRenderer::m_garbage;
+static int maxTextureSizeVal = 0;
 
 int QnGLRenderer::maxTextureSize() 
 {
-    return QnGLRendererPrivate::getMaxTextureSize();
+    return maxTextureSizeVal;
 }
 
-void QnGLRenderer::clearGarbage()
+bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
 {
-    foreach (GLuint textureId, m_garbage)
-        glDeleteTextures(1, &textureId);
-    m_garbage.clear();
-}
-
-bool QnGLRenderer::isPixelFormatSupported(PixelFormat pixfmt)
-{
-    switch (pixfmt)
+    switch( pixfmt )
     {
-    case PIX_FMT_YUV422P:
-    case PIX_FMT_YUV420P:
-    case PIX_FMT_YUV444P:
-    case PIX_FMT_RGBA:
-    case PIX_FMT_BGRA:
-    case PIX_FMT_RGB24:
-    case PIX_FMT_BGR24:
-        return true;
-    default:
-        break;
-    };
-    return false;
+        case PIX_FMT_YUV422P:
+        case PIX_FMT_YUV420P:
+        case PIX_FMT_YUV444P:
+        case PIX_FMT_RGBA:
+        case PIX_FMT_BGRA:
+        case PIX_FMT_RGB24:
+        case PIX_FMT_BGR24:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
-QnGLRenderer::QnGLRenderer(const QGLContext *context)
-{
+QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider )
+:
+    QnGlFunctions( context ),
     /* Postpone private initialization until it is actually needed.
      * This way if context is NULL, then we will pick the right context when
      * paint event is delivered. */
-    m_context = context;
-    m_glInitialized = false;
+    m_context( context ),
+    m_decodedPictureProvider( decodedPictureProvider ),
+    m_brightness( 0 ),
+    m_contrast( 0 ),
+    m_hue( 0 ),
+    m_saturation( 0 ),
+    m_lastDisplayedFlags( 0 ),
+    m_prevFrameSequence( 0 )
+{
+    Q_ASSERT( context );
 
-    m_forceSoftYUV = false;
-    m_textureUploaded = false;
-    m_brightness = 0;
-    m_contrast = 0;
-    m_hue = 0;
-    m_saturation = 0;
-    m_painterOpacity = 1.0;
-    m_needwait = true;
-    m_videoWidth = 0;
-    m_videoHeight = 0;
-    m_newtexture = false;
+    applyMixerSettings( m_brightness, m_contrast, m_hue, m_saturation );
+    /* Prepare shaders. */
+    m_yuy2ToRgbShaderProgram.reset( new QnYuy2ToRgbShaderProgram(context) );
+    m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
 
-    m_yuv2rgbBuffer = 0;
-    m_yuv2rgbBufferLen = 0;
-
-    m_lastDisplayedFlags = 0;
-    
-    for(int i = 0; i < TEXTURE_COUNT; i++) {
-        m_textures[i].reset(new QnGlRendererTexture());
-        m_textures[i]->setRenderer(this);
-    }
-
-    applyMixerSettings(m_brightness, m_contrast, m_hue, m_saturation);
+    glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSizeVal );
+    cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSizeVal), cl_logINFO );
 }
 
 QnGLRenderer::~QnGLRenderer()
 {
-    qFreeAligned(m_yuv2rgbBuffer);
-}
-
-void QnGLRenderer::ensureGlInitialized() {
-    if(m_glInitialized)
-        return;
-
-    if(m_context == NULL)
-        m_context = QGLContext::currentContext();
-
-    QnGLRendererPrivateStorage *storage = qn_glRendererPrivateStorage();
-    if(storage)
-        d = qn_glRendererPrivateStorage()->get(m_context);
-    if(d.isNull()) /* Application is being shut down. */
-        d = QSharedPointer<QnGLRendererPrivate>(new QnGLRendererPrivate(NULL));
-
-    m_glInitialized = true;
 }
 
 void QnGLRenderer::beforeDestroy()
 {
-    QMutexLocker lock(&m_displaySync);
-    m_needwait = false;
-    if (m_curImg)
-        m_curImg->setDisplaying(false);
-    m_waitCon.wakeAll();
-}
-
-void QnGLRenderer::draw( const QSharedPointer<CLVideoDecoderOutput>& img )
-{
-    QMutexLocker locker(&m_displaySync);
-
-    //m_imageList.enqueue(img);
-    if( m_curImg )
-        m_curImg->setDisplaying(false);
-    m_curImg = img;
-    m_format = m_curImg->format;
-
-    m_curImg->setDisplaying(true);
-}
-
-void QnGLRenderer::waitForFrameDisplayed(int channel)
-{
-    Q_UNUSED(channel)
-
-    QMutexLocker lock(&m_displaySync);
-    while (m_needwait && m_curImg && m_curImg->isDisplaying()) 
-    {
-        m_waitCon.wait(&m_displaySync);
-    }
-}
-
-void QnGLRenderer::setForceSoftYUV(bool value)
-{
-    m_forceSoftYUV = value;
-}
-
-const QGLContext* QnGLRenderer::context() const
-{
-	return m_context;
-}
-
-void QnGLRenderer::update( const QSharedPointer<CLVideoDecoderOutput>& curImg )
-{
-    if( !(curImg && (curImg->linesize[0] || curImg->picData.data())) )
-        return;
-
-    m_videoWidth = curImg->width;
-    m_videoHeight = curImg->height;
-    updateTexture( curImg );
-    if (quint64(curImg->pkt_dts) != AV_NOPTS_VALUE)
-        m_lastDisplayedTime = curImg->pkt_dts;
-    m_lastDisplayedMetadata[curImg->channel] = curImg->metadata;
-    m_lastDisplayedFlags = curImg->flags;
-    m_newtexture = true;
-}
-
-qreal QnGLRenderer::opacity() const
-{
-    return m_painterOpacity;
-}
-
-void QnGLRenderer::setOpacity(qreal opacity)
-{
-    m_painterOpacity = opacity;
 }
 
 void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hue, qreal saturation)
@@ -448,200 +122,69 @@ void QnGLRenderer::applyMixerSettings(qreal brightness, qreal contrast, qreal hu
     m_saturation = saturation + 1.0;
 }
 
-int QnGLRenderer::glRGBFormat() const
+Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
 {
-    if (!isYuvFormat())
+    DecodedPictureToOpenGLUploader::ScopedPictureLock picLock( m_decodedPictureProvider );
+    if( !picLock.get() )
+        return Qn::NothingRendered;
+
+    Qn::RenderStatus result = picLock->sequence() != m_prevFrameSequence ? Qn::NewFrameRendered : Qn::OldFrameRendered;
+    const bool draw = picLock->width() <= maxTextureSize() && picLock->height() <= maxTextureSize();
+    if( !draw )
     {
-        switch (m_format)
+        result = Qn::CannotRender;
+    } 
+    else if( picLock->width() > 0 && picLock->height() > 0 )
+    {
+        const float v_array[] = { r.left(), r.top(), r.right(), r.top(), r.right(), r.bottom(), r.left(), r.bottom() };
+        switch( picLock->colorFormat() )
         {
-        case PIX_FMT_RGBA: return GL_RGBA;
-        case PIX_FMT_BGRA: return GL_BGRA_EXT;
-        case PIX_FMT_RGB24: return GL_RGB;
-        case PIX_FMT_BGR24: return GL_BGR_EXT;
-        default: break;
-        }
-    }
-    return GL_RGBA;
-}
+            case PIX_FMT_RGBA:
+        	    drawVideoTextureDirectly(
+           		    picLock->texCoords(),
+           		    picLock->glTextures()[0],
+           		    v_array );
+                break;
 
-bool QnGLRenderer::isYuvFormat() const
-{
-    return m_format == PIX_FMT_YUV422P || m_format == PIX_FMT_YUV420P || m_format == PIX_FMT_YUV444P;
-}
+            case PIX_FMT_YUV420P:
+                Q_ASSERT( usingShaderYuvToRgb() );
+        	    drawYV12VideoTexture(
+                    picLock->texCoords(),
+                    picLock->glTextures()[0],
+                    picLock->glTextures()[1],
+                    picLock->glTextures()[2],
+                    v_array );
+                break;
 
-void QnGLRenderer::updateTexture( const QSharedPointer<CLVideoDecoderOutput>& curImg )
-{
-	 if( curImg->picData.data() && (curImg->picData->type() == QnAbstractPictureData::pstOpenGL) )
-		 return;	//decoded picture is already in OpenGL texture
+            case PIX_FMT_NV12:
+        	    drawNV12VideoTexture(
+                    picLock->texCoords(),
+                    picLock->glTextures()[0],
+                    picLock->glTextures()[1],
+                    v_array );
+                break;
 
-    unsigned int w[3] = { curImg->linesize[0], curImg->linesize[1], curImg->linesize[2] };
-    unsigned int r_w[3] = { curImg->width, curImg->width / 2, curImg->width / 2 }; // real_width / visible
-    unsigned int h[3] = { curImg->height, curImg->height / 2, curImg->height / 2 };
-
-    switch (curImg->format)
-    {
-        case PIX_FMT_YUV444P:
-            r_w[1] = r_w[2] = curImg->width;
-        // fall through
-        case PIX_FMT_YUV422P:
-            h[1] = h[2] = curImg->height;
-            break;
-        default:
-            break;
-    }
-
-    if (usingShaderYuvToRgb())
-    {
-        // using pixel shader to yuv-> rgb conversion
-        for (int i = 0; i < 3; ++i)
-        {
-            QnGlRendererTexture *texture = this->texture(i);
-            texture->ensureInitialized(r_w[i], h[i], w[i], 1, GL_LUMINANCE, 1, i == 0 ? 0x10 : 0x80);
-
-            glBindTexture(GL_TEXTURE_2D, texture->id());
-            const uchar *pixels = curImg->data[i];
-
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, w[i]);
-
-#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
-            qint64 frequency = QnPerformance::currentCpuFrequency();
-            qint64 startCycles = QnPerformance::currentThreadCycles();
-#endif 
-
-            glTexSubImage2D(GL_TEXTURE_2D, 0,
-                            0, 0,
-                            qPower2Ceil(r_w[i],ROUND_COEFF),
-                            h[i],
-                            GL_LUMINANCE, GL_UNSIGNED_BYTE, pixels);
-
-#ifdef QN_GL_RENDERER_DEBUG_PERFORMANCE
-            qint64 deltaCycles = QnPerformance::currentThreadCycles() - startCycles;
-            qDebug() << "glTexSubImage2D" << deltaCycles / (frequency / 1000.0) << "ms" << deltaCycles;
-#endif 
-
-            glCheckError("glTexSubImage2D");
-            glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-            glCheckError("glPixelStorei");
+            default:
+                //other formats must be converted to PIX_FMT_YUV420P or PIX_FMT_NV12 before picture uploading
+                Q_ASSERT( false );
         }
 
-        m_textureUploaded = true;
+        m_prevFrameSequence = picLock->sequence();
+        if( picLock->pts() != AV_NOPTS_VALUE )
+            m_lastDisplayedTime = picLock->pts();
+        m_lastDisplayedMetadata = picLock->metadata();
     }
     else
     {
-        QnGlRendererTexture *texture = this->texture(0);
-
-        int bytesPerPixel = 1;
-        if (!isYuvFormat()) {
-            if (curImg->format == PIX_FMT_RGB24 || curImg->format == PIX_FMT_BGR24)
-                bytesPerPixel = 3;
-            else
-                bytesPerPixel = 4;
-        }
-
-        texture->ensureInitialized(r_w[0], h[0], w[0], bytesPerPixel, GL_RGBA, 4, 0);
-        glBindTexture(GL_TEXTURE_2D, texture->id());
-
-        uchar *pixels = curImg->data[0];
-        if (isYuvFormat())
-        {
-            int size = 4 * curImg->linesize[0] * h[0];
-            if (m_yuv2rgbBufferLen < size)
-            {
-                m_yuv2rgbBufferLen = size;
-                qFreeAligned(m_yuv2rgbBuffer);
-                m_yuv2rgbBuffer = (uchar*)qMallocAligned(size, CL_MEDIA_ALIGNMENT);
-            }
-            pixels = m_yuv2rgbBuffer;
-        }
-
-        int lineInPixelsSize = curImg->linesize[0];
-        switch (curImg->format)
-        {
-        case PIX_FMT_YUV420P:
-            if (useSSE2())
-            {
-                yuv420_argb32_sse2_intr(pixels, curImg->data[0], curImg->data[2], curImg->data[1],
-                    qPower2Ceil(r_w[0],ROUND_COEFF),
-                    h[0],
-                    4 * curImg->linesize[0],
-                    curImg->linesize[0], curImg->linesize[1], m_painterOpacity*255);
-            }
-            else {
-                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
-            }
-            break;
-
-        case PIX_FMT_YUV422P:
-            if (useSSE2())
-            {
-                yuv422_argb32_sse2_intr(pixels, curImg->data[0], curImg->data[2], curImg->data[1],
-                    qPower2Ceil(r_w[0],ROUND_COEFF),
-                    h[0],
-                    4 * curImg->linesize[0],
-                    curImg->linesize[0], curImg->linesize[1], m_painterOpacity*255);
-            }
-            else {
-                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
-            }
-            break;
-
-        case PIX_FMT_YUV444P:
-            if (useSSE2())
-            {
-                yuv444_argb32_sse2_intr(pixels, curImg->data[0], curImg->data[2], curImg->data[1],
-                    qPower2Ceil(r_w[0],ROUND_COEFF),
-                    h[0],
-                    4 * curImg->linesize[0],
-                    curImg->linesize[0], curImg->linesize[1], m_painterOpacity*255);
-            }
-            else {
-                cl_log.log("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
-            }
-            break;
-
-        case PIX_FMT_RGB24:
-        case PIX_FMT_BGR24:
-            lineInPixelsSize /= 3;
-            break;
-
-        default:
-            lineInPixelsSize /= 4; // RGBA, BGRA
-            break;
-        }
-
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, lineInPixelsSize);
-        glCheckError("glPixelStorei");
-
-        glTexSubImage2D(GL_TEXTURE_2D, 0,
-            0, 0,
-            qPower2Ceil(r_w[0],ROUND_COEFF),
-            h[0],
-            glRGBFormat(), GL_UNSIGNED_BYTE, pixels);
-        glCheckError("glTexSubImage2D");
-
-        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-        glCheckError("glPixelStorei");
-
-        // TODO: free memory immediately for still images
+        result = Qn::NothingRendered;
     }
-}
 
-void QnGLRenderer::drawVideoTexture( QnGlRendererTexture *tex0, QnGlRendererTexture *tex1, QnGlRendererTexture *tex2, const float* v_array )
-{
-	if( usingShaderYuvToRgb() )
-		drawVideoTextureWithShader(
-			tex0->id(),
-			tex0->texCoords(),
-			tex1->id(),
-			tex2->id(),
-			v_array );
-	else
-		drawVideoTextureDirectly( tex0->id(), tex0->texCoords(), v_array );
+    return result;
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-	unsigned int tex0ID,
 	const QVector2D& tex0Coords,
+	unsigned int tex0ID,
 	const float* v_array )
 {
     cl_log.log( QString::fromAscii("QnGLRenderer::drawVideoTextureDirectly. texture %1").arg(tex0ID), cl_logDEBUG2 );
@@ -671,9 +214,9 @@ void QnGLRenderer::drawVideoTextureDirectly(
     drawBindedTexture( v_array, tx_array );
 }
 
-void QnGLRenderer::drawVideoTextureWithShader(
-	unsigned int tex0ID,
+void QnGLRenderer::drawYV12VideoTexture(
 	const QVector2D& tex0Coords,
+	unsigned int tex0ID,
 	unsigned int tex1ID,
 	unsigned int tex2ID,
 	const float* v_array )
@@ -688,21 +231,21 @@ void QnGLRenderer::drawVideoTextureWithShader(
     glEnable(GL_TEXTURE_2D);
     glCheckError("glEnable");
 
-    QnYv12ToRgbShaderProgram* prog = d->m_yv12ToRgbShaderProgram.data();
+    QnYv12ToRgbShaderProgram* prog = m_yv12ToRgbShaderProgram.data();
 	prog->bind();
-	prog->setParameters(m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_painterOpacity);
+    prog->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
-	d->glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE2);
 	glCheckError("glActiveTexture");
 	glBindTexture(GL_TEXTURE_2D, tex2ID);
 	glCheckError("glBindTexture");
 
-	d->glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(GL_TEXTURE1);
 	glCheckError("glActiveTexture");
 	glBindTexture(GL_TEXTURE_2D, tex1ID);
 	glCheckError("glBindTexture");
 
-	d->glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE0);
 	glCheckError("glActiveTexture");
 	glBindTexture(GL_TEXTURE_2D, tex0ID);
 	glCheckError("glBindTexture");
@@ -710,6 +253,47 @@ void QnGLRenderer::drawVideoTextureWithShader(
     drawBindedTexture( v_array, tx_array );
 
     prog->release();
+}
+
+void QnGLRenderer::drawNV12VideoTexture(
+	const QVector2D& tex0Coords,
+	unsigned int tex0ID,
+	unsigned int tex1ID,
+	const float* v_array )
+{
+    //TODO/IMPL
+ //   float tx_array[8] = {
+ //       0.0f, 0.0f,
+ //       tex0Coords.x(), 0.0f,
+ //       tex0Coords.x(), tex0Coords.y(),
+ //       0.0f, tex0Coords.y()
+ //   };
+
+ //   glEnable(GL_TEXTURE_2D);
+ //   glCheckError("glEnable");
+
+ //   QnYv12ToRgbShaderProgram* prog = m_yv12ToRgbShaderProgram.data();
+	//prog->bind();
+	//prog->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+
+	//glActiveTexture(GL_TEXTURE2);
+	//glCheckError("glActiveTexture");
+	//glBindTexture(GL_TEXTURE_2D, tex2ID);
+	//glCheckError("glBindTexture");
+
+	//glActiveTexture(GL_TEXTURE1);
+	//glCheckError("glActiveTexture");
+	//glBindTexture(GL_TEXTURE_2D, tex1ID);
+	//glCheckError("glBindTexture");
+
+	//glActiveTexture(GL_TEXTURE0);
+	//glCheckError("glActiveTexture");
+	//glBindTexture(GL_TEXTURE_2D, tex0ID);
+	//glCheckError("glBindTexture");
+
+ //   drawBindedTexture( v_array, tx_array );
+
+ //   prog->release();
 }
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
@@ -730,92 +314,6 @@ void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_arra
     glCheckError("glDisableClientState");
 }
 
-void QnGLRenderer::update()
-{
-    QSharedPointer<CLVideoDecoderOutput> curImg;
-    {
-        QMutexLocker locker( &m_displaySync );
-        curImg = m_curImg;
-    }
-    update( curImg );
-}
-
-
-Qn::RenderStatus QnGLRenderer::paint(const QRectF &r)
-{
-    ensureGlInitialized();
-
-    //glPushAttrib(GL_ALL_ATTRIB_BITS);
-    /*
-    if (m_painterOpacity < 1.0) {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-    */
-
-    Qn::RenderStatus result;
-
-    QSharedPointer<CLVideoDecoderOutput> curImg;
-    {
-        QMutexLocker locker( &m_displaySync );
-        curImg = m_curImg;
-    }
-
-    update( curImg );
-    result = m_newtexture ? Qn::NewFrameRendered : Qn::OldFrameRendered;
-    m_newtexture = false;
-
-    const bool draw = m_videoWidth <= maxTextureSize() && m_videoHeight <= maxTextureSize();
-    if( !draw )
-    {
-        result = Qn::CannotRender;
-    } 
-    else if( m_videoWidth > 0 && m_videoHeight > 0 )
-    {
-        QRectF temp(r);
-        const float v_array[] = { temp.left(), temp.top(), temp.right(), temp.top(), temp.right(), temp.bottom(), temp.left(), temp.bottom() };
-        if( curImg && curImg->picData && (curImg->picData.data()->type() == QnAbstractPictureData::pstOpenGL) )
-        {
-        	drawVideoTextureDirectly(
-           		static_cast<const QnOpenGLPictureData*>(curImg->picData.data())->glTexture(),
-           		texture(0)->texCoords(),
-           		v_array );
-        	m_prevFramePicData = curImg->picData;
-        }
-        else if( m_prevFramePicData && (m_prevFramePicData.data()->type() == QnAbstractPictureData::pstOpenGL) )
-        {
-            drawVideoTextureDirectly(
-                static_cast<const QnOpenGLPictureData*>(m_prevFramePicData.data())->glTexture(),
-                texture(0)->texCoords(),
-                v_array );
-        }
-        else
-        {
-        	drawVideoTexture( texture(0), texture(1), texture(2), v_array );
-        }
-    }
-    else
-    {
-        result = Qn::NothingRendered;
-    }
-
-    QMutexLocker locker( &m_displaySync );
-    if( curImg && curImg == m_curImg && curImg->isDisplaying() )
-    {
-        curImg->setDisplaying(false);
-        m_curImg.clear();
-        m_waitCon.wakeAll();
-    }
-
-    //glPopAttrib();
-
-    return result;
-}
-
-QnGlRendererTexture *QnGLRenderer::texture(int index) {
-    return m_textures[index].data();
-}
-
 qint64 QnGLRenderer::lastDisplayedTime() const
 {
     QMutexLocker locker(&m_displaySync);
@@ -827,13 +325,17 @@ bool QnGLRenderer::isLowQualityImage() const
     return m_lastDisplayedFlags & QnAbstractMediaData::MediaFlags_LowQuality;
 }
 
-QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata(int channel) const
+QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
 {
     QMutexLocker locker(&m_displaySync);
-    return m_lastDisplayedMetadata[channel];
+    return m_lastDisplayedMetadata;
 }
 
-bool QnGLRenderer::usingShaderYuvToRgb() const {
-    return (d->features() & QnGlFunctions::ArbPrograms) && (d->features() & QnGlFunctions::OpenGL1_3) && !m_forceSoftYUV && isYuvFormat() && 
-        d->m_yv12ToRgbShaderProgram->isValid() && !(d->features() & QnGlFunctions::ShadersBroken);
+bool QnGLRenderer::usingShaderYuvToRgb() const
+{
+    return (features() & QnGlFunctions::ArbPrograms)
+        && (features() & QnGlFunctions::OpenGL1_3)
+        && !(features() & QnGlFunctions::ShadersBroken)
+        && !m_decodedPictureProvider.isForcedSoftYUV()
+        && m_yv12ToRgbShaderProgram->isValid();
 }
