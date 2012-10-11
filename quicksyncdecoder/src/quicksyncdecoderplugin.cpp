@@ -14,6 +14,9 @@
 
 #include "quicksyncvideodecoder.h"
 
+//!if defined, a mfx session is created in QuicksyncDecoderPlugin and all mfx sessions are joined with this one
+//#define USE_PARENT_MFX_SESSION
+
 
 static const char* QUICKSYNC_PLUGIN_ID = "45D92FCC-2B59-431e-BFF9-E11F2D6213DA";
 //{ 0x45d92fcc, 0x2b59, 0x431e, { 0xbf, 0xf9, 0xe1, 0x1f, 0x2d, 0x62, 0x13, 0xda } };
@@ -83,6 +86,10 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const /*glContext*/ ) const
 {
+#ifdef _DEBUG
+    return NULL;
+#endif
+
     if( !m_initialized )
     {
         //have to perform this terrible delayed initialization because logging does not work till initializeLog call
@@ -162,6 +169,11 @@ void QuicksyncDecoderPlugin::initialize() const
         m_hardwareAccelerationEnabled = false;
         return;
     }
+
+#ifndef USE_PARENT_MFX_SESSION
+    m_mfxSession.reset();
+#endif
+
     m_adapterNumber = (actualImplUsed >= MFX_IMPL_HARDWARE2 && actualImplUsed <= MFX_IMPL_HARDWARE4)
         ? (actualImplUsed - MFX_IMPL_HARDWARE2 + 1)
         : 0;
