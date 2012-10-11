@@ -388,11 +388,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         icon(qnSkin->icon("titlebar/main_menu.png"));
 
+    // Text and icon are set in QnWorkbenchActionHandler::at_eventManager_connectionOpened/Closed
     factory(Qn::ConnectToServerAction).
         flags(Qn::Main).
-        text(tr("Connect to Server...")).
-        autoRepeat(false).
-        icon(qnSkin->icon("titlebar/connected.png"));
+        autoRepeat(false);
 
     factory(Qn::TogglePanicModeAction).
         flags(Qn::Main).
