@@ -387,18 +387,6 @@ int qnMain(int argc, char *argv[])
 
     qApp->setStyle(qnSkin->style());
 
-#if 0
-    // todo: remove me! debug only
-    QnCameraHistoryPtr history1(new QnCameraHistory());
-    qint64 dt = QDateTime::fromString("2012-04-12T19:19:00", Qt::ISODate).toMSecsSinceEpoch();
-    QnCameraTimePeriod period1(dt-1000*60*30, 1000*60*30, 2);
-    QnCameraTimePeriod period2(dt, 3600*24*1000ll, 43);
-    history1->setMacAddress("00-40-8C-BF-92-CE");
-    history1->addTimePeriod(period1);
-    history1->addTimePeriod(period2);
-    QnCameraHistoryPool::instance()->addCameraHistory(history1);
-#endif
-
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
     context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */

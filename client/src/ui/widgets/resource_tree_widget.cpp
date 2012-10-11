@@ -19,6 +19,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_history.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -122,7 +123,20 @@ protected:
         }
 
         /* Draw 'recording' icon. */
-        if(resource && resource->getStatus() == QnResource::Recording) {
+        bool recording = false;
+        if(resource) {
+            if(resource->getStatus() == QnResource::Recording) {
+                recording = true;
+            } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
+                foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
+                    if(otherCamera->getStatus() == QnResource::Recording) {
+                        recording = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(recording) {
             QRect iconRect = decorationRect;
             iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
