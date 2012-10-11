@@ -34,7 +34,7 @@ quint64 getUsecTimer()
 }
 #endif
 
-//#define RETURN_D3D_SURFACE
+#define RETURN_D3D_SURFACE
 #define CONVERT_NV12_TO_YV12
 
 
@@ -54,13 +54,6 @@ TODO copy to GL texture
 */
 
 
-//!Implementation of QnAbstractPictureData
-QnAbstractPictureData::PicStorageType D3DPictureData::type() const
-{
-    return QnAbstractPictureData::pstD3DSurface;
-}
-
-
 QuickSyncVideoDecoder::QuicksyncDXVAPictureData::QuicksyncDXVAPictureData(
     AbstractMFXFrameAllocator* const allocator,
     const QSharedPointer<SurfaceContext>& surface,
@@ -68,9 +61,10 @@ QuickSyncVideoDecoder::QuicksyncDXVAPictureData::QuicksyncDXVAPictureData(
 :
     m_mfxSurface( surface ),
     m_d3dSurface( NULL ),
-    m_cropRect( _cropRect )
+    m_cropRect( _cropRect ),
+    m_savedSequence( surface->syncCtx.sequence )
 {
-    _InterlockedIncrement16( (short*)&m_mfxSurface->mfxSurface.Data.Locked );
+    surface->syncCtx.externalRefCounter.ref();
     allocator->gethdl( m_mfxSurface->mfxSurface.Data.MemId, reinterpret_cast<mfxHDL*>(&m_d3dSurface) );
     m_d3dSurface->AddRef();
 }
@@ -78,12 +72,22 @@ QuickSyncVideoDecoder::QuicksyncDXVAPictureData::QuicksyncDXVAPictureData(
 QuickSyncVideoDecoder::QuicksyncDXVAPictureData::~QuicksyncDXVAPictureData()
 {
     m_d3dSurface->Release();
-    _InterlockedDecrement16( (short*)&m_mfxSurface->mfxSurface.Data.Locked );
+    m_mfxSurface->syncCtx.externalRefCounter.deref();
 }
 
 IDirect3DSurface9* QuickSyncVideoDecoder::QuicksyncDXVAPictureData::getSurface() const
 {
     return m_d3dSurface;
+}
+
+QnAbstractPictureDataRef::SynchronizationContext* QuickSyncVideoDecoder::QuicksyncDXVAPictureData::syncCtx() const
+{
+    return &m_mfxSurface->syncCtx;
+}
+
+bool QuickSyncVideoDecoder::QuicksyncDXVAPictureData::isValid() const
+{
+    return m_mfxSurface->syncCtx.sequence == m_savedSequence;
 }
 
 QRect QuickSyncVideoDecoder::QuicksyncDXVAPictureData::cropRect() const
@@ -130,10 +134,8 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     m_prevTimestamp( 0 ),
     m_decoderSurfaceSizeInBytes( 0 ),
     m_vppSurfaceSizeInBytes( 0 ),
-#ifdef USE_D3D
     m_d3dFrameAllocator( direct3D9, adapterNumber ),
     m_frameAllocator( &m_sysMemFrameAllocator, &m_d3dFrameAllocator ),
-#endif
     m_outPictureSize( 0, 0 ),
     m_originalFrameCropTop( 0 ),
     m_originalFrameCropBottom( 0 ),
@@ -159,7 +161,6 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
     memset( &m_decodingAllocResponse, 0, sizeof(m_decodingAllocResponse) );
     memset( &m_vppAllocResponse, 0, sizeof(m_vppAllocResponse) );
 
-#ifdef USE_D3D
     if( !m_d3dFrameAllocator.initialize() )
     {
         cl_log.log( QString::fromAscii("Failed to initialize DXVA frame surface allocator. %1").arg(m_d3dFrameAllocator.getLastErrorText()), cl_logERROR );
@@ -187,7 +188,6 @@ QuickSyncVideoDecoder::QuickSyncVideoDecoder(
         LocalFree(lpMsgBuf);
         return;
     }
-#endif
 #endif
 
 #if defined(WRITE_INPUT_STREAM_TO_FILE_1) || defined(WRITE_INPUT_STREAM_TO_FILE_2)
@@ -337,10 +337,19 @@ bool QuickSyncVideoDecoder::decode( const QnCompressedVideoDataPtr data, QShared
 }
 
 #ifdef USE_ASYNC_IMPL
-bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDecoderOutput* outFrame )
+bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
-    if( (m_state < decoding) && !init( MFX_CODEC_AVC, inputStream ) )
+    const bool isSeqHeaderPresent = readSequenceHeader( inputStream );
+    if( m_reinitializeNeeded && isSeqHeaderPresent )
+    {
+        //have to wait for a sequence header and I-frame before reinitializing decoder
+        closeMFXSession();
+        m_reinitializeNeeded = false;
+    }
+    if( m_state < decoding && !init( MFX_CODEC_AVC, inputStream ) )
         return false;
+    //if( (m_state < decoding) && !init( MFX_CODEC_AVC, inputStream ) )
+    //    return false;
 
     AsyncOperationContext* frameToDisplay = NULL;
     checkAsyncOperations( &frameToDisplay );
@@ -349,7 +358,8 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
     {
         //providing picture to output
         frameToDisplay->state = iisOutForDisplay;
-        saveToAVFrame( outFrame, frameToDisplay->outPicture );
+        saveToAVFrame( outFrame->data(), frameToDisplay->outPicture );
+        m_lastAVFrame = *outFrame;
         _InterlockedDecrement16( (short*)&frameToDisplay->outPicture->mfxSurface.Data.Locked );
         //removing operation frameToDisplay
         for( std::vector<AsyncOperationContext>::iterator
@@ -428,9 +438,27 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, CLVideoDeco
             case MFX_ERR_DEVICE_FAILED:
             case MFX_ERR_INCOMPATIBLE_VIDEO_PARAM:
             default:
-                cl_log.log( QString::fromAscii("Critical error occured during Quicksync decode session %1").arg(mfxStatusCodeToString(opStatus)), cl_logERROR );
-                resetMfxSession();
-                return false;
+                //limiting recursion depth
+                if( m_recursionDepth > 0 )
+                {
+                    cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Recursion detected!"), cl_logERROR );
+                    return false;
+                }
+                cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Critical error occured during Quicksync decode session %1").
+                    arg(mfxStatusCodeToString(opStatus)), cl_logERROR );
+                //draining decoded frames from decoder
+                mfxBitstream emptyBuffer;
+                memset( &emptyBuffer, 0, sizeof(emptyBuffer) );
+                //NOTE There can be more than one frame in decoder buffer. It will be good to drain them all...
+                ++m_recursionDepth;
+                const bool decoderDrainResult = decode( &emptyBuffer, outFrame );
+                closeMFXSession();
+                m_state = notInitialized;
+                //the bitstream pointer is at first bit of new sequence header (mediasdk-man, p.11)
+                const bool newSequenceFrameDecodeResult = decode( inputStream, outFrame );
+                --m_recursionDepth;
+                //if no frame from new sequence, returning drained frame
+                return newSequenceFrameDecodeResult || decoderDrainResult;
         }
 
         if( inputStream->DataLength > 0 )
@@ -487,8 +515,23 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
             {
                 case decoding:
                 {
-                    QSharedPointer<SurfaceContext> workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
+                    QSharedPointer<SurfaceContext> workingSurface;
+                    //workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
+                    for( ;; )
+                    {
+                        workingSurface = findUnlockedSurface( &m_decoderSurfacePool );
+                        if( !workingSurface.data() && !m_processor.get() )
+                        {
+                            //TODO/IMPL force take surface with oldest picture
+                            cl_log.log( QString::fromAscii("No empty frame for decoding. Waiting for a frame to get free..."), cl_logERROR );
+                            //waiting for a surface to get free
+                            ::Sleep( MS_TO_WAIT_FOR_DEVICE );
+                            continue;
+                        }
+                        break;
+                    }
                     Q_ASSERT( workingSurface.data() );
+                    Q_ASSERT( workingSurface->mfxSurface.Data.Locked == 0 );
                     opStatus = m_decoder->DecodeFrameAsync(
                         (inputStream && inputStream->DataLength > 0) ? inputStream : NULL,
                         &workingSurface->mfxSurface,
@@ -507,8 +550,21 @@ bool QuickSyncVideoDecoder::decode( mfxBitstream* const inputStream, QSharedPoin
                 case processing:
                 {
                     QSharedPointer<SurfaceContext> in = decodedFrameCtx;
-                    decodedFrameCtx = findUnlockedSurface( &m_vppOutSurfacePool );
+                    //decodedFrameCtx = findUnlockedSurface( &m_vppOutSurfacePool );
+                    for( ;; )
+                    {
+                        decodedFrameCtx = findUnlockedSurface( &m_vppOutSurfacePool );
+                        if( !decodedFrameCtx.data() )
+                        {
+                            cl_log.log( QString::fromAscii("No empty frame for processing. Waiting for a frame to get free..."), cl_logERROR );
+                            //waiting for a surface to get free
+                            ::Sleep( MS_TO_WAIT_FOR_DEVICE );
+                            continue;
+                        }
+                        break;
+                    }
                     Q_ASSERT( decodedFrameCtx.data() );
+                    Q_ASSERT( decodedFrameCtx->mfxSurface.Data.Locked == 0 );
                     opStatus = m_processor->RunFrameVPPAsync( &in->mfxSurface, &decodedFrameCtx->mfxSurface, NULL, &m_syncPoint );
                     m_state = done;
                     cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. starting frame (pts %1) processing. Result %2").
@@ -735,9 +791,9 @@ void QuickSyncVideoDecoder::setOutPictureSize( const QSize& outSize )
     }
 }
 
-QnAbstractPictureData::PicStorageType QuickSyncVideoDecoder::targetMemoryType() const
+QnAbstractPictureDataRef::PicStorageType QuickSyncVideoDecoder::targetMemoryType() const
 {
-    return QnAbstractPictureData::pstSysMemPic;
+    return QnAbstractPictureDataRef::pstSysMemPic;
 }
 
 #ifndef XVBA_TEST
@@ -807,26 +863,36 @@ bool QuickSyncVideoDecoder::init( mfxU32 codecID, mfxBitstream* seqHeader )
 
 bool QuickSyncVideoDecoder::initMfxSession()
 {
+    mfxStatus status = MFX_ERR_NONE;
     //opening media session
-    mfxVersion version;
-    memset( &version, 0, sizeof(version) );
-    version.Major = 1;
-    mfxStatus status = m_mfxSession.Init( MFX_IMPL_AUTO_ANY, &version );
-    if( status != MFX_ERR_NONE )
-    {
-        cl_log.log( QString::fromAscii("Failed to create Intel media SDK session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
-        m_mfxSession.Close();
-        return false;
-    }
-
     if( m_parentSession )
     {
+        status = m_parentSession->CloneSession( &m_mfxSession.getInternalSession() );
+        if( status != MFX_ERR_NONE )
+        {
+            cl_log.log( QString::fromAscii("Failed to clone parent Intel media SDK session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
+            return false;
+        }
+
         status = MFXJoinSession( *m_parentSession, m_mfxSession );
         if( status != MFX_ERR_NONE )
         {
             cl_log.log( QString::fromAscii("Failed to join Intel media SDK session with parent session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
             //m_mfxSession.Close();
             //return false;
+        }
+    }
+    else
+    {
+        mfxVersion version;
+        memset( &version, 0, sizeof(version) );
+        version.Major = 1;
+        status = m_mfxSession.Init( MFX_IMPL_AUTO_ANY, &version );
+        if( status != MFX_ERR_NONE )
+        {
+            cl_log.log( QString::fromAscii("Failed to create Intel media SDK session. Status %1").arg(mfxStatusCodeToString(status)), cl_logERROR );
+            m_mfxSession.Close();
+            return false;
         }
     }
 
@@ -907,7 +973,6 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
     m_mfxSession.QueryIMPL( &actualImplUsed );
     m_hardwareAccelerationEnabled = actualImplUsed != MFX_IMPL_SOFTWARE;
 
-#ifdef USE_D3D
     status = m_mfxSession.SetHandle( MFX_HANDLE_DIRECT3D_DEVICE_MANAGER9, m_d3dFrameAllocator.d3d9DeviceManager() );
     if( status != MFX_ERR_NONE )
     {
@@ -915,7 +980,6 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
         m_mfxSession.Close();
         return false;
     }
-#endif
 
     status = m_mfxSession.SetBufferAllocator( &m_bufAllocator );
     if( status != MFX_ERR_NONE )
@@ -940,11 +1004,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
 #endif
     m_srcStreamParam.mfx.FrameInfo.FourCC = MFX_FOURCC_NV12;
     m_srcStreamParam.mfx.FrameInfo.ChromaFormat = MFX_CHROMAFORMAT_YUV420;
-#ifdef USE_D3D
     m_srcStreamParam.IOPattern = MFX_IOPATTERN_OUT_VIDEO_MEMORY;
-#else
-    m_srcStreamParam.IOPattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
-#endif
 
     status = m_decoder->Query( &m_srcStreamParam, &m_srcStreamParam );
 
@@ -959,11 +1019,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
         return false;
     }
 
-#ifdef USE_D3D
     decodingAllocRequest.Type = MFX_MEMTYPE_VIDEO_MEMORY_DECODER_TARGET;
-#else
-    decodingAllocRequest.Type = MFX_MEMTYPE_SYSTEM_MEMORY;
-#endif
     decodingAllocRequest.Type |= MFX_MEMTYPE_FROM_DECODE | MFX_MEMTYPE_EXTERNAL_FRAME;
 
     allocateSurfacePool( &m_decoderSurfacePool, &decodingAllocRequest, &m_decodingAllocResponse );
@@ -991,11 +1047,7 @@ bool QuickSyncVideoDecoder::initDecoder( mfxU32 codecID, mfxBitstream* seqHeader
         arg(QString::number(m_srcStreamParam.mfx.CodecProfile)).
         arg(QString::number(m_srcStreamParam.mfx.CodecLevel)).
         arg(QString::number(m_decoderSurfacePool.size())).
-#ifdef USE_D3D
         arg(QString::fromAscii("video")),
-#else
-        arg(QString::fromAscii("system")),
-#endif
         cl_logINFO );
 
     //checking, whether hardware acceleration enabled
@@ -1037,11 +1089,7 @@ bool QuickSyncVideoDecoder::initProcessor()
 #else
     m_processingParams.AsyncDepth = 1;
 #endif
-#ifdef USE_D3D
     m_processingParams.IOPattern = MFX_IOPATTERN_IN_VIDEO_MEMORY | MFX_IOPATTERN_OUT_VIDEO_MEMORY;
-#else
-    m_processingParams.IOPattern = MFX_IOPATTERN_IN_SYSTEM_MEMORY | MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
-#endif
     m_processingParams.vpp.In = m_srcStreamParam.mfx.FrameInfo;
     m_processingParams.vpp.In.FourCC = MFX_FOURCC_NV12;
     m_processingParams.vpp.In.CropX = 0;
@@ -1124,11 +1172,7 @@ bool QuickSyncVideoDecoder::initProcessor()
     cl_log.log( QString::fromAscii("Intel Media processor (scale to %1x%2) successfully initialized!. Allocated %3 surfaces in %4 memory").
         arg(m_outPictureSize.width()).arg(m_outPictureSize.height()).
         arg(m_vppOutSurfacePool.size()).
-#ifdef USE_D3D
         arg(QString::fromAscii("video")),
-#else
-        arg(QString::fromAscii("system")),
-#endif
         cl_logINFO );
 
     return true;
@@ -1267,6 +1311,9 @@ void QuickSyncVideoDecoder::closeMFXSession()
 
     m_decoder.reset();
     m_decodingInitialized = false;
+
+    if( m_parentSession )
+        m_mfxSession.DisjoinSession();
 
     m_mfxSession.Close();
     m_mfxSessionEstablished = false;
@@ -1476,11 +1523,59 @@ void QuickSyncVideoDecoder::checkAsyncOperations( AsyncOperationContext** const 
 
 QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::findUnlockedSurface( SurfacePool* const surfacePool )
 {
-    for( int i = 0; i < surfacePool->size(); ++i )
+    //performing 2 tries because external reference to surface can be unlocked at any time
+    for( int tryNumber = 0; tryNumber < 2; ++tryNumber )
     {
-        if( surfacePool->at(i)->mfxSurface.Data.Locked == 0 )
+        for( int i = 0; i < surfacePool->size(); ++i )
+        {
+            SurfaceContext& surfaceCtx = *surfacePool->at(i);
+            if( surfaceCtx.mfxSurface.Data.Locked == 0 )
+                return surfacePool->at(i);
+            if( surfaceCtx.didWeLockedSurface && (surfaceCtx.syncCtx.externalRefCounter == 1) )
+            {
+                //only we are holding lock to the surface...
+                surfaceCtx.syncCtx.externalRefCounter.deref();
+                _InterlockedDecrement16( (short*)&surfaceCtx.mfxSurface.Data.Locked );
+                surfaceCtx.didWeLockedSurface = false;
+                return surfacePool->at(i);
+            }
+        }
+
+        if( tryNumber == 1 )
+        {
+            //looks like all surfaces are locked by media sdk. This is bad...
+            return QSharedPointer<SurfaceContext>();
+        }
+
+        //could not find unused surface: forcing unlock of used surface...
+        for( int i = 0; i < surfacePool->size(); ++i )
+        {
+            SurfaceContext& surfaceCtx = *surfacePool->at(i);
+
+            //searching for a surface that is not locked by decoder. While we here counters can only decrease
+            if( !(surfaceCtx.didWeLockedSurface
+                  && surfaceCtx.syncCtx.externalRefCounter > 0 
+                  && surfaceCtx.mfxSurface.Data.Locked == 1) )
+                continue;
+            //surface can be unlocked in any time
+
+            //incrementing sequence counter so that current references become invalid
+            surfaceCtx.syncCtx.sequence.ref();
+            //waiting for the surface to become unused (usage counter must drop to zero)
+            while( surfaceCtx.syncCtx.usageCounter > 0 ) { /*pause*/ }
+
+            //by this moment all external refs to the surface are invalidated (since sequence is modified) and are not allowed to use surface contexts
+            surfaceCtx.syncCtx.externalRefCounter.deref();
+            _InterlockedDecrement16( (short*)&surfaceCtx.mfxSurface.Data.Locked );
+            surfaceCtx.didWeLockedSurface = false;
+            cl_log.log( QString::fromAscii("QuickSyncVideoDecoder. Cancelled frame (%1) rendering (externalRefCounter = %2, Locked = %3)").
+                arg((size_t)&surfaceCtx.syncCtx).arg(surfaceCtx.syncCtx.externalRefCounter).arg(surfaceCtx.mfxSurface.Data.Locked), cl_logDEBUG1 );
             return surfacePool->at(i);
+        }
+
+        //we did not find anything. May be some surface became free while we were searching?
     }
+
     return QSharedPointer<SurfaceContext>();
 }
 
@@ -1510,37 +1605,37 @@ inline void fastmemcpy_sse4( __m128i* dst, __m128i* src, size_t sz )
     }
 }
 
-inline void fastmemcpy_sse4_buffered( __m128i* dst, __m128i* src, size_t sz )
-{
-    static const size_t TMP_BUF_SIZE = 1*1024 / sizeof(__m128i);
-    __m128i tmpBuf[TMP_BUF_SIZE];
-
-    const __m128i* const src_end = src + sz / sizeof(__m128i);
-    while( src < src_end )
-    {
-        //reading to tmp buffer
-        const size_t bytesToCopy = std::min<size_t>( (src_end - src)*sizeof(*src), sizeof(tmpBuf) );
-        fastmemcpy_sse4( tmpBuf, src, bytesToCopy );
-        src += bytesToCopy / sizeof(*src);
-
-        //storing
-        const __m128i* const tmpBufEnd = tmpBuf + bytesToCopy / sizeof(*tmpBuf);
-        for( __m128i* srcTmp = tmpBuf; srcTmp < tmpBufEnd; )
-        {
-            __m128i x1 = *srcTmp;
-            __m128i x2 = *(srcTmp+1);
-            __m128i x3 = *(srcTmp+2);
-            __m128i x4 = *(srcTmp+3);
-            srcTmp += 4;
-
-             _mm_store_si128( dst, x1 );
-             _mm_store_si128( dst+1, x2 );
-             _mm_store_si128( dst+2, x3 );
-             _mm_store_si128( dst+3, x4 );
-             dst += 4;
-        }
-    }
-}
+//inline void fastmemcpy_sse4_buffered( __m128i* dst, __m128i* src, size_t sz )
+//{
+//    static const size_t TMP_BUF_SIZE = 1*1024 / sizeof(__m128i);
+//    __m128i tmpBuf[TMP_BUF_SIZE];
+//
+//    const __m128i* const src_end = src + sz / sizeof(__m128i);
+//    while( src < src_end )
+//    {
+//        //reading to tmp buffer
+//        const size_t bytesToCopy = std::min<size_t>( (src_end - src)*sizeof(*src), sizeof(tmpBuf) );
+//        fastmemcpy_sse4( tmpBuf, src, bytesToCopy );
+//        src += bytesToCopy / sizeof(*src);
+//
+//        //storing
+//        const __m128i* const tmpBufEnd = tmpBuf + bytesToCopy / sizeof(*tmpBuf);
+//        for( __m128i* srcTmp = tmpBuf; srcTmp < tmpBufEnd; )
+//        {
+//            __m128i x1 = *srcTmp;
+//            __m128i x2 = *(srcTmp+1);
+//            __m128i x3 = *(srcTmp+2);
+//            __m128i x4 = *(srcTmp+3);
+//            srcTmp += 4;
+//
+//             _mm_store_si128( dst, x1 );
+//             _mm_store_si128( dst+1, x2 );
+//             _mm_store_si128( dst+2, x3 );
+//             _mm_store_si128( dst+3, x4 );
+//             dst += 4;
+//        }
+//    }
+//}
 
 void QuickSyncVideoDecoder::loadAndDeinterleaveUVPlane(
     __m128i* nv12UVPlane,
@@ -1595,7 +1690,7 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 {
     const mfxFrameSurface1* const decodedFrame = &decodedFrameCtx->mfxSurface;
 
-#if defined(USE_D3D) && defined(USE_OPENCL)
+#if defined(USE_OPENCL)
     mfxHDL handle = NULL;
     if( m_clContext && m_frameAllocator.gethdl( decodedFrameCtx->mfxSurface.Data.MemId, &handle ) == MFX_ERR_NONE )
     {
@@ -1614,7 +1709,11 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #endif
 
 #ifdef RETURN_D3D_SURFACE
-    outFrame->picData = QSharedPointer<QnAbstractPictureData>(
+    //locking surface
+    _InterlockedIncrement16( (short*)&decodedFrameCtx->mfxSurface.Data.Locked );
+    decodedFrameCtx->syncCtx.externalRefCounter.ref();
+    decodedFrameCtx->didWeLockedSurface = true;
+    outFrame->picData = QSharedPointer<QnAbstractPictureDataRef>(
         new QuicksyncDXVAPictureData(
             &m_frameAllocator,
             decodedFrameCtx,
@@ -1633,13 +1732,14 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
             PIX_FMT_NV12,
 #else
             PIX_FMT_YUV420P,
-#endif
+#endif  //CONVERT_NV12_TO_YV12
             decodedFrame->Data.Pitch );
 
+#if 1
         fastmemcpy_sse4(
             (__m128i*)outFrame->data[0],
             (__m128i*)(decodedFrame->Data.Y + (m_frameCropTopActual * decodedFrame->Data.Pitch)),
-            decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) );
+            decodedFrame->Data.Pitch * (decodedFrame->Info.Height - (m_frameCropTopActual+m_frameCropBottomActual)) );
 
         //const DWORD t1 = GetTickCount();
         //for( int i = 0; i < 5000; ++i )
@@ -1655,6 +1755,7 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
             decodedFrame->Data.Pitch * (decodedFrame->Info.Height - m_frameCropBottomActual) / 2,
             (__m128i*)outFrame->data[1],
             (__m128i*)outFrame->data[2] );
+#endif  //CONVERT_NV12_TO_YV12
 #endif
         //}
         //const DWORD t2 = GetTickCount();
@@ -1673,8 +1774,8 @@ void QuickSyncVideoDecoder::saveToAVFrame( CLVideoDecoderOutput* outFrame, const
 #else
     outFrame->linesize[1] = decodedFrame->Data.Pitch / 2;   //u_stride
     outFrame->linesize[2] = decodedFrame->Data.Pitch / 2;   //v_stride
-#endif
-#endif
+#endif  //CONVERT_NV12_TO_YV12
+#endif  //RETURN_D3D_SURFACE
 
     outFrame->width = decodedFrame->Info.Width;
     outFrame->height = decodedFrame->Info.Height - (m_frameCropTopActual + m_frameCropBottomActual);

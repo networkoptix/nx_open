@@ -34,24 +34,12 @@
 #endif
 #include "mfxallocator.h"
 
-#define USE_D3D
 //#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
 
 
 class PluginUsageWatcher;
-
-//!Holds picture as DXVA surface
-class D3DPictureData
-:
-    public QnAbstractPictureData
-{
-public:
-    //!Implementation of QnAbstractPictureData
-    virtual PicStorageType type() const;
-    virtual IDirect3DSurface9* getSurface() const = 0;
-};
 
 //!Uses Intel Media SDK to provide hardware-accelerated video decoding
 /*!
@@ -107,7 +95,7 @@ public:
     */
     virtual void setOutPictureSize( const QSize& outSize );
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
 #ifndef XVBA_TEST
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     /*!
@@ -131,6 +119,14 @@ public:
 #endif
 
 private:
+    class MyMFXVideoSession
+    :
+        public MFXVideoSession
+    {
+    public:
+        mfxSession& getInternalSession() { return m_session; }
+    };
+
     enum DecoderState
     {
         //!waiting for some data to start initialization
@@ -149,6 +145,15 @@ private:
     {
     public:
         mfxFrameSurface1 mfxSurface;
+        QnAbstractPictureDataRef::SynchronizationContext syncCtx;
+        bool didWeLockedSurface;
+
+        SurfaceContext()
+        :
+            didWeLockedSurface( false )
+        {
+            memset( &mfxSurface, 0, sizeof(mfxSurface) );
+        }
     };
 
     typedef std::vector<QSharedPointer<SurfaceContext> > SurfacePool;
@@ -195,7 +200,11 @@ private:
 
         //!Implementation of D3DPictureData::getSurface
         virtual IDirect3DSurface9* getSurface() const;
-        //!Implementation of QnAbstractPictureData::cropRect
+        //!Implementation of QnAbstractPictureDataRef::syncCtx
+        virtual QnAbstractPictureDataRef::SynchronizationContext* syncCtx() const;
+        //!Implementation of QnAbstractPictureDataRef::syncCtx
+        virtual bool isValid() const;
+        //!Implementation of QnAbstractPictureDataRef::cropRect
         /*!
             Returns crop rect from h.264 sps
         */
@@ -205,11 +214,12 @@ private:
         QSharedPointer<SurfaceContext> m_mfxSurface;
         IDirect3DSurface9* m_d3dSurface;
         const QRect m_cropRect;
+        int m_savedSequence;
     };
 
     MFXVideoSession* const m_parentSession;
     PluginUsageWatcher* const m_pluginUsageWatcher;
-    MFXVideoSession m_mfxSession;
+    MyMFXVideoSession m_mfxSession;
     DecoderState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
     std::auto_ptr<MFXVideoVPP> m_processor;
@@ -223,13 +233,9 @@ private:
     QSharedPointer<CLVideoDecoderOutput> m_lastAVFrame;
 
     MFXBufferAllocator m_bufAllocator;
-#ifdef USE_D3D
     MFXSysMemFrameAllocator m_sysMemFrameAllocator;
     MFXDirect3DSurfaceAllocator m_d3dFrameAllocator;
     MFXFrameAllocatorDispatcher m_frameAllocator;
-#else
-    MFXSysMemFrameAllocator m_frameAllocator;
-#endif
     SurfacePool m_decoderSurfacePool;
     SurfacePool m_vppOutSurfacePool;
     size_t m_decoderSurfaceSizeInBytes;

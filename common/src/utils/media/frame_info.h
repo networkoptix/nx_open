@@ -1,6 +1,11 @@
 #ifndef frame_info_1730
 #define frame_info_1730
 
+#ifdef _WIN32
+#include <D3D9.h>
+#endif
+#include <QAtomicInt>
+
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/media_data_packet.h"
 
@@ -9,9 +14,30 @@
 
 
 //!base class for differently-stored pictures
-class QnAbstractPictureData
+/*!
+    Usage of synchronization context is not required
+*/
+class QnAbstractPictureDataRef
 {
 public:
+    //!Used for synchronizing access to surface between decoder and renderer
+    class SynchronizationContext
+    {
+    public:
+        /*!
+            QnAbstractPictureDataRef implementation MUST increment this value at object instanciation and decrement at object destruction
+        */
+        QAtomicInt externalRefCounter;
+        //!Sequence counter incremented by the decoder to invalidate references to the picture
+        /*!
+            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved 
+            value this one to check, whether its reference is still valid
+        */
+        QAtomicInt sequence;
+        //!MUST be incremented for accessing picture data
+        QAtomicInt usageCounter;
+    };
+
     enum PicStorageType
     {
         //!Picture data is stored in memory
@@ -22,33 +48,54 @@ public:
         pstD3DSurface
     };
 
-    virtual ~QnAbstractPictureData() {}
+    virtual ~QnAbstractPictureDataRef() {}
+
     //!Returns pic type
     virtual PicStorageType type() const = 0;
+    /*!
+        Instances of \a QnAbstractPictureDataRef MUST share \a SynchronizationContext instance of single picture
+        \return Can be NULL
+    */
+    virtual SynchronizationContext* syncCtx() const = 0;
+    //!If return value is \a false, access to picture data can lead to undefined behavour
+    virtual bool isValid() const = 0;
 };
 
 //!Picture data stored in system memory
 class QnSysMemPictureData
 :
-    public QnAbstractPictureData
+    public QnAbstractPictureDataRef
 {
 public:
     //TODO/IMPL
 
-    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstSysMemPic; }
+    virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstSysMemPic; }
 };
+
+#ifdef _WIN32
+//!Holds picture as DXVA surface
+class D3DPictureData
+:
+    public QnAbstractPictureDataRef
+{
+public:
+    //!Implementation of QnAbstractPictureDataRef
+    virtual PicStorageType type() const { return QnAbstractPictureDataRef::pstD3DSurface; };
+    virtual IDirect3DSurface9* getSurface() const = 0;
+};
+#endif
 
 //!OpenGL texture (type \a pstOpenGL)
 class QnOpenGLPictureData
 :
-    public QnAbstractPictureData
+    public QnAbstractPictureDataRef
 {
 public:
     QnOpenGLPictureData(
 //  		GLXContext _glContext,
    		unsigned int _glTexture );
 
-    virtual QnAbstractPictureData::PicStorageType type() const { return QnAbstractPictureData::pstOpenGL; }
+    virtual QnAbstractPictureDataRef::PicStorageType type() const { return QnAbstractPictureDataRef::pstOpenGL; }
 
     //!Returns OGL texture name
     virtual unsigned int glTexture() const;
@@ -64,7 +111,7 @@ class CLVideoDecoderOutput: public AVFrame
 {
 public:
 	//!Stores picture data. If NULL, picture data is stored in \a AVFrame fields
-	QSharedPointer<QnAbstractPictureData> picData;
+	QSharedPointer<QnAbstractPictureDataRef> picData;
 
     CLVideoDecoderOutput();
     ~CLVideoDecoderOutput();
