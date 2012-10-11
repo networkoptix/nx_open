@@ -911,12 +911,6 @@ int QnRtspConnectionProcessor::composePlay()
         createPredefinedTracks();
     }
 
-    if (d->requestHeaders.value("Range").isNull())
-    {
-        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-        d->startTime = cameraResource ? DATETIME_NOW : 0;
-    }
-
     if (!d->requestHeaders.value("x-media-step").isEmpty())
         d->liveMode = Mode_ThumbNails;
     else if (d->rtspScale >= 0 && d->startTime == DATETIME_NOW)
