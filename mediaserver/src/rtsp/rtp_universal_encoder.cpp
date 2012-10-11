@@ -626,11 +626,6 @@ QByteArray QnUniversalRtpEncoder::getAdditionSDP()
     return QByteArray(buffer);
 }
 
-void QnUniversalRtpEncoder::setBaseTime(qint64 value)
-{
-    m_transcoder.setBaseTime(value);
-}
-
 void QnUniversalRtpEncoder::setDataPacket(QnAbstractMediaDataPtr media)
 {
     m_outputBuffer.clear();
