@@ -74,7 +74,6 @@ protected:
     void doRealtimeDelay(QnAbstractMediaDataPtr media);
 
     bool isMediaTimingsSlow() const;
-    void updateQualityTime();
     void setLiveQualityInternal(MediaQuality quality);
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;

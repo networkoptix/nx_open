@@ -164,14 +164,6 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
     return true;
 }
 
-void QnRtspDataConsumer::updateQualityTime()
-{
-    QMutexLocker lock(&m_allConsumersMutex);
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    m_lastSwitchTime[clientAddress] = currentTime;
-}
-
 bool QnRtspDataConsumer::canSwitchToHiQuality()
 {
     // RTSP queue is almost empty. But need some addition check to prevent quality change flood
@@ -731,6 +723,9 @@ void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
 
 void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
-    updateQualityTime();
+    QMutexLocker lock(&m_allConsumersMutex);
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    QHostAddress clientAddress = m_owner->getPeerAddress();
+    m_lastSwitchTime[clientAddress] = currentTime;
     m_liveQuality = quality;
 }
