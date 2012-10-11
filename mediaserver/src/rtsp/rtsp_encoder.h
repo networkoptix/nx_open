@@ -12,6 +12,7 @@ class QnRtspEncoder
 {
 public:
     QnRtspEncoder();
+    virtual ~QnRtspEncoder() {}
     void setMediaData(QnAbstractMediaDataPtr ctx);
     
     virtual QByteArray getAdditionSDP() = 0;
