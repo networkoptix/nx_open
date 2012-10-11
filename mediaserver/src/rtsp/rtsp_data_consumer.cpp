@@ -59,7 +59,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
         if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
         {
             if (consumer->m_liveQuality == MEDIA_Quality_Low) {
-                m_liveQuality = MEDIA_Quality_Low;
+                setLiveQualityInternal(MEDIA_Quality_Low);
                 m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
                 break;
             }
@@ -162,6 +162,14 @@ bool QnRtspDataConsumer::canSwitchToLowQuality()
 
     m_lastSwitchTime[clientAddress] = currentTime;
     return true;
+}
+
+void QnRtspDataConsumer::updateQualityTime()
+{
+    QMutexLocker lock(&m_allConsumersMutex);
+    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    QHostAddress clientAddress = m_owner->getPeerAddress();
+    m_lastSwitchTime[clientAddress] = currentTime;
 }
 
 bool QnRtspDataConsumer::canSwitchToHiQuality()
@@ -496,11 +504,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
         {
             if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                m_liveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+                setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
                 m_newLiveQuality = MEDIA_Quality_None;
             }
             else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_AlwaysHigh) && !isSecondaryProvider) {
-                m_liveQuality = m_newLiveQuality;
+                setLiveQualityInternal(m_newLiveQuality);
                 m_newLiveQuality = MEDIA_Quality_None;
             }
         }
@@ -719,4 +727,10 @@ void QnRtspDataConsumer::setUseUTCTime(bool value)
 void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
 {
     m_allowAdaptiveStreaming = value;
+}
+
+void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
+{
+    updateQualityTime();
+    m_liveQuality = quality;
 }
