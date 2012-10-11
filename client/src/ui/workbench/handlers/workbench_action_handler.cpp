@@ -759,10 +759,12 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged() {
 
 void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/disconnected.png"));
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Server..."));
 }
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server..."));
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
