@@ -10,6 +10,7 @@
 #include "utils/network/rtpsession.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 #include "utils/common/synctime.h"
+#include "core/resource/security_cam_resource.h"
 
 static const int MAX_QUEUE_SIZE = 10;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
@@ -215,14 +216,40 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None && m_liveQuality != MEDIA_Quality_AlwaysHigh)
         {
             //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
-            if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
-                m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-            else if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
+            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
+            //    m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
+            if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
                 m_newLiveQuality = MEDIA_Quality_High;
         }
     }
 
     // overflow control
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
+    {
+        m_dataQueue.lock();
+        QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();
+        if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh)
+        {
+            qint64 skipTime = m_dataQueue.front()->timestamp;
+            m_dataQueue.clear();
+            copyLastGopFromCamera(false, skipTime-1); // todo: add skip time here
+            m_newLiveQuality = MEDIA_Quality_Low;
+        }
+        else {
+            for (int i = m_dataQueue.size()-1; i >=0; --i)
+            {
+                QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
+                if (media->flags & AV_PKT_FLAG_KEY) 
+                {
+                    m_dataQueue.removeFirst(i);
+                    break;
+                }
+            }
+        }
+        m_dataQueue.unlock();
+    }
+
+/*
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
     {
         m_dataQueue.lock();
@@ -262,67 +289,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         m_dataQueue.unlock();
     }
 
-    /*
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
-    {
-        m_dataQueue.lock();
-
-        m_newLiveQuality = MEDIA_Quality_Low;
-
-        QnAbstractMediaDataPtr dataLow;
-        QnAbstractMediaDataPtr dataHi;
-        for (int i = m_dataQueue.size()-1; i >=0; --i)
-        {
-            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
-            if (media->flags & AV_PKT_FLAG_KEY)
-            {
-                if (media->flags & QnAbstractMediaData::MediaFlags_LowQuality)
-                {
-                    if (dataLow == 0)
-                        dataLow = media;
-                }
-                else {
-                    if (dataHi == 0)
-                        dataHi = media;
-                }
-            }
-        }
-
-        // some data need to remove
-        int i = 0;
-        while (dataHi || dataLow)
-        {
-            QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
-            bool deleted = false;
-            bool isLow = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-            if (isLow && dataLow)
-            {
-                if (media == dataLow) {
-                    // all data before dataLow removed
-                    dataLow.clear(); 
-                }
-                else {
-                    m_dataQueue.removeAt(i);
-                    deleted = true;
-                }
-            }
-            if (!isLow && dataHi)
-            {
-                if (media == dataHi) {
-                    // all data before dataHi removed
-                    dataHi.clear(); 
-                }
-                else {
-                    m_dataQueue.removeAt(i);
-                    deleted = true;
-                }
-            }
-            if (!deleted)
-                ++i;
-        }
-        m_dataQueue.unlock();
-    }
-    */
+*/
 
     while(m_dataQueue.size() > 120) // queue to large
     {
