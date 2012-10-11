@@ -193,7 +193,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
 
-        loadAccessRightsToUi(context()->accessController()->calculateGlobalPermissions(m_user));
+        loadAccessRightsToUi(context()->accessController()->globalPermissions(m_user));
         updatePassword();
     }
     setHasChanges(false);
@@ -345,7 +345,7 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
+    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
 
     // show only for view of owner
     if (permissions & Qn::GlobalEditProtectedUserPermission)
@@ -366,7 +366,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
+    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
     if (permissions & Qn::GlobalEditProtectedUserPermission)
