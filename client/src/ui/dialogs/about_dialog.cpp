@@ -17,6 +17,15 @@
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
 
+namespace {
+    QString versionString(const char *version) {
+        QString result = QString::fromLatin1(version);
+        result.replace(QLatin1String("-SNAPSHOT"), QString());
+        return result;
+    }
+
+} // anonymous namespace
+
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
     QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::AboutDialog())
@@ -63,24 +72,28 @@ void QnAboutDialog::retranslateUi()
             "<b>%1 %2</b> uses the following external libraries:<br />\n"
             "<br />\n"
             "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
-            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers.<br />\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />"
-            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 the LAME developers.<br />"
-            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br />"
+            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br />\n"
+            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />\n"
+            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br />\n"
+            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br />\n"
+            "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br />\n"
+            "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br />\n"
         ).
         arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)")).
         arg(QString::fromLatin1(APPLICATION_NAME)).
         arg(QString::fromLatin1(QT_VERSION_STR)).
-        arg(QString::fromLatin1(FFMPEG_VERSION)).
+        arg(versionString(FFMPEG_VERSION)).
         arg(QtvAudioDevice::instance()->versionString()).
-        arg(QtvAudioDevice::instance()->company());
+        arg(QtvAudioDevice::instance()->company()).
+        arg(versionString(SIGAR_VERSION)).
+        arg(versionString(BOOST_VERSION));
 
 #ifndef Q_OS_DARWIN
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
 #endif
 
     int maxTextureSize = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize); // TODO: using opengl calls here is BAD. use estimate?
 
     QString gpu = 
         tr(

@@ -548,6 +548,7 @@ void QnCameraScheduleWidget::updateMotionButtons() {
 void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
     m_disableUpdateGridParams = true;
+
     QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
     double fps(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::FirstParam).toDouble());
     QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString());

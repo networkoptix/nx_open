@@ -42,6 +42,11 @@ public:
         m_utcShift(0)
 
     {}
+    ~QnProgressiveDownloadingDataConsumer()
+    {
+        stop();
+    }
+
     void copyLastGopFromCamera(QnVideoCamera* camera)
     {
         CLDataQueue tmpQueue(20);
@@ -118,6 +123,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(TCPSocket* so
 
 QnProgressiveDownloadingConsumer::~QnProgressiveDownloadingConsumer()
 {
+    stop();
 }
 
 QByteArray QnProgressiveDownloadingConsumer::getMimeType(const QByteArray& streamingFormat)

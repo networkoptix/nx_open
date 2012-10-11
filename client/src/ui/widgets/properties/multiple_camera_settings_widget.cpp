@@ -19,6 +19,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui(new Ui::MultipleCameraSettingsWidget),
     m_hasDbChanges(false),
     m_hasScheduleChanges(false),
+    m_hasControlsChanges(false),
     m_readOnly(false),
     m_inUpdateMaxFps(false)
 {
@@ -31,6 +32,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->checkBoxEnableAudio,    SIGNAL(clicked()),                  this,       SLOT(at_enableAudioCheckBox_clicked()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
@@ -217,6 +219,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
     ui->cameraScheduleWidget->setCameras(m_cameras);
 
     setHasDbChanges(false);
+    m_hasControlsChanges = false;
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -259,12 +262,17 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
+    m_hasControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged() {
     at_dbDataChanged();
 
     m_hasScheduleEnabledChanges = true;
+}
+
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+    m_hasControlsChanges = true;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked()

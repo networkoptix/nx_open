@@ -124,7 +124,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
     m_timeMutex(QMutex::Recursive),
-    m_resource(resource)
+    m_resource(resource),
+    m_isLastVideoQualityLow(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -159,8 +160,19 @@ QnCamDisplay::~QnCamDisplay()
     {
         QMutexLocker lock(&m_qualityMutex);
         m_allCamDisplay.remove(this);
-        foreach(QnCamDisplay* display, m_allCamDisplay)
-            display->resetQualityStatistics();
+        if (m_lastDecodedTime != AV_NOPTS_VALUE)
+        {
+            // If camDisplay has decoded something and item is closing, some bandwidth appears. Change quality for other items
+            foreach(QnCamDisplay* display, m_allCamDisplay)
+            {
+                if (display->isLastVideoQualityLow())
+                {
+                    display->resetQualityStatistics();
+                    if (isLastVideoQualityLow())
+                        break; // try only one camera is current quality is low
+                }
+            }
+        }
     }
 
     Q_ASSERT(!isRunning());
@@ -479,6 +491,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         //qDebug() << "sleep time: " << needToSleep/1000.0 << "  real:" << realSleepTime/1000.0;
         if ((quint64)realSleepTime != AV_NOPTS_VALUE)
             hurryUpCheck(vd, speed, needToSleep, realSleepTime);
+        m_isLastVideoQualityLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
     }
 
     int channel = vd->channelNumber;
@@ -1452,4 +1465,9 @@ bool QnCamDisplay::isNoData() const
     int sign = m_speed >= 0 ? 1 : -1;
     return sign *(getCurrentTime() - ct) > MAX_FRAME_DURATION*1000;
     */
+}
+
+bool QnCamDisplay::isLastVideoQualityLow() const
+{
+    return m_isLastVideoQualityLow;
 }

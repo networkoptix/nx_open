@@ -66,7 +66,7 @@ public:
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
     QString getRangeHeaderIfChanged();
-    int getMetadataTcpChannel() const;
+    int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;

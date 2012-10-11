@@ -8,6 +8,8 @@
 
 #include <ui/style/globals.h>
 
+#include "client_meta_types.h"
+
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)
     {
@@ -39,6 +41,14 @@ bool QnConnectionDataList::contains(const QString &name){
         return true;
     }
     return false;
+}
+
+QnConnectionData QnConnectionDataList::getByName(const QString &name){
+    foreach(QnConnectionData data, *this){
+        if (data.name == name)
+            return data;
+    }
+    return QnConnectionData();
 }
 
 bool QnConnectionDataList::removeOne(const QString &name){
@@ -86,6 +96,8 @@ QnSettings::QnSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
+    QnClientMetaTypes::initialize();
+
     init();
 
     /* Set default values. */

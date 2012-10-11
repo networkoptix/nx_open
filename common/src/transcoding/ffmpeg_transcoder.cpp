@@ -78,8 +78,10 @@ void QnFfmpegTranscoder::closeFfmpegContext()
     }
     if (m_ioContext)
     {
-        m_ioContext->opaque = 0;
-        avio_close(m_ioContext);
+        //m_ioContext->opaque = 0;
+        //avio_close(m_ioContext);
+        av_free(m_ioContext->buffer);
+        av_free(m_ioContext);
         m_ioContext = 0;
         if (m_formatCtx)
             m_formatCtx->pb = 0;
@@ -130,13 +132,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
             return -1;
         }
 
-        AVCodec* avCodec = avcodec_find_decoder(m_videoCodec);
-        if (avCodec == 0)
-        {
-            m_lastErrMessage = tr("Transcoder error: can't find codec").arg(m_videoCodec);
-            return -2;
-        }
-        videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(avCodec);
+        videoStream->codec = m_videoEncoderCodecCtx = avcodec_alloc_context3(0);
         m_videoEncoderCodecCtx->codec_type = AVMEDIA_TYPE_VIDEO;
         m_videoEncoderCodecCtx->codec_id = m_videoCodec;
         m_videoEncoderCodecCtx->pix_fmt = PIX_FMT_YUV420P;
@@ -144,6 +140,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
         if (m_vTranscoder)
         {
             m_vTranscoder->open(video);
+            if (!m_vTranscoder->getLastError().isEmpty())
+                qWarning() << "Can't open video transcoder for RTSP streaming: " << m_vTranscoder->getLastError();
 
             QnFfmpegVideoTranscoderPtr ffmpegVideoTranscoder = m_vTranscoder.dynamicCast<QnFfmpegVideoTranscoder>();
             if (ffmpegVideoTranscoder->getCodecContext()) {

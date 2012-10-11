@@ -80,7 +80,6 @@ void QnAbstractMediaData::assign(QnAbstractMediaData* other)
     compressionType = other->compressionType;
     flags = other->flags;
     channelNumber = other->channelNumber;
-    //subChannelNumber = other->subChannelNumber;
     context = other->context;
     opaque = other->opaque;
 }

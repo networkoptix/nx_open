@@ -522,8 +522,9 @@ void QnWorkbenchNavigator::jumpForward() {
         pos = reader->endTime();
     } else {
         QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget);
-        const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
-        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        if (loader->isMotionRegionsEmpty())
+            periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
         QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), m_currentMediaWidget->display()->camera()->getCurrentTime() / 1000);
         if (itr == periods.end() || (reader->isReverseMode() && itr->durationMs == -1)) {

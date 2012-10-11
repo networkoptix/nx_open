@@ -13,13 +13,22 @@ qint64 QnPlaybackMaskHelper::findTimeAtPlaybackMask(qint64 timeUsec, bool isForw
         return timeUsec;
     QnTimePeriodList::const_iterator itr = m_playbackMask.findNearestPeriod(timeMs, isForwardDirection);
     if (itr == m_playbackMask.constEnd()) 
-        return DATETIME_NOW;
+        return isForwardDirection ? DATETIME_NOW : 0;
     
     m_curPlaybackPeriod = *itr;
-    if (!m_curPlaybackPeriod.contains(timeMs))
-        return isForwardDirection ? m_curPlaybackPeriod.startTimeMs*1000 : (m_curPlaybackPeriod.startTimeMs + m_curPlaybackPeriod.durationMs)*1000 - BACKWARD_SEEK_STEP;
-    else
+    if (!m_curPlaybackPeriod.contains(timeMs)) {
+        if (isForwardDirection)
+            return m_curPlaybackPeriod.startTimeMs*1000;
+        else {
+            if (m_curPlaybackPeriod.startTimeMs*1000 > timeUsec)
+                return -1; // BOF reached
+            else
+                return (m_curPlaybackPeriod.startTimeMs + m_curPlaybackPeriod.durationMs)*1000 - BACKWARD_SEEK_STEP;
+        }
+    }
+    else {
         return timeUsec;
+    }
 }
 
 void QnPlaybackMaskHelper::setPlaybackMask(const QnTimePeriodList& playbackMask)

@@ -3,7 +3,9 @@
 
 #include <QtCore/QRectF>
 #include <QtCore/QUuid>
+
 #include <recording/time_period.h>
+
 #include "resource.h"
 #include "layout_item_data.h"
 #include "recording/time_period.h"

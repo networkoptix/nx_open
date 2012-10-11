@@ -31,7 +31,7 @@ private:
     QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 private:
     bool m_gotLivePacket;
-    QMap<int, QList<QnMediaContextPtr> > m_ctxSended;
+    QnMediaContextPtr m_ctxSended;
     QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     QnAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;

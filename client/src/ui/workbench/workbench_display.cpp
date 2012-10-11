@@ -713,7 +713,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if (!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) { // TODO: unsupported for now
+    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -1278,6 +1278,8 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item) {
     if(addItemInternal(item, true)) {
         synchronizeSceneBounds();
         fitInView();
+
+        workbench()->setItem(Qn::ZoomedRole, NULL); /* Unzoom & fit in view on item addition. */
     }
 }
 
@@ -1313,7 +1315,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
-            if(timeUSec != AV_NOPTS_VALUE)
+            if((quint64)timeUSec != AV_NOPTS_VALUE)
                 mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
@@ -1374,9 +1376,16 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
         }
 
-        if(!thumbnailed && time != -1) {
-            qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
-            widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+        if(!thumbnailed) {
+            QnResourcePtr resource = widget->display()->archiveReader()->getResource();
+            if(time != -1) {
+                qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
+                widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+            } else if (resource->hasFlags(QnResource::sync) || !resource->hasFlags(QnResource::live)) 
+            {
+                // default position in SyncPlay is LIVE. If current resource is synchronized and it is not camera (does not has live) seek to 0 (default position)
+                widget->display()->archiveReader()->jumpTo(0, 0);
+            }
         }
 
         bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);

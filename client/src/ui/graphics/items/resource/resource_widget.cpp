@@ -265,7 +265,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
-
+    m_loadingStaticText.setText(tr("Loading..."));
+    m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
     /* Run handlers. */
     updateTitleText();
@@ -707,18 +708,15 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
 
     if(overlay == LoadingOverlay || overlay == PausedOverlay) {
         qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+        qreal unit = qnGlobals->workbenchUnitSize();
 
         painter->beginNativePainting();
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        QRectF overlayRect = expanded(
-            1.0,
-            QRectF(
-                rect.center() - toPoint(rect.size()) / 8,
-                rect.size() / 4
-            ),
-            Qt::KeepAspectRatio
+        QRectF overlayRect(
+            rect.center() - QPointF(unit / 10, unit / 10),
+            QSizeF(unit / 5, unit / 5)
         );
 
         glPushMatrix();
@@ -736,6 +734,9 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
 
         glDisable(GL_BLEND);
         painter->endNativePainting();
+
+        if(overlay == LoadingOverlay)
+            paintFlashingText(painter, m_loadingStaticText, 0.05, QPointF(0.0, 0.15));
     }
 
     if (overlay == NoDataOverlay) {

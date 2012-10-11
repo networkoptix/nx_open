@@ -42,6 +42,8 @@ class QnTcpListener;
 
 enum Mode {Mode_Live, Mode_Archive, Mode_ThumbNails};
 static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
+static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
+const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
 class QnRtspConnectionProcessor::QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
@@ -64,7 +66,8 @@ public:
         audioEnabled(false),
         useProprietaryFormat(false),
         tcpMode(true),
-        transcodedVideoSize(640, 480)
+        transcodedVideoSize(640, 480),
+        sessionTimeOut(0)
     {
     }
 
@@ -119,6 +122,7 @@ public:
     QnRtspDataConsumer* dataProcessor;
 
     QString sessionId;
+    int sessionTimeOut; // timeout in seconds. Not used if zerro
     QnMediaResourcePtr mediaRes;
     //QMap<int, QPair<int,int> > trackPorts; // associate trackID with RTP/RTCP ports (for TCP mode ports used as logical channel numbers, see RFC 2326)
     //QMap<int, QnRtspEncoderPtr> encoders; // associate trackID with RTP codec encoder
@@ -168,12 +172,18 @@ void QnRtspConnectionProcessor::parseRequest()
         QnResourcePtr resource = qnResPool->getResourceByUrl(resId);
         if (resource == 0) {
             resource = qnResPool->getNetResourceByPhysicalId(resId);
+            if (resource == 0) 
+                resource = qnResPool->getResourceByMacAddress(resId);
         }
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
     }
 
     if (d->requestHeaders.value("user-agent").toLower().contains("network optix"))
         d->useProprietaryFormat = true;
+    else {
+        d->sessionTimeOut = DEFAULT_RTSP_TIMEOUT;
+        d->socket->setReadTimeOut(d->sessionTimeOut * 1500);
+    }
 
     QString pos = url.queryItemValue("pos");
     if (pos.isEmpty())
@@ -253,8 +263,12 @@ void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
     if (!transport.isEmpty())
         d->responseHeaders.addValue("Transport", transport);
 
-    if (!d->sessionId.isEmpty())
-        d->responseHeaders.addValue("Session", d->sessionId);
+    if (!d->sessionId.isEmpty()) {
+        QString sessionId = d->sessionId;
+        if (d->sessionTimeOut > 0)
+            sessionId += QString(QLatin1String(";timeout=%1")).arg(d->sessionTimeOut);
+        d->responseHeaders.addValue("Session", sessionId);
+    }
 }
 
 void QnRtspConnectionProcessor::generateSessionId()
@@ -293,10 +307,10 @@ void QnRtspConnectionProcessor::sendResponse(int code)
     QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
 }
 
-int QnRtspConnectionProcessor::getMetadataTcpChannel() const
+int QnRtspConnectionProcessor::getMetadataChannelNum() const
 {
     Q_D(const QnRtspConnectionProcessor);
-    return getAVTcpChannel(d->metadataChannelNum);
+    return d->metadataChannelNum;
 }
 
 int QnRtspConnectionProcessor::getAVTcpChannel(int trackNum) const
@@ -361,22 +375,40 @@ QString QnRtspConnectionProcessor::getRangeStr()
     QString range;
     if (d->archiveDP) 
     {
-        range = "npt=";
         d->archiveDP->open();
-        if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
-            range += "now";
-        else
-            range += QString::number(d->archiveDP->startTime());
         d->prevStartTime = d->archiveDP->startTime();
-
-        range += "-";
-        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) {
-            range += "now";
+        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
             d->prevEndTime = DATETIME_NOW;
-        }
-        else {
-            range += QString::number(d->archiveDP->endTime());
+        else
             d->prevEndTime = d->archiveDP->endTime();
+        if (d->useProprietaryFormat)
+        {
+            // range in usecs since UTC
+            range = "npt=";
+            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+                range += "now";
+            else
+                range += QString::number(d->archiveDP->startTime());
+
+            range += "-";
+            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+                range += "now";
+            else 
+                range += QString::number(d->archiveDP->endTime());
+        }
+        else 
+        {
+            // use 'clock' attrubute. see RFC 2326
+            range = "clock=";
+            if (d->archiveDP->startTime() == AV_NOPTS_VALUE)
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+            else
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->startTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
+            range += "-";
+            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+                range += QDateTime::currentDateTime().toUTC().toString(RTSP_CLOCK_FORMAT);
+            else
+                range += QDateTime::fromMSecsSinceEpoch(d->archiveDP->endTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT);
         }
     }
     return range;
@@ -399,14 +431,14 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnAbstractM
 
     CodecID dstCodec;
     if (media->dataType == QnAbstractMediaData::VIDEO)
-        dstCodec = CODEC_ID_MPEG4;
+        dstCodec = CODEC_ID_H263P;
     else
         //dstCodec = media->compressionType == CODEC_ID_AAC ? CODEC_ID_AAC : CODEC_ID_MP2; // keep aac without transcoding for audio
         dstCodec = CODEC_ID_AAC; // keep aac without transcoding for audio
     //CodecID dstCodec = media->dataType == QnAbstractMediaData::VIDEO ? CODEC_ID_MPEG4 : media->compressionType;
     QSharedPointer<QnUniversalRtpEncoder> universalEncoder;
 
-    switch (media->compressionType)
+    switch (dstCodec)
     {
         //case CODEC_ID_H264:
         //    return QnRtspEncoderPtr(new QnRtspH264Encoder());
@@ -874,6 +906,8 @@ int QnRtspConnectionProcessor::composePlay()
         if (d->requestHeaders.value("x-play-now").isEmpty())
             return CODE_INTERNAL_ERROR;
         d->useProprietaryFormat = true;
+        d->sessionTimeOut = 0;
+        d->socket->setReadTimeOut(d->socketTimeout);
         createPredefinedTracks();
     }
 
@@ -924,7 +958,8 @@ int QnRtspConnectionProcessor::composePlay()
 
     QnAbstractMediaStreamDataProviderPtr currentDP = d->getCurrentDP();
 
-    addResponseRangeHeader();
+    if (d->useProprietaryFormat)
+        addResponseRangeHeader();
 
     if (!currentDP)
         return CODE_NOT_FOUND;
@@ -1086,10 +1121,11 @@ int QnRtspConnectionProcessor::composeGetParameter()
     QList<QByteArray> parameters = d->requestBody.split('\n');
     foreach(const QByteArray& parameter, parameters)
     {
-        if (parameter.trimmed().toLower() == "position")
+        QByteArray normParamName = parameter.trimmed().toLower();
+        if (normParamName == "position" || normParamName.isEmpty())
         {
             d->responseBody.append("position: ");
-            d->responseBody.append(QString::number(getRtspTime()));
+            d->responseBody.append(QDateTime::fromMSecsSinceEpoch(getRtspTime()/1000).toUTC().toString(RTSP_CLOCK_FORMAT));
             d->responseBody.append(ENDL);
             addResponseRangeHeader();
         }
@@ -1210,6 +1246,11 @@ void QnRtspConnectionProcessor::run()
         else if (t.elapsed() < 2)
         {
             // recv return 0 bytes imediatly, so client has closed socket
+            break;
+        }
+        else if (d->sessionTimeOut > 0)
+        {
+            // read timeout
             break;
         }
     }

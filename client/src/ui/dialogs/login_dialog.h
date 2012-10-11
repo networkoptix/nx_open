@@ -27,6 +27,7 @@ public:
     virtual ~LoginDialog();
 
     QUrl currentUrl() const;
+    QString currentName() const;
     QnConnectInfoPtr currentInfo() const;
 
 public slots:
@@ -50,7 +51,6 @@ private slots:
     void at_saveButton_clicked();
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
-	void at_oldHttpConnectFinished(int status, QByteArray errorString, QByteArray data, int handle);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
 private:

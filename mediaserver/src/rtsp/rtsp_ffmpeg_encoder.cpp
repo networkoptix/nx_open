@@ -41,20 +41,15 @@ void QnRtspFfmpegEncoder::setDataPacket(QnAbstractMediaDataPtr media)
     m_codecCtxData.clear();
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(m_media);
-    int subChannelNumber = m_media->subChannelNumber;
     if (!metadata && m_media->compressionType)
     {
-        QList<QnMediaContextPtr>& ctxData = m_ctxSended[m_media->channelNumber];
-        while (ctxData.size() <= subChannelNumber)
-            ctxData << QnMediaContextPtr(0);
-
         QnMediaContextPtr currentContext = m_media->context;
         if (currentContext == 0)
             currentContext = getGeneratedContext(m_media->compressionType);
         //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
-        if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
+        if (!m_ctxSended || !m_ctxSended->equalTo(currentContext.data()))
         {
-            ctxData[subChannelNumber] = currentContext;
+            m_ctxSended = currentContext;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &m_codecCtxData);
         }
     }
@@ -145,9 +140,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 
 quint32 QnRtspFfmpegEncoder::getSSRC()
 {
-    quint32 ssrc = BASIC_FFMPEG_SSRC + m_media->channelNumber * MAX_CONTEXTS_AT_VIDEO*2;
-    ssrc += m_media->subChannelNumber*2;
-    return ssrc + (m_isLastDataContext ? 1 : 0);
+    return BASIC_FFMPEG_SSRC + (m_isLastDataContext ? 1 : 0);
 }
 
 bool QnRtspFfmpegEncoder::getRtpMarker()

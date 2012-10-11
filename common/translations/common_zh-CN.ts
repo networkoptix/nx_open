@@ -84,7 +84,7 @@
     <message>
         <location filename="../src/api/video_server_statistics_storage.cpp" line="83"/>
         <source>CPU</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">CPU</translation>
     </message>
 </context>
 <context>

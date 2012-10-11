@@ -28,8 +28,7 @@ public:
         OpenGL2_0 = 0x8,                /**< Implements OpenGL2.0 spec. */
         
         ShadersBroken = 0x00010000,     /**< Vendor has messed something up, and shaders are not supported. */
-        OpenGLBroken = 0x00020000,      /**< Vendor has messed something up, and videodriver dies using OpenGL. */
-        NoOpenGLFullScreen = 0x0004000  /**< There are some artifacts in fullscreen mode. */
+        NoOpenGLFullScreen = 0x0002000  /**< There are some artifacts in fullscreen mode, so we shouldn't go to fullscreen. */
     };
     Q_DECLARE_FLAGS(Features, Feature);
 

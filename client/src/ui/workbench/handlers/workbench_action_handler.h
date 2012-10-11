@@ -165,12 +165,19 @@ protected:
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
+    bool closeAllLayouts(bool waitForReply = false);
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
     void openNewWindow(const QStringList &args);
 
-    void saveCameraSettingsFromDialog();
+    /**
+     * Save modified camera settings to resources.
+     * \param checkControls - if set then additional check will occur.
+     * If user modified some of control elements but did not apply changes he will be asked to fix it.
+     * \see Feature #1195
+     */
+    void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
     
@@ -231,6 +238,7 @@ protected slots:
     void at_reconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
@@ -288,14 +296,14 @@ protected slots:
 
 
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
-
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
+    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
    // void updateStoredConnections(QnConnectionData connectionData);
-    bool doAskNameAndExportLocalLayout(QnLayoutResourcePtr layout, LayoutExportMode mode);
+    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
+    QString getBinaryFilterName() const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
 private:
 

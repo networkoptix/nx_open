@@ -18,6 +18,7 @@ syntax: glob
 *.xcodeproj
 *.qm
 *.vcproj
+!launcher*.vcproj
 compatibility_info.cpp
 
 .DS_Store
@@ -144,3 +145,6 @@ android-client/.metadata/*
 android-client/**/bin/**
 android-client/**/*.prefs
 android-client/**/gen/*
+
+launcher/x86
+launcher/x64

@@ -284,8 +284,8 @@ int qnMain(int argc, char *argv[])
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
 #ifdef Q_WS_X11
-    QnX11LauncherWorkaround x11LauncherWorkaround;
-    application->installEventFilter(&x11LauncherWorkaround);
+ //   QnX11LauncherWorkaround x11LauncherWorkaround;
+ //   application->installEventFilter(&x11LauncherWorkaround);
 #endif
 
     if(singleApplication) {

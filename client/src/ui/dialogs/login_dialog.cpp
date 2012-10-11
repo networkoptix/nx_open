@@ -114,14 +114,15 @@ QUrl LoginDialog::currentUrl() const {
     return url;
 }
 
+QString LoginDialog::currentName() const {
+    return ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+}
+
 QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
 void LoginDialog::accept() {
-    /* Widget data may not be written out to the model yet. Force it. */
- //   m_dataWidgetMapper->submit();
-
     QUrl url = currentUrl();
     if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
@@ -130,19 +131,6 @@ void LoginDialog::accept() {
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
     m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
-
-    {
-        // TODO: #gdm ask Elrik about it a bit later
-        // Temporary 1.0/1.1 version check.
-        // Let's remove it 1.3/1.4.
-        QUrl httpUrl;
-        httpUrl.setHost(url.host());
-        httpUrl.setPort(url.port());
-        httpUrl.setScheme(QLatin1String("http"));
-        httpUrl.setUserName(QString());
-        httpUrl.setPassword(QString());
-        QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
-    }
 
     updateUsability();
 }
@@ -220,19 +208,6 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray /*errorString*/, QByteArray /*data*/, int /*handle*/) {
-    if (status == 204) {
-        m_requestHandle = -1;
-
-        updateUsability();
-
-        QMessageBox::warning(
-            this,
-            tr("Could not connect to Enterprise Controller"),
-            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your enterprise controller or contact VMS administrator.")
-        );
-    }
-}
 
 void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
@@ -308,16 +283,12 @@ void LoginDialog::at_saveButton_clicked() {
 
     bool ok = false;
 
-    QString defaultName(ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex()));
-    if (defaultName == QnConnectionDataList::defaultLastUsedName()){
-        defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-        if (connections.contains(defaultName))
-            defaultName = connections.generateUniqueName(defaultName);
-    }
-    QString name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, defaultName, &ok);
+    QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
     if (!ok)
         return;
 
+    // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
 
     if (connections.contains(name)){
@@ -341,14 +312,14 @@ void LoginDialog::at_saveButton_clicked() {
 }
 
 void LoginDialog::at_deleteButton_clicked() {
-    QnConnectionDataList connections = qnSettings->customConnections();
-    QString name = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    QString name = currentName();
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
+    QnConnectionDataList connections = qnSettings->customConnections();
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

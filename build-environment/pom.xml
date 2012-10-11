@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.hyperic</groupId>
 			<artifactId>sigar</artifactId>
-			<version>1.6-SNAPSHOT</version>
+			<version>${sigar.version}</version>
 			<type>zip</type>
 			<classifier>${platform}-${arch}-${compiler}</classifier>
 		</dependency>                               	

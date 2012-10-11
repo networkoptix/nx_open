@@ -74,15 +74,20 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
     {
         QMutexLocker lock(&m_allConsumersMutex);
         m_allConsumers.remove(this);
-        foreach(QnRtspDataConsumer* consumer, m_allConsumers)
+        if (m_firstLiveTime != AV_NOPTS_VALUE)
         {
-            if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
+            // If some data was transfered and camera is closing, some bandwidth appears.
+            // Try to switch some camera(s) to high quality
+            foreach(QnRtspDataConsumer* consumer, m_allConsumers)
             {
-                if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
                 {
-                    consumer->resetQualityStatistics();
-                    if (m_liveQuality == MEDIA_Quality_Low)
-                        break;
+                    if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                    {
+                        consumer->resetQualityStatistics();
+                        if (m_liveQuality == MEDIA_Quality_Low)
+                            break; // try only one camera is current quality is low
+                    }
                 }
             }
         }
@@ -645,8 +650,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (!newRange.isEmpty())
     {
         int sendLen = newRange.size();
-        int metadataTcpChannel = m_owner->getMetadataTcpChannel();
-        if (metadataTcpChannel >= 0) 
+        trackInfo = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
+        if (trackInfo) 
         {
             m_sendBuffer.resize(16);
             buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, newRange.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
@@ -659,7 +664,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                 *lenPtr = htons(m_sendBuffer.size() - 4);
                 m_owner->sendBuffer(m_sendBuffer);
             }
-            else  {
+            else  if (trackInfo->mediaSocket) {
                 Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
                 trackInfo->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
             }
