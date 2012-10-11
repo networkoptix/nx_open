@@ -38,7 +38,7 @@ public:
     AVCodecContext* getContext() const;
 
     PixelFormat GetPixelFormat() const;
-    QnAbstractPictureData::PicStorageType targetMemoryType() const;
+    QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
     //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize

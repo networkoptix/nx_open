@@ -550,9 +550,9 @@ PixelFormat CLFFmpegVideoDecoder::GetPixelFormat() const
     }
 }
 
-QnAbstractPictureData::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() const
+QnAbstractPictureDataRef::PicStorageType CLFFmpegVideoDecoder::targetMemoryType() const
 {
-	return QnAbstractPictureData::pstSysMemPic;
+	return QnAbstractPictureDataRef::pstSysMemPic;
 }
 
 QSize CLFFmpegVideoDecoder::getOriginalPictureSize() const

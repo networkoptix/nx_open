@@ -19,7 +19,7 @@ PixelFormat VideoDecoderSwitcher::GetPixelFormat() const
 }
 
 //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-QnAbstractPictureData::PicStorageType VideoDecoderSwitcher::targetMemoryType() const
+QnAbstractPictureDataRef::PicStorageType VideoDecoderSwitcher::targetMemoryType() const
 {
     return m_decoder->targetMemoryType();
 }

@@ -19,7 +19,7 @@ public:
     virtual void setOutPictureSize( const QSize& outSize );
     void setLightCpuMode(DecodeMode) {}
 
-    QnAbstractPictureData::PicStorageType targetMemoryType() const { return QnAbstractPictureData::pstSysMemPic; }
+    QnAbstractPictureDataRef::PicStorageType targetMemoryType() const { return QnAbstractPictureDataRef::pstSysMemPic; }
     //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
     virtual unsigned int getDecoderCaps() const;
 

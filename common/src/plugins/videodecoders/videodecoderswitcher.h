@@ -27,7 +27,7 @@ public:
     //!Implementation of QnAbstractVideoDecoder::GetPixelFormat
     virtual PixelFormat GetPixelFormat() const;
     //!Implementation of QnAbstractVideoDecoder::targetMemoryType
-    virtual QnAbstractPictureData::PicStorageType targetMemoryType() const;
+    virtual QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
     //!Implementation of QnAbstractVideoDecoder::decode
     virtual bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
     //!Implementation of QnAbstractVideoDecoder::setLightCpuMode
