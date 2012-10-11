@@ -45,8 +45,6 @@ public:
     */
     virtual bool isRtpHeaderExists() const = 0;
 
-    virtual void setBaseTime(qint64 value) {}
-
 protected:
     QnAbstractMediaDataPtr m_sdpMediaPacket;
 };
