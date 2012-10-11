@@ -232,7 +232,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         {
             qint64 skipTime = m_dataQueue.front()->timestamp;
             m_dataQueue.clear();
-            copyLastGopFromCamera(false, skipTime-1); // todo: add skip time here
+            copyLastGopFromCamera(false, skipTime-1);
             m_newLiveQuality = MEDIA_Quality_Low;
         }
         else {
