@@ -54,11 +54,15 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
     if(user->isAdmin())
         result |= Qn::GlobalOwnerPermission;
 
-    if(result & Qn::DeprecatedEditCamerasPermission)
+    if(result & Qn::DeprecatedEditCamerasPermission) {
+        result &= ~Qn::DeprecatedEditCamerasPermission;
         result |= Qn::GlobalEditCamerasPermission | Qn::GlobalPtzControlPermission;
+    }
 
-    if(result & Qn::DeprecatedViewExportArchivePermission)
+    if(result & Qn::DeprecatedViewExportArchivePermission) {
+        result &= ~Qn::DeprecatedViewExportArchivePermission;
         result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportArchivePermission;
+    }
 
     return result;
 }

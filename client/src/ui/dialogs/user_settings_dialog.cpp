@@ -376,7 +376,9 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
                      Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions,
                      previous);
     previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
-    createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
+    previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
+    previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportArchivePermission, previous);
 }
 
 QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {

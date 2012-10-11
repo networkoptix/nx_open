@@ -192,8 +192,8 @@ namespace Qn {
 
         /* Shortcuts. */
         GlobalLiveViewerPermission              = GlobalViewLivePermission,
-        GlobalViewerPermission                  = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
-        GlobalAdvancedViewerPermission          = GlobalViewerPermission           | GlobalEditCamerasPermission,
+        GlobalViewerPermission                  = GlobalLiveViewerPermission       | GlobalViewArchivePermission | GlobalExportArchivePermission,
+        GlobalAdvancedViewerPermission          = GlobalViewerPermission           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
         GlobalAdminPermission                   = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
         GlobalOwnerPermission                   = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
             
