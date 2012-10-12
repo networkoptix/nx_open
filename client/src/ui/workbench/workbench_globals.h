@@ -172,10 +172,12 @@ namespace Qn {
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
         CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
-        
+
+        /* Media-specific permissions. */
+        ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */
+
         /* Camera-specific permissions. */
         PtzControlPermission                    = 0x10000000,   /**< Permission to use camera's PTZ controls. */
-        ExportPermission                        = 0x20000000,   /**< Permission to export camera's archive. */
 
         /* Global permissions, applicable to current user only. */
         GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
