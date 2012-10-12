@@ -202,7 +202,7 @@ namespace Qn {
         GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
-        AllPermissions                          = 0xFFFFFFFFFFFFFFFF
+        AllPermissions                          = 0xFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 
