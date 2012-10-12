@@ -68,7 +68,7 @@ protected slots:
     void updateAccessRights() { updateElement(AccessRights); }
     void loadAccessRightsToUi(quint64 rights);
 
-    void updateCheckBoxEnabled();
+    void updateDependantPermissions();
 
     void updateAll();
     void setHasChanges(bool hasChanges = true);

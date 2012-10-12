@@ -12,6 +12,7 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -143,7 +144,9 @@ void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
 
     if(context) {
         connect(context->instance<QnWorkbenchPanicWatcher>(), SIGNAL(panicModeChanged()), this, SLOT(updatePanicLabelText()));
+        connect(context, SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateLicensesButtonVisible()));
         updatePanicLabelText();
+        updateLicensesButtonVisible();
     }
 }
 
@@ -486,6 +489,10 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
                 arg(tr("%n license(s) are used out of %1", NULL, used).arg(total))
         );
     }
+}
+
+void QnCameraScheduleWidget::updateLicensesButtonVisible() {
+    ui->licensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {

@@ -595,7 +595,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if(m_camera) {
         if(
             (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) && 
-            accessController()->hasPermissions(m_resource, Qn::WritePermission) 
+            accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
 
@@ -610,7 +610,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
     if (m_display->camDisplay()->isStillImage()) {
         return EmptyOverlay;
-    } else if(m_display->isPaused() && (options() & DisplayActivityOverlay)) {
+    } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
         return OfflineOverlay;
@@ -618,6 +618,8 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isNoData()) {
         return NoDataOverlay;
+    } else if (m_display->isPaused()) {
+        return EmptyOverlay;
     } else {
         return base_type::calculateChannelOverlay(channel, QnResource::Online);
     }

@@ -52,7 +52,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
     if(user->isAdmin())
-        result |= Qn::GlobalOwnerPermission;
+        result |= Qn::GlobalOwnerPermissions;
 
     if(result & Qn::DeprecatedEditCamerasPermission) {
         result &= ~Qn::DeprecatedEditCamerasPermission;
@@ -61,7 +61,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 
     if(result & Qn::DeprecatedViewExportArchivePermission) {
         result &= ~Qn::DeprecatedViewExportArchivePermission;
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportArchivePermission;
+        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
     }
 
     return result;
@@ -123,7 +123,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnUserRe
         
         /* Protected users can only be edited by super-user. */
         if ((m_userPermissions & Qn::GlobalEditProtectedUserPermission) || !(globalPermissions(user) & Qn::GlobalProtectedPermission))
-            result |= Qn::ReadWriteSavePermission | Qn::WriteLoginPermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
+            result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission | Qn::WritePasswordPermission | Qn::WriteAccessRightsPermission | Qn::RemovePermission;
     }
     return result;
 }
@@ -137,14 +137,14 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
     } if(QnWorkbenchLayoutSnapshotManager::isFile(layout)) {
         return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
     } else if(m_userPermissions & Qn::GlobalEditLayoutsPermission) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
     } else {
         QnResourcePtr user = resourcePool()->getResourceById(layout->getParentId());
         if(user != m_user) 
             return 0; /* Viewer can't view other's layouts. */
 
         if(snapshotManager()->isLocal(layout)) {
-            return Qn::ReadPermission | Qn::WritePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
+            return Qn::ReadPermission | Qn::WritePermission | Qn::WriteNamePermission | Qn::RemovePermission | Qn::AddRemoveItemsPermission; /* Can structurally modify local layouts only. */
         } else {
             return Qn::ReadPermission | Qn::WritePermission;
         }
@@ -154,24 +154,27 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
     assert(camera);
 
-    if(m_userPermissions & Qn::GlobalEditCamerasPermission) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
-    } else {
-        return Qn::ReadPermission;
-    }
+    Qn::Permissions result = Qn::ReadPermission;
+    if(m_userPermissions & Qn::GlobalEditCamerasPermission)
+        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+    if(m_userPermissions & Qn::GlobalPtzControlPermission)
+        result |= Qn::WritePtzPermission;
+    if(m_userPermissions & Qn::GlobalExportPermission)
+        result |= Qn::ExportPermission;
+    return result;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &media) {
     assert(media);
 
-    return Qn::ReadPermission;
+    return Qn::ReadPermission | Qn::ExportPermission;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {
     assert(server);
 
     if(m_userPermissions & Qn::GlobalEditServersPermissions) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
+        return Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
     } else {
         return 0;
     }

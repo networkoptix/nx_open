@@ -18,17 +18,16 @@ void QnAppCastParser::setPlatform(const QString& platform) {
     m_platform = platform;
 }
 
-QnUpdateInfoItems QnAppCastParser::items() const {
+QnUpdateInfoItemList QnAppCastParser::items() const {
     return m_items;
 }
 
-QnUpdateInfoItems QnAppCastParser::newItems(const QnVersion& version) const {
-    QnUpdateInfoItems filtered;
+QnUpdateInfoItemList QnAppCastParser::newItems(const QnVersion& version) const {
+    QnUpdateInfoItemList filtered;
 
-    foreach(QnUpdateInfoItemPtr item, m_items) {
-        if (version < item->version)
+    foreach(const QnUpdateInfoItem &item, m_items)
+        if (version < item.version)
             filtered.append(item);
-    }
 
     return filtered;
 }
@@ -36,7 +35,8 @@ QnUpdateInfoItems QnAppCastParser::newItems(const QnVersion& version) const {
 void QnAppCastParser::parse(const QByteArray& data) {
     m_items.clear();
 
-    QnUpdateInfoItemPtr currentItem;
+    bool inItem = false;
+    QnUpdateInfoItem currentItem;
 
     QXmlStreamReader xml;
     xml.addData(data);
@@ -45,31 +45,32 @@ void QnAppCastParser::parse(const QByteArray& data) {
         xml.readNext();
         if (xml.isStartElement()) {
             if (xml.name() == TAG_ITEM)
-                currentItem = QnUpdateInfoItemPtr(new QnUpdateInfoItem());
+                inItem = true;
 
-            if (currentItem && xml.name() == TAG_ENCLOSURE) {
+            if (inItem && xml.name() == TAG_ENCLOSURE) {
                 QXmlStreamAttributes attributes = xml.attributes();
 
                 if (m_platform.isEmpty() || m_platform == attributes.value(TAG_PLATFORM).toString()) {
-                    currentItem->url = QUrl(attributes.value(TAG_URL).toString());
-                    currentItem->version = attributes.value(TAG_VERSION).toString();
+                    currentItem.url = QUrl(attributes.value(TAG_URL).toString());
+                    currentItem.version = attributes.value(TAG_VERSION).toString();
                 }
             }
 
             currentTag = xml.name().toString();
         } else if (xml.isEndElement()) {
             if (xml.name() == TAG_ITEM) {
-                if (currentItem && !currentItem->version.isEmpty())
+                if (inItem && !currentItem.isNull())
                     m_items.append(currentItem);
-                currentItem = QnUpdateInfoItemPtr();
+                inItem = false;
+                currentItem = QnUpdateInfoItem();
             }
-        } else if (currentItem && xml.isCharacters() && !xml.isWhitespace()) {
+        } else if (inItem && xml.isCharacters() && !xml.isWhitespace()) {
              if (currentTag == TAG_TITLE)
-                 currentItem->title = xml.text().toString();
+                 currentItem.title = xml.text().toString();
              else if (currentTag == TAG_DESCRIPTION)
-                 currentItem->description = xml.text().toString();
+                 currentItem.description = xml.text().toString();
              else if (currentTag == TAG_PUBDATE)
-                 currentItem->pubDate = xml.text().toString();
+                 currentItem.pubDate = xml.text().toString();
         }
      }
 

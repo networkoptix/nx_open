@@ -78,6 +78,7 @@ public:
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
 
         local_media = local | media,
+        local_layout = local | layout,
 
         local_server = local | server,
         remote_server = remote | server,

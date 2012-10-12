@@ -17,8 +17,10 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
 {
     ui->setupUi(this);
 
+    ui->camerasTable->horizontalHeader()->setVisible(true);
     ui->camerasTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
     ui->camerasTable->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
+    ui->camerasTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
