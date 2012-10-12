@@ -702,7 +702,9 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgets.size() >= 24) { // TODO: item limit must be changeable.
+    const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
+
+    if (m_widgets.size() >= maxItemCount) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
