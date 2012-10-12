@@ -5,7 +5,6 @@
 #include <QUrl>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QXmlStreamReader>
 
 #include "update_info.h"
 #include "appcast_parser.h"
@@ -13,7 +12,7 @@
 class QnUpdateChecker : public QObject {
     Q_OBJECT
 public:
-    QnUpdateChecker(const QUrl& url, const QString& platform, const QString& version);
+    QnUpdateChecker(const QUrl& url, const QString& platform, const QString& version, QObject *parent = NULL);
 
     void checkForUpdates();
 
