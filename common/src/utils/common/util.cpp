@@ -184,3 +184,14 @@ quint64 getUsecTimer()
     return tv.tv_sec * 1000000ull + tv.tv_usec;
 #endif
 } 
+
+QString getValueFromString(const QString& line)
+{
+
+    int index = line.indexOf(QLatin1Char('='));
+
+    if (index < 1)
+        return QString();
+
+    return line.mid(index+1);
+}

@@ -162,16 +162,8 @@ static QStringList getValues(const QString& line)
     return values.split(QLatin1Char(','));
 }
 
-QString getValueFromString(const QString& line)
-{
-    
-    int index = line.indexOf(QLatin1Char('='));
+extern QString getValueFromString(const QString& line);
 
-    if (index < 1)
-        return QString();
-
-    return line.mid(index+1);
-}
 
 static bool sizeCompare(const QSize &s1, const QSize &s2)
 {

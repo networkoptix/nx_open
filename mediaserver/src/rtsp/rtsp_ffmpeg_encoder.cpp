@@ -39,6 +39,8 @@ void QnRtspFfmpegEncoder::setDataPacket(QnAbstractMediaDataPtr media)
     m_media = media;
     m_curDataBuffer = media->data.data();
     m_codecCtxData.clear();
+    if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
+        m_ctxSended.clear();
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
@@ -82,9 +84,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
             flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_gotLivePacket = true;
     }
-    if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        m_ctxSended.clear();
-
 
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
