@@ -52,7 +52,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
     if(user->isAdmin())
-        result |= Qn::GlobalOwnerPermission;
+        result |= Qn::GlobalOwnerPermissions;
 
     if(result & Qn::DeprecatedEditCamerasPermission) {
         result &= ~Qn::DeprecatedEditCamerasPermission;
@@ -61,7 +61,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 
     if(result & Qn::DeprecatedViewExportArchivePermission) {
         result &= ~Qn::DeprecatedViewExportArchivePermission;
-        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportArchivePermission;
+        result |= Qn::GlobalViewArchivePermission | Qn::GlobalExportPermission;
     }
 
     return result;
@@ -154,17 +154,20 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnLayout
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnVirtualCameraResourcePtr &camera) {
     assert(camera);
 
-    if(m_userPermissions & Qn::GlobalEditCamerasPermission) {
-        return Qn::ReadWriteSavePermission | Qn::RemovePermission;
-    } else {
-        return Qn::ReadPermission;
-    }
+    Qn::Permissions result = Qn::ReadPermission;
+    if(m_userPermissions & Qn::GlobalEditCamerasPermission)
+        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    if(m_userPermissions & Qn::GlobalPtzControlPermission)
+        result |= Qn::PtzControlPermission;
+    if(m_userPermissions & Qn::GlobalExportPermission)
+        result |= Qn::ExportPermission;
+    return result;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnAbstractArchiveResourcePtr &media) {
     assert(media);
 
-    return Qn::ReadPermission;
+    return Qn::ReadPermission | Qn::ExportPermission;
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnMediaServerResourcePtr &server) {

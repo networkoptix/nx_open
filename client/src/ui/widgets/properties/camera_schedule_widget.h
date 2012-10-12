@@ -61,6 +61,7 @@ private slots:
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
+    void updateLicensesButtonVisible();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();

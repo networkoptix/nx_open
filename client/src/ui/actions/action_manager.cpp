@@ -178,28 +178,38 @@ public:
         return *this;
     }
 
-    void showCheckBoxInMenu(bool show) {
+    QnActionBuilder showCheckBoxInMenu(bool show) {
         m_action->setProperty(Qn::HideCheckBoxInMenu, !show);
+
+        return *this;
     }
 
-    void condition(QnActionCondition *condition) {
+    QnActionBuilder condition(QnActionCondition *condition) {
         assert(m_action->condition() == NULL);
 
         m_action->setCondition(condition);
+
+        return *this;
     }
 
-    void condition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All) {
+    QnActionBuilder condition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode = Qn::All) {
         assert(m_action->condition() == NULL);
 
         m_action->setCondition(new QnResourceActionCondition(criterion, matchMode, m_action));
+
+        return *this;
     }
 
-    void childFactory(QnActionFactory *childFactory) {
+    QnActionBuilder childFactory(QnActionFactory *childFactory) {
         m_action->setChildFactory(childFactory);
+
+        return *this;
     }
 
-    void rotationSpeed(qreal rotationSpeed) {
+    QnActionBuilder rotationSpeed(qreal rotationSpeed) {
         m_action->setProperty(Qn::ToolButtonCheckedRotationSpeed, rotationSpeed);
+
+        return *this;
     }
 
 private:
@@ -685,12 +695,14 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
+        conditionalText(tr("Show Motion"), new QnNoArchiveActionCondition(this)).
         shortcut(tr("Alt+G")).
         condition(new QnSmartSearchActionCondition(false, this));
 
     factory(Qn::StopSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Hide Motion/Smart Search")).
+        conditionalText(tr("Hide Motion"), new QnNoArchiveActionCondition(this)).
         shortcut(tr("Alt+G")).
         condition(new QnSmartSearchActionCondition(true, this));
 
@@ -910,12 +922,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection...")).
+        requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
         text(tr("Export Selection as Multi-View...")).
-        //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
     factory(Qn::ThumbnailsSearchAction).

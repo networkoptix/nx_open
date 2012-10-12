@@ -306,3 +306,7 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
 Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
     return action(Qn::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
+    return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
+}
