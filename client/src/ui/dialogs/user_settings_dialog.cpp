@@ -358,15 +358,15 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
 
     // show only for view of owner
     if (permissions & Qn::GlobalEditProtectedUserPermission)
-        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermission);
+        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermissions);
 
     // show for an admin or for anyone opened by owner
     if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermission);
+        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermission);
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermission);
-    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermission);
+    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermissions);
 
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }

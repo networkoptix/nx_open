@@ -52,7 +52,7 @@ Qn::Permissions QnWorkbenchAccessController::globalPermissions(const QnUserResou
 
     result = static_cast<Qn::Permissions>(user->getPermissions());
     if(user->isAdmin())
-        result |= Qn::GlobalOwnerPermission;
+        result |= Qn::GlobalOwnerPermissions;
 
     if(result & Qn::DeprecatedEditCamerasPermission) {
         result &= ~Qn::DeprecatedEditCamerasPermission;

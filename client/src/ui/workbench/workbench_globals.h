@@ -196,11 +196,11 @@ namespace Qn {
         DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Can view and export archives of available cameras. */
 
         /* Shortcuts. */
-        GlobalLiveViewerPermission              = GlobalViewLivePermission,
-        GlobalViewerPermission                  = GlobalLiveViewerPermission       | GlobalViewArchivePermission | GlobalExportPermission,
-        GlobalAdvancedViewerPermission          = GlobalViewerPermission           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermission                   = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
-        GlobalOwnerPermission                   = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
+        GlobalLiveViewerPermissions             = GlobalViewLivePermission,
+        GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
+        GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
         AllPermissions                          = 0xFFFFFFFFFFFFFFFF
     };
