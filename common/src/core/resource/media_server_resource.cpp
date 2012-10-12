@@ -10,7 +10,7 @@ QnLocalMediaServerResource::QnLocalMediaServerResource()
 {
     //setTypeId(qnResTypePool->getResourceTypeId("", QLatin1String("LocalServer"))); // ###
     addFlags(QnResource::server | QnResource::local);
-    removeFlags(QnResource::media);
+    removeFlags(QnResource::media); // TODO: is this call needed here?
 
     setName(QLatin1String("Local"));
     setStatus(Online);
@@ -28,7 +28,7 @@ QnMediaServerResource::QnMediaServerResource():
 {
     setTypeId(qnResTypePool->getResourceTypeId(QString(), QLatin1String("Server")));
     addFlags(QnResource::server | QnResource::remote);
-    removeFlags(QnResource::media);
+    removeFlags(QnResource::media); // TODO: is this call needed here?
     setName(tr("Server"));
 
     m_primaryIFSelected = false;

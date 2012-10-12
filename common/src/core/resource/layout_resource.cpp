@@ -317,7 +317,8 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
     }
     delete itemNamesIO;
     layout->setItems(updatedItems);
-    layout->addFlags(QnResource::local_media);
+    //layout->addFlags(QnResource::local_media);
+    layout->addFlags(QnResource::local);
     return layout;
 }
 
