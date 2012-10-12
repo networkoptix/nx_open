@@ -1567,9 +1567,11 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
             /* User may have opened some panels while zoomed, 
              * we want to leave them opened even if they were closed before. */
             setOpenedPanels(m_unzoomedOpenedPanels | openedPanels());
+
+            /* Viewport margins have changed, force fit-in-view. */
+            display()->fitInView();
         }
     }
-
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {
