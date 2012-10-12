@@ -42,6 +42,9 @@ void QnViewportBoundWidget::setDesiredRotation(Qn::FixedItemRotation fixedRotati
 }
 
 void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
+    if (m_desiredSize.isNull())
+        return;
+
     if(!view)
         view = m_lastView.data();
     if(!view && scene() && !scene()->views().empty())
