@@ -6,7 +6,7 @@
 #include "core/resource/media_resource.h"
 #include "api/media_server_connection.h"
 
-class QnLocalMediaServerResource : public QnMediaResource
+class QnLocalMediaServerResource : public QnResource
 {
     Q_OBJECT
 
@@ -20,7 +20,7 @@ protected:
 };
 
 
-class QnMediaServerResource : public QnMediaResource
+class QnMediaServerResource : public QnResource
 {
     Q_OBJECT
     Q_PROPERTY(QString apiUrl READ getApiUrl WRITE setApiUrl)

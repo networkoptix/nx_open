@@ -911,12 +911,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Export Selection...")).
+        requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
         text(tr("Export Selection as Multi-View...")).
-        //condition(new QnTimePeriodActionCondition(Qn::NormalTimePeriod, Qn::DisabledAction, false, this));
+        requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
     factory(Qn::ThumbnailsSearchAction).

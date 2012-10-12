@@ -335,9 +335,9 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
-void QnUserSettingsDialog::updateCheckBoxEnabled() {
+void QnUserSettingsDialog::updateDependantPermissions() {
     bool canViewArchive = m_advancedRights[Qn::GlobalViewArchivePermission] ? m_advancedRights[Qn::GlobalViewArchivePermission]->isChecked() : false;
-    if(QCheckBox *exportArchiveCheckBox = m_advancedRights[Qn::GlobalExportArchivePermission]) {
+    if(QCheckBox *exportArchiveCheckBox = m_advancedRights[Qn::GlobalExportPermission]) {
         exportArchiveCheckBox->setEnabled(canViewArchive);
         if(!canViewArchive)
             exportArchiveCheckBox->setChecked(false);
@@ -347,9 +347,8 @@ void QnUserSettingsDialog::updateCheckBoxEnabled() {
 void QnUserSettingsDialog::at_accessRights_changed() {
     setHasChanges(true);
     selectAccessRightsPreset(readAccessRightsAdvanced());
-    updateCheckBoxEnabled();
+    updateDependantPermissions();
 }
-
 
 void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
@@ -388,9 +387,9 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
-    previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportArchivePermission, previous);
+    previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
 
-    updateCheckBoxEnabled();
+    updateDependantPermissions();
 }
 
 QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {
@@ -428,7 +427,7 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
         i.next();
         i.value()->setChecked(i.key() & rights);
     }
-    updateCheckBoxEnabled(); // TODO: rename to something more sane, connect properly
+    updateDependantPermissions(); // TODO: rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {

@@ -5,31 +5,23 @@
 
 namespace Qn {
 
-    inline QLatin1String qn_gridPositionParameter()         { return QLatin1String("_qn_gridPosition"); }
-    inline QLatin1String qn_userParameter()                 { return QLatin1String("_qn_user"); }
-    inline QLatin1String qn_nameParameter()                 { return QLatin1String("_qn_name"); }
-    inline QLatin1String qn_serverParameter()               { return QLatin1String("_qn_server"); }
-    inline QLatin1String qn_layoutParameter()               { return QLatin1String("_qn_layoutParameter"); }
-    inline QLatin1String qn_currentLayoutParameter()        { return QLatin1String("_qn_currentLayoutParameter"); }
-    inline QLatin1String qn_currentUserParameter()          { return QLatin1String("_qn_currentUserParameter"); }
-    inline QLatin1String qn_allMediaServersParameter()      { return QLatin1String("_qn_allMediaServers"); }
-    inline QLatin1String qn_serializedResourcesParameter()  { return QLatin1String("_qn_serializedResourcesParameter"); }
-    inline QLatin1String qn_timePeriodParameter()           { return QLatin1String("_qn_timePeriodParameter"); }
-    inline QLatin1String qn_timePeriodsParameter()          { return QLatin1String("_qn_timePeriodsParameter"); }
-    inline QLatin1String qn_connectInfoParameter()          { return QLatin1String("_qn_connectInfoParameter"); }
+    inline QLatin1String fromLatin1(const char *s) {
+        return QLatin1String(s);
+    }
 
-#define GridPositionParameter qn_gridPositionParameter()
-#define UserParameter qn_userParameter()
-#define NameParameter qn_nameParameter()
-#define ServerParameter qn_serverParameter()
-#define LayoutParameter qn_layoutParameter()
-#define CurrentLayoutParameter qn_currentLayoutParameter()
-#define CurrentUserParameter qn_currentUserParameter()
-#define AllMediaServersParameter qn_allMediaServersParameter()
-#define SerializedResourcesParameter qn_serializedResourcesParameter()
-#define TimePeriodParameter qn_timePeriodParameter()
-#define TimePeriodsParameter qn_timePeriodsParameter()
-#define ConnectInfoParameter qn_connectInfoParameter()
+#define GridPositionParameter               fromLatin1("_qn_gridPosition")
+#define UserParameter                       fromLatin1("_qn_user")
+#define NameParameter                       fromLatin1("_qn_name")
+#define ServerParameter                     fromLatin1("_qn_server")
+#define LayoutParameter                     fromLatin1("_qn_layoutParameter")
+#define CurrentLayoutParameter              fromLatin1("_qn_currentLayoutParameter")
+#define CurrentLayoutMediaItemsParameter    fromLatin1("_qn_currentLayoutMediaItemsParameter")
+#define CurrentUserParameter                fromLatin1("_qn_currentUserParameter")
+#define AllMediaServersParameter            fromLatin1("_qn_allMediaServers")
+#define SerializedResourcesParameter        fromLatin1("_qn_serializedResourcesParameter")
+#define TimePeriodParameter                 fromLatin1("_qn_timePeriodParameter")
+#define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
+#define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
 
     /**
      * Enum of all menu actions.
