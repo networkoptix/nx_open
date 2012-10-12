@@ -8,6 +8,7 @@
 #include <QList>
 #include <QUrl>
 
+// TODO: use boost to implement operators.
 class QnVersion {
 public:
     QnVersion();
@@ -17,7 +18,7 @@ public:
     bool isNull() const;
     bool operator<(const QnVersion  &other) const;
     bool operator==(const QnVersion &other) const;
-    
+
     QString toString() const;
 
     int major() const {
@@ -38,12 +39,21 @@ private:
     int m_build;
 };
 
-// TODO: #Ivan add doxycomments for fields of this struct.
+
 struct QnUpdateInfoItem {
+    /** Update version. */
     QnVersion version;
+
+    /** Update information title. */
     QString title;
+
+    /** Detailed update information. */
     QString description;
+
+    /** Date when this update was released. */
     QString pubDate;
+
+    /** Download url. */
     QUrl url;
 
     bool isNull() const;

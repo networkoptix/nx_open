@@ -7,8 +7,14 @@
 #include "version.h"
 
 namespace {
+    struct UpdateVersionLess {
+        bool operator()(const QnUpdateInfoItem &l, const QnUpdateInfoItem &r) {
+            return l.version < r.version;
+        }
+    };
+
     const int updatePeriodMSec = 60 * 60 * 1000; /* 1 hour. */
-}
+} // anonymous namespace
 
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
     QObject(parent)
@@ -33,10 +39,23 @@ QnWorkbenchUpdateWatcher::~QnWorkbenchUpdateWatcher() {
 }
 
 void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList updates) {
-    if(m_availableUpdates == updates)
+    if(updates.isEmpty())
         return;
+
+    qSort(updates.begin(), updates.end(), UpdateVersionLess());
+    QnUpdateInfoItem lastUpdate = updates.last();
+
+    QnVersion currentVersion = QnVersion(VER_PRODUCTVERSION);
+    if(lastUpdate.version == currentVersion || lastUpdate.version < currentVersion) // TODO: use <=
+        return;
+
+    if(lastUpdate.version == m_availableUpdate.version)
+        return;
+
+    m_availableUpdate = lastUpdate;
+    emit availableUpdateChanged();
 }
 
 void QnWorkbenchUpdateWatcher::at_timer_timeout() {
-
+    m_checker->checkForUpdates();
 }

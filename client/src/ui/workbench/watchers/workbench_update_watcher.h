@@ -13,12 +13,12 @@ public:
     QnWorkbenchUpdateWatcher(QObject *parent = NULL);
     virtual ~QnWorkbenchUpdateWatcher();
 
-    QnUpdateInfoItemList availableUpdates() const {
-        return m_availableUpdates;
+    QnUpdateInfoItem availableUpdate() const {
+        return m_availableUpdate;
     }
 
 signals:
-    void availableUpdatesChanged();
+    void availableUpdateChanged();
 
 private slots:
     void at_checker_updatesAvailable(QnUpdateInfoItemList updates);
@@ -26,7 +26,7 @@ private slots:
 
 private:
     QnUpdateChecker *m_checker;
-    QnUpdateInfoItemList m_availableUpdates;
+    QnUpdateInfoItem m_availableUpdate;
 };
 
 #endif // QN_WORKBENCH_UPDATE_WATCHER_H

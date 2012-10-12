@@ -70,6 +70,7 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
+#include <ui/workbench/watchers/workbench_update_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -236,6 +237,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
+    connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -2635,6 +2637,18 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull())
+        return;
+    
+    QMessageBox::information(
+        widget(), 
+        tr("Software Update is Available"), 
+        tr("Version %1 is available for download at %2.").arg(update.version.toString()).arg(update.url.toString())
+    );
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {

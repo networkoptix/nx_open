@@ -285,6 +285,7 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
+    void at_updateWatcher_availableUpdateChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
@@ -294,8 +295,8 @@ protected slots:
     void at_layout_exportFinished();
     void at_cameraCamera_exportFailed(QString errorMessage);
 
-
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -307,7 +308,6 @@ private:
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
 
 private:
-
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
