@@ -1969,7 +1969,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
-QString QnWorkbenchActionHandler::getBinaryFilterName() const
+QString QnWorkbenchActionHandler::binaryFilterName() const
 {
     if (sizeof(char*) == 4)
         return tr("Executable Network Optix Media File (x86) (*.exe)");
@@ -2001,17 +2001,16 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     QString fileName;
     QString selectedExtension;
-    QString binaryFilterName;
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov);;")+ getBinaryFilterName(),
+            tr("Network Optix Media File (*.nov);;") + binaryFilterName(),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
-            );
+        );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
@@ -2026,7 +2025,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                     tr("Save As"), 
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
+                );
 
                 if(button == QMessageBox::Cancel || button == QMessageBox::No)
                     return false;
@@ -2039,7 +2038,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                 tr("Can't overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
-                );
+            );
             continue;
         } 
 
@@ -2387,7 +2386,7 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + getBinaryFilterName();
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName();
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(

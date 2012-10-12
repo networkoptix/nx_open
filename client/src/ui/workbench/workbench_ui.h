@@ -260,6 +260,7 @@ private slots:
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();
+    void at_calendarHidingProcessor_hoverFocusLeft();
 
     void at_fpsItem_geometryChanged();
 
@@ -457,6 +458,8 @@ private:
     AnimatorGroup *m_calendarOpacityAnimatorGroup;
 
     HoverFocusProcessor *m_calendarOpacityProcessor;
+
+    HoverFocusProcessor *m_calendarHidingProcessor;
 
     bool m_inCalendarGeometryUpdate;
 };

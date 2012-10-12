@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "../workbench_globals.h"
+#include <ui/workbench/workbench_globals.h>
 #include <utils/settings.h>
 
 class QAction;
@@ -189,7 +189,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-signals:
+
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
@@ -301,10 +301,11 @@ private:
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
-   // void updateStoredConnections(QnConnectionData connectionData);
+    // void updateStoredConnections(QnConnectionData connectionData);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-    QString getBinaryFilterName() const;
+    QString binaryFilterName() const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
+
 private:
 
     friend class detail::QnResourceStatusReplyProcessor;
