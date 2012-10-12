@@ -23,7 +23,7 @@ static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
 QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
 QSet<QnRtspDataConsumer*> QnRtspDataConsumer::m_allConsumers;
-QMutex QnRtspDataConsumer::m_allConsumersMutex;
+QMutex QnRtspDataConsumer::m_allConsumersMutex(QMutex::Recursive);
 
 
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
@@ -723,9 +723,9 @@ void QnRtspDataConsumer::setAllowAdaptiveStreaming(bool value)
 
 void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
-    QMutexLocker lock(&m_allConsumersMutex);
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
+    QMutexLocker lock(&m_allConsumersMutex);
     m_lastSwitchTime[clientAddress] = currentTime;
     m_liveQuality = quality;
 }
