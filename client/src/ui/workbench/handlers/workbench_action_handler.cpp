@@ -70,6 +70,7 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
+#include <ui/workbench/watchers/workbench_update_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -237,6 +238,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
+    connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1863,7 +1865,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     QnUserSettingsDialog::ElementFlags loginFlags = 
         ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : zero);
+        ((permissions & Qn::WriteNamePermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags passwordFlags = 
         ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
@@ -1970,7 +1972,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
-QString QnWorkbenchActionHandler::getBinaryFilterName() const
+QString QnWorkbenchActionHandler::binaryFilterName() const
 {
     if (sizeof(char*) == 4)
         return tr("Executable Network Optix Media File (x86) (*.exe)");
@@ -2002,17 +2004,16 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     QString fileName;
     QString selectedExtension;
-    QString binaryFilterName;
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov);;")+ getBinaryFilterName(),
+            tr("Network Optix Media File (*.nov);;") + binaryFilterName(),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
-            );
+        );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
         if (fileName.isEmpty())
@@ -2027,7 +2028,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                     tr("Save As"), 
                     tr("File '%1' already exists. Overwrite?").arg(QFileInfo(fileName).baseName()),
                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
-                    );
+                );
 
                 if(button == QMessageBox::Cancel || button == QMessageBox::No)
                     return false;
@@ -2040,7 +2041,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
                 tr("Can't overwrite file"), 
                 tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
                 QMessageBox::Ok
-                );
+            );
             continue;
         } 
 
@@ -2404,7 +2405,7 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + getBinaryFilterName();
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName();
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
@@ -2660,6 +2661,18 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull())
+        return;
+    
+    QMessageBox::information(
+        widget(), 
+        tr("Software Update is Available"), 
+        tr("Version %1 is available for download at %2.").arg(update.version.toString()).arg(update.url.toString())
+    );
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {

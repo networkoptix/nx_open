@@ -627,7 +627,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Layout in a new Tab")).
+        text(tr("Open Layout in a New Tab")).
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenMultipleLayoutsAction).
@@ -637,7 +637,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenNewWindowLayoutsAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open Layout(s) in a new Window")).
+        text(tr("Open Layout(s) in a New Window")). // TODO: split into sinle- & multi- action
         condition(hasFlags(QnResource::layout));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
@@ -779,11 +779,10 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::RenameAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        requiredPermissions(Qn::WritePermission).
+        requiredPermissions(Qn::WritePermission | Qn::WriteNamePermission).
         text(tr("Rename")).
         shortcut(tr("F2")).
-        autoRepeat(false).
-        condition(hasFlags(QnResource::layout) || hasFlags(QnResource::media) || hasFlags(QnResource::remote_server));
+        autoRepeat(false);
 
     factory(Qn::YouTubeUploadAction).
         //flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget). // TODO
@@ -927,7 +926,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Multi-View...")).
+        text(tr("Export Selection as Layout...")).
         requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 

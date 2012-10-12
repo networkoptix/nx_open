@@ -61,7 +61,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
-    qRegisterMetaType<QnUpdateInfoItems>();
+    qRegisterMetaType<QnUpdateInfoItemList>();
 
     qn_commonMetaTypes_initialized = true;
 }

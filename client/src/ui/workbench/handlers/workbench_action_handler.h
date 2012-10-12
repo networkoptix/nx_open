@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "../workbench_globals.h"
+#include <ui/workbench/workbench_globals.h>
 #include <utils/settings.h>
 
 class QAction;
@@ -189,7 +189,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-signals:
+
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
@@ -285,6 +285,7 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
+    void at_updateWatcher_availableUpdateChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
@@ -294,7 +295,6 @@ protected slots:
     void at_layout_exportFinished();
     void at_layoutCamera_exportFailed(QString errorMessage);
 
-
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
     void at_cancelExport();
@@ -303,12 +303,12 @@ private:
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
-   // void updateStoredConnections(QnConnectionData connectionData);
+    // void updateStoredConnections(QnConnectionData connectionData);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-    QString getBinaryFilterName() const;
+    QString binaryFilterName() const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-private:
 
+private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;

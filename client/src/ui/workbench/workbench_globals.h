@@ -163,12 +163,12 @@ namespace Qn {
         SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to appserver. */
         RemovePermission                        = 0x00080000,   /**< Generic delete permission. */
         ReadWriteSavePermission                 = ReadPermission | WritePermission | SavePermission,
-        
+        WriteNamePermission                     = 0x01000000,   /**< Permission to edit resource's name. */
+
         /* Layout-specific permissions. */
         AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
         
         /* User-specific permissions. */
-        WriteLoginPermission                    = 0x01000000,   /**< Permission to edit login. */ // TODO: replace with generic WriteNamePermission
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
         CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
@@ -177,7 +177,7 @@ namespace Qn {
         ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */
 
         /* Camera-specific permissions. */
-        PtzControlPermission                    = 0x10000000,   /**< Permission to use camera's PTZ controls. */
+        WritePtzPermission                      = 0x10000000,   /**< Permission to use camera's PTZ controls. */
 
         /* Global permissions, applicable to current user only. */
         GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
@@ -202,7 +202,7 @@ namespace Qn {
         GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
         GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
-        AllPermissions                          = 0xFFFFFFFFFFFFFFFF
+        AllPermissions                          = 0xFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 

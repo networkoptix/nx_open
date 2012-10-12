@@ -1,5 +1,5 @@
-#ifndef APPCAST_PARSER_H_
-#define APPCAST_PARSER_H_
+#ifndef QN_APPCAST_PARSER_H
+#define QN_APPCAST_PARSER_H
 
 #include "update_info.h"
 
@@ -8,14 +8,14 @@ public:
     void setPlatform(const QString& platform);
     void parse(const QByteArray& data);
 
-    QnUpdateInfoItems items() const;
-    QnUpdateInfoItems newItems(const QnVersion&) const;
+    QnUpdateInfoItemList items() const;
+    QnUpdateInfoItemList newItems(const QnVersion &) const;
 
 private:
     QString m_platform;
     QString currentTag;
 
-    QnUpdateInfoItems m_items;
+    QnUpdateInfoItemList m_items;
 };
 
-#endif // APPCAST_PARSER_H_
+#endif // QN_APPCAST_PARSER_H

@@ -4,13 +4,16 @@
 #ifndef ${artifactId}_VERSION_H_
 #define ${artifactId}_VERSION_H_
 
-static const char *const ORGANIZATION_NAME="${company.name}";
-static const char *const APPLICATION_NAME="${product.title}";
-static const char *const APPLICATION_VERSION="${project.version}.${buildNumber}";
-static const char *const APPLICATION_REVISION="${changeSet}";
-static const char *const FFMPEG_VERSION="${ffmpeg.version}";
-static const char *const SIGAR_VERSION="${sigar.version}";
-static const char *const BOOST_VERSION="${boost.version}";
+static const char *const ORGANIZATION_NAME      = "${company.name}";
+static const char *const APPLICATION_NAME       = "${product.title}";
+static const char *const APPLICATION_VERSION    = "${project.version}.${buildNumber}";
+static const char *const APPLICATION_REVISION   = "${changeSet}";
+static const char *const APPLICATION_PLATFORM   = "${platform}";
+static const char *const APPLICATION_ARCH       = "${arch}";
+static const char *const APPLICATION_COMPILER   = "${compiler}";
+static const char *const FFMPEG_VERSION         = "${ffmpeg.version}";
+static const char *const SIGAR_VERSION          = "${sigar.version}";
+static const char *const BOOST_VERSION          = "${boost.version}";
 
 // These constans are here for windows resouce file.
 #define VER_CUSTOMIZATION           "${installer.customization}"
