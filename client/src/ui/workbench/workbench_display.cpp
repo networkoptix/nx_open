@@ -1100,6 +1100,9 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
+    /* Update overlays rotation */
+    widget->updateOverlayRotation(item->rotation());
+
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {

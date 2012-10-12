@@ -228,7 +228,14 @@ public:
      * \see setTitleTextFormat(const QString &)
      */
     void setInfoTextFormat(const QString &infoTextFormat);
-    
+
+    /**
+     * Updates overlay widget's rotation.
+     *
+     * \param rotation - target rotation angle in degrees.
+     */
+    void updateOverlayRotation(qreal rotation);
+
     bool isDecorationsVisible() const;
     Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
 

@@ -335,6 +335,26 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
+void QnResourceWidget::updateOverlayRotation(qreal rotation){
+    while (rotation < -180)
+        rotation += 360;
+    while (rotation > 180)
+        rotation -= 360;
+
+    Qn::FixedItemRotation fixed;
+    if (rotation >= -45 && rotation <= 45)
+        fixed = Qn::Angle0;
+    else if (rotation > 135 || rotation < -135)
+        fixed = Qn::Angle180;
+    else if (rotation > 0)
+        fixed = Qn::Angle270;
+    else
+        fixed = Qn::Angle90;
+
+    m_headerOverlayWidget->setDesiredRotation(fixed);
+    m_footerOverlayWidget->setDesiredRotation(fixed);
+}
+
 QString QnResourceWidget::titleText() const {
     return m_headerLeftLabel->text();
 }
