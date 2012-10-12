@@ -23,7 +23,7 @@ void QnUpdateChecker::finished(QNetworkReply *reply) {
 
     m_parser.parse(reply->readAll());
 
-    QnUpdateInfoItems items = m_parser.newItems(m_version);
+    QnUpdateInfoItemList items = m_parser.newItems(m_version);
     if (!items.isEmpty())
         emit updatesAvailable(items);
 }

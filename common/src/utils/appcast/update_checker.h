@@ -17,7 +17,7 @@ public:
     void checkForUpdates();
 
 signals:
-    void updatesAvailable(QnUpdateInfoItems updates);
+    void updatesAvailable(QnUpdateInfoItemList updates);
 
 private slots:
     void finished(QNetworkReply *);
