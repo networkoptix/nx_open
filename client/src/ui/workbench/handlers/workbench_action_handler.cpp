@@ -151,7 +151,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
-    m_tourTimer(new QTimer())
+    m_tourTimer(new QTimer()),
+    m_exportedCamera(0)
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -2070,6 +2071,18 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
 void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
 {
+    if (m_exportedCamera)
+    {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Another export in progress"),
+            tr("Another export in progress. Please wait"), 
+            QMessageBox::Ok
+            );
+
+        return;
+    }
+
     m_layoutExportMode = mode;
     m_layoutFileName = QnLayoutFileStorageResource::removeProtocolPrefix(layoutFileName); 
     QString fileName = m_layoutFileName;
@@ -2083,8 +2096,10 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
 
-    m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0)); // TODO: leaking memory here.
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 m_layoutExportCamera,   SLOT(stopLayoutExport()));
+    if (!m_layoutExportCamera)
+        m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0));
+    m_exportedCamera = m_layoutExportCamera;
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
@@ -2143,7 +2158,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
     {
-        at_cameraCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
+        at_layoutCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
         return;
     }
 
@@ -2231,6 +2246,7 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         }
     }
     m_exportStorage.clear();
+    m_exportedCamera = 0;
 
     if (m_layoutExportMode == LayoutExport_Export)
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
@@ -2287,7 +2303,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     }
 }
 
-void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage) 
+void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage) 
 {
     disconnect(sender(), NULL, this, NULL);
 
@@ -2298,6 +2314,7 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
+    m_exportedCamera = 0;
 
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
 }
@@ -2470,17 +2487,17 @@ Do you want to continue?"),
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
 
-        QnVideoCamera *camera = widget->display()->camera();
+        m_exportedCamera = widget->display()->camera();
 
-        connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+        connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
         connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+        connect(m_exportedCamera,       SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+        connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+        connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+        connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
+        connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-        camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
+        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
         //exportProgressDialog->exec();
     }
 }
@@ -2492,8 +2509,15 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
     QnAviResourcePtr file(new QnAviResource(fileName));
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
-
+    m_exportedCamera = 0;
     QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_cancelExport()
+{
+    if (m_exportedCamera)
+        m_exportedCamera->stopExport();
+    m_exportedCamera = 0;
 }
 
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
@@ -2501,7 +2525,7 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
-
+    m_exportedCamera = 0;
     QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
 }
 
