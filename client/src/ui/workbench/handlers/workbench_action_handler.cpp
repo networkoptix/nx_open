@@ -1719,7 +1719,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
 void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     QnUserResourcePtr user(new QnUserResource());
-    user->setPermissions(Qn::GlobalLiveViewerPermission);
+    user->setPermissions(Qn::GlobalLiveViewerPermissions);
 
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);

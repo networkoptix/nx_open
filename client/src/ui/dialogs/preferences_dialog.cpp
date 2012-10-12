@@ -10,11 +10,12 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include "utils/settings.h"
+#include <utils/settings.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench_translation_manager.h"
+#include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
 #include <ui/widgets/settings/license_manager_widget.h>
@@ -61,18 +62,20 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
-    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
-    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this, SLOT(at_addExtraMediaFolderButton_clicked()));
-    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this, SLOT(at_removeExtraMediaFolderButton_clicked()));
-    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this, SLOT(at_extraMediaFoldersList_selectionChanged()));
-    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
-    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
-    connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this, SLOT(accept()));
-    connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
+    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
+    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
+    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
+    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this,   SLOT(at_extraMediaFoldersList_selectionChanged()));
+    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this,   SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
+    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
+    connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
+    connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
+
+    connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
 
     initLanguages();
-
     updateFromSettings();
+    at_context_userChanged();
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
@@ -234,4 +237,9 @@ void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &co
         ui->backgroundColorPicker->setCurrentColor(Qt::white);
         ui->animateBackgroundCheckBox->setChecked(false);
     }
+}
+
+void QnPreferencesDialog::at_context_userChanged()
+{
+    ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
 }

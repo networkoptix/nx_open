@@ -172,7 +172,13 @@ namespace Qn {
         WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
         WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
         CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
-        
+
+        /* Media-specific permissions. */
+        ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */
+
+        /* Camera-specific permissions. */
+        PtzControlPermission                    = 0x10000000,   /**< Permission to use camera's PTZ controls. */
+
         /* Global permissions, applicable to current user only. */
         GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
         GlobalProtectedPermission               = 0x00000002,   /**< Admin, can edit other non-admins. */
@@ -181,7 +187,7 @@ namespace Qn {
         GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
         GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
         GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
-        GlobalExportArchivePermission           = 0x00000200,   /**< Can export archives of available cameras. */
+        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
         GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
         GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
         
@@ -189,15 +195,14 @@ namespace Qn {
         DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
         DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Can view and export archives of available cameras. */
 
-
         /* Shortcuts. */
-        GlobalLiveViewerPermission              = GlobalViewLivePermission,
-        GlobalViewerPermission                  = GlobalLiveViewerPermission       | GlobalViewArchivePermission | GlobalExportArchivePermission,
-        GlobalAdvancedViewerPermission          = GlobalViewerPermission           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
-        GlobalAdminPermission                   = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
-        GlobalOwnerPermission                   = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
+        GlobalLiveViewerPermissions             = GlobalViewLivePermission,
+        GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
+        GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
             
-        AllPermissions                          = 0xFFFFFFFF
+        AllPermissions                          = 0xFFFFFFFFFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 
