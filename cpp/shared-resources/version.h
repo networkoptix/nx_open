@@ -1,21 +1,24 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#ifndef ${artifactId}_VERSION_H_
-#define ${artifactId}_VERSION_H_
+#ifndef ${artifactId}_VERSION_H
+#define ${artifactId}_VERSION_H
 
-static const char *const ORGANIZATION_NAME      = "${company.name}";
-static const char *const APPLICATION_NAME       = "${product.title}";
-static const char *const APPLICATION_VERSION    = "${project.version}.${buildNumber}";
-static const char *const APPLICATION_REVISION   = "${changeSet}";
-static const char *const APPLICATION_PLATFORM   = "${platform}";
-static const char *const APPLICATION_ARCH       = "${arch}";
-static const char *const APPLICATION_COMPILER   = "${compiler}";
-static const char *const FFMPEG_VERSION         = "${ffmpeg.version}";
-static const char *const SIGAR_VERSION          = "${sigar.version}";
-static const char *const BOOST_VERSION          = "${boost.version}";
+/* Some defines from the build system. Feel free to use these. */
+#define ORGANIZATION_NAME           "${company.name}";
+#define APPLICATION_NAME            "${product.title}";
+#define APPLICATION_VERSION         "${release.version}.${buildNumber}";
+#define APPLICATION_REVISION        "${changeSet}";
+#define APPLICATION_PLATFORM        "${platform}";
+#define APPLICATION_ARCH            "${arch}";
+#define APPLICATION_COMPILER        "${compiler}";
+#define FFMPEG_VERSION              "${ffmpeg.version}";
+#define SIGAR_VERSION               "${sigar.version}";
+#define BOOST_VERSION               "${boost.version}";
 
-// These constans are here for windows resouce file.
+/* These constans are here for windows resouce file.
+ *
+ * DO NOT USE THEM IN YOUR CODE. */
 #define VER_CUSTOMIZATION           "${installer.customization}"
 #define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}"
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
@@ -32,4 +35,4 @@ static const char *const BOOST_VERSION          = "${boost.version}";
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
 
-#endif // ${artifactId}_VERSION_H_
+#endif // ${artifactId}_VERSION_H

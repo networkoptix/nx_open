@@ -63,9 +63,9 @@ void QnAboutDialog::retranslateUi()
 
     QString version = 
         tr("<b>%1</b> Version: %2 (%3)").
-        arg(QString::fromLatin1(APPLICATION_NAME)).
-        arg(QString::fromLatin1(APPLICATION_VERSION)).
-        arg(QString::fromLatin1(APPLICATION_REVISION));
+        arg(QLatin1String(APPLICATION_NAME)).
+        arg(QLatin1String(APPLICATION_VERSION)).
+        arg(QLatin1String(APPLICATION_REVISION));
 
     QString credits = 
         tr(

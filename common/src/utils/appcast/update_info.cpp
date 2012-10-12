@@ -3,17 +3,17 @@
 QnVersion::QnVersion(): 
     m_major(0), 
     m_minor(0), 
-    m_build(0) 
+    m_bugfix(0) 
 {}
 
-QnVersion::QnVersion(int major, int minor, int build):
+QnVersion::QnVersion(int major, int minor, int bugfix):
     m_major(major),
     m_minor(minor),
-    m_build(build)
+    m_bugfix(bugfix)
 {}
 
 QnVersion::QnVersion(const QString &versionString) {
-    m_major = m_minor = m_build = 0;
+    m_major = m_minor = m_bugfix = 0;
 
     QStringList versionList = versionString.split(QLatin1Char('.'));
 
@@ -24,11 +24,11 @@ QnVersion::QnVersion(const QString &versionString) {
         m_minor = versionList[1].toInt();
 
     if (versionList.size() > 2)
-        m_build = versionList[2].toInt();
+        m_bugfix = versionList[2].toInt();
 }
 
 bool QnVersion::isNull() const {
-    return m_major == 0 && m_minor == 0 && m_build == 0;
+    return m_major == 0 && m_minor == 0 && m_bugfix == 0;
 }
 
 bool QnVersion::operator<(const QnVersion& other) const {
@@ -38,7 +38,7 @@ bool QnVersion::operator<(const QnVersion& other) const {
         if (m_minor < other.m_minor) {
             return true;
         } else if (m_minor == other.m_minor) {
-            return m_build < other.m_build;
+            return m_bugfix < other.m_bugfix;
         }
     }
 
@@ -46,12 +46,12 @@ bool QnVersion::operator<(const QnVersion& other) const {
 }
 
 bool QnVersion::operator==(const QnVersion &other) const {
-    return m_major == other.m_major && m_minor == other.m_minor && m_build == other.m_build;
+    return m_major == other.m_major && m_minor == other.m_minor && m_bugfix == other.m_bugfix;
 }
 
 QString QnVersion::toString() const {
-    if (m_build)
-        return QString(QLatin1String("%1.%2.%3")).arg(m_major).arg(m_minor).arg(m_build);
+    if (m_bugfix)
+        return QString(QLatin1String("%1.%2.%3")).arg(m_major).arg(m_minor).arg(m_bugfix);
     else
         return QString(QLatin1String("%1.%2")).arg(m_major).arg(m_minor);
 }
