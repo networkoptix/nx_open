@@ -578,6 +578,8 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     {
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
+        if (m_waitSCeq)
+            break;
 
         bool isRtcp = false;
         if (codecEncoder->isRtpHeaderExists()) 
