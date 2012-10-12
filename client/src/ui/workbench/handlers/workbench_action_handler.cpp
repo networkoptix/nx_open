@@ -1862,7 +1862,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     QnUserSettingsDialog::ElementFlags loginFlags = 
         ((permissions & Qn::ReadPermission) ? QnUserSettingsDialog::Visible : zero) |
-        ((permissions & Qn::WriteLoginPermission) ? QnUserSettingsDialog::Editable : zero);
+        ((permissions & Qn::WriteNamePermission) ? QnUserSettingsDialog::Editable : zero);
 
     QnUserSettingsDialog::ElementFlags passwordFlags = 
         ((permissions & Qn::WritePasswordPermission) ? QnUserSettingsDialog::Visible : zero) | /* There is no point to display flag edit field if password cannot be changed. */
