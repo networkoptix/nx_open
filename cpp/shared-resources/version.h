@@ -5,16 +5,17 @@
 #define ${artifactId}_VERSION_H
 
 /* Some defines from the build system. Feel free to use these. */
-#define ORGANIZATION_NAME           "${company.name}";
-#define APPLICATION_NAME            "${product.title}";
-#define APPLICATION_VERSION         "${release.version}.${buildNumber}";
-#define APPLICATION_REVISION        "${changeSet}";
-#define APPLICATION_PLATFORM        "${platform}";
-#define APPLICATION_ARCH            "${arch}";
-#define APPLICATION_COMPILER        "${compiler}";
-#define FFMPEG_VERSION              "${ffmpeg.version}";
-#define SIGAR_VERSION               "${sigar.version}";
-#define BOOST_VERSION               "${boost.version}";
+#define ORGANIZATION_NAME           "${company.name}"
+#define APPLICATION_NAME            "${product.title}"
+#define APPLICATION_VERSION         "${project.version}.${buildNumber}"
+#define CUSTOMIZATION_VERSION       "${release.version}.${buildNumber}"
+#define APPLICATION_REVISION        "${changeSet}"
+#define APPLICATION_PLATFORM        "${platform}"
+#define APPLICATION_ARCH            "${arch}"
+#define APPLICATION_COMPILER        "${compiler}"
+#define FFMPEG_VERSION              "${ffmpeg.version}"
+#define SIGAR_VERSION               "${sigar.version}"
+#define BOOST_VERSION               "${boost.version}"
 
 /* These constans are here for windows resouce file.
  *

@@ -22,7 +22,7 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
     m_checker = new QnUpdateChecker(
         QUrl(QLatin1String("http://networkoptix.com/files/hdwitnesscast.xml")), 
         QString(QLatin1String("%1-%2")).arg(QLatin1String(APPLICATION_PLATFORM)).arg(QLatin1String(APPLICATION_ARCH)), 
-        QLatin1String(APPLICATION_VERSION), 
+        QLatin1String(CUSTOMIZATION_VERSION), 
         this
     );
     connect(m_checker, SIGNAL(updatesAvailable(QnUpdateInfoItemList)), this, SLOT(at_checker_updatesAvailable(QnUpdateInfoItemList)));
@@ -45,7 +45,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     qSort(updates.begin(), updates.end(), UpdateVersionLess());
     QnUpdateInfoItem lastUpdate = updates.last();
 
-    QnVersion currentVersion = QnVersion(APPLICATION_VERSION);
+    QnVersion currentVersion = QnVersion(QLatin1String(CUSTOMIZATION_VERSION));
     if(lastUpdate.version == currentVersion || lastUpdate.version < currentVersion) // TODO: use <=
         return;
 
