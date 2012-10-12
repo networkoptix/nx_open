@@ -144,13 +144,16 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     for (int i = 0; i < m_dataQueue.size(); ++i)
     {
         QnAbstractDataPacketPtr data = m_dataQueue.at(i);
-        if (skipTime)
+        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+        if (skipTime && video && video->timestamp <= skipTime)
         {
-            QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-            if (video && video->timestamp <= skipTime)
-                video->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            QnCompressedVideoData* newData = video->clone();
+            newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
-        dstQueue.push(data);
+        else { 
+            dstQueue.push(data);
+        }
         rez++;
     }
     return rez;
