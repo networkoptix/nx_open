@@ -487,8 +487,9 @@ void QnWorkbenchNavigator::jumpBackward() {
 
     qint64 pos = reader->startTime();
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget)) {
-        const QnTimePeriodList fullPeriods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
-        const QnTimePeriodList periods = QnTimePeriod::aggregateTimePeriods(fullPeriods, MAX_FRAME_DURATION);
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        if (loader->isMotionRegionsEmpty())
+            periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
         
         if (!periods.isEmpty()) {
             qint64 currentTime = m_currentMediaWidget->display()->camera()->getCurrentTime();
@@ -497,7 +498,7 @@ void QnWorkbenchNavigator::jumpBackward() {
                 pos = periods.last().startTimeMs * 1000;
             } else {
                 QnTimePeriodList::const_iterator itr = qUpperBound(periods.begin(), periods.end(), currentTime / 1000);
-                itr = qMax(itr - 2, periods.begin());
+                itr = qMax(itr - 2, periods.constBegin());
                 pos = itr->startTimeMs * 1000;
                 if (reader->isReverseMode() && itr->durationMs != -1)
                     pos += itr->durationMs * 1000;
