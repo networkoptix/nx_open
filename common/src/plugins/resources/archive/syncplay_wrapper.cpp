@@ -551,10 +551,14 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
                 allReady &= (i->isEOF || i->reader->isRealTimeSource());
         }
 
-        if (allReady && d->enabled)
-            jumpTo(DATETIME_NOW, 0);         // all items at EOF position
-        else if (reader)
-            reader->jumpTo(DATETIME_NOW, 0); // if sync disabled and items go to archive EOF, jump to live immediatly (without waiting other items)
+        if (d->enabled) {
+            if (allReady)
+                jumpTo(DATETIME_NOW, 0);         // all items at EOF position
+        }
+        else {
+            if (reader)
+                reader->jumpTo(DATETIME_NOW, 0); // if sync disabled and items go to archive EOF, jump to live immediatly (without waiting other items)
+        }
     }
 }
 
