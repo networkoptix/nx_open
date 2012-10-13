@@ -220,9 +220,9 @@ int qnMain(int argc, char *argv[])
 #endif
 
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
@@ -315,8 +315,8 @@ int qnMain(int argc, char *argv[])
 
 
     QnLog::initLog(logLevel);
-    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);

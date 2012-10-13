@@ -24,6 +24,7 @@
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
+#include "version.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -236,7 +237,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
         QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),

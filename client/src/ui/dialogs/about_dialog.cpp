@@ -59,13 +59,13 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    setWindowTitle(tr("About %1").arg(QString::fromLatin1(APPLICATION_NAME)));
+    setWindowTitle(tr("About %1").arg(QString::fromLatin1(QN_APPLICATION_NAME)));
 
     QString version = 
         tr("<b>%1</b> Version: %2 (%3)").
-        arg(QLatin1String(APPLICATION_NAME)).
-        arg(QLatin1String(APPLICATION_VERSION)).
-        arg(QLatin1String(APPLICATION_REVISION));
+        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_REVISION));
 
     QString credits = 
         tr(
@@ -79,14 +79,14 @@ void QnAboutDialog::retranslateUi()
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br />\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br />\n"
         ).
-        arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QString::fromLatin1(APPLICATION_NAME)).
+        arg(QString::fromLatin1(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
+        arg(QString::fromLatin1(QN_APPLICATION_NAME)).
         arg(QString::fromLatin1(QT_VERSION_STR)).
-        arg(versionString(FFMPEG_VERSION)).
+        arg(versionString(QN_FFMPEG_VERSION)).
         arg(QtvAudioDevice::instance()->versionString()).
         arg(QtvAudioDevice::instance()->company()).
-        arg(versionString(SIGAR_VERSION)).
-        arg(versionString(BOOST_VERSION));
+        arg(versionString(QN_SIGAR_VERSION)).
+        arg(versionString(QN_BOOST_VERSION));
 
 #ifndef Q_OS_DARWIN
     credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
