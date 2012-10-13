@@ -14,7 +14,7 @@
 
 #define USE_SINGLE_STREAMING_PORT
 
-static const QString MEDIA_SERVER_NAME (QString(ORGANIZATION_NAME) + QString(" Media Server"));
+static const QString MEDIA_SERVER_NAME (QString(QN_ORGANIZATION_NAME) + QString(" Media Server"));
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
@@ -69,8 +69,8 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerHandle = 0;
     m_skipTicks = 0;
 
-    m_mediaServerServiceName = QString(VER_CUSTOMIZATION) + QString("MediaServer");
-    m_appServerServiceName = QString(VER_CUSTOMIZATION) + QString("AppServer");
+    m_mediaServerServiceName = QString(QN_CUSTOMIZATION) + QString("MediaServer");
+    m_appServerServiceName = QString(QN_CUSTOMIZATION) + QString("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -108,10 +108,10 @@ QnSystrayWindow::QnSystrayWindow():
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
 
-    ui->labelProductName->setText(APPLICATION_NAME);
-    ui->labelProductRevision->setText(APPLICATION_REVISION);
-    ui->labelProductVersion->setText(APPLICATION_VERSION);
-    ui->labelFfmpegRevision->setText(FFMPEG_VERSION);
+    ui->labelProductName->setText(QN_APPLICATION_NAME);
+    ui->labelProductRevision->setText(QN_APPLICATION_REVISION);
+    ui->labelProductVersion->setText(QN_APPLICATION_VERSION);
+    ui->labelFfmpegRevision->setText(QN_FFMPEG_VERSION);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -182,7 +182,7 @@ void QnSystrayWindow::findServiceInfo()
         m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
     if (!m_mediaServerHandle && !m_appServerHandle)
-        showMessage(QString("No %1 services installed").arg(ORGANIZATION_NAME));
+        showMessage(QString("No %1 services installed").arg(QN_ORGANIZATION_NAME));
 }
 
 void QnSystrayWindow::setVisible(bool visible)

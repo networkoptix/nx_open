@@ -24,11 +24,8 @@ namespace {
 QList<QAction *> QnOpenCurrentUserLayoutActionFactory::newActions(QObject *parent) {
     QList<QAction *> result;
 
-    QnUserResourcePtr user = context()->user();
-    if(!user)
-        return result;
-
-    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>();
+    QnId userId = context()->user() ? context()->user()->getId() : QnId();
+    QnLayoutResourceList layouts = resourcePool()->getResourcesWithParentId(userId).filtered<QnLayoutResource>();
     qSort(layouts.begin(), layouts.end(), LayoutNameCmp());
 
     foreach(const QnLayoutResourcePtr &layout, layouts) {

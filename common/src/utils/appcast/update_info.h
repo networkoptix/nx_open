@@ -1,7 +1,6 @@
 #ifndef QN_UPDATE_INFO_H
 #define QN_UPDATE_INFO_H
 
-#include <QSharedPointer>
 #include <QMetaType>
 #include <QString>
 #include <QStringList>
@@ -12,7 +11,7 @@
 class QnVersion {
 public:
     QnVersion();
-    QnVersion(int major, int minor, int build);
+    QnVersion(int major, int minor, int bugfix);
     QnVersion(const QString &versionString);
 
     bool isNull() const;
@@ -29,14 +28,14 @@ public:
         return m_minor;
     }
 
-    int build() const {
-        return m_build;
+    int bugfix() const {
+        return m_bugfix;
     }
 
 private:
     int m_major;
     int m_minor;
-    int m_build;
+    int m_bugfix;
 };
 
 

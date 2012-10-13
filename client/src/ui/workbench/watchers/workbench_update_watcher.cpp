@@ -3,6 +3,8 @@
 #include <QtCore/QTimer>
 
 #include <utils/appcast/update_checker.h>
+#include <utils/common/warnings.h>
+#include <utils/settings.h>
 
 #include "version.h"
 
@@ -17,14 +19,19 @@ namespace {
 } // anonymous namespace
 
 QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    m_checker(NULL)
 {
-    m_checker = new QnUpdateChecker(
-        QUrl(QLatin1String("http://networkoptix.com/files/hdwitnesscast.xml")), 
-        QString(QLatin1String("%1-%2")).arg(QLatin1String(APPLICATION_PLATFORM)).arg(QLatin1String(APPLICATION_ARCH)), 
-        QLatin1String(APPLICATION_VERSION), 
-        this
-    );
+    QUrl updateFeedUrl = qnSettings->updateFeedUrl();
+    if(updateFeedUrl.isEmpty())
+        return; 
+
+    QString platform = QString(QLatin1String("%1-%2")).arg(QLatin1String(QN_APPLICATION_PLATFORM)).arg(QLatin1String(QN_APPLICATION_ARCH));
+    QString version = QLatin1String(QN_APPLICATION_VERSION);
+
+    qnDebug("Settings up update watcher for %1 build of version %2 at %3.", platform, version, updateFeedUrl);
+
+    m_checker = new QnUpdateChecker(updateFeedUrl, platform, version, this);
     connect(m_checker, SIGNAL(updatesAvailable(QnUpdateInfoItemList)), this, SLOT(at_checker_updatesAvailable(QnUpdateInfoItemList)));
 
     QTimer *timer = new QTimer(this);
@@ -45,7 +52,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     qSort(updates.begin(), updates.end(), UpdateVersionLess());
     QnUpdateInfoItem lastUpdate = updates.last();
 
-    QnVersion currentVersion = QnVersion(VER_PRODUCTVERSION);
+    QnVersion currentVersion = QnVersion(QLatin1String(QN_APPLICATION_VERSION));
     if(lastUpdate.version == currentVersion || lastUpdate.version < currentVersion) // TODO: use <=
         return;
 

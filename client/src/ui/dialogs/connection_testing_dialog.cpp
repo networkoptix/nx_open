@@ -11,6 +11,7 @@
 #include <core/resource/resource.h>
 
 #include "utils/settings.h"
+#include "version.h"
 
 QnConnectionTestingDialog::QnConnectionTestingDialog(const QUrl &url, QWidget *parent) :
     QDialog(parent),
@@ -98,7 +99,7 @@ void QnConnectionTestingDialog::testResults(int status, const QByteArray &errorS
         compatibilityChecker = &localChecker;
 
     ui->progressBar->setValue(ui->progressBar->maximum());
-    updateUi(!status && compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version));
+    updateUi(!status && compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version));
 }
 
 void QnConnectionTestingDialog::testSettings()

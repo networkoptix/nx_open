@@ -51,7 +51,7 @@
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0) {
+    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -61,6 +61,17 @@ namespace {
         button->setFixedSize(iconWidth, iconHeight);
 
         button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
+
+        if(popup) {
+            /* We want the button to activate the corresponding action so that menu is updated. 
+             * However, menu buttons do not activate their corresponding actions as they do not receive release events. 
+             * We work this around by making some hacky connections. */
+            button->setPopupMode(QToolButton::InstantPopup);
+
+            QObject::disconnect(button, SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+            QObject::connect(button,    SIGNAL(pressed()),  button->defaultAction(),    SLOT(trigger()));
+            QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+        }
 
         return button;
     }
@@ -199,17 +210,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->addStretch(0x1000);
     tabBarLayout->addWidget(m_tabBar);
 
-    /* We want the main menu button to activate the corresponding action so that
-     * main menu is updated. However, menu buttons do not activate their corresponding 
-     * actions as they do not receive release events. We work this around by making
-     * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
-    m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
-
-    disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
-    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton->defaultAction(),      SLOT(trigger()));
-    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
-
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
     m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
@@ -221,12 +221,14 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5);
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
     if (QnScreenRecorder::isSupported())

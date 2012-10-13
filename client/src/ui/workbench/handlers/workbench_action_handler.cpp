@@ -71,6 +71,7 @@
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/watchers/workbench_update_watcher.h>
+#include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -169,6 +170,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
     connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -239,11 +241,15 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
+    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
+
+
+    at_updateWatcher_availableUpdateChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -256,6 +262,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     /* Clean up. */
     if(m_mainMenu)
         delete m_mainMenu.data();
+
+    if(m_currentUserLayoutsMenu)
+        delete m_currentUserLayoutsMenu.data();
 
     if(cameraSettingsDialog())
         delete cameraSettingsDialog();
@@ -767,13 +776,23 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server..."));
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+    m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
+
+    action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
+    action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
 void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {
@@ -2671,7 +2690,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     QMessageBox::information(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at %2.").arg(update.version.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
     );
 }
 
