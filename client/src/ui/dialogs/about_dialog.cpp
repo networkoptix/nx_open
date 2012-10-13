@@ -62,7 +62,7 @@ void QnAboutDialog::retranslateUi()
     setWindowTitle(tr("About %1").arg(QString::fromLatin1(QN_APPLICATION_NAME)));
 
     QString version = 
-        tr("<b>%1</b> Version: %2 (%3)").
+        tr("<b>%1</b> version %2 (%3)").
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION));
@@ -103,7 +103,7 @@ void QnAboutDialog::retranslateUi()
             "<b>OpenGL max texture size</b>: %4.<br />"
         ).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))).
+        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: same shit, OpenGL calls.
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))).
         arg(maxTextureSize);
 

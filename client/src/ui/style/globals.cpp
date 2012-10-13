@@ -71,9 +71,9 @@ QnGlobals::QnGlobals(QObject *parent):
 
     init();
 
-    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/skin/globals.ini");
+    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
     QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
-    settings->beginGroup(QLatin1String("globals"));
+    settings->beginGroup(QLatin1String("style"));
     updateFromSettings(settings.data());
     settings->endGroup();
 }
