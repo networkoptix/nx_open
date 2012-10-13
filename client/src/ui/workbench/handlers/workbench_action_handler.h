@@ -293,10 +293,11 @@ protected slots:
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_layout_exportFinished();
-    void at_cameraCamera_exportFailed(QString errorMessage);
+    void at_layoutCamera_exportFailed(QString errorMessage);
 
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
+    void at_cancelExport();
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
@@ -327,6 +328,7 @@ private:
     QList<QnMimeData> m_delayedDrops;
 
     QnVideoCamera* m_layoutExportCamera;
+    QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;

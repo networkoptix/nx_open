@@ -44,7 +44,8 @@ public:
     
     //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
 protected:
-    virtual qint64 packetTimestamp(const AVPacket& packet);
+    void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
+    void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     virtual bool findStreams();
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
