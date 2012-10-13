@@ -532,11 +532,13 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
+    QnAbstractArchiveReader* reader = 0;
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
         if (i->cam == source)
         {
             i->isEOF = value;
+            reader = i->reader;
             break;
         }
     }
@@ -549,8 +551,10 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
                 allReady &= (i->isEOF || i->reader->isRealTimeSource());
         }
 
-        if (allReady)
-            jumpTo(DATETIME_NOW, 0);
+        if (allReady && d->enabled)
+            jumpTo(DATETIME_NOW, 0);         // all items at EOF position
+        else if (reader)
+            reader->jumpTo(DATETIME_NOW, 0); // if sync disabled and items go to archive EOF, jump to live immediatly (without waiting other items)
     }
 }
 
