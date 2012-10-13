@@ -346,7 +346,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
                 // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
                 // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
-                bool shouldInvesigate = (diffAddr || diffNet) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
+                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
                 if (shouldInvesigate)
                 {
                     // should keep it into resources to investigate it further 
