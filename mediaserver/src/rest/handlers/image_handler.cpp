@@ -37,7 +37,11 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
 int QnImageHandler::noVideoError(QByteArray& result, qint64 time)
 {
     result.append("<root>\n");
-    result.append(QString("No video for time %1").arg(time));
+    result.append("No video for time ");
+    if (time == DATETIME_NOW)
+        result.append("now");
+    else
+        result.append(QByteArray::number(time));
     result.append("</root>\n");
     return CODE_INVALID_PARAMETER;
 }
@@ -124,7 +128,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     bool gotFrame = false;
 
     if (time == DATETIME_NOW) {
-        gotFrame = decoder.decode(video, &outFrame);
+        gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
     }
     else {
         for (int i = 0; i < MAX_GOP_LEN; ++i)
