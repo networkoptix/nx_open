@@ -244,6 +244,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
+
+
+    at_updateWatcher_availableUpdateChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -2671,7 +2674,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     QMessageBox::information(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at %2.").arg(update.version.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
     );
 }
 

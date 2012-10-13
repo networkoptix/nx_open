@@ -1,7 +1,6 @@
 #ifndef QN_UPDATE_INFO_H
 #define QN_UPDATE_INFO_H
 
-#include <QSharedPointer>
 #include <QMetaType>
 #include <QString>
 #include <QStringList>
