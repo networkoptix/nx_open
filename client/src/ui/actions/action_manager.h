@@ -88,6 +88,8 @@ public:
      */
     QMenu *newMenu(Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
 
+    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
+
     /**
      * \returns                         Action target provider that is assigned to this
      *                                  action manager.

@@ -200,6 +200,7 @@ protected slots:
     void at_eventManager_connectionOpened();
 
     void at_mainMenuAction_triggered();
+    void at_openCurrentUserLayoutMenuAction_triggered();
 
     void at_incrementDebugCounterAction_triggered();
     void at_decrementDebugCounterAction_triggered();
@@ -286,6 +287,7 @@ protected slots:
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
     void at_updateWatcher_availableUpdateChanged();
+    void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
@@ -313,6 +315,7 @@ private:
 
     QWeakPointer<QWidget> m_widget;
     QWeakPointer<QMenu> m_mainMenu;
+    QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
 
