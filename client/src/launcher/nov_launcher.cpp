@@ -82,6 +82,11 @@ void QnNovLauncher::getSrcFileList(QVector<QString>& result, const QString& srcD
 
 int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& novFileName)
 {
+    QSet<QString> allowedFileExt;
+    allowedFileExt << QLatin1String(".exe");
+    allowedFileExt << QLatin1String(".dll");
+
+
     QString srcDataFolder = QFileInfo(qApp->arguments()[0]).path();
     QString launcherFile(QLatin1String(":/launcher.exe"));
 
@@ -101,10 +106,13 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
 
     for (int i= 0; i < srcMediaFiles.size(); ++i)
     {
-        if (appendFile(dstFile, getFullFileName(srcDataFolder, srcMediaFiles[i])) == 0)
+        if (allowedFileExt.contains(srcMediaFiles[i].right(4)))
         {
-            filePosList.push_back(dstFile.pos());
-            fileNameList.push_back(srcMediaFiles[i]);
+            if (appendFile(dstFile, getFullFileName(srcDataFolder, srcMediaFiles[i])) == 0)
+            {
+                filePosList.push_back(dstFile.pos());
+                fileNameList.push_back(srcMediaFiles[i]);
+            }
         }
     }
     

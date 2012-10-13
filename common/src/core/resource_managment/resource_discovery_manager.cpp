@@ -7,7 +7,6 @@
 #include "resource_pool.h"
 #include "utils/common/util.h"
 #include "api/app_server_connection.h"
-#include "core/resource/resource_directory_browser.h"
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
@@ -151,7 +150,7 @@ void QnResourceDiscoveryManager::run()
     {
         searcher->setShouldBeUsed(true);
 
-        if (dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
+        if (dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);

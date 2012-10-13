@@ -82,6 +82,7 @@
 #include "camera/caching_time_period_loader.h"
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "core/resource/resource_directory_browser.h"
 
 
 
@@ -2047,7 +2048,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedExtension.contains(tr("read only"));
+        exportReadOnly = selectedFilter.contains(tr("read only"));
         if (fileName.isEmpty())
             return false;
 
@@ -2207,7 +2208,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = exportReadOnly ? 1 : 0;
-    device->write((const char*) flags, sizeof(flags));
+    device->write((const char*) &flags, sizeof(flags));
     delete device;
 
     // If layout export create new guid. If layout just renamed (local save or local saveAs) keep guid
@@ -2277,7 +2278,7 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         snapshotManager()->store(layout);
     }
     else {
-        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
+        QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
         if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
             layout->setStatus(QnResource::Online);
             resourcePool()->addResource(layout);

@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_DIRECTORY_BROWSER_H
 #define QN_RESOURCE_DIRECTORY_BROWSER_H
 
-#include "../resource_managment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 class QnResourceDirectoryBrowser : public QnAbstractFileResourceSearcher
 {
@@ -17,6 +17,7 @@ public:
 
     // Lical files search only once. Use cleanup before search to re-search files again
     void cleanup();
+    static QnLayoutResourcePtr layoutFromFile(const QString& xfile);
 protected:
     bool m_resourceReady;
 
