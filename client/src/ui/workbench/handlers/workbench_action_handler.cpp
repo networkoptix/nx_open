@@ -932,7 +932,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if (layout->flags() & QnResource::local) {
         if (!validateItemTypes(layout))
             return;
-        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
+        bool isReadOnly = !(accessController()->permissions(layout) & Qn::ReadWriteSavePermission);
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // override layout
     }
     else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -1991,12 +1992,20 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
-QString QnWorkbenchActionHandler::binaryFilterName() const
+QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
-    if (sizeof(char*) == 4)
-        return tr("Executable Network Optix Media File (x86) (*.exe)");
-    else
-        return tr("Executable Network Optix Media File (x64) (*.exe)");
+    if (readOnly) {
+        if (sizeof(char*) == 4)
+            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+        else
+            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+    }
+    else {
+        if (sizeof(char*) == 4)
+            return tr("Executable Network Optix Media File (x86) (*.exe)");
+        else
+            return tr("Executable Network Optix Media File (x64) (*.exe)");
+    }
 }
 
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
@@ -2021,20 +2030,24 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     QString suggestion = layout->getName();
 
+    bool exportReadOnly = false;
     QString fileName;
     QString selectedExtension;
+    QString filterSeparator(QLatin1String(";;"));
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov);;") + binaryFilterName(),
+            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
+            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        exportReadOnly = selectedExtension.contains(tr("read only"));
         if (fileName.isEmpty())
             return false;
 
@@ -2084,12 +2097,12 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     }
 
 
-    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode);
+    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, exportReadOnly);
 
     return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly)
 {
     if (m_exportedCamera)
     {
@@ -2190,6 +2203,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("range.bin"), QIODevice::WriteOnly);
     device->write(exportPeriod.serialize());
+    delete device;
+
+    device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
+    quint32 flags = exportReadOnly ? 1 : 0;
+    device->write((const char*) flags, sizeof(flags));
     delete device;
 
     // If layout export create new guid. If layout just renamed (local save or local saveAs) keep guid
@@ -2424,7 +2442,7 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName();
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName(false);
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
@@ -2498,7 +2516,7 @@ Do you want to continue?"),
         QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
-        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export);
+        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
     }
     else {
         QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());

@@ -256,6 +256,22 @@ QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
         layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
 
+    QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
+    if (rangeFile)
+    {
+        QByteArray data = miscFile->readAll();
+        delete miscFile;
+        if (data.size() >= sizeof(quint32))
+        {
+            quint32 flags = *((quint32*) data.data());
+            if (flags & 1) {
+                //Qn::Permissions permissions = Qn::RemovePermission | Qn::AddRemoveItemsPermission;
+                //layout->setData(Qn::LayoutPermissionsRole, permissions);
+            }
+        }
+        //layout->setLocalRange(QnTimePeriod().deserialize(data));
+    }
+
     layout->setParentId(0);
     layout->setId(QnId::generateSpecialId());
     layout->setName(QFileInfo(xfile).fileName());
