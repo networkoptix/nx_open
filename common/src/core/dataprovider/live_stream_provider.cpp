@@ -43,7 +43,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
             }
 
             int oldFps = m_fps;
-            int newFps = qMin(5, m_cameraRes->getMaxFps());
+            int newFps = qMin(5, m_cameraRes->getMaxFps()); //ss; target for secind stream fps is 5 
             newFps = qMax(1, newFps);
 
             if (newFps != oldFps)
@@ -207,7 +207,7 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int maxFps = res->getMaxFps();
 
-    int newSecFps = qMin(5, maxFps - newFps);
+    int newSecFps = qMin(5, maxFps - newFps); //ss; minimum between 5 and what is left;
 
     //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
 
