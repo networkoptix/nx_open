@@ -106,7 +106,7 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
 
     for (int i= 0; i < srcMediaFiles.size(); ++i)
     {
-        if (allowedFileExt.contains(srcMediaFiles[i].right(4)))
+        if (allowedFileExt.contains(srcMediaFiles[i].right(4).toLower()))
         {
             if (appendFile(dstFile, getFullFileName(srcDataFolder, srcMediaFiles[i])) == 0)
             {
