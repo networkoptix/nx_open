@@ -62,6 +62,7 @@
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
+#include "rest/handlers/image_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -559,6 +560,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
+    QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
