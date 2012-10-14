@@ -2784,3 +2784,7 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 void QnWorkbenchActionHandler::at_activityInstrument_activated() {
     action(Qn::ToggleTourModeAction)->setChecked(false);
 }
+
+
+
+
