@@ -2244,7 +2244,8 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     disconnect(sender(), NULL, this, NULL);
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
-
+    if (!m_exportStorage)
+        return; // race condition. Export just canceled from gui
     QString fileName = m_exportStorage->getUrl();
     if (fileName.endsWith(QLatin1String(".tmp")))
     {
@@ -2554,9 +2555,18 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
 
 void QnWorkbenchActionHandler::at_cancelExport()
 {
-    if (m_exportedCamera)
+    QString exportFileName;
+    if (m_exportedCamera) {
+        exportFileName = m_exportedCamera->exportedFileName();
         m_exportedCamera->stopExport();
+    }
     m_exportedCamera = 0;
+    if (m_exportStorage)
+        QFile::remove(QnLayoutFileStorageResource::removeProtocolPrefix(m_exportStorage->getUrl()));
+    else if (!exportFileName.isEmpty())
+        QFile::remove(exportFileName);
+    m_exportStorage.clear();
+    m_exportedMediaRes.clear();
 }
 
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {

@@ -138,6 +138,19 @@ QIODevice* QnLayoutFileStorageResource::open(const QString& url, QIODevice::Open
         else
             setUrl(url.left(postfixPos));
     }
+
+#ifdef _DEBUG
+    if (openMode & QIODevice::WriteOnly)
+    {
+        for (QSet<QnLayoutFile*>::iterator itr = m_openedFiles.begin(); itr != m_openedFiles.end(); ++itr)
+        {
+            QnLayoutFile* storage = *itr;
+            if (storage->openMode() & QIODevice::WriteOnly)
+                Q_ASSERT_X(false, Q_FUNC_INFO, "Can't open several files for writing");
+        }
+    }
+#endif
+
     QnLayoutFile* rez = new QnLayoutFile(*this, url);
     if (!rez->open(openMode))
     {
@@ -364,6 +377,9 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
     if (m_index.entryCount >= (quint32)MAX_FILES_AT_LAYOUT)
         return false;
+
+    qint64 testPos = 0;
+    Q_ASSERT_X(getFileOffset(srcFileName, &testPos) == -1, Q_FUNC_INFO, "Duplicate file name");
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
 
