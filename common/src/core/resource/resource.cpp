@@ -68,7 +68,7 @@ void QnResource::updateInner(QnResourcePtr other)
 {
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id;
+    m_id = other->m_id; // TODO: this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
