@@ -219,10 +219,22 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
         if (!m_usedPanicMode)
         {
             QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-            if (m_role == QnResource::Role_LiveVideo)
-                m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
+
+            if (camera->streamFpsSharingMethod()==shareFps)
+            {
+                if (m_role == QnResource::Role_LiveVideo)
+                    m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
+                else
+                    m_panicSchedileRecord.setFps(2);
+            }
             else
-                m_panicSchedileRecord.setFps(2);
+            {
+                if (m_role == QnResource::Role_LiveVideo)
+                    m_panicSchedileRecord.setFps(camera->getMaxFps());
+                else
+                    m_panicSchedileRecord.setFps(DESIRED_SECOND_STREAM_FPS);
+            }
+
 
             // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
             CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
