@@ -188,6 +188,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
 
     /* Run handlers. */
     updateButtonsVisibility();
+    updateTitleText();
     at_statistics_received();
 }
 
@@ -385,6 +386,10 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+QString QnServerResourceWidget::calculateTitleText() const {
+    return tr("%1 (%2)").arg(m_resource->getName()).arg(QUrl(m_resource->getUrl()).host()); // TODO: connect to change signal
+}
+
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
