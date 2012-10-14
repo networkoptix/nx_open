@@ -607,8 +607,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
-    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
-        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
+    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked() && m_camera->streamFpsSharingMethod() == shareFps )
+        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+    {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentMaxFps > maxFps)

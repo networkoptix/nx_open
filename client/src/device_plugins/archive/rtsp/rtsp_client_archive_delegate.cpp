@@ -841,7 +841,8 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
 {
     qint64 diff = qAbs(m_lastReceivedTime - qnSyncTime->currentMSecsSinceEpoch());
-    if (((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10)
+    bool longNoData = ((m_position == DATETIME_NOW || time == DATETIME_NOW) && diff > 250) || diff > 1000*10;
+	if (longNoData || m_quality == MEDIA_Quality_Low)
     {
         m_blockReopening = true;
         close();

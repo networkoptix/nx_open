@@ -125,7 +125,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     m_useMTRealTimeDecode(false),
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
-    m_isLastVideoQualityLow(false)
+    m_isLastVideoQualityLow(false),
+	m_firstAfterJumpTime(AV_NOPTS_VALUE),
+	m_receivedInterval(0)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -201,6 +203,7 @@ void QnCamDisplay::resume()
         QMutexLocker lock(&m_audioChangeMutex);
         m_audioDisplay->resume();
     }
+	m_firstAfterJumpTime = AV_NOPTS_VALUE;
     QnAbstractDataConsumer::resume();
 }
 
@@ -231,6 +234,31 @@ void QnCamDisplay::hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64
         hurryUpCheckForLocalFile(vd, speed, needToSleep, realSleepTime);
 }
 
+void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
+{
+	bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+	if (isVideoCamera)
+	{
+		if (m_speed < 1.0)
+			return;
+		if (m_firstAfterJumpTime == AV_NOPTS_VALUE) {
+			m_firstAfterJumpTime = media->timestamp;
+			m_receivedInterval = 0;
+			m_afterJumpTimer.restart();
+			return;
+		}
+
+		m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
+		if (m_afterJumpTimer.elapsed() > 1000)
+		{
+			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
+			{
+				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
+				reader->setQuality(MEDIA_Quality_Low, true);
+			}
+		}
+	}
+};
 
 bool QnCamDisplay::canSwitchToHighQuality()
 {
@@ -694,7 +722,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
         }
     }
     m_audioDisplay->clearAudioBuffer();
-
+	m_firstAfterJumpTime = AV_NOPTS_VALUE;
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -824,6 +852,8 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
         m_delay.breakSleep();
     }
     QnAbstractDataConsumer::putData(data);
+	if (media)
+		hurryUpCkeckForCamera2(media); // check if slow network
 }
 
 bool QnCamDisplay::canAcceptData() const

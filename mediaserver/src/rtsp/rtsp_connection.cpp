@@ -824,7 +824,10 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
-            if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
+
+            bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != shareFps || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
+
+            if (canRunSecondStream)
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
@@ -1201,6 +1204,8 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+    //d->socket->setNoDelay(true);
+    d->socket->setSendBufferSize(16*1024);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();
