@@ -478,7 +478,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
 
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
         if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
-            if((resource->flags() & QnResource::local_media) != QnResource::local_media) /* Not a file. */
+            if(!snapshotManager()->isFile(resource)) /* Not a file. */
                 resourcePool()->removeResource(resource);
     }
 }
