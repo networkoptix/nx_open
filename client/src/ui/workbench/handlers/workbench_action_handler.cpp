@@ -1803,6 +1803,12 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
+    if(context()->user()) { // TODO: factor out
+        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
+        states[context()->user()->getName()] = state;
+        qnSettings->setUserWorkbenchStates(states);
+    }
+
     menu()->trigger(Qn::ClearCameraSettingsAction);
     if(closeAllLayouts(true))
         qApp->closeAllWindows();
