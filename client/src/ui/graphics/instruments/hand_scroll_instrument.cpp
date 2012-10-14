@@ -11,7 +11,8 @@
 #include <ui/animation/animation_event.h>
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
-    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent)
+    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent),
+    m_mouseButtons(Qt::RightButton)
 {
     KineticCuttingProcessor *processor = new KineticCuttingProcessor(QMetaType::QPointF, this);
     processor->setHandler(this);
@@ -23,6 +24,14 @@ HandScrollInstrument::HandScrollInstrument(QObject *parent):
 
 HandScrollInstrument::~HandScrollInstrument() {
     ensureUninstalled();
+}
+
+Qt::MouseButtons HandScrollInstrument::mouseButtons() const {
+    return m_mouseButtons;
+}
+
+void HandScrollInstrument::setMouseButtons(Qt::MouseButtons mouseButtons) {
+    m_mouseButtons = mouseButtons;
 }
 
 void HandScrollInstrument::emulate(QPoint viewportDelta) {
@@ -48,7 +57,7 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     if(!dragProcessor()->isWaiting())
         return false;
 
-    if (event->button() != Qt::RightButton)
+    if (!(event->button() & m_mouseButtons))
         return false;
 
     QGraphicsItem *item = this->item(view(viewport), event->pos()); 

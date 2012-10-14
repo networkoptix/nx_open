@@ -14,6 +14,9 @@ public:
     HandScrollInstrument(QObject *parent);
     virtual ~HandScrollInstrument();
 
+    Qt::MouseButtons mouseButtons() const;
+    void setMouseButtons(Qt::MouseButtons mouseButtons);
+
     void emulate(QPoint viewportDelta);
 
 signals:
@@ -37,6 +40,7 @@ protected:
     virtual void finishKinetic() override;
 
 private:
+    Qt::MouseButtons m_mouseButtons;
     QCursor m_originalCursor;
     QWeakPointer<QGraphicsView> m_currentView;
 };
