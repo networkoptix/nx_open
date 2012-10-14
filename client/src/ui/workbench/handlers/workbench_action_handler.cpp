@@ -2169,12 +2169,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
         {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Can't write to file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
-                QMessageBox::Ok
-                );
+            at_layoutCamera_exportFailed(tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()));
             return;
         }
     }
