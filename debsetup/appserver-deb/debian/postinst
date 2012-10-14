@@ -10,6 +10,8 @@ ${DEBIAN_SCRIPT_TRACE:+ echo "#42#DEBUG# RUNNING $0 $*" 1>&2 }
 export PATH=$PATH:/sbin:/usr/sbin:/bin:/usr/bin
 
 CONFIG_FILE="/opt/$COMPANY_NAME/entcontroller/etc/entcontroller.conf"
+SSL_CERT="/opt/$COMPANY_NAME/entcontroller/share/ssl/cert.pem"
+BINDIR="/opt/$COMPANY_NAME/entcontroller/bin"
 
 # This is necessary because changed configuration options should take effect 
 # immediately.
@@ -109,14 +111,21 @@ case "$1" in
 
       write_config
 
-      /opt/$COMPANY_NAME/entcontroller/bin/dbsync
+      "$BINDIR/dbsync"
 
       if [ -n "$ECS_PASSWORD" ]
       then
-        /opt/$COMPANY_NAME/entcontroller/bin/dbconfig admin "$ECS_PASSWORD"
+        "$BINDIR/dbconfig" admin "$ECS_PASSWORD"
       fi
 
       chmod 600 /opt/$COMPANY_NAME/entcontroller/var/db/ecs.db
+
+      if [ -f "$SSL_CERT" ]
+      then
+        echo "8bc51737d190bf748681276b529ce5f7  $SSL_CERT" | md5sum -c --quiet 2> /dev/null && "$BINDIR/certgen" "$SSL_CERT"
+      else
+        "$BINDIR/certgen" "$SSL_CERT"
+      fi
   ;;
 
   abort-upgrade|abort-remove|abort-configure)
