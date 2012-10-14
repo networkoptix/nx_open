@@ -239,7 +239,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 	bool isVideoCamera = media->dataProvider && qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
 	if (isVideoCamera)
 	{
-		if (m_speed < 1.0)
+		if (m_speed < 1.0 || m_singleShotMode)
 			return;
 		if (m_firstAfterJumpTime == AV_NOPTS_VALUE) {
 			m_firstAfterJumpTime = media->timestamp;
@@ -852,7 +852,7 @@ void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
         m_delay.breakSleep();
     }
     QnAbstractDataConsumer::putData(data);
-	if (media)
+	if (media && m_dataQueue.size() < 2)
 		hurryUpCkeckForCamera2(media); // check if slow network
 }
 
