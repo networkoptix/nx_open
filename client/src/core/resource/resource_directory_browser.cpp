@@ -221,28 +221,35 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
     QTextStream itemNames(itemNamesIO);
 
-    // todo: here is bad place to add resources to pool. need rafactor
+    // TODO: here is bad place to add resources to pool. need refactor
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         QnLayoutItemData& item = itr.value();
         QString path = item.resource.path;
         item.uuid = QUuid::createUuid();
-        item.resource.id = QnId::generateSpecialId();
+        //item.resource.id = QnId::generateSpecialId();
         if (!path.endsWith(QLatin1String(".mkv")))
             item.resource.path += QLatin1String(".mkv");
         item.resource.path = QnLayoutResource::updateNovParent(xfile,item.resource.path);
-        updatedItems.insert(item.uuid, item);
 
         QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
         storage->setUrl(xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->setStorage(storage);
-        aviResource->setId(item.resource.id);
+        //aviResource->setId(item.resource.id);
         aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
         QString itemName(itemNames.readLine());
         if (!itemName.isEmpty())
             aviResource->setName(itemName);
+
+        qnResPool->addResource(aviResource);
+        aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
+        if(!aviResource) {
+            qnWarning("ACHTUNG! Total mess up in exported layout loading!");
+            continue;
+        }
+        item.resource.id = aviResource->getId();
 
         int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
         for (int channel = 0; channel < numberOfChannels; ++channel)
@@ -265,7 +272,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
             }
         }
 
-        qnResPool->addResource(aviResource);
+        updatedItems.insert(item.uuid, item);
     }
     delete itemNamesIO;
     layout->setItems(updatedItems);

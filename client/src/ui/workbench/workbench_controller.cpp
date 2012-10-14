@@ -365,6 +365,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        m_resizingInstrument,           SLOT(recursiveDisable()));
     connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      m_resizingInstrument,           SLOT(recursiveEnable()));
+    connect(m_zoomedToggle,             SIGNAL(activated()),                                                                        this,                           SLOT(at_zoomedToggle_activated()));
+    connect(m_zoomedToggle,             SIGNAL(deactivated()),                                                                      this,                           SLOT(at_zoomedToggle_deactivated()));
     m_zoomedToggle->setActive(display()->widget(Qn::ZoomedRole) != NULL);
 
     /* Set up context menu. */
@@ -1300,4 +1302,12 @@ void QnWorkbenchController::at_workbench_currentLayoutChanged() {
 
     m_moveInstrument->setEnabled(writable);
     m_resizingInstrument->setEnabled(writable);
+}
+
+void QnWorkbenchController::at_zoomedToggle_activated() {
+    m_handScrollInstrument->setMouseButtons(Qt::LeftButton | Qt::RightButton);
+}
+
+void QnWorkbenchController::at_zoomedToggle_deactivated() {
+    m_handScrollInstrument->setMouseButtons(Qt::RightButton);
 }

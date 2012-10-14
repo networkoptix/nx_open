@@ -235,6 +235,7 @@ int qnMain(int argc, char *argv[])
     QString authenticationString, delayedDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
     bool devBackgroundEditable = false;
+    bool skipMediaFolderScan = false;
     
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -245,6 +246,7 @@ int qnMain(int argc, char *argv[])
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
     commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
+    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -343,12 +345,14 @@ int qnMain(int argc, char *argv[])
 
     //============================
     //QnResourceDirectoryBrowser
-    QnResourceDirectoryBrowser::instance().setLocal(true);
-    QStringList dirs;
-    dirs << qnSettings->mediaFolder();
-    dirs << qnSettings->extraMediaFolders();
-    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    if(!skipMediaFolderScan) {
+        QnResourceDirectoryBrowser::instance().setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    }
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);

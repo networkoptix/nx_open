@@ -56,6 +56,8 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -243,6 +245,20 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
+
+    SignalingInstrument *activityInstrument = new SignalingInstrument(
+        Instrument::makeSet(QEvent::MouseButtonRelease), 
+        Instrument::makeSet(QEvent::KeyRelease),
+        Instrument::makeSet(),
+        Instrument::makeSet(),
+        this
+    );
+    foreach(InstrumentManager *manager, InstrumentManager::managersOf(display()->scene())) {
+        manager->installInstrument(activityInstrument);
+        break;
+    }
+    connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
+    connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -462,7 +478,7 @@ void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
 
         Qn::ResourceSavingFlags flags = snapshotManager()->flags(resource);
         if((flags & (Qn::ResourceIsLocal | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsLocal) /* Local, not being saved. */
-            if((resource->flags() & QnResource::local_media) != QnResource::local_media) /* Not a file. */
+            if(!snapshotManager()->isFile(resource)) /* Not a file. */
                 resourcePool()->removeResource(resource);
     }
 }
@@ -1787,6 +1803,15 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
 }
 
 void QnWorkbenchActionHandler::at_exitAction_triggered() {
+    if(context()->user()) { // TODO: factor out
+        QnWorkbenchState state;
+        workbench()->submit(state);
+
+        QnWorkbenchStateHash states = qnSettings->userWorkbenchStates();
+        states[context()->user()->getName()] = state;
+        qnSettings->setUserWorkbenchStates(states);
+    }
+
     menu()->trigger(Qn::ClearCameraSettingsAction);
     if(closeAllLayouts(true))
         qApp->closeAllWindows();
@@ -2144,12 +2169,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     {
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
         {
-            QMessageBox::critical(
-                this->widget(), 
-                tr("Can't write to file"),
-                tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()), 
-                QMessageBox::Ok
-                );
+            at_layoutCamera_exportFailed(tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()));
             return;
         }
     }
@@ -2244,7 +2264,8 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     disconnect(sender(), NULL, this, NULL);
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
-
+    if (!m_exportStorage)
+        return; // race condition. Export just canceled from gui
     QString fileName = m_exportStorage->getUrl();
     if (fileName.endsWith(QLatin1String(".tmp")))
     {
@@ -2554,9 +2575,18 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
 
 void QnWorkbenchActionHandler::at_cancelExport()
 {
-    if (m_exportedCamera)
+    QString exportFileName;
+    if (m_exportedCamera) {
+        exportFileName = m_exportedCamera->exportedFileName();
         m_exportedCamera->stopExport();
+    }
     m_exportedCamera = 0;
+    if (m_exportStorage)
+        QFile::remove(QnLayoutFileStorageResource::removeProtocolPrefix(m_exportStorage->getUrl()));
+    else if (!exportFileName.isEmpty())
+        QFile::remove(exportFileName);
+    m_exportStorage.clear();
+    m_exportedMediaRes.clear();
 }
 
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
@@ -2754,3 +2784,11 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
 }
+
+void QnWorkbenchActionHandler::at_activityInstrument_activated() {
+    action(Qn::ToggleTourModeAction)->setChecked(false);
+}
+
+
+
+
