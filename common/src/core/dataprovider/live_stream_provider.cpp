@@ -22,7 +22,7 @@ m_softMotionLastChannel(0)
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
-
+    //if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
 }
 
 void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)

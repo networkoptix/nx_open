@@ -216,6 +216,29 @@ bool QnSecurityCamResource::hasDualStreaming() const
     return val.toInt();
 }
 
+StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
+{
+    if (!hasParam(QLatin1String("streamFpsSharing")))
+    {
+        //Q_ASSERT(false);
+        return sharePixels;
+    }
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(QLatin1String("hasDualStreaming"), val, QnDomainMemory);
+
+    QString sval = val.toString();
+
+    if (sval == QLatin1String("shareFps"))
+        return shareFps;
+
+    if (sval == QLatin1String("noSharing"))
+        return noSharing;
+
+    return sharePixels;
+}
+
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const
 {
     MotionTypeFlags rez = supportedMotionType();
