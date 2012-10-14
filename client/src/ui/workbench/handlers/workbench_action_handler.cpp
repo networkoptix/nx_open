@@ -56,6 +56,8 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/instruments/instrument_manager.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -243,6 +245,20 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
+
+    SignalingInstrument *activityInstrument = new SignalingInstrument(
+        Instrument::makeSet(QEvent::MouseButtonRelease), 
+        Instrument::makeSet(QEvent::KeyRelease),
+        Instrument::makeSet(),
+        Instrument::makeSet(),
+        this
+    );
+    foreach(InstrumentManager *manager, InstrumentManager::managersOf(display()->scene())) {
+        manager->installInstrument(activityInstrument);
+        break;
+    }
+    connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
+    connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -2763,4 +2779,8 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     Q_UNUSED(role)
     if(!workbench()->item(Qn::ZoomedRole))
         action(Qn::ToggleTourModeAction)->setChecked(false);
+}
+
+void QnWorkbenchActionHandler::at_activityInstrument_activated() {
+    action(Qn::ToggleTourModeAction)->setChecked(false);
 }
