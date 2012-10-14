@@ -191,7 +191,7 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
             parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
             parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
 
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: no types in pool => crash
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
 
             storages.append(storage);
