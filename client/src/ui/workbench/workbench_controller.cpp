@@ -341,8 +341,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                boundingInstrument,             SLOT(recursiveDisable()));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               boundingInstrument,             SLOT(recursiveEnable()));
 
-    connect(m_motionSelectionInstrument, SIGNAL(rotationProcessStarted(QGraphicsView *, QGraphicsWidget *)),                        m_handScrollInstrument,         SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument, SIGNAL(rotationProcessFinished(QGraphicsView *, QGraphicsWidget *)),                       m_handScrollInstrument,         SLOT(recursiveEnable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_handScrollInstrument,         SLOT(recursiveDisable()));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_handScrollInstrument,         SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_moveInstrument,               SLOT(recursiveDisable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),                m_moveInstrument,               SLOT(recursiveEnable()));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 m_dragInstrument,               SLOT(recursiveDisable()));
