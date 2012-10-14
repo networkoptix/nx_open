@@ -62,6 +62,7 @@
 #include "network/default_tcp_connection_processor.h"
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
+#include "rest/handlers/image_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -305,9 +306,9 @@ int serverMain(int argc, char *argv[])
 
 //    av_log_set_callback(decoderLogCallback);
 
-    QCoreApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QCoreApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QCoreApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+    QCoreApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QCoreApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QCoreApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     QString dataLocation = getDataDirectory();
     QDir::setCurrent(QFileInfo(QFile::decodeName(qApp->argv()[0])).absolutePath());
@@ -332,9 +333,9 @@ int serverMain(int argc, char *argv[])
     commandLineParser.parse(argc, argv, stderr);
 
     QnLog::initLog(logLevel);
-    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
-    cl_log.log("Software revision: ", APPLICATION_REVISION, cl_logALWAYS);
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log("Software revision: ", QN_APPLICATION_REVISION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
@@ -559,6 +560,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/setCameraParam", new QnSetCameraParamHandler());
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
+    QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -625,7 +627,7 @@ void QnMain::run()
     else
         compatibilityChecker = &localChecker;
 
-    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, qApp->applicationVersion(), "ECS", connectInfo->version))
+    if (!compatibilityChecker->isCompatible(COMPONENT_NAME, QN_ENGINE_VERSION, "ECS", connectInfo->version))
     {
         cl_log.log(cl_logERROR, "Incompatible Enterprise Controller version detected! Giving up.");
         return;

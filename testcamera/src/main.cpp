@@ -28,9 +28,9 @@ int main(int argc, char *argv[])
 {
     QN_INIT_MODULE_RESOURCES(common);
 
-    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     ffmpegInit();  
     
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 
     QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
-    qDebug() << APPLICATION_NAME << "version" << APPLICATION_VERSION;
+    qDebug() << QN_APPLICATION_NAME << "version" << QN_APPLICATION_VERSION;
     
     if (argc == 1)
     {

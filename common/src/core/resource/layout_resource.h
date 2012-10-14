@@ -46,11 +46,6 @@ public:
 
     void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
 
-    /**
-     * Deserialize layout resource from file
-     */
-    static QnLayoutResourcePtr fromFile(const QString& xfile);
-
     void setData(const QHash<int, QVariant> &dataByRole);
 
     void setData(int role, const QVariant &value);

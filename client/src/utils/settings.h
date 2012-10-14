@@ -36,20 +36,23 @@ struct QnConnectionData {
     bool readOnly;
 };
 
+// TODO: #gdm 
+// * Use \returns doxytag.
+// * Don't use "-" after param name, it will be displayed in generated docs.
+//   A better way is to use indentation. See comment for QnConnectionDataList::contains().
 class QnConnectionDataList: public QList<QnConnectionData> {
 public:
     QnConnectionDataList(): QList<QnConnectionData>(){}
 
     /**
-     *  Returns true if the list contains a connection with the name provided;
-     *  otherwise returns false.
-     * \param name - name of the connection
+     * \param name                      Name of the connection.
+     * \returns                         True if the list contains a connection with the provided name, false otherwise.
      */
     bool contains(const QString &name);
 
     /**
      * Returns the first occurrence of a connection in the list with the
-     * name provided. Retuns empty connection if no such connection was found.
+     * name provided. Returns empty connection if no such connection was found.
      * \param name - name of the connection
      */
     QnConnectionData getByName(const QString &name);
@@ -115,6 +118,8 @@ public:
         EXTRA_TRANSLATIONS_PATH,
         TRANSLATION_PATH,
 
+        UPDATE_FEED_URL,
+
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
 
@@ -156,6 +161,7 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                     debugCounter,           setDebugCounter,            DEBUG_COUNTER,              0)
         QN_DECLARE_RW_PROPERTY(QString,                 extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                 translationPath,        setLanguage,                TRANSLATION_PATH,           QLatin1String(":/translations/client_en.qm"))
+        QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
     QN_END_PROPERTY_STORAGE()

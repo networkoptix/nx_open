@@ -70,6 +70,8 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
+#include <ui/workbench/watchers/workbench_update_watcher.h>
+#include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 
 #include "client_message_processor.h"
 #include "file_processor.h"
@@ -80,6 +82,7 @@
 #include "camera/caching_time_period_loader.h"
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "core/resource/resource_directory_browser.h"
 
 
 
@@ -151,7 +154,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
-    m_tourTimer(new QTimer())
+    m_tourTimer(new QTimer()),
+    m_exportedCamera(0)
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -167,6 +171,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
+    connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
     connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
     connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
@@ -236,11 +241,16 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
+    connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
+    //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
     at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
+
+
+    at_updateWatcher_availableUpdateChanged();
 }
 
 QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
@@ -253,6 +263,9 @@ QnWorkbenchActionHandler::~QnWorkbenchActionHandler() {
     /* Clean up. */
     if(m_mainMenu)
         delete m_mainMenu.data();
+
+    if(m_currentUserLayoutsMenu)
+        delete m_currentUserLayoutsMenu.data();
 
     if(cameraSettingsDialog())
         delete cameraSettingsDialog();
@@ -764,13 +777,23 @@ void QnWorkbenchActionHandler::at_eventManager_connectionClosed() {
 
 void QnWorkbenchActionHandler::at_eventManager_connectionOpened() {
     action(Qn::ConnectToServerAction)->setIcon(qnSkin->icon("titlebar/connected.png"));
-    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server..."));
+    action(Qn::ConnectToServerAction)->setText(tr("Connect to Another Server...")); // TODO: use conditional texts? 
 }
 
 void QnWorkbenchActionHandler::at_mainMenuAction_triggered() {
     m_mainMenu = menu()->newMenu(Qn::MainScope);
 
     action(Qn::MainMenuAction)->setMenu(m_mainMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_openCurrentUserLayoutMenuAction_triggered() {
+    m_currentUserLayoutsMenu = menu()->newMenu(Qn::OpenCurrentUserLayoutMenu, Qn::TitleBarScope);
+
+    action(Qn::OpenCurrentUserLayoutMenu)->setMenu(m_currentUserLayoutsMenu.data());
+}
+
+void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
+    action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
 void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {
@@ -910,7 +933,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if (layout->flags() & QnResource::local) {
         if (!validateItemTypes(layout))
             return;
-        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave); // override layout
+        bool isReadOnly = !(accessController()->permissions(layout) & Qn::ReadWriteSavePermission);
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // override layout
     }
     else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
@@ -1969,12 +1993,20 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     return true;
 }
 
-QString QnWorkbenchActionHandler::binaryFilterName() const
+QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
-    if (sizeof(char*) == 4)
-        return tr("Executable Network Optix Media File (x86) (*.exe)");
-    else
-        return tr("Executable Network Optix Media File (x64) (*.exe)");
+    if (readOnly) {
+        if (sizeof(char*) == 4)
+            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+        else
+            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+    }
+    else {
+        if (sizeof(char*) == 4)
+            return tr("Executable Network Optix Media File (x86) (*.exe)");
+        else
+            return tr("Executable Network Optix Media File (x64) (*.exe)");
+    }
 }
 
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
@@ -1999,20 +2031,24 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
 
     QString suggestion = layout->getName();
 
+    bool exportReadOnly = false;
     QString fileName;
     QString selectedExtension;
+    QString filterSeparator(QLatin1String(";;"));
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov);;") + binaryFilterName(),
+            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
+            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
+        exportReadOnly = selectedFilter.contains(tr("read only"));
         if (fileName.isEmpty())
             return false;
 
@@ -2062,13 +2098,25 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     }
 
 
-    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode);
+    saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, exportReadOnly);
 
     return true;
 }
 
-void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode)
+void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly)
 {
+    if (m_exportedCamera)
+    {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Another export in progress"),
+            tr("Another export in progress. Please wait"), 
+            QMessageBox::Ok
+            );
+
+        return;
+    }
+
     m_layoutExportMode = mode;
     m_layoutFileName = QnLayoutFileStorageResource::removeProtocolPrefix(layoutFileName); 
     QString fileName = m_layoutFileName;
@@ -2082,8 +2130,10 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
 
-    m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0)); // TODO: leaking memory here.
-    connect(exportProgressDialog,   SIGNAL(canceled()),                 m_layoutExportCamera,   SLOT(stopLayoutExport()));
+    if (!m_layoutExportCamera)
+        m_layoutExportCamera = new QnVideoCamera(QnMediaResourcePtr(0));
+    m_exportedCamera = m_layoutExportCamera;
+    connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
@@ -2142,7 +2192,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
     {
-        at_cameraCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
+        at_layoutCamera_exportFailed(tr("Could not create output file %1").arg(fileName));
         return;
     }
 
@@ -2154,6 +2204,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("range.bin"), QIODevice::WriteOnly);
     device->write(exportPeriod.serialize());
+    delete device;
+
+    device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
+    quint32 flags = exportReadOnly ? 1 : 0;
+    device->write((const char*) &flags, sizeof(flags));
     delete device;
 
     // If layout export create new guid. If layout just renamed (local save or local saveAs) keep guid
@@ -2223,13 +2278,14 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
         snapshotManager()->store(layout);
     }
     else {
-        QnLayoutResourcePtr layout =  QnLayoutResource::fromFile(m_exportStorage->getUrl());
+        QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
         if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
             layout->setStatus(QnResource::Online);
             resourcePool()->addResource(layout);
         }
     }
     m_exportStorage.clear();
+    m_exportedCamera = 0;
 
     if (m_layoutExportMode == LayoutExport_Export)
         QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
@@ -2286,7 +2342,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
     }
 }
 
-void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage) 
+void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage) 
 {
     disconnect(sender(), NULL, this, NULL);
 
@@ -2297,6 +2353,7 @@ void QnWorkbenchActionHandler::at_cameraCamera_exportFailed(QString errorMessage
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
+    m_exportedCamera = 0;
 
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
 }
@@ -2386,7 +2443,7 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName();
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName(false);
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
@@ -2460,7 +2517,7 @@ Do you want to continue?"),
         QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
         itemData.uuid = QUuid::createUuid();
         newLayout->addItem(itemData);
-        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export);
+        saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
     }
     else {
         QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
@@ -2469,17 +2526,17 @@ Do you want to continue?"),
         exportProgressDialog->setRange(0, 100);
         exportProgressDialog->setMinimumDuration(1000);
 
-        QnVideoCamera *camera = widget->display()->camera();
+        m_exportedCamera = widget->display()->camera();
 
-        connect(exportProgressDialog,   SIGNAL(canceled()),                 camera,                 SLOT(stopExport()));
+        connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
         connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
-        connect(camera,                 SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
-        connect(camera,                 SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
+        connect(m_exportedCamera,       SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
+        connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
+        connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    exportProgressDialog,   SLOT(deleteLater()));
+        connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
+        connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-        camera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
+        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
         //exportProgressDialog->exec();
     }
 }
@@ -2491,8 +2548,15 @@ void QnWorkbenchActionHandler::at_camera_exportFinished(QString fileName) {
     QnAviResourcePtr file(new QnAviResource(fileName));
     file->setStatus(QnResource::Online);
     resourcePool()->addResource(file);
-
+    m_exportedCamera = 0;
     QMessageBox::information(widget(), tr("Export finished"), tr("Export successfully finished"), QMessageBox::Ok);
+}
+
+void QnWorkbenchActionHandler::at_cancelExport()
+{
+    if (m_exportedCamera)
+        m_exportedCamera->stopExport();
+    m_exportedCamera = 0;
 }
 
 void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
@@ -2500,7 +2564,7 @@ void QnWorkbenchActionHandler::at_camera_exportFailed(QString errorMessage) {
 
     if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
         camera->stopExport();
-
+    m_exportedCamera = 0;
     QMessageBox::warning(widget(), tr("Could not export video"), errorMessage, QMessageBox::Ok);
 }
 
@@ -2635,6 +2699,18 @@ void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             connection()->saveAsync(resource, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
         }
     }
+}
+
+void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
+    QnUpdateInfoItem update = context()->instance<QnWorkbenchUpdateWatcher>()->availableUpdate();
+    if(update.isNull())
+        return;
+    
+    QMessageBox::information(
+        widget(), 
+        tr("Software Update is Available"), 
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
+    );
 }
 
 void QnWorkbenchActionHandler::at_toggleTourAction_toggled(bool checked) {

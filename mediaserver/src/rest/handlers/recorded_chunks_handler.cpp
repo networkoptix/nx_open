@@ -10,20 +10,6 @@
 #include "motion/motion_helper.h"
 #include "api/serializer/serializer.h"
 
-qint64 QnRecordedChunksHandler::parseDateTime(const QString& dateTime)
-{
-    if (dateTime.contains('T') || dateTime.contains('-'))
-    {
-        QStringList dateTimeParts = dateTime.split('.');
-        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
-        if (dateTimeParts.size() > 1)
-            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
-        return tmpDateTime.toMSecsSinceEpoch() * 1000;
-    }
-    else
-        return dateTime.toLongLong();
-}
-
 QRect QnRecordedChunksHandler::deserializeMotionRect(const QString& rectStr)
 {
     QList<QString> params = rectStr.split(",");
@@ -173,6 +159,7 @@ QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above).";
     rez += "<BR>Param <b>motionRect</b> - Match motion on a video by specified rect. Params can be used several times.";
+    rez += "<BR>Param <b>format</b> - Optional. Data format. Allowed values: 'jason', 'xml', 'txt', 'bin'. Default value 'jason'";
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 
     rez += "<BR><b>Return</b> XML - with chunks merged for all cameras. Returned time and duration in microseconds.";

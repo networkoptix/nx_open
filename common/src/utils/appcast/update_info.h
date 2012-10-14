@@ -1,23 +1,23 @@
 #ifndef QN_UPDATE_INFO_H
 #define QN_UPDATE_INFO_H
 
-#include <QSharedPointer>
 #include <QMetaType>
 #include <QString>
 #include <QStringList>
 #include <QList>
 #include <QUrl>
 
+// TODO: use boost to implement operators.
 class QnVersion {
 public:
     QnVersion();
-    QnVersion(int major, int minor, int build);
+    QnVersion(int major, int minor, int bugfix);
     QnVersion(const QString &versionString);
 
     bool isNull() const;
     bool operator<(const QnVersion  &other) const;
     bool operator==(const QnVersion &other) const;
-    
+
     QString toString() const;
 
     int major() const {
@@ -28,22 +28,31 @@ public:
         return m_minor;
     }
 
-    int build() const {
-        return m_build;
+    int bugfix() const {
+        return m_bugfix;
     }
 
 private:
     int m_major;
     int m_minor;
-    int m_build;
+    int m_bugfix;
 };
 
-// TODO: #Ivan add doxycomments for fields of this struct.
+
 struct QnUpdateInfoItem {
+    /** Update version. */
     QnVersion version;
+
+    /** Update information title. */
     QString title;
+
+    /** Detailed update information. */
     QString description;
+
+    /** Date when this update was released. */
     QString pubDate;
+
+    /** Download url. */
     QUrl url;
 
     bool isNull() const;

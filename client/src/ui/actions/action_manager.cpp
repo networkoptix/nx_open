@@ -35,7 +35,7 @@ namespace {
         if(result)
             return result;
 
-        return checked_cast<QnAction *>(action);
+        return dynamic_cast<QnAction *>(action);
     }
 
 } // anonymous namespace
@@ -454,7 +454,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenCurrentUserLayoutMenu).
         flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::RequiresChildren).
         text(tr("Open Layout...")).
-        childFactory(new QnOpenCurrentUserLayoutActionFactory(this));
+        childFactory(new QnOpenCurrentUserLayoutActionFactory(this)).
+        icon(qnSkin->icon("titlebar/dropdown.png"));
 
     factory().
         flags(Qn::Main | Qn::Scene).
@@ -1138,11 +1139,24 @@ void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &paramet
 }
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, const QnActionParameters &parameters) {
-    QMenu *result = newMenuRecursive(m_root, scope, parameters);
-    m_parametersByMenu[result] = parameters;
+    return newMenu(Qn::NoAction, scope, parameters);
+}
 
-    connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
-    connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
+QMenu *QnActionManager::newMenu(Qn::ActionId rootId, Qn::ActionScope scope, const QnActionParameters &parameters) {
+    QnAction *rootAction = rootId == Qn::NoAction ? m_root : action(rootId);
+    
+    QMenu *result = NULL;
+    if(!rootAction) {
+        qnWarning("No action exists for id '%1'.", static_cast<int>(rootId));
+    } else {
+        result = newMenuRecursive(rootAction, scope, parameters);
+    }
+
+    if(result) {
+        m_parametersByMenu[result] = parameters;
+        connect(result, SIGNAL(destroyed(QObject *)), this, SLOT(at_menu_destroyed(QObject *)));
+        connect(result, SIGNAL(aboutToShow()), this, SLOT(at_menu_aboutToShow()));
+    }
 
     return result;
 }
@@ -1167,29 +1181,27 @@ void QnActionManager::copyAction(QAction *dst, QnAction *src, bool forwardSignal
 }
 
 QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope scope, const QnActionParameters &parameters) {
-    QMenu *result = new QMenu();
+    if(!parent->children().isEmpty()) {
+        QMenu *result = new QMenu();
 
-    foreach(QnAction *action, parent->children()) {
-        Qn::ActionVisibility visibility;
-        if(action->flags() & Qn::HotkeyOnly) {
-            visibility = Qn::InvisibleAction;
-        } else {
-            visibility = action->checkCondition(scope, parameters);
-        }
-        if(visibility == Qn::InvisibleAction)
-            continue;
-
-        QString replacedText;
-        QMenu *menu = NULL;
-        if(action->children().size() > 0) {
-            menu = newMenuRecursive(action, scope, parameters);
-            if(menu->isEmpty()) {
-                delete menu;
-                menu = NULL;
+        foreach(QnAction *action, parent->children()) {
+            Qn::ActionVisibility visibility;
+            if(action->flags() & Qn::HotkeyOnly) {
                 visibility = Qn::InvisibleAction;
-            } else if(menu->actions().size() == 1) {
+            } else {
+                visibility = action->checkCondition(scope, parameters);
+            }
+            if(visibility == Qn::InvisibleAction)
+                continue;
+
+            QMenu *menu = newMenuRecursive(action, scope, parameters);
+            if(!menu && (action->flags() & Qn::RequiresChildren))
+                continue;
+
+            QString replacedText;
+            if(menu && menu->actions().size() == 1) {
                 QnAction *menuAction = qnAction(menu->actions()[0]);
-                if(menuAction->flags() & Qn::Pullable) {
+                if(menuAction && (menuAction->flags() & Qn::Pullable)) {
                     delete menu;
                     menu = NULL;
 
@@ -1201,39 +1213,44 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 
             if(menu)
                 connect(result, SIGNAL(destroyed()), menu, SLOT(deleteLater()));
-        } else if(action->childFactory()) {
-            QList<QAction *> children = action->childFactory()->newActions(result);
-            if(!children.isEmpty()) {
-                menu = new QMenu();
-                foreach(QAction *action, children)
-                    menu->addAction(action);
-            }
-        }
 
-        if((action->flags() & Qn::RequiresChildren) && !menu)
-            continue;
+            if (action->hasConditionalTexts())
+                replacedText = action->checkConditionalText(parameters);
 
-        QAction *newAction = NULL;
-        if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
-            newAction = new QAction(result);
-            copyAction(newAction, action);
+            QAction *newAction = NULL;
+            if(!replacedText.isEmpty() || visibility == Qn::DisabledAction || menu != NULL) {
+                newAction = new QAction(result);
+                copyAction(newAction, action);
             
-            newAction->setMenu(menu);
-            newAction->setDisabled(visibility == Qn::DisabledAction);
-            if(!replacedText.isEmpty())
-                newAction->setText(replacedText);
-        } else {
-            newAction = action;
+                newAction->setMenu(menu);
+                newAction->setDisabled(visibility == Qn::DisabledAction);
+                if(!replacedText.isEmpty())
+                    newAction->setText(replacedText);
+            } else {
+                newAction = action;
+            }
+
+            if(visibility != Qn::InvisibleAction)
+                result->addAction(newAction);
         }
 
-        if (action->hasConditionalTexts())
-            newAction->setText(action->checkConditionalText(parameters));
+        return result;
+    } else if(parent->childFactory()) {
+        QList<QAction *> actions = parent->childFactory()->newActions(NULL);
 
-        if(visibility != Qn::InvisibleAction)
-            result->addAction(newAction);
+        if(!actions.isEmpty()) {
+            QMenu *result = new QMenu();
+            foreach(QAction *action, actions) {
+                action->setParent(result);
+                result->addAction(action);
+            }
+            return result;
+        } else {
+            return NULL;
+        }
+    } else {
+        return NULL;
     }
-
-    return result;
 }
 
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
