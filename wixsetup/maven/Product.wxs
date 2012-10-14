@@ -384,6 +384,11 @@
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
         
+        <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
+                      Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="CertGenAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
+                      Execute="deferred" Return="check" Impersonate="no" />
+        
         <CustomAction Id="CloseTrayToolAction_Cmd" Property="CloseTrayToolAction"
                       Value="&quot;[${installer.customization}TrayToolDir]traytool.exe&quot; &quot;quit&quot;" Execute="immediate" />
         <CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
@@ -458,6 +463,9 @@
             
             <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
