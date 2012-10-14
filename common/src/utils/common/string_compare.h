@@ -1,3 +1,6 @@
+/* This file is a modified version of OnShore string comparison library,
+ * see http://sabgroup.com. Original copyright notice follows. */
+
 /*
  * This software was written by people from OnShore Consulting services LLC
  * <info@sabgroup.com> and placed in the public domain.
