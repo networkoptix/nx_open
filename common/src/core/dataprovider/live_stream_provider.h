@@ -9,7 +9,7 @@
 #include "core/resource/resource_fwd.h"
 
 #define META_DATA_DURATION_MS 300
-
+#define DESIRED_SECOND_STREAM_FPS (7)
 
 class QnLiveStreamProvider
 {

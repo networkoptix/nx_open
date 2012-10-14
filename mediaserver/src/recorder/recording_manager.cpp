@@ -155,7 +155,11 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
         if (providerLow) {
             QnSecurityCamResourcePtr cameraRes = qSharedPointerDynamicCast<QnSecurityCamResource>(res);
             float currentFps = recorderHiRes->currentScheduleTask().getFps();
-            if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
+
+            // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
+            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != shareFps || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS); 
+
+            if (runSecondStream)
             {
                 if (recorderLowRes) {
                     if (!recorderLowRes->isRunning())

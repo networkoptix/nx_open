@@ -226,7 +226,7 @@ StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
 
     QVariant val;
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
-    this_casted->getParam(QLatin1String("hasDualStreaming"), val, QnDomainMemory);
+    this_casted->getParam(QLatin1String("streamFpsSharing"), val, QnDomainMemory);
 
     QString sval = val.toString();
 
