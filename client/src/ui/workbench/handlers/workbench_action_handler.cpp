@@ -10,7 +10,6 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
-#include <QtGui/QProgressDialog>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -52,6 +51,7 @@
 #include <ui/dialogs/resource_list_dialog.h>
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
+#include <ui/dialogs/progress_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -1999,7 +1999,11 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     {
         QnLayoutItemData& item = itr.value();
         QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
-        if (layoutItemRes) {
+        if (layoutItemRes) 
+        {
+            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
+            if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
+                continue; // skip unaccessible local resources because is not possible to check utc flag
             if (layoutItemRes->hasFlags(QnResource::utc))
                 utcExists = true;
             else
@@ -2150,7 +2154,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         fileName += QLatin1String(".tmp");
     }
 
-    QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+    QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
     m_exportProgressDialog = exportProgressDialog;
@@ -2541,7 +2545,7 @@ Do you want to continue?"),
         saveLayoutToLocalFile(period, newLayout, fileName, LayoutExport_Export, false);
     }
     else {
-        QProgressDialog *exportProgressDialog = new QProgressDialog(this->widget());
+        QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
         exportProgressDialog->setWindowTitle(tr("Exporting Video"));
         exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
         exportProgressDialog->setRange(0, 100);
@@ -2558,7 +2562,7 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
-        //exportProgressDialog->exec();
+        exportProgressDialog->exec();
     }
 }
 

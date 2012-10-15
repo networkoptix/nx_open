@@ -551,6 +551,14 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
+void CommunicatingSocket::setSendBufferSize(int buff_size)
+{
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+    {
+        //error
+    }
+}
+
 UDPSocket::UDPSocket(unsigned short localPort)   :
     CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
     setLocalPort(localPort);

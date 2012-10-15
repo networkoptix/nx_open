@@ -1,0 +1,1 @@
+"C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\signtool.exe" sign /v /p qweasd123 /d "Network Optix HD Witness" /f app.p12 /tr "http://www.startssl.com/timestamp" hdwitness-1.3.1.0-windows-x64-release-default.msi 

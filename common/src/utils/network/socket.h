@@ -214,6 +214,7 @@ public:
 
     bool isConnected() const { return mConnected; }
 
+    void setSendBufferSize(int buff_size);
 protected:
     CommunicatingSocket(int type, int protocol) ;
     CommunicatingSocket(int newConnSD);

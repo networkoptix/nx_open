@@ -1204,6 +1204,8 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+    //d->socket->setNoDelay(true);
+    d->socket->setSendBufferSize(16*1024);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();

@@ -630,14 +630,15 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
-
     bool canAuth = !m_readOnly;
 
+    // TODO: #gdm Use QDesktopServices::setUrlHandler
 #ifdef Q_OS_WIN
-    if (canAuth){
-        QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
-        QString defaultBrowser = settings.value(QLatin1String("HKEY_CLASSES_ROOT\\http\\shell\\open\\command")).toString();
-        canAuth = !defaultBrowser.contains(QLatin1String("iexplore"));
+    if (canAuth) {
+        QSettings settings(QLatin1String("HKEY_CURRENT_USER\\Software\\Clients\\StartMenuInternet"), QSettings::NativeFormat);
+        QString defaultBrowser = settings.value(QLatin1String("Default")).toString();
+        if (defaultBrowser.isEmpty() || defaultBrowser.contains(QLatin1String("iexplore")))
+			canAuth = false;
     }
 #endif
 

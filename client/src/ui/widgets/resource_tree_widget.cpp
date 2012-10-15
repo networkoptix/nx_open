@@ -361,19 +361,19 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
-void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos){
+void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelection) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
         return;
     }
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, QnActionParameters(currentTarget(Qn::TreeScope))));
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : QnActionParameters(currentTarget(Qn::TreeScope))));
 
     /* Add tree-local actions to the menu. */
     manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
-    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()))
-        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */
+    if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
+        manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
 
     if(menu->isEmpty())
         return;
@@ -487,12 +487,16 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *) {
+void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
+    QWidget *child = childAt(event->pos());
+    while(child && child != ui->resourceTreeView && child != ui->searchTreeView)
+        child = child->parentWidget();
+
     /** 
      * Note that we cannot use event->globalPos() here as it doesn't work when
      * the widget is embedded into graphics scene.
      */
-    showContextMenuAt(QCursor::pos());
+    showContextMenuAt(QCursor::pos(), !child);
 }
 
 void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {
@@ -509,7 +513,7 @@ void QnResourceTreeWidget::mouseReleaseEvent(QMouseEvent *event) {
 
 void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
-    if (event->key() == Qt::Key_Menu){
+    if (event->key() == Qt::Key_Menu) {
         if (ui->filterLineEdit->hasFocus())
             return;
 

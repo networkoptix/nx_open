@@ -116,6 +116,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
     resource->setName(name);
     resource->setMAC(mac);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
 

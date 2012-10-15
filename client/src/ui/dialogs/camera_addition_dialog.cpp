@@ -93,10 +93,9 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
 void QnCameraAdditionDialog::removeAddedCameras(){
     int row = ui->camerasTable->rowCount() - 1;
     while (row > 0){
-        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
-            continue;
-        ui->camerasTable->removeRow(row);
-        row--;
+        if (ui->camerasTable->item(row, 0)->checkState() == Qt::Checked)
+	        ui->camerasTable->removeRow(row);
+		row--;
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
 }
@@ -138,9 +137,11 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
     ui->endIPLineEdit->validator()->fixup(fixed);
     QHostAddress endAddr(fixed);
 
-    if (endAddr.toIPv4Address() > startAddr.toIPv4Address() &&
-        endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
-        startAddr = QHostAddress::parseSubnet(endAddr.toString() + QLatin1String("/24")).first;
+    quint32 startSubnet = startAddr.toIPv4Address() >> 8;
+    quint32 endSubnet = endAddr.toIPv4Address() >> 8;
+
+    if (startSubnet != endSubnet){
+        startAddr = QHostAddress(startAddr.toIPv4Address() + ((endSubnet - startSubnet) << 8) );
         ui->startIPLineEdit->setText(startAddr.toString());
     }
     m_inIpRangeEdit = false;
@@ -153,12 +154,12 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column){
         return;
 
     int rowCount = ui->camerasTable->rowCount();
-    bool enabled = rowCount > 0;
+    bool enabled = false;
     for (int row = 0; row < rowCount; ++row) {
-        if (ui->camerasTable->item(row, 0)->checkState() == Qt::Checked)
+        if (ui->camerasTable->item(row, 0)->checkState() != Qt::Checked)
             continue;
-        enabled = false;
-        break;
+		enabled = true;
+		break;
     }
     ui->addButton->setEnabled(enabled);
 }
@@ -307,4 +308,14 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
 void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
     ui->startIPLabel->setText(m_startLabelTexts[toggled ? 1 : 0]);
+    if (toggled){
+        QHostAddress startAddr(ui->startIPLineEdit->text());
+        quint32 addr = startAddr.toIPv4Address();
+        addr = addr >> 8;
+        addr = (addr << 8) + 255;
+        QString endAddrStr = QHostAddress(addr).toString();
+        ui->endIPLineEdit->setText(endAddrStr);
+        ui->endIPLineEdit->setFocus();
+        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+    }
 }

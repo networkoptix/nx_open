@@ -213,6 +213,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
     resource->setName(name);
     resource->setMAC(mac);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
 

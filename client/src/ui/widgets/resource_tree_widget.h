@@ -85,7 +85,7 @@ protected:
     void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
 
     void killSearchTimer();
-    void showContextMenuAt(const QPoint &pos);
+    void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
 
 private slots:
     void expandAll();

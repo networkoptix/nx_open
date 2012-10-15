@@ -15,6 +15,7 @@
 #include "camera/camera_pool.h"
 
 static const int MAX_GOP_LEN = 100;
+static const qint64 LATEST_IMAGE = -1;
 
 QnImageHandler::QnImageHandler()
 {
@@ -65,8 +66,12 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
             if (!res)
                 errStr = QString("Camera resource %1 not found").arg(params[i].second);
         }
-        else if (params[i].first == "time")
-            time = parseDateTime(params[i].second);
+        else if (params[i].first == "time") {
+            if (params[i].second.toLower().trimmed() == "latest")
+                time = LATEST_IMAGE;
+            else
+                time = parseDateTime(params[i].second);
+        }
         else if (params[i].first == "precise") {
             QString val = params[i].second.toLower().trimmed(); 
             precise = (val == "true" || val == "1");
@@ -99,26 +104,41 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         return CODE_INVALID_PARAMETER;
     }
 
-    QnServerArchiveDelegate serverDelegate;
-    serverDelegate.open(res);
-    serverDelegate.seek(time, true);
     bool useHQ = true;
     if (dstSize.width() > 0 && dstSize.width() <= 320 || dstSize.height() > 0 && dstSize.height() <= 240)
         useHQ = false;
 
+    QnServerArchiveDelegate serverDelegate;
     if (!useHQ)
         serverDelegate.setQuality(MEDIA_Quality_Low, true);
+    if (time != DATETIME_NOW) {
+        serverDelegate.open(res);
+        if (time == LATEST_IMAGE)
+            serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
+        else
+            serverDelegate.seek(time, true);
+    }
 
     QnCompressedVideoDataPtr video;
     CLVideoDecoderOutput outFrame;
-    // read data from archive
-    if (time == DATETIME_NOW) {
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
+
+    if (time == DATETIME_NOW) 
+    {
         // get live data
-        QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
         if (camera)
             video = camera->getLastVideoFrame(useHQ);
     }
+    else if (time == LATEST_IMAGE)
+    {
+        // get latest data
+        if (camera)
+            video = camera->getLastVideoFrame(useHQ);
+        if (!video)
+            video = getNextArchiveVideoPacket(serverDelegate);
+    }
     else {
+        // get archive data
         video = getNextArchiveVideoPacket(serverDelegate);
     }
     if (!video) 
@@ -131,7 +151,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
     }
     else {
-        for (int i = 0; i < MAX_GOP_LEN; ++i)
+        for (int i = 0; i < MAX_GOP_LEN && !gotFrame; ++i)
         {
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
             if (gotFrame)
@@ -214,7 +234,7 @@ QString QnImageHandler::description(TCPSocket* tcpSocket) const
         QString rez;
     rez += "Return image from camera <BR>";
     rez += "<BR>Param <b>physicalId</b> - camera physicalId.";
-    rez += "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
+    rez += "<BR>Param <b>time</b> - required image time. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected. Also, special values allowed: 'NOW' - live position (no frame is returned if camera is offline). 'LATEST' - last frame from camera (return live position or last frame from archive if camera is offline)";
     rez += "<BR>Param <b>format</b> - Optional. image format. Allowed values: 'jpeg', 'png', 'bmp', 'tiff'. Default value 'jpeg";
     rez += "<BR>Param <b>precise</b> - Optional. Allowed values: 'true' or 'false'. If parameter is 'false' server returns nearest I-frame instead of exact frame. Default value 'false'. Parameter not used for Motion jpeg video codec";
     rez += "<BR>Param <b>height</b> - Optional. Required image height.";
