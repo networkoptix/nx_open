@@ -138,9 +138,11 @@ void QnCameraAdditionDialog::at_endIPLineEdit_textChanged(QString value){
     ui->endIPLineEdit->validator()->fixup(fixed);
     QHostAddress endAddr(fixed);
 
-    if (endAddr.toIPv4Address() > startAddr.toIPv4Address() &&
-        endAddr.toIPv4Address() - startAddr.toIPv4Address() > 255){
-        startAddr = QHostAddress::parseSubnet(endAddr.toString() + QLatin1String("/24")).first;
+    quint32 startSubnet = startAddr.toIPv4Address() >> 8;
+    quint32 endSubnet = endAddr.toIPv4Address() >> 8;
+
+    if (startSubnet != endSubnet){
+        startAddr = QHostAddress(startAddr.toIPv4Address() + ((endSubnet - startSubnet) << 8) );
         ui->startIPLineEdit->setText(startAddr.toString());
     }
     m_inIpRangeEdit = false;
@@ -307,4 +309,6 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
 void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
     ui->startIPLabel->setText(m_startLabelTexts[toggled ? 1 : 0]);
+    if (toggled)
+        ui->endIPLineEdit->setFocus();
 }
