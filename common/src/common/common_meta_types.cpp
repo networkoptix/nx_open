@@ -57,6 +57,7 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCamerasFoundInfoList>();
     qRegisterMetaType<QnStatisticsDataList>();
+    qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();

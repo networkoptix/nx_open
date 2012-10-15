@@ -58,7 +58,7 @@ namespace {
 
         bool first(true);
 
-        QnStatisticsDataIterator iter(values);
+        QnStatisticsDataIterator iter(values.values);
         bool last = !iter.hasNext();
         while (true) {
             qreal value = qBound(0.0, iter.next(), 1.0);
@@ -382,7 +382,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
 }
 
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -393,6 +392,14 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
+
+
+bool statisticsDataLessThat(const QnStatisticsData &first, const QnStatisticsData &second)
+ {
+    if (first.deviceType != second.deviceType)
+        return first.deviceType < second.deviceType;
+    return first.description.toLower() < second.description.toLower();
+ }
 
 void QnServerResourceWidget::at_statistics_received() {
     QnStatisticsHistory history_update;
@@ -429,18 +436,11 @@ void QnServerResourceWidget::at_statistics_received() {
 
     if (reSort) {
         m_sortedKeys.clear();
-        foreach(QString key, m_history.keys())
-            m_sortedKeys.append(key);
-        m_sortedKeys.sort();
 
-        // TODO: #gdm Just use a proper comparator with qSort!
-
-        // ugly hack
-        // TODO: #gdm Think about it. Later.
-        if (m_sortedKeys.contains(tr("CPU"))){
-            m_sortedKeys.removeOne(tr("CPU"));
-            m_sortedKeys.prepend(tr("CPU"));
-        }
+        QList<QnStatisticsData> tmp(m_history.values());
+        qSort(tmp.begin(), tmp.end(), statisticsDataLessThat);
+        foreach(QnStatisticsData key, tmp)
+            m_sortedKeys.append(key.description);
     }
 
     m_lastHistoryId = id;
@@ -452,11 +452,13 @@ void QnServerResourceWidget::at_statistics_received() {
 
 void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues) {
     QnStatisticsData &oldValues = m_history[key];
+    oldValues.deviceType = newValues.deviceType;
+    oldValues.description = newValues.description;
 
-    while (!newValues.isEmpty())
-        oldValues.append(newValues.takeFirst());
-    while (oldValues.size() > CHART_POINTS_LIMIT)
-        oldValues.removeFirst();
-    while (oldValues.size() < CHART_POINTS_LIMIT)
-        oldValues.prepend(0);
+    while (!newValues.values.isEmpty())
+        oldValues.values.append(newValues.values.takeFirst());
+    while (oldValues.values.size() > CHART_POINTS_LIMIT)
+        oldValues.values.removeFirst();
+    while (oldValues.values.size() < CHART_POINTS_LIMIT)
+        oldValues.values.prepend(0);
 }

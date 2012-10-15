@@ -9,24 +9,30 @@
 #include <QtCore/QLinkedList>
 #include <QtCore/QLinkedListIterator>
 
+enum  QnStatisticsDeviceType {
+    CPU,
+    RAM,
+    HDD
+};
+
 struct QnStatisticsDataItem {
-    enum DeviceType {
-        CPU,
-        RAM,
-        HDD
-    };
 
     QnStatisticsDataItem() {}
-    QnStatisticsDataItem(const QString &description, qreal value, DeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
+    QnStatisticsDataItem(const QString &description, qreal value, QnStatisticsDeviceType deviceType): description(description), value(value), deviceType(deviceType) {}
 
     QString description;
     qreal value;
-    DeviceType deviceType;
+    QnStatisticsDeviceType deviceType;
 };
 
 typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
-typedef QLinkedList<qreal> QnStatisticsData;
+struct QnStatisticsData{
+    QString description;
+    QnStatisticsDeviceType deviceType;
+    QLinkedList<qreal> values;
+};
+
 typedef QHash<QString, QnStatisticsData> QnStatisticsHistory;
 
 // TODO: remove this iterator hell.
@@ -35,5 +41,6 @@ typedef QHashIterator<QString, QnStatisticsData> QnStatisticsIterator;
 typedef QMutableHashIterator<QString, QnStatisticsData> QnStatisticsCleaner;
 
 Q_DECLARE_METATYPE(QnStatisticsDataList)
+Q_DECLARE_METATYPE(QnStatisticsData)
 
 #endif // QN_STATISTICS_DATA

@@ -33,15 +33,18 @@ qint64 QnMediaServerStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHis
     QnStatisticsIterator iter(m_history);
     while (iter.hasNext()){
         iter.next();
-        QnStatisticsData stats;
+        QnStatisticsData item = iter.value();
+        QnStatisticsData update;
+        update.description = item.description;
+        update.deviceType = item.deviceType;
         qint64 counter = m_lastId;
-        QnStatisticsDataIterator peeker(iter.value());
+        QnStatisticsDataIterator peeker(item.values);
         peeker.toBack();
         while (counter > lastId && peeker.hasPrevious()) {
-            stats.prepend(peeker.previous());
+            update.values.prepend(peeker.previous());
             counter--;
         }
-        history->insert(iter.key(), stats);
+        history->insert(iter.key(), update);
     }
 
     return m_lastId;
@@ -57,9 +60,9 @@ void QnMediaServerStatisticsStorage::update() {
 
         for (QnStatisticsHistory::iterator iter = m_history.begin(); iter != m_history.end(); iter++) {
             QnStatisticsData &stats = iter.value();
-            stats.append(0);
-            if (stats.size() > STORAGE_LIMIT)
-                stats.removeFirst();
+            stats.values.append(0);
+            if (stats.values.size() > STORAGE_LIMIT)
+                stats.values.removeFirst();
         }
         return;
     }
@@ -76,14 +79,14 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
     while(iter.hasNext()) {
         QnStatisticsDataItem nextData = iter.next();
 
-        QString id = nextData.deviceType == QnStatisticsDataItem::CPU
-           ? tr("CPU")
-           : nextData.description;
+        QString id = nextData.description;
 
         QnStatisticsData &stats = m_history[id];
-        stats.append(nextData.value);
-        if (stats.size() > STORAGE_LIMIT)
-            stats.removeFirst();
+        stats.deviceType = nextData.deviceType;
+        stats.description = nextData.description;
+        stats.values.append(nextData.value);
+        if (stats.values.size() > STORAGE_LIMIT)
+            stats.values.removeFirst();
     }
     m_alreadyUpdating = false;
 
