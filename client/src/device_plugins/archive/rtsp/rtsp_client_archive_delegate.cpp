@@ -331,9 +331,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
         return result;
     
     // Check if archive moved to other video server
-    qint64 timeMs = result ? result->timestamp/1000 : 0;
-    bool outOfRange = (m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
-                      (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs);
+    qint64 timeMs = AV_NOPTS_VALUE;
+	if (result && result->timestamp >= 0)
+		timeMs = result->timestamp/1000; // do not switch server if AV_NOPTS_VALUE and any other invalid packet timings
+    bool outOfRange = timeMs != AV_NOPTS_VALUE && ((m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
+                      (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
