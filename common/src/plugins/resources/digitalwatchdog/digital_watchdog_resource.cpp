@@ -108,7 +108,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
-    return qMax(512,result);
+    return qMax(1024,result);
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()
