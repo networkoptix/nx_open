@@ -635,9 +635,11 @@ void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
 
 #ifdef Q_OS_WIN
     if (canAuth){
-        QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
-        QString defaultBrowser = settings.value(QLatin1String("HKEY_CLASSES_ROOT\\http\\shell\\open\\command")).toString();
-        canAuth = !defaultBrowser.contains(QLatin1String("iexplore"));
+        QSettings settings(QLatin1String("HKEY_LOCAL_MACHINE"), QSettings::NativeFormat);
+        QString defaultBrowser = settings.value(QLatin1String("HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\StartMenuInternet")).toString();
+		qDebug() << "default browser" << defaultBrowser;
+        if (defaultBrowser.isEmpty() || defaultBrowser.contains(QLatin1String("iexplore")))
+			canAuth = false;
     }
 #endif
 
