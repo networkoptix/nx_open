@@ -508,14 +508,14 @@ void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(int status,
         data.append(QnStatisticsDataItem(
             QLatin1String("CPU"), 
             extractXmlBody(cpuBlock, "load").toDouble(), 
-            QnStatisticsDataItem::CPU
+            CPU
         ));
 
         QByteArray memoryBlock = extractXmlBody(reply, "memory");
         data.append(QnStatisticsDataItem(
             QLatin1String("RAM"), 
             extractXmlBody(memoryBlock, "usage").toDouble(), 
-            QnStatisticsDataItem::RAM
+            RAM
         ));
 
         QByteArray storagesBlock = extractXmlBody(reply, "storages"), storageBlock;
@@ -527,7 +527,7 @@ void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(int status,
             data.append(QnStatisticsDataItem(
                 QLatin1String(extractXmlBody(storageBlock, "url")), 
                 extractXmlBody(storageBlock, "usage").toDouble(), 
-                QnStatisticsDataItem::HDD
+                HDD
             ));
         } while (storageBlock.length() > 0);
 
