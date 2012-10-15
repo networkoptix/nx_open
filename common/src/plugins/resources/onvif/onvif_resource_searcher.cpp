@@ -54,7 +54,21 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthe
     if (resource->fetchAndSetDeviceInformation())
     {
         // Clarify resource type
-        QString manufacturer = resource->getName().split(QLatin1String("-"))[0];
+        QString fullName = resource->getName();
+        int manufacturerPos = fullName.indexOf(QLatin1String("-"));
+        QString manufacturer = fullName.mid(0,manufacturerPos).trimmed();
+        QString modelName = fullName.mid(manufacturerPos+1).trimmed().toLower();
+
+        if (NameHelper::instance().isSupported(modelName))
+            return QnResourcePtr();
+
+        int modelNamePos = modelName.indexOf(QLatin1String(" "));
+        if (modelNamePos >= 0)
+        {
+            modelName = modelName.mid(modelNamePos+1);
+            if (NameHelper::instance().isSupported(modelName))
+                return QnResourcePtr();
+        }
         QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer);
         if (rt)
             resource->setTypeId(rt);
