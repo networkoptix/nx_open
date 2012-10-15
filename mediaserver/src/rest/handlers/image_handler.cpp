@@ -111,13 +111,6 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     QnServerArchiveDelegate serverDelegate;
     if (!useHQ)
         serverDelegate.setQuality(MEDIA_Quality_Low, true);
-    if (time != DATETIME_NOW) {
-        serverDelegate.open(res);
-        if (time == LATEST_IMAGE)
-            serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
-        else
-            serverDelegate.seek(time, true);
-    }
 
     QnCompressedVideoDataPtr video;
     CLVideoDecoderOutput outFrame;
@@ -134,11 +127,16 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         // get latest data
         if (camera)
             video = camera->getLastVideoFrame(useHQ);
-        if (!video)
+        if (!video) {
+            serverDelegate.open(res);
+            serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             video = getNextArchiveVideoPacket(serverDelegate);
+        }
     }
     else {
         // get archive data
+        serverDelegate.open(res);
+        serverDelegate.seek(time, true);
         video = getNextArchiveVideoPacket(serverDelegate);
     }
     if (!video) 
