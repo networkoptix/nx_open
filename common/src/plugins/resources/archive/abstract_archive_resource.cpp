@@ -23,8 +23,8 @@ void QnAbstractArchiveResource::setUniqId(const QString& value)
 }
 
 
-void QnAbstractArchiveResource::setStatus(QnResource::Status /*newStatus*/, bool silenceMode)
+void QnAbstractArchiveResource::setStatus(QnResource::Status newStatus, bool silenceMode)
 {
-    QnResource::setStatus(Online, silenceMode);
+    QnResource::setStatus(newStatus, silenceMode);
     return;
 }
