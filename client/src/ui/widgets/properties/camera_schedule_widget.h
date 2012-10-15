@@ -68,6 +68,7 @@ private slots:
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();
+    void at_releaseSignalizer_activated(QObject *target);
 
 private:
     int qualityTextToIndex(const QString &text);
