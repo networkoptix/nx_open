@@ -212,7 +212,12 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
     int newSecFps;
 
     if (sharingMethod == sharePixels)
+    {
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
+        if (maxFps - newFps < 2 )
+            newSecFps = qMin(DESIRED_SECOND_STREAM_FPS/2,3);
+
+    }
     else if (sharingMethod == shareFps)
         newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps - newFps); //ss; minimum between 5 and what is left;
     else// noSharing
