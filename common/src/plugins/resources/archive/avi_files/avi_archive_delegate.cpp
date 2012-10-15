@@ -258,7 +258,7 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
     QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
-    if (m_formatContext == 0)
+    if (m_formatContext == 0 && m_resource->getStatus() != QnResource::Offline)
     {
         m_eofReached = false;
         QString url = m_resource->getUrl(); // "c:/00-1A-07-03-BD-09.mkv"; //
@@ -272,12 +272,16 @@ bool QnAviArchiveDelegate::open(QnResourcePtr resource)
         m_formatContext->pb = m_ioContext = m_storage->createFfmpegIOContext(url, QIODevice::ReadOnly);
         if (!m_ioContext) {
             close();
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
             return false;
         }
         m_initialized = avformat_open_input(&m_formatContext, "", 0, 0) >= 0;
 
-        if (!m_initialized ) 
+        if (!m_initialized ) {
             close();
+            m_resource->setStatus(QnResource::Offline); // mark local resource as unaccesible
+            return false;
+        }
         
         getVideoLayout();
     }

@@ -1999,7 +1999,11 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
     {
         QnLayoutItemData& item = itr.value();
         QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
-        if (layoutItemRes) {
+        if (layoutItemRes) 
+        {
+            bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
+            if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
+                continue; // skip unaccessible local resources because is not possible to check utc flag
             if (layoutItemRes->hasFlags(QnResource::utc))
                 utcExists = true;
             else
