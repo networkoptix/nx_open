@@ -54,6 +54,8 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
     QString host = url.host();
     int port = url.port();
+    if (host.isEmpty())
+        host = url.toString(); // in case if url just host address without protocol and port
 
     int timeout = 2000;
 

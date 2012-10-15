@@ -31,7 +31,7 @@ int QnAxisStreamReader::toAxisQuality(QnStreamQuality quality)
     switch(quality)
     {
         case QnQualityLowest:
-            return 60;
+            return 50;
         case QnQualityLow:
             return 50;
         case QnQualityNormal:
