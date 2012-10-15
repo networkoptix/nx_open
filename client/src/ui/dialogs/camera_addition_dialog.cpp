@@ -158,9 +158,8 @@ void QnCameraAdditionDialog::at_camerasTable_cellChanged( int row, int column){
     bool enabled = rowCount > 0;
     for (int row = 0; row < rowCount; ++row) {
         if (ui->camerasTable->item(row, 0)->checkState() == Qt::Checked)
-            continue;
+            break;
         enabled = false;
-        break;
     }
     ui->addButton->setEnabled(enabled);
 }
@@ -309,6 +308,14 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 
 void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
     ui->startIPLabel->setText(m_startLabelTexts[toggled ? 1 : 0]);
-    if (toggled)
+    if (toggled){
+        QHostAddress startAddr(ui->startIPLineEdit->text());
+        quint32 addr = startAddr.toIPv4Address();
+        addr = addr >> 8;
+        addr = (addr << 8) + 255;
+        QString endAddrStr = QHostAddress(addr).toString();
+        ui->endIPLineEdit->setText(endAddrStr);
         ui->endIPLineEdit->setFocus();
+        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+    }
 }
