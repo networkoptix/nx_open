@@ -92,7 +92,7 @@ void QnCameraAdditionDialog::fillTable(const QnCamerasFoundInfoList &cameras) {
 
 void QnCameraAdditionDialog::removeAddedCameras(){
     int row = ui->camerasTable->rowCount() - 1;
-    while (row > 0){
+    while (row >= 0){
         if (ui->camerasTable->item(row, 0)->checkState() == Qt::Checked)
 	        ui->camerasTable->removeRow(row);
 		row--;
