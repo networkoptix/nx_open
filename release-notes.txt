@@ -1,3 +1,71 @@
+
+----------------------------------------------- 1.4 -----------------------------------------------
+
+New Cameras and Recorders Supported:
+ - D-Link cameras are able to do dual-streaming. This results in software motion detection support and RADASS capabilities on these cameras
+ - Camera models that can be addable manually are extended. Now Arecont, D-Link and ISD cameras can be added manually
+
+New Features: 
+ - Multi-channel export. Now it is possible to export whole videos on layouts in a single file. This file is in proprietary format (*.nov), that can be played back in the client.
+   Additionally it is possible to save is as executable (windows only). This executable can be played back in a clean windows installation.
+   It is possible to play back such files as regular layouts including ff/rew, smart motion search etc
+ - Version for 64-bit architecture is available for Windows. 
+ - Calendar is available in web-client
+ - Android client is introduced
+ - New permissions added:
+   - export video
+   - PTZ
+ - If a new version is available notification in client is fired.
+   
+Improvements:
+ - RADASS is greatly improved:
+    - Seek time is greatly improved especially for low bandwidth
+    - Switching to low quality in low bandwidth is speeded up
+ - Default motion sensitivity slider is 0 so motion masking is much more intuitive now
+ - "Hide Panel" context menu items are added to each panel 
+ - If zoom a video in fullscreen mode left and right click can be used for movement (used to be right click only)
+ - If an item goes to fullscreen all panels are hidden
+ - Saved connections list should display last stored connections first
+ - RAM Usage is displayed if monitor Media Server status
+ - Calendar search will move out after user picks a date
+ - LIVE icon is displayed on item's panel if viewing live on a corresponding camera
+ - HQ/LQ is shown on panels depending on current dual-streaming quality
+ - If connected to EC Main Menu displays "Connect to Another Server"
+ - Max # of items is increased (64) for x64 platforms
+ - General and Network tabs are merged in Camera Settings
+ - Screen recording icon is introduced in top right corner
+ - Waiting circles are replaced to "LOADING... + circles"
+ - FPS, second stream, Motion Detection settings improvements:
+   - If MaxFPS is set up the second stream still should be acquired (2 FPS)
+   - MaxFPS for low quality stream is 7
+ - If a recording schedule has not been changed user is warned
+ - If user logs back in all saved layouts that have been opened are restored
+ - New button on the top bar opens a drop-down menu with all saved layouts available for this user
+ - Selection (selected items) is saved in layouts
+ - Cameras and servers IP are shown in Tree
+ - Ping button is added to camera's Network Settings form
+ - It is possible to configure transport settings for Linux (RTP over UDP or TCP). Earlier it was possible for Windows only.
+ - Installer is improved:
+   - Desktop shortcut is optional
+   - Components selection dialog is improved
+   - Installer is signed and approved by Microsoft 
+   
+Bugs Fixed:
+ - If connect to another EC old cameras were still displayed on Scene. Fixed
+ - Last used connection details wasn't stored. Fixed
+ - maxFPS is unrestricted for first stream settings (used to be 28 instead of 30)
+ - Web-client displayed time line in the future. Now not
+ - Playback position was not saved in layouts if navigate through tabs. Fixed 
+ - "Open in a web page" did not go to URL if using IE. Fixed
+ - Monitoring depended on WMI, that resulted in inability to launch monitoring on some computers. Fixed
+ - If do not install EC (extend existing system) it was suggested to delete database during uninstall
+ - If upgrade media server only (client is not installed) client launch is suggested at the end of the upgrade process
+ - If install client only, Tray tool was also installed. Fixed
+ - Cameras were not marked as being recorded in layouts if they had been moved between servers.Fixed
+ - If the same camera was in two different layouts video didn't play back in one of it. Fixed
+ - Fixed a bug with frame by frame seek (back and forth jumping)
+ - Fixed a bug with unsupported audio format for screen recording
+ 
 ----------------------------------------------- 1.3 -----------------------------------------------
 New Cameras and Recorders Supported:
  - IQ models list is extended.
@@ -41,6 +109,7 @@ Improvements:
  - If discover Digital Watchdog set default login credentials are being tried.
  - Non-indexed local files (outside media folders) are added in Tree after client restart if a layout that contains such items is opened.
  - If several media servers were hosted on EC client could acquire traffic through proxy for all servers only. Now not: one server can be accessed directly and another one - via Media Proxy. 
+ 
  Bugs Fixed:
  - If connect to another EC old cameras were still displayed on Scene. Fixed.
  - Fixed non-sequential port numbers during Linux installation. 
