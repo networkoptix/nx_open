@@ -51,10 +51,7 @@ qint64 QnMediaServerStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHis
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    if (m_alreadyUpdating)
-        return;
-
-    if (!m_listeners) {
+    if (!m_listeners || m_alreadyUpdating) {
         m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
         m_lastId++;
 
@@ -64,7 +61,8 @@ void QnMediaServerStatisticsStorage::update() {
             if (stats.values.size() > STORAGE_LIMIT)
                 stats.values.removeFirst();
         }
-        return;
+        if (!m_alreadyUpdating)
+            return;
     }
 
     m_apiConnection->asyncGetStatistics(this, SLOT(at_statisticsReceived(const QnStatisticsDataList &)));
@@ -80,7 +78,6 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
         QnStatisticsDataItem nextData = iter.next();
 
         QString id = nextData.description;
-
         QnStatisticsData &stats = m_history[id];
         stats.deviceType = nextData.deviceType;
         stats.description = nextData.description;
