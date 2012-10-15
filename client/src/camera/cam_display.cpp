@@ -55,7 +55,7 @@ static void updateActivity()
 
 // a lot of small audio packets in bluray HD audio codecs. So, previous size 7 is not enought
 #define CL_MAX_DISPLAY_QUEUE_SIZE 15
-#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 15
+#define CL_MAX_DISPLAY_QUEUE_FOR_SLOW_SOURCE_SIZE 20
 
 static const int DEFAULT_AUDIO_BUFF_SIZE = 1000 * 4;
 
