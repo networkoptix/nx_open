@@ -54,7 +54,7 @@ protected:
 
 private:
     mutable int m_numberOfchannels;
-    qint64 m_lastVideoTime[CL_MAX_CHANNELS];
+    qint64 m_lastMediaTime[CL_MAX_CHANNELS+1]; // max video channels + audio channel
     bool m_isCamera;
 };
 
