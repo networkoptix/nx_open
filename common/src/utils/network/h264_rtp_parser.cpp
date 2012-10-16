@@ -176,7 +176,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
 #ifdef _DEBUG
         qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         if (qAbs(currentTime - result->timestamp) > 500*1000) {
-            qDebug() << "large RTSP video jitter " << (result->timestamp - currentTime)/1000  << "RtpTime=" << rtpTime;
+            //qDebug() << "large RTSP video jitter " << (result->timestamp - currentTime)/1000  << "RtpTime=" << rtpTime;
         }
 #endif
     }
