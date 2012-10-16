@@ -43,7 +43,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false),
     m_audioTranscoder(0),
-    m_dstAudioCodec(CODEC_ID_NONE)
+    m_dstAudioCodec(CODEC_ID_NONE),
+    m_role(Role_ServerRecording)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
