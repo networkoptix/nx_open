@@ -1,6 +1,10 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
+#include <QtGui/QMessageBox>
+
+#include <utils/common/event_processors.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -58,6 +62,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+    
+    QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
+    releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
+    ui->recordMotionButton->installEventFilter(releaseSignalizer);
+    ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
     
     connectToGridWidget();
     
@@ -605,3 +615,16 @@ bool QnCameraScheduleWidget::isSecondaryStreamReserver() const
 {
     return ui->recordMotionPlusLQButton->isChecked();
 }
+
+void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
+    QWidget *widget = qobject_cast<QWidget *>(target);
+    if(!widget)
+        return;
+
+    if(widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
+        return;
+
+    QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+}
+
+

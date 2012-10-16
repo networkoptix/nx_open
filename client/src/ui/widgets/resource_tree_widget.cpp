@@ -53,8 +53,9 @@ public:
     explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
         base_type(parent)
     {
-        m_recIcon = qnSkin->icon("tree/recording.png");
+        m_recordingIcon = qnSkin->icon("tree/recording.png");
         m_raisedIcon = qnSkin->icon("tree/raised.png");
+        m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
     }
 
     QnWorkbench *workbench() const {
@@ -123,7 +124,7 @@ protected:
         }
 
         /* Draw 'recording' icon. */
-        bool recording = false;
+        bool recording = false, scheduled = false;
         if(resource) {
             if(resource->getStatus() == QnResource::Recording) {
                 recording = true;
@@ -135,12 +136,17 @@ protected:
                     }
                 }
             }
+
+            if(!recording)
+                if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+                    scheduled = !camera->isScheduleDisabled();
         }
-        if(recording) {
+
+        if(recording || scheduled) {
             QRect iconRect = decorationRect;
             iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
 
-            m_recIcon.paint(painter, iconRect);
+            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, iconRect);
         }
 
         /* Draw item. */
@@ -154,7 +160,7 @@ protected:
 
 private:
     QWeakPointer<QnWorkbench> m_workbench;
-    QIcon m_recIcon, m_raisedIcon;
+    QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
 };
 
 class QnResourceTreeStyle: public QnProxyStyle {
