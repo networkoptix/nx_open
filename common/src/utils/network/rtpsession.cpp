@@ -159,7 +159,11 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         int rtpTimeDiff = rtpTime - statistics.timestamp;
         double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
-        if (qAbs(localTimeInSecs - resultInSecs) < MAX_FRAME_DURATION/1000 || !recursiveAllowed)
+        // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
+        // Such data can not be recorded to archive. I ofter got that situation if media server under debug
+        // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
+        // In any way, valid threshold behaviour if camera time is changed.
+        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed)
             return resultInSecs * 1000000ll;
         else {
             reset();
