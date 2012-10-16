@@ -34,7 +34,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
 
         QnResourcePtr resource = qnResPool->getResourceById(data.resource.id);
         if(resource)
-            m_resourceUid = resource->getUniqueId();
+            m_resourceUid = resource->getUniqueId(); // TODO: add warning if NULL?
     }
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
