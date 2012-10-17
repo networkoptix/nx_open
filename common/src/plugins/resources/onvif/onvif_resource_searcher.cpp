@@ -9,8 +9,8 @@
 static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
 {
     80,
-    8032,
-    9988
+    8032, // DW default port
+    9988 // Dahui default port
 };
 
 OnvifResourceSearcher::OnvifResourceSearcher():
