@@ -306,8 +306,10 @@ qint64 QnRtspClientArchiveDelegate::startTime()
 
 qint64 QnRtspClientArchiveDelegate::endTime()
 {
-    //return DATETIME_NOW; // always use LIVE as right edge for server video
-    return m_rtspSession.endTime();
+    if (m_rtspSession.endTime() > qnSyncTime->currentUSecsSinceEpoch())
+        return m_rtspSession.endTime();
+    else
+        return DATETIME_NOW; // LIVE or archive future point as right edge for server video
 }
 
 void QnRtspClientArchiveDelegate::reopen()

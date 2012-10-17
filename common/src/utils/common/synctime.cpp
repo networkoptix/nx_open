@@ -46,6 +46,11 @@ QDateTime QnSyncTime::currentDateTime()
     return QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch());
 }
 
+qint64 QnSyncTime::currentUSecsSinceEpoch()
+{
+    return currentMSecsSinceEpoch() * 1000;
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
