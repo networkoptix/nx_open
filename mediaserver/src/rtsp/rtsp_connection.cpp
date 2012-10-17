@@ -33,6 +33,7 @@
 #include "rtsp_h264_encoder.h"
 #include "rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
+#include "utils/common/synctime.h"
 
 class QnTcpListener;
 
@@ -290,7 +291,8 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
         return QString();
 
     qint64 endTime = d->archiveDP->endTime();
-    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes)) 
+    bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture)
         endTime = DATETIME_NOW;
 
     if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
@@ -377,10 +379,13 @@ QString QnRtspConnectionProcessor::getRangeStr()
     {
         d->archiveDP->open();
         d->prevStartTime = d->archiveDP->startTime();
-        if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+        qint64 archiveEndTime = d->archiveDP->endTime();
+        bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture;
+        if (endTimeIsNow)
             d->prevEndTime = DATETIME_NOW;
         else
-            d->prevEndTime = d->archiveDP->endTime();
+            d->prevEndTime = archiveEndTime;
         if (d->useProprietaryFormat)
         {
             // range in usecs since UTC
@@ -391,10 +396,10 @@ QString QnRtspConnectionProcessor::getRangeStr()
                 range += QString::number(d->archiveDP->startTime());
 
             range += "-";
-            if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
+            if (endTimeIsNow)
                 range += "now";
             else 
-                range += QString::number(d->archiveDP->endTime());
+                range += QString::number(archiveEndTime);
         }
         else 
         {

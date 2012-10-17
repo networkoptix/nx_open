@@ -31,7 +31,7 @@ public:
     void setUpdateInterval(qint64 msecs);
 
     const QnTimePeriod &loadedPeriod() const;
-    void setTargetPeriod(const QnTimePeriod &targetPeriod);
+    void setTargetPeriods(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod);
     
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
@@ -51,7 +51,7 @@ protected:
     void load(Qn::TimePeriodRole type);
     void trim(Qn::TimePeriodRole type, qint64 trimTime);
 
-    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
+    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
 
 private:
     QnCachingTimePeriodLoader(QnAbstractTimePeriodLoader **loaders, QObject *parent);

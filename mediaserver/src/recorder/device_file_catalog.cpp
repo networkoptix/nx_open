@@ -61,7 +61,8 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_macAddress(macAddress),
     m_mutex(QMutex::Recursive),
     m_duplicateName(false),
-    m_role(role)
+    m_role(role),
+    m_lastAddIndex(0)
 {
 #ifdef _TEST_TWO_SERVERS
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/");
@@ -228,13 +229,13 @@ QList<QDate> DeviceFileCatalog::recordedMonthList()
     return rez;
 }
 
-void DeviceFileCatalog::addChunk(const Chunk& chunk, qint64 lastStartTime)
+void DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
-    if (chunk.startTimeMs > lastStartTime) {
+    if (!m_chunks.isEmpty() && chunk.startTimeMs > m_chunks.last().startTimeMs) {
         m_chunks << chunk;
     }
     else {
-        ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
 };
@@ -247,7 +248,6 @@ void DeviceFileCatalog::deserializeTitleFile()
 
     m_file.readLine(); // read header
     QByteArray line;
-    qint64 lastStartTime = 0;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
@@ -303,13 +303,12 @@ void DeviceFileCatalog::deserializeTitleFile()
             }       
             else 
             {
-                addChunk(chunk, lastStartTime);
+                addChunk(chunk);
             }
         }
         else {
             needRewriteCatalog = true;
         }
-        lastStartTime = startTime;
 
     } while (!line.isEmpty());
     newFile.close();
@@ -339,8 +338,12 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
 
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
-    m_chunks.insert(itr, chunk);
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+    itr = m_chunks.insert(itr, chunk);
+    m_lastAddIndex = itr - m_chunks.begin();
+    if (m_lastAddIndex < m_chunks.size()-1)
+        itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
+    m_lastAddIndex -= m_firstDeleteCount;
     QTextStream str(&m_file);
 
     str << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
@@ -353,7 +356,8 @@ void DeviceFileCatalog::updateDuration(int durationMs)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
-    m_chunks.last().durationMs = durationMs;
+    //m_chunks.last().durationMs = durationMs;
+    m_chunks[m_lastAddIndex+m_firstDeleteCount].durationMs = durationMs;
     QTextStream str(&m_file);
     str << durationMs << '\n';
     str.flush();
@@ -511,6 +515,8 @@ qint64 DeviceFileCatalog::maxTime() const
     QMutexLocker lock(&m_mutex);
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
+    else if (m_chunks.last().durationMs == -1)
+        return DATETIME_NOW;
     else
         return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
 }

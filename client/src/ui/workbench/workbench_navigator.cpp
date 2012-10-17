@@ -805,7 +805,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
 
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
-    QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
 
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
@@ -818,10 +819,10 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             if(QnCachingTimePeriodLoader *loader = this->loader(widget))
-                loader->setTargetPeriod(period);
+                loader->setTargetPeriods(targetPeriod, boundingPeriod);
     } else if(m_currentWidgetFlags & WidgetSupportsPeriods) {
         if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget))
-            loader->setTargetPeriod(period);
+            loader->setTargetPeriods(targetPeriod, boundingPeriod);
     }
 }
 
