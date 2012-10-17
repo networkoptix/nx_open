@@ -207,6 +207,16 @@
 				<arch>x86</arch>
 			</properties>
 		</profile>	
+		<profile>
+			<id>android</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<modules>
+				<module>android-client/protobuf-classes</module>
+				<module>android-client/android-main</module>
+			</modules>
+		</profile>			
 	</profiles>	
 </project>
 
