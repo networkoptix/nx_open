@@ -3,6 +3,15 @@
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
 
+/*
+*   Port list used for manual camera add
+*/
+static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
+{
+    80,
+    8032,
+    9988
+};
 
 OnvifResourceSearcher::OnvifResourceSearcher():
     wsddSearcher(OnvifResourceSearcherWsdd::instance())
@@ -34,6 +43,25 @@ QString OnvifResourceSearcher::manufacture() const
 
 
 QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
+{
+    if (url.port() == -1)
+    {
+        for (int i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i) 
+        {
+            QUrl newUrl(url);
+            newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
+            QnResourcePtr result = checkHostAddrInternal(newUrl, auth);
+            if (result)
+                return result;
+        }
+        return QnResourcePtr();
+    }
+    else {
+        return checkHostAddrInternal(url, auth);
+    }
+}
+
+QnResourcePtr OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth)
 {
     QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
     if (!typePtr)
