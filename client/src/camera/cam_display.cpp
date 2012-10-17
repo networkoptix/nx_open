@@ -986,7 +986,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (vd)
             m_display[vd->channelNumber]->waitForFramesDisplaed();
-        afterJump(media);
+        if (vd || ad)
+            afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
     if (emptyData && !flushCurrentBuffer)
