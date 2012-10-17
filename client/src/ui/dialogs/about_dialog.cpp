@@ -62,10 +62,16 @@ void QnAboutDialog::retranslateUi()
     setWindowTitle(tr("About %1").arg(QString::fromLatin1(QN_APPLICATION_NAME)));
 
     QString version = 
-        tr("<b>%1</b> version %2 (%3)").
+        tr(
+            "<b>%1</b> version %2 (%3).<br />\n"
+            "Built for %4-%5 with %6."
+        ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
-        arg(QLatin1String(QN_APPLICATION_REVISION));
+        arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
+        arg(QLatin1String(QN_APPLICATION_ARCH)).
+        arg(QLatin1String(QN_APPLICATION_COMPILER));
 
     QString credits = 
         tr(
