@@ -214,10 +214,6 @@ void QnNoptixStyle::polish(QApplication *application) {
     palette.setColor(QPalette::Button, activeColor);
     application->setPalette(palette);
 
-    QnPaletteWidget *w = new QnPaletteWidget();
-    w->setPalette(palette);
-    w->show();
-
     QFont font;
     font.setPixelSize(12);
     font.setStyle(QFont::StyleNormal);
