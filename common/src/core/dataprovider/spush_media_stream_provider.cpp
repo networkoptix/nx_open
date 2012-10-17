@@ -51,7 +51,7 @@ void CLServerPushStreamreader::run()
 
                 if (mFramesLost >= MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
                 {
-                    if (canChangeStatus())
+                    if (canChangeStatus() && getResource()->getStatus() != QnResource::Unauthorized) // avoid offline->unauthorized->offline loop
                         getResource()->setStatus(QnResource::Offline);
                     m_stat[0].onLostConnection();
                     mFramesLost = 0;
