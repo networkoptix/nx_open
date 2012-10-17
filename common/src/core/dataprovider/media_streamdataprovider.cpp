@@ -153,7 +153,7 @@ float QnAbstractMediaStreamDataProvider::getBitrate() const
 
 void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr media)
 {
-    if (m_isCamera && media)
+    if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
         // correct packets timestamp if we have got several packets very fast
         qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
