@@ -15,6 +15,14 @@ public:
 };
 
 enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
+
+enum StreamFpsSharingMethod 
+{
+    shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+    sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+    noSharing // second stream does not subtract first stream fps 
+};
+
 Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
 
 class QnSecurityCamResource : virtual public QnMediaResource
@@ -67,6 +75,8 @@ public:
     const QnScheduleTaskList &getScheduleTasks() const;
 
     virtual bool hasDualStreaming() const;
+
+    virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
 
 protected:
     void updateInner(QnResourcePtr other) override;

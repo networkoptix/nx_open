@@ -124,6 +124,10 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     QnVideoRecorderSettings recorderSettings;
     QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
     QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
+    if (QAudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
+        audioDevice = QAudioDeviceInfo(); // no audio devices
+        secondAudioDevice = QAudioDeviceInfo();
+    }
     int screen = screenToAdapter(recorderSettings.screen());
     bool captureCursor = recorderSettings.captureCursor();
     QSize encodingSize = resolutionToSize(recorderSettings.resolution());

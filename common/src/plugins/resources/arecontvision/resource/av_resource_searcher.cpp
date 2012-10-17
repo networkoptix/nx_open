@@ -11,8 +11,12 @@
 #include "core/resource/camera_resource.h"
 
 #include "plugins/resources/mdns/mdns_device_searcher.h"
+#include "av_panoramic.h"
+#include "av_singesensor.h"
 
 #define CL_BROAD_CAST_RETRY 1
+
+extern QString getValueFromString(const QString& line);
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 {
@@ -192,7 +196,69 @@ QnResourcePtr QnPlArecontResourceSearcher::createResource(QnId resourceTypeId, c
 
 QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    return QnResourcePtr(0);
+
+    QString host = url.host();
+    int port = url.port();
+    if (host.isEmpty())
+        host = url.toString(); // in case if url just host address without protocol and port
+
+    int timeout = 2000;
+
+
+    if (port < 0)
+        port = 80;
+
+    CLHttpStatus status;
+    QString model = QString(QLatin1String(downloadFile(status, QLatin1String("get?model"), QHostAddress(host), port, timeout, auth)));
+
+    if (model.length()==0)
+        return QnResourcePtr(0);
+
+    QString modelRelease = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=releasename"), QHostAddress(host), port, timeout, auth)));
+
+
+    if (modelRelease!=model)
+    {
+        //this camera supports release name
+        model = modelRelease;
+    }
+    else
+    {
+        QString modelFull = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=fullname"), QHostAddress(host), port, timeout, auth)));
+
+        if (modelFull.length())        
+            model = modelFull;
+    }
+
+    model = getValueFromString(model);
+
+    if (model.isEmpty())
+        return QnResourcePtr(0);
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), model);
+    if (!rt.isValid())
+        return QnResourcePtr(0);;
+
+
+
+    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("get?mac"), QHostAddress(host), port, timeout, auth)));
+    mac = getValueFromString(mac);
+
+    if (mac.isEmpty())
+        return QnResourcePtr(0);
+
+    QnPlAreconVisionResourcePtr res(0);
+
+    if (QnPlAreconVisionResource::isPanoramic(model))
+        res = QnPlAreconVisionResourcePtr(new QnArecontPanoramicResource(model));
+    else
+        res = QnPlAreconVisionResourcePtr(new CLArecontSingleSensorResource(model));
+
+    res->setTypeId(rt);
+    res->setName(model);
+    res->setMAC(mac);
+    res->setHostAddress(QHostAddress(host), QnDomainMemory);
+    res->setAuth(auth);
+
+    return res;
 }

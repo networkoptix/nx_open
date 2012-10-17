@@ -158,79 +158,51 @@ namespace Qn {
      */
     enum Permission {
         /* Generic permissions. */
-
-        /** Generic read access. Having this access right doesn't necessary mean that all information is readable. */
-        ReadPermission                      = 0x00010000,   
-
-        /** Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
-        WritePermission                     = 0x00020000,   
-
-        /** Generic save access. Entity can be saved to appserver. */
-        SavePermission                      = 0x00040000,   
-
-        /** Generic delete permission. */
-        RemovePermission                    = 0x00080000,
-
-        /** Generic read-write-save permission. */
-        ReadWriteSavePermission             = ReadPermission | WritePermission | SavePermission,
-
+        ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
+        WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
+        SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to appserver. */
+        RemovePermission                        = 0x00080000,   /**< Generic delete permission. */
+        ReadWriteSavePermission                 = ReadPermission | WritePermission | SavePermission,
+        WriteNamePermission                     = 0x01000000,   /**< Permission to edit resource's name. */
 
         /* Layout-specific permissions. */
-
-        /** Permission to add or remove items from a layout. */
-        AddRemoveItemsPermission            = 0x00100000,
-
-
+        AddRemoveItemsPermission                = 0x00100000,   /**< Permission to add or remove items from a layout. */
+        
         /* User-specific permissions. */
+        WritePasswordPermission                 = 0x02000000,   /**< Permission to edit associated password. */
+        WriteAccessRightsPermission             = 0x04000000,   /**< Permission to edit access rights. */
+        CreateLayoutPermission                  = 0x08000000,   /**< Permission to create layouts for the user. */
 
-        /** Permission to edit login. */
-        WriteLoginPermission                = 0x01000000, // TODO: replace with generic WriteNamePermission
+        /* Media-specific permissions. */
+        ExportPermission                        = 0x20000000,   /**< Permission to export video parts. */
 
-        /** Permission to edit associated password. */
-        WritePasswordPermission             = 0x02000000,
-
-        /** Permission to edit access rights. */
-        WriteAccessRightsPermission         = 0x04000000,
-
-        /** Permission to create layouts for the user. */
-        CreateLayoutPermission              = 0x08000000,
-
+        /* Camera-specific permissions. */
+        WritePtzPermission                      = 0x10000000,   /**< Permission to use camera's PTZ controls. */
 
         /* Global permissions, applicable to current user only. */
-
-        /** Root, can edit admins. */
-        GlobalEditProtectedUserPermission   = 0x00000001,
-
-        /** Admin, can edit other non-admins. */
-        GlobalProtectedPermission           = 0x00000002,
-
-        /** Can create and edit layouts. */
-        GlobalEditLayoutsPermission         = 0x00000004,
-
-        /** Can create and edit users. */        
-        GlobalEditUsersPermission            = 0x00000008,
-
-        /** Can edit camera settings. */
-        GlobalEditCamerasPermission         = 0x00000010,
-
-        /** Can edit server settings. */
-        GlobalEditServersPermissions        = 0x00000020,
-
-        /** Can view archives of available cameras. */
-        GlobalViewArchivePermission         = 0x00000040,
-
-        /** Can view live stream of available cameras. */
-        GlobalViewLivePermission            = 0x00000080,
-
+        GlobalEditProtectedUserPermission       = 0x00000001,   /**< Root, can edit admins. */
+        GlobalProtectedPermission               = 0x00000002,   /**< Admin, can edit other non-admins. */
+        GlobalEditLayoutsPermission             = 0x00000004,   /**< Can create and edit layouts. */
+        GlobalEditUsersPermission               = 0x00000008,   /**< Can create and edit users. */        
+        GlobalEditServersPermissions            = 0x00000020,   /**< Can edit server settings. */
+        GlobalViewLivePermission                = 0x00000080,   /**< Can view live stream of available cameras. */
+        GlobalViewArchivePermission             = 0x00000100,   /**< Can view archives of available cameras. */
+        GlobalExportPermission                  = 0x00000200,   /**< Can export archives of available cameras. */
+        GlobalEditCamerasPermission             = 0x00000400,   /**< Can edit camera settings. */
+        GlobalPtzControlPermission              = 0x00000800,   /**< Can change camera's PTZ state. */
+        
+        /* Deprecated permissions. */
+        DeprecatedEditCamerasPermission         = 0x00000010,   /**< Can edit camera settings and change camera's PTZ state. */
+        DeprecatedViewExportArchivePermission   = 0x00000040,   /**< Can view and export archives of available cameras. */
 
         /* Shortcuts. */
-        GlobalLiveViewerPermission          = GlobalViewLivePermission,
-        GlobalViewerPermission              = GlobalLiveViewerPermission       | GlobalViewArchivePermission,
-        GlobalAdvancedViewerPermission      = GlobalViewerPermission           | GlobalEditCamerasPermission,
-        GlobalAdminPermission               = GlobalAdvancedViewerPermission   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
-        GlobalOwnerPermission               = GlobalAdminPermission            | GlobalEditProtectedUserPermission,
-
-        AllPermissions                      = 0xFFFFFFFF
+        GlobalLiveViewerPermissions             = GlobalViewLivePermission,
+        GlobalViewerPermissions                 = GlobalLiveViewerPermissions       | GlobalViewArchivePermission | GlobalExportPermission,
+        GlobalAdvancedViewerPermissions         = GlobalViewerPermissions           | GlobalEditCamerasPermission | GlobalPtzControlPermission,
+        GlobalAdminPermissions                  = GlobalAdvancedViewerPermissions   | GlobalEditLayoutsPermission | GlobalEditUsersPermission | GlobalProtectedPermission | GlobalEditServersPermissions,
+        GlobalOwnerPermissions                  = GlobalAdminPermissions            | GlobalEditProtectedUserPermission,
+            
+        AllPermissions                          = 0xFFFFFFFF
     };
     Q_DECLARE_FLAGS(Permissions, Permission)
 

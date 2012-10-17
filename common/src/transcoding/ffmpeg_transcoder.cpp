@@ -56,7 +56,7 @@ m_audioEncoderCodecCtx(0),
 m_videoBitrate(0),
 m_formatCtx(0),
 m_ioContext(0),
-m_baseTime(0)
+m_baseTime(AV_NOPTS_VALUE)
 {
 }
 
@@ -256,6 +256,9 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
+    if (m_baseTime == AV_NOPTS_VALUE)
+        m_baseTime = media->timestamp - 1000*100;
+
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;
     if (m_vTranscoder && m_aTranscoder && media->dataType == QnAbstractMediaData::AUDIO)
@@ -332,11 +335,4 @@ AVCodecContext* QnFfmpegTranscoder::getVideoCodecContext() const
 AVCodecContext* QnFfmpegTranscoder::getAudioCodecContext() const 
 { 
     return m_audioEncoderCodecCtx; 
-}
-
-void QnFfmpegTranscoder::setBaseTime(qint64 value)
-{
-    // absolute value is not important. Important relative value for av sync only
-    // reduce base time value to
-    m_baseTime = value - 1000*1000;
 }

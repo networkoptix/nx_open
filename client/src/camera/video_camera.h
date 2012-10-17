@@ -55,7 +55,7 @@ public:
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);
     int getExportProgressOffset() const;
-
+    QString exportedFileName() const;
 signals:
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
@@ -75,6 +75,7 @@ protected slots:
     void at_exportProgress(int value);
 
 private:
+    mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
     QnCamDisplay m_camdispay;
     QnStreamRecorder* m_recorder;

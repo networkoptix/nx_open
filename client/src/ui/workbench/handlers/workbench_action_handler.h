@@ -9,13 +9,13 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "../workbench_globals.h"
+#include <ui/workbench/workbench_globals.h>
 #include <utils/settings.h>
 
 class QAction;
 class QMenu;
-class QProgressDialog;
 
+class QnProgressDialog;
 class QnMimeData;
 class QnResourcePool;
 class QnWorkbench;
@@ -189,7 +189,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
-signals:
+
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
     void at_workbench_layoutsChanged();
@@ -200,6 +200,7 @@ protected slots:
     void at_eventManager_connectionOpened();
 
     void at_mainMenuAction_triggered();
+    void at_openCurrentUserLayoutMenuAction_triggered();
 
     void at_incrementDebugCounterAction_triggered();
     void at_decrementDebugCounterAction_triggered();
@@ -285,32 +286,38 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
+    void at_updateWatcher_availableUpdateChanged();
+    void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_activityInstrument_activated();
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_layout_exportFinished();
-    void at_cameraCamera_exportFailed(QString errorMessage);
-
+    void at_layoutCamera_exportFailed(QString errorMessage);
 
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
+
+    void at_cancelExport();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode);
-   // void updateStoredConnections(QnConnectionData connectionData);
+    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
+    // void updateStoredConnections(QnConnectionData connectionData);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
-    QString getBinaryFilterName() const;
+    QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-private:
 
+private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
     QWeakPointer<QMenu> m_mainMenu;
+    QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
 
@@ -326,10 +333,11 @@ private:
     QList<QnMimeData> m_delayedDrops;
 
     QnVideoCamera* m_layoutExportCamera;
+    QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QWeakPointer<QProgressDialog> m_exportProgressDialog;
+    QWeakPointer<QnProgressDialog> m_exportProgressDialog;
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;

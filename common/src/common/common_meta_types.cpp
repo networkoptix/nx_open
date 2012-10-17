@@ -57,11 +57,12 @@ void QnCommonMetaTypes::initilize() {
 
     qRegisterMetaType<QnCamerasFoundInfoList>();
     qRegisterMetaType<QnStatisticsDataList>();
+    qRegisterMetaType<QnStatisticsData>();
 
     qRegisterMetaType<Qn::TimePeriodRole>();
     qRegisterMetaType<QnTimePeriodList>();
 
-    qRegisterMetaType<QnUpdateInfoItems>();
+    qRegisterMetaType<QnUpdateInfoItemList>();
 
     qn_commonMetaTypes_initialized = true;
 }

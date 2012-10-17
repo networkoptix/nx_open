@@ -34,7 +34,7 @@ public:
 
 protected:
     void setPath(const QString& path) { m_path = path; }
-
+    qint64 parseDateTime(const QString& dateTime);
 protected:
     QString m_path;
 };

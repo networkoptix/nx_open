@@ -2,6 +2,7 @@
 #include "isd_resource_searcher.h"
 #include "isd_resource.h"
 
+extern QString getValueFromString(const QString& line);
 
 QnPlISDResourceSearcher::QnPlISDResourceSearcher()
 {
@@ -50,9 +51,78 @@ QString QnPlISDResourceSearcher::manufacture() const
 
 QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
-    Q_UNUSED(url)
-    Q_UNUSED(auth)
-    return QnResourcePtr(0);
+
+    QString host = url.host();
+    int port = url.port();
+    if (host.isEmpty())
+        host = url.toString(); // in case if url just host address without protocol and port
+
+    int timeout = 2000;
+
+
+    if (port < 0)
+        port = 80;
+
+    CLHttpStatus status;
+    QString name = QString(QLatin1String(downloadFile(status, QLatin1String("api/param.cgi?req=General.Brand.ModelName"), QHostAddress(host), port, timeout, auth)));
+
+    name.replace(QLatin1Char(' '), QString()); // remove spaces
+    //name.replace(QLatin1Char('-'), QString()); // remove spaces
+    name.replace(QLatin1Char('\r'), QString()); // remove spaces
+    name.replace(QLatin1Char('\n'), QString()); // remove spaces
+    name.replace(QLatin1Char('\t'), QString()); // remove tabs
+
+
+    if (name.length()==0)
+        return QnResourcePtr(0);
+
+
+    name = getValueFromString(name).trimmed();
+
+
+
+    if (name.endsWith(QLatin1Char('0')))
+        name.chop(1);
+
+
+    QString mac = QString(QLatin1String(downloadFile(status, QLatin1String("/api/param.cgi?req=Network.1.MacAddress"), QHostAddress(host), port, timeout, auth)));
+
+    mac.replace(QLatin1Char(' '), QString()); // remove spaces
+    mac.replace(QLatin1Char('\r'), QString()); // remove spaces
+    mac.replace(QLatin1Char('\n'), QString()); // remove spaces
+    mac.replace(QLatin1Char('\t'), QString()); // remove tabs
+
+
+    if (mac.isEmpty() || name.isEmpty())
+        return QnResourcePtr(0);
+
+
+    mac = getValueFromString(mac).trimmed();
+
+    int n = mac.length();
+
+    if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
+        mac.chop(mac.length() - 17);
+
+
+
+
+
+    QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
+    if (!rt.isValid())
+        return QnResourcePtr(0);
+
+    QnNetworkResourcePtr resource ( new QnPlIsdResource() );
+
+    resource->setTypeId(rt);
+    resource->setName(name);
+    resource->setMAC(mac);
+    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setAuth(auth);
+
+    //resource->setDiscoveryAddr(iface.address);
+
+    return resource;
 }
 
 QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress)

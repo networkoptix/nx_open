@@ -100,6 +100,7 @@ void QnCompressedVideoData::assign(QnCompressedVideoData* other)
     width = other->width;
     height = other->height;
     motion = other->motion;
+    pts = other->pts;
 }
 
 QnCompressedVideoData* QnCompressedVideoData::clone()

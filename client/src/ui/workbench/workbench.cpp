@@ -265,6 +265,9 @@ void QnWorkbench::update(const QnWorkbenchState &state) {
         if(i == state.currentLayoutIndex)            
             setCurrentLayout(layout);
     }
+
+    if(currentLayoutIndex() == -1 && !layouts().isEmpty())
+        setCurrentLayoutIndex(layouts().size() - 1);
 }
 
 void QnWorkbench::submit(QnWorkbenchState &state) {

@@ -251,6 +251,7 @@ void QnVideoCamera::stopExport()
         m_exportReader->stop();
     if (m_exportRecorder)
         m_exportRecorder->stop();
+    QMutexLocker lock(&m_exportMutex);
     delete m_exportReader;
     delete m_exportRecorder;
     m_exportReader = 0;
@@ -275,4 +276,13 @@ int QnVideoCamera::getExportProgressOffset() const
 void QnVideoCamera::setMotionIODevice(QSharedPointer<QBuffer> value, int channel)
 {
     m_motionFileList[channel] = value;
+}
+
+QString QnVideoCamera::exportedFileName() const
+{
+    QMutexLocker lock(&m_exportMutex);
+    if (m_exportRecorder)
+        return m_exportRecorder->fixedFileName();
+    else
+        return QString();
 }

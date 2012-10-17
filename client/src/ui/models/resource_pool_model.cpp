@@ -201,15 +201,11 @@ public:
             break;
         case Qn::ResourceNode: 
             bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-            if(!bastard) {
-                QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>();
-                if(layout) {
-                    /* Hide local layouts that are not file-based. */
-                    bastard = m_model->snapshotManager()->isLocal(layout) && (m_flags & QnResource::local_media) != QnResource::local_media; 
-                }
-                if(!bastard)
-                    bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
-            }
+            if(!bastard)
+                if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) /* Hide local layouts that are not file-based. */
+                    bastard = m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout); 
+            if(!bastard)
+                bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -626,6 +622,9 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
         return m_serversNode;
 
     if((node->resourceFlags() & QnResource::local_media) == QnResource::local_media)
+        return m_localNode;
+
+    if((node->resourceFlags() & QnResource::local_layout) == QnResource::local_layout)
         return m_localNode;
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());

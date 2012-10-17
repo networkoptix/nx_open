@@ -229,9 +229,9 @@ int qnMain(int argc, char *argv[])
 #endif
 
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
@@ -244,6 +244,7 @@ int qnMain(int argc, char *argv[])
     QString authenticationString, delayedDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
     bool devBackgroundEditable = false;
+    bool skipMediaFolderScan = false;
     
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
@@ -254,6 +255,7 @@ int qnMain(int argc, char *argv[])
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
     commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
+    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -324,8 +326,8 @@ int qnMain(int argc, char *argv[])
 
 
     QnLog::initLog(logLevel);
-    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
@@ -352,12 +354,14 @@ int qnMain(int argc, char *argv[])
 
     //============================
     //QnResourceDirectoryBrowser
-    QnResourceDirectoryBrowser::instance().setLocal(true);
-    QStringList dirs;
-    dirs << qnSettings->mediaFolder();
-    dirs << qnSettings->extraMediaFolders();
-    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    if(!skipMediaFolderScan) {
+        QnResourceDirectoryBrowser::instance().setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    }
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
@@ -395,18 +399,6 @@ int qnMain(int argc, char *argv[])
     QnResourceDiscoveryManager::instance().start();
 
     qApp->setStyle(qnSkin->style());
-
-#if 0
-    // todo: remove me! debug only
-    QnCameraHistoryPtr history1(new QnCameraHistory());
-    qint64 dt = QDateTime::fromString("2012-04-12T19:19:00", Qt::ISODate).toMSecsSinceEpoch();
-    QnCameraTimePeriod period1(dt-1000*60*30, 1000*60*30, 2);
-    QnCameraTimePeriod period2(dt, 3600*24*1000ll, 43);
-    history1->setMacAddress("00-40-8C-BF-92-CE");
-    history1->addTimePeriod(period1);
-    history1->addTimePeriod(period2);
-    QnCameraHistoryPool::instance()->addCameraHistory(history1);
-#endif
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));

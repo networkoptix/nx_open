@@ -156,7 +156,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user) {
         return;
 
     m_user = user;
-    if (m_editorRights){
+    if (m_editorRights) {
         createAccessRightsPresets();
         createAccessRightsAdvanced();
     }
@@ -193,7 +193,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(placeholder);
         ui->confirmPasswordEdit->clear();
 
-        loadAccessRightsToUi(context()->accessController()->calculateGlobalPermissions(m_user));
+        loadAccessRightsToUi(context()->accessController()->globalPermissions(m_user));
         updatePassword();
     }
     setHasChanges(false);
@@ -335,29 +335,38 @@ void QnUserSettingsDialog::updateAll() {
     updateElement(Login);
 }
 
+void QnUserSettingsDialog::updateDependantPermissions() {
+    bool canViewArchive = m_advancedRights[Qn::GlobalViewArchivePermission] ? m_advancedRights[Qn::GlobalViewArchivePermission]->isChecked() : false;
+    if(QCheckBox *exportArchiveCheckBox = m_advancedRights[Qn::GlobalExportPermission]) {
+        exportArchiveCheckBox->setEnabled(canViewArchive);
+        if(!canViewArchive)
+            exportArchiveCheckBox->setChecked(false);
+    }
+}
+
 void QnUserSettingsDialog::at_accessRights_changed() {
     setHasChanges(true);
     selectAccessRightsPreset(readAccessRightsAdvanced());
+    updateDependantPermissions();
 }
-
 
 void QnUserSettingsDialog::createAccessRightsPresets() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
+    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
 
     // show only for view of owner
     if (permissions & Qn::GlobalEditProtectedUserPermission)
-        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermission);
+        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermissions);
 
     // show for an admin or for anyone opened by owner
     if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermission);
+        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermission);
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermission);
-    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermission);
+    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermissions);
 
     ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
 }
@@ -366,7 +375,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     if (!m_user)
         return;
 
-    Qn::Permissions permissions = context()->accessController()->calculateGlobalPermissions(m_user);
+    Qn::Permissions permissions = context()->accessController()->globalPermissions(m_user);
     QWidget* previous = ui->advancedButton;
 
     if (permissions & Qn::GlobalEditProtectedUserPermission)
@@ -376,7 +385,11 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
                      Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions,
                      previous);
     previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
-    createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
+    previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
+    previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
+    previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);
+
+    updateDependantPermissions();
 }
 
 QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64 right, QWidget *previous) {
@@ -394,7 +407,7 @@ QCheckBox *QnUserSettingsDialog::createAccessRightCheckBox(QString text, quint64
 
 void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
     bool custom = true;
-    for (int i = 0; i < ui->accessRightsComboBox->count(); i++){
+    for (int i = 0; i < ui->accessRightsComboBox->count(); i++) {
         if (ui->accessRightsComboBox->itemData(i).toULongLong() == rights) {
             ui->accessRightsComboBox->setCurrentIndex(i);
             custom = false;
@@ -402,7 +415,7 @@ void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
         }
     }
 
-    if (custom){
+    if (custom) {
         ui->advancedButton->setChecked(true);
         ui->accessRightsComboBox->setCurrentIndex(ui->accessRightsComboBox->count() - 1);
     }
@@ -414,17 +427,15 @@ void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
         i.next();
         i.value()->setChecked(i.key() & rights);
     }
+    updateDependantPermissions(); // TODO: rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
-    quint64 rights = Qn::GlobalViewLivePermission;
-    QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
-    while (i.hasNext()) {
-        i.next();
-        if (i.value()->isChecked())
-            rights |= i.key();
-    }
-    return rights;
+    quint64 result = Qn::GlobalViewLivePermission;
+    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+        if(pos.value()->isChecked())
+            result |= pos.key();
+    return result;
 }
 
 void QnUserSettingsDialog::at_advancedButton_toggled() {

@@ -61,12 +61,14 @@ private slots:
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
+    void updateLicensesButtonVisible();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();
+    void at_releaseSignalizer_activated(QObject *target);
 
 private:
     int qualityTextToIndex(const QString &text);

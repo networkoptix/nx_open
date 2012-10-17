@@ -139,6 +139,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
         //ignore = false;
         flags = 0;
         width = height = -1;
+        pts = AV_NOPTS_VALUE;
     }
 
     virtual QnCompressedVideoData* clone() override;
@@ -150,6 +151,7 @@ struct QnCompressedVideoData : public QnAbstractMediaData
     //int flags;
     //bool ignore;
     QnMetaDataV1Ptr motion;
+    qint64 pts;
 protected:
     void assign(QnCompressedVideoData* other);
 };

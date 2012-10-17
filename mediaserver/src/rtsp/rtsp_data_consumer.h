@@ -74,6 +74,7 @@ protected:
     void doRealtimeDelay(QnAbstractMediaDataPtr media);
 
     bool isMediaTimingsSlow() const;
+    void setLiveQualityInternal(MediaQuality quality);
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -117,6 +118,5 @@ private:
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
-    qint64 m_firstRtpTime;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

@@ -5,6 +5,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
+#include <QtCore/QUrl>
 
 #include "preprocessor.h"
 
@@ -32,6 +33,10 @@ namespace detail {
         template<class T>
         QString operator<<(const QString &s, const T &arg) {
             return s.arg(arg);
+        }
+
+        inline QString operator<<(const QString &s, const QUrl &arg) {
+            return s.arg(arg.toString());
         }
 
         inline QString operator<<(const QString &s, const char *arg) {

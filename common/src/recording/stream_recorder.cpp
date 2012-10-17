@@ -43,7 +43,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false),
     m_audioTranscoder(0),
-    m_dstAudioCodec(CODEC_ID_NONE)
+    m_dstAudioCodec(CODEC_ID_NONE),
+    m_role(Role_ServerRecording)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -290,8 +291,13 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
 
     AVPacket avPkt;
     av_init_packet(&avPkt);
-    avPkt.pts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
-    avPkt.dts = avPkt.pts;
+    avPkt.dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
+    QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
+    if (video && video->pts != AV_NOPTS_VALUE)
+        avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base);
+    else
+        avPkt.pts = avPkt.dts;
+
     if(md->flags & AV_PKT_FLAG_KEY)
         avPkt.flags |= AV_PKT_FLAG_KEY;
     avPkt.data = (quint8*) md->data.data();

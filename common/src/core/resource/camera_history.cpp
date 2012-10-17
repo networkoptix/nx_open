@@ -200,6 +200,14 @@ QnCameraHistoryPtr QnCameraHistoryPool::getCameraHistory(const QString& physical
     return m_cameraHistory.value(physicalId);
 }
 
+QnNetworkResourceList QnCameraHistoryPool::getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera) 
+{
+    QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());
+    if (!history)
+        return QList<QnNetworkResourcePtr>() << camera;
+    return history->getAllCamerasWithSamePhysicalId();
+}
+
 QnNetworkResourceList QnCameraHistoryPool::getAllCamerasWithSamePhysicalId(const QnNetworkResourcePtr &camera, const QnTimePeriod& timePeriod)
 {
     QnCameraHistoryPtr history = getCameraHistory(camera->getPhysicalId());

@@ -16,7 +16,7 @@ class QAction;
 class QMenu;
 class QGraphicsItem;
 
-class QnActionFactory;
+class QnMenuFactory;
 class QnActionBuilder;
 class QnWorkbenchContext;
 
@@ -87,6 +87,8 @@ public:
      *                                  the caller.
      */
     QMenu *newMenu(Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
+
+    QMenu *newMenu(Qn::ActionId rootId, Qn::ActionScope scope, const QnActionParameters &parameters = QnActionParameters());
 
     /**
      * \returns                         Action target provider that is assigned to this

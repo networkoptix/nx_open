@@ -414,6 +414,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->setSpacing(2);
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
     if (QnScreenRecorder::isSupported())
@@ -568,6 +569,12 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarOpacityProcessor->addTargetItem(m_calendarItem);
     m_calendarOpacityProcessor->addTargetItem(m_calendarShowButton);
 
+    m_calendarHidingProcessor = new HoverFocusProcessor(m_controlsWidget);
+    m_calendarHidingProcessor->addTargetItem(m_calendarItem);
+    m_calendarHidingProcessor->addTargetItem(m_calendarShowButton);
+    m_calendarHidingProcessor->setHoverLeaveDelay(closeConstrolsTimeoutMSec);
+    m_calendarHidingProcessor->setFocusLeaveDelay(closeConstrolsTimeoutMSec);
+
     m_calendarSizeAnimator = new VariantAnimator(this);
     m_calendarSizeAnimator->setTimer(m_instrumentManager->animationTimer());
     m_calendarSizeAnimator->setTargetObject(m_calendarItem);
@@ -585,6 +592,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateCalendarOpacity()));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateControlsVisibility()));
     connect(m_calendarOpacityProcessor, SIGNAL(hoverLeft()),                                                                        this,                           SLOT(updateControlsVisibility()));
+    connect(m_calendarHidingProcessor,  SIGNAL(hoverLeft()),                                                                        this,                           SLOT(at_calendarHidingProcessor_hoverFocusLeft()));
     connect(m_calendarItem,             SIGNAL(paintRectChanged()),                                                                 this,                           SLOT(at_calendarItem_paintGeometryChanged()));
     connect(m_calendarItem,             SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_calendarItem_paintGeometryChanged()));
     connect(action(Qn::ToggleCalendarAction), SIGNAL(toggled(bool)),                                                                this,                           SLOT(at_toggleCalendarAction_toggled(bool)));
@@ -1567,9 +1575,11 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
             /* User may have opened some panels while zoomed, 
              * we want to leave them opened even if they were closed before. */
             setOpenedPanels(m_unzoomedOpenedPanels | openedPanels());
+
+            /* Viewport margins have changed, force fit-in-view. */
+            display()->fitInView();
         }
     }
-
 }
 
 void QnWorkbenchUi::at_controlsWidget_deactivated() {
@@ -1883,3 +1893,6 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
     updateHelpGeometry();
 }
 
+void QnWorkbenchUi::at_calendarHidingProcessor_hoverFocusLeft() {
+    setCalendarOpened(false);
+}

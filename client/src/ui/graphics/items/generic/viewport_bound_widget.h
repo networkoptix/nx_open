@@ -5,6 +5,15 @@
 
 class Instrument;
 
+namespace Qn{
+    enum FixedItemRotation{
+        Angle0,
+        Angle90,
+        Angle180,
+        Angle270
+    };
+}
+
 /**
  * Graphics widget with a coordinate system that has the same scale as the
  * viewport, regardless of its size.
@@ -31,6 +40,13 @@ public:
      */
     void setDesiredSize(const QSizeF &desiredSize);
 
+    /**
+     * Update desized rotation angle of the overlay widget. Allowed only some fixed angles.
+     *
+     * \param fixedRotation             Desired rotation angle, in enum values.
+     */
+    void setDesiredRotation(Qn::FixedItemRotation fixedRotation);
+
 protected:
     virtual void resizeEvent(QGraphicsSceneResizeEvent *event) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -41,6 +57,7 @@ protected slots:
 private:
     QSizeF m_desiredSize;
     bool m_inUpdateScale;
+    Qn::FixedItemRotation m_fixedRotation;
     QWeakPointer<QGraphicsView> m_lastView;
     QWeakPointer<Instrument> m_instrument;
 };

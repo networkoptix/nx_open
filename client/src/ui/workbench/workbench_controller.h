@@ -162,6 +162,9 @@ protected slots:
     void at_recordingAnimation_valueChanged(const QVariant &value);
     void at_recordingAnimation_finished();
 
+    void at_zoomedToggle_activated();
+    void at_zoomedToggle_deactivated();
+
 private:
     /* Global state. */
 

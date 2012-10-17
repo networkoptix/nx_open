@@ -33,7 +33,18 @@ void QnViewportBoundWidget::setDesiredSize(const QSizeF &desiredSize) {
     updateScale();
 }
 
+void QnViewportBoundWidget::setDesiredRotation(Qn::FixedItemRotation fixedRotation){
+    if (m_fixedRotation == fixedRotation)
+        return;
+
+    m_fixedRotation = fixedRotation;
+    updateScale();
+}
+
 void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
+    if (m_desiredSize.isNull())
+        return;
+
     if(!view)
         view = m_lastView.data();
     if(!view && scene() && !scene()->views().empty())
@@ -51,7 +62,11 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    QRectF geometry = QRectF(QPointF(0, 0), m_desiredSize / scale);
+    QSizeF geometrySize = m_desiredSize / scale;
+    if (m_fixedRotation == Qn::Angle90 || m_fixedRotation == Qn::Angle270)
+        geometrySize.transpose();
+
+    QRectF geometry = QRectF(QPointF(0, 0), geometrySize);
     setGeometry(geometry);
 
     QSizeF resultingSize = size();
@@ -63,6 +78,28 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 
         setGeometry(geometry);
     }
+
+    QPointF rotationCenter = geometry.center();
+    qreal rotation;
+    switch (m_fixedRotation){
+        case Qn::Angle0:
+            rotation = 0;
+            break;
+        case Qn::Angle180:
+            rotation = 180;
+            break;
+        case Qn::Angle90:
+            rotation = 90;
+            rotationCenter.setX(rotationCenter.y());
+            break;
+        case Qn::Angle270:
+            rotation = -90;
+            rotationCenter.setY(rotationCenter.x());
+            break;
+    }
+
+    setTransformOriginPoint(rotationCenter);
+    setRotation(rotation);
 
     setTransform(QTransform::fromScale(scale, scale));
 }
@@ -98,7 +135,6 @@ QVariant QnViewportBoundWidget::itemChange(GraphicsItemChange change, const QVar
 
 void QnViewportBoundWidget::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
-
     if(!m_inUpdateScale)
         updateScale();
 }

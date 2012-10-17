@@ -824,7 +824,10 @@ void QnRtspConnectionProcessor::createDataProvider()
         {
             QnVirtualCameraResourcePtr cameraRes = qSharedPointerDynamicCast<QnVirtualCameraResource> (d->mediaRes);
             QSharedPointer<QnLiveStreamProvider> liveHiProvider = qSharedPointerDynamicCast<QnLiveStreamProvider> (d->liveDpHi);
-            if (cameraRes && liveHiProvider && cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS)
+
+            bool canRunSecondStream = cameraRes && liveHiProvider && (cameraRes->streamFpsSharingMethod() != shareFps || cameraRes->getMaxFps() - liveHiProvider->getFps() >= QnRecordingManager::MIN_SECONDARY_FPS);
+
+            if (canRunSecondStream)
             {
                 d->liveDpLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
                 if (d->liveDpLow)
@@ -909,12 +912,6 @@ int QnRtspConnectionProcessor::composePlay()
         d->sessionTimeOut = 0;
         d->socket->setReadTimeOut(d->socketTimeout);
         createPredefinedTracks();
-    }
-
-    if (d->requestHeaders.value("Range").isNull())
-    {
-        QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-        d->startTime = cameraResource ? DATETIME_NOW : 0;
     }
 
     if (!d->requestHeaders.value("x-media-step").isEmpty())
@@ -1207,6 +1204,8 @@ int QnRtspConnectionProcessor::isFullBinaryMessage(const QByteArray& data)
 void QnRtspConnectionProcessor::run()
 {
     Q_D(QnRtspConnectionProcessor);
+    //d->socket->setNoDelay(true);
+    d->socket->setSendBufferSize(16*1024);
 
     if (!d->clientRequest.isEmpty()) {
         parseRequest();
@@ -1266,8 +1265,11 @@ void QnRtspConnectionProcessor::resetTrackTiming()
     Q_D(QnRtspConnectionProcessor);
     for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
     {
-        itr.value()->sequence = 0;
-        itr.value()->firstRtpTime = -1;
+        RtspServerTrackInfoPtr track = itr.value();
+        track->sequence = 0;
+        track->firstRtpTime = -1;
+        if (track->encoder)
+            track->encoder->init();
     }
 }
 

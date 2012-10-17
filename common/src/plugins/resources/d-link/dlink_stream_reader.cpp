@@ -86,7 +86,7 @@ void PlDlinkStreamReader::openStream()
 
     //=====requesting a video
 
-    if (m_h264 && false)
+    if (m_h264)
     //if (m_h264) //look_for_this_comment
     {
         QStringList srtpUrls =  getRTPurls();
@@ -151,8 +151,8 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
 
 
     if (m_h264) //look_for_this_comment
-        return getNextDataMPEG(CODEC_ID_H264);
-        //return mRTP264.getNextData();
+        //return getNextDataMPEG(CODEC_ID_H264);
+        return m_rtpReader.getNextData();
 
     if (m_mpeg4)
         return getNextDataMPEG(CODEC_ID_MPEG4);

@@ -1,6 +1,10 @@
 #include "camera_schedule_widget.h"
 #include "ui_camera_schedule_widget.h"
 
+#include <QtGui/QMessageBox>
+
+#include <utils/common/event_processors.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -12,6 +16,7 @@
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     QWidget(parent), 
@@ -57,6 +62,12 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+    
+    QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
+    releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
+    connect(releaseSignalizer, SIGNAL(activated(QObject *, QEvent *)), this, SLOT(at_releaseSignalizer_activated(QObject *)));
+    ui->recordMotionButton->installEventFilter(releaseSignalizer);
+    ui->recordMotionPlusLQButton->installEventFilter(releaseSignalizer);
     
     connectToGridWidget();
     
@@ -143,7 +154,9 @@ void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
 
     if(context) {
         connect(context->instance<QnWorkbenchPanicWatcher>(), SIGNAL(panicModeChanged()), this, SLOT(updatePanicLabelText()));
+        connect(context, SIGNAL(userChanged(const QnUserResourcePtr &)), this, SLOT(updateLicensesButtonVisible()));
         updatePanicLabelText();
+        updateLicensesButtonVisible();
     }
 }
 
@@ -488,6 +501,10 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
     }
 }
 
+void QnCameraScheduleWidget::updateLicensesButtonVisible() {
+    ui->licensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
 void QnCameraScheduleWidget::updateMotionButtons() {
     bool hasDualStreaming = !m_cameras.isEmpty();
     bool hasMotion = !m_cameras.isEmpty();
@@ -598,3 +615,16 @@ bool QnCameraScheduleWidget::isSecondaryStreamReserver() const
 {
     return ui->recordMotionPlusLQButton->isChecked();
 }
+
+void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
+    QWidget *widget = qobject_cast<QWidget *>(target);
+    if(!widget)
+        return;
+
+    if(widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
+        return;
+
+    QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+}
+
+

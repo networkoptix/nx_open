@@ -121,6 +121,13 @@ QnSettings::QnSettings():
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
 
+    /* Load from internal resource. */
+    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
+    QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
+    settings->beginGroup(QLatin1String("settings"));
+    updateFromSettings(settings.data());
+    settings->endGroup();
+
     /* Load from settings. */
     load();
 

@@ -7,7 +7,6 @@
 #include "resource_pool.h"
 #include "utils/common/util.h"
 #include "api/app_server_connection.h"
-#include "core/resource/resource_directory_browser.h"
 #include "utils/common/synctime.h"
 #include "utils/network/ping.h"
 #include "utils/network/ip_range_checker.h"
@@ -151,7 +150,7 @@ void QnResourceDiscoveryManager::run()
     {
         searcher->setShouldBeUsed(true);
 
-        if (dynamic_cast<QnResourceDirectoryBrowser*>(searcher))
+        if (dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
@@ -347,7 +346,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
 
                 // sometimes camera could be found with 2 different nics; sometimes just on one nic. so, diffNet will be detected - but camera is still ok,
                 // so status needs to be checked. hasRunningLiveProvider here to avoid situation where there is no recording and live view, but user is about to view the cam. fuck
-                bool shouldInvesigate = (diffAddr || diffNet) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
+                bool shouldInvesigate = (diffAddr || (diffNet && newNetRes->shoudResolveConflicts() )) && ( rpNetRes->getStatus() == QnResource::Offline || !rpNetRes->hasRunningLiveProvider());
                 if (shouldInvesigate)
                 {
                     // should keep it into resources to investigate it further 

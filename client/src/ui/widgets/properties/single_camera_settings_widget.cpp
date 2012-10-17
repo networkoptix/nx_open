@@ -607,8 +607,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
-    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked())
-        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) {
+    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked() && m_camera->streamFpsSharingMethod() == shareFps )
+        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+    {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
         if (currentMaxFps > maxFps)
@@ -629,14 +630,14 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
-
     bool canAuth = !m_readOnly;
 
 #ifdef Q_OS_WIN
-    if (canAuth){
-        QSettings settings(QLatin1String("HKEY_CLASSES_ROOT"), QSettings::NativeFormat);
-        QString defaultBrowser = settings.value(QLatin1String("HKEY_CLASSES_ROOT\\http\\shell\\open\\command")).toString();
-        canAuth = !defaultBrowser.contains(QLatin1String("iexplore"));
+    if (canAuth) {
+        QSettings settings(QLatin1String("HKEY_CURRENT_USER\\Software\\Clients\\StartMenuInternet"), QSettings::NativeFormat);
+        QString defaultBrowser = settings.value(QLatin1String("Default")).toString().toLower();
+        if (defaultBrowser.isEmpty() || defaultBrowser.contains(QLatin1String("iexplore")))
+			canAuth = false;
     }
 #endif
 

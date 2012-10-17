@@ -32,6 +32,8 @@ public:
     virtual QString manufacture() const;
 
     virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
+private:
+    QnResourcePtr checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth);
 };
 
 #endif // onvif_resource_searcher_h

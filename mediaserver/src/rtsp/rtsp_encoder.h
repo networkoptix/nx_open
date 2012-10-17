@@ -12,6 +12,7 @@ class QnRtspEncoder
 {
 public:
     QnRtspEncoder();
+    virtual ~QnRtspEncoder() {}
     void setMediaData(QnAbstractMediaDataPtr ctx);
     
     virtual QByteArray getAdditionSDP() = 0;
@@ -43,8 +44,6 @@ public:
     * Return true if codec can produce RTP header
     */
     virtual bool isRtpHeaderExists() const = 0;
-
-    virtual void setBaseTime(qint64 value) {}
 
 protected:
     QnAbstractMediaDataPtr m_sdpMediaPacket;
