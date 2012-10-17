@@ -121,7 +121,7 @@
 								</resource>
 								<resource>
 									<targetPath>${project.build.directory}</targetPath>
-									<directory>${basedir}/../cpp/shared-resources/icons/${custom.skin}</directory>
+									<directory>${basedir}/../customization/${custom.skin}</directory>
 									<filtering>false</filtering>
 								</resource>												
 							</resources>              
