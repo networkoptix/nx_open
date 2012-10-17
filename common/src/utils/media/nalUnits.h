@@ -528,4 +528,43 @@ private:
 	int deserializeSliceHeader(const QMap<quint32, const SPSUnit*>& spsMap,const QMap<quint32, const PPSUnit*>& ppsMap);
 };
 
+namespace h264
+{
+    namespace AspectRatio
+    {
+        static const int Extended_SAR = 255;
+
+        void decode( int aspect_ratio_idc, unsigned int* w, unsigned int* h );
+    }
+
+    namespace SEIType
+    {
+        enum Value
+        {
+            buffering_period = 0,
+            pic_timing = 1,
+            pan_scan_rect = 2,
+            filler_payload = 3,
+            user_data_registered_itu_t_t35 = 4,
+            user_data_unregistered = 5,
+            recovery_point = 6,
+            dec_ref_pic_marking_repetition = 7,
+            spare_pic = 8,
+            scene_info = 9,
+            sub_seq_info = 10,
+            sub_seq_layer_characteristics = 11,
+            sub_seq_characteristics = 12,
+            full_frame_freeze = 13,
+            full_frame_freeze_release = 14,
+            full_frame_snapshot = 15,
+            progressive_refinement_segment_start = 16,
+            progressive_refinement_segment_end = 17,
+            motion_constrained_slice_group_set = 18,
+            film_grain_characteristics = 19,
+            deblocking_filter_display_preference = 20,
+            stereo_video_info = 21
+        };
+    }
+}
+
 #endif

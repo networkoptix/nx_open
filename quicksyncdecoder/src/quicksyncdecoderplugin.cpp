@@ -17,6 +17,9 @@
 //!if defined, a mfx session is created in QuicksyncDecoderPlugin and all mfx sessions are joined with this one
 //#define USE_PARENT_MFX_SESSION
 
+//TODO/IMPL pass CPU type to xml
+//TODO/IMPL support creation of first hardware decoder after N software decoders
+
 
 static const char* QUICKSYNC_PLUGIN_ID = "45D92FCC-2B59-431e-BFF9-E11F2D6213DA";
 //{ 0x45d92fcc, 0x2b59, 0x431e, { 0xbf, 0xf9, 0xe1, 0x1f, 0x2d, 0x62, 0x13, 0xda } };
@@ -86,9 +89,9 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     const QnCompressedVideoDataPtr& data,
     const QGLContext* const /*glContext*/ ) const
 {
-#ifdef _DEBUG
-    return NULL;
-#endif
+//#ifdef _DEBUG
+    //return NULL;
+//#endif
 
     if( !m_initialized )
     {
@@ -100,7 +103,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     if( !m_hardwareAccelerationEnabled || (codecID != CODEC_ID_H264) )
         return NULL;
 
-    cl_log.log( QString::fromAscii("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
+    NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
 
     //TODO/IMPL parse media sequence header to determine necessary parameters
 
@@ -148,7 +151,7 @@ void QuicksyncDecoderPlugin::initialize() const
     mfxStatus status = m_mfxSession->Init( MFX_IMPL_AUTO_ANY, &version );
     if( status != MFX_ERR_NONE )
     {
-        cl_log.log( QString::fromAscii("Failed to create Intel media SDK parent session. Status %1").arg(status), cl_logERROR );
+        NX_LOG( QString::fromAscii("Failed to create Intel media SDK parent session. Status %1").arg(status), cl_logERROR );
         m_mfxSession.reset();
         return;
     }
@@ -156,7 +159,7 @@ void QuicksyncDecoderPlugin::initialize() const
     status = m_mfxSession->QueryVersion( &version );
     if( status != MFX_ERR_NONE )
     {
-        cl_log.log( QString::fromAscii("Failed to read Intel media SDK version. Status %1").arg(status), cl_logERROR );
+        NX_LOG( QString::fromAscii("Failed to read Intel media SDK version. Status %1").arg(status), cl_logERROR );
         m_mfxSession.reset();
         return;
     }
@@ -181,7 +184,7 @@ void QuicksyncDecoderPlugin::initialize() const
     HRESULT d3d9Result = Direct3DCreate9Ex( D3D_SDK_VERSION, &m_direct3D9 );
     if( d3d9Result != S_OK )
     {
-        cl_log.log( QString::fromAscii("Failed to initialize IDirect3D9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(d3d9Result))), cl_logERROR );
+        NX_LOG( QString::fromAscii("Failed to initialize IDirect3D9Ex. %1").arg(QString::fromWCharArray(DXGetErrorDescription(d3d9Result))), cl_logERROR );
         return;
     }
 

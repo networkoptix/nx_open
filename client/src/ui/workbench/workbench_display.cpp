@@ -67,6 +67,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
 
 
 namespace {
@@ -394,6 +395,12 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             /*QnGlHardwareChecker* filter =*/
             new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
+
+            //initializing gl context pool used to render decvoded pictures in non-GUI thread
+            DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindowHandle( glWidget->winId() );
+            DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
+                GLContext::getSysHandleOfQtContext( glWidget->context() ),
+                glWidget->winId() );
         }
 
         /* Turn on antialiasing at QPainter level. */

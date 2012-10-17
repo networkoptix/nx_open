@@ -43,8 +43,10 @@ public:
     qint64 lastDisplayedTime() const;
     QnMetaDataV1Ptr lastFrameMetadata() const; 
 
+    bool isYV12ToRgbShaderUsed() const;
+    bool isNV12ToRgbShaderUsed() const;
+
 private:
-    const QGLContext* m_context;
     const DecodedPictureToOpenGLUploader& m_decodedPictureProvider;
     mutable QMutex m_displaySync; // to avoid call paintEvent() more than once at the same time
     qreal m_brightness;
@@ -57,6 +59,7 @@ private:
     unsigned int m_prevFrameSequence;
     QScopedPointer<QnYuy2ToRgbShaderProgram> m_yuy2ToRgbShaderProgram;
     QScopedPointer<QnYv12ToRgbShaderProgram> m_yv12ToRgbShaderProgram;
+    QScopedPointer<QnNv12ToRgbShaderProgram> m_nv12ToRgbShaderProgram;
 
     void update( const QSharedPointer<CLVideoDecoderOutput>& curImg );
     //!Draws texture \a tex0ID to the screen
@@ -87,8 +90,6 @@ private:
     bool isYuvFormat() const;
     int glRGBFormat() const;
     
-    bool usingShaderYuvToRgb() const;
-
     static int maxTextureSize();
 };
 

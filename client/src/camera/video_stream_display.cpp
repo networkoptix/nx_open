@@ -139,7 +139,8 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
         newWidth /= 2;
         newHeight /= 2;
     }
-    return rez;
+    //return rez;
+    return (QnFrameScaler::DownscaleFactor)(rez * 2);
 }
 
 void QnVideoStreamDisplay::reorderPrevFrames()
@@ -278,11 +279,14 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
         outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
         pixFmt = dec->GetPixelFormat();
 
-        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
-            QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-        else {
-            if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
-                { /* do nothing. */ } // TODO: wtf?
+        if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
+        {
+            if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+                QnFrameScaler::downscale(tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
+            else {
+                if (!rescaleFrame(*(tmpFrame.data()), *outFrame, tmpFrame->width / scaleFactor, tmpFrame->height / scaleFactor)) // universal scaler
+                    { /* do nothing. */ } // TODO: wtf?
+            }
         }
         m_drawer->draw(outFrame);
         m_drawer->waitForFrameDisplayed(channelNum);
@@ -380,19 +384,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         //data->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice;
     }
 
+    dec->setOutPictureSize( m_drawer->sizeOnScreen(data->channelNumber) );
+
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0)
         //scaleFactor = determineScaleFactor(data->channelNumber, dec->getOriginalPictureSize().width(), dec->getOriginalPictureSize().height(), force_factor);
         scaleFactor = determineScaleFactor(data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
-
-    //set scaling in decoder
-    if( scaleFactor != QnFrameScaler::factor_unknown &&
-        scaleFactor != QnFrameScaler::factor_1 &&
-        scaleFactor != QnFrameScaler::factor_any )
-    {
-        dec->setOutPictureSize( QSize( dec->getWidth() / scaleFactor, dec->getHeight() / scaleFactor ) );
-    }
 
     //if true, decoding to tmp frame which will be later scaled/converted to supported format
     const bool useTmpFrame =
@@ -510,11 +508,14 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     if (useTmpFrame)
     {
-        if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
-            QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
-        else {
-            if (!rescaleFrame(*m_tmpFrame, *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
-                return Status_Displayed;
+        if( !(dec->getDecoderCaps() & QnAbstractVideoDecoder::decodedPictureScaling) )
+        {
+            if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+                QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
+            else {
+                if (!rescaleFrame(*m_tmpFrame, *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
+                    return Status_Displayed;
+            }
         }
         outFrame->pkt_dts = m_tmpFrame->pkt_dts;
         outFrame->metadata = m_tmpFrame->metadata;

@@ -249,8 +249,8 @@ mfxStatus MFXSysMemFrameAllocator::alloc( mfxFrameAllocRequest* request, mfxFram
         for( int i=0; i<request->NumFrameSuggested; ++i )
         {
             SysMemoryFrameContext* mmid = new SysMemoryFrameContext();
-            mmid->width = ALIGN16( request->Info.Width );
-            mmid->height = ALIGN32( request->Info.Height );
+            mmid->width = ALIGN16_UP( request->Info.Width );
+            mmid->height = ALIGN32_UP( request->Info.Height );
             mmid->chromaFormat = request->Info.ChromaFormat;
             mmid->fourCC = request->Info.FourCC;
             if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV420 )
@@ -336,7 +336,6 @@ MFXDirect3DSurfaceAllocator::MFXDirect3DSurfaceAllocator( IDirect3D9Ex* direct3D
     m_adapterNumber( adapterNumber ),
     m_dc( NULL )
 {
-    //memset( &m_prevResponse, 0, sizeof(m_prevResponse) );
 }
 
 MFXDirect3DSurfaceAllocator::~MFXDirect3DSurfaceAllocator()
@@ -357,6 +356,9 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     //MFX_MEMTYPE_INTERNAL_FRAME, MFX_MEMTYPE_EXTERNAL_FRAME support:
         //for MFX_MEMTYPE_EXTERNAL_FRAME only increase ref count of allocation response (if already exists)
 
+    if( request->NumFrameSuggested == 0 )
+        return MFX_ERR_NONE;
+
     if( (request->Type & MFX_MEMTYPE_EXTERNAL_FRAME) > 0 &&
         getCachedResponse( request, response ) ) //checking, whether such request has already been processed
     {
@@ -369,27 +371,56 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     }
 
     DWORD renderTarget = 0;
+    DWORD dxvaType = 0;
     if( request->Type & MFX_MEMTYPE_DXVA2_DECODER_TARGET )
-        renderTarget = DXVA2_VideoDecoderRenderTarget;
+    {
+        dxvaType = DXVA2_VideoDecoderRenderTarget;
+    }
     else if( request->Type & MFX_MEMTYPE_DXVA2_PROCESSOR_TARGET )
-        renderTarget = DXVA2_VideoProcessorRenderTarget;
+    {
+        dxvaType = DXVA2_VideoProcessorRenderTarget;
+        //renderTarget = D3DUSAGE_RENDERTARGET;
+    }
     else
+    {
         return MFX_ERR_UNSUPPORTED;
+    }
 
     IDirect3DSurface9** surfaceArray = new IDirect3DSurface9*[request->NumFrameSuggested];
 
     for( int i = 0; i < 2; ++i )
     {
-        m_prevOperationResult = m_decoderService->CreateSurface(
-            request->Info.Width,
-            request->Info.Height,
-            request->NumFrameSuggested-1,   //CreateSurface creates BackBuffers+1 surfaces
-            (D3DFORMAT)MAKEFOURCC('N','V','1','2'),
-            D3DPOOL_DEFAULT,
-            0,
-            renderTarget,
-            surfaceArray,
-            NULL );
+        if( request->Type & MFX_MEMTYPE_DXVA2_PROCESSOR_TARGET )
+        {
+            for( int j = 0; j < request->NumFrameSuggested; ++j )
+            {
+                m_prevOperationResult = m_d3d9Device->CreateRenderTarget(
+                    request->Info.Width,
+                    request->Info.Height,
+                    (D3DFORMAT)MAKEFOURCC('N','V','1','2'),
+                    D3DMULTISAMPLE_NONE,
+                    0,
+                    TRUE,
+                    &surfaceArray[j],
+                    NULL );
+                if( m_prevOperationResult != S_OK )
+                    break;
+            }
+        }
+        else
+        {
+            m_prevOperationResult = m_decoderService->CreateSurface(
+                request->Info.Width,
+                request->Info.Height,
+                request->NumFrameSuggested-1,   //CreateSurface creates BackBuffers+1 surfaces
+                (D3DFORMAT)MAKEFOURCC('N','V','1','2'),
+                D3DPOOL_DEFAULT,
+                renderTarget,
+                dxvaType,
+                surfaceArray,
+                NULL );
+        }
+
         switch( m_prevOperationResult )
         {
             case S_OK:
@@ -499,6 +530,16 @@ bool MFXDirect3DSurfaceAllocator::initialize()
 bool MFXDirect3DSurfaceAllocator::initialized() const
 {
     return m_initialized;
+}
+
+IDirect3D9Ex* MFXDirect3DSurfaceAllocator::d3d9() const
+{
+    return m_direct3D9;
+}
+
+unsigned int MFXDirect3DSurfaceAllocator::adapterNumber() const
+{
+    return m_adapterNumber;
 }
 
 IDirect3DDevice9Ex* MFXDirect3DSurfaceAllocator::d3d9Device() const

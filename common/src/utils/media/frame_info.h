@@ -59,6 +59,8 @@ public:
     virtual SynchronizationContext* syncCtx() const = 0;
     //!If return value is \a false, access to picture data can lead to undefined behavour
     virtual bool isValid() const = 0;
+    //!Returns rect, that contains actual data
+    virtual QRect cropRect() const = 0;
 };
 
 //!Picture data stored in system memory

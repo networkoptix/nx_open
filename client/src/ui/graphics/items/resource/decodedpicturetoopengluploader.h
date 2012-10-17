@@ -16,12 +16,51 @@
 #include <QWaitCondition>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <utils/common/safepool.h>
+#include <utils/gl/glcontext.h>
 #include <utils/media/frame_info.h>
 
 
+class GLContext;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
 class QnGlRendererTexture;
+
+class DecodedPictureToOpenGLUploaderContextPool
+{
+public:
+    DecodedPictureToOpenGLUploaderContextPool();
+    virtual ~DecodedPictureToOpenGLUploaderContextPool();
+
+    //!Set id of window to use for gl context creation
+    void setPaintWindowHandle( WId paintWindowId );
+    WId paintWindowHandle() const;
+    //!Checks, whether there are any contexts in pool shared with \a parentContext
+    /*!
+        If there are no contexts shared with \a parentContext, creates one (in this case \a winID is used)
+        \param winID Passe to \a GLContext constructor
+        \param poolSizeIncrement Number of gl contexts to create if pool is empty. If < 0, pool decides itself how much context to create
+        \note It is recommended to call this method from GUI thread. In other case, behavour can be implementation-specific
+    */
+    bool ensureThereAreContextsSharedWith(
+        GLContext::SYS_GL_CTX_HANDLE parentContext,
+        WId winID = NULL,
+        int poolSizeIncrement = -1 );
+    /*!
+        If on pool shared with \a parentContexts, an empty pool is created and returned
+    */
+    SafePool<GLContext*, QSharedPointer<GLContext> >* getPoolOfContextsSharedWith( GLContext::SYS_GL_CTX_HANDLE parentContext ) const;
+
+    static DecodedPictureToOpenGLUploaderContextPool* instance();
+
+private:
+    mutable QMutex m_mutex;
+    GLContext::SYS_GL_CTX_HANDLE prevRootContext;
+    //map<parent context, pool of contexts shared with parent>
+    mutable std::map<GLContext::SYS_GL_CTX_HANDLE, SafePool<GLContext*, QSharedPointer<GLContext> >* > m_auxiliaryGLContextPool;
+    WId m_paintWindowId;
+    size_t m_optimalGLContextPoolSize;
+};
 
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
@@ -47,6 +86,8 @@ public:
         friend class DecodedPictureToOpenGLUploader;
 
     public:
+        SafePool<GLContext*, QSharedPointer<GLContext> >* glContextPool() const;
+        GLContext* glContext() const;
         PixelFormat colorFormat() const;
         int width() const;
         int height() const;
@@ -66,6 +107,8 @@ public:
     private:
         static const int TEXTURE_COUNT = 3;
 
+        SafePool<GLContext*, QSharedPointer<GLContext> >* const m_glContextPool;
+        GLContext* const m_glContext;
         PixelFormat m_colorFormat;
         int m_width;
         int m_height;
@@ -75,7 +118,10 @@ public:
         quint64 m_pts;
         QnMetaDataV1Ptr m_metadata;
 
-        UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
+        UploadedPicture(
+            DecodedPictureToOpenGLUploader* const uploader,
+            SafePool<GLContext*, QSharedPointer<GLContext> >* const _glContextPool,
+            GLContext* const _glContext );
         UploadedPicture( const UploadedPicture& );
         UploadedPicture& operator=( const UploadedPicture& );
         ~UploadedPicture();
@@ -100,13 +146,19 @@ public:
     };
 
     /*!
-        \param glContext Opengl context to use
+        \param mainContext Application's main gl context. Used to find address of opengl extension functions. Required, because \a QnGlFunctions is tied to \a QGLContext.
+            In future, this parameter should be removed (this will required \a QnGlFunctions refactoring)
+        \param mainContextHandle System-dependent handle of \a mainContext. This argument is introduced to allow \a DecodedPictureToOpenGLUploader
+            instanciation from non-GUI thread (since we can get gl context handle only in GUI thread)
         \param asyncDepth Number of additional uploaded picture textures to allocate so that decrease wait for rendering by decoder thread
         If \a asyncDepth is 0, only one uploded picture data is allocated so \a uploadDecodedPicture will block while GUI thread renders picture
 
         \note If \a asyncDepth is 0 then it is possible that getUploadedPicture() will return NULL (if the only gl buffer is currently used for uploading)
     */
-    DecodedPictureToOpenGLUploader( const QSharedPointer<QGLContext>& glContext, unsigned int asyncDepth = 1 );
+    DecodedPictureToOpenGLUploader(
+        const QGLContext* const mainContext,
+        GLContext::SYS_GL_CTX_HANDLE mainContextHandle,
+        unsigned int asyncDepth = 1 );
     ~DecodedPictureToOpenGLUploader();
 
     //!Uploads \a decodedPicture to opengl texture(s). Used by decoder thread
@@ -127,8 +179,6 @@ public:
         Renderer MUST call this method to signal that \a picture can be used for uploading next decoded frame
     */
     void pictureDrawingFinished( UploadedPicture* const picture ) const;
-    //!Returns used openGL context
-    const QSharedPointer<QGLContext>& getGLContext() const;
     void setForceSoftYUV( bool value );
     bool isForcedSoftYUV() const;
     int glRGBFormat() const;
@@ -139,6 +189,8 @@ public:
         In this method occures cleanup of all resources. Object is unusable futher...
     */
     void beforeDestroy();
+    void setYV12ToRgbShaderUsed( bool yv12SharedUsed );
+    void setNV12ToRgbShaderUsed( bool nv12SharedUsed );
 
     //!This method is called by asynchronous uploader when upload is done
     void pictureDataUploadSucceeded( const QSharedPointer<QnAbstractPictureDataRef>& picData, UploadedPicture* const picture );
@@ -150,7 +202,6 @@ private:
     friend class AsyncUploader;
 
     QSharedPointer<DecodedPictureToOpenGLUploaderPrivate> d;
-    QSharedPointer<QGLContext> m_glContext;
     int m_format;
     uchar* m_yuv2rgbBuffer;
     int m_yuv2rgbBufferLen;
@@ -164,6 +215,9 @@ private:
     mutable std::deque<UploadedPicture*> m_renderedPictures;
     mutable std::deque<UploadedPicture*> m_picturesWaitingRendering;
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
+    bool m_terminated;
+    bool m_yv12SharedUsed;
+    bool m_nv12SharedUsed;
 
     void updateTextures( UploadedPicture* const emptyPictureBuf, const QSharedPointer<CLVideoDecoderOutput>& curImg );
     /*!
@@ -173,6 +227,7 @@ private:
         \note Method is re-enterable
     */
     void uploadDataToGl(
+        GLContext* const glContext,
         UploadedPicture* const dest,
         PixelFormat format,
         unsigned int width,
@@ -181,6 +236,18 @@ private:
         int lineSizes[],
         bool isVideoMemory );
     bool usingShaderYuvToRgb() const;
+    bool usingShaderNV12ToRgb() const;
+    void releaseDecodedPicturePool( std::deque<UploadedPicture*>* const pool );
+};
+
+class AuxiliaryGLContextDeleter
+:
+    public QObject
+{
+    Q_OBJECT
+
+public:
+    virtual bool event( QEvent* e );
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H

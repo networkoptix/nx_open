@@ -82,10 +82,6 @@ bool QnGLRenderer::isPixelFormatSupported( PixelFormat pixfmt )
 QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpenGLUploader& decodedPictureProvider )
 :
     QnGlFunctions( context ),
-    /* Postpone private initialization until it is actually needed.
-     * This way if context is NULL, then we will pick the right context when
-     * paint event is delivered. */
-    m_context( context ),
     m_decodedPictureProvider( decodedPictureProvider ),
     m_brightness( 0 ),
     m_contrast( 0 ),
@@ -100,6 +96,7 @@ QnGLRenderer::QnGLRenderer( const QGLContext* context, const DecodedPictureToOpe
     /* Prepare shaders. */
     m_yuy2ToRgbShaderProgram.reset( new QnYuy2ToRgbShaderProgram(context) );
     m_yv12ToRgbShaderProgram.reset( new QnYv12ToRgbShaderProgram(context) );
+    //m_nv12ToRgbShaderProgram.reset( new QnNv12ToRgbShaderProgram(context) );
 
     glGetIntegerv( GL_MAX_TEXTURE_SIZE, &maxTextureSizeVal );
     cl_log.log( QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSizeVal), cl_logINFO );
@@ -147,7 +144,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 break;
 
             case PIX_FMT_YUV420P:
-                Q_ASSERT( usingShaderYuvToRgb() );
+                Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(
                     picLock->texCoords(),
                     picLock->glTextures()[0],
@@ -157,6 +154,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
                 break;
 
             case PIX_FMT_NV12:
+                Q_ASSERT( isNV12ToRgbShaderUsed() );
         	    drawNV12VideoTexture(
                     picLock->texCoords(),
                     picLock->glTextures()[0],
@@ -231,9 +229,8 @@ void QnGLRenderer::drawYV12VideoTexture(
     glEnable(GL_TEXTURE_2D);
     glCheckError("glEnable");
 
-    QnYv12ToRgbShaderProgram* prog = m_yv12ToRgbShaderProgram.data();
-	prog->bind();
-    prog->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+	m_yv12ToRgbShaderProgram->bind();
+    m_yv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
 
 	glActiveTexture(GL_TEXTURE2);
 	glCheckError("glActiveTexture");
@@ -252,48 +249,45 @@ void QnGLRenderer::drawYV12VideoTexture(
 
     drawBindedTexture( v_array, tx_array );
 
-    prog->release();
+    m_yv12ToRgbShaderProgram->release();
 }
 
 void QnGLRenderer::drawNV12VideoTexture(
 	const QVector2D& tex0Coords,
-	unsigned int tex0ID,
-	unsigned int tex1ID,
+	unsigned int yPlaneTexID,
+	unsigned int uvPlaneTexID,
 	const float* v_array )
 {
-    //TODO/IMPL
- //   float tx_array[8] = {
- //       0.0f, 0.0f,
- //       tex0Coords.x(), 0.0f,
- //       tex0Coords.x(), tex0Coords.y(),
- //       0.0f, tex0Coords.y()
- //   };
+    float tx_array[8] = {
+        0.0f, 0.0f,
+        tex0Coords.x(), 0.0f,
+        tex0Coords.x(), tex0Coords.y(),
+        0.0f, tex0Coords.y()
+    };
 
- //   glEnable(GL_TEXTURE_2D);
- //   glCheckError("glEnable");
+    glEnable(GL_TEXTURE_2D);
+    glCheckError("glEnable");
 
- //   QnYv12ToRgbShaderProgram* prog = m_yv12ToRgbShaderProgram.data();
-	//prog->bind();
-	//prog->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+	m_nv12ToRgbShaderProgram->bind();
+	//m_nv12ToRgbShaderProgram->setParameters( m_brightness / 256.0f, m_contrast, m_hue, m_saturation, m_decodedPictureProvider.opacity() );
+    m_nv12ToRgbShaderProgram->setYTexture( yPlaneTexID );
+    m_nv12ToRgbShaderProgram->setUVTexture( uvPlaneTexID );
+    m_nv12ToRgbShaderProgram->setOpacity( m_decodedPictureProvider.opacity() );
+    m_nv12ToRgbShaderProgram->setColorTransform( QnNv12ToRgbShaderProgram::colorTransform(QnNv12ToRgbShaderProgram::YuvEbu) );
 
-	//glActiveTexture(GL_TEXTURE2);
-	//glCheckError("glActiveTexture");
-	//glBindTexture(GL_TEXTURE_2D, tex2ID);
-	//glCheckError("glBindTexture");
+	glActiveTexture(GL_TEXTURE1);
+	glCheckError("glActiveTexture");
+	glBindTexture(GL_TEXTURE_2D, yPlaneTexID);
+	glCheckError("glBindTexture");
 
-	//glActiveTexture(GL_TEXTURE1);
-	//glCheckError("glActiveTexture");
-	//glBindTexture(GL_TEXTURE_2D, tex1ID);
-	//glCheckError("glBindTexture");
+	glActiveTexture(GL_TEXTURE0);
+	glCheckError("glActiveTexture");
+	glBindTexture(GL_TEXTURE_2D, uvPlaneTexID);
+	glCheckError("glBindTexture");
 
-	//glActiveTexture(GL_TEXTURE0);
-	//glCheckError("glActiveTexture");
-	//glBindTexture(GL_TEXTURE_2D, tex0ID);
-	//glCheckError("glBindTexture");
+    drawBindedTexture( v_array, tx_array );
 
- //   drawBindedTexture( v_array, tx_array );
-
- //   prog->release();
+    m_nv12ToRgbShaderProgram->release();
 }
 
 void QnGLRenderer::drawBindedTexture( const float* v_array, const float* tx_array )
@@ -331,11 +325,20 @@ QnMetaDataV1Ptr QnGLRenderer::lastFrameMetadata() const
     return m_lastDisplayedMetadata;
 }
 
-bool QnGLRenderer::usingShaderYuvToRgb() const
+bool QnGLRenderer::isYV12ToRgbShaderUsed() const
 {
     return (features() & QnGlFunctions::ArbPrograms)
         && (features() & QnGlFunctions::OpenGL1_3)
         && !(features() & QnGlFunctions::ShadersBroken)
         && !m_decodedPictureProvider.isForcedSoftYUV()
         && m_yv12ToRgbShaderProgram->isValid();
+}
+
+bool QnGLRenderer::isNV12ToRgbShaderUsed() const
+{
+    return (features() & QnGlFunctions::ArbPrograms)
+        && (features() & QnGlFunctions::OpenGL1_3)
+        && !(features() & QnGlFunctions::ShadersBroken)
+        && !m_decodedPictureProvider.isForcedSoftYUV();
+        //&& m_nv12ToRgbShaderProgram->isValid();
 }

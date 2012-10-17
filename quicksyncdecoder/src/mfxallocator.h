@@ -17,16 +17,26 @@
 #include <Dxva2api.h>
 
 
-template<class Numeric> Numeric ALIGN16( Numeric n )
+template<class Numeric> Numeric ALIGN16_UP( Numeric n )
 {
     Numeric tmp = n & 0x0F;
     return tmp == 0 ? n : (n - tmp + 16);
 }
 
-template<class Numeric> Numeric ALIGN32( Numeric n )
+template<class Numeric> Numeric ALIGN32_UP( Numeric n )
 {
     Numeric tmp = n & 0x1F;
     return tmp == 0 ? n : (n - tmp + 32);
+}
+
+template<class Numeric> Numeric ALIGN16_DOWN( Numeric n )
+{
+    return n & ~0x0F;
+}
+
+template<class Numeric> Numeric ALIGN32_DOWN( Numeric n )
+{
+    return n & ~0x1F;
 }
 
 //!Routes calls to func from \a mfxBufferAllocator to implementation of abstract methods
@@ -221,6 +231,9 @@ public:
     bool initialize();
     //!Returns true if D3D9 device was created and initialized successfully
     bool initialized() const;
+    //!Return value is not NULL only if \a initialized() returns \a true
+    IDirect3D9Ex* d3d9() const;
+    unsigned int adapterNumber() const;
     //!Return value is not NULL only if \a initialized() returns \a true
     IDirect3DDevice9Ex* d3d9Device() const;
     //!Return value is not NULL only if \a initialized() returns \a true

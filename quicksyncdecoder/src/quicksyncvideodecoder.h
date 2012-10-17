@@ -34,6 +34,8 @@
 #endif
 #include "mfxallocator.h"
 
+//!if defined, scale is performed with MFX, otherwise - by directx means (by rendering to surface with scaling)
+//#define SCALE_WITH_MFX
 //#define WRITE_INPUT_STREAM_TO_FILE_1
 //#define WRITE_INPUT_STREAM_TO_FILE_2
 //#define USE_ASYNC_IMPL
@@ -57,7 +59,7 @@ class QuickSyncVideoDecoder
 {
 public:
     /*!
-        Newly created session joins session \a parentSession
+        Newly created session joins session \a parentSession (if not NULL)
     */
     QuickSyncVideoDecoder(
         MFXVideoSession* const parentSession,
@@ -222,7 +224,9 @@ private:
     MyMFXVideoSession m_mfxSession;
     DecoderState m_state;
     std::auto_ptr<MFXVideoDECODE> m_decoder;
+#ifdef SCALE_WITH_MFX
     std::auto_ptr<MFXVideoVPP> m_processor;
+#endif
     mfxVideoParam m_srcStreamParam;
     mfxSyncPoint m_syncPoint;
     mfxBitstream m_inputBitStream;
@@ -284,7 +288,9 @@ private:
     bool init( mfxU32 codecID, mfxBitstream* seqHeader );
     bool initMfxSession();
     bool initDecoder( mfxU32 codecID, mfxBitstream* seqHeader );
+#ifdef SCALE_WITH_MFX
     bool initProcessor();
+#endif
 #ifdef USE_OPENCL
     bool initOpenCL();
 #endif
@@ -307,9 +313,12 @@ private:
     bool processingNeeded() const;
     void saveToAVFrame( CLVideoDecoderOutput* outFrame, const QSharedPointer<SurfaceContext>& decodedFrameCtx );
     /*!
-        \return true if sequence header has been read successfully
+        \param streamParams If not NULL than filled with stream parameters
+        \return \a MFX_ERR_NONE if sequence header has been read successfully
+        \note If \a streamParams not NULL, this method will not return \a MFX_ERR_NONE until it reads fps (this can require SEI of slice header), 
+            otherwise \a MFX_ERR_NONE is returned after reading sps & pps
     */
-    bool readSequenceHeader( mfxBitstream* const inputStream );
+    mfxStatus readSequenceHeader( mfxBitstream* const inputStream, mfxVideoParam* const streamParams = NULL );
     QString mfxStatusCodeToString( mfxStatus status ) const;
     QSharedPointer<SurfaceContext> getSurfaceCtxFromSurface( mfxFrameSurface1* const surf ) const;
     void resetMfxSession();
@@ -321,6 +330,10 @@ private:
         __m128i* yv12VPlane );
 #ifdef USE_OPENCL
     QString prevCLErrorText() const;
+#endif
+#ifndef SCALE_WITH_MFX
+    void initializeScaleSurfacePool();
+    mfxStatus scaleFrame( const mfxFrameSurface1& from, mfxFrameSurface1* const to );
 #endif
 };
 
