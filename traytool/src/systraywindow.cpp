@@ -101,17 +101,25 @@ QnSystrayWindow::QnSystrayWindow():
     trayIcon->show();
 
     setWindowTitle(tr("VMS settings"));
-    //resize(440, 300);
 
-    connect (&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
-    connect (&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
+    connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
+    connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
+    
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
 
-    ui->labelProductName->setText(QN_APPLICATION_NAME);
-    ui->labelProductRevision->setText(QN_APPLICATION_REVISION);
-    ui->labelProductVersion->setText(QN_APPLICATION_VERSION);
-    ui->labelFfmpegRevision->setText(QN_FFMPEG_VERSION);
+    ui->informationLabel->setText(
+        tr(
+            "<b>%1</b> version %2 (%3).<br />\n"
+            "Built for %4-%5 with %6."
+        ).
+        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
+        arg(QLatin1String(QN_APPLICATION_ARCH)).
+        arg(QLatin1String(QN_APPLICATION_COMPILER))
+    );
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)

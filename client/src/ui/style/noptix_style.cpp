@@ -21,10 +21,11 @@
 #include <ui/common/color_transformations.h>
 #include <ui/common/geometry.h>
 
+#include <ui/widgets/palette_widget.h>
+
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
-#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";

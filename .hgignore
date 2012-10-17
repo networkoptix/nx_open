@@ -148,3 +148,5 @@ android-client/**/gen/*
 
 launcher/x86
 launcher/x64
+android-client/android-main/target/**
+android-client/protobuf-classes/target/**
