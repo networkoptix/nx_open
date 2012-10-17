@@ -21,10 +21,11 @@
 #include <ui/common/color_transformations.h>
 #include <ui/common/geometry.h>
 
+#include <ui/widgets/palette_widget.h>
+
 #include "noptix_style_animator.h"
 #include "globals.h"
 #include "skin.h"
-#include "ui/widgets/palette_widget.h"
 
 namespace {
     const char *qn_hoveredPropertyName = "_qn_hovered";
@@ -212,6 +213,10 @@ void QnNoptixStyle::polish(QApplication *application) {
     palette.setColor(QPalette::Active, QPalette::Highlight, activeColor);
     palette.setColor(QPalette::Button, activeColor);
     application->setPalette(palette);
+
+    QnPaletteWidget *w = new QnPaletteWidget();
+    w->setPalette(palette);
+    w->show();
 
     QFont font;
     font.setPixelSize(12);
