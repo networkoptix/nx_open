@@ -62,7 +62,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_mutex(QMutex::Recursive),
     m_duplicateName(false),
     m_role(role),
-    m_lastAddIndex(0)
+    m_lastAddIndex(-1)
 {
 #ifdef _TEST_TWO_SERVERS
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/");
@@ -343,7 +343,6 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     m_lastAddIndex = itr - m_chunks.begin();
     if (m_lastAddIndex < m_chunks.size()-1)
         itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
-    m_lastAddIndex -= m_firstDeleteCount;
     QTextStream str(&m_file);
 
     str << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
@@ -357,7 +356,8 @@ void DeviceFileCatalog::updateDuration(int durationMs)
     Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
     //m_chunks.last().durationMs = durationMs;
-    m_chunks[m_lastAddIndex+m_firstDeleteCount].durationMs = durationMs;
+    if (m_lastAddIndex >= 0)
+        m_chunks[m_lastAddIndex].durationMs = durationMs;
     QTextStream str(&m_file);
     str << durationMs << '\n';
     str.flush();
@@ -392,6 +392,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
         emit firstDataRemoved(m_firstDeleteCount);
         m_chunks.erase(m_chunks.begin(), m_chunks.begin() + m_firstDeleteCount);
         m_firstDeleteCount = 0;
+        m_lastAddIndex -= m_firstDeleteCount;
     }
     for (int i = 0; i < m_chunks.size();)
     {
@@ -443,10 +444,12 @@ bool DeviceFileCatalog::deleteFirstRecord()
         m_firstDeleteCount = 0;
         emit firstDataRemoved(m_chunks.size());
         m_chunks.clear();
+        m_lastAddIndex = -1;
     }
     if (m_firstDeleteCount == DELETE_COEFF) {
         emit firstDataRemoved(DELETE_COEFF);
         m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
+        m_lastAddIndex -= DELETE_COEFF;
         m_firstDeleteCount = 0;
     }
     return true;
