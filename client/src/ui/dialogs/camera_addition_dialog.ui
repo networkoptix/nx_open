@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
+    <width>481</width>
     <height>284</height>
    </rect>
   </property>
@@ -204,7 +204,7 @@
           </sizepolicy>
          </property>
          <property name="text">
-          <string>Http P&amp;ort:</string>
+          <string>&amp;Discovery Port:</string>
          </property>
          <property name="buddy">
           <cstring>portSpinBox</cstring>
