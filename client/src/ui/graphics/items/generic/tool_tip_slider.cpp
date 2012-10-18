@@ -72,6 +72,7 @@ void QnToolTipSlider::init() {
     m_autoHideToolTip = true;
     m_sliderUnderMouse = false;
     m_toolTipUnderMouse = false;
+    m_pendingPositionUpdate = false;
 
     m_toolTipItemVisibilityAnimator = new VariantAnimator(this);
     m_toolTipItemVisibilityAnimator->setSpeed(2.0);
@@ -166,6 +167,8 @@ void QnToolTipSlider::updateToolTipText() {
 }
 
 void QnToolTipSlider::updateToolTipPosition() {
+    m_pendingPositionUpdate = false;
+
     if(!toolTipItem())
         return;
 
@@ -188,6 +191,9 @@ void QnToolTipSliderAnimationListener::tick(int) {
      * so we have to track it in animation handler (which gets invoked before the
      * paint event). */
     m_slider->updateToolTipOpacity();
+
+    if(m_slider->m_pendingPositionUpdate)
+        m_slider->updateToolTipPosition();
 }
 
 QString QnToolTipSlider::toolTipAt(const QPointF &) const {
@@ -254,7 +260,7 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
             updateToolTipVisibility();
             updateToolTipPosition();
         } else if(change == SliderMappingChange) {
-            updateToolTipPosition();
+            m_pendingPositionUpdate = true;
         }
     }
 }
@@ -304,6 +310,6 @@ void QnToolTipSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 void QnToolTipSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
 
-    updateToolTipPosition();
+    m_pendingPositionUpdate = true;
 }
 

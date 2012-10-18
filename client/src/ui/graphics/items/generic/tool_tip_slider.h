@@ -68,6 +68,7 @@ private:
     bool m_autoHideToolTip;
     bool m_sliderUnderMouse;
     bool m_toolTipUnderMouse;
+    bool m_pendingPositionUpdate;
     QPointF m_dragOffset;
 };
 
