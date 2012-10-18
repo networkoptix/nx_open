@@ -25,8 +25,8 @@
                 <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgDescription)" />
                 <Control Id="Title" Type="Text" X="15" Y="6" Width="210" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgTitle)" />
                 <Control Id="groupBox1" Type="GroupBox" Height="64" Width="141" X="10" Y="50" Text="Components" />
-                <Control Id="checkBox2" Type="CheckBox" Height="18" Width="128" X="25" Y="87" Text="HD Witness Client" Property="INSTALL_CLIENT" CheckBoxValue="1"/>
-                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="128" X="25" Y="64" Text="HD Witness Media Server" Property="INSTALL_SERVER" CheckBoxValue="1"/>
+                <Control Id="checkBox2" Type="CheckBox" Height="18" Width="128" X="25" Y="87" Text="${client.name}" Property="INSTALL_CLIENT" CheckBoxValue="1"/>
+                <Control Id="checkBox1" Type="CheckBox" Height="18" Width="128" X="25" Y="64" Text="${mediaserver.name}" Property="INSTALL_SERVER" CheckBoxValue="1"/>
             </Dialog>
 		</UI>
 	</Fragment>
