@@ -320,7 +320,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${client.name}"
+                            Key="Software\[Manufacturer]\${product.name}"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
