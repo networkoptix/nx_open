@@ -64,7 +64,6 @@ void QnCameraMotionMaskWidget::init() {
     m_controller.reset(new QnWorkbenchController(display));
 
     /* Disable unused instruments. */
-    m_controller->motionSelectionInstrument()->disable();
     m_controller->itemRightClickInstrument()->disable();
     m_controller->moveInstrument()->disable();
     m_controller->resizingInstrument()->disable();
@@ -77,23 +76,21 @@ void QnCameraMotionMaskWidget::init() {
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
     /* Create motion mask selection instrument. */
-    m_motionSelectionInstrument = new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument = m_controller->motionSelectionInstrument();//new MotionSelectionInstrument(this);
     m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::MouseBorder, qnGlobals->motionMaskMouseFrameColor());
-    display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
+    /* Create motion region floodfill instrument. */
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
-    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
-    ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
+    disconnect(m_motionSelectionInstrument, NULL,                                                                                   m_controller.data(),            NULL); // TODO: controller flags?
+    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),    this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                    this,                           SLOT(at_motionRegionCleared()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();

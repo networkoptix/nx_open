@@ -600,7 +600,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
     bool isCentral = false;
-    if (m_centralWidget != NULL || !m_streamSynchronizer->isRunning()) {
+    if (m_centralWidget != NULL /*|| !m_streamSynchronizer->isRunning()*/) {
         widget = m_centralWidget;
         isCentral = true;
     } else if(m_syncedWidgets.contains(m_currentMediaWidget)) {
@@ -818,6 +818,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         //period.addPeriod(calendarPeriod);
     }
 
+    // TODO: 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
+    // We need to set all targets every time.
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             if(QnCachingTimePeriodLoader *loader = this->loader(widget))
