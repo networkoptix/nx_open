@@ -229,6 +229,7 @@ public:
      */
     void setInfoTextFormat(const QString &infoTextFormat);
 
+    // TODO: #gdm move to private interface, update on rotation change.
     /**
      * Updates overlay widget's rotation.
      *

@@ -335,7 +335,7 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
-void QnResourceWidget::updateOverlayRotation(qreal rotation){
+void QnResourceWidget::updateOverlayRotation(qreal rotation) {
     while (rotation < -180)
         rotation += 360;
     while (rotation > 180)

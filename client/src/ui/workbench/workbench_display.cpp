@@ -1108,14 +1108,12 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        QEasingCurve easingCurve;
-
         /*
         QSizeF currentSize = widget->enclosingGeometry().size();
         QSizeF targetSize = enclosingGeometry.size();
         */
 
-        animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
+        animator->moveTo(enclosingGeometry, item->rotation());
     } else {
         animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);
