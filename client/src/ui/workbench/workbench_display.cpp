@@ -1387,8 +1387,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
                 if(widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
-            } else if (resource->hasFlags(QnResource::sync) || !resource->hasFlags(QnResource::live)) 
-            {
+            } else if (!resource->hasFlags(QnResource::live)) {
                 // default position in SyncPlay is LIVE. If current resource is synchronized and it is not camera (does not has live) seek to 0 (default position)
                 if(widget->display()->archiveReader())
                     widget->display()->archiveReader()->jumpTo(0, 0);
