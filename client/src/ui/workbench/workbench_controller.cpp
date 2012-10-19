@@ -380,12 +380,16 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     if (QnScreenRecorder::isSupported())
         window->addAction(action(Qn::ToggleScreenRecordingAction));
     window->addAction(action(Qn::ToggleSmartSearchAction));
+    window->addAction(action(Qn::ToggleInfoAction));
 
     connect(action(Qn::SelectAllAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_selectAllAction_triggered()));
     connect(action(Qn::StartSmartSearchAction), SIGNAL(triggered()),                                                                this,                           SLOT(at_startSmartSearchAction_triggered()));
     connect(action(Qn::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
     connect(action(Qn::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
     connect(action(Qn::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
+    connect(action(Qn::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
+    connect(action(Qn::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
+    connect(action(Qn::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
     connect(action(Qn::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
@@ -462,6 +466,11 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
 
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
+}
+
+void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display){
+    foreach(QnResourceWidget *widget, widgets)
+        widget->setOption(QnResourceWidget::DisplayInfo, display);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &direction) {
@@ -1257,8 +1266,10 @@ void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
 
     bool hidden = false;
     foreach(QnResourceWidget *widget, widgets)
-        if((widget->resource()->flags() & QnResource::network) && !(widget->options() & QnResourceWidget::DisplayMotion))
+        if((widget->resource()->flags() & QnResource::network) && !(widget->options() & QnResourceWidget::DisplayMotion)){
             hidden = true;
+            break;
+        }
 
     if(hidden) {
         at_startSmartSearchAction_triggered();
@@ -1274,6 +1285,33 @@ void QnWorkbenchController::at_clearMotionSelectionAction_triggered() {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
             mediaWidget->clearMotionSelection();
 }
+
+
+void QnWorkbenchController::at_showInfoAction_triggered() {
+    displayWidgetInfo(menu()->currentParameters(sender()).widgets(), true);
+}
+
+void QnWorkbenchController::at_hideInfoAction_triggered() {
+    displayWidgetInfo(menu()->currentParameters(sender()).widgets(), false);
+}
+
+void QnWorkbenchController::at_toggleInfoAction_triggered() {
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+
+    bool hidden = false;
+    foreach(QnResourceWidget *widget, widgets)
+        if(!(widget->options() & QnResourceWidget::DisplayInfo)){
+            hidden = true;
+            break;
+        }
+
+    if(hidden) {
+        at_showInfoAction_triggered();
+    } else {
+        at_hideInfoAction_triggered();
+    }
+}
+
 
 void QnWorkbenchController::at_maximizeItemAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();

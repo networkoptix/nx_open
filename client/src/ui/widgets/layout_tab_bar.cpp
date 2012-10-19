@@ -142,8 +142,11 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(menu->isEmpty())
         return;
 
-    /* Run menu. */
-    menu->exec(event->globalPos());
+    /** 
+     * Note that we cannot use event->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene.
+     */
+    menu->exec(QCursor::pos());
 }
 
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){

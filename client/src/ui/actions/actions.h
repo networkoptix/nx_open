@@ -406,6 +406,21 @@ namespace Qn {
          */
         Rotate270Action,
 
+        /**
+         * Displays info widget on all selected items
+         */
+        ShowInfoAction,
+
+        /**
+         * Hides info widget on all selected items
+         */
+        HideInfoAction,
+
+        /**
+         * Hides info widget if it is visible on all items, otherwise displays on all items
+         */
+        ToggleInfoAction,
+
         /* Layout actions. */
 
         /**

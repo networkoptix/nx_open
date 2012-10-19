@@ -45,12 +45,16 @@ public:
     int getGridMaxFps();
     bool isSecondaryStreamReserver() const;
 
+    /** Returns true if there is at least one "record-motion" square on the grid */
+    bool hasMotionOnGrid() const;
+
     // TODO
     QnWorkbenchContext *context() const { return m_context; }
     void setContext(QnWorkbenchContext *context);
 
 signals:
     void scheduleTasksChanged();
+    void recordingSettingsChanged();
     void scheduleEnabledChanged();
     void moreLicensesRequested();
     void gridParamsChanged();
@@ -62,6 +66,7 @@ private slots:
     void updateMotionButtons();
     void updatePanicLabelText();
     void updateLicensesButtonVisible();
+    void updateRecordSpinboxes();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();

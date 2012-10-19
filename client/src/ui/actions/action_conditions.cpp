@@ -82,6 +82,25 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
     return Qn::InvisibleAction;
 }
 
+Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
+            continue;
+
+        if (!widget->isInfoButtonVisible())
+            continue;
+
+        if(m_hasRequiredDisplayInfoValue) {
+            if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayInfo) == m_requiredDisplayInfoValue)
+                return Qn::EnabledAction;
+        } else {
+            return Qn::EnabledAction;
+        }
+    }
+
+    return Qn::InvisibleAction;
+}
+
 Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResourceWidgetList &widgets) {
     bool hasDisplayedGrid = false;
 

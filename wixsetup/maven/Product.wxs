@@ -322,7 +322,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${client.name}"
+                            Key="Software\[Manufacturer]\${product.name}"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
@@ -337,7 +337,7 @@
                             Win64="no"/>
         </Property>
         
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Debug\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />

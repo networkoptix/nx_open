@@ -202,6 +202,7 @@ public:
 
     QnActionBuilder childFactory(QnActionFactory *childFactory) {
         m_action->setChildFactory(childFactory);
+        m_action->setFlags(m_action->flags() | Qn::RequiresChildren);
 
         return *this;
     }
@@ -254,7 +255,10 @@ public:
             m_manager->registerAction(action);
         }
 
-        m_actionStack.back()->addChild(action);
+        QnAction *parentAction = m_actionStack.back();
+        parentAction->addChild(action);
+        parentAction->setFlags(parentAction->flags() | Qn::RequiresChildren);
+
         m_lastAction = action;
         if (m_currentGroup)
             m_currentGroup->addAction(action);
@@ -693,6 +697,24 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
+    factory(Qn::ShowInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Show Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(false, this));
+
+    factory(Qn::HideInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Hide Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(true, this));
+
+    factory(Qn::ToggleInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
@@ -892,6 +914,10 @@ QnActionManager::QnActionManager(QObject *parent):
         factory.endGroup();
 
     } factory.endSubMenu();
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget).
@@ -1195,7 +1221,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 continue;
 
             QMenu *menu = newMenuRecursive(action, scope, parameters);
-            if(!menu && (action->flags() & Qn::RequiresChildren))
+            if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
                 continue;
 
             QString replacedText;
@@ -1294,13 +1320,13 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId
             return true;
         }
 
-        if(action->menu() != NULL) {
-            bool success = redirectActionRecursive(action->menu(), sourceId, targetAction);
-            
-            if(success && action->menu()->isEmpty())
-                menu->removeAction(action);
+        if(action->menu()) {
+            if(redirectActionRecursive(action->menu(), sourceId, targetAction)) {
+                if(action->menu()->isEmpty())
+                    menu->removeAction(action);
 
-            return success;
+                return true;
+            }
         }
     }
         

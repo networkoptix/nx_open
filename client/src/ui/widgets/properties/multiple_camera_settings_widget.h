@@ -62,6 +62,7 @@ signals:
 private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_enableAudioCheckBox_clicked();
