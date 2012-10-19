@@ -27,12 +27,12 @@
      </property>
      <item>
       <property name="text">
-       <string>Automatic activation via Internet</string>
+       <string>Automatic Activation via Internet</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Manual activation</string>
+       <string>Manual Activation</string>
       </property>
      </item>
     </widget>
@@ -77,7 +77,7 @@ p, li { white-space: pre-wrap; }
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Serial key:</string>
+        <string>Serial Key:</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -120,7 +120,7 @@ p, li { white-space: pre-wrap; }
      <item row="2" column="0">
       <widget class="QLabel" name="activationKeyLabel">
        <property name="text">
-        <string>Activation key:</string>
+        <string>Activation Key:</string>
        </property>
       </widget>
      </item>
@@ -167,7 +167,7 @@ p, li { white-space: pre-wrap; }
      <item row="4" column="0">
       <widget class="QLabel" name="activationKeyFileLabel">
        <property name="text">
-        <string>Activation key file:</string>
+        <string>Activation Key File:</string>
        </property>
       </widget>
      </item>

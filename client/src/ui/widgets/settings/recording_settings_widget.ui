@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>520</width>
-    <height>457</height>
+    <height>480</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,7 +97,7 @@
       <item>
        <widget class="QCheckBox" name="captureCursorCheckBox">
         <property name="text">
-         <string>Capture cursor</string>
+         <string>Capture Cursor</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -116,7 +116,7 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Encoder quality:</string>
+         <string>Recording Quality:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -226,7 +226,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Balanced</string>
+          <string>Average</string>
          </property>
         </item>
         <item>
@@ -255,7 +255,7 @@
    <item>
     <widget class="QGroupBox" name="groupBox_4">
      <property name="title">
-      <string>Audio grabbing</string>
+      <string>Audio Grabbing</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -288,7 +288,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Primary device:</string>
+           <string>Primary Device:</string>
           </property>
          </widget>
         </item>
@@ -342,7 +342,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Secondary device:</string>
+           <string>External Device:</string>
           </property>
          </widget>
         </item>
