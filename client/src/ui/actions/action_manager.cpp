@@ -342,6 +342,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Delayed Drop Resources"));
 
+    factory(Qn::InstantDropResourcesAction).
+        flags(Qn::NoTarget).
+        text(tr("Instant Drop Resources"));
+
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).

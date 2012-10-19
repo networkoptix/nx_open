@@ -78,6 +78,16 @@ namespace Qn {
         DelayedDropResourcesAction,
 
         /**
+         * Instantly drops provided serialized resources on the current layout.
+         *
+         * Parameters:
+         *
+         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * QnMimeData representation of a set of resources.
+         */
+        InstantDropResourcesAction,
+
+        /**
          * Moves cameras from one server to another.
          * 
          * Parameters.
