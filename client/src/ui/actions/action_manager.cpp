@@ -693,6 +693,24 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
+    factory(Qn::ShowInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Show Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(false, this));
+
+    factory(Qn::HideInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Hide Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(true, this));
+
+    factory(Qn::ToggleInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
@@ -892,6 +910,10 @@ QnActionManager::QnActionManager(QObject *parent):
         factory.endGroup();
 
     } factory.endSubMenu();
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget).

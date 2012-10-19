@@ -115,6 +115,27 @@ private:
     bool m_requiredGridDisplayValue;
 };
 
+class QnDisplayInfoActionCondition: public QnActionCondition {
+public:
+    QnDisplayInfoActionCondition(bool requiredDisplayInfoValue, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_hasRequiredDisplayInfoValue(true),
+        m_requiredDisplayInfoValue(requiredDisplayInfoValue)
+    {}
+
+    QnDisplayInfoActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_hasRequiredDisplayInfoValue(false),
+        m_requiredDisplayInfoValue(false)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+
+private:
+    bool m_hasRequiredDisplayInfoValue;
+    bool m_requiredDisplayInfoValue;
+};
+
 class QnClearMotionSelectionActionCondition: public QnActionCondition {
 public:
     QnClearMotionSelectionActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}

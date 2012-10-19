@@ -103,6 +103,7 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
+    void displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display);
 
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
@@ -149,6 +150,9 @@ protected slots:
     void at_stopSmartSearchAction_triggered();
     void at_toggleSmartSearchAction_triggered();
     void at_clearMotionSelectionAction_triggered();
+    void at_showInfoAction_triggered();
+    void at_hideInfoAction_triggered();
+    void at_toggleInfoAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);
