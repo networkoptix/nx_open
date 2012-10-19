@@ -11,3 +11,4 @@ CheckPorts
 FindFreePorts
 FixServerFolder
 FixClientFolder
+CopyMediaServerProfile

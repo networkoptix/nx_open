@@ -232,7 +232,7 @@ int qnMain(int argc, char *argv[])
     QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
-    QString authenticationString, delayedDrop, logLevel;
+    QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
     bool devBackgroundEditable = false;
     bool skipMediaFolderScan = false;
@@ -242,6 +242,7 @@ int qnMain(int argc, char *argv[])
     commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
     commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
@@ -444,6 +445,13 @@ int qnMain(int argc, char *argv[])
 
         QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
         context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+    }
+
+    if (!instantDrop.isEmpty()){
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
+        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
     }
 
 #ifdef _DEBUG

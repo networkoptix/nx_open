@@ -12,8 +12,10 @@
 
         <?if $(var.arch) = x86?>
         <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+        <?define SystemFolderActual = "SystemFolder"?>
         <?else?>
         <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+        <?define SystemFolderActual = "System64Folder"?>
         <?endif?>
         
         <!-- Wix Variables -->
@@ -341,6 +343,7 @@
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
+        <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
@@ -383,6 +386,9 @@
                       Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
+        
+        <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
+            Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
         
         <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
                       Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
@@ -469,12 +475,32 @@
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            
+            <Custom Action="CopyMediaServerProfile_Cmd" After="InitDatabaseAction"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            
             <Custom Action="LaunchTrayTool" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
+            
+            <Directory Id="$(var.SystemFolderActual)">
+                <Directory Id="sysfoconfig" Name="config">
+                    <Directory Id="sysfoprofile" Name="systemprofile">
+                        <Directory Id="sysfoappda" Name="AppData">
+                            <Directory Id="sysfolocal" Name="Local">
+                                <Directory Id="sysfocona" Name="${company.name}">
+                                    <Component Id="sysfomediaservercomponent" Guid="{07B8C08D-2EDC-4b3a-892D-C75E799B6DF5}" >
+                                        <CreateFolder Directory="sysfocona"/>
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
             
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
@@ -856,6 +882,7 @@
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerSigar"/>
+            <ComponentRef Id="sysfomediaservercomponent"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
