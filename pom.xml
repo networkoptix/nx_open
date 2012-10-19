@@ -13,6 +13,7 @@
 	</scm>	
 
 	<properties>
+		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
@@ -157,6 +158,7 @@
 								</goals>
 								<configuration>
 									<outputDirectory>${project.build.directory}</outputDirectory>
+									<skip>${unpack.skip}</skip>
 								</configuration>
 							</execution>
 						</executions>

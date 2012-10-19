@@ -172,6 +172,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setDecorationsVisible())); //ugly hack, bind order is important
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
@@ -493,7 +494,13 @@ bool QnResourceWidget::isInfoVisible() const {
     return !qFuzzyIsNull(m_footerWidget->opacity());
 }
 
+bool QnResourceWidget::isInfoButtonVisible() const {
+    return calculateButtonsVisibility() & InfoButton;
+}
+
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    setOption(DisplayInfo, visible);
+
     qreal opacity = visible ? 1.0 : 0.0;
 
     if(animate) {
@@ -809,7 +816,7 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isDecorationsVisible())
-        setDecorationsVisible(true);
+        setDecorationsVisible();
 
     base_type::hoverMoveEvent(event);
 }
@@ -821,6 +828,12 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
+void QnResourceWidget::optionsChangedNotify(Options changedFlags){
+    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+        setInfoVisible(options() & DisplayInfo);
+        setDecorationsVisible(options() & DisplayInfo);
+    }
+}
 void QnResourceWidget::at_iconButton_visibleChanged() {
     if(m_iconButton->isVisible()) {
         m_headerLayout->insertItem(0, m_iconButton);

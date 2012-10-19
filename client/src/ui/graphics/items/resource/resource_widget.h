@@ -32,13 +32,13 @@ class QnImageButtonBar;
 class GraphicsLabel;
 
 class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
-    Q_OBJECT;
-    Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
-    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
-    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
-    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
-    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
-    Q_FLAGS(Options Option);
+    Q_OBJECT
+    Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
+    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
+    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
+    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
+    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
+    Q_FLAGS(Options Option)
 
     typedef Shaded<Instrumented<GraphicsWidget> > base_type;
 
@@ -51,15 +51,16 @@ public:
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x20, // TODO
         ControlPtz                  = 0x40, // TODO
+        DisplayInfo                 = 0x80  /** Whether info widget is to be displayed. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
     enum Button {
         CloseButton                 = 0x1,
         InfoButton                  = 0x2,
-        RotateButton                = 0x4,
+        RotateButton                = 0x4
     };
-    Q_DECLARE_FLAGS(Buttons, Button);
+    Q_DECLARE_FLAGS(Buttons, Button)
 
     /**
      * Constructor.
@@ -238,10 +239,12 @@ public:
     void updateOverlayRotation(qreal rotation);
 
     bool isDecorationsVisible() const;
-    Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
+    Q_SLOT void setDecorationsVisible(bool visible = true, bool animate = true);
 
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
+
+    bool isInfoButtonVisible() const;
 
     using base_type::mapRectToScene;
 
@@ -284,7 +287,7 @@ protected:
 
     const QSize &channelScreenSize() const;
     void setChannelScreenSize(const QSize &size);
-    virtual void channelScreenSizeChangedNotify() {};
+    virtual void channelScreenSizeChangedNotify() {}
 
     Overlay channelOverlay(int channel) const;
     void setChannelOverlay(int channel, Overlay overlay);
@@ -312,7 +315,7 @@ protected:
     void setChannelLayout(const QnResourceVideoLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
-    virtual void optionsChangedNotify(Options changedFlags) { Q_UNUSED(changedFlags); }
+    virtual void optionsChangedNotify(Options changedFlags);
 
     int channelCount() const;
     QRectF channelRect(int channel) const;

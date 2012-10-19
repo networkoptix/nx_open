@@ -544,6 +544,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
     }
+    base_type::optionsChangedNotify(changedFlags);
 }
 
 QString QnMediaResourceWidget::calculateInfoText() const {
