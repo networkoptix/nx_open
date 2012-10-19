@@ -93,21 +93,6 @@ public:
 signals:
     void motionSelectionChanged();
 
-private slots:
-    void at_renderer_sourceSizeChanged(const QSize &size);
-    void at_resource_resourceChanged();
-    void at_searchButton_toggled(bool checked);
-    void at_ptzButton_toggled(bool checked);
-    void at_zoomInButton_pressed();
-    void at_zoomInButton_released();
-    void at_zoomOutButton_pressed();
-    void at_zoomOutButton_released();
-
-    void at_replyReceived(int status, int handle);
-    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
-
-    void at_camDisplay_liveChanged();
-
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
 
@@ -140,8 +125,25 @@ protected:
 
     Q_SIGNAL void updateInfoTextLater();
 
+private slots:
+    void at_renderer_sourceSizeChanged(const QSize &size);
+    void at_resource_resourceChanged();
+    void at_searchButton_toggled(bool checked);
+    void at_ptzButton_toggled(bool checked);
+    void at_zoomInButton_pressed();
+    void at_zoomInButton_released();
+    void at_zoomOutButton_pressed();
+    void at_zoomOutButton_released();
+
+    void at_replyReceived(int status, int handle);
+    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
+
+    void at_camDisplay_liveChanged();
+
 private:
     void sendZoomAsync(qreal zoomSpeed);
+    Q_SLOT void updateIconButton();
+    int currentRecordingMode();
 
 private:
     /** Media resource. */

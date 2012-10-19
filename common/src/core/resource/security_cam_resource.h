@@ -30,7 +30,6 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;

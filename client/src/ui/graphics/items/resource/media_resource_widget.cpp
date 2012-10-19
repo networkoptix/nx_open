@@ -1,11 +1,13 @@
 #include "media_resource_widget.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/synctime.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -110,8 +112,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     buttonBar()->addButton(PtzButton, ptzButton);
     buttonBar()->addButton(ZoomInButton, zoomInButton);
     buttonBar()->addButton(ZoomOutButton, zoomOutButton);
+    
+    if(m_camera) {
+        QTimer *timer = new QTimer(this);
+        connect(timer, SIGNAL(timeout()), this, SLOT(updateIconButton()));
+        timer->start(1000 * 60); /* Update icon button every minute. */
+    }
+
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
+    updateIconButton();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -495,6 +505,52 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
 
         m_connection->asyncSetParam(m_camera, params, this, SLOT(at_replyReceived(int, const QList<QPair<QString, bool> > &)));
     }
+}
+
+void QnMediaResourceWidget::updateIconButton() {
+    if(!m_camera) {
+        iconButton()->setVisible(false);
+        return;
+    }
+
+    iconButton()->setVisible(true);
+    
+    switch(currentRecordingMode()) {
+    case QnScheduleTask::RecordingType_Never:
+        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
+        iconButton()->setToolTip(tr("Not recording."));
+        break;
+    case QnScheduleTask::RecordingType_Run:
+        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
+        iconButton()->setToolTip(tr("Recording everything."));
+        break;
+    case QnScheduleTask::RecordingType_MotionOnly:
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
+        iconButton()->setToolTip(tr("Recording motion only."));
+        break;
+    case QnScheduleTask::RecordingType_MotionPlusLQ:
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
+        iconButton()->setToolTip(tr("Recording motion and low quality."));
+        break;
+    default:
+        iconButton()->setVisible(false);
+        break;
+    }
+}
+
+int QnMediaResourceWidget::currentRecordingMode() {
+    if(!m_camera)
+        return QnScheduleTask::RecordingType_Never;
+
+    QDateTime dateTime = qnSyncTime->currentDateTime();
+    int dayOfWeek = dateTime.date().dayOfWeek();
+    int seconds = QTime().secsTo(dateTime.time());
+
+    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
+        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
+            return task.getRecordingType();
+
+    return QnScheduleTask::RecordingType_Never;
 }
 
 

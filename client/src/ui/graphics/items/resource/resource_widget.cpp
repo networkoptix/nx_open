@@ -193,7 +193,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_iconButton->setVisible(false);
     connect(m_iconButton, SIGNAL(visibleChanged()), this, SLOT(at_iconButton_visibleChanged()));
 
-    QGraphicsLinearLayout *m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_headerLayout->setSpacing(2.0);
     m_headerLayout->addItem(m_headerLeftLabel);

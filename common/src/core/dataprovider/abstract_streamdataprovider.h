@@ -55,17 +55,17 @@ public:
     double getSpeed() const;
 
     void disconnectFromResource();
+
 signals:
     void videoParamsChanged(AVCodecContext * codec);
     void slowSourceHint();
+
 protected:
     virtual void putData(QnAbstractDataPacketPtr data);
     void beforeDisconnectFromResource();
+
 protected:
-
     QList<QnAbstractDataConsumer*> m_dataprocessors;
-
-
     mutable QMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
 };
