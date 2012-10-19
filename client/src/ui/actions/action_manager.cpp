@@ -1294,13 +1294,13 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId
             return true;
         }
 
-        if(action->menu() != NULL) {
-            bool success = redirectActionRecursive(action->menu(), sourceId, targetAction);
-            
-            if(success && action->menu()->isEmpty())
-                menu->removeAction(action);
+        if(action->menu()) {
+            if(redirectActionRecursive(action->menu(), sourceId, targetAction)) {
+                if(action->menu()->isEmpty())
+                    menu->removeAction(action);
 
-            return success;
+                return true;
+            }
         }
     }
         

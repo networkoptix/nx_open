@@ -16,6 +16,7 @@
 
 	<properties>
 		<buildLib/>
+		<product.title>${project.name}</product.title>		
 	</properties>
 
 	<build>

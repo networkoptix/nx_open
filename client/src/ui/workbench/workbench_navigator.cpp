@@ -200,6 +200,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     updateLines();
+    updateCalendar();
     updateScrollBarFromSlider();
     updateTimeSliderWindowSizePolicy();
 } 
@@ -647,6 +648,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     updateCurrentWidgetFlags();
     updateLines();
+    updateCalendar();
 
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget) {
         m_sliderDataInvalid = true;
@@ -891,8 +893,12 @@ void QnWorkbenchNavigator::updateLines() {
 }
 
 void QnWorkbenchNavigator::updateCalendar(){
-    if (m_calendar)
+    if (!m_calendar)
+        return;
+    if(m_currentWidgetFlags & WidgetSupportsPeriods)
         m_calendar->setCurrentWidgetIsCentral(m_currentWidgetIsCentral);
+    else
+        m_calendar->setCurrentWidgetIsCentral(false);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
@@ -1183,8 +1189,10 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
         updateCentralWidget();
 
-    if(role == Qn::ZoomedRole)
+    if(role == Qn::ZoomedRole){
         updateLines();
+        updateCalendar();
+    }
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {

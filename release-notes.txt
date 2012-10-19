@@ -25,13 +25,14 @@ Improvements:
  - "Hide Panel" context menu items are added to each panel 
  - If zoom a video in fullscreen mode left and right click can be used for movement (used to be right click only)
  - If an item goes to fullscreen all panels are hidden
- - Saved connections list should display last stored connections first
+ - Saved connections list displays last stored connections first
  - RAM Usage is displayed if monitor Media Server status
  - Calendar search will move out after user picks a date
  - LIVE icon is displayed on item's panel if viewing live on a corresponding camera
  - HQ/LQ is shown on panels depending on current dual-streaming quality
  - If connected to EC Main Menu displays "Connect to Another Server"
  - Max # of items is increased (64) for x64 platforms
+ - If select several items and press "X" all items were closed. Now only one is.
  - General and Network tabs are merged in Camera Settings
  - Screen recording icon is introduced in top right corner
  - Waiting circles are replaced to "LOADING... + circles"
@@ -43,7 +44,7 @@ Improvements:
  - New button on the top bar opens a drop-down menu with all saved layouts available for this user
  - Selection (selected items) is saved in layouts
  - Cameras and servers IP are shown in Tree
- - Ping button is added to camera's Network Settings form
+ - Ping button is added to camera's Network Settings section
  - It is possible to configure transport settings for Linux (RTP over UDP or TCP). Earlier it was possible for Windows only.
  - Installer is improved:
    - Desktop shortcut is optional
@@ -98,15 +99,15 @@ Improvements:
  - All Linux packages can be installed in Ubuntu Software Center.
  - Media Server is using a single port for HTTP and RTSP.
  - Now it is possible to install different customizations of HD Withess on a single computer.
- - Stored connections form is removes, last used connections are stored automagically.
+ - Stored connections form is removed, last used connections are stored automatically.
  - Onvif support is greatly improved.
  - Playback is optimized.
  - If uninstall and reinstall the system, Media Server storages configuration will be restored.
  - It is possible to delete database during uninstall.
  - Look and Feel of the Interface is improved.
- - Server settings form is redesigned.
+ - Server Settings form is redesigned.
  - Password field is always empty if open login dialog.
- - If discover Digital Watchdog set default login credentials are being tried.
+ - If discover Digital Watchdog then default login credentials are being tried.
  - Non-indexed local files (outside media folders) are added in Tree after client restart if a layout that contains such items is opened.
  - If several media servers were hosted on EC client could acquire traffic through proxy for all servers only. Now not: one server can be accessed directly and another one - via Media Proxy. 
  

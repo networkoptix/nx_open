@@ -130,7 +130,7 @@ void LicenseWidget::at_activationTypeComboBox_currentIndexChanged() {
 }
 
 void LicenseWidget::at_browseLicenseFileButton_clicked() {
-    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open License file")));
+    QScopedPointer<QFileDialog> dialog(new QFileDialog(this, tr("Open License File")));
     dialog->setNameFilters(QStringList() << tr("All files (*.*)"));
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
     dialog->setFileMode(QFileDialog::ExistingFile);

@@ -85,6 +85,7 @@ private slots:
     void at_dbDataChanged();
     void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
