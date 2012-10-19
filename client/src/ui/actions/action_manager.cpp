@@ -202,6 +202,7 @@ public:
 
     QnActionBuilder childFactory(QnActionFactory *childFactory) {
         m_action->setChildFactory(childFactory);
+        m_action->setFlags(m_action->flags() | Qn::RequiresChildren);
 
         return *this;
     }
@@ -254,7 +255,10 @@ public:
             m_manager->registerAction(action);
         }
 
-        m_actionStack.back()->addChild(action);
+        QnAction *parentAction = m_actionStack.back();
+        parentAction->addChild(action);
+        parentAction->setFlags(parentAction->flags() | Qn::RequiresChildren);
+
         m_lastAction = action;
         if (m_currentGroup)
             m_currentGroup->addAction(action);
@@ -1195,7 +1199,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 continue;
 
             QMenu *menu = newMenuRecursive(action, scope, parameters);
-            if(!menu && (action->flags() & Qn::RequiresChildren))
+            if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
                 continue;
 
             QString replacedText;
