@@ -51,6 +51,7 @@ public:
 
 signals:
     void scheduleTasksChanged();
+    void recordingSettingsChanged();
     void scheduleEnabledChanged();
     void moreLicensesRequested();
     void gridParamsChanged();

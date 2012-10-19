@@ -52,6 +52,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
@@ -684,6 +685,13 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
 
     m_hasScheduleChanges = true;
     m_hasControlsChanges = false;
+}
+
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged(){
+    at_dbDataChanged();
+    at_cameraDataChanged();
+
+    m_hasScheduleChanges = true;
 }
 
 void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
