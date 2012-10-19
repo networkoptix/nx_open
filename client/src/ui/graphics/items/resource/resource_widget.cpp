@@ -139,6 +139,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         setPalette(palette);
     }
 
+
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
     m_headerLeftLabel->setAcceptedMouseButtons(0);
@@ -185,16 +186,22 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
 
-    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerLeftLabel);
-    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    headerLayout->addItem(m_headerRightLabel);
-    headerLayout->addItem(m_buttonBar);
+    m_iconButton = new QnImageButtonWidget();
+    m_iconButton->setParent(this);
+    m_iconButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setVisible(false);
+    connect(m_iconButton, SIGNAL(visibleChanged()), this, SLOT(at_iconButton_visibleChanged()));
+
+    QGraphicsLinearLayout *m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->setSpacing(2.0);
+    m_headerLayout->addItem(m_headerLeftLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_headerRightLabel);
+    m_headerLayout->addItem(m_buttonBar);
 
     m_headerWidget = new GraphicsWidget();
-    m_headerWidget->setLayout(headerLayout);
+    m_headerWidget->setLayout(m_headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
     {
@@ -212,6 +219,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
+
 
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
@@ -267,6 +275,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+
 
     /* Run handlers. */
     updateTitleText();
@@ -812,5 +821,11 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
-
+void QnResourceWidget::at_iconButton_visibleChanged() {
+    if(m_iconButton->isVisible()) {
+        m_headerLayout->insertItem(0, m_iconButton);
+    } else {
+        m_headerLayout->removeItem(m_iconButton);
+    }
+}
 

@@ -302,6 +302,10 @@ protected:
         return m_buttonBar;
     }
 
+    QnImageButtonWidget *iconButton() const {
+        return m_iconButton;
+    }
+
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
@@ -319,6 +323,8 @@ protected:
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
+
+    Q_SLOT void at_iconButton_visibleChanged();
 
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
@@ -378,10 +384,12 @@ private:
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
+    QGraphicsLinearLayout *m_headerLayout;
     GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLeftLabel;
     GraphicsLabel *m_headerRightLabel;
     QnImageButtonBar *m_buttonBar;
+    QnImageButtonWidget *m_iconButton;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
     GraphicsWidget *m_footerWidget;
