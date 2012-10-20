@@ -11,4 +11,8 @@ bool IsPortRangeAvailable(int firstPort, int count);
 void InitWinsock();
 void FinishWinsock();
 
+int CopyDirectory(const CAtlString &refcstrSourceDirectory,
+                  const CAtlString &refcstrDestinationDirectory);
+
+
 #endif // _CUSTOM_ACTIONS_UTILS_H_

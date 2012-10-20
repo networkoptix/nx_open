@@ -78,6 +78,16 @@ namespace Qn {
         DelayedDropResourcesAction,
 
         /**
+         * Instantly drops provided serialized resources on the current layout.
+         *
+         * Parameters:
+         *
+         * <tt>QByteArray SerializedResourcesParameter</tt> --- a serialized
+         * QnMimeData representation of a set of resources.
+         */
+        InstantDropResourcesAction,
+
+        /**
          * Moves cameras from one server to another.
          * 
          * Parameters.
@@ -405,6 +415,21 @@ namespace Qn {
          * Rotates item to 270 degrees clockwise
          */
         Rotate270Action,
+
+        /**
+         * Displays info widget on all selected items
+         */
+        ShowInfoAction,
+
+        /**
+         * Hides info widget on all selected items
+         */
+        HideInfoAction,
+
+        /**
+         * Hides info widget if it is visible on all items, otherwise displays on all items
+         */
+        ToggleInfoAction,
 
         /* Layout actions. */
 

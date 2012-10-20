@@ -169,6 +169,8 @@ protected:
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
+    void openResourcesInNewWindow(const QnResourceList &resources);
+
     void openNewWindow(const QStringList &args);
 
     /**
@@ -189,6 +191,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
+    void submitInstantDrop(QnMimeData &data);
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
@@ -228,6 +231,7 @@ protected slots:
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
     void at_delayedDropResourcesAction_triggered();
+    void at_instantDropResourcesAction_triggered();
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();

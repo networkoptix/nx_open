@@ -22,6 +22,7 @@
 #include <comutil.h>
 #include <objbase.h>
 #include <shobjidl.h>
+#include <Shellapi.h>
 #include <shlobj.h>
 #include <msxml2.h>
 

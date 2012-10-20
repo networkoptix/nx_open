@@ -1108,14 +1108,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        QEasingCurve easingCurve;
-
-        /*
-        QSizeF currentSize = widget->enclosingGeometry().size();
-        QSizeF targetSize = enclosingGeometry.size();
-        */
-
-        animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
+        animator->moveTo(enclosingGeometry, item->rotation());
     } else {
         animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);
@@ -1382,21 +1375,24 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(!thumbnailed) {
-            QnResourcePtr resource = widget->display()->archiveReader()->getResource();
+            QnResourcePtr resource = widget->resource();
             if(time != -1) {
                 qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
-                widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
-            } else if (resource->hasFlags(QnResource::sync) || !resource->hasFlags(QnResource::live)) 
-            {
+                if(widget->display()->archiveReader())
+                    widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+            } else if (!resource->hasFlags(QnResource::live)) {
                 // default position in SyncPlay is LIVE. If current resource is synchronized and it is not camera (does not has live) seek to 0 (default position)
-                widget->display()->archiveReader()->jumpTo(0, 0);
+                if(widget->display()->archiveReader())
+                    widget->display()->archiveReader()->jumpTo(0, 0);
             }
         }
 
         bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);
         if(paused) {
-            widget->display()->archiveReader()->pauseMedia();
-            widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+            if(widget->display()->archiveReader()) {
+                widget->display()->archiveReader()->pauseMedia();
+                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+            }
         }
 
         if(hasTimeLabels) {

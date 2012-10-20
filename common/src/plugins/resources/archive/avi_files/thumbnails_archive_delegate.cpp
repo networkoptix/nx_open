@@ -76,7 +76,7 @@ QnAbstractMediaDataPtr QnThumbnailsArchiveDelegate::getNextData()
     if (!delegateForMediaStep) {
         qint64 seekRez = m_baseDelegate->seek(m_currentPos, true);
         holeDetected = seekRez > m_currentPos;
-        m_currentPos = qMax(m_currentPos, seekRez);
+        m_currentPos = seekRez - (seekRez-m_currentPos)%m_frameStep;
     }
     
     QnAbstractMediaDataPtr result;

@@ -30,12 +30,21 @@ public:
         {
         }
 
+        /** Day of the week, integer in range [1..7]. */
         int m_dayOfWeek;
+
+        /** Start time offset, in seconds. */
         int m_startTime;
+
+        /** End time offset, in seconds. */
         int m_endTime;
+
         RecordingType m_recordType;
+
         int m_beforeThreshold;
+
         int m_afterThreshold;
+
         QnStreamQuality m_streamQuality;
         int m_fps;
         bool m_doRecordAudio;

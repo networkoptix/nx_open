@@ -221,6 +221,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RenameAction),                           SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(Qn::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(Qn::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
+    connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),                   SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
@@ -487,6 +488,24 @@ bool QnWorkbenchActionHandler::closeAllLayouts(bool waitForReply) {
     return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply);
 }
 
+void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &resources){
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    if (context()->user())
+        arguments << QLatin1String("--delayed-drop");
+    else
+        arguments << QLatin1String("--instant-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    openNewWindow(arguments);
+}
+
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
@@ -513,7 +532,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasControlsChanges()){
-        QString message = tr("Recording schedule is not changed! Pick desired Recording Type, FPS and Quality and click on schedule to change it!");
+        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.");
         int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                              QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
@@ -719,6 +738,14 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     m_delayedDrops.clear();
 }
 
+void QnWorkbenchActionHandler::submitInstantDrop(QnMimeData &data) {
+    QMimeData mimeData;
+    data.toMimeData(&mimeData);
+
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
+}
+
 
 
 // -------------------------------------------------------------------------- //
@@ -871,18 +898,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
     if(resources.isEmpty()) 
         return;
     
-    QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
-    QnMimeData data(&mimeData);
-    QByteArray serializedData;
-    QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << data;
-
-    QStringList arguments;
-    arguments << QLatin1String("--delayed-drop");
-    arguments << QLatin1String(serializedData.toBase64().data());
-
-    openNewWindow(arguments);
+    openResourcesInNewWindow(resources);
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
@@ -903,26 +919,11 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
     // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
-    // TODO: #GDM avoid copypasta.
-
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if(layouts.isEmpty()) 
         return;
-
-    QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(layouts, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
-    QnMimeData data(&mimeData);
-    QByteArray serializedData;
-    QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << data;
-
-    QStringList arguments;
-    arguments << QLatin1String("--delayed-drop");
-    arguments << QLatin1String(serializedData.toBase64().data());
-
-    openNewWindow(arguments);
+    openResourcesInNewWindow(layouts);
 }
-
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
@@ -1158,6 +1159,16 @@ void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
     m_delayedDrops.push_back(mimeData);
 
     submitDelayedDrops();
+}
+
+void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    QnMimeData mimeData;
+    stream >> mimeData;
+    if(stream.status() != QDataStream::Ok || mimeData.formats().empty())
+        return;
+    submitInstantDrop(mimeData);
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
