@@ -10,6 +10,7 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
+#include "events/business_event_connector.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -17,7 +18,9 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_mediaProvider(mediaProvider),
     m_scheduleMutex(QMutex::Recursive),
     m_dualStreamingHelper(0),
-    m_usedPanicMode(false)
+    m_usedPanicMode(false),
+    m_usedSpecialRecordingMode(false),
+    m_forcedRecordFps(0)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -32,6 +35,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_recordType = QnScheduleTask::RecordingType_Run;
     scheduleData.m_streamQuality = QnQualityHighest;
     m_panicSchedileRecord.setData(scheduleData);
+
+    connect(this, SIGNAL(motionDetected(bool, qint64)), qnBusinessRuleConnector, SLOT(at_motionDetected(bool, qint64)));
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -135,28 +140,18 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     else
     {
         m_lastMotionTimeUsec = motionTime;
+        // use 'before motion' threshold for calculate start motion time
+        updateMotionStateInternal(true, m_dataQueue.isEmpty() ? m_lastMotionTimeUsec : m_dataQueue.front()->timestamp); 
         setPrebufferingUsec(0); // motion in progress, flush prebuffer
     }
+}
 
-    /*
-    QnMetaDataV1Ptr metaData = qSharedPointerDynamicCast<QnMetaDataV1>(media);
-    if (metaData) {
-        
-        metaData->removeMotion(m_motionMaskBinData[metaData->channelNumber]);
-        bool motionContainData = !metaData->isEmpty();
-        if (motionContainData || m_lastMotionContainData) {
-            m_lastMotionTimeUsec = metaData->timestamp;
-            setPrebufferingUsec(0); // flush prebuffer
-        }
-        m_lastMotionContainData = motionContainData;
+void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp)
+{
+    if (m_lastMotionState == value)
         return;
-    }
-    if (m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp >= m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll)
-    {
-        // no motion sometime. Go to prebuffering mode
-        setPrebufferingUsec(m_currentScheduleTask.getBeforeThreshold()*1000000ll);
-    }
-    */
+    m_lastMotionState = value;
+    emit motionDetected(m_lastMotionState, timestamp);
 }
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
@@ -187,8 +182,29 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         else
             m_endDateTime += MIN_FRAME_DURATION;
         close();
+        updateMotionStateInternal(false, m_endDateTime);
     }
     return rez;
+}
+
+void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int fps)
+{
+    QnScheduleTask::Data scheduleData;
+    scheduleData.m_startTime = 0;
+    scheduleData.m_endTime = 24*3600*7;
+    scheduleData.m_recordType = QnScheduleTask::RecordingType_Run;
+    scheduleData.m_streamQuality = quality;
+    
+    m_forcedRecordFps = fps;
+    m_forcedSchedileRecord.setData(scheduleData);
+
+    updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnServerStreamRecorder::stopForcedRecording()
+{
+    m_forcedSchedileRecord.setEndTime(0);
+    updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
 
 void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleTask)
@@ -210,6 +226,36 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
     m_currentScheduleTask = scheduleTask;
 }
 
+void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task, int fps)
+{
+    // zero fps value means 'autodetect as maximum possible fps'
+    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
+
+    if (camera->streamFpsSharingMethod()==shareFps)
+    {
+        if (m_role == QnResource::Role_LiveVideo)
+            task.setFps(fps ? qMin(fps, camera->getMaxFps()-2) : camera->getMaxFps()-2);
+        else
+            task.setFps(fps ? qMax(2, qMin(DESIRED_SECOND_STREAM_FPS, camera->getMaxFps()-fps)) : 2);
+    }
+    else
+    {
+        if (m_role == QnResource::Role_LiveVideo)
+            task.setFps(fps ? fps : camera->getMaxFps());
+        else
+            task.setFps(DESIRED_SECOND_STREAM_FPS);
+    }
+
+
+    // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
+    CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+    bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
+    updateRecordingType(m_panicSchedileRecord);
+    if (!doNotChangeParams)
+        updateStreamParams();
+    m_lastSchedulePeriod.clear();
+}
+
 void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
@@ -218,37 +264,22 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
     {
         if (!m_usedPanicMode)
         {
-            QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-
-            if (camera->streamFpsSharingMethod()==shareFps)
-            {
-                if (m_role == QnResource::Role_LiveVideo)
-                    m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
-                else
-                    m_panicSchedileRecord.setFps(2);
-            }
-            else
-            {
-                if (m_role == QnResource::Role_LiveVideo)
-                    m_panicSchedileRecord.setFps(camera->getMaxFps());
-                else
-                    m_panicSchedileRecord.setFps(DESIRED_SECOND_STREAM_FPS);
-            }
-
-
-            // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-            CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
-            bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
-            updateRecordingType(m_panicSchedileRecord);
-            if (!doNotChangeParams)
-                updateStreamParams();
-            m_lastSchedulePeriod.clear();
+            setSpecialRecordingMode(m_panicSchedileRecord, 0); 
             m_usedPanicMode = true;
         }
         return;
     }
+    else if (!m_forcedSchedileRecord.isEmpty())
+    {
+        if (!m_usedSpecialRecordingMode)
+        {
+            setSpecialRecordingMode(m_forcedSchedileRecord, m_forcedRecordFps);
+            m_usedSpecialRecordingMode = true;
+        }
+        return;
+    }
 
-    m_usedPanicMode = false;
+    m_usedSpecialRecordingMode = m_usedPanicMode = false;
 
     if (!m_schedule.isEmpty())
     {

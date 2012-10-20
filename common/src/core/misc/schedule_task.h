@@ -56,6 +56,8 @@ public:
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
 
+    bool isEmpty() const {return m_data.m_startTime == 0 && m_data.m_endTime == 0; }
+
     const Data& getData() const { return m_data; }
     void setData(const Data& data) { m_data = data; }
 
@@ -63,15 +65,21 @@ public:
     QnId getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_data.m_dayOfWeek; }
     int getStartTime() const { return m_data.m_startTime; }
-    int getEndTime() const { return m_data.m_endTime; }
+    
+    int getEndTime() const     { return m_data.m_endTime;  }
+    void setEndTime(int value) { m_data.m_endTime = value; }
+
     RecordingType getRecordingType() const { return m_data.m_recordType; }
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }
-    QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
+    
+    QnStreamQuality getStreamQuality() const     { return m_data.m_streamQuality; }
+    void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
+    
     int getFps() const { return m_data.m_fps; }
+    void setFps(int value) { m_data.m_fps = value; }
     bool getDoRecordAudio() const { return m_data.m_doRecordAudio; }
 
-    void setFps(int value) { m_data.m_fps = value; }
 
     /*
     * Duration at ms
