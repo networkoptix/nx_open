@@ -336,7 +336,7 @@
                             Type="raw"
                             Win64="no"/>
         </Property>
-        
+
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
@@ -349,6 +349,7 @@
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
         <CustomAction Id="CheckServerDirectoryWritable" BinaryKey="CustomActions.dll" DllEntry="CheckServerDirectoryWritable"/>
+        <CustomAction Id="IsClientFolderExists" BinaryKey="CustomActions.dll" DllEntry="IsClientFolderExists"/>
         
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
@@ -372,10 +373,10 @@
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
-        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
-        
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
-        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
+
+        <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
+        <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
                       Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
@@ -441,18 +442,18 @@
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer"><![CDATA[ $(var.EcsNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForServer" Before="FindConfiguredStorages"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
-            <Custom Action="FindConfiguredStorages" Before="AssignClientFolder"></Custom> 
+            <Custom Action="FindConfiguredStorages" Before="SetClientFolderToDefault"></Custom> 
 
-            <Custom Action="FixClientFolder" After="ResetClientFolder"/>
-            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
+            <Custom Action="SetClientFolderToRegistry" Before="CostInitialize">1</Custom>
+            <Custom Action="FixClientFolder" After="SetClientFolderToRegistry">1</Custom>
+            <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
+            <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
             
-            <Custom Action="ResetClientFolder" Before="CostInitialize"/>
             <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
-            
-            <Custom Action="AssignClientFolder" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
             <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
             
-            <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <!--          <Custom Action="SetClientFolderToRegistry" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
   -->      </InstallUISequence>
         

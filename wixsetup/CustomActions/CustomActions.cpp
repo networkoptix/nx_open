@@ -12,10 +12,6 @@ UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
 
     Wow64DisableWow64FsRedirection(0);
 
-    CAtlString msg;
-    msg.Format(L"%d", GetCurrentProcessId());
-    MessageBox(0,msg, L"Pen2", 0);
-
     CAtlString foldersString, fromFolder, toFolder;
 
     hr = WcaInitialize(hInstall, "CopyMediaServerProfile");
@@ -354,6 +350,28 @@ UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
         CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
         fixPath(clientFolder);
         MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "IsClientFolderExists");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+        if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
+            MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
     }
 
 LExit:
