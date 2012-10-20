@@ -57,6 +57,7 @@
         <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch"><![CDATA[ PROXY_PORT = "" ]]></SetProperty>
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch"><![CDATA[ APPSERVER_PASSWORD_REG = "" ]]></SetProperty>
         
+        <SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ClientFeature = 3 ]]></SetProperty>
 
@@ -89,7 +90,6 @@
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
         
         <Property Id="INSTALLTYPE" Value="0"/>
-        <Property Id="ADVANCEDTYPE" Value="0"/>
         
         <Property Id="BUSYPORT" Secure="yes"/>
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
@@ -964,7 +964,7 @@
             <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">INSTALLTYPE=1</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
 
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
@@ -985,23 +985,23 @@
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
             
-            <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
-            <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
-            
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
             
-            <?define SomeFeaturesSelected="(!ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+            <?define SomeFeaturesSelected2="(!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+            <?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
             <?define NeedTrayTool="(&AppServerFeature = 3 OR !AppServerFeature = 3 OR &ServerFeature = 3 OR (!ServerFeature = 3 AND &ServerFeature <> 2))"?>
             
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature=3]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature<>3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND INSTALL_SERVER]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND NOT INSTALL_SERVER]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature"><![CDATA[ $(var.NeedTrayTool) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature"><![CDATA[ NOT $(var.NeedTrayTool) ]]></Publish>
             
