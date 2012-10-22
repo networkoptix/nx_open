@@ -328,6 +328,7 @@ private:
     void setInfoTextInternal(const QString &infoText);
 
     Q_SLOT void at_iconButton_visibleChanged();
+    Q_SLOT void at_infoButton_toggled(bool toggled);
 
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
@@ -410,6 +411,9 @@ private:
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
     QStaticText m_loadingStaticText;
+
+    /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
+    bool m_mouseInWidget;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

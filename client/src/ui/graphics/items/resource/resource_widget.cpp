@@ -118,7 +118,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
-    m_aboutToBeDestroyedEmitted(false)
+    m_aboutToBeDestroyedEmitted(false),
+    m_mouseInWidget(false)
 {
     setAcceptHoverEvents(true);
 
@@ -171,8 +172,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setCheckable(true);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
-    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
-    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setDecorationsVisible())); //ugly hack, bind order is important
+
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(at_infoButton_toggled(bool)));
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
@@ -491,7 +492,7 @@ void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    return !qFuzzyIsNull(m_footerWidget->opacity());
+    return (options() & DisplayInfo);
 }
 
 bool QnResourceWidget::isInfoButtonVisible() const {
@@ -809,7 +810,8 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 }
 
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    setDecorationsVisible(true);
+    setDecorationsVisible();
+    m_mouseInWidget = true;
 
     base_type::hoverEnterEvent(event);
 }
@@ -824,14 +826,16 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isInfoVisible())
         setDecorationsVisible(false);
+    m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
     if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
-        setInfoVisible(options() & DisplayInfo);
-        setDecorationsVisible(options() & DisplayInfo);
+        bool visible = isInfoVisible();
+        setInfoVisible(visible);
+        setDecorationsVisible(visible || m_mouseInWidget);
     }
 }
 void QnResourceWidget::at_iconButton_visibleChanged() {
@@ -840,5 +844,10 @@ void QnResourceWidget::at_iconButton_visibleChanged() {
     } else {
         m_headerLayout->removeItem(m_iconButton);
     }
+}
+
+void QnResourceWidget::at_infoButton_toggled(bool toggled){
+    setInfoVisible(toggled);
+    setDecorationsVisible(toggled || m_mouseInWidget);
 }
 
