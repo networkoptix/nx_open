@@ -482,7 +482,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpBackgroundItem->setFrameColor(QColor(110, 110, 110, 255));
     m_helpBackgroundItem->setFrameWidth(0.5);
 
-    m_helpWidget = new QnHelpWidget(qnHelp);
+    m_helpWidget = new QnHelpWidget(new QnContextHelp(this));
     m_helpWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_helpWidget->palette();
@@ -1405,6 +1405,7 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 void QnWorkbenchUi::updateHelpContext() {
+#if 0
     Qn::ActionScope scope = Qn::InvalidScope;
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
@@ -1442,6 +1443,7 @@ void QnWorkbenchUi::updateHelpContext() {
     }
 
     qnHelp->setHelpContext(context);
+#endif
 }
 
 bool QnWorkbenchUi::isThumbnailsVisible() const {
