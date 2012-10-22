@@ -77,6 +77,13 @@ public:
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
 
+signals:
+    /** 
+     * This signal is virtual to work around a problem with inheritance from
+     * two <tt>QObject</tt>s. 
+     */
+    virtual void scheduleTasksChanged();
+
 protected:
     void updateInner(QnResourcePtr other) override;
 
@@ -88,6 +95,7 @@ protected:
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
+
 private:
     QnDataProviderFactory* m_dpFactory;
     

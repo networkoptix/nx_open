@@ -197,6 +197,8 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleT
     // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
 
     m_scheduleTasks = scheduleTasks;
+
+    emit scheduleTasksChanged();
 }
 
 const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
