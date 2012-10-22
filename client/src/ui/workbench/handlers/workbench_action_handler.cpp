@@ -77,6 +77,7 @@
 
 #include "client_message_processor.h"
 #include "file_processor.h"
+#include "version.h"
 
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -1975,15 +1976,15 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
     if (readOnly) {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+            return tr("Executable %1 Media File (x86, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+            return tr("Executable %1 Media File (x64, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
     else {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86) (*.exe)");
+            return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64) (*.exe)");
+            return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
 }
 
@@ -2013,14 +2014,23 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+
+    QString mediaFilter =
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+            + filterSeparator
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + filterSeparator
+            + binaryFilterName(false)
+            + filterSeparator
+            + binaryFilterName(true);
+
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
-            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
+            mediaFilter,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
