@@ -23,15 +23,12 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
 void QnSignDialogDisplay::finilizeSign()
 {
     QByteArray signFromPicture;
-#ifdef SIGN_FRAME_ENABLED
     QByteArray calculatedSign = m_mdctx.result();
+#ifdef SIGN_FRAME_ENABLED
     QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
     QnSignHelper signHelper;
     signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
 #else
-    if (m_lastKeyFrame)
-        QnSignHelper::updateDigest(m_lastKeyFrame->context->ctx(), m_mdctx, (const quint8*) m_lastKeyFrame->data.data(), m_lastKeyFrame->data.size());
-    QByteArray calculatedSign = m_mdctx.result();
     if (m_reader) 
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
@@ -87,11 +84,19 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else if (video || audio)
     {
+#ifndef SIGN_FRAME_ENABLED
+        // update digest from current frame
+        if (media && media->data.size() > 4) {
+            const quint8* data = (const quint8*) media->data.data();
+            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->data.size());
+        }
+#else
+        // update digest from previous frames because of last frame it is sign frame itself
         if (m_prevFrame && m_prevFrame->data.size() > 4) {
             const quint8* data = (const quint8*) m_prevFrame->data.data();
             QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
         }
-
+#endif
         if (video) 
         {
             video->channelNumber = 0; // ignore layout info

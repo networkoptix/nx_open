@@ -396,8 +396,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
-            QByteArray signPatter = QnSignHelper::getSignPattern();
-            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPatter.data(), 0);
+            QByteArray signPattern = QnSignHelper::getSignPattern();
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPattern.data(), 0);
         }
 #endif
 
