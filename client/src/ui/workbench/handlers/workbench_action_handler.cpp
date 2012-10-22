@@ -77,6 +77,7 @@
 
 #include "client_message_processor.h"
 #include "file_processor.h"
+#include "version.h"
 
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -85,6 +86,8 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
+#include "help/context_help_queryable.h"
+#include "help/help_topics.h"
 
 
 
@@ -1715,7 +1718,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-
+    setHelpTopicId(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1851,6 +1854,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
+    setHelpTopicId(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -1975,15 +1979,15 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
     if (readOnly) {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+            return tr("Executable %1 Media File (x86, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+            return tr("Executable %1 Media File (x64, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
     else {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86) (*.exe)");
+            return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64) (*.exe)");
+            return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
 }
 
@@ -2013,14 +2017,23 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+
+    QString mediaFilter =
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+            + filterSeparator
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + filterSeparator
+            + binaryFilterName(false)
+            + filterSeparator
+            + binaryFilterName(true);
+
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
-            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
+            mediaFilter,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
