@@ -28,5 +28,5 @@ bool QnIexploreUrlHandler::handleUrl(QUrl url){
         url.setPassword(QString());
     }
 
-    QDesktopServices::openUrl(url);
+    return QDesktopServices::openUrl(url);
 }
