@@ -73,4 +73,11 @@
 #endif
 
 
+/* Helper function that can be used to 'place' macros into Qn namespace. */
+namespace Qn {
+    template<class T>
+    const T &_id(const T &value) { return value; }
+}
+
+
 #endif // QN_COMMON_CONFIG_H

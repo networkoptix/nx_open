@@ -37,6 +37,7 @@
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
+#define VER_CUSTOMIZEDFILENAME_STR  "${product.name}.exe"
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
 
