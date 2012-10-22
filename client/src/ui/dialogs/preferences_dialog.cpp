@@ -22,6 +22,9 @@
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
 
+#include <help/context_help_queryable.h>
+#include <help/help_topics.h>
+
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     QnWorkbenchContextAware(context),
@@ -61,6 +64,11 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
+
+    /* Set up context help. */
+    ui->mainMediaFolderGroupBox->setProperty(Qn::HelpTopicId, Qn::SystemSettings_General_MediaFolders_Help);
+    ui->extraMediaFoldersGroupBox->setProperty(Qn::HelpTopicId, Qn::SystemSettings_General_MediaFolders_Help);
+
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
