@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "action.h"
@@ -419,7 +420,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
-        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
+        condition(new QnPanicActionCondition(this));
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -872,14 +873,15 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("4:3")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
 
         factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("16:9")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
 
         factory.endGroup();
     } factory.endSubMenu();
@@ -895,26 +897,29 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("None")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.0);
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_SPACING ?
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.1);
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Medium")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.2);
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Large")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.3);
         factory.endGroup();
 
     } factory.endSubMenu();
