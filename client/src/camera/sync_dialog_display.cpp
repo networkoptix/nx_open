@@ -2,6 +2,7 @@
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
     QnCamDisplay(resource),
@@ -11,6 +12,7 @@ QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     m_lastDisplayTime = 0;
     m_lastDisplayTime2 = 0;
     m_eofProcessed = false;
+    m_reader = 0;
 
     m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
@@ -20,18 +22,42 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
 
 void QnSignDialogDisplay::finilizeSign()
 {
-    QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
-
+    QByteArray signFromPicture;
+#ifdef SIGN_FRAME_ENABLED
     QByteArray calculatedSign = m_mdctx.result();
-
+    QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
     QnSignHelper signHelper;
-    QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
+    signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
+#else
+    if (m_lastKeyFrame)
+        QnSignHelper::updateDigest(m_lastKeyFrame->context->ctx(), m_mdctx, (const quint8*) m_lastKeyFrame->data.data(), m_lastKeyFrame->data.size());
+    QByteArray calculatedSign = m_mdctx.result();
+    if (m_reader) 
+    {
+        QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
+        if (aviFile) {
+            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
+            if (signPattern) {
+                QList<QByteArray> pattern = QByteArray(signPattern).split(';');
+                signFromPicture = QnSignHelper::getDigestFromSign(pattern[0]);
+                if (pattern.size() >= 4)
+                {
+                    emit gotSignatureDescription(QString::fromUtf8(pattern[1]), QString::fromUtf8(pattern[2]), QString::fromUtf8(pattern[3]));
+                }
+            }
+        }
+    }
+#endif
     emit calcSignInProgress(calculatedSign, 100);
     emit gotSignature(calculatedSign, signFromPicture);
 }
 
 bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 {
+    QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (data->dataProvider);
+    if (reader)
+        m_reader = reader;
+
     QnEmptyMediaDataPtr eofPacket = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
     
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
@@ -89,7 +115,6 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
         {
             QnCryptographicHash tmpctx = m_mdctx;
             QByteArray calculatedSign = tmpctx.result();
-            QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
             int progress = 100;
             if (reader)
                 progress =  (media->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;

@@ -57,6 +57,23 @@ QnStreamRecorder::~QnStreamRecorder()
     delete m_audioTranscoder;
 }
 
+/* It is impossible to write avi/mkv attribute in the end
+*  So, write magic on startup, then update it
+*/
+void QnStreamRecorder::updateSignatureAttr()
+{
+    QIODevice* file = m_storage->open(m_fileName, QIODevice::ReadWrite);
+    if (!file)
+        return;
+    QByteArray data = file->read(1024*16);
+    int pos = data.indexOf(QnSignHelper::getSignMagic());
+    if (pos == -1)
+        return; // no signature found
+    file->seek(pos);
+    file->write(QnSignHelper::getSignFromDigest(getSignature()));
+    delete file;
+}
+
 void QnStreamRecorder::close()
 {
     if (m_formatCtx) 
@@ -80,6 +97,10 @@ void QnStreamRecorder::close()
         if (m_ioContext)
         {
             m_storage->closeFfmpegIOContext(m_ioContext);
+#ifndef SIGN_FRAME_ENABLED
+            if (m_needCalcSignature)
+                updateSignatureAttr();
+#endif
             m_ioContext = 0;
             if (m_formatCtx)
                 m_formatCtx->pb = 0;
@@ -137,9 +158,10 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (!m_endOfData) 
         {
             bool isOK = true;
+#ifdef SIGN_FRAME_ENABLED
             if (m_needCalcSignature && !m_firstTime)
                 isOK = addSignatureFrame(m_lastErrMessage);
-
+#endif
             if (isOK)
                 emit recordingFinished(m_fileName);
             else
@@ -372,6 +394,12 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         qint64 startTime = m_startOffset+mediaData->timestamp/1000;
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_startTime, fileExt), QString::number(startTime).toAscii().data(), 0);
         av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Software, fileExt), "Network Optix", 0);
+#ifndef SIGN_FRAME_ENABLED
+        if (m_needCalcSignature) {
+            QByteArray signPatter = QnSignHelper::getSignPattern();
+            av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPatter.data(), 0);
+        }
+#endif
 
         m_formatCtx->start_time = mediaData->timestamp;
 

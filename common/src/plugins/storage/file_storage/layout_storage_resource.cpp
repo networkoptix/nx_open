@@ -76,8 +76,12 @@ public:
         m_openMode = openMode;
         if (openMode & QIODevice::WriteOnly) 
         {
-            if (!m_storageResource.addFileEntry(m_fileName))
-                return false;
+            qint64 fileSize;
+            if (m_storageResource.getFileOffset(m_fileName, &fileSize) == -1)
+            {
+                if (!m_storageResource.addFileEntry(m_fileName))
+                    return false;
+            }
             openMode |= QIODevice::Append;
         }
         m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
