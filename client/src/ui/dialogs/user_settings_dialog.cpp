@@ -16,7 +16,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_globals.h>
 
-#define CUSTOM_RIGHTS 0x0FFFFFFF
+#define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
+#define ADMIN_CHECKBOX Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
@@ -24,7 +25,8 @@ QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget 
     ui(new Ui::UserSettingsDialog()),
     m_user(0),
     m_hasChanges(false),
-    m_editorRights(0)
+    m_editorRights(0),
+    m_inUpdateDependensies(false)
 {
     if(context == NULL) 
         qnNullWarning(context);
@@ -336,15 +338,46 @@ void QnUserSettingsDialog::updateAll() {
 }
 
 void QnUserSettingsDialog::updateDependantPermissions() {
-    bool canViewArchive = m_advancedRights[Qn::GlobalViewArchivePermission] ? m_advancedRights[Qn::GlobalViewArchivePermission]->isChecked() : false;
-    if(QCheckBox *exportArchiveCheckBox = m_advancedRights[Qn::GlobalExportPermission]) {
-        exportArchiveCheckBox->setEnabled(canViewArchive);
-        if(!canViewArchive)
-            exportArchiveCheckBox->setChecked(false);
+    m_inUpdateDependensies = true;
+
+    bool isOwner = isCheckboxChecked(Qn::GlobalEditProtectedUserPermission);
+    if (isOwner){
+        setCheckboxEnabled(ADMIN_CHECKBOX, false);
+        setCheckboxChecked(ADMIN_CHECKBOX);
     }
+
+    bool isAdmin = isCheckboxChecked(ADMIN_CHECKBOX);
+    if (isAdmin){
+        setCheckboxEnabled(Qn::GlobalEditCamerasPermission, false);
+        setCheckboxChecked(Qn::GlobalEditCamerasPermission);
+
+        setCheckboxEnabled(Qn::GlobalPtzControlPermission, false);
+        setCheckboxChecked(Qn::GlobalPtzControlPermission);
+
+        setCheckboxEnabled(Qn::GlobalViewArchivePermission, false);
+        setCheckboxChecked(Qn::GlobalViewArchivePermission);
+
+        setCheckboxEnabled(Qn::GlobalExportPermission, false);
+        setCheckboxChecked(Qn::GlobalExportPermission);
+    } else {
+        setCheckboxEnabled(Qn::GlobalEditCamerasPermission);
+        setCheckboxEnabled(Qn::GlobalPtzControlPermission);
+        setCheckboxEnabled(Qn::GlobalViewArchivePermission);
+        setCheckboxEnabled(Qn::GlobalExportPermission);
+
+        bool canViewArchive = isCheckboxChecked(Qn::GlobalViewArchivePermission);
+        setCheckboxEnabled(Qn::GlobalExportPermission, canViewArchive);
+        if(!canViewArchive)
+            setCheckboxChecked(Qn::GlobalExportPermission, false);
+    }
+
+    m_inUpdateDependensies = false;
 }
 
 void QnUserSettingsDialog::at_accessRights_changed() {
+    if (m_inUpdateDependensies)
+        return;
+
     setHasChanges(true);
     selectAccessRightsPreset(readAccessRightsAdvanced());
     updateDependantPermissions();
@@ -358,17 +391,17 @@ void QnUserSettingsDialog::createAccessRightsPresets() {
 
     // show only for view of owner
     if (permissions & Qn::GlobalEditProtectedUserPermission)
-        ui->accessRightsComboBox->addItem(tr("Owner"), (quint64)Qn::GlobalOwnerPermissions);
+        ui->accessRightsComboBox->addItem(tr("Owner"), Qn::GlobalOwnerPermissions);
 
     // show for an admin or for anyone opened by owner
     if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
-        ui->accessRightsComboBox->addItem(tr("Administrator"), (quint64)Qn::GlobalAdminPermissions);
+        ui->accessRightsComboBox->addItem(tr("Administrator"), Qn::GlobalAdminPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), (quint64)Qn::GlobalAdvancedViewerPermissions);
-    ui->accessRightsComboBox->addItem(tr("Viewer"), (quint64)Qn::GlobalViewerPermissions);
-    ui->accessRightsComboBox->addItem(tr("Live Viewer"), (quint64)Qn::GlobalLiveViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Advanced Viewer"), Qn::GlobalAdvancedViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Viewer"), Qn::GlobalViewerPermissions);
+    ui->accessRightsComboBox->addItem(tr("Live Viewer"), Qn::GlobalLiveViewerPermissions);
 
-    ui->accessRightsComboBox->addItem(tr("Custom..."), (quint64)CUSTOM_RIGHTS); // should be the last
+    ui->accessRightsComboBox->addItem(tr("Custom..."), CUSTOM_RIGHTS); // should be the last
 }
 
 void QnUserSettingsDialog::createAccessRightsAdvanced() {
@@ -382,7 +415,7 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalEditProtectedUserPermission, previous);
     if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
-                     Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions,
+                     ADMIN_CHECKBOX,
                      previous);
     previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
@@ -422,18 +455,23 @@ void QnUserSettingsDialog::selectAccessRightsPreset(quint64 rights) {
 }
 
 void QnUserSettingsDialog::fillAccessRightsAdvanced(quint64 rights) {
-    QHashIterator<quint64, QCheckBox*> i(m_advancedRights);
-    while (i.hasNext()) {
-        i.next();
-        i.value()->setChecked(i.key() & rights);
-    }
+    if (m_inUpdateDependensies)
+        return; //just in case
+
+    m_inUpdateDependensies = true;
+
+    for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
+        if(pos.value())
+            pos.value()->setChecked(pos.key() & rights);
+    m_inUpdateDependensies = false;
+
     updateDependantPermissions(); // TODO: rename to something more sane, connect properly
 }
 
 quint64 QnUserSettingsDialog::readAccessRightsAdvanced() {
     quint64 result = Qn::GlobalViewLivePermission;
     for(QHash<quint64, QCheckBox *>::const_iterator pos = m_advancedRights.begin(); pos != m_advancedRights.end(); pos++)
-        if(pos.value()->isChecked())
+        if(pos.value() && pos.value()->isChecked())
             result |= pos.key();
     return result;
 }
@@ -451,5 +489,23 @@ void QnUserSettingsDialog::at_advancedButton_toggled() {
         }
         
         widget = widget->parentWidget();
+    }
+}
+
+// Utility functions
+
+bool QnUserSettingsDialog::isCheckboxChecked(quint64 right){
+    return m_advancedRights[right] ? m_advancedRights[right]->isChecked() : false;
+}
+
+void QnUserSettingsDialog::setCheckboxChecked(quint64 right, bool checked){
+    if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
+        targetCheckBox->setChecked(checked);
+    }
+}
+
+void QnUserSettingsDialog::setCheckboxEnabled(quint64 right, bool enabled){
+    if(QCheckBox *targetCheckBox = m_advancedRights[right]) {
+        targetCheckBox->setEnabled(enabled);
     }
 }
