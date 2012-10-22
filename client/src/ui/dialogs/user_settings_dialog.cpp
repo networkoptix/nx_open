@@ -17,7 +17,11 @@
 #include <ui/workbench/workbench_globals.h>
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
-#define ADMIN_CHECKBOX Qn::GlobalProtectedPermission | Qn::GlobalEditUsersPermission | Qn::GlobalEditLayoutsPermission | Qn::GlobalEditServersPermissions
+
+namespace Qn{
+    const quint64 ExcludingOwnerPermission = GlobalOwnerPermissions & ~GlobalAdminPermissions;
+    const quint64 ExcludingAdminPermission = GlobalAdminPermissions & ~GlobalAdvancedViewerPermissions;
+}
 
 QnUserSettingsDialog::QnUserSettingsDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
@@ -340,13 +344,13 @@ void QnUserSettingsDialog::updateAll() {
 void QnUserSettingsDialog::updateDependantPermissions() {
     m_inUpdateDependensies = true;
 
-    bool isOwner = isCheckboxChecked(Qn::GlobalEditProtectedUserPermission);
+    bool isOwner = isCheckboxChecked(Qn::ExcludingOwnerPermission);
     if (isOwner){
-        setCheckboxEnabled(ADMIN_CHECKBOX, false);
-        setCheckboxChecked(ADMIN_CHECKBOX);
+        setCheckboxEnabled(Qn::ExcludingAdminPermission, false);
+        setCheckboxChecked(Qn::ExcludingAdminPermission);
     }
 
-    bool isAdmin = isCheckboxChecked(ADMIN_CHECKBOX);
+    bool isAdmin = isCheckboxChecked(Qn::ExcludingAdminPermission);
     if (isAdmin){
         setCheckboxEnabled(Qn::GlobalEditCamerasPermission, false);
         setCheckboxChecked(Qn::GlobalEditCamerasPermission);
@@ -412,10 +416,10 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
     QWidget* previous = ui->advancedButton;
 
     if (permissions & Qn::GlobalEditProtectedUserPermission)
-        previous = createAccessRightCheckBox(tr("Owner"), Qn::GlobalEditProtectedUserPermission, previous);
+        previous = createAccessRightCheckBox(tr("Owner"), Qn::ExcludingOwnerPermission, previous);
     if ((permissions & Qn::GlobalProtectedPermission) || (m_editorRights & Qn::GlobalEditProtectedUserPermission))
         previous = createAccessRightCheckBox(tr("Administrator"),
-                     ADMIN_CHECKBOX,
+                     Qn::ExcludingAdminPermission,
                      previous);
     previous = createAccessRightCheckBox(tr("Can adjust camera settings"), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
