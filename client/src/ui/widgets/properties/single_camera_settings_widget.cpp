@@ -633,6 +633,7 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
     bool canAuth = !m_readOnly;
 
+    // TODO: #gdm implement this at QDesktopServices::setUrlHandler level.
 #ifdef Q_OS_WIN
     if (canAuth) {
         QSettings settings(QLatin1String("HKEY_CURRENT_USER\\Software\\Clients\\StartMenuInternet"), QSettings::NativeFormat);
