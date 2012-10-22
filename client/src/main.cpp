@@ -77,6 +77,10 @@
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
 
+#ifdef Q_OS_WIN
+    #include "ui/workaround/iexplore_url_handler.h"
+#endif
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -280,6 +284,12 @@ int qnMain(int argc, char *argv[])
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;
  //   application->installEventFilter(&x11LauncherWorkaround);
+#endif
+
+#ifdef Q_OS_WIN
+    QnIexploreUrlHandler iexploreUrlHanderWorkaround;
+    // all effects are placed in the constructor
+    Q_UNUSED(iexploreUrlHanderWorkaround)
 #endif
 
     if(singleApplication) {

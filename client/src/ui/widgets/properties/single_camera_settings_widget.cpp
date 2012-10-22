@@ -359,7 +359,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         updateMaxFPS();
 
-        ui->motionWebPageLabel->setText(webPageAddress); // TODO: wrong, need to get camera-specific web page
+        // TODO: wrong, need to get camera-specific web page
+        ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
         ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
 
@@ -631,25 +632,11 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
-    bool canAuth = !m_readOnly;
-
-    // TODO: #gdm implement this at QDesktopServices::setUrlHandler level.
-#ifdef Q_OS_WIN
-    if (canAuth) {
-        QSettings settings(QLatin1String("HKEY_CURRENT_USER\\Software\\Clients\\StartMenuInternet"), QSettings::NativeFormat);
-        QString defaultBrowser = settings.value(QLatin1String("Default")).toString().toLower();
-        if (defaultBrowser.isEmpty() || defaultBrowser.contains(QLatin1String("iexplore")))
-			canAuth = false;
-    }
-#endif
-
     QUrl url(urlString);
-
-    if (canAuth) {
+    if (!m_readOnly) {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
     }
-
     QDesktopServices::openUrl(url);
 }
 
