@@ -50,7 +50,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->backgroundColorWidget->hide();
     }
 
-    if (QnScreenRecorder::isSupported()){
+    if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
@@ -66,8 +66,15 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #endif
 
     /* Set up context help. */
-    ui->mainMediaFolderGroupBox->setProperty(Qn::HelpTopicId, Qn::SystemSettings_General_MediaFolders_Help);
-    ui->extraMediaFoldersGroupBox->setProperty(Qn::HelpTopicId, Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopicId(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopicId(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopicId(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopicId(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopicId(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    if(m_recordingSettingsWidget)
+        setHelpTopicId(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
+    if(m_licenseManagerWidget)
+        setHelpTopicId(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
 
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
@@ -78,7 +85,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
-
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
 
     initLanguages();
