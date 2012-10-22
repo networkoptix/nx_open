@@ -67,8 +67,10 @@ void QnStreamRecorder::updateSignatureAttr()
         return;
     QByteArray data = file->read(1024*16);
     int pos = data.indexOf(QnSignHelper::getSignMagic());
-    if (pos == -1)
+    if (pos == -1) {
+        delete file;
         return; // no signature found
+    }
     file->seek(pos);
     file->write(QnSignHelper::getSignFromDigest(getSignature()));
     delete file;

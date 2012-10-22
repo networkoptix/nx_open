@@ -90,8 +90,9 @@ public:
         m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
         if (m_fileOffset == -1)
             return false;
-        m_file.seek(m_fileOffset);
-        return QIODevice::open(openMode);
+        bool rez = QIODevice::open(openMode);
+        seek(0);
+        return rez;
     }
 
     void lockFile()
