@@ -115,7 +115,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     
     if(m_camera) {
         QTimer *timer = new QTimer(this);
+        
         connect(timer, SIGNAL(timeout()), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(scheduleTasksChanged()), this, SLOT(updateIconButton()));
+
         timer->start(1000 * 60); /* Update icon button every minute. */
     }
 
@@ -513,9 +517,12 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    iconButton()->setVisible(true);
+    int recordingMode = QnScheduleTask::RecordingType_Never;
+    if(m_camera->getStatus() == QnResource::Recording)
+        recordingMode = currentRecordingMode();
     
-    switch(currentRecordingMode()) {
+    iconButton()->setVisible(true);
+    switch(recordingMode) {
     case QnScheduleTask::RecordingType_Never:
         iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
         iconButton()->setToolTip(tr("Not recording."));
