@@ -346,26 +346,6 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
-void QnResourceWidget::updateOverlayRotation(qreal rotation) {
-    while (rotation < -180)
-        rotation += 360;
-    while (rotation > 180)
-        rotation -= 360;
-
-    Qn::FixedItemRotation fixed;
-    if (rotation >= -45 && rotation <= 45)
-        fixed = Qn::Angle0;
-    else if (rotation > 135 || rotation < -135)
-        fixed = Qn::Angle180;
-    else if (rotation > 0)
-        fixed = Qn::Angle270;
-    else
-        fixed = Qn::Angle90;
-
-    m_headerOverlayWidget->setDesiredRotation(fixed);
-    m_footerOverlayWidget->setDesiredRotation(fixed);
-}
-
 QString QnResourceWidget::titleText() const {
     return m_headerLeftLabel->text();
 }
@@ -435,6 +415,27 @@ QString QnResourceWidget::calculateInfoText() const {
 void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
+
+void QnResourceWidget::updateOverlayRotation(qreal rotation) {
+    while (rotation < -180)
+        rotation += 360;
+    while (rotation > 180)
+        rotation -= 360;
+
+    Qn::FixedItemRotation fixed;
+    if (rotation >= -45 && rotation <= 45)
+        fixed = Qn::Angle0;
+    else if (rotation > 135 || rotation < -135)
+        fixed = Qn::Angle180;
+    else if (rotation > 0)
+        fixed = Qn::Angle270;
+    else
+        fixed = Qn::Angle90;
+
+    m_headerOverlayWidget->setDesiredRotation(fixed);
+    m_footerOverlayWidget->setDesiredRotation(fixed);
+}
+
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
@@ -829,6 +830,13 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
+}
+
+QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
+    if (change == QGraphicsItem::ItemRotationHasChanged){
+        updateOverlayRotation(value.toReal());
+    }
+    return base_type::itemChange(change, value);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
