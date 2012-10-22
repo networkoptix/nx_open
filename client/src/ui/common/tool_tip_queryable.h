@@ -16,6 +16,8 @@
  */
 class ToolTipQueryable {
 public:
+    virtual ~ToolTipQueryable() {}
+
     // TODO: bool toolTipAt(const QPointF &pos, QString *toolTip, QRectF *area) const
     /**
      * \param pos                       Position inside an item.

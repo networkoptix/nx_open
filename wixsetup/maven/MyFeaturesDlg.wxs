@@ -14,9 +14,9 @@
 	<Fragment>
 		<UI>
 			<Dialog Id="MyFeaturesDlg" Width="370" Height="270" Title="!(loc.FeaturesDlg_Title)" TrackDiskSpace="yes">
-    <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+    <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="no" Text="!(loc.WixUINext)" />
     <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Text="!(loc.WixUIBack)" />
-    <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+    <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="no" Text="!(loc.WixUICancel)">
         <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
     </Control>
     <Control Id="BannerBitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="44" TabSkip="no" Text="!(loc.FeaturesDlgBannerBitmap)" />
@@ -24,10 +24,10 @@
     <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="2" />
     <Control Id="Description" Type="Text" X="25" Y="23" Width="280" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgDescription)" />
     <Control Id="Title" Type="Text" X="15" Y="6" Width="210" Height="15" Transparent="yes" NoPrefix="yes" Text="!(loc.FeaturesDlgTitle)" />
-    <Control Id="groupBox1" Type="GroupBox" Height="88" Width="350" X="10" Y="50" Text="Components" />
-    <Control Id="checkBox2" Type="CheckBox" Height="18" Width="331" X="25" Y="111" Text="${client.name}" Property="INSTALL_CLIENT" CheckBoxValue="1" />
-    <Control Id="checkBox1" Type="CheckBox" Height="18" Width="331" X="25" Y="88" Text="${mediaserver.name}" Property="INSTALL_SERVER" CheckBoxValue="1" />
-    <Control Id="checkBox3" Type="CheckBox" Height="18" Width="331" X="25" Y="64" Text="${appserver.name}" Property="INSTALL_ECS" CheckBoxValue="1" />
+    <Control Id="groupBox1" Type="GroupBox" Height="127" Width="350" X="10" Y="50" Text="Components" />
+    <Control Id="checkBox2" Type="CheckBox" Height="30" Width="331" X="25" Y="65" Text="${client.name} (I want to view video recorded elsewhere)" Property="INSTALL_CLIENT" CheckBoxValue="1" />
+    <Control Id="checkBox1" Type="CheckBox" Height="30" Width="331" X="25" Y="103" Text="${mediaserver.name} (I want to record locally on this PC)" Property="INSTALL_SERVER" CheckBoxValue="1" />
+    <Control Id="checkBox3" Type="CheckBox" Height="30" Width="331" X="25" Y="137" Text="${appserver.name} (Database management. Should not be installed more than once in a network)" Property="INSTALL_ECS" CheckBoxValue="1" />
 </Dialog>
 		</UI>
 	</Fragment>

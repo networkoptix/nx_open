@@ -86,6 +86,8 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
+#include "help/context_help_queryable.h"
+#include "help/help_topics.h"
 
 
 
@@ -1716,7 +1718,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-
+    setHelpTopicId(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1852,6 +1854,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
+    setHelpTopicId(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 

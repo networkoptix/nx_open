@@ -8,7 +8,7 @@ namespace {
         switch(topic) {
 #define QN_HELP_TOPIC(ID, URL)                                                  \
         case Qn::ID: return URL;
-#include "help_topics.h"
+#include "help_topics.i"
         default:
             return NULL;
         }
@@ -43,7 +43,7 @@ void QnContextHelp::setHelpTopic(Qn::HelpTopic topic) {
 }
 
 QUrl QnContextHelp::urlForTopic(Qn::HelpTopic topic) const {
-    return QUrl(m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic)));
+    return QUrl::fromLocalFile(m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic)));
 }
 
 
