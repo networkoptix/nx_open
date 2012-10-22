@@ -17,8 +17,10 @@ extern "C" {
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
+char SIGN_TEXT_DELIMITER('\\');
+char SIGN_TEXT_DELIMITER_REPLACED('/');
 
-QString INITIAL_SIGNATURE_MAGIC(QLatin1String("BCDC833CB81C47bc83B37ECD87FD5217")); // initial MD5 hash
+QByteArray INITIAL_SIGNATURE_MAGIC("BCDC833CB81C47bc83B37ECD87FD5217"); // initial MD5 hash
 QByteArray SIGNATURE_XOR_MAGIC = QByteArray::fromHex("B80466320F15448096F7CEE3379EEF78");
 
 
@@ -677,22 +679,26 @@ void QnSignHelper::setSign(const QByteArray& sign)
 
 QByteArray QnSignHelper::getSignMagic()
 {
-    return INITIAL_SIGNATURE_MAGIC.toUtf8();
+    return INITIAL_SIGNATURE_MAGIC;
+}
+
+char QnSignHelper::getSignPatternDelim()
+{
+    return SIGN_TEXT_DELIMITER;
 }
 
 QByteArray QnSignHelper::getSignPattern()
 {
-    QString DELIMITER_STR(QLatin1String(";"));
-    QString result;
+    QByteArray result;
     result.append(INITIAL_SIGNATURE_MAGIC);
-    result.append(DELIMITER_STR);
+    result.append(SIGN_TEXT_DELIMITER);
 
-    result.append(qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion())).append(DELIMITER_STR);
+    result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
     if (hid.isEmpty())
         hid = tr("Unknown");
-    result.append(hid).append(DELIMITER_STR);
+    result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
     QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
     QString licenseName(tr("FREE license"));
@@ -701,8 +707,9 @@ QByteArray QnSignHelper::getSignPattern()
         if (license->name() != QLatin1String("FREE"))
             licenseName = license->name();
     }
-    result.append(licenseName);
-    return result.toUtf8();
+    QByteArray bLicName = licenseName.toUtf8().replace(SIGN_TEXT_DELIMITER, SIGN_TEXT_DELIMITER_REPLACED);
+    result.append(bLicName);
+    return result;
 }
 
 void QnSignHelper::setVersionStr(const QString& value)

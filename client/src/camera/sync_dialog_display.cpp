@@ -39,7 +39,7 @@ void QnSignDialogDisplay::finilizeSign()
             {
                 QByteArray baPattern(signPattern);
                 QByteArray magic = QnSignHelper::getSignMagic();
-                QList<QByteArray> patternParams = baPattern.split(';');
+                QList<QByteArray> patternParams = baPattern.split(QnSignHelper::getSignPatternDelim());
 
                 baPattern.replace(0, magic.size(), magic);
                 QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
