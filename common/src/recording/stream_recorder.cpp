@@ -160,10 +160,8 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         if (!m_endOfData) 
         {
             bool isOK = true;
-#ifdef SIGN_FRAME_ENABLED
             if (m_needCalcSignature && !m_firstTime)
                 isOK = addSignatureFrame(m_lastErrMessage);
-#endif
             if (isOK)
                 emit recordingFinished(m_fileName);
             else
@@ -604,7 +602,10 @@ QByteArray QnStreamRecorder::getSignature() const
 
 bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 {
-
+#ifndef SIGN_FRAME_ENABLED
+    QByteArray signText = QnSignHelper::getSignPattern();
+    QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) signText.data(), signText.size());
+#else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
     QnSignHelper signHelper;
     signHelper.setLogo(m_logo);
@@ -626,7 +627,7 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
         generatedFrame->timestamp += 100 * 1000ll;
     }
     m_needCalcSignature = true;
-
+#endif
 
     return true;
 }

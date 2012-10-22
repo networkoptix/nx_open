@@ -23,8 +23,9 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
 void QnSignDialogDisplay::finilizeSign()
 {
     QByteArray signFromPicture;
-    QByteArray calculatedSign = m_mdctx.result();
+    QByteArray calculatedSign;
 #ifdef SIGN_FRAME_ENABLED
+    calculatedSign = m_mdctx.result();
     QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
     QnSignHelper signHelper;
     signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
@@ -34,12 +35,20 @@ void QnSignDialogDisplay::finilizeSign()
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile) {
             const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
-            if (signPattern) {
-                QList<QByteArray> pattern = QByteArray(signPattern).split(';');
-                signFromPicture = QnSignHelper::getDigestFromSign(pattern[0]);
-                if (pattern.size() >= 4)
+            if (signPattern) 
+            {
+                QByteArray baPattern(signPattern);
+                QByteArray magic = QnSignHelper::getSignMagic();
+                QList<QByteArray> patternParams = baPattern.split(';');
+
+                baPattern.replace(0, magic.size(), magic);
+                QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
+                calculatedSign = m_mdctx.result();
+
+                signFromPicture = QnSignHelper::getDigestFromSign(patternParams[0]);
+                if (patternParams.size() >= 4)
                 {
-                    emit gotSignatureDescription(QString::fromUtf8(pattern[1]), QString::fromUtf8(pattern[2]), QString::fromUtf8(pattern[3]));
+                    emit gotSignatureDescription(QString::fromUtf8(patternParams[1]), QString::fromUtf8(patternParams[2]), QString::fromUtf8(patternParams[3]));
                 }
             }
         }
