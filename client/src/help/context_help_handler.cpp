@@ -2,6 +2,7 @@
 
 #include <QtCore/QEvent>
 #include <QtGui/QHelpEvent>
+#include <QtGui/QWhatsThis>
 
 #include <utils/common/variant.h>
 
@@ -53,6 +54,7 @@ bool QnContextHelpHandler::eventFilter(QObject *watched, QEvent *event) {
                 contextHelp()->show();
             }
 
+            QWhatsThis::leaveWhatsThisMode();
             return true;
         }
 

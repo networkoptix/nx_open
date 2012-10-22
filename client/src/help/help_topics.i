@@ -55,14 +55,14 @@ QN_HELP_TOPIC(ServerSettings_Storages_Help,                     "configuring_med
 QN_HELP_TOPIC(UserSettings_Help,                                "changing_user_settings.htm")
 QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_user_(admin_only).htm")
 
-QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm")
+QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm") // TODO
 
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
-QN_HELP_TOPIC(CameraSettings_General_Ip_Help,                   "obtaining_cameras_ip_and_mac.htm")
+QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")
 QN_HELP_TOPIC(CameraSettings_General_Audio_Help,                "configuring_audio_for_the_camera_(admin_only).htm")
 QN_HELP_TOPIC(CameraSettings_General_Auth_Help,                 "configuring_camera_authentication_(admin_only).htm")
+QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recording_schedule.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "configuring_proprietary_camera_parameters.htm")
-QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recording_schedule.htm")
 
 #undef QN_HELP_TOPIC
