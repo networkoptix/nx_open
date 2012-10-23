@@ -4,6 +4,9 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 
+class QGraphicsItem;
+class QGraphicsView;
+
 class QnContextHelp;
 class QnContextHelpQueryable;
 
@@ -19,7 +22,12 @@ public:
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
-    QnContextHelpQueryable *queryable(QObject *object);
+    int helpTopicAt(QGraphicsItem *item, const QPointF &pos) const;
+    int helpTopicAt(QWidget *widget, const QPoint &pos) const;
+
+    QnContextHelpQueryable *queryable(QGraphicsItem *item) const;
+    QnContextHelpQueryable *queryable(QObject *object) const;
+    QGraphicsView *view(QObject *object) const;
 
 private:
     QWeakPointer<QnContextHelp> m_contextHelp;

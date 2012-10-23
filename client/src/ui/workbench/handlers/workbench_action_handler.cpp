@@ -10,6 +10,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
+#include <QtGui/QWhatsThis>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -243,6 +244,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
+    connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
@@ -2774,6 +2776,8 @@ void QnWorkbenchActionHandler::at_activityInstrument_activated() {
     action(Qn::ToggleTourModeAction)->setChecked(false);
 }
 
-
+void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
+    QWhatsThis::enterWhatsThisMode();
+}
 
 

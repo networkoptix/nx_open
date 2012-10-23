@@ -122,6 +122,12 @@ namespace Qn {
          */
         SelectionChangeAction,
 
+        /**
+         * Enters "what's this" mode.
+         */
+        WhatsThisAction,
+
+
 
 
         /* Main menu actions. */

@@ -215,6 +215,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));

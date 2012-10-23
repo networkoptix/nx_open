@@ -307,6 +307,8 @@ protected slots:
 
     void at_cancelExport();
 
+    void at_whatsThisAction_triggered();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
