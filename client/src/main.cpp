@@ -484,8 +484,25 @@ int qnMain(int argc, char *argv[])
     return result;
 }
 
+#if defined(_WIN32) && defined(_DEBUG)
+#include <crtdbg.h>
+
+int MUAllocHook( int allocType, void *userData, size_t size, int blockType, 
+                 long requestNumber, const unsigned char *filename, int lineNumber )
+{
+    if( allocType == _HOOK_FREE )
+        printf( "_HOOK_FREE. %x. %s : %d\n", size_t(userData), filename, lineNumber );
+    return TRUE;
+}
+#endif
+
 int main(int argc, char *argv[]) {
     // TODO: this is an ugly hack for a problem with threads not being stopped before globals are destroyed.
+
+#if defined(_WIN32) && defined(_DEBUG)
+    //_CrtSetDbgFlag( _CRTDBG_ALLOC_MEM_DF | /*_CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_LEAK_CHECK_DF*/ ); 
+    _CrtSetAllocHook( MUAllocHook );
+#endif
 
     int result = qnMain(argc, argv);
 #if defined(Q_OS_WIN)
