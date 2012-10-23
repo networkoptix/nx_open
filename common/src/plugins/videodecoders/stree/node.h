@@ -141,6 +141,7 @@ namespace stree
         {
             unknown,
             equal,
+            greater,
             wildcard
         };
 
