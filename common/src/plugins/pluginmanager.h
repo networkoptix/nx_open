@@ -30,6 +30,9 @@
 class PluginManager
 {
 public:
+    PluginManager( const QString& pluginDir = QString() );
+    virtual ~PluginManager();
+
     //!Searches for plugins of type \a T among loaded plugins
     template<class T>
         QList<T*> findPlugins() const
@@ -59,9 +62,6 @@ private:
     const QString m_pluginDir;
     QList<QSharedPointer<QPluginLoader> > m_loadedPlugins;
     mutable QMutex m_mutex;
-
-    PluginManager( const QString& pluginDir = QString() );
-    ~PluginManager();
 
     void loadPlugins( const QString& dirToSearchIn );
     void loadPlugin( const QString& fullFilePath );

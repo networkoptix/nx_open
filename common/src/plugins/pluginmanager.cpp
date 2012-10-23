@@ -16,6 +16,43 @@
 #include "../utils/common/log.h"
 
 
+class PluginManagerWrapper
+{
+public:
+    PluginManagerWrapper()
+    :
+        m_pluginManager( NULL )
+    {
+    }
+
+    PluginManagerWrapper::~PluginManagerWrapper()
+    {
+        delete m_pluginManager;
+        m_pluginManager = NULL;
+    }
+
+    PluginManager* getPluginManager( const QString& pluginDir )
+    {
+        if( !m_pluginManager )
+        {
+            PluginManager* newInstance = new PluginManager( pluginDir );
+            if( !m_pluginManager.testAndSetOrdered( NULL, newInstance ) )
+                delete newInstance;
+            //else
+            //    newInstance->loadPlugins();
+        }
+        return m_pluginManager;
+    }
+
+private:
+    QAtomicPointer<PluginManager> m_pluginManager;
+};
+
+
+Q_GLOBAL_STATIC(PluginManagerWrapper, pluginManagerWrapper);
+
+//static QAtomicPointer<PluginManager> pluginManagerInstance;
+
 PluginManager::PluginManager( const QString& pluginDir )
 :
     m_pluginDir( pluginDir )
@@ -24,23 +61,29 @@ PluginManager::PluginManager( const QString& pluginDir )
 
 PluginManager::~PluginManager()
 {
+    for( QList<QSharedPointer<QPluginLoader> >::iterator
+        it = m_loadedPlugins.begin();
+        it != m_loadedPlugins.end();
+        ++it )
+    {
+        (*it)->unload();
+    }
 }
-
-//Q_GLOBAL_STATIC(PluginManager, pluginManagerInstance);
-static QAtomicPointer<PluginManager> pluginManagerInstance;
 
 //!Guess what
 PluginManager* PluginManager::instance( const QString& pluginDir )
 {
-    if( !pluginManagerInstance )
-    {
-        PluginManager* newInstance = new PluginManager( pluginDir );
-        if( !pluginManagerInstance.testAndSetOrdered( NULL, newInstance ) )
-            delete newInstance;
-        //else
-        //    newInstance->loadPlugins();
-    }
-    return pluginManagerInstance;
+    return pluginManagerWrapper()->getPluginManager( pluginDir );
+
+    //if( !pluginManagerInstance )
+    //{
+    //    PluginManager* newInstance = new PluginManager( pluginDir );
+    //    if( !pluginManagerInstance.testAndSetOrdered( NULL, newInstance ) )
+    //        delete newInstance;
+    //    //else
+    //    //    newInstance->loadPlugins();
+    //}
+    //return pluginManagerInstance;
 }
 
 void PluginManager::loadPlugins()
@@ -86,8 +129,12 @@ void PluginManager::loadPlugin( const QString& fullFilePath )
     QnAbstractClientPlugin* clientPlugin = dynamic_cast<QnAbstractClientPlugin*>(obj);
     if( !clientPlugin )
         return;
-
     clientPlugin->initializeLog( QnLog::instance() );
+    if( !clientPlugin->initialized() )
+    {
+        cl_log.log( QString::fromAscii("Failed to initialize plugin %1").arg(fullFilePath), cl_logERROR );
+        return;
+    }
 
     cl_log.log( QString::fromAscii("Successfully loaded plugin %1").arg(fullFilePath), cl_logWARNING );
     m_loadedPlugins.push_back( plugin );
