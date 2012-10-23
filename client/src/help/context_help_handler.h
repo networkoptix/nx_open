@@ -3,6 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
+#include <QtCore/QPoint>
+#include <QtCore/QPointF>
 
 class QGraphicsItem;
 class QGraphicsView;
@@ -23,11 +25,7 @@ public:
 
 private:
     int helpTopicAt(QGraphicsItem *item, const QPointF &pos) const;
-    int helpTopicAt(QWidget *widget, const QPoint &pos) const;
-
-    QnContextHelpQueryable *queryable(QGraphicsItem *item) const;
-    QnContextHelpQueryable *queryable(QObject *object) const;
-    QGraphicsView *view(QObject *object) const;
+    int helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp = false) const;
 
 private:
     QWeakPointer<QnContextHelp> m_contextHelp;

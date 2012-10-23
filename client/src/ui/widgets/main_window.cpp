@@ -42,6 +42,8 @@
 #include "ui/events/system_menu_event.h"
 #include <ui/screen_recording/screen_recorder.h>
 
+#include "help/context_help_queryable.h"
+
 #include "file_processor.h"
 #include "utils/settings.h"
 
@@ -223,6 +225,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5);
+    setHelpTopicId(m_mainMenuButton, Qn::MainWindow_MainMenu_Help);
+
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);

@@ -1,14 +1,14 @@
 #include "context_help_queryable.h"
 
-#include <QtGui/QWidget>
+#include <QtCore/QObject>
 
 #include <utils/common/warnings.h>
 
-void setHelpTopicId(QWidget *widget, Qn::HelpTopic helpTopic) {
-    if(!widget) {
-        qnNullWarning(widget);
+void setHelpTopicId(QWidget *object, Qn::HelpTopic helpTopic) {
+    if(!object) {
+        qnNullWarning(object);
         return;
     }
 
-    widget->setProperty(Qn::HelpTopicId, static_cast<int>(helpTopic));
+    object->setProperty(Qn::HelpTopicId, static_cast<int>(helpTopic));
 }

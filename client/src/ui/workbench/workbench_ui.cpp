@@ -63,6 +63,7 @@
 #include <ui/screen_recording/screen_recorder.h>
 
 #include <help/context_help.h>
+#include <help/context_help_queryable.h>
 
 #include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"
@@ -388,6 +389,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_tabBarItem->setWidget(m_tabBarWidget);
 
     m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
+    setHelpTopicId(m_mainMenuButton, Qn::MainWindow_MainMenu_Help);
 
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
