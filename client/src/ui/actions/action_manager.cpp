@@ -419,8 +419,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::DisconnectAction).
         flags(Qn::Main).
-        text(tr("Disconnect")).
-        icon(qnSkin->icon("titlebar/disconnected.png")).
+        text(tr("Logout")).
         autoRepeat(false).
         condition(new QnDisconnectActionCondition(this));
 
