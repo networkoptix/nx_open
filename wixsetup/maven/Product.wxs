@@ -1151,6 +1151,7 @@
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
         </UI>
     </Product>
 </Wix>
