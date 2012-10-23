@@ -1,0 +1,423 @@
+﻿<!DOCTYPE HTML>
+<html><head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- This line includes the general project style sheet (not required) -->
+   <link type="text/css" href="default.css" rel="stylesheet">
+
+<!-- This block defines the styles of the TOC headings, change them as needed -->
+<style type="text/css">
+a { color: black; text-decoration: none }
+a:visited {color: black}
+a:hover { text-decoration: underline }
+.navtitle    { font-size: 14pt; font-weight: bold; margin-bottom: 16px; }
+.navbar      { font-size: 10pt; }
+span#navsearch {display: none;}
+
+ body { }
+.heading1 { font-size: 10pt; color: #000000; text-decoration: none; }
+.heading2 { font-size: 10pt; color: #000000; text-decoration: none; }
+.heading3 { font-size: 10pt; color: #000000; text-decoration: none; }
+.heading4 { font-size: 10pt; color: #000000; text-decoration: none; }
+.heading5 { font-size: 10pt; color: #000000; text-decoration: none; }
+.heading6 { font-size: 10pt; color: #000000; text-decoration: none; }
+
+.hilight1 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+.hilight2 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+.hilight3 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+.hilight4 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+.hilight5 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+.hilight6 { font-size: 10pt; color: #FFFFFF; background: #004101; text-decoration: none; }
+
+/* TOC LIST CSS */
+#toc    { padding:0; margin:0 }
+#toc li { margin-top:2px; margin-left:0px; padding:1px; }
+#toc ul { padding-left:0; margin-left:-16px; }
+/* TOC LIST CSS */
+</style>
+<!--[if lt IE 7]>
+<style type="text/css">
+ html {padding: 0; margin: 0;overflow-x: hidden;}
+ body { margin: 0; padding: 15px 0 0 10px;} 
+</style> 
+<![endif]-->
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript">
+     var parentScope = (parent.hmNavigationFrame);
+     if (!parentScope) {
+		      var s = document.createElement("script");
+		      s.setAttribute("type","text/javascript");
+		      s.setAttribute("src", "helpman_navigation.js");
+		      document.getElementsByTagName("head")[0].appendChild(s);
+	    }
+     else {
+       if (initialtocstate != "expandall") parent.hmAddCss(document, "#toc li ul { display: none }");
+     }
+     function loadicons() { var icons = new Array(); for (i=0; i<arguments.length; i++) { icons[i] = new Image(); icons[i].src = arguments[i]; } }
+     function loadtoc() { if (parentScope) parent.loadstate(document.getElementById("toc")); else loadstate(document.getElementById("toc")); }
+     function savetoc() { if (parentScope) parent.savestate(document.getElementById("toc")); else savestate(document.getElementById("toc")); }
+     function clicked(node, event) { deselect(); if (parentScope) parent.hmNodeClicked(node, event); else hmNodeClicked(node, event); }
+     function dblclicked(node) { if (parentScope) parent.hmNodeDblclicked(node); else hmNodeDblclicked(node); }
+     function deselect() { if (window.getSelection) window.getSelection().removeAllRanges(); else if (document.selection) document.selection.empty(); }
+     $(document).ready(function(){
+       loadtoc();
+       $(window).onunload = savetoc;
+     });
+   </script>
+</head>
+<body style="background:#FFFFFF url('lines.gif')">
+<p class="navtitle">DW Spectrum Guide</p>
+<p class="navbar">
+<b>Contents</b>&nbsp;|&nbsp;<a href="hd_witness_1_2_-_variable_changed_kwindex.htm">Index</a>&nbsp;
+<span id="navsearch">|&nbsp;<a href="hd_witness_1_2_-_variable_changed_ftsearch.htm">Search</a></span>
+<hr size="1" />
+
+<!-- Placeholder for the TOC - this variable is REQUIRED! -->
+<ul id="toc" style="list-style-type:none;display:block;padding-left:0">
+<li class="heading1" id="i1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading1" id="a1" href="hd_witness%AE.htm" target="hmcontent"><span class="heading1" id="s1">DW Spectrum®</span></a>
+</li>
+<li class="heading1" id="i2" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading1" id="a2" href="hd_witness%AE_installation_and_configuration_guide.htm" target="hmcontent"><span class="heading1" id="s2" ondblclick="return dblclicked(this)">DW Spectrum® Installation and Configuration Guide</span></a>
+<ul id="ul2" style="list-style-type:none">
+<li class="heading2" id="i2.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.1" href="hd_witness_architecture.htm" target="hmcontent"><span class="heading2" id="s2.1">DW Spectrum Architecture</span></a>
+</li>
+<li class="heading2" id="i2.2" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.2" href="hd_witness_requirements.htm" target="hmcontent"><span class="heading2" id="s2.2" ondblclick="return dblclicked(this)">DW Spectrum System Requirements</span></a>
+<ul id="ul2.2" style="list-style-type:none">
+<li class="heading3" id="i2.2.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.2.1" href="list_of_supported_camera_vendors.htm" target="hmcontent"><span class="heading3" id="s2.2.1">List of Supported Camera Vendors</span></a>
+</li>
+<li class="heading3" id="i2.2.2" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.2.2" href="network_requirements.htm" target="hmcontent"><span class="heading3" id="s2.2.2" ondblclick="return dblclicked(this)">Network Requirements</span></a>
+<ul id="ul2.2.2" style="list-style-type:none">
+<li class="heading4" id="i2.2.2.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.2.1" href="ports_and_firewall_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.2.1">Ports and Firewall Requirements</span></a>
+</li>
+<li class="heading4" id="i2.2.2.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.2.2" href="requirements_for_addressing_ip.htm" target="hmcontent"><span class="heading4" id="s2.2.2.2">Requirements for Addressing IP</span></a>
+</li>
+<li class="heading4" id="i2.2.2.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.2.3" href="forwarding_traffic_from_private_to_public_subnets_.htm" target="hmcontent"><span class="heading4" id="s2.2.2.3">Forwarding Traffic from Private to Public Subnets via Mediaproxy Component</span></a>
+</li>
+<li class="heading4" id="i2.2.2.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.2.4" href="time_synchronization_between_system_components.htm" target="hmcontent"><span class="heading4" id="s2.2.2.4">Time Synchronization between System Components</span></a>
+</li>
+<li class="heading4" id="i2.2.2.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.2.5" href="bandwidth_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.2.5">Bandwidth Requirements</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i2.2.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.2.3" href=javascript:void(0);><span class="heading3" id="s2.2.3" ondblclick="return dblclicked(this)">Hardware Requirements</span></a>
+<ul id="ul2.2.3" style="list-style-type:none">
+<li class="heading4" id="i2.2.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.3.1" href="server_hardware_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.3.1">Server Hardware Requirements</span></a>
+</li>
+<li class="heading4" id="i2.2.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.3.2" href="client_hardware_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.3.2">Client Hardware Requirements</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i2.2.4" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.2.4" href="software_requirements.htm" target="hmcontent"><span class="heading3" id="s2.2.4" ondblclick="return dblclicked(this)">Software Requirements</span></a>
+<ul id="ul2.2.4" style="list-style-type:none">
+<li class="heading4" id="i2.2.4.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.4.1" href="operating_system_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.4.1">Operating System Requirements</span></a>
+</li>
+<li class="heading4" id="i2.2.4.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.2.4.2" href="additional_software_requirements.htm" target="hmcontent"><span class="heading4" id="s2.2.4.2">Additional Software Requirements</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i2.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.3" href="hd_witness_install_guide_(windows).htm" target="hmcontent"><span class="heading2" id="s2.3" ondblclick="return dblclicked(this)">DW Spectrum Install Guide (Windows)</span></a>
+<ul id="ul2.3" style="list-style-type:none">
+<li class="heading3" id="i2.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.1" href="obtaining_hd_witness.htm" target="hmcontent"><span class="heading3" id="s2.3.1">Obtaining DW Spectrum</span></a>
+</li>
+<li class="heading3" id="i2.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.2" href="choosing_the_best_installation_configuration.htm" target="hmcontent"><span class="heading3" id="s2.3.2">Choosing the Best Installation Configuration</span></a>
+</li>
+<li class="heading3" id="i2.3.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.3" href="all-in-one_installation.htm" target="hmcontent"><span class="heading3" id="s2.3.3" ondblclick="return dblclicked(this)">All-in-one installation</span></a>
+<ul id="ul2.3.3" style="list-style-type:none">
+<li class="heading4" id="i2.3.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.3.3.1" href="quick_installation_(all-in-one).htm" target="hmcontent"><span class="heading4" id="s2.3.3.1">Quick Installation (All-in-One)</span></a>
+</li>
+<li class="heading4" id="i2.3.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.3.3.2" href="custom_installation_(all-in-one).htm" target="hmcontent"><span class="heading4" id="s2.3.3.2">Custom Installation (All-in-One)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i2.3.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.4" href="installing_enterprise_controller_and_media_server_.htm" target="hmcontent"><span class="heading3" id="s2.3.4">Installing Enterprise Controller and Media Server on one computer</span></a>
+</li>
+<li class="heading3" id="i2.3.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.5" href="installing_media_server_and_connecting_it_to_exist.htm" target="hmcontent"><span class="heading3" id="s2.3.5">Installing Media Server and Connecting it to Existing Enterprise Controller</span></a>
+</li>
+<li class="heading3" id="i2.3.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.6" href="installing_client_only.htm" target="hmcontent"><span class="heading3" id="s2.3.6">Installing Client Only</span></a>
+</li>
+<li class="heading3" id="i2.3.7" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.7" href="upgrading_hd_witness_or_changing_installed_compone.htm" target="hmcontent"><span class="heading3" id="s2.3.7">Upgrading DW Spectrum or changing installed components</span></a>
+</li>
+<li class="heading3" id="i2.3.8" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.8" href="configuring_hd_witness_components_after_installati.htm" target="hmcontent"><span class="heading3" id="s2.3.8" ondblclick="return dblclicked(this)">Configuring DW Spectrum Components after Installation</span></a>
+<ul id="ul2.3.8" style="list-style-type:none">
+<li class="heading4" id="i2.3.8.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.3.8.1" href="configuring_enterprise_controller.htm" target="hmcontent"><span class="heading4" id="s2.3.8.1">Configuring Enterprise Controller</span></a>
+</li>
+<li class="heading4" id="i2.3.8.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a2.3.8.2" href="configuring_media_server.htm" target="hmcontent"><span class="heading4" id="s2.3.8.2">Configuring Media Server</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i2.3.9" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.9" href="starting_and_stopping_hd_witness_server_components.htm" target="hmcontent"><span class="heading3" id="s2.3.9">Starting and Stopping DW Spectrum Server Components</span></a>
+</li>
+<li class="heading3" id="i2.3.10" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a2.3.10" href="uninstalling_hd_witness.htm" target="hmcontent"><span class="heading3" id="s2.3.10">Uninstalling DW Spectrum</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i2.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.4" href="hd_witness_install_guide_linux.htm" target="hmcontent"><span class="heading2" id="s2.4">DW Spectrum Install Guide (Linux)</span></a>
+</li>
+<li class="heading2" id="i2.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.5" href="web-client.htm" target="hmcontent"><span class="heading2" id="s2.5">Web-Client</span></a>
+</li>
+<li class="heading2" id="i2.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a2.6" href="upgrading_hd_witness.htm" target="hmcontent"><span class="heading2" id="s2.6">Upgrading DW Spectrum</span></a>
+</li>
+</ul>
+</li>
+<li class="heading1" id="i3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading1" id="a3" href=javascript:void(0);><span class="heading1" id="s3" ondblclick="return dblclicked(this)">Working with DW Spectrum</span></a>
+<ul id="ul3" style="list-style-type:none">
+<li class="heading2" id="i3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.1" href="launching_and_closing_hd_witness_client.htm" target="hmcontent"><span class="heading2" id="s3.1">Launching and Closing DW Spectrum Client</span></a>
+</li>
+<li class="heading2" id="i3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.2" href="connecting_to_enterprise_controller_and_working_of.htm" target="hmcontent"><span class="heading2" id="s3.2">Connecting to Enterprise Controller and Working Offline</span></a>
+</li>
+<li class="heading2" id="i3.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.3" href="introducing_user_roles.htm" target="hmcontent"><span class="heading2" id="s3.3">Introducing User Roles</span></a>
+</li>
+<li class="heading2" id="i3.4" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.4" href="hd_witness_user_interface_overview.htm" target="hmcontent"><span class="heading2" id="s3.4" ondblclick="return dblclicked(this)">DW Spectrum User Interface Overview</span></a>
+<ul id="ul3.4" style="list-style-type:none">
+<li class="heading3" id="i3.4.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.1" href="main_menu.htm" target="hmcontent"><span class="heading3" id="s3.4.1">Main Menu</span></a>
+</li>
+<li class="heading3" id="i3.4.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.2" href="scene.htm" target="hmcontent"><span class="heading3" id="s3.4.2">Scene and Layouts</span></a>
+</li>
+<li class="heading3" id="i3.4.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.3" href="viewing_camera_stream_information.htm" target="hmcontent"><span class="heading3" id="s3.4.3">Items on Layouts and Scene</span></a>
+</li>
+<li class="heading3" id="i3.4.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.4" href="showing_and_hiding_side_panels.htm" target="hmcontent"><span class="heading3" id="s3.4.4">Showing and Hiding Side Panels</span></a>
+</li>
+<li class="heading3" id="i3.4.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.5" href="tabs.htm" target="hmcontent"><span class="heading3" id="s3.4.5">Tabs</span></a>
+</li>
+<li class="heading3" id="i3.4.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.6" href="context_menu.htm" target="hmcontent"><span class="heading3" id="s3.4.6">Context Menu</span></a>
+</li>
+<li class="heading3" id="i3.4.7" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.7" href="working_with_a_resource_tree.htm" target="hmcontent"><span class="heading3" id="s3.4.7">Working with Resource Tree</span></a>
+</li>
+<li class="heading3" id="i3.4.8" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.8" href="search.htm" target="hmcontent"><span class="heading3" id="s3.4.8">Search</span></a>
+</li>
+<li class="heading3" id="i3.4.9" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.9" href="full_screen_and_windowed_mode.htm" target="hmcontent"><span class="heading3" id="s3.4.9">Full Screen and Windowed Mode</span></a>
+</li>
+<li class="heading3" id="i3.4.10" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.10" href="changing_interface_language.htm" target="hmcontent"><span class="heading3" id="s3.4.10">Changing Interface Language</span></a>
+</li>
+<li class="heading3" id="i3.4.11" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.11" href="getting_context_help.htm" target="hmcontent"><span class="heading3" id="s3.4.11">Getting Context Help</span></a>
+</li>
+<li class="heading3" id="i3.4.12" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.4.12" href="playback_panel.htm" target="hmcontent"><span class="heading3" id="s3.4.12">Playback Panel</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.5" href="hd_witness_quick_start.htm" target="hmcontent"><span class="heading2" id="s3.5">DW Spectrum Quick Start</span></a>
+</li>
+<li class="heading2" id="i3.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.6" href="obtaining_and_activating_hd_witness_licenses.htm" target="hmcontent"><span class="heading2" id="s3.6">Obtaining and Activating DW Spectrum Licenses</span></a>
+</li>
+<li class="heading2" id="i3.7" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.7" href="configuring_media_servers_additional_settings_(ad.htm" target="hmcontent"><span class="heading2" id="s3.7" ondblclick="return dblclicked(this)">Obtaining and Configuring Media Server’s Additional Settings (Admin Only)</span></a>
+<ul id="ul3.7" style="list-style-type:none">
+<li class="heading3" id="i3.7.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.7.1" href="configuring_media_server_storages_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.7.1">Configuring Media Server Storages (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.7.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.7.2" href="deleting_media_server_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.7.2">Deleting Media Server (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.7.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.7.3" href="monitoring_media_servers.htm" target="hmcontent"><span class="heading3" id="s3.7.3">Monitoring Media Servers (Admin Only)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.8" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.8" href="configuring_cameras.htm" target="hmcontent"><span class="heading2" id="s3.8" ondblclick="return dblclicked(this)">Configuring Cameras</span></a>
+<ul id="ul3.8" style="list-style-type:none">
+<li class="heading3" id="i3.8.1" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.8.1" href=javascript:void(0);><span class="heading3" id="s3.8.1" ondblclick="return dblclicked(this)">Adding Cameras</span></a>
+<ul id="ul3.8.1" style="list-style-type:none">
+<li class="heading4" id="i3.8.1.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.1.1" href="discovering_cameras_automatica.htm" target="hmcontent"><span class="heading4" id="s3.8.1.1">Discovering Cameras Automatically</span></a>
+</li>
+<li class="heading4" id="i3.8.1.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.1.2" href="adding_cameras_manually.htm" target="hmcontent"><span class="heading4" id="s3.8.1.2">Adding Cameras Manually</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.8.2" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.8.2" href="opening_camera_settings_dialog.htm" target="hmcontent"><span class="heading3" id="s3.8.2" ondblclick="return dblclicked(this)">Setting Up Cameras</span></a>
+<ul id="ul3.8.2" style="list-style-type:none">
+<li class="heading4" id="i3.8.2.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.1" href="renaming_a_camera.htm" target="hmcontent"><span class="heading4" id="s3.8.2.1">Renaming a Camera</span></a>
+</li>
+<li class="heading4" id="i3.8.2.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.2" href="obtaining_cameras_ip_and_mac.htm" target="hmcontent"><span class="heading4" id="s3.8.2.2">Obtaining Camera’s IP and MAC</span></a>
+</li>
+<li class="heading4" id="i3.8.2.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.3" href="configuring_audio_for_the_camera_(admin_only).htm" target="hmcontent"><span class="heading4" id="s3.8.2.3">Configuring Audio for the Camera</span></a>
+</li>
+<li class="heading4" id="i3.8.2.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.4" href="configuring_camera_authentication_(admin_only).htm" target="hmcontent"><span class="heading4" id="s3.8.2.4">Configuring Camera Authentication</span></a>
+</li>
+<li class="heading4" id="i3.8.2.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.5" href="setting_up_ptz.htm" target="hmcontent"><span class="heading4" id="s3.8.2.5">Setting up PTZ</span></a>
+</li>
+<li class="heading4" id="i3.8.2.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.6" href="configuring_proprietary_camera_parameters.htm" target="hmcontent"><span class="heading4" id="s3.8.2.6">Configuring Proprietary Camera Parameters</span></a>
+</li>
+<li class="heading4" id="i3.8.2.7" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.7" href="setting_up_recording_schedule_(admin_only).htm" target="hmcontent"><span class="heading4" id="s3.8.2.7" ondblclick="return dblclicked(this)">Setting up Recording Schedule</span></a>
+<ul id="ul3.8.2.7" style="list-style-type:none">
+<li class="heading5" id="i3.8.2.7.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.8.2.7.1" href="dual_stream_recording_radass.htm" target="hmcontent"><span class="heading5" id="s3.8.2.7.1">Dual Stream Recording (RADASS)</span></a>
+</li>
+<li class="heading5" id="i3.8.2.7.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.8.2.7.2" href="editing_recording_schedule.htm" target="hmcontent"><span class="heading5" id="s3.8.2.7.2">Editing Recording Schedule</span></a>
+</li>
+<li class="heading5" id="i3.8.2.7.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.8.2.7.3" href="panic_recording.htm" target="hmcontent"><span class="heading5" id="s3.8.2.7.3">Panic Recording</span></a>
+</li>
+</ul>
+</li>
+<li class="heading4" id="i3.8.2.8" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.8.2.8" href="setting_up_motion_mask_and_motion_sensitivity_(adm.htm" target="hmcontent"><span class="heading4" id="s3.8.2.8">Setting up Motion Mask and Motion Sensitivity</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.8.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.8.3" href="setting_same_parameters_for_multiple_cameras_(admi.htm" target="hmcontent"><span class="heading3" id="s3.8.3">Setting Same Parameters for Multiple Cameras</span></a>
+</li>
+<li class="heading3" id="i3.8.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.8.4" href="swapping_cameras_between_media_servers_(admin_only.htm" target="hmcontent"><span class="heading3" id="s3.8.4">Swapping Cameras between Media Servers (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.8.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.8.5" href="deleting_a_camera_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.8.5">Deleting a Camera (Admin Only)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.9" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.9" href="users_management.htm" target="hmcontent"><span class="heading2" id="s3.9" ondblclick="return dblclicked(this)">Users Management</span></a>
+<ul id="ul3.9" style="list-style-type:none">
+<li class="heading3" id="i3.9.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.9.1" href="creating_a_new_user_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.9.1">Creating a New User (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.9.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.9.2" href="changing_user_settings.htm" target="hmcontent"><span class="heading3" id="s3.9.2">Changing User Settings</span></a>
+</li>
+<li class="heading3" id="i3.9.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.9.3" href="deleting_a_user_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.9.3">Deleting a User (Admin Only)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.10" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.10" href="configuring_layouts.htm" target="hmcontent"><span class="heading2" id="s3.10" ondblclick="return dblclicked(this)">Configuring Layouts</span></a>
+<ul id="ul3.10" style="list-style-type:none">
+<li class="heading3" id="i3.10.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.10.1" href="distinguishing_tabs_and_layouts.htm" target="hmcontent"><span class="heading3" id="s3.10.1">Distinguishing Tabs and Layouts</span></a>
+</li>
+<li class="heading3" id="i3.10.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.10.2" href="creating_a_new_layout_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.10.2">Creating a New Layout (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.10.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.10.3" href="setting_up_a_layout.htm" target="hmcontent"><span class="heading3" id="s3.10.3" ondblclick="return dblclicked(this)">Setting up a Layout</span></a>
+<ul id="ul3.10.3" style="list-style-type:none">
+<li class="heading4" id="i3.10.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.10.3.1" href="adding_items_to_layouts.htm" target="hmcontent"><span class="heading4" id="s3.10.3.1">Adding Items to Layouts</span></a>
+</li>
+<li class="heading4" id="i3.10.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.10.3.2" href="removing_item(s)_from_layouts.htm" target="hmcontent"><span class="heading4" id="s3.10.3.2">Removing Item(s) from Layouts</span></a>
+</li>
+<li class="heading4" id="i3.10.3.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.10.3.3" href="adjusting_the_layout_look_and_feel.htm" target="hmcontent"><span class="heading4" id="s3.10.3.3" ondblclick="return dblclicked(this)">Adjusting the Layout Look and Feel</span></a>
+<ul id="ul3.10.3.3" style="list-style-type:none">
+<li class="heading5" id="i3.10.3.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.1" href="selecting_items.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.1">Selecting items</span></a>
+</li>
+<li class="heading5" id="i3.10.3.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.2" href="moving_and_swapping_items_within_scene.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.2">Moving and swapping items within Scene</span></a>
+</li>
+<li class="heading5" id="i3.10.3.3.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.3" href="resizing_items_within_scene.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.3">Resizing items within Scene</span></a>
+</li>
+<li class="heading5" id="i3.10.3.3.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.4" href="using_fit_in_view.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.4">Using Fit In View</span></a>
+</li>
+<li class="heading5" id="i3.10.3.3.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.5" href="changing_the_distance_between_items.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.5">Changing the distance between items</span></a>
+</li>
+<li class="heading5" id="i3.10.3.3.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.10.3.3.6" href="changing_aspect_ratio_of_the_scene_cells.htm" target="hmcontent"><span class="heading5" id="s3.10.3.3.6">Changing Aspect Ratio of the Scene Cells</span></a>
+</li>
+</ul>
+</li>
+<li class="heading4" id="i3.10.3.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.10.3.4" href="working_with_several_hd_witness_windows.htm" target="hmcontent"><span class="heading4" id="s3.10.3.4">Working with Several DW Spectrum Windows</span></a>
+</li>
+<li class="heading4" id="i3.10.3.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.10.3.5" href="saving_layouts_(admin_only).htm" target="hmcontent"><span class="heading4" id="s3.10.3.5">Saving Layouts (Admin Only)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.10.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.10.4" href="copying_layouts_between_users_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.10.4">Assigning Layouts to Users (Admin Only)</span></a>
+</li>
+<li class="heading3" id="i3.10.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.10.5" href="deleting_layouts_(admin_only).htm" target="hmcontent"><span class="heading3" id="s3.10.5">Deleting Layouts (Admin Only)</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.11" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.11" href="playback_in_hd_witness.htm" target="hmcontent"><span class="heading2" id="s3.11" ondblclick="return dblclicked(this)">Playback in DW Spectrum</span></a>
+<ul id="ul3.11" style="list-style-type:none">
+<li class="heading3" id="i3.11.1" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.1" href="watching_cameras_in_hd_witness.htm" target="hmcontent"><span class="heading3" id="s3.11.1" ondblclick="return dblclicked(this)">Watching Cameras in DW Spectrum</span></a>
+<ul id="ul3.11.1" style="list-style-type:none">
+<li class="heading4" id="i3.11.1.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.1.1" href="opening_and_closing_saved_layouts.htm" target="hmcontent"><span class="heading4" id="s3.11.1.1">Opening and Closing Saved Layouts</span></a>
+</li>
+<li class="heading4" id="i3.11.1.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.1.2" href="cpu_and_bandwidth_saving_durin.htm" target="hmcontent"><span class="heading4" id="s3.11.1.2">CPU and Bandwidth Saving during Playback (RADASS)</span></a>
+</li>
+<li class="heading4" id="i3.11.1.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.1.3" href="navigating_through_archive_and.htm" target="hmcontent"><span class="heading4" id="s3.11.1.3" ondblclick="return dblclicked(this)">Navigating through Archive and Live</span></a>
+<ul id="ul3.11.1.3" style="list-style-type:none">
+<li class="heading5" id="i3.11.1.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.3.1" href="pan-temporal_timeline.htm" target="hmcontent"><span class="heading5" id="s3.11.1.3.1">Pan-Temporal Timeline</span></a>
+</li>
+<li class="heading5" id="i3.11.1.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.3.2" href="navigating_through_several_cameras_synchronously.htm" target="hmcontent"><span class="heading5" id="s3.11.1.3.2">Navigating through several cameras synchronously</span></a>
+</li>
+</ul>
+</li>
+<li class="heading4" id="i3.11.1.4" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.1.4" href="searching_through_archive.htm" target="hmcontent"><span class="heading4" id="s3.11.1.4" ondblclick="return dblclicked(this)">Searching through Archive</span></a>
+<ul id="ul3.11.1.4" style="list-style-type:none">
+<li class="heading5" id="i3.11.1.4.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.4.1" href="using_calendar.htm" target="hmcontent"><span class="heading5" id="s3.11.1.4.1">Using Calendar</span></a>
+</li>
+<li class="heading5" id="i3.11.1.4.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.4.2" href="performing_smart_search.htm" target="hmcontent"><span class="heading5" id="s3.11.1.4.2">Performing Smart Motion Search</span></a>
+</li>
+<li class="heading5" id="i3.11.1.4.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.4.3" href="using_thumbnails_for_better_navigation.htm" target="hmcontent"><span class="heading5" id="s3.11.1.4.3">Using Thumbnails for Better Navigation</span></a>
+</li>
+<li class="heading5" id="i3.11.1.4.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.1.4.4" href="thumbnail_search.htm" target="hmcontent"><span class="heading5" id="s3.11.1.4.4">Thumbnail Search</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.11.2" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.2" href="playing_back_local_files_in_hd_witness.htm" target="hmcontent"><span class="heading3" id="s3.11.2" ondblclick="return dblclicked(this)">Playing Back Local Files in DW Spectrum</span></a>
+<ul id="ul3.11.2" style="list-style-type:none">
+<li class="heading4" id="i3.11.2.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.2.1" href="local_files_structure_in_resource_tree.htm" target="hmcontent"><span class="heading4" id="s3.11.2.1">Local files structure in Resource Tree</span></a>
+</li>
+<li class="heading4" id="i3.11.2.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.2.2" href="configuring_media_folders.htm" target="hmcontent"><span class="heading4" id="s3.11.2.2">Configuring Media Folders</span></a>
+</li>
+<li class="heading4" id="i3.11.2.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.2.3" href="opening_local_files__outside_of_media_folders.htm" target="hmcontent"><span class="heading4" id="s3.11.2.3">Opening Local Files Outside of Media Folders</span></a>
+</li>
+<li class="heading4" id="i3.11.2.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.2.4" href="navigating_through_local_files.htm" target="hmcontent"><span class="heading4" id="s3.11.2.4">Navigating Through Local Files</span></a>
+</li>
+<li class="heading4" id="i3.11.2.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.2.5" href="adjusting_volume_while_viewing_local_files.htm" target="hmcontent"><span class="heading4" id="s3.11.2.5">Adjusting Volume while Viewing Local Files</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.11.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.3" href="exporting.htm" target="hmcontent"><span class="heading3" id="s3.11.3" ondblclick="return dblclicked(this)">Exporting</span></a>
+<ul id="ul3.11.3" style="list-style-type:none">
+<li class="heading4" id="i3.11.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.3.1" href="exporting_a_recorded_region_from_a_camera.htm" target="hmcontent"><span class="heading4" id="s3.11.3.1">Exporting Recorded Region from Single Camera</span></a>
+</li>
+<li class="heading4" id="i3.11.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.3.2" href="viewing_videos_exported_from_a.htm" target="hmcontent"><span class="heading4" id="s3.11.3.2">Viewing Videos Exported from a Single Camera</span></a>
+</li>
+<li class="heading4" id="i3.11.3.3" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.3.3" href="exporting_the_layout_in_multi-.htm" target="hmcontent"><span class="heading4" id="s3.11.3.3" ondblclick="return dblclicked(this)">Exporting the Layout in Multi-Video Format</span></a>
+<ul id="ul3.11.3.3" style="list-style-type:none">
+<li class="heading5" id="i3.11.3.3.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.3.3.1" href="viewing_multi-channel_videos.htm" target="hmcontent"><span class="heading5" id="s3.11.3.3.1">Viewing Multi-Channel Videos</span></a>
+</li>
+<li class="heading5" id="i3.11.3.3.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading5" id="a3.11.3.3.2" href="changing_multi-channel_video_a.htm" target="hmcontent"><span class="heading5" id="s3.11.3.3.2">Changing Multi-Channel Video after Export</span></a>
+</li>
+</ul>
+</li>
+<li class="heading4" id="i3.11.3.4" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.3.4" href="viewing_and_checking_the_validity_of_exported_vide.htm" target="hmcontent"><span class="heading4" id="s3.11.3.4">Checking the Validity of Exported Videos</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.11.4" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.4" href="forensic_analysis.htm" target="hmcontent"><span class="heading3" id="s3.11.4" ondblclick="return dblclicked(this)">Forensic Analysis</span></a>
+<ul id="ul3.11.4" style="list-style-type:none">
+<li class="heading4" id="i3.11.4.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.4.1" href="fullscreen.htm" target="hmcontent"><span class="heading4" id="s3.11.4.1">Expanding Items to Fullscreen</span></a>
+</li>
+<li class="heading4" id="i3.11.4.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.4.2" href="zoom.htm" target="hmcontent"><span class="heading4" id="s3.11.4.2">Zoom</span></a>
+</li>
+<li class="heading4" id="i3.11.4.3" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading4" id="a3.11.4.3" href="rotate.htm" target="hmcontent"><span class="heading4" id="s3.11.4.3">Rotate</span></a>
+</li>
+</ul>
+</li>
+<li class="heading3" id="i3.11.5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.5" href="taking_a_screenshot.htm" target="hmcontent"><span class="heading3" id="s3.11.5">Taking a Screenshot</span></a>
+</li>
+<li class="heading3" id="i3.11.6" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.11.6" href="tours.htm" target="hmcontent"><span class="heading3" id="s3.11.6">Tours</span></a>
+</li>
+</ul>
+</li>
+<li class="heading2" id="i3.12" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a3.12" href="screen_recording.htm" target="hmcontent"><span class="heading2" id="s3.12" ondblclick="return dblclicked(this)">Screen Recording (Windows Only)</span></a>
+<ul id="ul3.12" style="list-style-type:none">
+<li class="heading3" id="i3.12.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.12.1" href="setting_up_screen_recording.htm" target="hmcontent"><span class="heading3" id="s3.12.1">Setting up Screen Recording</span></a>
+</li>
+<li class="heading3" id="i3.12.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading3" id="a3.12.2" href="performing_screen_recording.htm" target="hmcontent"><span class="heading3" id="s3.12.2">Performing Screen Recording</span></a>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="heading1" id="i4" data-bg="button_closedbook.gif;button_openbook.gif" style="background:url(button_openbook.gif) no-repeat;cursor:pointer;padding-left:34px" onclick="return clicked(this,event)"><a class="heading1" id="a4" href="troubleshooting_and_contacting_support.htm" target="hmcontent"><span class="heading1" id="s4" ondblclick="return dblclicked(this)">Troubleshooting and Contacting Support</span></a>
+<ul id="ul4" style="list-style-type:none">
+<li class="heading2" id="i4.1" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a4.1" href="obtaining_the_current_network_configuration.htm" target="hmcontent"><span class="heading2" id="s4.1">Obtaining the Current Network Configuration</span></a>
+</li>
+<li class="heading2" id="i4.2" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading2" id="a4.2" href="obtaining_system_logs.htm" target="hmcontent"><span class="heading2" id="s4.2">Obtaining System Logs</span></a>
+</li>
+</ul>
+</li>
+<li class="heading1" id="i5" style="background:url(button_topic.gif) no-repeat;padding-left:34px" onclick="return clicked(this,event)"><a class="heading1" id="a5" href="glossary.htm" target="hmcontent"><span class="heading1" id="s5">Glossary</span></a>
+</li>
+</ul>
+<script type="text/javascript">loadicons('button_topic.gif','button_openbook.gif','button_closedbook.gif');</script>
+<hr size="1" /><p><span style="font-size: 8px">© 2012 Boris Biryuchkov</span></p>
+<script type="text/javascript">
+document.getElementById("navsearch").style.display="inline";
+</script> 
+</body>
+</html>
+
+
+
+
+
+
+
+

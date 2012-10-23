@@ -24,7 +24,8 @@
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <skip.sign>true</skip.sign>                     
+        <skip.sign>true</skip.sign>
+        <ClientHelpSourceDir>${basedir}/../help/HTML</ClientHelpSourceDir>                     
     </properties>
 
     <build>
@@ -141,6 +142,21 @@
                             </execution>
 
                             <execution>
+                                <id>help-heat</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python</executable>
+                                    <arguments>
+                                        <argument>generate-help-wxs.py</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>                    
+                            </execution>
+
+                            <execution>
                                 <id>package-CustomActions-with-msbuild</id>
                                 <phase>generate-resources</phase>
                                 <goals>
@@ -163,6 +179,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                     <arguments>
                                         <argument>-dAppServerSourceDir="${AppServerDir}"</argument>
+                                        <argument>-dClientHelpSourceDir="${ClientHelpSourceDir}"</argument>
                                         <argument>-arch</argument>
                                         <argument>${arch}</argument>
                                         <argument>-out</argument>
@@ -194,6 +211,7 @@
                                         <argument>DowngradeWarningDlg.wxs</argument>
                                         <argument>Product.wxs</argument>
                                         <argument>AppServerFiles.wxs</argument>
+                                        <argument>ClientHelp.wxs</argument>
                                         <argument>AppServerDlg.wxs</argument> 
                                     </arguments>
                                 </configuration>                    

@@ -1,0 +1,177 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+   <title>Working with DW Spectrum &gt; Playback in DW Spectrum &gt; Playing Back Local Files in DW Spectrum &gt; Configuring Media Folders</title>
+   <meta name="generator" content="Help & Manual">
+   <meta name="keywords" content="">
+   <meta name="description" content="Configuring Media Folders">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="custom.css" rel="stylesheet">
+   <script type="text/javascript" src="nsh.js"></script>
+
+<script type="text/javascript">   
+// Toggle Toggler 
+
+var toggleCount=false;
+var switchState;
+
+function toggleToggles() {
+
+    if (!toggleCount) {
+     toggleCount = true;
+     HMToggleExpandAll(true);
+     switchState = true;
+     }
+   
+     else if (switchState) {
+        HMToggleExpandAll(false);
+        switchState = false;
+        }
+        
+     else  {
+        HMToggleExpandAll(true);
+        switchState = true;
+        } 
+    }
+</script>
+   
+<!-- non-scrolling headers for CHM and browser-based help, local styles-->
+<style type="text/css" media="screen"> 
+html, body { margin:0; 
+   padding:0; 
+   overflow: hidden; 
+   background: #FFFFFF; 
+  }
+ 
+div#printheader { 
+   display: none;
+   padding-bottom: 10px;
+   }
+   #idheader { 
+      width:100%; 
+      height:auto; 
+      padding: 0; 
+      margin: 0; 
+} 
+    #idheaderbg  {
+    background: #6F6F6F; 
+}
+   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+   #callout-table a {text-decoration: none; color: blue;}
+   #callout-table a:visited {text-decoration: none; color: blue;}
+   #overview-table a {text-decoration: none; color: black;}
+   #overview-table a:visited {text-decoration: none; color: black;}
+   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
+   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+   </style>
+<!--[if lt IE 7]>
+<style type="text/css">
+  #idcontent {padding: 0px;} 
+  #innerdiv {padding: 10px 5px 5px 10px ;} 
+</style> 
+<![endif]-->
+<noscript>
+<style type="text/css">
+html, body { overflow: auto; }
+</style> 
+</noscript>
+<style type="text/css" media="print">
+span.f_Heading1 { color: black; }
+#idheader, #printheader img { display:none; }
+#printheader { display: block; margin-top: 20px; }
+#idcontent { margin-top: 10px; }
+</style>   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "configuring_media_folders.htm");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+<!--ZOOMSTOP-->
+
+<div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Configuring Media Folders</span></h1>
+</div> 
+<div id="idheader">
+<div id="idheaderbg">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+       style="margin: 0px; background: url(header_bg.jpg);">
+
+  <tr valign="bottom">
+    <td align="left" valign="bottom" class="topichead">
+   <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
+   
+   Working with DW Spectrum &gt; <a href="playback_in_hd_witness.htm">Playback in DW Spectrum</a> &gt; <a href="playing_back_local_files_in_hd_witness.htm">Playing Back Local Files in DW Spectrum</a>&nbsp;&gt;</p>
+   <h1 class="p_Heading1"><span class="f_Heading1">Configuring Media Folders</span></h1>
+
+    </td>
+    <td align="right" width="120" valign="middle" class="topichead" id="idnav">
+    
+     <a href="local_files_structure_in_resource_tree.htm"
+        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
+        onmouseout="document.images.prev.src='btn_prev_n.gif'"
+        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        ></a><a href="playing_back_local_files_in_hd_witness.htm"
+        onmouseover="document.images.main.src='btn_home_h.gif'" 
+        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        ></a><a href="opening_local_files__outside_of_media_folders.htm"
+        onmouseover="document.images.next.src='btn_next_h.gif'" 
+        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        ></a>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+</table>
+</div>
+
+<!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
+  
+
+</div>  
+
+
+
+<div id="idcontent"><div id="innerdiv"> 
+<!--ZOOMRESTART-->
+<p>When DW Spectrum starts, it automatically performs indexing of <span style="font-weight: bold;">local media folders</span> in order to find and display local files in <span style="font-weight: bold;">Resource Tree</span>. By default current user’s video folder (<span style="font-weight: bold;">C:\Users\$User\Videos</span>) is configured as media folder.</p>
+<p>It is possible to configure unlimited number of media folders with the following steps:</p>
+<p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">1.</span><span class="f_ListNumber">Open </span><span class="f_ListNumber" style="font-weight: bold;">Main Menu</span><span class="f_ListNumber"> and choose </span><span class="f_ListNumber" style="font-style: italic;">System Settings</span><span class="f_ListNumber">.</span></p><p class="p_BodyTextFirstIndent"><img src="_img73_zoom86.png" width="28" height="28" alt="_img73" style="border:none" /></p>
+<p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">2.</span><span class="f_ListNumber">If needed to change main media folder, click </span><span class="f_ListNumber" style="font-style: italic;">Browse </span><span class="f_ListNumber">and choose the desired path for it.</span></p><p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">3.</span><span class="f_ListNumber">Configure </span><span class="f_ListNumber" style="font-weight: bold;">Extra Media Folders</span><span class="f_ListNumber">:</span></p><p style="text-align: left; padding: 0px 0px 0px 24px; margin: 7px 0px 7px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:24px;margin-left:-24px">&#8226;</span><span class="f_ListBullet2">To add extra media folder click </span><span class="f_ListBullet2" style="font-style: italic;">Add…</span><span class="f_ListBullet2"> and choose the desired path.</span></p><p class="p_BodyTextFirstIndent2"><img src="_img74.png" width="32" height="32" alt="_img74" style="border:none" /><span class="f_BodyTextFirstIndent2"> </span></p>
+<p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">It is possible to perform standard files and folders operations in this form (like in Windows Explorer).</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 24px; margin: 7px 0px 7px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:24px;margin-left:-24px">&#8226;</span><span class="f_ListBullet2">To delete extra media folder select it in the list and click </span><span class="f_ListBullet2" style="font-style: italic;">Remove.</span></p><p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">4.</span><span class="f_ListNumber">Click </span><span class="f_ListNumber" style="font-style: italic;">OK </span><span class="f_ListNumber">when finished (or </span><span class="f_ListNumber" style="font-style: italic;">Cancel</span><span class="f_ListNumber"> to discard changes).</span></p><p>As soon as media folders are configured, DW Spectrum should be restarted. Then files from the specified media folders will be visible in <span style="font-weight: bold;">Resources Tree</span> (under the <span style="font-weight: bold;">Local</span> node). It is possible to place it in a layout as cameras. Search is also available for local files.</p>
+<p style="text-align: center;"><span style="font-size: 8pt; color: #000000;">&nbsp;</span></p>
+<p style="text-align: center;"><span style="font-size: 8pt; color: #000000;"><a href="http://www.helpandmanual.com" target="_blank" class="weblink">This help system was created with an evaluation copy of Help &amp; Manual.</a></span></p>
+
+<!--ZOOMSTOP-->
+</div></div>
+<script type="text/javascript">
+
+var lastSlashPos = document.URL.lastIndexOf("/") > document.URL.lastIndexOf("\\") ? document.URL.lastIndexOf("/") : document.URL.lastIndexOf("\\");
+if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != "~hh" )
+{
+ if (document.all) setTimeout(function() {nsrInit();},20); 
+    else nsrInit();
+ } 
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
