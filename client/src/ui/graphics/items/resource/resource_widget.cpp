@@ -528,6 +528,10 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
     return result;
 }
 
+int QnResourceWidget::helpTopicAt(const QPointF &pos) const {
+    return -1;
+}
+
 void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
     if(m_aboutToBeDestroyedEmitted)
         return;

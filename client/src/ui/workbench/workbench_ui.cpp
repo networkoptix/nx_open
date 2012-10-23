@@ -82,7 +82,7 @@
 
 namespace {
 
-    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, QGraphicsItem *parent = NULL) {
+    QnImageButtonWidget *newActionButton(QAction *action, qreal sizeMultiplier = 1.0, int helpTopicId = -1, QGraphicsItem *parent = NULL) {
         int baseSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
         qreal height = baseSize * sizeMultiplier;
@@ -105,6 +105,9 @@ namespace {
         button->setDefaultAction(action);
         button->setCached(true);
 
+        if(helpTopicId != -1)
+            setHelpTopicId(button, helpTopicId);
+
         return button;
     }
 
@@ -113,6 +116,16 @@ namespace {
         button->resize(15, 45);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
         button->setCheckable(true);
+        setHelpTopicId(button, Qn::MainWindow_Pin_Help);
+        return button;
+    }
+
+    QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL) {
+        QnImageButtonWidget *button = new QnImageButtonWidget(parent);
+        button->resize(24, 24);
+        button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
+        button->setCheckable(true);
+        setHelpTopicId(button, Qn::MainWindow_Pin_Help);
         return button;
     }
 
@@ -303,10 +316,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
 
-    m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
-    m_treePinButton->resize(24, 24);
-    m_treePinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
-    m_treePinButton->setCheckable(true);
+    m_treePinButton = newPinButton(m_controlsWidget);
     m_treePinButton->setFocusProxy(m_treeItem);
 
     m_treeShowButton = newShowHideButton(m_controlsWidget);
@@ -388,8 +398,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_tabBarWidget->setAttribute(Qt::WA_TranslucentBackground);
     m_tabBarItem->setWidget(m_tabBarWidget);
 
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
-    setHelpTopicId(m_mainMenuButton, Qn::MainWindow_MainMenu_Help);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5, Qn::MainWindow_MainMenu_Help);
 
     QGraphicsLinearLayout * windowButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
@@ -397,7 +406,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
     windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
-    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction), 1.0, Qn::MainWindow_Fullscreen_Help));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));
     
     m_windowButtonsWidget = new GraphicsWidget();
@@ -419,9 +428,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::OpenCurrentUserLayoutMenu)));
     m_titleRightButtonsLayout->addStretch(0x1000);
-    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction)));
+    m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::TogglePanicModeAction), 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
-        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction)));
+        m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ToggleScreenRecordingAction), 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleRightButtonsLayout->addItem(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleRightButtonsLayout->addItem(m_windowButtonsWidget);
     titleLayout->addItem(m_titleRightButtonsLayout);
@@ -499,10 +508,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_helpItem->setWidget(m_helpWidget);
 
-    m_helpPinButton = new QnImageButtonWidget(m_controlsWidget);
-    m_helpPinButton->resize(24, 24);
-    m_helpPinButton->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
-    m_helpPinButton->setCheckable(true);
+    m_helpPinButton = newPinButton(m_controlsWidget);
     m_helpPinButton->setFocusProxy(m_helpItem);
 
     m_helpShowButton = newShowHideButton(m_controlsWidget);

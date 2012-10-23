@@ -24,8 +24,11 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <help/help_topics.h>
+
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
+
 
 // TODO: remove
 #include <core/resource/media_server_resource.h>
@@ -569,6 +572,14 @@ Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRect
         return Qn::NoSection; /* No resizing when PTZ control is ON. */
     } else {
         return base_type::windowFrameSectionsAt(region);
+    }
+}
+
+int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
+    if(options() & DisplayMotion) {
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+    } else {
+        return Qn::MainWindow_MediaItem_Help;
     }
 }
 

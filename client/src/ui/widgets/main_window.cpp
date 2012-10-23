@@ -42,7 +42,8 @@
 #include "ui/events/system_menu_event.h"
 #include <ui/screen_recording/screen_recorder.h>
 
-#include "help/context_help_queryable.h"
+#include <help/context_help_queryable.h>
+#include <help/help_topics.h>
 
 #include "file_processor.h"
 #include "utils/settings.h"
@@ -53,7 +54,7 @@
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0) {
+    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -74,6 +75,10 @@ namespace {
             QObject::connect(button,    SIGNAL(pressed()),  button->defaultAction(),    SLOT(trigger()));
             QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
         }
+
+        if(helpTopicId != -1)
+            setHelpTopicId(button, helpTopicId);
+
 
         return button;
     }
@@ -133,6 +138,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
+    setHelpTopicId(scene, Qn::MainWindow_Scene_Help);
+
     m_view = new QnGraphicsView(scene);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
@@ -219,13 +226,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_windowButtonsLayout->addSpacing(6);
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5);
-    setHelpTopicId(m_mainMenuButton, Qn::MainWindow_MainMenu_Help);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_MainMenu_Help);
 
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -235,9 +241,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
-        m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction)));
+        m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 

@@ -3,24 +3,22 @@
 
 #include <QtCore/QPointF>
 
-#include "help_topics.h"
-
 class QObject;
 
 class QnContextHelpQueryable {
 public:
     virtual ~QnContextHelpQueryable() {}
 
-    virtual Qn::HelpTopic helpTopicAt(const QPointF &pos) const = 0;
+    virtual int helpTopicAt(const QPointF &pos) const = 0;
 };
 
 
 
 #define HelpTopicId _id("_qn_contextHelpId")
 
-void setHelpTopicId(QObject *object, Qn::HelpTopic helpTopic);
+void setHelpTopicId(QObject *object, int helpTopic);
 
-inline void setHelpTopicId(QObject *object0, QObject *object1, Qn::HelpTopic helpTopic) {
+inline void setHelpTopicId(QObject *object0, QObject *object1, int helpTopic) {
     setHelpTopicId(object0, helpTopic);
     setHelpTopicId(object1, helpTopic);
 }

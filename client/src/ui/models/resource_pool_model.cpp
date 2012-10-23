@@ -23,6 +23,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_globals.h>
 
+#include <help/help_topics.h>
+
 #include "file_processor.h"
 
 namespace {
@@ -386,6 +388,18 @@ public:
             return static_cast<int>(m_status);
         case Qn::NodeTypeRole:
             return static_cast<int>(m_type);
+        case Qn::HelpTopicIdRole:
+            if(m_flags & QnResource::layout) {
+                return Qn::MainWindow_Tree_Layouts_Help;
+            } else if(m_flags & QnResource::user) {
+                return Qn::MainWindow_Tree_Users_Help;
+            } else if(m_flags & QnResource::local) {
+                return Qn::MainWindow_Tree_Local_Help;
+            } else if(m_flags & QnResource::server) {
+                return Qn::MainWindow_Tree_Servers_Help;
+            } else {
+                return -1;
+            }
         default:
             break;
         }

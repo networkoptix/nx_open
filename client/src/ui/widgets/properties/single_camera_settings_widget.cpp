@@ -1,14 +1,10 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-//#include "core/resource/video_server.h"
 #include <core/resource/media_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
 #include <QtCore/QProcess>
-#ifdef Q_OS_WIN
-    #include <QtCore/QSettings>
-#endif
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -22,6 +18,7 @@
 #include <ui/graphics/items/resource/resource_widget.h>
 
 #include <help/context_help_queryable.h>
+#include <help/context_help.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),

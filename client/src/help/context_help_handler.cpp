@@ -72,13 +72,19 @@ int QnContextHelpHandler::helpTopicAt(QWidget *widget, const QPoint &pos, bool b
                 if(topicId != -1)
                     return topicId;
             }
+            
+            if(view->scene()) {
+                topicId = qvariant_cast<int>(view->scene()->property(Qn::HelpTopicId), -1);
+                if(topicId != -1)
+                    return topicId;
+            }
         }
 
         if(!bubbleUp)
             break;
 
         if(widget->parentWidget()) {
-            widgetPos = widget->parentWidget()->mapFrom(widget, widgetPos);
+            widgetPos = widget->mapToParent(widgetPos);
             widget = widget->parentWidget();
         } else {
             break;

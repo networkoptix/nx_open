@@ -4,11 +4,11 @@
 
 #include <utils/common/warnings.h>
 
-void setHelpTopicId(QWidget *object, Qn::HelpTopic helpTopic) {
+void setHelpTopicId(QObject *object, int helpTopic) {
     if(!object) {
         qnNullWarning(object);
         return;
     }
 
-    object->setProperty(Qn::HelpTopicId, static_cast<int>(helpTopic));
+    object->setProperty(Qn::HelpTopicId, helpTopic);
 }

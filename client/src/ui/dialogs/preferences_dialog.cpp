@@ -23,6 +23,7 @@
 #include <youtube/youtubesettingswidget.h>
 
 #include <help/context_help_queryable.h>
+#include <help/help_topics.h>
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),

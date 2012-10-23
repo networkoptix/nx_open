@@ -39,6 +39,9 @@
 #include "ui/style/noptix_style.h"
 #include "ui/style/globals.h"
 
+#include <help/context_help_queryable.h>
+#include <help/help_topics.h>
+
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
     const char *qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
@@ -258,6 +261,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
+
+    setHelpTopicId(this,            Qn::MainWindow_Tree_Help);
+    setHelpTopicId(ui->searchTab,   Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));

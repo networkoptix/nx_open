@@ -19,6 +19,7 @@
 #include <ui/style/skin.h>
 
 #include <help/context_help_queryable.h>
+#include <help/help_topics.h>
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
