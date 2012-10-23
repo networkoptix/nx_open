@@ -152,6 +152,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
+    m_inChangeLayout(false),
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
@@ -1297,6 +1298,10 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
+    if (m_inChangeLayout)
+        qWarning() << "Changing layout while changing layout. Error! #GDM";
+
+    m_inChangeLayout = true;
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     disconnect(layout, NULL, this, NULL);
@@ -1322,6 +1327,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    m_inChangeLayout = false;
 }
 
 
