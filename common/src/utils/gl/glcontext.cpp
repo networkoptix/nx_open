@@ -7,6 +7,8 @@
 
 #include <QGLContext>
 
+#include "../common/log.h"
+
 
 //!Creates context shared with \a contextToShareWith (if not NULL)
 //GLContext::GLContext( SYS_GL_CTX_HANDLE contextToShareWith )
@@ -27,10 +29,10 @@ GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
     m_winID( wnd ),
     m_previousErrorCode( 0 )
 {
-    m_dc = GetDC( m_winID );
-    m_handle = wglCreateContext( m_dc );
-    ReleaseDC( m_winID, m_dc );
-    m_dc = NULL;
+    HDC dc = GetDC( m_winID );
+    m_handle = wglCreateContext( dc );
+    ReleaseDC( m_winID, dc );
+    dc = NULL;
     if( m_handle == NULL )
     {
         m_previousErrorCode = GetLastError();
@@ -50,27 +52,38 @@ GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
 
 GLContext::~GLContext()
 {
+    Q_ASSERT( IsWindow(m_winID) );
+
     if( m_handle != NULL )
     {
-        if( wglDeleteContext( m_handle ) )
-            m_handle = NULL;
+        if( !wglDeleteContext( m_handle ) )
+            int x = 0;
+        m_handle = NULL;
     }
 
     if( m_dc != NULL )
     {
-        DeleteDC( m_dc );
+        if( !DeleteDC( m_dc ) )
+            int x = 0;
+        m_dc = NULL;
     }
 }
 
 bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 {
-    m_dc = paintDevToUse != NULL ? paintDevToUse : GetDC( m_winID );
+    if( paintDevToUse != NULL )
+    {
+        m_dc = paintDevToUse;
+    }
+    else
+    {
+        Q_ASSERT( IsWindow( m_winID ) );
+        m_dc = GetDC( m_winID );
+    }
     BOOL res = wglMakeCurrent( m_dc, m_handle );
     m_previousErrorCode = GetLastError();
     if( paintDevToUse != NULL )
         m_dc = NULL;    //no need to release device context at doneCurrent
-    if( !res )
-        int x = 0;
     return res;
 }
 
@@ -113,6 +126,11 @@ bool GLContext::shareWith( SYS_GL_CTX_HANDLE ctxID )
     }
 
     return true;
+}
+
+WId GLContext::wnd() const
+{
+    return m_winID;
 }
 
 //!Returns system-dependent handle of qt context \a ctx

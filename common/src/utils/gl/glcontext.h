@@ -28,6 +28,33 @@ public:
     typedef void* SYS_PAINT_DEVICE_HANDLE;
 #endif
 
+    //!Calls \a makeCurrent() at instanciation, calls \a doneCurrent at destroy
+    class ScopedContextUsage
+    {
+    public:
+        ScopedContextUsage( GLContext* const glContext, SYS_PAINT_DEVICE_HANDLE paintDevToUse = NULL )
+        :
+            m_glContext( glContext ),
+            m_isCurrent( false )
+        {
+            m_isCurrent = m_glContext->makeCurrent( paintDevToUse );
+        }
+
+        bool isCurrent() const
+        {
+            return m_isCurrent;
+        }
+
+        ~ScopedContextUsage()
+        {
+            m_glContext->doneCurrent();
+        }
+
+    private:
+        GLContext* const m_glContext;
+        bool m_isCurrent;
+    };
+
     //!Creates context shared with \a contextToShareWith on paint device of \a contextToShareWith
     /*!
         One MUST call \a isValid just after object instanciation to check whether context has been created successfully.
@@ -51,6 +78,8 @@ public:
     QString getLastErrorString() const;
     //void* getProcAddress( const char* procName ) const;
     bool shareWith( SYS_GL_CTX_HANDLE ctxID );
+    //!Returns window ID, gl context has been reated with
+    WId wnd() const;
 
     //!Returns system-dependent handle of qt context \a ctx
     /*!
