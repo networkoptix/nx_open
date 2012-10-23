@@ -22,6 +22,8 @@
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
 
+#include <help/context_help_queryable.h>
+
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
     QnWorkbenchContextAware(context),
@@ -47,7 +49,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
         ui->backgroundColorWidget->hide();
     }
 
-    if (QnScreenRecorder::isSupported()){
+    if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
@@ -62,6 +64,18 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
+    /* Set up context help. */
+    setHelpTopicId(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopicId(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopicId(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopicId(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopicId(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    if(m_recordingSettingsWidget)
+        setHelpTopicId(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
+    if(m_licenseManagerWidget)
+        setHelpTopicId(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
+
+
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
     connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
@@ -70,7 +84,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
-
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
 
     initLanguages();

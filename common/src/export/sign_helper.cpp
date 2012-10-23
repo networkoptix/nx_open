@@ -17,6 +17,12 @@ extern "C" {
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
+char SIGN_TEXT_DELIMITER('\\');
+char SIGN_TEXT_DELIMITER_REPLACED('/');
+
+QByteArray INITIAL_SIGNATURE_MAGIC("BCDC833CB81C47bc83B37ECD87FD5217"); // initial MD5 hash
+QByteArray SIGNATURE_XOR_MAGIC = QByteArray::fromHex("B80466320F15448096F7CEE3379EEF78");
+
 
 int getSquareSize(int width, int height, int signBits)
 {
@@ -47,6 +53,19 @@ QnSignHelper::QnSignHelper():
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
+
+    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
+    m_hwIdStr = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    if (m_hwIdStr.isEmpty())
+        m_hwIdStr = tr("Unknown");
+
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    m_licensedToStr = QString(tr("FREE license"));
+    foreach (QnLicensePtr license, list)
+    {
+        if (license->name() != QLatin1String("FREE"))
+            m_licensedToStr = license->name();
+    }
 }
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
@@ -139,9 +158,24 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
     return QByteArray((const char*)signArray, signLen);
 }
 
+QByteArray QnSignHelper::getSignFromDigest(const QByteArray& digest)
+{
+    QByteArray result = digest;
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= SIGNATURE_XOR_MAGIC[i % SIGNATURE_XOR_MAGIC.size()];
+    return result.toHex();
+}
+
+QByteArray QnSignHelper::getDigestFromSign(const QByteArray& sign)
+{
+    QByteArray result = QByteArray::fromHex(sign);
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= SIGNATURE_XOR_MAGIC[i % SIGNATURE_XOR_MAGIC.size()];
+    return result;
+}
+
 QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize)
 {
-    QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
     if (m_lastPaintSize == paintSize)
     {
         painter.setFont(m_cachedFont);
@@ -154,7 +188,7 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
     for (int i = 0; i < 100; ++i)
     {
         metric = QFontMetrics(font);
-        int width = metric.width(versionStr);
+        int width = metric.width(m_versionStr);
         int height = metric.height();
         if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
             break;
@@ -214,24 +248,12 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
 
     if (drawText)
     {
-        QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
         QFontMetrics metric = updateFontSize(painter, paintSize);
 
-        //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
-        QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
-        if (hid.isEmpty())
-            hid = tr("Unknown");
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(hid));
-        QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
-        QString licenseName(tr("FREE license"));
-        foreach (QnLicensePtr license, list)
-        {
-            if (license->name() != QLatin1String("FREE"))
-                licenseName = license->name();
-        }
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), m_versionStr);
 
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(licenseName));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(m_hwIdStr));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(m_licensedToStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: ").append(QLatin1String(m_sign.toHex())));
     }
 
@@ -653,4 +675,54 @@ void QnSignHelper::setLogo(QPixmap logo)
 void QnSignHelper::setSign(const QByteArray& sign)
 {
     m_sign = sign;
+}
+
+QByteArray QnSignHelper::getSignMagic()
+{
+    return INITIAL_SIGNATURE_MAGIC;
+}
+
+char QnSignHelper::getSignPatternDelim()
+{
+    return SIGN_TEXT_DELIMITER;
+}
+
+QByteArray QnSignHelper::getSignPattern()
+{
+    QByteArray result;
+    result.append(INITIAL_SIGNATURE_MAGIC);
+    result.append(SIGN_TEXT_DELIMITER);
+
+    result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
+
+    QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    if (hid.isEmpty())
+        hid = tr("Unknown");
+    result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
+
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QString licenseName(tr("FREE license"));
+    foreach (QnLicensePtr license, list)
+    {
+        if (license->name() != QLatin1String("FREE"))
+            licenseName = license->name();
+    }
+    QByteArray bLicName = licenseName.toUtf8().replace(SIGN_TEXT_DELIMITER, SIGN_TEXT_DELIMITER_REPLACED);
+    result.append(bLicName);
+    return result;
+}
+
+void QnSignHelper::setVersionStr(const QString& value)
+{
+    m_versionStr = value;
+}
+
+void QnSignHelper::setHwIdStr(const QString& value)
+{
+    m_hwIdStr = value;
+}
+
+void QnSignHelper::setLicensedToStr(const QString& value)
+{
+    m_licensedToStr = value;
 }

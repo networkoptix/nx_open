@@ -81,6 +81,9 @@
     #include "ui/workaround/iexplore_url_handler.h"
 #endif
 
+#include "help/context_help.h"
+#include "help/context_help_handler.h"
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -325,6 +328,12 @@ int qnMain(int argc, char *argv[])
         return 0;
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
         return 0;
+
+
+    QnContextHelp help;
+    QnContextHelpHandler helpHandler;
+    helpHandler.setContextHelp(&help);
+    qApp->installEventFilter(&helpHandler);
 
 
     QnLog::initLog(logLevel);
