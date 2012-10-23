@@ -22,9 +22,12 @@ class CLFFmpegVideoDecoder
     public QnAbstractVideoDecoder
 {
 public:
-    CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
-    bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
+    /*!
+        \param swDecoderCount Atomically incremented in constructor and atommically decremented in destructor
+    */
+    CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
     ~CLFFmpegVideoDecoder();
+    bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void showMotion(bool show);
 
@@ -103,6 +106,7 @@ private:
     int m_forceSliceDecoding;
     typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
     MotionMap m_motionMap; 
+    QAtomicInt* const m_swDecoderCount;
 };
 
 #endif //cl_ffmpeg_h

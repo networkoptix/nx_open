@@ -8,8 +8,6 @@
 
 #include "ffmpeg.h"
 #include "ipp_h264_decoder.h"
-//#include "quicksyncvideodecoder.h"
-//#include "xvbadecoder.h"
 #include "../abstractvideodecoderplugin.h"
 #include "../../plugins/pluginmanager.h"
 
@@ -18,6 +16,9 @@ CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufact
 
 QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding, const QGLContext* glContext )
 {
+    //TODO/IMPL this is a quick solution. Need something more beautiful (static counter is not beautiful at all...)
+    static QAtomicInt swDecoderCount = 0;
+
     // h264 
     switch( m_codecManufacture )
     {
@@ -40,7 +41,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
             }
             if( videoDecoderPlugin )
             {
-                std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext ) );
+                std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount ) );
                 if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                     return decoder.release();
             }
@@ -49,7 +50,9 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
 
         case FFMPEG:
         default:
-            return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding );
+        {
+            return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding, &swDecoderCount );
+        }
     }
 
     return NULL;
