@@ -476,16 +476,23 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
-        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
+//        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
         
-        /* Estimate size of the last term in filter expression. */
-        int size = 0;
-        for(;pos < filter.size(); pos++)
-            if(!filter[pos].isSpace())
-                size++;
+        int pos = 0;
+        /* Estimate size of the each term in filter expression. */
+        while (pos < filter.size()){
+            int size = 0;
+            for(;pos < filter.size(); pos++){
+                if (filter[pos] == QLatin1Char('+') || filter[pos] == QLatin1Char('\\'))
+                    break;
 
-        if (size > 0 && size < 3) 
-            return; /* Filter too short, ignore. */
+                if(!filter[pos].isSpace())
+                    size++;
+            }
+            pos++;
+            if (size > 0 && size < 3)
+                return; /* Filter too short, ignore. */
+        }
     }
 
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
