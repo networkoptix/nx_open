@@ -206,6 +206,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutVV);
     mainLayout->addItem(sliderLayout);
+    mainLayout->setStretchFactor(sliderLayout, 0x1000);
     mainLayout->addItem(rightLayoutVV);
     setLayout(mainLayout);
 
