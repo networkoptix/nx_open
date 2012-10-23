@@ -7,6 +7,8 @@
 
 #include <dxerr.h>
 
+#include <utils/common/log.h>
+
 
 bool operator==( const mfxFrameAllocResponse& left, const mfxFrameAllocResponse& right )
 {
@@ -324,18 +326,17 @@ MFXDirect3DSurfaceAllocator::Direct3DSurfaceContext::Direct3DSurfaceContext()
 {
 }
 
-MFXDirect3DSurfaceAllocator::MFXDirect3DSurfaceAllocator( IDirect3D9Ex* direct3D9, unsigned int adapterNumber )
+MFXDirect3DSurfaceAllocator::MFXDirect3DSurfaceAllocator( IDirect3DDeviceManager9* d3d9manager, unsigned int adapterNumber )
 :
     m_initialized( false ),
-    m_direct3D9( direct3D9 ),
-    m_d3d9manager( NULL ),
-    m_d3d9Device( NULL ),
+    m_d3d9manager( d3d9manager ),
     m_decoderService( NULL ),
+    m_d3DeviceHandle( NULL ),
     m_deviceResetToken( 0 ),
     m_prevOperationResult( S_OK ),
-    m_adapterNumber( adapterNumber ),
-    m_dc( NULL )
+    m_adapterNumber( adapterNumber )
 {
+    m_d3d9manager->AddRef();
 }
 
 MFXDirect3DSurfaceAllocator::~MFXDirect3DSurfaceAllocator()
@@ -348,7 +349,14 @@ MFXDirect3DSurfaceAllocator::~MFXDirect3DSurfaceAllocator()
     m_decoderService->Release();
     m_decoderService = NULL;
 
-    closeD3D9Device();
+    if( m_d3DeviceHandle != NULL )
+    {
+        m_d3d9manager->CloseDeviceHandle( m_d3DeviceHandle );
+        m_d3DeviceHandle = NULL;
+    }
+
+    m_d3d9manager->Release();
+    m_d3d9manager = NULL;
 }
 
 mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfxFrameAllocResponse* response )
@@ -362,11 +370,9 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     if( (request->Type & MFX_MEMTYPE_EXTERNAL_FRAME) > 0 &&
         getCachedResponse( request, response ) ) //checking, whether such request has already been processed
     {
-        if( response->NumFrameActual < request->NumFrameMin )
-        {
-            releaseFrameSurfaces( response );
-            return MFX_ERR_MEMORY_ALLOC;
-        }
+        //considering response with lower frame number as 
+        //if( response->NumFrameActual < request->NumFrameMin )
+        //    return MFX_ERR_MEMORY_ALLOC;
         return MFX_ERR_NONE;
     }
 
@@ -392,9 +398,30 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     {
         if( request->Type & MFX_MEMTYPE_DXVA2_PROCESSOR_TARGET )
         {
+            IDirect3DDevice9* d3d9Device = NULL;
+            for( ;; )
+            {
+                m_prevOperationResult = m_d3d9manager->LockDevice( d3DeviceHandle(), &d3d9Device, TRUE );
+                if( m_prevOperationResult == DXVA2_E_NEW_VIDEO_DEVICE )
+                {
+                    if( !reopenDeviceHandle() )
+                        break;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if( m_prevOperationResult != S_OK )
+            {
+                delete[] surfaceArray;
+                return MFX_ERR_MEMORY_ALLOC;
+            }
+
             for( int j = 0; j < request->NumFrameSuggested; ++j )
             {
-                m_prevOperationResult = m_d3d9Device->CreateRenderTarget(
+                m_prevOperationResult = d3d9Device->CreateRenderTarget(
                     request->Info.Width,
                     request->Info.Height,
                     (D3DFORMAT)MAKEFOURCC('N','V','1','2'),
@@ -406,6 +433,9 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
                 if( m_prevOperationResult != S_OK )
                     break;
             }
+
+            d3d9Device->Release();
+            m_d3d9manager->UnlockDevice( d3DeviceHandle(), FALSE );
         }
         else
         {
@@ -427,8 +457,9 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
                 break;
 
             case E_FAIL:
-                if( resetDevice() )
-                    continue;
+                break;
+                //if( resetDevice() )
+                //    continue;
 
             default:
                 delete[] surfaceArray;
@@ -448,6 +479,7 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
     {
         mids[i] = new Direct3DSurfaceContext();
         mids[i]->surface = surfaceArray[i];
+        NX_LOG( QString::fromAscii("Allocated IDirect3DSurface9 0x%1").arg((size_t)mids[i]->surface, 0, 16), cl_logDEBUG2 );
         mids[i]->width = request->Info.Width;
         mids[i]->height = request->Info.Height;
     }
@@ -494,34 +526,23 @@ mfxStatus MFXDirect3DSurfaceAllocator::unlock( mfxMemId mid, mfxFrameData* ptr )
 mfxStatus MFXDirect3DSurfaceAllocator::gethdl( mfxMemId mid, mfxHDL* handle )
 {
     IDirect3DSurface9* surface = static_cast<Direct3DSurfaceContext*>(mid)->surface;
-    //surface->AddRef();
+    //ULONG refCount = surface->AddRef();   //documentation says, we MUST do AddRef(), but Intel sample code does not do that...
+    //NX_LOG( QString::fromAscii("MFXDirect3DSurfaceAllocator::gethdl. surf(%1) ref %2").arg((size_t)surface, 0, 16).arg(refCount), cl_logDEBUG2 );
     *handle = surface;
     return MFX_ERR_NONE;
 }
 
 bool MFXDirect3DSurfaceAllocator::initialize()
 {
-    if( !openD3D9Device() )
+    if( !reopenDeviceHandle() )
         return false;
-
-    HANDLE d3DeviceHandle = INVALID_HANDLE_VALUE;
-    m_prevOperationResult = m_d3d9manager->OpenDeviceHandle( &d3DeviceHandle );
-    if( m_prevOperationResult != S_OK )
-    {
-        closeD3D9Device();
-        return false;
-    }
 
     m_prevOperationResult = m_d3d9manager->GetVideoService(
-        d3DeviceHandle,
+        m_d3DeviceHandle,
         IID_IDirectXVideoDecoderService,
         reinterpret_cast<void**>(&m_decoderService) );
-    m_d3d9manager->CloseDeviceHandle( d3DeviceHandle ); //closing device handle in any case
     if( m_prevOperationResult != S_OK )
-    {
-        closeD3D9Device();
         return false;
-    }
 
     m_initialized = true;
     return true;
@@ -532,24 +553,32 @@ bool MFXDirect3DSurfaceAllocator::initialized() const
     return m_initialized;
 }
 
-IDirect3D9Ex* MFXDirect3DSurfaceAllocator::d3d9() const
-{
-    return m_direct3D9;
-}
-
 unsigned int MFXDirect3DSurfaceAllocator::adapterNumber() const
 {
     return m_adapterNumber;
 }
 
-IDirect3DDevice9Ex* MFXDirect3DSurfaceAllocator::d3d9Device() const
-{
-    return m_d3d9Device;
-}
-
 IDirect3DDeviceManager9* MFXDirect3DSurfaceAllocator::d3d9DeviceManager() const
 {
     return m_d3d9manager;
+}
+
+HANDLE MFXDirect3DSurfaceAllocator::d3DeviceHandle() const
+{
+    return m_d3DeviceHandle;
+}
+
+//!Opens new d3 device handle
+bool MFXDirect3DSurfaceAllocator::reopenDeviceHandle()
+{
+    if( m_d3DeviceHandle != NULL )
+    {
+        m_d3d9manager->CloseDeviceHandle( m_d3DeviceHandle );
+        m_d3DeviceHandle = NULL;
+    }
+
+    m_prevOperationResult = m_d3d9manager->OpenDeviceHandle( &m_d3DeviceHandle );
+    return m_prevOperationResult == D3D_OK;
 }
 
 HRESULT MFXDirect3DSurfaceAllocator::getLastError() const
@@ -562,128 +591,18 @@ QString MFXDirect3DSurfaceAllocator::getLastErrorText() const
     return QString::fromWCharArray( DXGetErrorDescription( m_prevOperationResult ) );
 }
 
-HDC MFXDirect3DSurfaceAllocator::dc() const
-{
-    return m_dc;
-}
-
 void MFXDirect3DSurfaceAllocator::deinitializeFrame( BaseFrameContext* const frameCtx )
 {
-    static_cast<Direct3DSurfaceContext*>(frameCtx)->surface->Release();
+    const ULONG refCount = static_cast<Direct3DSurfaceContext*>(frameCtx)->surface->Release();
+    NX_LOG( QString::fromAscii("MFXDirect3DSurfaceAllocator::deinitializeFrame. surf(%1) ref %2").
+        arg((size_t)static_cast<Direct3DSurfaceContext*>(frameCtx)->surface, 0, 16).arg(refCount), cl_logDEBUG2 );
 }
 
-//const mfxFrameAllocResponse& MFXDirect3DSurfaceAllocator::prevResponse() const
+//bool MFXDirect3DSurfaceAllocator::resetDevice()
 //{
-//    return m_prevResponse;
+//    m_prevOperationResult = m_d3d9manager->ResetDevice( NULL, m_deviceResetToken );
+//    return m_prevOperationResult == S_OK;
 //}
-//
-//void MFXDirect3DSurfaceAllocator::clearPrevResponse()
-//{
-//    memset( &m_prevResponse, 0, sizeof(m_prevResponse) );
-//}
-
-static BOOL CALLBACK enumWindowsProc( HWND hwnd, LPARAM lParam )
-{
-    //HWND* foundHwnd = (HWND*)lParam;
-    std::list<HWND>* processTopLevelWindows = (std::list<HWND>*)lParam;
-
-    DWORD processId = 0;
-    GetWindowThreadProcessId( hwnd, &processId );
-    if( processId == GetCurrentProcessId() )
-    {
-        //*foundHwnd = hwnd;
-        //return FALSE;
-        //HWND parentWnd = GetAncestor( hwnd, GA_PARENT );
-        processTopLevelWindows->push_back( hwnd );
-    }
-    return TRUE;
-}
-
-bool MFXDirect3DSurfaceAllocator::openD3D9Device()
-{
-    //searching for a window handle
-    std::list<HWND> processTopLevelWindows;
-    HWND processWindow = NULL;
-    EnumWindows( enumWindowsProc, (LPARAM)&processTopLevelWindows );
-    if( processTopLevelWindows.empty() )
-        return false;   //could not find window
-    processWindow = processTopLevelWindows.front();
-    m_dc = GetDC( processWindow );
-
-    //creating device
-    D3DPRESENT_PARAMETERS presentationParameters;
-    memset( &presentationParameters, 0, sizeof(presentationParameters) );
-    presentationParameters.BackBufferWidth = GetSystemMetrics(SM_CXSCREEN);
-    presentationParameters.BackBufferHeight = GetSystemMetrics(SM_CYSCREEN);
-    presentationParameters.BackBufferFormat = D3DFMT_X8R8G8B8;  //(D3DFORMAT)MAKEFOURCC( 'N', 'V', '1', '2' );
-    presentationParameters.BackBufferCount = 1;
-    //presentationParameters.MultiSampleType = D3DMULTISAMPLE_NONE;
-    //presentationParameters.MultiSampleQuality = 0;
-    presentationParameters.SwapEffect = D3DSWAPEFFECT_DISCARD;  //D3DSWAPEFFECT_COPY;
-    presentationParameters.hDeviceWindow = processWindow;
-    presentationParameters.Windowed = TRUE;
-    presentationParameters.EnableAutoDepthStencil = FALSE;
-    presentationParameters.Flags = D3DPRESENTFLAG_VIDEO;
-    presentationParameters.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT; //since WINDOWED
-    presentationParameters.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
-    m_prevOperationResult = m_direct3D9->CreateDeviceEx(
-        m_adapterNumber,
-        D3DDEVTYPE_HAL,
-        processWindow,
-        D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_MULTITHREADED | D3DCREATE_FPU_PRESERVE,
-        &presentationParameters,
-        NULL,
-        &m_d3d9Device );
-    if( m_prevOperationResult != S_OK )
-        return false;
-
-    m_prevOperationResult = m_d3d9Device->ResetEx( &presentationParameters, NULL );
-    if( m_prevOperationResult != S_OK )
-    {
-        m_d3d9Device->Release();
-        m_d3d9Device = NULL;
-        return false;
-    }
-
-    //creating device manager
-    m_prevOperationResult = DXVA2CreateDirect3DDeviceManager9( &m_deviceResetToken, &m_d3d9manager );
-    if( m_prevOperationResult != S_OK )
-    {
-        m_d3d9Device->Release();
-        m_d3d9Device = NULL;
-        return false;
-    }
-
-    //resetting manager with device
-    m_prevOperationResult = m_d3d9manager->ResetDevice( m_d3d9Device, m_deviceResetToken );
-    if( m_prevOperationResult != S_OK )
-    {
-        m_d3d9manager->Release();
-        m_d3d9manager = NULL;
-        m_d3d9Device->Release();
-        m_d3d9Device = NULL;
-        return false;
-    }
-
-    return true;
-}
-
-void MFXDirect3DSurfaceAllocator::closeD3D9Device()
-{
-    //releasing device manager
-    m_d3d9manager->Release();
-    m_d3d9manager = NULL;
-
-    //closing device
-    m_d3d9Device->Release();
-    m_d3d9Device = NULL;
-}
-
-bool MFXDirect3DSurfaceAllocator::resetDevice()
-{
-    m_prevOperationResult = m_d3d9manager->ResetDevice( NULL, m_deviceResetToken );
-    return m_prevOperationResult == S_OK;
-}
 
 
 //////////////////////////////////////////////////////////

@@ -217,7 +217,7 @@ public:
     /*!
         \param adapterNumber Graphics adapter to use (to create D3D device on). By default, default adapter is used
     */
-    MFXDirect3DSurfaceAllocator( IDirect3D9Ex* direct3D9, unsigned int adapterNumber = 0 );
+    MFXDirect3DSurfaceAllocator( IDirect3DDeviceManager9* d3d9manager, unsigned int adapterNumber = 0 );
     virtual ~MFXDirect3DSurfaceAllocator();
 
     virtual mfxStatus alloc( mfxFrameAllocRequest* request, mfxFrameAllocResponse* response );
@@ -231,20 +231,20 @@ public:
     bool initialize();
     //!Returns true if D3D9 device was created and initialized successfully
     bool initialized() const;
-    //!Return value is not NULL only if \a initialized() returns \a true
-    IDirect3D9Ex* d3d9() const;
     unsigned int adapterNumber() const;
     //!Return value is not NULL only if \a initialized() returns \a true
-    IDirect3DDevice9Ex* d3d9Device() const;
-    //!Return value is not NULL only if \a initialized() returns \a true
     IDirect3DDeviceManager9* d3d9DeviceManager() const;
+    //!Returns d3d device hanldle
+    /*!
+        Since, this class uses d3d device via \a IDirect3DDeviceManager9, this handle can be invalidated at any time 
+        (any d3d method accepting this handle returns \a DXVA2_E_NEW_VIDEO_DEVICE). 
+        In this case it is neccessary to call \a reopenDeviceHandle(), \a d3DeviceHandle() once again and repeat d3d operation
+    */
+    HANDLE d3DeviceHandle() const;
+    //!Opens new d3 device handle
+    bool reopenDeviceHandle();
     HRESULT getLastError() const;
     QString getLastErrorText() const;
-    HDC dc() const;
-
-    //!Returns response from previous \a alloc call
-    //const mfxFrameAllocResponse& prevResponse() const;
-    //void clearPrevResponse();
 
 protected:
     virtual void deinitializeFrame( BaseFrameContext* const frameCtx );
@@ -261,18 +261,13 @@ private:
     };
 
     bool m_initialized;
-    IDirect3D9Ex* m_direct3D9;
     IDirect3DDeviceManager9* m_d3d9manager;
-    IDirect3DDevice9Ex* m_d3d9Device;
     IDirectXVideoDecoderService* m_decoderService;
+    HANDLE m_d3DeviceHandle;
     UINT m_deviceResetToken;
     HRESULT m_prevOperationResult;
     unsigned int m_adapterNumber;
     HDC m_dc;
-
-    bool openD3D9Device();
-    void closeD3D9Device();
-    bool resetDevice();
 };
 
 //!Redirects calls to \a MFXDirect3DSurfaceAllocator or \a MFXSysMemFrameAllocator depending on requested memory type

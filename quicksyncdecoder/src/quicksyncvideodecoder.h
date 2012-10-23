@@ -63,8 +63,14 @@ public:
     */
     QuickSyncVideoDecoder(
         MFXVideoSession* const parentSession,
-        IDirect3D9Ex* direct3D9,
+        IDirect3DDeviceManager9* d3d9manager,
         const QnCompressedVideoDataPtr data,
+        PluginUsageWatcher* const pluginUsageWatcher,
+        unsigned int adapterNumber );
+    //!Object instanciation without decoder initialization
+    QuickSyncVideoDecoder(
+        MFXVideoSession* const parentSession,
+        IDirect3DDeviceManager9* d3d9manager,
         PluginUsageWatcher* const pluginUsageWatcher,
         unsigned int adapterNumber );
     virtual ~QuickSyncVideoDecoder();
@@ -119,6 +125,10 @@ public:
     */
     virtual bool get( int resID, QVariant* const value ) const;
 #endif
+
+    bool readSequenceHeader( const QnCompressedVideoDataPtr data, mfxVideoParam* const streamParams );
+    //!Returns estimate in bytes of required frame surface memory to decode stream. Estimaion based on previously parsed header (by method \a readSequenceHeader)
+    size_t estimateSurfaceMemoryUsage() const;
 
 private:
     class MyMFXVideoSession
@@ -197,15 +207,12 @@ private:
         QuicksyncDXVAPictureData(
             AbstractMFXFrameAllocator* const allocator,
             const QSharedPointer<SurfaceContext>& surface,
-            const QRect& _cropRect );
+            const QRect& _cropRect,
+            QuickSyncVideoDecoder* decoder );
         virtual ~QuicksyncDXVAPictureData();
 
         //!Implementation of D3DPictureData::getSurface
         virtual IDirect3DSurface9* getSurface() const;
-        //!Implementation of QnAbstractPictureDataRef::syncCtx
-        virtual QnAbstractPictureDataRef::SynchronizationContext* syncCtx() const;
-        //!Implementation of QnAbstractPictureDataRef::syncCtx
-        virtual bool isValid() const;
         //!Implementation of QnAbstractPictureDataRef::cropRect
         /*!
             Returns crop rect from h.264 sps
@@ -216,7 +223,37 @@ private:
         QSharedPointer<SurfaceContext> m_mfxSurface;
         IDirect3DSurface9* m_d3dSurface;
         const QRect m_cropRect;
-        int m_savedSequence;
+        QuickSyncVideoDecoder* m_decoder;
+    };
+
+    template<class T>
+    class ScopedIUnknownReference
+    {
+    public:
+        ScopedIUnknownReference( T* ptr = NULL )
+        :
+            m_ptr( ptr )
+        {
+        }
+
+        ~ScopedIUnknownReference()
+        {
+            if( m_ptr )
+                m_ptr->Release();
+        }
+
+        T*& get()
+        {
+            return m_ptr;
+        }
+
+        T* operator->() const
+        {
+            return m_ptr;
+        }
+
+    private:
+        T* m_ptr;
     };
 
     MFXVideoSession* const m_parentSession;
@@ -262,10 +299,10 @@ private:
     std::deque<qint64> m_fpsCalcFrameTimestamps;
     size_t m_totalInputFrames;
     size_t m_totalOutputFrames;
-    quint64 m_prevInputFrameMs;
+    DWORD m_prevInputFrameMs;
     std::auto_ptr<SPSUnit> m_sps;
     std::auto_ptr<PPSUnit> m_pps;
-    qint64 m_prevOutPictureClock;
+    DWORD m_prevOutPictureClock;
     int m_recursionDepth;
 #ifdef USE_OPENCL
     cl_context m_clContext;
@@ -275,6 +312,7 @@ private:
     HDC m_glContextDevice;
     HGLRC m_glContext;
 #endif
+    IDirect3DDevice9* m_d3d9Device;
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;

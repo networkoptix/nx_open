@@ -8,8 +8,11 @@
 #include <memory>
 
 #include <D3D9.h>
+#include <Dxva2api.h>
 
 #include <mfxvideo++.h>
+
+#include <QMutex>
 
 #include <plugins/videodecoders/abstractvideodecoderusagecalculator.h>
 #include <plugins/videodecoders/pluginusagewatcher.h>
@@ -30,12 +33,14 @@ class QuicksyncDecoderPlugin
 
 public:
     QuicksyncDecoderPlugin();
-    ~QuicksyncDecoderPlugin();
+    virtual ~QuicksyncDecoderPlugin();
 
     //!Implementation of QnAbstractClientPlugin::minSupportedVersion
     virtual quint32 minSupportedVersion() const;
     //!Implementation of QnAbstractClientPlugin::initializeLog
     virtual void initializeLog( QnLog* logInstance );
+    //!Implementation of QnAbstractClientPlugin::initialized
+    virtual bool initialized() const;
 
     //!Implementation of QnAbstractVideoDecoderPlugin::supportedCodecTypes
     virtual QList<CodecID> supportedCodecTypes() const;
@@ -45,9 +50,26 @@ public:
     virtual QnAbstractVideoDecoder* create(
         CodecID codecID,
         const QnCompressedVideoDataPtr& data,
-        const QGLContext* const glContext ) const;
+        const QGLContext* const glContext,
+        int currentSWDecoderCount ) const;
 
 private:
+    class D3D9DeviceContext
+    {
+    public:
+        IDirect3DDevice9Ex* d3d9Device;
+        IDirect3DDeviceManager9* d3d9manager;
+        UINT deviceResetToken;
+
+        D3D9DeviceContext()
+        :
+            d3d9Device( NULL ),
+            d3d9manager( NULL ),
+            deviceResetToken( 0 )
+        {
+        }
+    };
+
     DecoderResourcesNameset m_resNameset;
     mutable std::auto_ptr<PluginUsageWatcher> m_usageWatcher;
     mutable std::auto_ptr<AbstractVideoDecoderUsageCalculator> m_usageCalculator;
@@ -60,10 +82,17 @@ private:
     mutable QString m_sdkVersionStr;
     mutable bool m_initialized;
     QString m_osName;
+    QString m_cpuString;
+    mutable HRESULT m_prevD3DOperationResult;
+    mutable QMutex m_mutex;
+    mutable std::vector<D3D9DeviceContext> m_d3dDevices;
 
     void initializeResourceNameset();
-    void initialize() const;
+    bool initialize() const;
+    bool openD3D9Device() const;
+    void closeD3D9Device();
     QString winVersionToName( const OSVERSIONINFOEX& osVersionInfo ) const;
+    void readCPUInfo();
 };
 
 #endif  //QUICKSYNCDECODERPLUGIN_H
