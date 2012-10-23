@@ -46,7 +46,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent->toGraphicsObject()),
     m_updatingSpeedSliderFromNavigator(false),
-    m_updatingNavigatorFromSpeedSlider(false)
+    m_updatingNavigatorFromSpeedSlider(false),
+    m_zoomingIn(false),
+    m_zoomingOut(false)
 {
     setFlag(QGraphicsItem::ItemIsMovable, false);
     setFlag(QGraphicsItem::ItemIsSelectable, false);
@@ -60,6 +62,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
         pal.setColor(QPalette::Window, Qt::black);
         setPalette(pal);
     }
+
+    registerAnimation(this);
+    startListening();
 
 
     /* Create buttons. */
@@ -225,6 +230,11 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(streamSynchronizer,             SIGNAL(runningChanged()),                   this,           SLOT(updateSyncButtonChecked()));
     connect(streamSynchronizer,             SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonChecked()));
     connect(streamSynchronizer,             SIGNAL(effectiveChanged()),                 this,           SLOT(updateSyncButtonEnabled()));
+
+    connect(m_zoomInButton,                 SIGNAL(pressed()),                          this,           SLOT(at_zoomInButton_pressed()));
+    connect(m_zoomInButton,                 SIGNAL(released()),                         this,           SLOT(at_zoomInButton_released()));
+    connect(m_zoomOutButton,                SIGNAL(pressed()),                          this,           SLOT(at_zoomOutButton_pressed()));
+    connect(m_zoomOutButton,                SIGNAL(released()),                         this,           SLOT(at_zoomOutButton_released()));
 
     connect(m_speedSlider,                  SIGNAL(roundedSpeedChanged(qreal)),         this,           SLOT(updateNavigatorSpeedFromSpeedSlider()));
     connect(m_volumeSlider,                 SIGNAL(valueChanged(qint64)),               this,           SLOT(updateMuteButtonChecked()));
@@ -440,6 +450,27 @@ void QnNavigationItem::updatePlayButtonChecked() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+void QnNavigationItem::tick(int deltaMSecs) {
+    if(!m_zoomingIn && !m_zoomingOut)
+        return;
+
+    if(!scene())
+        return;
+
+    QPointF pos;
+    if(m_timeSlider->windowStart() <= m_timeSlider->sliderPosition() && m_timeSlider->sliderPosition() <= m_timeSlider->windowEnd()) {
+        pos = timeSlider()->positionFromValue(m_timeSlider->sliderPosition(), true);
+    } else {
+        pos = timeSlider()->rect().center();
+    }
+
+    QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
+    event.setDelta(360 * 8 * (m_zoomingIn ? deltaMSecs : -deltaMSecs) / 1000); /* 360 degrees per sec, x8 since delta is measured in in eighths (1/8s) of a degree. */
+    event.setPos(pos);
+    event.setScenePos(m_timeSlider->mapToScene(pos));
+    scene()->sendEvent(m_timeSlider, &event);
+}
+
 bool QnNavigationItem::eventFilter(QObject *watched, QEvent *event) {
     if(watched == m_speedSlider && event->type() == QEvent::GraphicsSceneWheel)
         return at_speedSlider_wheelEvent(static_cast<QGraphicsSceneWheelEvent *>(event));
@@ -514,4 +545,20 @@ void QnNavigationItem::at_stepForwardButton_clicked() {
     } else {
         navigator()->stepForward();
     }
+}
+
+void QnNavigationItem::at_zoomInButton_pressed() {
+    m_zoomingIn = true;
+}
+
+void QnNavigationItem::at_zoomInButton_released() {
+    m_zoomingIn = false;
+}
+
+void QnNavigationItem::at_zoomOutButton_pressed() {
+    m_zoomingOut = true;
+}
+
+void QnNavigationItem::at_zoomOutButton_released() {
+    m_zoomingOut = false;
 }
