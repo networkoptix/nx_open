@@ -16,6 +16,8 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <help/context_help_queryable.h>
+
 static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 
 namespace {
@@ -53,6 +55,13 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     ui->storagesTable->setItemDelegate(itemDelegate);
 
     setButtonBox(ui->buttonBox);
+
+    /* Set up context help. */
+    setHelpTopicId(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopicId(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
+    setHelpTopicId(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopicId(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
+    setHelpTopicId(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
     connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));

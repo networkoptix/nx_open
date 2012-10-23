@@ -738,6 +738,7 @@
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
+                                    <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
                                 </RegistryKey>
                             </Component>
                             

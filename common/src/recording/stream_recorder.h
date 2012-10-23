@@ -105,6 +105,7 @@ private:
 private:
     void markNeedKeyData();
     void writeData(QnAbstractMediaDataPtr md, int streamIndex);
+    void updateSignatureAttr();
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;

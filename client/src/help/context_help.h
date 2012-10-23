@@ -4,21 +4,10 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
-namespace Qn {
-
-    enum HelpTopic {
-#define QN_HELP_TOPIC(ID, URL) ID,
 #include "help_topics.h"
-
-        Empty_Help = -1
-    };
-
-} // namespace Qn
-
 
 class QnContextHelp: public QObject {
     Q_OBJECT;
-
 public:
     QnContextHelp(QObject *parent = NULL);
     virtual ~QnContextHelp();

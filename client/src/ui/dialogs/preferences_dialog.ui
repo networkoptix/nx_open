@@ -40,7 +40,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="mainMediaFolderGroupBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -75,7 +75,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_3">
+        <widget class="QGroupBox" name="extraMediaFoldersGroupBox">
          <property name="title">
           <string>Extra Media Folders</string>
          </property>
@@ -273,7 +273,7 @@
            </layout>
           </item>
           <item row="4" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="showIpInTreeLabel">
             <property name="text">
              <string>Show IP in Tree:</string>
             </property>
@@ -290,7 +290,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_10">
+        <widget class="QGroupBox" name="miscGroupBox">
          <property name="title">
           <string>Misc</string>
          </property>
@@ -339,7 +339,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="NetworkInterfacesGroupBox">
+        <widget class="QGroupBox" name="networkInterfacesGroupBox">
          <property name="title">
           <string>Network Interfaces</string>
          </property>
