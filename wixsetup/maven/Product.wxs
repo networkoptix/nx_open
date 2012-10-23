@@ -682,9 +682,9 @@
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
                                 <File Id="ServerOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-								<File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-								<File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-								<File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                                <File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -706,6 +706,8 @@
                         </Directory>
                         
                         <Directory Id="${installer.customization}ClientDir" Name="Client">
+                            <Directory Id="${installer.customization}HelpDir" Name="help"/>
+
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
                                 <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
@@ -762,9 +764,9 @@
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
                                 <File Id="ClientOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-								<File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-								<File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-								<File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                                <File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                                 <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
                             </Component>
                             
@@ -895,6 +897,7 @@
  
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="clientShortcutDesktop"/>
+            <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentRef Id="ClientConfiguration" />
             <ComponentRef Id="ClientConfigurationPassword" />
             <ComponentRef Id="ClientFFmpegLibraries"/>
@@ -903,7 +906,7 @@
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientQtColorPicker"/>
-			<ComponentRef Id="ClientVsRedistributable"/>
+            <ComponentRef Id="ClientVsRedistributable"/>
             <ComponentRef Id="bespin" />
             
             <ComponentRef Id='ClientDirectoryComponent'/>

@@ -1,0 +1,204 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+   <title>Working with DW Spectrum &gt; DW Spectrum User Interface Overview &gt; Working with Resource Tree</title>
+   <meta name="generator" content="Help & Manual">
+   <meta name="keywords" content="">
+   <meta name="description" content="Working with Resource Tree">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="custom.css" rel="stylesheet">
+   <script type="text/javascript" src="nsh.js"></script>
+
+<script type="text/javascript">   
+// Toggle Toggler 
+
+var toggleCount=false;
+var switchState;
+
+function toggleToggles() {
+
+    if (!toggleCount) {
+     toggleCount = true;
+     HMToggleExpandAll(true);
+     switchState = true;
+     }
+   
+     else if (switchState) {
+        HMToggleExpandAll(false);
+        switchState = false;
+        }
+        
+     else  {
+        HMToggleExpandAll(true);
+        switchState = true;
+        } 
+    }
+</script>
+   
+<!-- non-scrolling headers for CHM and browser-based help, local styles-->
+<style type="text/css" media="screen"> 
+html, body { margin:0; 
+   padding:0; 
+   overflow: hidden; 
+   background: #FFFFFF; 
+  }
+ 
+div#printheader { 
+   display: none;
+   padding-bottom: 10px;
+   }
+   #idheader { 
+      width:100%; 
+      height:auto; 
+      padding: 0; 
+      margin: 0; 
+} 
+    #idheaderbg  {
+    background: #6F6F6F; 
+}
+   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+   #callout-table a {text-decoration: none; color: blue;}
+   #callout-table a:visited {text-decoration: none; color: blue;}
+   #overview-table a {text-decoration: none; color: black;}
+   #overview-table a:visited {text-decoration: none; color: black;}
+   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
+   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+   </style>
+<!--[if lt IE 7]>
+<style type="text/css">
+  #idcontent {padding: 0px;} 
+  #innerdiv {padding: 10px 5px 5px 10px ;} 
+</style> 
+<![endif]-->
+<noscript>
+<style type="text/css">
+html, body { overflow: auto; }
+</style> 
+</noscript>
+<style type="text/css" media="print">
+span.f_Heading1 { color: black; }
+#idheader, #printheader img { display:none; }
+#printheader { display: block; margin-top: 20px; }
+#idcontent { margin-top: 10px; }
+</style>   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "working_with_a_resource_tree.htm");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+<!--ZOOMSTOP-->
+
+<div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Working with Resource Tree</span></h1>
+</div> 
+<div id="idheader">
+<div id="idheaderbg">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+       style="margin: 0px; background: url(header_bg.jpg);">
+
+  <tr valign="bottom">
+    <td align="left" valign="bottom" class="topichead">
+   <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
+   
+   Working with DW Spectrum &gt; <a href="hd_witness_user_interface_overview.htm">DW Spectrum User Interface Overview</a>&nbsp;&gt;</p>
+   <h1 class="p_Heading1"><span class="f_Heading1">Working with Resource Tree</span></h1>
+
+    </td>
+    <td align="right" width="120" valign="middle" class="topichead" id="idnav">
+    
+     <a href="context_menu.htm"
+        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
+        onmouseout="document.images.prev.src='btn_prev_n.gif'"
+        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        ></a><a href="hd_witness_user_interface_overview.htm"
+        onmouseover="document.images.main.src='btn_home_h.gif'" 
+        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        ></a><a href="search.htm"
+        onmouseover="document.images.next.src='btn_next_h.gif'" 
+        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        ></a>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+</table>
+</div>
+
+<!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
+  
+
+</div>  
+
+
+
+<div id="idcontent"><div id="innerdiv"> 
+<!--ZOOMRESTART-->
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText"> is a convenient way to display, search and manage resources in the application. &nbsp;Look and Feel of </span><span class="f_BodyText" style="font-weight: bold;">Resource Tree </span><span class="f_BodyText">depends on the user logged in. </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText"> is displayed on the left </span><span class="f_BodyText" style="font-weight: bold;">Panel</span><span class="f_BodyText"> and may contain different elements depending on the user logged in (see &quot;<a href="introducing_user_roles.htm" class="topiclink">Introducing User Roles</a>&quot;). For </span><span class="f_BodyText" style="font-weight: bold;">Administrators</span><span class="f_BodyText"> it is shown in the following way:</span></p>
+<div style="text-align: left; text-indent: 0px; line-height: 1.15; padding: 0px 0px 0px 0px; margin: 6px 0px 6px 10px;"><table style="border:none; border-spacing:0px;">
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:475px; padding:4px;"><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Servers</span><span class="f_BodyTextIndent"> (admin only) – a list of servers registered in the system. Additionally Servers' IP addresses are displayed (if the corresponding setting is enabled).</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Cameras</span><span class="f_BodyTextIndent">. Cameras are displayed under </span><span class="f_BodyTextIndent" style="font-weight: bold;">Servers</span><span class="f_BodyTextIndent"> (admin only) and </span><span class="f_BodyTextIndent" style="font-weight: bold;">Layouts</span><span class="f_BodyTextIndent">. If a camera appears in more than one layout, the reference in the main tree becomes duplicated. </span></p><p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">Legend:</span></p>
+<p class="p_BodyTextFirstIndent2"><img src="recording_zoom28.png" width="8" height="8" alt="recording" style="border:none" /><span class="f_BodyTextIndent"> – </span><span class="f_BodyTextFirstIndent2">a camera is being recorded  </span></p>
+<p class="p_BodyTextFirstIndent2"><img src="scheduled_zoom30.png" width="8" height="8" alt="scheduled" style="border:none" /><span class="f_BodyTextFirstIndent2"> – recording is set up for the camera, but it's not recorded right now. </span></p>
+<p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">Additionally Cameras' IP addresses are displayed (if the setting is enabled)</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Users</span><span class="f_BodyTextIndent"> (</span><span class="f_BodyTextIndent" style="font-weight: bold;">Administrator</span><span class="f_BodyTextIndent"> can view several users in </span><span class="f_BodyTextIndent" style="font-weight: bold;">Resource Tree</span><span class="f_BodyTextIndent">).</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Layouts</span><span class="f_BodyTextIndent">. Contains resources (cameras and local files). Owned by users and displayed under each user.</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Local Files</span><span class="f_BodyTextIndent">. Contains:</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Video files</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Images</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Exported Video Files</span><span class="f_BodyTextFirstIndent2"> (see “<a href="exporting.htm" class="topiclink">Exporting</a>”)</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Exported Multi-Video Files</span><span class="f_BodyTextFirstIndent2"> and their contents: </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Cameras</span><span class="f_BodyTextFirstIndent2">, or </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Local Files</span><span class="f_BodyTextFirstIndent2"> (see “<a href="exporting_the_layout_in_multi-.htm" class="topiclink">Exporting the Layout in Multi-Video Format</a>&quot;</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Screen Recordings</span><span class="f_BodyTextFirstIndent2"> (see “<a href="screen_recording.htm" class="topiclink">Screen Recording</a>”)</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Screenshots</span><span class="f_BodyTextFirstIndent2"> (see “<a href="taking_a_screenshot.htm" class="topiclink">Taking a Screenshot</a>”).</span></p><p class="p_BodyText"><span class="f_BodyText"><a href="viewing_camera_stream_information.htm" class="topiclink">Items</a> that are currently placed on <a href="scene.htm" class="topiclink">Scene</a> are highlighted with bold in </span><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText">. A selected (focused) </span><span class="f_BodyText" style="font-weight: bold;">Item</span><span class="f_BodyText"> it has the“&gt;” mark in both </span><span class="f_BodyText" style="font-weight: bold;">Server </span><span class="f_BodyText">and </span><span class="f_BodyText" style="font-weight: bold;">Layout</span><span class="f_BodyText">.</span></p>
+<p class="p_BodyText"><span class="f_BodyText">To enable/disable displaying IP addresses within </span><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText">:</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent">1. Open <a href="main_menu.htm" class="topiclink">Main Menu</a> and go to </span><span class="f_T_Interface_Elements">System Settings</span></p>
+<p class="p_BodyTextIndent"><span class="f_BodyTextIndent">2. Select/clear the flag in </span><span class="f_T_Interface_Elements">Show IP in Tree </span><span class="f_BodyTextIndent">option (</span><span class="f_T_Interface_Elements">Look and Feel</span><span class="f_BodyTextIndent"> section).</span></p>
+</td>
+<td style="vertical-align:top; width:559px; padding:4px;"><p class="p_BodyText"><img src="hmfile_hash_8178c557.png" width="570" height="654" alt="Working with Resource Tree - 1 - digitalwatchdog" style="border:none" /></p>
+</td>
+</tr>
+</table>
+</div>
+<div style="text-align: left; text-indent: 0px; line-height: 1.15; padding: 0px 0px 0px 0px; margin: 6px 0px 6px 10px;"><table style="border:none; border-spacing:0px;">
+<tr style="text-align:left;vertical-align:top;">
+<td style="vertical-align:top; width:602px; padding:0px;"><p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Viewer</span><span class="f_BodyText">'s </span><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText"> is shown as following:</span></p>
+<p class="p_BodyText"><span class="f_BodyText">If the </span><span class="f_BodyText" style="font-weight: bold;">Client</span><span class="f_BodyText"> is not connected to </span><span class="f_BodyText" style="font-weight: bold;">Enterprise Controller</span><span class="f_BodyText">, only local file names are visible.</span></p>
+<p class="p_BodyText"><span class="f_BodyText">The following actions can be performed in Resource Tree:</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Expanding/collapsing</span><span class="f_BodyTextIndent"> a tree node (+/- on keypad)</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Scrolling</span><span class="f_BodyTextIndent"> (if the tree contains multiple elements)</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Multi-Selection</span><span class="f_BodyTextIndent">. Shift to select multiple items and hold Ctrl to select/deselect items individually.</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Drag and drop</span><span class="f_BodyTextIndent">. An efficient way of organizing and configuring resources in the tree. The next chapters will explain the drag and drop capabilities.</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent"><a href="search.htm" class="topiclink">Search</a>.</span></p><p class="p_BodyText"><span class="f_BodyText">Almost any resource (except </span><span class="f_BodyText" style="font-weight: bold;">Local Files</span><span class="f_BodyText">) can be renamed by Administrator in </span><span class="f_BodyText" style="font-weight: bold;">Resource Tree</span><span class="f_BodyText">. To rename a resource select it and:</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent">click on it again (like Windows Explorer).</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent">right-click for <a href="context_menu.htm" class="topiclink">Context Menu</a> and choose </span><span class="f_T_Interface_Elements">Rename </span><span class="f_BodyTextIndent">(or press </span><span class="f_T_Hotkey">F2</span><span class="f_BodyTextIndent">):</span></p><p class="p_BodyText"><img src="hmfile_hash_e1af3aba.png" width="377" height="153" alt="Context Menu - 1" style="border:none" /></p>
+</td>
+<td style="vertical-align:top; width:469px; padding:0px;"><p class="p_BodyText"><img src="hmfile_hash_b85d8a11.png" width="250" height="387" alt="Working with Resource Tree - 2 - digitalwatchdog" style="border:none" /></p>
+</td>
+</tr>
+</table>
+</div>
+<p class="p_BodyText"><span class="f_BodyText">&nbsp;</span></p>
+<p class="p_BodyText"><span class="f_BodyText">&nbsp;</span></p>
+<p style="text-align: center;"><span style="font-size: 8pt; color: #000000;">&nbsp;</span></p>
+<p style="text-align: center;"><span style="font-size: 8pt; color: #000000;"><a href="http://www.helpandmanual.com" target="_blank" class="weblink">This help system was created with an evaluation copy of Help &amp; Manual.</a></span></p>
+
+<!--ZOOMSTOP-->
+</div></div>
+<script type="text/javascript">
+
+var lastSlashPos = document.URL.lastIndexOf("/") > document.URL.lastIndexOf("\\") ? document.URL.lastIndexOf("/") : document.URL.lastIndexOf("\\");
+if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != "~hh" )
+{
+ if (document.all) setTimeout(function() {nsrInit();},20); 
+    else nsrInit();
+ } 
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
