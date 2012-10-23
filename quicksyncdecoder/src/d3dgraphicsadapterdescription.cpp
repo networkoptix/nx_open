@@ -5,6 +5,7 @@
 #include "d3dgraphicsadapterdescription.h"
 
 #include <DxErr.h>
+#include <GL/Gl.h>
 #include <Windows.h>
 
 #include <plugins/videodecoders/videodecoderplugintypes.h>
@@ -13,6 +14,7 @@
 
 D3DGraphicsAdapterDescription::D3DGraphicsAdapterDescription( IDirect3D9Ex* direct3D9, unsigned int graphicsAdapterNumber )
 :
+    m_direct3D9( direct3D9 ),
     m_graphicsAdapterNumber( graphicsAdapterNumber )
 {
     memset( &m_adapterIdentifier, 0, sizeof(m_adapterIdentifier) );
@@ -32,6 +34,11 @@ D3DGraphicsAdapterDescription::D3DGraphicsAdapterDescription( IDirect3D9Ex* dire
         arg(LOWORD(m_adapterIdentifier.DriverVersion.HighPart)).  //Version
         arg(HIWORD(m_adapterIdentifier.DriverVersion.LowPart)).   //SubVersion
         arg(LOWORD(m_adapterIdentifier.DriverVersion.LowPart));   //Build
+
+    //reading m_displayAdapterDeviceString
+    const GLubyte* rendererStr = glGetString( GL_RENDERER );
+    if( rendererStr )
+        m_displayAdapterDeviceString = QString::fromAscii( (const char*)rendererStr );
 }
 
 bool D3DGraphicsAdapterDescription::get( int resID, QVariant* const value ) const
@@ -64,6 +71,16 @@ bool D3DGraphicsAdapterDescription::get( int resID, QVariant* const value ) cons
 
         case DecoderParameter::gpuRevision:
             *value = (unsigned int)m_adapterIdentifier.Revision;
+            return true;
+
+        case DecoderParameter::graphicAdapterCount:
+            *value = (unsigned int)m_direct3D9->GetAdapterCount();
+            return true;
+
+        case DecoderParameter::displayAdapterDeviceString:
+            if( m_displayAdapterDeviceString.isEmpty() )
+                return false;
+            *value = m_displayAdapterDeviceString;
             return true;
 
         default:

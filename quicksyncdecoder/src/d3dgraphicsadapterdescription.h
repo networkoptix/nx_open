@@ -20,6 +20,8 @@
     - gpuVendorId
     - gpuDeviceId
     - gpuRevision
+    - graphicAdapterCount
+    - displayAdapterDeviceString
 */
 class D3DGraphicsAdapterDescription
 :
@@ -35,9 +37,11 @@ public:
     virtual bool get( int resID, QVariant* const value ) const;
 
 private:
+    IDirect3D9Ex* m_direct3D9;
     int m_graphicsAdapterNumber;
     QString m_driverVersionStr;
     D3DADAPTER_IDENTIFIER9 m_adapterIdentifier;
+    QString m_displayAdapterDeviceString;
 };
 
 #endif  //INTELGRAPHICSADAPTERDESCRIPTION_H
