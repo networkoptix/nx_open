@@ -4,7 +4,7 @@
 #include <QtGui/QDesktopServices>
 
 namespace {
-    const char *relativeUrlForTopic(Qn::HelpTopic topic) {
+    const char *relativeUrlForTopic(int topic) {
         switch(topic) {
 #define QN_HELP_TOPIC(ID, URL)                                                  \
         case Qn::ID: return URL;
@@ -36,13 +36,13 @@ void QnContextHelp::hide() {
     return;
 }
 
-void QnContextHelp::setHelpTopic(Qn::HelpTopic topic) {
+void QnContextHelp::setHelpTopic(int topic) {
     m_topic = topic;
 
     QDesktopServices::openUrl(urlForTopic(topic));
 }
 
-QUrl QnContextHelp::urlForTopic(Qn::HelpTopic topic) const {
+QUrl QnContextHelp::urlForTopic(int topic) const {
     return QUrl::fromLocalFile(m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic)));
 }
 
