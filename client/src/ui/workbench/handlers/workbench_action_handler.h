@@ -241,6 +241,7 @@ protected slots:
     void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
+    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
@@ -305,6 +306,8 @@ protected slots:
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
     void at_cancelExport();
+
+    void at_whatsThisAction_triggered();
 
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};

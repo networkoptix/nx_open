@@ -1,8 +1,13 @@
 #include "context_help_handler.h"
 
 #include <QtCore/QEvent>
+#include <QtGui/QCursor>
 #include <QtGui/QHelpEvent>
 #include <QtGui/QWhatsThis>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsObject>
+#include <QtGui/QGraphicsProxyWidget>
 
 #include <utils/common/variant.h>
 
@@ -25,32 +30,89 @@ void QnContextHelpHandler::setContextHelp(QnContextHelp *contextHelp) {
     m_contextHelp = contextHelp;
 }
 
-QnContextHelpQueryable *QnContextHelpHandler::queryable(QObject *object) {
-    return dynamic_cast<QnContextHelpQueryable *>(object);
+int QnContextHelpHandler::helpTopicAt(QGraphicsItem *item, const QPointF &pos) const {
+    if(QGraphicsObject *object = item->toGraphicsObject()) {
+        int topicId = qvariant_cast<int>(object->property(Qn::HelpTopicId), -1);
+        if(topicId != -1)
+            return topicId;
+    }
+
+    if(QnContextHelpQueryable *queryable = dynamic_cast<QnContextHelpQueryable *>(item))
+        return queryable->helpTopicAt(pos);
+
+    if(QGraphicsProxyWidget *proxy = dynamic_cast<QGraphicsProxyWidget *>(item)) {
+        if(proxy->widget()) {
+            QPoint widgetPos = pos.toPoint();
+            QWidget *child = proxy->widget()->childAt(widgetPos);
+            if(!child)
+                child = proxy->widget();
+
+            return helpTopicAt(child, widgetPos, true);
+        }
+    }
+
+    return -1;
+}
+
+int QnContextHelpHandler::helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp) const {
+    QPoint widgetPos = pos;
+
+    while(true) {
+        int topicId = qvariant_cast<int>(widget->property(Qn::HelpTopicId), -1);
+        if(topicId != -1)
+            return topicId;
+
+        if(QnContextHelpQueryable *queryable = dynamic_cast<QnContextHelpQueryable *>(widget))
+            return queryable->helpTopicAt(widgetPos);
+
+        if(QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget)) {
+            QPointF scenePos = view->mapToScene(widgetPos);
+            foreach(QGraphicsItem *item, view->items(widgetPos)) {
+                int topicId = helpTopicAt(item, item->mapFromScene(scenePos));
+                if(topicId != -1)
+                    return topicId;
+            }
+            
+            if(view->scene()) {
+                topicId = qvariant_cast<int>(view->scene()->property(Qn::HelpTopicId), -1);
+                if(topicId != -1)
+                    return topicId;
+            }
+        }
+
+        if(!bubbleUp)
+            break;
+
+        if(widget->parentWidget()) {
+            widgetPos = widget->mapToParent(widgetPos);
+            widget = widget->parentWidget();
+        } else {
+            break;
+        }
+    }
+
+    return -1;
 }
 
 bool QnContextHelpHandler::eventFilter(QObject *watched, QEvent *event) {
-    switch(event->type()) {
-    case QEvent::QueryWhatsThis:
-        if(qvariant_cast<int>(watched->property(Qn::HelpTopicId), -1) != -1 || queryable(watched)) {
-            event->accept();
-            return true;
-        }
-       
+    QWidget *widget = qobject_cast<QWidget *>(watched);
+    if(!widget)
         return false;
-    case QEvent::WhatsThis: {
-        int topicId = -1;
-        if(QnContextHelpQueryable *queryable = this->queryable(watched)) {
-            topicId = queryable->helpTopicAt(static_cast<QHelpEvent *>(event)->pos());
-        } else {
-            topicId = qvariant_cast<int>(watched->property(Qn::HelpTopicId), -1);
-        }
 
+    switch(event->type()) {
+    case QEvent::QueryWhatsThis: {
+        bool accepted = helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos())) != -1;
+        event->setAccepted(accepted);
+        return accepted;
+    }
+    case QEvent::WhatsThis: {
+        int topicId = helpTopicAt(widget, static_cast<QHelpEvent *>(event)->pos());
+        
         if(topicId != -1) {
             event->accept();
 
             if(contextHelp()) {
-                contextHelp()->setHelpTopic(static_cast<Qn::HelpTopic>(topicId));
+                contextHelp()->setHelpTopic(topicId);
                 contextHelp()->show();
             }
 

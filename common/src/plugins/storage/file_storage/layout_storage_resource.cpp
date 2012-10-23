@@ -76,8 +76,12 @@ public:
         m_openMode = openMode;
         if (openMode & QIODevice::WriteOnly) 
         {
-            if (!m_storageResource.addFileEntry(m_fileName))
-                return false;
+            qint64 fileSize;
+            if (m_storageResource.getFileOffset(m_fileName, &fileSize) == -1)
+            {
+                if (!m_storageResource.addFileEntry(m_fileName))
+                    return false;
+            }
             openMode |= QIODevice::Append;
         }
         m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
@@ -86,8 +90,9 @@ public:
         m_fileOffset = m_storageResource.getFileOffset(m_fileName, &m_fileSize);
         if (m_fileOffset == -1)
             return false;
-        m_file.seek(m_fileOffset);
-        return QIODevice::open(openMode);
+        bool rez = QIODevice::open(openMode);
+        seek(0);
+        return rez;
     }
 
     void lockFile()

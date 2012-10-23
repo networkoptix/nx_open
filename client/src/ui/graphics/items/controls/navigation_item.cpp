@@ -25,6 +25,9 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
 
+#include <help/context_help_queryable.h>
+#include <help/help_topics.h>
+
 #include "time_slider.h"
 #include "time_scroll_bar.h"
 
@@ -87,18 +90,22 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_liveButton = newActionButton(action(Qn::JumpToLiveAction));
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
+    setHelpTopicId(m_liveButton, Qn::MainWindow_Navigation_Help);
 
     m_syncButton = newActionButton(action(Qn::ToggleSyncAction));
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
+    setHelpTopicId(m_syncButton, Qn::MainWindow_Sync_Help);
 
     m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
     m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_thumbnailsButton->setPreferredSize(48, 24);
+    setHelpTopicId(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
+    setHelpTopicId(m_calendarButton, Qn::MainWindow_Calendar_Help);
 
 
     /* Create sliders. */
@@ -113,8 +120,20 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
     m_timeSlider->setRulerHeight(70.0);
 
+    m_zoomOutButton = new QnImageButtonWidget(m_timeSlider);
+    m_zoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));
+    m_zoomOutButton->setPreferredSize(16, 16);
+
+    m_zoomInButton = new QnImageButtonWidget(m_timeSlider);
+    m_zoomInButton->setIcon(qnSkin->pixmap("item/zoom_in.png"));
+    m_zoomInButton->setPreferredSize(16, 16);
+    m_zoomInButton->setPos(16, 0);
+
     m_timeScrollBar = new QnTimeScrollBar(this);
     
+    setHelpTopicId(m_timeSlider, m_timeScrollBar, Qn::MainWindow_Navigation_Help);
+
+
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
@@ -140,6 +159,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
+
+    QGraphicsWidget *leftWidget = new QGraphicsWidget();
+    leftWidget->setLayout(leftLayoutV);
+    setHelpTopicId(leftWidget, Qn::MainWindow_Playback_Help);
 
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);
@@ -179,7 +202,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutVV->setContentsMargins(0, 0, 0, 0);
     leftLayoutVV->setSpacing(0);
     leftLayoutVV->addStretch(1);
-    leftLayoutVV->addItem(leftLayoutV);
+    leftLayoutVV->addItem(leftWidget);
 
     QGraphicsLinearLayout *rightLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutVV->setContentsMargins(0, 0, 0, 0);
@@ -192,6 +215,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutVV);
     mainLayout->addItem(sliderLayout);
+    mainLayout->setStretchFactor(sliderLayout, 0x1000);
     mainLayout->addItem(rightLayoutVV);
     setLayout(mainLayout);
 

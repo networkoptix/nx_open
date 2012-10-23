@@ -329,3 +329,8 @@ Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParame
 Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
     return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
 }
+
+
+Qn::ActionVisibility QnDisconnectActionCondition::check(const QnActionParameters &) {
+    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+}

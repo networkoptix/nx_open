@@ -5,6 +5,7 @@
 #include <QtGui/QTreeView>
 
 #include <ui/common/tool_tip_queryable.h>
+#include <help/context_help_queryable.h>
 
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop
@@ -12,7 +13,7 @@
  * 
  * It also adds several features that the QTreeView is lacking.
  */
-class QnTreeView: public QTreeView, public ToolTipQueryable {
+class QnTreeView: public QTreeView, public ToolTipQueryable, public QnContextHelpQueryable {
     Q_OBJECT;
 public:
     QnTreeView(QWidget *parent = NULL);
@@ -35,6 +36,7 @@ protected:
     virtual void timerEvent(QTimerEvent *event) override;
 
     virtual QString toolTipAt(const QPointF &pos) const override;
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
 private:
     QBasicTimer m_openTimer;

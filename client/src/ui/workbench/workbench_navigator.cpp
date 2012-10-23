@@ -375,8 +375,10 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
 
-    if(m_syncedWidgets.contains(m_currentMediaWidget))
-        updateItemDataFromSlider(widget);
+    if (display() && !display()->isChangingLayout()){
+        if(m_syncedWidgets.contains(m_currentMediaWidget))
+            updateItemDataFromSlider(widget);
+    }
 
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
@@ -639,8 +641,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
             archiveReader->setPlaybackMask(QnTimePeriodList());
     }
 
-    m_currentWidget = widget;
-    m_currentMediaWidget = mediaWidget;
+    if (display() && display()->isChangingLayout()){
+        m_currentWidget = NULL;
+        m_currentMediaWidget = NULL;
+    } else {
+        m_currentWidget = widget;
+        m_currentMediaWidget = mediaWidget;
+    }
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;

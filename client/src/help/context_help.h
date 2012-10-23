@@ -14,13 +14,13 @@ public:
     
     void show();
     void hide();
-    void setHelpTopic(Qn::HelpTopic topic);
+    void setHelpTopic(int topic);
 
 protected:
-    QUrl urlForTopic(Qn::HelpTopic topic) const;
+    QUrl urlForTopic(int topic) const;
 
 private:
-    Qn::HelpTopic m_topic;
+    int m_topic;
     QString m_helpRoot;
 };
 

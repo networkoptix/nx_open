@@ -51,6 +51,11 @@ namespace Qn {
         ReconnectAction,
 
         /**
+         * Disconnects from the Enterprise Controller
+         */
+        DisconnectAction,
+
+        /**
          * Shows / hides FPS display.
          */
         ShowFpsAction,
@@ -116,6 +121,12 @@ namespace Qn {
          * Notifies action handler about selectin changes.
          */
         SelectionChangeAction,
+
+        /**
+         * Enters "what's this" mode.
+         */
+        WhatsThisAction,
+
 
 
 

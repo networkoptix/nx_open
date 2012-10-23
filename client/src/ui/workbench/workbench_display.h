@@ -264,6 +264,11 @@ public:
 
     QPointF mapGlobalToGridF(const QPoint &globalPoint) const;
 
+    /**
+     * Status function to know if we are changing layout now.
+     * \returns true if we are changing layout
+     */
+    bool isChangingLayout() const {return m_inChangeLayout; }
 public slots:
     void fitInView(bool animate = true);
 
@@ -396,6 +401,8 @@ private:
 
     Qn::MarginFlags m_zoomedMarginFlags, m_normalMarginFlags;
 
+    /** Whether we are changing layout now. */
+    bool m_inChangeLayout;
 
 
     /* Instruments. */
