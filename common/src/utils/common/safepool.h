@@ -13,6 +13,7 @@
 #include <QWaitCondition>
 
 
+//!Associative thread-safe container, which allows to lock elements from accessing from other threads
 /*!
     \note All methods are thread-safe
     \note All operations on locked element MUST occur from locking thread, otherwise undefined behavour can occur
@@ -71,12 +72,12 @@ public:
         friend class SafePool;
 
     public:
-        reference operator*()
+        reference operator*() const
         {
             return *m_iter;
         }
 
-        pointer operator->()
+        pointer operator->() const
         {
             return m_iter.operator->();
         }
@@ -108,7 +109,9 @@ public:
 
     //!Locks element with key \a key
     /*!
+        If requested element is already locked, blocks till element is unlocked
         \return end() if no element with \a key
+        \note Recursive locking of element by single thread causes a dead-lock
     */
     const_iterator lock( const KeyType& key ) const
     {
@@ -120,7 +123,35 @@ public:
         {
             it = m_dataDict.find( key );
             if( it == m_dataDict.end() )
-                return end();
+                return const_iterator( m_dataDict.end() );
+
+            syncCtxIter = m_syncCtxDict.find( key );
+            Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
+            if( !syncCtxIter->second.locked )
+                break;
+            m_cond.wait( lk.mutex() );
+            //element could be removed while we were waiting, so repeating search...
+        }
+
+        syncCtxIter->second.locked = true;
+        return it;
+    }
+
+    //!Locks element with key \a key
+    /*!
+        \return end() if no element with \a key
+    */
+    iterator lock( const KeyType& key )
+    {
+        QMutexLocker lk( &m_mutex );
+
+        typename InternalContainerType::iterator it = m_dataDict.end();
+        typename SyncCtxDict::iterator syncCtxIter = m_syncCtxDict.end();
+        for( ;; )
+        {
+            it = m_dataDict.find( key );
+            if( it == m_dataDict.end() )
+                return iterator( m_dataDict.end() );
 
             syncCtxIter = m_syncCtxDict.find( key );
             Q_ASSERT( syncCtxIter != m_syncCtxDict.end() );
@@ -144,7 +175,7 @@ public:
         typename InternalContainerType::const_iterator it = m_dataDict.find( key );
         if( it == m_dataDict.end() )
         {
-            *lockedIter = end();
+            *lockedIter = const_iterator( m_dataDict.end() );  //Cannot call end() here since it locks m_mutex
             return false;
         }
 
@@ -158,7 +189,7 @@ public:
         return true;
     }
 
-    void unlock( const const_iterator& it )
+    void unlock( const const_iterator& it ) const
     {
         QMutexLocker lk( &m_mutex );
 
@@ -211,7 +242,7 @@ public:
         QMutexLocker lk( &m_mutex );
 
         m_syncCtxDict.erase( it->first );
-        m_dataDict.erase( it );
+        m_dataDict.erase( it.m_iter );
         m_cond.wakeAll();
     }
 
@@ -282,7 +313,7 @@ public:
     class ScopedReadLock
     {
     public:
-        ScopedReadLock( SafePool* const pool, const typename SafePool::const_iterator iter )
+        ScopedReadLock( const SafePool& pool, const typename SafePool::const_iterator iter )
         :
             m_pool( pool ),
             m_iter( iter )
@@ -291,12 +322,13 @@ public:
 
         ~ScopedReadLock()
         {
-            m_pool->unlock( m_iter );
+            if( isValid() )
+                m_pool.unlock( m_iter );
         }
 
         bool isValid() const
         {
-            return m_iter != m_pool->end();
+            return m_iter != m_pool.end();
         }
 
         const_reference operator*() const
@@ -310,7 +342,7 @@ public:
         }
 
     private:
-        SafePool* const m_pool;
+        const SafePool& m_pool;
         const typename SafePool::const_iterator m_iter;
     };
 
