@@ -12,8 +12,10 @@
 class AbstractVideoDecoderUsageCalculator
 {
 public:
-    //!Returns true, if there are free resources to decode media stream with parameters \a mediaStreamParams
-    virtual bool isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const = 0;
+    //!Returns true, if there are free resources (defined in \a curUsageParams) to decode media stream with parameters \a mediaStreamParams
+    virtual bool isEnoughHWResourcesForAnotherDecoder(
+        const stree::AbstractResourceReader& mediaStreamParams,
+        const stree::AbstractResourceReader& curUsageParams ) const = 0;
 };
 
 #endif  //ABSTRACTVIDEODECODERUSAGECALCULATOR_H

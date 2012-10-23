@@ -7,6 +7,7 @@
 
 namespace DecoderParameter
 {
+    /*
     std::string toString( const Value& val )
     {
         switch( val )
@@ -17,6 +18,10 @@ namespace DecoderParameter
                 return "osName";
             case architecture:
                 return "architecture";
+            case cpuString:
+                return "cpuString";
+            case displayAdapterDeviceString:
+                return "displayAdapterDeviceString";
             case gpuDeviceString:
                 return "gpuDeviceString";
             case driverVersion:
@@ -41,8 +46,14 @@ namespace DecoderParameter
                 return "pixelsPerSecond";
             case videoMemoryUsage:
                 return "videoMemoryUsage";
+            case availableVideoMemory:
+                return "availableVideoMemory";
             case simultaneousStreamCount:
                 return "simultaneousStreamCount";
+            case totalCurrentNumberOfDecoders:
+                return "totalCurrentNumberOfDecoders";
+            case graphicAdapterCount:
+                return "graphicAdapterCount";
             default:
                 return "unknown";
         }
@@ -56,6 +67,10 @@ namespace DecoderParameter
             return osName;
         else if( name == "architecture" )
             return architecture;
+        else if( name == "cpuString" )
+            return cpuString;
+        else if( name == "displayAdapterDeviceString" )
+            return displayAdapterDeviceString;
         else if( name == "gpuDeviceString" )
             return gpuDeviceString;
         else if( name == "driverVersion" )
@@ -80,11 +95,17 @@ namespace DecoderParameter
             return pixelsPerSecond;
         else if( name == "videoMemoryUsage" )
             return videoMemoryUsage;
+        else if( name == "availableVideoMemory" )
+            return availableVideoMemory;
         else if( name == "simultaneousStreamCount" )
             return simultaneousStreamCount;
+        else if( name == "totalCurrentNumberOfDecoders" )
+            return totalCurrentNumberOfDecoders;
+        else if( name == "graphicAdapterCount" )
+            return graphicAdapterCount;
 
         return (Value)-1;
-    }
+    }*/
 }
 
 DecoderResourcesNameset::DecoderResourcesNameset()
@@ -92,6 +113,8 @@ DecoderResourcesNameset::DecoderResourcesNameset()
     registerResource( DecoderParameter::decoderName, QString::fromAscii("decoderName"), QVariant::String );
     registerResource( DecoderParameter::osName, QString::fromAscii("osName"), QVariant::String );
     registerResource( DecoderParameter::architecture, QString::fromAscii("architecture"), QVariant::String );
+    registerResource( DecoderParameter::cpuString, QString::fromAscii("cpuString"), QVariant::String );
+    registerResource( DecoderParameter::displayAdapterDeviceString, QString::fromAscii("displayAdapterDeviceString"), QVariant::String );
     registerResource( DecoderParameter::gpuDeviceString, QString::fromAscii("gpuDeviceString"), QVariant::String );
     registerResource( DecoderParameter::driverVersion, QString::fromAscii("driverVersion"), QVariant::String );
     registerResource( DecoderParameter::gpuVendorId, QString::fromAscii("gpuVendorId"), QVariant::UInt );
@@ -104,7 +127,10 @@ DecoderResourcesNameset::DecoderResourcesNameset()
     registerResource( DecoderParameter::fps, QString::fromAscii("fps"), QVariant::Double );
     registerResource( DecoderParameter::pixelsPerSecond, QString::fromAscii("pixelsPerSecond"), QVariant::ULongLong );
     registerResource( DecoderParameter::videoMemoryUsage, QString::fromAscii("videoMemoryUsage"), QVariant::ULongLong );
+    registerResource( DecoderParameter::availableVideoMemory, QString::fromAscii("availableVideoMemory"), QVariant::ULongLong );
     registerResource( DecoderParameter::simultaneousStreamCount, QString::fromAscii("simultaneousStreamCount"), QVariant::Int );
+    registerResource( DecoderParameter::totalCurrentNumberOfDecoders, QString::fromAscii("totalCurrentNumberOfDecoders"), QVariant::Int );
+    registerResource( DecoderParameter::graphicAdapterCount, QString::fromAscii("graphicAdapterCount"), QVariant::UInt );
 }
 
 MediaStreamParameterSumContainer::MediaStreamParameterSumContainer(

@@ -32,11 +32,16 @@ std::set<stree::AbstractResourceReader*> PluginUsageWatcher::currentSessions() c
     return m_currentSessions;
 }
 
+size_t PluginUsageWatcher::currentSessionCount() const
+{
+    QMutexLocker lk( &m_mutex );
+    return m_currentSessions.size();
+}
+
 stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
 {
     QMutexLocker lk( &m_mutex );
 
-    stree::ResourceContainer rc;
     quint64 totalFramePictureSize = 0;
     double totalFPS = 0;
     quint64 totalPixelsPerSecond = 0;
@@ -63,6 +68,7 @@ stree::ResourceContainer PluginUsageWatcher::currentTotalUsage() const
             totalVideoMemoryUsage += videoMemoryUsage;
     }
 
+    stree::ResourceContainer rc;
     rc.put( DecoderParameter::framePictureSize, totalFramePictureSize );
     rc.put( DecoderParameter::fps, totalFPS );
     rc.put( DecoderParameter::pixelsPerSecond, totalPixelsPerSecond );

@@ -35,6 +35,8 @@ public:
         \note Returned data is actual for the moment of calling this method
     */
     std::set<stree::AbstractResourceReader*> currentSessions() const;
+    //!Returns number of current decode sessions, using this plugin
+    size_t currentSessionCount() const;
     //!Returns parameters, describing total plugin usage (total pixels per second, total fps, etc...)
     /*!
         Method returns following resources:\n

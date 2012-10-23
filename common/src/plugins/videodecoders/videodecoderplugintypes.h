@@ -21,17 +21,21 @@ namespace DecoderParameter
         osName,
         //string. CPU archtecture (x64 or x86)
         architecture,
-        //string
+        //string. CPU brand and name
+        cpuString,
+        //string. Device string of graphics adapter, application is using to display
+        displayAdapterDeviceString,
+        //string. Info of adapter, hardware acceleration is available on
         gpuDeviceString,
-        //string. e.g. 1.2.3.4 (Product.Version.SubVersion.Build)
+        //string. e.g. 1.2.3.4 (Product.Version.SubVersion.Build). Info of adapter, quicksync is available on
         driverVersion,
-        //unsigned int
+        //unsigned int. Info of adapter, quicksync is available on
         gpuVendorId,
-        //unsigned int
+        //unsigned int. Info of adapter, quicksync is available on
         gpuDeviceId,
-        //unsigned int
+        //unsigned int. Info of adapter, quicksync is available on
         gpuRevision,
-        //string
+        //string. Version of Intel MFX SDK available
         sdkVersion,
         //int. Width of decoded frame picture in pixels (before any post-processing)
         framePictureWidth,
@@ -45,12 +49,24 @@ namespace DecoderParameter
         pixelsPerSecond,
         //uint64
         videoMemoryUsage,
+        //uint64
+        availableVideoMemory,
         //int
-        simultaneousStreamCount
+        /*!
+            In input parameters - it is current number of decoders of type we are checking (if we are checking Quicksync plugin, 
+                it is a current number of quicksync decoders running).
+
+            In output parameters it is maximum allowed number of decoders
+        */
+        simultaneousStreamCount,
+        //!int. Number of all running decoders (SW and HW)
+        totalCurrentNumberOfDecoders,
+        //!unsigned int
+        graphicAdapterCount
     };
 
-    std::string toString( const Value& val );
-    Value fromString( const std::string& name );
+    //std::string toString( const Value& val );
+    //Value fromString( const std::string& name );
 }
 
 class DecoderResourcesNameset

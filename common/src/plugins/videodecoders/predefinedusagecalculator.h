@@ -5,6 +5,8 @@
 #ifndef PREDEFINEDUSAGECALCULATOR_H
 #define PREDEFINEDUSAGECALCULATOR_H
 
+#include <memory>
+
 #include <QMutex>
 #include <QString>
 
@@ -31,13 +33,15 @@ public:
         PluginUsageWatcher* const usageWatcher );
     
     //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
-    virtual bool isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const;
+    virtual bool isEnoughHWResourcesForAnotherDecoder(
+        const stree::AbstractResourceReader& mediaStreamParams,
+        const stree::AbstractResourceReader& curUsageParams ) const override;
 
 private:
     const stree::ResourceNameSet& m_rns;
     const QString m_predefinedDataFilePath;
     PluginUsageWatcher* const m_usageWatcher;
-    stree::AbstractNode* m_currentTree;
+    std::auto_ptr<stree::AbstractNode> m_currentTree;
     mutable QMutex m_treeMutex;
 
     void updateTree();

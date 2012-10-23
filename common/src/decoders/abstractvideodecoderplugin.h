@@ -36,12 +36,15 @@ public:
     /*!
         \param codecID Codec type
         \param data Access unit of media stream. MUST contain sequence header (sps & pps in case of h.264)
+        \param glContext Parent OpenGL context to use. In case decoder returns decoded pictures as gl textures, these textures MUST belong to gl context shared with \a glContext
+        \param currentSWDecoderCount
         \note QnAbstractVideoDecoder::decode method of created object MUST be called from same thread that called this method
     */
     virtual QnAbstractVideoDecoder* create(
             CodecID codecID,
             const QnCompressedVideoDataPtr& data,
-            const QGLContext* const glContext ) const = 0;
+            const QGLContext* const glContext,
+            int currentSWDecoderCount ) const = 0;
 };
 
 Q_DECLARE_INTERFACE( QnAbstractVideoDecoderPlugin, "com.networkoptix.plugin.videodecoder/0.1" );

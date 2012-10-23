@@ -22,10 +22,12 @@ PredefinedUsageCalculator::PredefinedUsageCalculator(
 }
 
 //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
-bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder( const stree::AbstractResourceReader& mediaStreamParams ) const
+bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
+    const stree::AbstractResourceReader& mediaStreamParams,
+    const stree::AbstractResourceReader& curUsageParams ) const
 {
     //retrieving existing sessions' info
-    const stree::ResourceContainer& curUsageParams = m_usageWatcher->currentTotalUsage();
+    //const stree::ResourceContainer& curUsageParams = m_usageWatcher->currentTotalUsage();
 
     //summarizing current sessions' parameters and new session parameters
     MediaStreamParameterSumContainer inputParams(
@@ -35,7 +37,7 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder( const stre
     stree::ResourceContainer rc;
     {
         QMutexLocker lk( &m_treeMutex );
-        if( m_currentTree )
+        if( m_currentTree.get() )
             m_currentTree->get( inputParams, &rc );
         else
             return false;
@@ -79,12 +81,12 @@ void PredefinedUsageCalculator::updateTree()
     if( !newTree )
         return;
 
-    stree::AbstractNode* oldTree = m_currentTree;
+    std::auto_ptr<stree::AbstractNode> oldTree;
     {
         QMutexLocker lk( &m_treeMutex );
-        m_currentTree = newTree;
+        oldTree = m_currentTree;
+        m_currentTree.reset( newTree );
     }
-    delete oldTree;
 }
 
 void PredefinedUsageCalculator::loadXml( const QString& filePath, stree::AbstractNode** const treeRoot )
