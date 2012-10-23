@@ -57,6 +57,8 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 
 QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm") // TODO
 
+QN_HELP_TOPIC(ManualCameraAddition_Help,                        "") // TODO
+
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
 QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")
 QN_HELP_TOPIC(CameraSettings_General_Audio_Help,                "configuring_audio_for_the_camera_(admin_only).htm")

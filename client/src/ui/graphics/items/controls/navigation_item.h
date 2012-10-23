@@ -71,6 +71,9 @@ private:
     QnImageButtonWidget *m_thumbnailsButton;
     QnImageButtonWidget *m_calendarButton;
 
+    QnImageButtonWidget *m_zoomInButton;
+    QnImageButtonWidget *m_zoomOutButton;
+
     GraphicsLabel *m_timeLabel;
 
     bool m_updatingSpeedSliderFromNavigator;
