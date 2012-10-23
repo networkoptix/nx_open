@@ -51,6 +51,11 @@ namespace Qn {
         ReconnectAction,
 
         /**
+         * Disconnects from the Enterprise Controller
+         */
+        DisconnectAction,
+
+        /**
          * Shows / hides FPS display.
          */
         ShowFpsAction,

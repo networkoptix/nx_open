@@ -412,6 +412,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         autoRepeat(false);
 
+    factory(Qn::DisconnectAction).
+        flags(Qn::Main).
+        text(tr("Disconnect")).
+        icon(qnSkin->icon("titlebar/disconnected.png")).
+        autoRepeat(false).
+        condition(new QnDisconnectActionCondition(this));
+
+    factory().
+        flags(Qn::Main).
+        separator();
+
     factory(Qn::TogglePanicModeAction).
         flags(Qn::Main).
         text(tr("Start Panic Recording")).

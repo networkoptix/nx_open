@@ -187,6 +187,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
+    connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -1293,6 +1294,24 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     context()->setUserName(connectionData.url.userName());
 
     at_eventManager_connectionOpened();
+}
+
+void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
+    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+//    QnSessionManager::instance()->stop(); // omfg... logic sucks
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+
+    //if(context()->user()) /* If we were connected... */
+        //workbench()->clear(); // TODO: ask to save?
+
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->setLayoutsUpdated(false);
+    resourcePool()->removeResources(remoteResources);
+    resourcePool()->setLayoutsUpdated(true);
+
+    qnLicensePool->reset();
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
