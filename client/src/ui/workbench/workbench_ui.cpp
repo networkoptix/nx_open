@@ -393,6 +393,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     windowButtonsLayout->setSpacing(2);
     windowButtonsLayout->addItem(newSpacerWidget(6.0, 6.0));
+    windowButtonsLayout->addItem(newActionButton(action(Qn::WhatsThisAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::MinimizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::EffectiveMaximizeAction)));
     windowButtonsLayout->addItem(newActionButton(action(Qn::ExitAction)));

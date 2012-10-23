@@ -50,6 +50,8 @@ int QnContextHelpHandler::helpTopicAt(QGraphicsItem *item, const QPointF &pos) c
 
     if(QnContextHelpQueryable *queryable = this->queryable(item))
         return queryable->helpTopicAt(pos);
+
+    return -1;
 }
 
 int QnContextHelpHandler::helpTopicAt(QWidget *widget, const QPoint &pos) const {

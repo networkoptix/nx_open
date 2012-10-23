@@ -389,6 +389,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F11")).
         autoRepeat(false);
 
+    factory(Qn::WhatsThisAction).
+        flags(Qn::NoTarget).
+        text(tr("Help")).
+        icon(qnSkin->icon("titlebar/whats_this.png"));
+
 
     /* Context menu actions. */
 
