@@ -26,9 +26,11 @@ extern "C" {
 //  class QnOpenGLPictureData
 /////////////////////////////////////////////////////
 QnOpenGLPictureData::QnOpenGLPictureData(
+    SynchronizationContext* const syncCtx,
 //	GLXContext _glContext,
 	unsigned int _glTexture )
 :
+    QnAbstractPictureDataRef( syncCtx ),
 //	m_glContext( _glContext ),
 	m_glTexture( _glTexture )
 {

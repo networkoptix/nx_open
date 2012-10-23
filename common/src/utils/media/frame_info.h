@@ -48,19 +48,36 @@ public:
         pstD3DSurface
     };
 
+    QnAbstractPictureDataRef( SynchronizationContext* const syncCtx )
+    :
+        m_syncCtx( syncCtx ),
+        m_initialSequence( syncCtx->sequence )
+    {
+    }
     virtual ~QnAbstractPictureDataRef() {}
 
     //!Returns pic type
     virtual PicStorageType type() const = 0;
+    //!Returns rect, that contains actual data
+    virtual QRect cropRect() const = 0;
+
     /*!
         Instances of \a QnAbstractPictureDataRef MUST share \a SynchronizationContext instance of single picture
         \return Can be NULL
     */
-    virtual SynchronizationContext* syncCtx() const = 0;
+    SynchronizationContext* syncCtx() const
+    {
+        return m_syncCtx;
+    }
     //!If return value is \a false, access to picture data can lead to undefined behavour
-    virtual bool isValid() const = 0;
-    //!Returns rect, that contains actual data
-    virtual QRect cropRect() const = 0;
+    bool isValid() const
+    {
+        return m_syncCtx->sequence == m_initialSequence;
+    }
+
+private:
+    SynchronizationContext* const m_syncCtx;
+    int m_initialSequence;
 };
 
 //!Picture data stored in system memory
@@ -81,6 +98,12 @@ class D3DPictureData
     public QnAbstractPictureDataRef
 {
 public:
+    D3DPictureData( SynchronizationContext* const syncCtx )
+    :
+        QnAbstractPictureDataRef( syncCtx )
+    {
+    }
+
     //!Implementation of QnAbstractPictureDataRef
     virtual PicStorageType type() const { return QnAbstractPictureDataRef::pstD3DSurface; };
     virtual IDirect3DSurface9* getSurface() const = 0;
@@ -94,6 +117,7 @@ class QnOpenGLPictureData
 {
 public:
     QnOpenGLPictureData(
+        SynchronizationContext* const syncCtx,
 //  		GLXContext _glContext,
    		unsigned int _glTexture );
 
