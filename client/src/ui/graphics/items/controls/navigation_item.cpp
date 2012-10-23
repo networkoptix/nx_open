@@ -128,11 +128,12 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_zoomOutButton = new QnImageButtonWidget(m_timeSlider);
     m_zoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));
     m_zoomOutButton->setPreferredSize(16, 16);
+    m_zoomOutButton->setPos(0, 8);
 
     m_zoomInButton = new QnImageButtonWidget(m_timeSlider);
     m_zoomInButton->setIcon(qnSkin->pixmap("item/zoom_in.png"));
     m_zoomInButton->setPreferredSize(16, 16);
-    m_zoomInButton->setPos(16, 0);
+    m_zoomInButton->setPos(16, 8);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
