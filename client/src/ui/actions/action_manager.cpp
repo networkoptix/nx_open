@@ -956,13 +956,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection...")).
+        text(tr("Export Selected Area...")).
         requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Layout...")).
+        text(tr("Export Multi-Video...")).
         requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
