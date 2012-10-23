@@ -241,6 +241,7 @@ protected slots:
     void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
+    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();

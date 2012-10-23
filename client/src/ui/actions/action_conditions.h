@@ -309,4 +309,11 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnDisconnectActionCondition: public QnActionCondition {
+public:
+    QnDisconnectActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 #endif // QN_ACTION_CONDITIONS_H
