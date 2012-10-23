@@ -48,6 +48,8 @@
 #include "resource_tree_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
+
 
 namespace {
 
@@ -449,6 +451,13 @@ bool QnMainWindow::event(QEvent *event) {
         result |= m_dwm->widgetEvent(event);
 
     return result;
+}
+
+void QnMainWindow::closeEvent(QCloseEvent* event)
+{
+    //Informing DecodedPictureToOpenGLUploaderContextPool that window is about to destroy so that it can destroy its gl contexts 
+        //before destroying window (destroying gl context after window destruction is bad and causes access violation on catalyst drivers)
+    DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( NULL );
 }
 
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {

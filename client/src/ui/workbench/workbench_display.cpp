@@ -396,11 +396,10 @@ void QnWorkbenchDisplay::setView(QGraphicsView *view) {
             new QnGlHardwareChecker(glWidget);
             m_view->setViewport(glWidget);
 
-            //initializing gl context pool used to render decvoded pictures in non-GUI thread
-            DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindowHandle( glWidget->winId() );
+            //initializing gl context pool used to render decoded pictures in non-GUI thread
+            DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( glWidget );
             DecodedPictureToOpenGLUploaderContextPool::instance()->ensureThereAreContextsSharedWith(
-                GLContext::getSysHandleOfQtContext( glWidget->context() ),
-                glWidget->winId() );
+                GLContext::getSysHandleOfQtContext( glWidget->context() ) );
         }
 
         /* Turn on antialiasing at QPainter level. */
