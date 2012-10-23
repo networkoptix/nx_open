@@ -89,26 +89,21 @@ private:
 };
 
 
-namespace Qn { namespace {
-    /**
-     * Name of the property to set on a <tt>QnResourceWidget</tt> to change
-     * the keyboard modifiers that must be pressed to activate the
-     * motion selection instrument.
-     * 
-     * If not set, default modifiers set for the motion selection instrument
-     * will be used.
-     */
-    const char *MotionSelectionModifiers = "_qn_motionSelectionModifiers";
+/**
+ * Name of the property to set on a <tt>QnResourceWidget</tt> to change
+ * the keyboard modifiers that must be pressed to activate the
+ * motion selection instrument.
+ *
+ * If not set, default modifiers set for the motion selection instrument
+ * will be used.
+ */
+#define MotionSelectionModifiers _id("_qn_motionSelectionModifiers")
 
-    /**
-     * Name of the property to set on a graphics item to stop it from
-     * blocking motion selection.
-     */
-    const char *NoBlockMotionSelection = "_qn_noBlockMotionSelection";
-
-#define MotionSelectionModifiers MotionSelectionModifiers
-#define NoBlockMotionSelection NoBlockMotionSelection
-}}
+/**
+ * Name of the property to set on a graphics item to stop it from
+ * blocking motion selection.
+ */
+#define NoBlockMotionSelection _id("_qn_noBlockMotionSelection")
 
 
 #endif // QN_MOTION_SELECTION_INSTRUMENT_H
