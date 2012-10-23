@@ -342,8 +342,6 @@ private:
 
     QGraphicsWidget *m_sliderResizerItem;
 
-    QGraphicsWidget *m_sliderEaterItem;
-
     bool m_ignoreSliderResizerGeometryChanges;
     bool m_ignoreSliderResizerGeometryChanges2;
 
