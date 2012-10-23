@@ -77,6 +77,7 @@
 
 #include "client_message_processor.h"
 #include "file_processor.h"
+#include "version.h"
 
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -85,6 +86,8 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
+#include "help/context_help_queryable.h"
+#include "help/help_topics.h"
 
 
 
@@ -221,6 +224,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::RenameAction),                           SIGNAL(triggered()),    this,   SLOT(at_renameAction_triggered()));
     connect(action(Qn::DropResourcesAction),                    SIGNAL(triggered()),    this,   SLOT(at_dropResourcesAction_triggered()));
     connect(action(Qn::DelayedDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_delayedDropResourcesAction_triggered()));
+    connect(action(Qn::InstantDropResourcesAction),             SIGNAL(triggered()),    this,   SLOT(at_instantDropResourcesAction_triggered()));
     connect(action(Qn::DropResourcesIntoNewLayoutAction),       SIGNAL(triggered()),    this,   SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(Qn::MoveCameraAction),                       SIGNAL(triggered()),    this,   SLOT(at_moveCameraAction_triggered()));
     connect(action(Qn::TakeScreenshotAction),                   SIGNAL(triggered()),    this,   SLOT(at_takeScreenshotAction_triggered()));
@@ -487,6 +491,24 @@ bool QnWorkbenchActionHandler::closeAllLayouts(bool waitForReply) {
     return closeLayouts(resourcePool()->getResources().filtered<QnLayoutResource>(), waitForReply);
 }
 
+void QnWorkbenchActionHandler::openResourcesInNewWindow(const QnResourceList &resources){
+    QMimeData mimeData;
+    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
+    QnMimeData data(&mimeData);
+    QByteArray serializedData;
+    QDataStream stream(&serializedData, QIODevice::WriteOnly);
+    stream << data;
+
+    QStringList arguments;
+    if (context()->user())
+        arguments << QLatin1String("--delayed-drop");
+    else
+        arguments << QLatin1String("--instant-drop");
+    arguments << QLatin1String(serializedData.toBase64().data());
+
+    openNewWindow(arguments);
+}
+
 void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     QStringList arguments = args;
     arguments << QLatin1String("--no-single-application");
@@ -513,7 +535,7 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     bool hasCameraChanges = cameraSettingsDialog()->widget()->hasCameraChanges();
 
     if (checkControls && cameraSettingsDialog()->widget()->hasControlsChanges()){
-        QString message = tr("Recording schedule is not changed! Pick desired Recording Type, FPS and Quality and click on schedule to change it!");
+        QString message = tr(" Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.");
         int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
                              QMessageBox::Retry, QMessageBox::Ignore);
         if (button == QMessageBox::Retry){
@@ -600,68 +622,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
-/*void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    // remove all existing duplicates
-    int i = 0;
-    int sameIdx = -1;
-    while (i < connections.count()){
-        QString url = connections[i].url.toString(QUrl::RemovePassword);
-        if (sameIdx < 0 && connectionData.url.toString(QUrl::RemovePassword) == url)
-            sameIdx = i;
-
-        int j = i + 1;
-        while (j < connections.count()){
-            if (connections[j].url.toString(QUrl::RemovePassword) == url){
-                connections.removeAt(j);
-            }
-            else{
-                j++;
-            }
-        }
-        i++;
-    }
-
-    if (sameIdx >= 0)
-        connections.removeAt(sameIdx);
-
-    connections.prepend(connectionData);
-
-    while (connections.count() > 10) // TODO: #gdm move const out of here
-        connections.removeLast();
-
-    for (QnConnectionDataList::iterator iter = connections.begin(); iter != connections.end(); ++iter){
-
-        // there is at least one connection with same port
-        bool samePort = false;
-
-        // there is at least one connection with different port
-        bool otherPort = false;
-
-        foreach(QnConnectionData compared, connections){
-            if (*iter == compared)
-                continue;
-
-            if (iter->url.host() != compared.url.host())
-                continue;
-
-            if (iter->url.port() != compared.url.port())
-                otherPort = true;
-            else
-                samePort = true;
-        }
-
-        iter->name = iter->url.host();
-        if (samePort)
-            iter->name.prepend(iter->url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
-
-        if (otherPort)
-            iter->name.append(QLatin1Char(':') + QString::number(iter->url.port()));
-    }
-    qnSettings->setCustomConnections(connections);
-}*/
-
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if(!widgets.empty()) {
@@ -717,6 +677,14 @@ void QnWorkbenchActionHandler::submitDelayedDrops() {
     }
 
     m_delayedDrops.clear();
+}
+
+void QnWorkbenchActionHandler::submitInstantDrop(QnMimeData &data) {
+    QMimeData mimeData;
+    data.toMimeData(&mimeData);
+
+    QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
+    menu()->trigger(Qn::OpenInCurrentLayoutAction, resources);
 }
 
 
@@ -871,18 +839,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
     if(resources.isEmpty()) 
         return;
     
-    QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
-    QnMimeData data(&mimeData);
-    QByteArray serializedData;
-    QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << data;
-
-    QStringList arguments;
-    arguments << QLatin1String("--delayed-drop");
-    arguments << QLatin1String(serializedData.toBase64().data());
-
-    openNewWindow(arguments);
+    openResourcesInNewWindow(resources);
 }
 
 void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
@@ -903,26 +860,11 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
     // TODO: #GDM this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
-    // TODO: #GDM avoid copypasta.
-
     QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
     if(layouts.isEmpty()) 
         return;
-
-    QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(layouts, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
-    QnMimeData data(&mimeData);
-    QByteArray serializedData;
-    QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << data;
-
-    QStringList arguments;
-    arguments << QLatin1String("--delayed-drop");
-    arguments << QLatin1String(serializedData.toBase64().data());
-
-    openNewWindow(arguments);
+    openResourcesInNewWindow(layouts);
 }
-
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
@@ -1158,6 +1100,16 @@ void QnWorkbenchActionHandler::at_delayedDropResourcesAction_triggered() {
     m_delayedDrops.push_back(mimeData);
 
     submitDelayedDrops();
+}
+
+void QnWorkbenchActionHandler::at_instantDropResourcesAction_triggered() {
+    QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedResourcesParameter);
+    QDataStream stream(&data, QIODevice::ReadOnly);
+    QnMimeData mimeData;
+    stream >> mimeData;
+    if(stream.status() != QDataStream::Ok || mimeData.formats().empty())
+        return;
+    submitInstantDrop(mimeData);
 }
 
 void QnWorkbenchActionHandler::at_openFileAction_triggered() {
@@ -1766,7 +1718,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-
+    setHelpTopicId(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1902,6 +1854,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
+    setHelpTopicId(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -2026,15 +1979,15 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
     if (readOnly) {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+            return tr("Executable %1 Media File (x86, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+            return tr("Executable %1 Media File (x64, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
     else {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86) (*.exe)");
+            return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64) (*.exe)");
+            return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
 }
 
@@ -2064,14 +2017,23 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+
+    QString mediaFilter =
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+            + filterSeparator
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + filterSeparator
+            + binaryFilterName(false)
+            + filterSeparator
+            + binaryFilterName(true);
+
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
-            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
+            mediaFilter,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );

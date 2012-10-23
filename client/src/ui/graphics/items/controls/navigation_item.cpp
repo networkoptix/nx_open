@@ -62,23 +62,23 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     /* Create buttons. */
     m_jumpBackwardButton = newActionButton(action(Qn::JumpToStartAction));
     m_jumpBackwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_backward.png"));
-    m_jumpBackwardButton->setPreferredSize(32, 18);
+    m_jumpBackwardButton->setPreferredSize(32, 32);
 
     m_stepBackwardButton = newActionButton(action(Qn::PreviousFrameAction));
     m_stepBackwardButton->setIcon(qnSkin->icon("slider/navigation/step_backward.png"));
-    m_stepBackwardButton->setPreferredSize(32, 18);
+    m_stepBackwardButton->setPreferredSize(32, 32);
 
     m_playButton = newActionButton(action(Qn::PlayPauseAction));
     m_playButton->setIcon(qnSkin->icon("slider/navigation/play.png", "slider/navigation/pause.png"));
-    m_playButton->setPreferredSize(32, 30);
+    m_playButton->setPreferredSize(32, 32);
 
     m_stepForwardButton = newActionButton(action(Qn::NextFrameAction));
     m_stepForwardButton->setIcon(qnSkin->icon("slider/navigation/step_forward.png"));
-    m_stepForwardButton->setPreferredSize(32, 18);
+    m_stepForwardButton->setPreferredSize(32, 32);
 
     m_jumpForwardButton = newActionButton(action(Qn::JumpToEndAction));
     m_jumpForwardButton->setIcon(qnSkin->icon("slider/navigation/rewind_forward.png"));
-    m_jumpForwardButton->setPreferredSize(32, 18);
+    m_jumpForwardButton->setPreferredSize(32, 32);
 
     m_muteButton = newActionButton(action(Qn::ToggleMuteAction));
     m_muteButton->setIcon(qnSkin->icon("slider/buttons/unmute.png", "slider/buttons/mute.png"));

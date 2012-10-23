@@ -12,8 +12,10 @@
 
         <?if $(var.arch) = x86?>
         <?define ProgramFilesFolder = "ProgramFilesFolder"?>
+        <?define SystemFolderActual = "SystemFolder"?>
         <?else?>
         <?define ProgramFilesFolder = "ProgramFiles64Folder"?>
+        <?define SystemFolderActual = "System64Folder"?>
         <?endif?>
         
         <!-- Wix Variables -->
@@ -55,6 +57,7 @@
         <SetProperty Id="PROXY_PORT" Value="[PROXY_PORT32]" After="AppSearch"><![CDATA[ PROXY_PORT = "" ]]></SetProperty>
         <SetProperty Id="APPSERVER_PASSWORD_REG" Value="[APPSERVER_PASSWORD_REG32]" After="AppSearch"><![CDATA[ APPSERVER_PASSWORD_REG = "" ]]></SetProperty>
         
+        <SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ClientFeature = 3 ]]></SetProperty>
 
@@ -87,7 +90,6 @@
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
         
         <Property Id="INSTALLTYPE" Value="0"/>
-        <Property Id="ADVANCEDTYPE" Value="0"/>
         
         <Property Id="BUSYPORT" Secure="yes"/>
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
@@ -320,7 +322,7 @@
         <Property Id="CLIENT_DIRECTORY_REG" Secure="yes">
             <RegistrySearch Id="ClientDirectoryReg"
                             Root="HKCU"
-                            Key="Software\[Manufacturer]\${client.name}"
+                            Key="Software\[Manufacturer]\${product.name}"
                             Name="mediaRoot"
                             Type="raw"
                             Win64="yes"/>
@@ -334,18 +336,20 @@
                             Type="raw"
                             Win64="no"/>
         </Property>
-        
+
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
+        <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
         <CustomAction Id="CheckServerDirectoryWritable" BinaryKey="CustomActions.dll" DllEntry="CheckServerDirectoryWritable"/>
+        <CustomAction Id="IsClientFolderExists" BinaryKey="CustomActions.dll" DllEntry="IsClientFolderExists"/>
         
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
         <CustomAction Id="CheckPorts" BinaryKey="CustomActions.dll" DllEntry="CheckPorts"/>
@@ -369,10 +373,10 @@
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
         <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
-        <CustomAction Id="AssignClientFolder" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
-        
         <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
-        <CustomAction Id="ResetClientFolder" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
+
+        <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
+        <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         
         <CustomAction Id="InitDatabaseAction_Cmd" Property="InitDatabaseAction"
                       Value="&quot;[#dbconfig.exe]&quot; &quot;[APPSERVER_LOGIN]&quot;  &quot;[APPSERVER_PASSWORD]&quot;" Execute="immediate" Impersonate="yes"/>
@@ -383,6 +387,9 @@
                       Value="&quot;[#dbsync.exe]&quot;" Execute="immediate" Impersonate="yes"/>
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
+        
+        <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
+            Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
         
         <CustomAction Id="CertGenAction_Cmd" Property="CertGenAction"
                       Value="&quot;[#certgen.exe]&quot; -i" Execute="immediate" Impersonate="yes"/>
@@ -435,18 +442,18 @@
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForEcs" Before="SetNewGuidForServer"><![CDATA[ $(var.EcsNeedsGuid) ]]></Custom>
             <Custom Action="SetNewGuidForServer" Before="FindConfiguredStorages"><![CDATA[ $(var.ServerNeedsGuid)  ]]></Custom>
-            <Custom Action="FindConfiguredStorages" Before="AssignClientFolder"></Custom> 
+            <Custom Action="FindConfiguredStorages" Before="SetClientFolderToDefault"></Custom> 
 
-            <Custom Action="FixClientFolder" After="ResetClientFolder"/>
-            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
+            <Custom Action="SetClientFolderToRegistry" Before="CostInitialize">1</Custom>
+            <Custom Action="FixClientFolder" After="SetClientFolderToRegistry">1</Custom>
+            <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
+            <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
             
-            <Custom Action="ResetClientFolder" Before="CostInitialize"/>
             <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
-            
-            <Custom Action="AssignClientFolder" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
+            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
             <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
             
-            <!--          <Custom Action="ResetClientFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <!--          <Custom Action="SetClientFolderToRegistry" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
             <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
   -->      </InstallUISequence>
         
@@ -469,12 +476,32 @@
             
             <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
             <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            
+            <Custom Action="CopyMediaServerProfile_Cmd" After="InitDatabaseAction"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            
             <Custom Action="LaunchTrayTool" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
 
         <Directory Id="TARGETDIR" Name="SourceDir">
+            
+            <Directory Id="$(var.SystemFolderActual)">
+                <Directory Id="sysfoconfig" Name="config">
+                    <Directory Id="sysfoprofile" Name="systemprofile">
+                        <Directory Id="sysfoappda" Name="AppData">
+                            <Directory Id="sysfolocal" Name="Local">
+                                <Directory Id="sysfocona" Name="${company.name}">
+                                    <Component Id="sysfomediaservercomponent" Guid="{07B8C08D-2EDC-4b3a-892D-C75E799B6DF5}" >
+                                        <CreateFolder Directory="sysfocona"/>
+                                    </Component>
+                                </Directory>
+                            </Directory>
+                        </Directory>
+                    </Directory>
+                </Directory>
+            </Directory>
             
             <Directory Id="SERVER_DIRECTORY" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
@@ -711,6 +738,7 @@
                                     <RegistryValue Type="string" Name="appserverHost" Value="[CLIENT_APPSERVER_HOST]"/>
                                     <RegistryValue Type="string" Name="appserverPort" Value="[CLIENT_APPSERVER_PORT]"/>
                                     <RegistryValue Type="string" Name="appserverLogin" Value="[CLIENT_APPSERVER_LOGIN]"/>
+                                    <RegistryValue Type="string" Name="mediaRoot" Value="[CLIENT_DIRECTORY]"/>
                                 </RegistryKey>
                             </Component>
                             
@@ -856,6 +884,7 @@
             <ComponentRef Id="ServerQTLibraries" />
             <ComponentRef Id="ServerOpenSSL"/>
             <ComponentRef Id="ServerSigar"/>
+            <ComponentRef Id="sysfomediaservercomponent"/>
         </Feature>
         
         <Feature Id="ClientFeature" Title="${product.name} Client" Level="1"
@@ -936,7 +965,7 @@
             <Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
             
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
-            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="AdvancedTypeDlg">INSTALLTYPE=1</Publish>
+            <Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">INSTALLTYPE=1</Publish>
             <Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
 
             <Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ INSTALLTYPE=0 ]]></Publish>
@@ -957,23 +986,23 @@
             <Publish Dialog="PasswordDlg" Control="Next" Event="SpawnDialog" Value="PasswordShouldMatchDlg" Order="2"><![CDATA[ NOT $(var.EcsPasswordsEqual) ]]></Publish>
             <Publish Dialog="PasswordDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">$(var.EcsPasswordsEqual) AND APPSERVER_PASSWORD</Publish>
             
-            <Publish Dialog="AdvancedTypeDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg">1</Publish>
-            <Publish Dialog="AdvancedTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
-            
-            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="AdvancedTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
             
-            <?define SomeFeaturesSelected="(!ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+            <?define SomeFeaturesSelected2="(!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
+            <?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
             <?define NeedTrayTool="(&AppServerFeature = 3 OR !AppServerFeature = 3 OR &ServerFeature = 3 OR (!ServerFeature = 3 AND &ServerFeature <> 2))"?>
             
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature=3]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND &ServerFeature<>3]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND INSTALL_SERVER]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND NOT INSTALL_SERVER]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature"><![CDATA[ $(var.NeedTrayTool) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature"><![CDATA[ NOT $(var.NeedTrayTool) ]]></Publish>
             

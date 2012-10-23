@@ -377,9 +377,15 @@ void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelec
     QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, ignoreSelection ? QnActionParameters() : QnActionParameters(currentTarget(Qn::TreeScope))));
 
     /* Add tree-local actions to the menu. */
-    manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
+    
+    if(currentItemView() == ui->searchTreeView) {
+        /* Disable rename action for search view. */
+        manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
+    } else {
+        manager->redirectAction(menu.data(), Qn::RenameAction, m_renameAction);
+    }
 
     if(menu->isEmpty())
         return;
@@ -470,16 +476,23 @@ void QnResourceTreeWidget::updateFilter(bool force) {
         return;
 
     if(!force) {
-        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
+//        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
         
-        /* Estimate size of the last term in filter expression. */
-        int size = 0;
-        for(;pos < filter.size(); pos++)
-            if(!filter[pos].isSpace())
-                size++;
+        int pos = 0;
+        /* Estimate size of the each term in filter expression. */
+        while (pos < filter.size()){
+            int size = 0;
+            for(;pos < filter.size(); pos++){
+                if (filter[pos] == QLatin1Char('+') || filter[pos] == QLatin1Char('\\'))
+                    break;
 
-        if (size > 0 && size < 3) 
-            return; /* Filter too short, ignore. */
+                if(!filter[pos].isSpace())
+                    size++;
+            }
+            pos++;
+            if (size > 0 && size < 3)
+                return; /* Filter too short, ignore. */
+        }
     }
 
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);

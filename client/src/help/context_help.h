@@ -1,51 +1,28 @@
 #ifndef QN_CONTEXT_HELP_H
 #define QN_CONTEXT_HELP_H
 
-#include <QCoreApplication>
-#include <QSettings>
+#include <QtCore/QObject>
+#include <QtCore/QUrl>
 
-class QnContextHelp: public QObject
-{
+#include "help_topics.h"
+
+class QnContextHelp: public QObject {
     Q_OBJECT;
-
 public:
-    enum ContextId {
-        ContextId_Invalid = -1,
-        ContextId_Scene = 0,
-        ContextId_MotionGrid,
-        ContextId_Slider,
-        ContextId_Tree
-    };
-
-    static QnContextHelp* instance();
-
-    QnContextHelp();
-    ~QnContextHelp();
-    void setHelpContext(ContextId id);
+    QnContextHelp(QObject *parent = NULL);
+    virtual ~QnContextHelp();
     
-    void setAutoShowNeeded(bool value);
-    bool isAutoShowNeeded() const;
+    void show();
+    void hide();
+    void setHelpTopic(Qn::HelpTopic topic);
 
-    QString text(ContextId id) const;
-
-    ContextId currentId() const;
-
-signals:
-    void helpContextChanged(QnContextHelp::ContextId id);
+protected:
+    QUrl urlForTopic(Qn::HelpTopic topic) const;
 
 private:
-    void deserializeShownContext();
-    void serializeShownContext();
-
-private:
-    QSettings m_settings;
-    QTranslator *m_translator;
-    ContextId m_currentId;
-    bool m_autoShowNeeded;
+    Qn::HelpTopic m_topic;
+    QString m_helpRoot;
 };
-
-
-#define qnHelp (QnContextHelp::instance())
 
 
 #endif // QN_CONTEXT_HELP_H

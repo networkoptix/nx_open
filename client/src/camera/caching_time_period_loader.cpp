@@ -132,11 +132,11 @@ const QnTimePeriod &QnCachingTimePeriodLoader::loadedPeriod() const {
     return m_loadedPeriod;
 }
 
-void QnCachingTimePeriodLoader::setTargetPeriod(const QnTimePeriod &targetPeriod) {
+void QnCachingTimePeriodLoader::setTargetPeriods(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) {
     if(m_loadedPeriod.contains(targetPeriod)) 
         return;
     
-    m_loadedPeriod = addLoadingMargins(targetPeriod);
+    m_loadedPeriod = addLoadingMargins(targetPeriod, boundingPeriod);
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
         load(static_cast<Qn::TimePeriodRole>(i));
 }
@@ -164,19 +164,20 @@ QnTimePeriodList QnCachingTimePeriodLoader::periods(Qn::TimePeriodRole type) {
     return m_periods[type];
 }
 
-QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &targetPeriod) const {
+QnTimePeriod QnCachingTimePeriodLoader::addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const {
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
     qint64 startTime = targetPeriod.startTimeMs;
     qint64 endTime = targetPeriod.durationMs == -1 ? currentTime : targetPeriod.startTimeMs + targetPeriod.durationMs;
 
+    qint64 minStartTime = boundingPeriod.startTimeMs;
+    qint64 maxEndTime = boundingPeriod.durationMs == -1 ? currentTime : boundingPeriod.startTimeMs + boundingPeriod.durationMs;
+
     /* Adjust for margin. */
     qint64 margin = qMax(minLoadingMargin, static_cast<qint64>((endTime - startTime) * m_loadingMargin));
-    startTime -= margin;
-    endTime += margin;
-
-    /* Adjust for update interval. */
-    endTime = qMin(endTime, currentTime + m_updateInterval);
+    
+    startTime = qMax(startTime - margin, minStartTime);
+    endTime = qMin(endTime + margin, maxEndTime + m_updateInterval);
 
     return QnTimePeriod(startTime, endTime - startTime);
 }

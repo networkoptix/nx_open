@@ -118,7 +118,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
-    m_aboutToBeDestroyedEmitted(false)
+    m_aboutToBeDestroyedEmitted(false),
+    m_mouseInWidget(false)
 {
     setAcceptHoverEvents(true);
 
@@ -138,6 +139,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         palette.setColor(QPalette::WindowText, overlayTextColor);
         setPalette(palette);
     }
+
 
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
@@ -170,7 +172,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setCheckable(true);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
-    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
+
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(at_infoButton_toggled(bool)));
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
@@ -185,16 +188,22 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
 
-    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerLeftLabel);
-    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    headerLayout->addItem(m_headerRightLabel);
-    headerLayout->addItem(m_buttonBar);
+    m_iconButton = new QnImageButtonWidget();
+    m_iconButton->setParent(this);
+    m_iconButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setVisible(false);
+    connect(m_iconButton, SIGNAL(visibleChanged()), this, SLOT(at_iconButton_visibleChanged()));
+
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->setSpacing(2.0);
+    m_headerLayout->addItem(m_headerLeftLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_headerRightLabel);
+    m_headerLayout->addItem(m_buttonBar);
 
     m_headerWidget = new GraphicsWidget();
-    m_headerWidget->setLayout(headerLayout);
+    m_headerWidget->setLayout(m_headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
     {
@@ -212,6 +221,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
+
 
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
@@ -267,6 +277,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
     m_loadingStaticText.setText(tr("Loading..."));
     m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
+
 
     /* Run handlers. */
     updateTitleText();
@@ -335,7 +346,7 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
-void QnResourceWidget::updateOverlayRotation(qreal rotation){
+void QnResourceWidget::updateOverlayRotation(qreal rotation) {
     while (rotation < -180)
         rotation += 360;
     while (rotation > 180)
@@ -481,10 +492,16 @@ void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    return !qFuzzyIsNull(m_footerWidget->opacity());
+    return (options() & DisplayInfo);
+}
+
+bool QnResourceWidget::isInfoButtonVisible() const {
+    return calculateButtonsVisibility() & InfoButton;
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    setOption(DisplayInfo, visible);
+
     qreal opacity = visible ? 1.0 : 0.0;
 
     if(animate) {
@@ -793,14 +810,15 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 }
 
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    setDecorationsVisible(true);
+    setDecorationsVisible();
+    m_mouseInWidget = true;
 
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isDecorationsVisible())
-        setDecorationsVisible(true);
+        setDecorationsVisible();
 
     base_type::hoverMoveEvent(event);
 }
@@ -808,9 +826,28 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isInfoVisible())
         setDecorationsVisible(false);
+    m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
 }
 
+void QnResourceWidget::optionsChangedNotify(Options changedFlags){
+    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+        bool visible = isInfoVisible();
+        setInfoVisible(visible);
+        setDecorationsVisible(visible || m_mouseInWidget);
+    }
+}
+void QnResourceWidget::at_iconButton_visibleChanged() {
+    if(m_iconButton->isVisible()) {
+        m_headerLayout->insertItem(0, m_iconButton);
+    } else {
+        m_headerLayout->removeItem(m_iconButton);
+    }
+}
 
+void QnResourceWidget::at_infoButton_toggled(bool toggled){
+    setInfoVisible(toggled);
+    setDecorationsVisible(toggled || m_mouseInWidget);
+}
 

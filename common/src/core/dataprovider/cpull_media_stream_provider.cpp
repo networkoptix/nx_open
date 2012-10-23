@@ -28,6 +28,12 @@ bool QnClientPullMediaStreamProvider::isMaxFps() const
     return abs( m_fps - MAX_LIVE_FPS)< .1;
 }
 
+bool QnClientPullMediaStreamProvider::canChangeStatus() const
+{
+    const QnLiveStreamProvider* liveProvider = dynamic_cast<const QnLiveStreamProvider*>(this);
+    return liveProvider && liveProvider->canChangeStatus();
+}
+
 void QnClientPullMediaStreamProvider::run()
 {
     setPriority(QThread::HighPriority);
@@ -77,10 +83,8 @@ void QnClientPullMediaStreamProvider::run()
 
             if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
             {
-                if (getResource().dynamicCast<QnPhysicalCameraResource>())
-                {
+                if (canChangeStatus() && getResource()->getStatus() != QnResource::Unauthorized) // avoid offline->unauthorized->offline loop
                     getResource()->setStatus(QnResource::Offline);
-                }
 
                 m_stat[0].onLostConnection();
             }

@@ -20,7 +20,7 @@ public:
     float getFps() const;
     bool isMaxFps() const;
 protected:
-
+    bool canChangeStatus() const;
 
 private:
     void run(); // in a loop: takes images from camera and put into queue

@@ -45,6 +45,7 @@ protected:
     virtual bool afterGetData(QnAbstractDataPacketPtr data);
     
     void checkTime(QnAbstractMediaDataPtr data);
+    void resetTimeCheck();
 protected:
     QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];

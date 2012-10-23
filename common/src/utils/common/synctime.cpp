@@ -31,6 +31,7 @@ QnSyncTime::QnSyncTime()
     m_lastReceivedTime = 0;
     m_gotTimeTask = 0;
     m_lastWarnTime = 0;
+    m_lastLocalTime = 0;
 }
 
 void QnSyncTime::updateTime(qint64 newTime)
@@ -46,18 +47,25 @@ QDateTime QnSyncTime::currentDateTime()
     return QDateTime::fromMSecsSinceEpoch(currentMSecsSinceEpoch());
 }
 
+qint64 QnSyncTime::currentUSecsSinceEpoch()
+{
+    return currentMSecsSinceEpoch() * 1000;
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
-
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL) && m_gotTimeTask == 0 && QnSessionManager::instance()->isReady())
+    qint64 localTime = QDateTime::currentMSecsSinceEpoch();
+    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL || qAbs(localTime-m_lastLocalTime) > SYNC_TIME_INTERVAL) && 
+         m_gotTimeTask == 0 && QnSessionManager::instance()->isReady())
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
         QThreadPool::globalInstance()->start(m_gotTimeTask);
     }
+    m_lastLocalTime = localTime;
+
     if (m_lastReceivedTime) {
         qint64 time = m_lastReceivedTime + m_timer.elapsed();
-        qint64 localTime = QDateTime::currentMSecsSinceEpoch();
         if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000*10)
         {
             m_lastWarnTime = localTime;

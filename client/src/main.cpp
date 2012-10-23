@@ -78,6 +78,13 @@
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
 
+#ifdef Q_OS_WIN
+    #include "ui/workaround/iexplore_url_handler.h"
+#endif
+
+#include "help/context_help.h"
+#include "help/context_help_handler.h"
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -241,7 +248,7 @@ int qnMain(int argc, char *argv[])
     QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
-    QString authenticationString, delayedDrop, logLevel;
+    QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
     bool devBackgroundEditable = false;
     bool skipMediaFolderScan = false;
@@ -251,6 +258,7 @@ int qnMain(int argc, char *argv[])
     commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
     commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
@@ -290,6 +298,12 @@ int qnMain(int argc, char *argv[])
  //   application->installEventFilter(&x11LauncherWorkaround);
 #endif
 
+#ifdef Q_OS_WIN
+    QnIexploreUrlHandler iexploreUrlHanderWorkaround;
+    // all effects are placed in the constructor
+    Q_UNUSED(iexploreUrlHanderWorkaround)
+#endif
+
     if(singleApplication) {
         QString argsMessage;
         for (int i = 1; i < argc; ++i)
@@ -323,6 +337,12 @@ int qnMain(int argc, char *argv[])
         return 0;
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
         return 0;
+
+
+    QnContextHelp help;
+    QnContextHelpHandler helpHandler;
+    helpHandler.setContextHelp(&help);
+    qApp->installEventFilter(&helpHandler);
 
 
     QnLog::initLog(logLevel);
@@ -456,6 +476,13 @@ int qnMain(int argc, char *argv[])
 
         QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
         context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+    }
+
+    if (!instantDrop.isEmpty()){
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
+        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
     }
 
 #ifdef _DEBUG

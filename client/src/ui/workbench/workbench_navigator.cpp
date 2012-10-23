@@ -200,6 +200,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     updateLines();
+    updateCalendar();
     updateScrollBarFromSlider();
     updateTimeSliderWindowSizePolicy();
 } 
@@ -374,8 +375,10 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     if(!m_syncedWidgets.remove(widget))
         return;
 
-    if(m_syncedWidgets.contains(m_currentMediaWidget))
-        updateItemDataFromSlider(widget);
+    if (display() && !display()->isChangingLayout()){
+        if(m_syncedWidgets.contains(m_currentMediaWidget))
+            updateItemDataFromSlider(widget);
+    }
 
     /* QHash::erase does nothing when called for container's end, 
      * and is therefore perfectly safe. */
@@ -599,7 +602,7 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 void QnWorkbenchNavigator::updateCurrentWidget() {
     QnResourceWidget *widget = NULL;
     bool isCentral = false;
-    if (m_centralWidget != NULL || !m_streamSynchronizer->isRunning()) {
+    if (m_centralWidget != NULL /*|| !m_streamSynchronizer->isRunning()*/) {
         widget = m_centralWidget;
         isCentral = true;
     } else if(m_syncedWidgets.contains(m_currentMediaWidget)) {
@@ -638,8 +641,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
             archiveReader->setPlaybackMask(QnTimePeriodList());
     }
 
-    m_currentWidget = widget;
-    m_currentMediaWidget = mediaWidget;
+    if (display() && display()->isChangingLayout()){
+        m_currentWidget = NULL;
+        m_currentMediaWidget = NULL;
+    } else {
+        m_currentWidget = widget;
+        m_currentMediaWidget = mediaWidget;
+    }
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
@@ -647,6 +655,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     updateCurrentWidgetFlags();
     updateLines();
+    updateCalendar();
 
     if(!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget) {
         m_sliderDataInvalid = true;
@@ -805,7 +814,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
 
     /* Update target time period for time period loaders. 
      * If playback is synchronized, do it for all cameras. */
-    QnTimePeriod period(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
+    QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
 
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
@@ -815,13 +825,15 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
         //period.addPeriod(calendarPeriod);
     }
 
+    // TODO: 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
+    // We need to set all targets every time.
     if(m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods)) {
         foreach(QnResourceWidget *widget, m_syncedWidgets)
             if(QnCachingTimePeriodLoader *loader = this->loader(widget))
-                loader->setTargetPeriod(period);
+                loader->setTargetPeriods(targetPeriod, boundingPeriod);
     } else if(m_currentWidgetFlags & WidgetSupportsPeriods) {
         if(QnCachingTimePeriodLoader *loader = this->loader(m_currentWidget))
-            loader->setTargetPeriod(period);
+            loader->setTargetPeriods(targetPeriod, boundingPeriod);
     }
 }
 
@@ -890,8 +902,12 @@ void QnWorkbenchNavigator::updateLines() {
 }
 
 void QnWorkbenchNavigator::updateCalendar(){
-    if (m_calendar)
+    if (!m_calendar)
+        return;
+    if(m_currentWidgetFlags & WidgetSupportsPeriods)
         m_calendar->setCurrentWidgetIsCentral(m_currentWidgetIsCentral);
+    else
+        m_calendar->setCurrentWidgetIsCentral(false);
 }
 
 void QnWorkbenchNavigator::updateSliderFromScrollBar() {
@@ -1182,8 +1198,10 @@ void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
         updateCentralWidget();
 
-    if(role == Qn::ZoomedRole)
+    if(role == Qn::ZoomedRole){
         updateLines();
+        updateCalendar();
+    }
 }
 
 void QnWorkbenchNavigator::at_display_widgetAdded(QnResourceWidget *widget) {

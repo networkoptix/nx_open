@@ -15,6 +15,7 @@ public:
 
     static QnSyncTime *instance();
     qint64 currentMSecsSinceEpoch();
+    qint64 currentUSecsSinceEpoch();
 
     QDateTime currentDateTime();
     
@@ -28,6 +29,7 @@ private:
     QnSyncTimeTask* m_gotTimeTask;
     QMutex m_mutex;
     qint64 m_lastWarnTime;
+    qint64 m_lastLocalTime;
 
     friend class QnSyncTimeTask;
 };

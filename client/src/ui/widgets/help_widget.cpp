@@ -31,22 +31,22 @@ void QnHelpWidget::wheelEvent(QWheelEvent *event) {
     event->accept(); /* Do not propagate wheel events past the help widget. */
 }
 
-void QnHelpWidget::at_contextHelp_helpContextChanged(QnContextHelp::ContextId id) {
-    m_id = id;
+void QnHelpWidget::at_contextHelp_helpContextChanged(int id) {
+    /*m_id = id;
     ui->textEdit->setText(contextHelp()->text(id));
     ui->checkBox->setCheckState(contextHelp()->isAutoShowNeeded() ? Qt::Unchecked : Qt::Checked);
 
 #ifndef QN_HELP_WIDGET_NO_DONT_SHOW_AGAIN
     if(contextHelp()->isAutoShowNeeded())
         emit showRequested();
-#endif
+#endif*/
 }
 
 void QnHelpWidget::at_checkBox_clicked(bool checked) {
-    contextHelp()->setAutoShowNeeded(!checked);
+    /*contextHelp()->setAutoShowNeeded(!checked);
 
 #ifndef QN_HELP_WIDGET_NO_DONT_SHOW_AGAIN
     if(checked)
         emit hideRequested();
-#endif
+#endif*/
 }

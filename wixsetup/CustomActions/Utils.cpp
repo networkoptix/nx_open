@@ -74,4 +74,55 @@ void FinishWinsock()
     WSACleanup();
 }
 
+int CopyDirectory(const CAtlString &refcstrSourceDirectory,
+                  const CAtlString &refcstrDestinationDirectory)
+{
+  CAtlString     strSource;               // Source file
+  CAtlString     strDestination;          // Destination file
+  CAtlString     strPattern;              // Pattern
+  HANDLE          hFile;                   // Handle to file
+  WIN32_FIND_DATA FileInformation;         // File information
+
+
+  strPattern = refcstrSourceDirectory + "\\*";
+
+  // Create destination directory
+  if(::CreateDirectory(refcstrDestinationDirectory, 0) == FALSE)
+    return ::GetLastError();
+
+  hFile = ::FindFirstFile(strPattern, &FileInformation);
+  if(hFile != INVALID_HANDLE_VALUE)
+  {
+    do
+    {
+      if(FileInformation.cFileName[0] != '.')
+      {
+        strSource      = refcstrSourceDirectory + "\\" + FileInformation.cFileName;
+        strDestination = refcstrDestinationDirectory + "\\" + FileInformation.cFileName;
+
+        if(FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+        {
+          // Copy subdirectory
+          if(CopyDirectory(strSource, strDestination))
+            return ::GetLastError();
+        }
+        else
+        {
+          // Copy file
+          if(::CopyFile(strSource, strDestination, TRUE) == FALSE)
+            return ::GetLastError();
+        }
+      }
+    } while(::FindNextFile(hFile, &FileInformation) == TRUE);
+
+    // Close handle
+    ::FindClose(hFile);
+
+    DWORD dwError = ::GetLastError();
+    if(dwError != ERROR_NO_MORE_FILES)
+      return dwError;
+  }
+
+  return 0;
+}
 

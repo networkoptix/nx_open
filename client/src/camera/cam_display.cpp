@@ -300,9 +300,9 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
             {
-                bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
+                //bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
-                reader->setQuality(MEDIA_Quality_Low, fastSwitch);
+                reader->setQualityForced(MEDIA_Quality_Low);
                 m_toLowQSpeed = speed;
                 //m_toLowQTimer.restart();
             }
@@ -315,7 +315,7 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             {
                 if (qAbs(speed) < m_toLowQSpeed || (m_toLowQSpeed < 0 && speed > 0))
                 {
-                    reader->setQuality(MEDIA_Quality_High, true); // speed decreased, try to Hi quality again
+                    reader->setQualityForced(MEDIA_Quality_High); // speed decreased, try to Hi quality again
                 }
                 else if(qAbs(speed) < 1.0 + FPS_EPS && canSwitchToHighQuality())
                 {
@@ -986,7 +986,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
     {
         if (vd)
             m_display[vd->channelNumber]->waitForFramesDisplaed();
-        afterJump(media);
+        if (vd || ad)
+            afterJump(media); // do not reinit time for empty mediaData because there are always 0 or DATE_TIME timing
     }
 
     if (emptyData && !flushCurrentBuffer)

@@ -2,6 +2,7 @@
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
     QnCamDisplay(resource),
@@ -11,6 +12,7 @@ QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource):
     m_lastDisplayTime = 0;
     m_lastDisplayTime2 = 0;
     m_eofProcessed = false;
+    m_reader = 0;
 
     m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
 }
@@ -20,18 +22,48 @@ QnSignDialogDisplay::~QnSignDialogDisplay()
 
 void QnSignDialogDisplay::finilizeSign()
 {
+    QByteArray signFromPicture;
+    QByteArray calculatedSign;
+#ifdef SIGN_FRAME_ENABLED
+    calculatedSign = m_mdctx.result();
     QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
-
-    QByteArray calculatedSign = m_mdctx.result();
-
     QnSignHelper signHelper;
-    QByteArray signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
+    signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
+#else
+    if (m_reader) 
+    {
+        QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
+        if (aviFile) {
+            const char* signPattern = aviFile->getTagValue(QnAviArchiveDelegate::Tag_Signature);
+            if (signPattern) 
+            {
+                QByteArray baPattern(signPattern);
+                QByteArray magic = QnSignHelper::getSignMagic();
+                QList<QByteArray> patternParams = baPattern.split(QnSignHelper::getSignPatternDelim());
+
+                baPattern.replace(0, magic.size(), magic);
+                QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
+                calculatedSign = m_mdctx.result();
+
+                signFromPicture = QnSignHelper::getDigestFromSign(patternParams[0]);
+                if (patternParams.size() >= 4)
+                {
+                    emit gotSignatureDescription(QString::fromUtf8(patternParams[1]), QString::fromUtf8(patternParams[2]), QString::fromUtf8(patternParams[3]));
+                }
+            }
+        }
+    }
+#endif
     emit calcSignInProgress(calculatedSign, 100);
     emit gotSignature(calculatedSign, signFromPicture);
 }
 
 bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
 {
+    QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (data->dataProvider);
+    if (reader)
+        m_reader = reader;
+
     QnEmptyMediaDataPtr eofPacket = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
     
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
@@ -61,11 +93,19 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
     }
     else if (video || audio)
     {
+#ifndef SIGN_FRAME_ENABLED
+        // update digest from current frame
+        if (media && media->data.size() > 4) {
+            const quint8* data = (const quint8*) media->data.data();
+            QnSignHelper::updateDigest(media->context->ctx(), m_mdctx, data, media->data.size());
+        }
+#else
+        // update digest from previous frames because of last frame it is sign frame itself
         if (m_prevFrame && m_prevFrame->data.size() > 4) {
             const quint8* data = (const quint8*) m_prevFrame->data.data();
             QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
         }
-
+#endif
         if (video) 
         {
             video->channelNumber = 0; // ignore layout info
@@ -89,7 +129,6 @@ bool QnSignDialogDisplay::processData(QnAbstractDataPacketPtr data)
         {
             QnCryptographicHash tmpctx = m_mdctx;
             QByteArray calculatedSign = tmpctx.result();
-            QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
             int progress = 100;
             if (reader)
                 progress =  (media->timestamp - reader->startTime()) / (double) (reader->endTime() - reader->startTime()) * 100;

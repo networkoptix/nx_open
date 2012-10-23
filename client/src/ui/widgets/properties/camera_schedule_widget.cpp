@@ -48,9 +48,10 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->noRecordButton,          SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
     connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateGridParams()));
     connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),       this,   SLOT(updateGridParams()));
+    connect(this,                        SIGNAL(scheduleTasksChanged()),     this,   SLOT(updateRecordSpinboxes()));
 
-    connect(ui->recordBeforeSpinBox,    SIGNAL(valueChanged(int)),          this,   SIGNAL(scheduleTasksChanged()));
-    connect(ui->recordAfterSpinBox,     SIGNAL(valueChanged(int)),          this,   SIGNAL(scheduleTasksChanged()));
+    connect(ui->recordBeforeSpinBox,    SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
+    connect(ui->recordAfterSpinBox,     SIGNAL(valueChanged(int)),          this,   SIGNAL(recordingSettingsChanged()));
     
     connect(ui->licensesButton,         SIGNAL(clicked()),                  this,   SLOT(at_licensesButton_clicked()));
     connect(ui->displayQualityCheckBox, SIGNAL(stateChanged(int)),          this,   SLOT(at_displayQualiteCheckBox_stateChanged(int)));
@@ -376,12 +377,10 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         color = ui->recordMotionPlusLQButton->color();
 
     bool enabled = !ui->noRecordButton->isChecked();
-    bool motionEnabled = ui->recordMotionButton->isChecked() || ui->recordMotionPlusLQButton->isChecked();
-
     ui->fpsSpinBox->setEnabled(enabled);
     ui->qualityComboBox->setEnabled(enabled);
-    ui->recordBeforeSpinBox->setEnabled(motionEnabled);
-    ui->recordAfterSpinBox->setEnabled(motionEnabled);
+    updateRecordSpinboxes();
+
 
     if(!(m_readOnly && fromUserInput)) {
         ui->gridWidget->setDefaultParam(QnScheduleGridWidget::ColorParam, color.rgba());
@@ -481,28 +480,51 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         if (!camera->isScheduleDisabled())
             alreadyActive++;
 
+    // how many licenses will be used if recording will be enabled on all cameras
     int toBeUsed = qnResPool->activeCameras() + m_cameras.size() - alreadyActive;
+
+    // how many licensed is used really
     int used = qnResPool->activeCameras() + activeCameraCount() - alreadyActive;
+
+    // how many licenses do we have
     int total = qnLicensePool->getLicenses().totalCameras();
 
     QPalette palette = this->palette();
-    if(toBeUsed > total)
+    if(used > total)
         palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->licensesLabel->setPalette(palette);
 
-    if(ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
-        ui->licensesLabel->setText(tr("%n license(s) are used out of %1.", NULL, used).arg(total));
+    QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);
+
+    if (ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
+        ui->licensesLabel->setText(usageText);
+    } else if (toBeUsed > total){
+        ui->licensesLabel->setText(
+            QString(QLatin1String("%1 %2")).
+                arg(tr("Activate %n more license(s).", NULL, toBeUsed - total)).
+                arg(usageText)
+        );
     } else {
         ui->licensesLabel->setText(
-            tr("%1. %2.").
-                arg(tr("Requires %n license(s)", NULL, m_cameras.size() - alreadyActive)).
-                arg(tr("%n license(s) are used out of %1", NULL, used).arg(total))
+            QString(QLatin1String("%1 %2")).
+                arg(tr("%n license(s) will be used.", NULL, m_cameras.size() - alreadyActive)).
+                arg(usageText)
         );
     }
 }
 
 void QnCameraScheduleWidget::updateLicensesButtonVisible() {
     ui->licensesButton->setVisible(context()->accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
+void QnCameraScheduleWidget::updateRecordSpinboxes(){
+    bool motionEnabled = m_motionAvailable && (
+                ui->recordMotionButton->isChecked() ||
+                ui->recordMotionPlusLQButton->isChecked() ||
+                hasMotionOnGrid()
+                );
+    ui->recordBeforeSpinBox->setEnabled(motionEnabled);
+    ui->recordAfterSpinBox->setEnabled(motionEnabled);
 }
 
 void QnCameraScheduleWidget::updateMotionButtons() {
@@ -625,6 +647,35 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
         return;
 
     QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+}
+
+bool QnCameraScheduleWidget::hasMotionOnGrid() const{
+    for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
+        for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+            const QPoint cell(col, row);
+
+            // TODO: swordsmanship skills must be used here.
+            QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
+            {
+                QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+                if (color == ui->recordAlwaysButton->color())
+                    recordType = QnScheduleTask::RecordingType_Run;
+                else if (color == ui->recordMotionButton->color())
+                    recordType = QnScheduleTask::RecordingType_MotionOnly;
+                else if (color == ui->recordMotionPlusLQButton->color())
+                    recordType = QnScheduleTask::RecordingType_MotionPlusLQ;
+                else if (color == ui->noRecordButton->color())
+                    recordType = QnScheduleTask::RecordingType_Never;
+                else
+                    qWarning("ColorParam wasn't acknowledged. fallback to 'Always'");
+            }
+
+            if(recordType == QnScheduleTask::RecordingType_MotionOnly || recordType == QnScheduleTask::RecordingType_MotionPlusLQ) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 

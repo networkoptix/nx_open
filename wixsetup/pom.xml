@@ -24,7 +24,7 @@
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-		<skip.sign>true</skip.sign>						
+        <skip.sign>true</skip.sign>                     
     </properties>
 
     <build>
@@ -183,7 +183,6 @@
                                         <argument>EmptyPasswordDlg.wxs</argument>
                                         <argument>AllFieldsAreMandatoryDlg.wxs</argument>
                                         <argument>InstallTypeDlg.wxs</argument>
-                                        <argument>AdvancedTypeDlg.wxs</argument>
                                         <argument>PortDuplicateDlg.wxs</argument>
                                         <argument>PortIsBusyDlg.wxs</argument>
                                         <argument>InvalidPasswordDlg.wxs</argument>
@@ -282,18 +281,18 @@
                                     <arguments>
                                         <argument>sign</argument>
                                         <argument>/v</argument>
-										<argument>/p</argument>
-										<argument>qweasd123</argument>
-										<argument>/d</argument>
-										<argument>"Network Optix HD Witness"</argument>
-										<argument>/f</argument>
-										<argument>${basedir}/sign/app.p12</argument>
+                                        <argument>/p</argument>
+                                        <argument>qweasd123</argument>
+                                        <argument>/d</argument>
+                                        <argument>"Network Optix HD Witness"</argument>
+                                        <argument>/f</argument>
+                                        <argument>${basedir}/sign/app.p12</argument>
                                         <argument>${project.build.finalName}.msi</argument>
                                     </arguments>
-									<skip>${skip.sign}</skip>						
+                                    <skip>${skip.sign}</skip>                       
                                 </configuration>                    
-                            </execution>    						
-							
+                            </execution>                            
+                            
                             <execution>
                                 <id>integration-test</id>
                                 <phase>integration-test</phase>

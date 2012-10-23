@@ -72,7 +72,7 @@ public:
 
 private:
     bool fileExists(const Chunk& chunk);
-    void addChunk(const Chunk& chunk, qint64 lastStartTime);
+    void addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
 private:
@@ -87,6 +87,8 @@ private:
     bool m_duplicateName;
     QString m_prevFileName;
     QnResource::ConnectionRole m_role;
+    int m_lastAddIndex; // last added record index. In most cases it is last record
+
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

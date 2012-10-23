@@ -20,7 +20,7 @@ signals:
     void hideRequested();
 
 protected slots:
-    void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
+    void at_contextHelp_helpContextChanged(int id);
     void at_checkBox_clicked(bool checked);
 
 protected:
@@ -33,7 +33,7 @@ protected:
 private:
     QScopedPointer<Ui::HelpWidget> ui;
     QWeakPointer<QnContextHelp> m_contextHelp;
-    QnContextHelp::ContextId m_id;
+    int m_id;
 };
 
 #endif // QN_HELP_WIDGET_H

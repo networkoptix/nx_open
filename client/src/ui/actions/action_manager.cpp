@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "action.h"
@@ -202,6 +203,7 @@ public:
 
     QnActionBuilder childFactory(QnActionFactory *childFactory) {
         m_action->setChildFactory(childFactory);
+        m_action->setFlags(m_action->flags() | Qn::RequiresChildren);
 
         return *this;
     }
@@ -254,7 +256,10 @@ public:
             m_manager->registerAction(action);
         }
 
-        m_actionStack.back()->addChild(action);
+        QnAction *parentAction = m_actionStack.back();
+        parentAction->addChild(action);
+        parentAction->setFlags(parentAction->flags() | Qn::RequiresChildren);
+
         m_lastAction = action;
         if (m_currentGroup)
             m_currentGroup->addAction(action);
@@ -338,6 +343,10 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Delayed Drop Resources"));
 
+    factory(Qn::InstantDropResourcesAction).
+        flags(Qn::NoTarget).
+        text(tr("Instant Drop Resources"));
+
     factory(Qn::MoveCameraAction).
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredPermissions(Qn::RemovePermission).
@@ -411,7 +420,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
-        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
+        condition(new QnPanicActionCondition(this));
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -693,6 +702,24 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnItemZoomedActionCondition(true, this));
 
+    factory(Qn::ShowInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Show Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(false, this));
+
+    factory(Qn::HideInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Hide Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(true, this));
+
+    factory(Qn::ToggleInfoAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Info")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
         text(tr("Show Motion/Smart Search")).
@@ -846,14 +873,15 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("4:3")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
 
         factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("16:9")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
 
         factory.endGroup();
     } factory.endSubMenu();
@@ -869,29 +897,36 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("None")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.0);
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_SPACING ?
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.1);
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Medium")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.2);
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Large")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.3);
         factory.endGroup();
 
     } factory.endSubMenu();
+
+    factory().
+        flags(Qn::Scene | Qn::NoTarget).
+        separator();
 
     factory(Qn::ToggleTourModeAction).
         flags(Qn::Scene | Qn::NoTarget).
@@ -921,13 +956,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection...")).
+        text(tr("Export Selected Area...")).
         requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Layout...")).
+        text(tr("Export Multi-Video...")).
         requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 
@@ -1195,7 +1230,7 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
                 continue;
 
             QMenu *menu = newMenuRecursive(action, scope, parameters);
-            if(!menu && (action->flags() & Qn::RequiresChildren))
+            if((!menu || menu->isEmpty())  && (action->flags() & Qn::RequiresChildren))
                 continue;
 
             QString replacedText;
@@ -1294,13 +1329,13 @@ bool QnActionManager::redirectActionRecursive(QMenu *menu, Qn::ActionId sourceId
             return true;
         }
 
-        if(action->menu() != NULL) {
-            bool success = redirectActionRecursive(action->menu(), sourceId, targetAction);
-            
-            if(success && action->menu()->isEmpty())
-                menu->removeAction(action);
+        if(action->menu()) {
+            if(redirectActionRecursive(action->menu(), sourceId, targetAction)) {
+                if(action->menu()->isEmpty())
+                    menu->removeAction(action);
 
-            return success;
+                return true;
+            }
         }
     }
         
