@@ -3,16 +3,16 @@
 New Features: 
  - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help.
  - Daylight Savings Time is Supported
- - Logout is implemented 
+ - Logout button is implemented 
  
 Improvements:
  - System Settings form is resized to better fit in smaller resolutions.
  - Camera motion web page in Camera Motion Setup was plain text. Now it's hyperlink
- - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is displayed.
+ - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is shows that camera has recording enabled.
  - Fixed "Unsupported audio format for capturing" error in screen recording caused by no sound device
- - Licenses can be registered by admin users only.
- - Many renamings is performed in UI.
- - Added ability to find DW and Dahua manually with Auto discovery port.
+ - Licenses could be registered by admins only
+ - Many renamings is performed in UI
+ - Added ability to find DW and Dahua manually with Auto discovery port. Not need to remember DW Onvif port.
  - Added checkbox "Auto" to the form "Add camera(s)"
  - Playback buttons are larger
  - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
