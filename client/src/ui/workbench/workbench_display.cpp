@@ -777,9 +777,15 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if(startDisplay)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(startDisplay) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->display()->start();
+            if(mediaWidget->display()->archiveReader() && m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+            {
+                mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
+        }
+    }
 
     return true;
 }

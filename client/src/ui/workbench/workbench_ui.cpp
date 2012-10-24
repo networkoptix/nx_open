@@ -243,7 +243,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_fpsItem = new GraphicsLabel(m_controlsWidget);
     m_fpsItem->setAcceptedMouseButtons(0);
     m_fpsItem->setAcceptsHoverEvents(false);
-    m_fpsItem->setFont(QFont(QLatin1String("Courier New"), 10));
+
     {
         QPalette palette = m_fpsItem->palette();
         palette.setColor(QPalette::Window, QColor(0, 0, 0, 0));
