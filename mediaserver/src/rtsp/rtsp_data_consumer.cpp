@@ -12,7 +12,7 @@
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
 
-static const int MAX_QUEUE_SIZE = 10;
+static const int MAX_QUEUE_SIZE = 12;
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
