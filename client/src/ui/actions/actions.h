@@ -519,7 +519,10 @@ namespace Qn {
          */
         ToggleTourModeAction,
 
-
+        /**
+         * Toggles tour mode. Used only as hotkey.
+         */
+        ToggleTourModeHotkeyAction,
 
         /* Slider actions. */
 

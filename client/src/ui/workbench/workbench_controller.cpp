@@ -1114,6 +1114,11 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);
     if(zoomedItem == workbenchItem) {
+        if (action(Qn::ToggleTourModeAction)->isChecked()){
+            action(Qn::ToggleTourModeAction)->toggle();
+            return;
+        }
+
         QRectF viewportGeometry = display()->viewportGeometry();
         QRectF zoomedItemGeometry = display()->itemGeometry(zoomedItem);
 

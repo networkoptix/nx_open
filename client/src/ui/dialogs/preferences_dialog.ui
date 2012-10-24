@@ -199,6 +199,9 @@
             <property name="text">
              <string>Animate background:</string>
             </property>
+            <property name="buddy">
+             <cstring>animateBackgroundCheckBox</cstring>
+            </property>
            </widget>
           </item>
           <item row="1" column="1">
@@ -212,6 +215,9 @@
            <widget class="QLabel" name="backgroundColorLabel">
             <property name="text">
              <string>Background animation color:</string>
+            </property>
+            <property name="buddy">
+             <cstring>backgroundColorPicker</cstring>
             </property>
            </widget>
           </item>
@@ -232,7 +238,7 @@
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer">
+              <spacer name="backgroundColorSpacer">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -251,6 +257,9 @@
            <widget class="QLabel" name="tourCycleTimeLabel">
             <property name="text">
              <string>Sequence Cycle Time:</string>
+            </property>
+            <property name="buddy">
+             <cstring>tourCycleTimeSpinBox</cstring>
             </property>
            </widget>
           </item>
@@ -276,6 +285,9 @@
            <widget class="QLabel" name="showIpInTreeLabel">
             <property name="text">
              <string>Show IP in Tree:</string>
+            </property>
+            <property name="buddy">
+             <cstring>showIpInTreeCheckBox</cstring>
             </property>
            </widget>
           </item>
@@ -307,6 +319,9 @@
               </property>
               <property name="text">
                <string>Language:</string>
+              </property>
+              <property name="buddy">
+               <cstring>languageComboBox</cstring>
               </property>
              </widget>
             </item>
