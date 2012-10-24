@@ -37,6 +37,8 @@ public:
     QnMediaServerResourcePtr resource() const;
 
 protected:
+    virtual int helpTopicAt(const QPointF &pos) const override;
+
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;

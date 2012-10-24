@@ -17,6 +17,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <help/context_help_queryable.h>
+#include <help/help_topics.h>
 
 static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 

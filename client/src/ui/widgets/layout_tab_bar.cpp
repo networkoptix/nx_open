@@ -18,6 +18,9 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/style/skin.h>
 
+#include <help/context_help_queryable.h>
+#include <help/help_topics.h>
+
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
@@ -39,6 +42,8 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     /* Connect to context. */
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
+
+    setHelpTopicId(this, Qn::MainWindow_TabNavigator_Help);
 
     connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));

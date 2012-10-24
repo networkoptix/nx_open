@@ -37,6 +37,7 @@
         <?define VmsChanging=" (Installed AND REMOVE <> "ALL") "?>
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsRepairing=" (REINSTALLMODE) " ?>
+        <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
         
         <?define LaunchClientChecBoxText="Launch ${product.name} when setup exits." ?>
          
@@ -468,14 +469,14 @@
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             
-            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
-            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstalling) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstallingOrChanging) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstallingOrChanging) AND &AppServerFeature=3 ]]></Custom>
             
             <Custom Action="CopyMediaServerProfile_Cmd" After="InitDatabaseAction"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
@@ -682,9 +683,9 @@
                                 <File Id="ServerAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ServerSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
                                 <File Id="ServerOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-								<File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-								<File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-								<File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                                <File Id="ServerVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                                <File Id="ServerMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ServerVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                             </Component>
                             
                             <Component Id="ServerQTLibraries" Guid="{97B2E8C3-274A-4e3e-8FBD-F60355A75A8A}">
@@ -706,6 +707,8 @@
                         </Directory>
                         
                         <Directory Id="${installer.customization}ClientDir" Name="Client">
+                            <Directory Id="${installer.customization}HelpDir" Name="help"/>
+
                             <Component Id="ClientExecutable" Guid="{7AAC7815-50A6-4dc9-ADD2-BDD9B7EE8FEF}">
                                 <File Id="client.exe" Name="${product.name}.exe" Source="${libdir}/bin/${build.configuration}/client.exe" KeyPath="yes">
                                     <fire:FirewallException Id="FirewallExceptionClient" Name="${product.name}" Scope="any" IgnoreFailure="yes"/>
@@ -762,9 +765,9 @@
                                 <File Id="ClientAvutilDll" Name="avutil-51.dll" Source="${libdir}/bin/${build.configuration}/avutil-51.dll"/>
                                 <File Id="ClientSwscaleDll" Name="swscale-2.dll" Source="${libdir}/bin/${build.configuration}/swscale-2.dll"/>
                                 <File Id="ClientOggDll" Name="libogg-0.dll" Source="${libdir}/bin/${build.configuration}/libogg-0.dll"/>
-								<File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
-								<File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
-								<File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
+                                <File Id="ClientVorbisDll" Name="libvorbis-0.dll" Source="${libdir}/bin/${build.configuration}/libvorbis-0.dll"/>
+                                <File Id="ClientMp3lameDll" Name="libmp3lame-0.dll" Source="${libdir}/bin/${build.configuration}/libmp3lame-0.dll"/>
+                                <File Id="ClientVorbisEncDll" Name="libvorbisenc-2.dll" Source="${libdir}/bin/${build.configuration}/libvorbisenc-2.dll"/>
                                 <File Id="ClientX264" Name="x264.exe" Source="${libdir}/bin/${build.configuration}/x264.exe"/>                                
                             </Component>
                             
@@ -895,6 +898,7 @@
  
             <ComponentRef Id="ClientExecutable" />
             <ComponentRef Id="clientShortcutDesktop"/>
+            <ComponentGroupRef Id="ClientHelpComponent"/>
             <ComponentRef Id="ClientConfiguration" />
             <ComponentRef Id="ClientConfigurationPassword" />
             <ComponentRef Id="ClientFFmpegLibraries"/>
@@ -903,7 +907,7 @@
             <ComponentRef Id="ClientOpenAL" />
             <ComponentRef Id="ClientOpenSSL" />
             <ComponentRef Id="ClientQtColorPicker"/>
-			<ComponentRef Id="ClientVsRedistributable"/>
+            <ComponentRef Id="ClientVsRedistributable"/>
             <ComponentRef Id="bespin" />
             
             <ComponentRef Id='ClientDirectoryComponent'/>
@@ -991,7 +995,7 @@
             
             <?define SomeFeaturesSelected2="(!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
             <?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
-            <?define NeedTrayTool="(&AppServerFeature = 3 OR !AppServerFeature = 3 OR &ServerFeature = 3 OR (!ServerFeature = 3 AND &ServerFeature <> 2))"?>
+            <?define NeedTrayTool="(&AppServerFeature = 3 OR &ServerFeature = 3)"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
@@ -1000,9 +1004,9 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND INSTALL_SERVER]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstalling) AND NOT INSTALL_SERVER]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstallingOrChanging)]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstallingOrChanging) AND INSTALL_SERVER]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstallingOrChanging) AND NOT INSTALL_SERVER]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature"><![CDATA[ $(var.NeedTrayTool) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature"><![CDATA[ NOT $(var.NeedTrayTool) ]]></Publish>
             
@@ -1077,9 +1081,9 @@
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature=3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.VmsInstalling) AND &AppServerFeature<>3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstalling)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.VmsInstallingOrChanging) AND &AppServerFeature=3]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.VmsInstallingOrChanging) AND &AppServerFeature<>3]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstallingOrChanging)]]></Publish>
 
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (&AppServerFeature<>3))" ?>
@@ -1120,15 +1124,15 @@
             <?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
             <?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstalling) AND &ServerFeature<>3 AND &ClientFeature <> 3]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) AND &ClientFeature <> 3]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" ><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND &ClientFeature = 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstallingOrChanging) AND &ServerFeature<>3 AND &ClientFeature <> 3]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) AND &ClientFeature <> 3]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" ><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstalling) AND &ServerFeature <> 3)) ]]></Publish>
+<!--            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstallingOrChanging) AND &ServerFeature <> 3)) ]]></Publish>-->
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UninstallOptionsDlg" Order="2"><![CDATA[ $(var.VmsRemoving) AND !AppServerFeature = 3 ]]></Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2"><![CDATA[ $(var.VmsRemoving) AND !AppServerFeature <> 3 ]]></Publish>
@@ -1147,6 +1151,7 @@
 
             <Publish Dialog="UninstallOptionsDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
             <Publish Dialog="UninstallOptionsDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+            <Publish Dialog="UninstallOptionsDlg" Control="Back" Property="REMOVE" Value="{}">1</Publish>
         </UI>
     </Product>
 </Wix>

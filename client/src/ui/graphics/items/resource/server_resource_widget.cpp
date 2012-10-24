@@ -21,6 +21,8 @@
 
 #include <ui/workbench/workbench_context.h>
 
+#include <help/help_topics.h>
+
 #include <QtCore/QHash>
 
 /** How many points of the chart are shown on the screen simultaneously */
@@ -200,6 +202,10 @@ QnServerResourceWidget::~QnServerResourceWidget() {
 
 QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
     return m_resource;
+}
+
+int QnServerResourceWidget::helpTopicAt(const QPointF &pos) const {
+    return Qn::MainWindow_MonitoringItem_Help;
 }
 
 Qn::RenderStatus QnServerResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {

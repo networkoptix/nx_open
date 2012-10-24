@@ -3,6 +3,7 @@
 
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/animation/animated.h>
 
 class QnSpeedSlider;
 class QnVolumeSlider;
@@ -13,10 +14,10 @@ class QnTimeScrollBar;
 class QnWorkbenchNavigator;
 class QGraphicsProxyWidget;
 
-class QnNavigationItem : public QnSimpleFrameWidget, public QnWorkbenchContextAware {
+class QnNavigationItem : public Animated<QnSimpleFrameWidget>, public QnWorkbenchContextAware, public AnimationTimerListener {
     Q_OBJECT;
 
-    typedef QnSimpleFrameWidget base_type;
+    typedef Animated<QnSimpleFrameWidget> base_type;
 
 public:
     explicit QnNavigationItem(QGraphicsItem *parent = NULL);
@@ -54,9 +55,16 @@ private slots:
     void at_stepBackwardButton_clicked();
     void at_stepForwardButton_clicked();
 
+    void at_zoomInButton_pressed();
+    void at_zoomInButton_released();
+    void at_zoomOutButton_pressed();
+    void at_zoomOutButton_released();
+
 protected:
     virtual void wheelEvent(QGraphicsSceneWheelEvent *) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent *) override;
+
+    virtual void tick(int deltaMSecs) override;
 
 private:
     QnImageButtonWidget *m_jumpBackwardButton;
@@ -71,10 +79,15 @@ private:
     QnImageButtonWidget *m_thumbnailsButton;
     QnImageButtonWidget *m_calendarButton;
 
+    QnImageButtonWidget *m_zoomInButton;
+    QnImageButtonWidget *m_zoomOutButton;
+
     GraphicsLabel *m_timeLabel;
 
     bool m_updatingSpeedSliderFromNavigator;
     bool m_updatingNavigatorFromSpeedSlider;
+
+    bool m_zoomingIn, m_zoomingOut;
 
     QnTimeSlider *m_timeSlider;
     QnTimeScrollBar *m_timeScrollBar;

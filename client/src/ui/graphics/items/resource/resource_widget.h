@@ -18,6 +18,8 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/shadow/shaded.h>
 
+#include <help/context_help_queryable.h>
+
 class QGraphicsLinearLayout;
 
 class QnViewportBoundWidget;
@@ -31,7 +33,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public QnContextHelpQueryable {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -267,6 +269,7 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;

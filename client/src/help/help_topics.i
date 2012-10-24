@@ -22,7 +22,7 @@ QN_HELP_TOPIC(MainWindow_TabNavigator_Help,                     "tabs.htm")
 QN_HELP_TOPIC(MainWindow_Pin_Help,                              "showing_and_hiding_side_panels.htm")
 QN_HELP_TOPIC(MainWindow_Panic_Help,                            "panic_recording.htm")
 QN_HELP_TOPIC(MainWindow_ScreenRecording_Help,                  "performing_screen_recording.htm")
-QN_HELP_TOPIC(MainWindow_Fulscreen_Help,                        "full_screen_and_windowed_mode.htm")
+QN_HELP_TOPIC(MainWindow_Fullscreen_Help,                       "full_screen_and_windowed_mode.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Help,                             "working_with_a_resource_tree.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Servers_Help,                     "configuring_media_servers_additional_settings_(ad.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Search_Help,                      "search.htm")
@@ -31,11 +31,11 @@ QN_HELP_TOPIC(MainWindow_Tree_Layouts_Help,                     "configuring_lay
 QN_HELP_TOPIC(MainWindow_Tree_Local_Help,                       "playing_back_local_files_in_hd_witness.htm")
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Playback_Help,                         "playback_panel.htm")
-QN_HELP_TOPIC(MainWindow_LivePlayPause_Help,                    "navigating_through_archive_and.htm")
+QN_HELP_TOPIC(MainWindow_Navigation_Help,						"navigating_through_archive_and.htm")
 QN_HELP_TOPIC(MainWindow_Sync_Help,                             "navigating_through_several_cameras_synchronously.htm")
 QN_HELP_TOPIC(MainWindow_Calendar_Help,                         "using_calendar.htm")
 QN_HELP_TOPIC(MainWindow_Thumbnails_Help,                       "using_thumbnails_for_better_navigation.htm")
-QN_HELP_TOPIC(MainWindow_ThumbnailSearch_Help,                  "thumbnail_search.htm")
+QN_HELP_TOPIC(MainWindow_ThumbnailSearch_Help,                  "thumbnail_search.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MediaItem_Help,                        "viewing_camera_stream_information.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_SmartSearch_Help,            "performing_smart_search.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")
@@ -56,6 +56,8 @@ QN_HELP_TOPIC(UserSettings_Help,                                "changing_user_s
 QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_user_(admin_only).htm")
 
 QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm") // TODO
+
+QN_HELP_TOPIC(ManualCameraAddition_Help,                        "") // TODO
 
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
 QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")

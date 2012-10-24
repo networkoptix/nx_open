@@ -1,6 +1,9 @@
 #include "tree_view.h"
-#include <QTimerEvent>
-#include <QDragMoveEvent>
+
+#include <QtCore/QTimerEvent>
+#include <QtGui/QDragMoveEvent>
+
+#include <ui/workbench/workbench_globals.h>
 
 QnTreeView::QnTreeView(QWidget *parent): 
     QTreeView(parent)
@@ -55,9 +58,18 @@ void QnTreeView::timerEvent(QTimerEvent *event) {
 
 QString QnTreeView::toolTipAt(const QPointF &pos) const {
     QVariant toolTip = indexAt(pos.toPoint()).data(Qt::ToolTipRole);
-    if (toolTip.canConvert<QString>()) {
+    if (toolTip.convert(QVariant::String)) {
         return toolTip.toString();
     } else {
         return QString();
+    }
+}
+
+int QnTreeView::helpTopicAt(const QPointF &pos) const {
+    QVariant topicId = indexAt(pos.toPoint()).data(Qn::HelpTopicIdRole);
+    if(topicId.convert(QVariant::Int)) {
+        return topicId.toInt();
+    } else {
+        return -1;
     }
 }
