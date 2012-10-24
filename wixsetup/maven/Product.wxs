@@ -62,6 +62,30 @@
         <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ClientFeature = 3 ]]></SetProperty>
         
+        <?define Inst_E1="(INSTALL_ECS    AND !AppServerFeature <> 3)"?>
+        <?define Inst_S1="(INSTALL_SERVER AND !ServerFeature <> 3)"?>
+        <?define Inst_C1="(INSTALL_CLIENT AND !ClientFeature <> 3)"?>
+        <?define Inst_E0="(NOT $(var.Inst_E1))"?>
+        <?define Inst_S0="(NOT $(var.Inst_S1))"?>
+        <?define Inst_C0="(NOT $(var.Inst_C1))"?>
+        
+        <?define Inst_E0S0="($(var.Inst_E0) AND $(var.Inst_S0))"?>
+        <?define Inst_E0S1="($(var.Inst_E0) AND $(var.Inst_S1))"?>
+        <?define Inst_E1S0="($(var.Inst_E1) AND $(var.Inst_S0))"?>
+        
+        <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
+        <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
+        <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
+        
+        <?define Inst_E1S0C0="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>
+        <?define Inst_E0S1C0="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C0))"?>
+        <?define Inst_E0S0C1="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
+        <?define Inst_E1S1C0="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C0))"?> 
+        <?define Inst_E1S0C1="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
+        <?define Inst_E0S1C1="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
+        <?define Inst_E1S1C1="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
+        <?define Inst_E0S0C0="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>            
+
         <SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_HOST = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PORT = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_LOGIN = "" ]]></SetProperty>
@@ -180,7 +204,7 @@
         <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
-        <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost">
+        <Property Id="SERVER_APPSERVER_HOST" Secure="yes">
             <RegistrySearch Id="ServerEcsHostReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -189,7 +213,7 @@
                             Win64="yes"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_HOST32" Secure="yes" Value="localhost">
+        <Property Id="SERVER_APPSERVER_HOST32" Secure="yes">
             <RegistrySearch Id="ServerEcsHostReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -198,7 +222,7 @@
                             Win64="no"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000">
+        <Property Id="SERVER_APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerEcsPortReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -207,7 +231,7 @@
                             Win64="yes"/>
         </Property>
             
-        <Property Id="SERVER_APPSERVER_PORT32" Secure="yes" Value="8000">
+        <Property Id="SERVER_APPSERVER_PORT32" Secure="yes">
             <RegistrySearch Id="ServerEcsPortReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -216,7 +240,7 @@
                             Win64="no"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin">
+        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes">
             <RegistrySearch Id="ServerEcsLoginReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -225,7 +249,7 @@
                             Win64="yes"/>
         </Property>
             
-        <Property Id="SERVER_APPSERVER_LOGIN32" Secure="yes" Value="admin">
+        <Property Id="SERVER_APPSERVER_LOGIN32" Secure="yes">
             <RegistrySearch Id="ServerEcsLoginReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -437,7 +461,7 @@
             <Custom Action="AssignAppServerPort" Before="AssignServerPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
-            <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
+            <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">NOT SERVER_APPSERVER_PORT</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
@@ -469,14 +493,14 @@
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             
-            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ $(var.Inst_E1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ $(var.Inst_E1) AND REMOVE <> "ALL" ]]></Custom>
 
-            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ (&AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ $(var.Inst_E1) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ $(var.Inst_E1) AND REMOVE <> "ALL" ]]></Custom>
             
-            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstallingOrChanging) AND &AppServerFeature=3 ]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstallingOrChanging) AND &AppServerFeature=3 ]]></Custom>
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.Inst_E1) ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.Inst_E1) ]]></Custom>
             
             <Custom Action="CopyMediaServerProfile_Cmd" After="InitDatabaseAction"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
@@ -995,30 +1019,6 @@
             
             <?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
             <?define NeedTrayTool="(&AppServerFeature = 3 OR &ServerFeature = 3)"?>
-            
-            <?define Inst_E1="(INSTALL_ECS    AND !AppServerFeature <> 3)"?>
-            <?define Inst_S1="(INSTALL_SERVER AND !ServerFeature <> 3)"?>
-            <?define Inst_C1="(INSTALL_CLIENT AND !ClientFeature <> 3)"?>
-            <?define Inst_E0="(NOT $(var.Inst_E1))"?>
-            <?define Inst_S0="(NOT $(var.Inst_S1))"?>
-            <?define Inst_C0="(NOT $(var.Inst_C1))"?>
-            
-            <?define Inst_E0S0="($(var.Inst_E0) AND $(var.Inst_S0))"?>
-            <?define Inst_E0S1="($(var.Inst_E0) AND $(var.Inst_S1))"?>
-            <?define Inst_E1S0="($(var.Inst_E1) AND $(var.Inst_S0))"?>
-            
-            <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
-            <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
-            <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
-            
-            <?define Inst_E1S0C0="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>
-            <?define Inst_E0S1C0="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C0))"?>
-            <?define Inst_E0S0C1="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
-            <?define Inst_E1S1C0="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C0))"?> 
-            <?define Inst_E1S0C1="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
-            <?define Inst_E0S1C1="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
-            <?define Inst_E1S1C1="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
-            <?define Inst_E0S0C0="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
