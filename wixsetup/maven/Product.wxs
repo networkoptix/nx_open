@@ -61,7 +61,7 @@
         <SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ServerFeature = 3 ]]></SetProperty>
         <SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize"><![CDATA[ NOT Installed OR !ClientFeature = 3 ]]></SetProperty>
-
+        
         <SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_HOST = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_PORT" Value="[SERVER_APPSERVER_PORT32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_PORT = "" ]]></SetProperty>
         <SetProperty Id="SERVER_APPSERVER_LOGIN" Value="[SERVER_APPSERVER_LOGIN32]" After="AppSearch"><![CDATA[ SERVER_APPSERVER_LOGIN = "" ]]></SetProperty>
@@ -993,9 +993,32 @@
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"><![CDATA[ NOT $(var.VmsChanging) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
             
-            <?define SomeFeaturesSelected2="(!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3 OR !ClientFeature=3 OR &ClientFeature=3)"?>
             <?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
             <?define NeedTrayTool="(&AppServerFeature = 3 OR &ServerFeature = 3)"?>
+            
+            <?define Inst_E1="(INSTALL_ECS    AND !AppServerFeature <> 3)"?>
+            <?define Inst_S1="(INSTALL_SERVER AND !ServerFeature <> 3)"?>
+            <?define Inst_C1="(INSTALL_CLIENT AND !ClientFeature <> 3)"?>
+            <?define Inst_E0="(NOT $(var.Inst_E1))"?>
+            <?define Inst_S0="(NOT $(var.Inst_S1))"?>
+            <?define Inst_C0="(NOT $(var.Inst_C1))"?>
+            
+            <?define Inst_E0S0="($(var.Inst_E0) AND $(var.Inst_S0))"?>
+            <?define Inst_E0S1="($(var.Inst_E0) AND $(var.Inst_S1))"?>
+            <?define Inst_E1S0="($(var.Inst_E1) AND $(var.Inst_S0))"?>
+            
+            <?define Inst_S0C0="($(var.Inst_S0) AND $(var.Inst_C0))"?>
+            <?define Inst_S0C1="($(var.Inst_S0) AND $(var.Inst_C1))"?>
+            <?define Inst_S1C0="($(var.Inst_S1) AND $(var.Inst_C0))"?>
+            
+            <?define Inst_E1S0C0="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>
+            <?define Inst_E0S1C0="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C0))"?>
+            <?define Inst_E0S0C1="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
+            <?define Inst_E1S1C0="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C0))"?> 
+            <?define Inst_E1S0C1="($(var.Inst_E1) AND $(var.Inst_S0) AND $(var.Inst_C1))"?>
+            <?define Inst_E0S1C1="($(var.Inst_E0) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
+            <?define Inst_E1S1C1="($(var.Inst_E1) AND $(var.Inst_S1) AND $(var.Inst_C1))"?>
+            <?define Inst_E0S0C0="($(var.Inst_E0) AND $(var.Inst_S0) AND $(var.Inst_C0))"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
@@ -1004,9 +1027,19 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg"><![CDATA[NOT $(var.SomeFeaturesSelected)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstallingOrChanging)]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstallingOrChanging) AND INSTALL_SERVER]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[$(var.SomeFeaturesSelected) AND NOT $(var.VmsInstallingOrChanging) AND NOT INSTALL_SERVER]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.SomeFeaturesSelected) AND $(var.VmsInstalling)]]></Publish>
+            
+            <?define Changing_E1="NOT $(var.VmsInstalling) AND $(var.Inst_E1)"?>
+            <?define Changing_E0S1="NOT $(var.VmsInstalling) AND $(var.Inst_E0S1)"?>
+            <?define Changing_E0S0C1="NOT $(var.VmsInstalling) AND $(var.Inst_E0S0C1)"?>
+            <?define ChangingNothing="NOT $(var.VmsInstalling) AND $(var.Inst_E0S0C0)"?>
+            
+            <!-- Changing -->
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="AppServerDlg"><![CDATA[ $(var.Changing_E1) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.Changing_E0S1) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="ClientDlg"><![CDATA[ $(var.Changing_E0S0C1) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg"><![CDATA[ $(var.ChangingNothing) ]]></Publish>
+            
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature"><![CDATA[ $(var.NeedTrayTool) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature"><![CDATA[ NOT $(var.NeedTrayTool) ]]></Publish>
             
@@ -1044,8 +1077,9 @@
             <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDriveLowSpace">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDirectoryWritable">1</Publish>
-            
-            <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+                        
+            <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.VmsChanging) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) ]]></Publish>
 
             <?define EcsPortsDiffer="(APPSERVER_PORT <> PROXY_PORT)" ?>
             <?define EcsNeedCheckPorts="(APPSERVER_PORT <> OLD_APPSERVER_PORT OR PROXY_PORT <> OLD_PROXY_PORT)" ?>        
@@ -1058,12 +1092,13 @@
             <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="PortIsBusyDlg" Order="3"><![CDATA[ $(var.EcsPortsDiffer) AND $(var.EcsPasswordsEqual) AND BUSYPORT ]]></Publish>
             
             <?define IsAsSettingsFilled="(APPSERVER_PORT AND PROXY_PORT AND APPSERVER_LOGIN AND APPSERVER_PASSWORD)" ?>
+            <?define EcsSettingsValid="($(var.IsAsSettingsFilled) AND NOT BUSYPORT)"?>
             
             <Publish Dialog="AppServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsAsSettingsFilled) ]]></Publish>
             
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature=3)]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3 AND &ClientFeature = 3)]]></Publish>
-            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[($(var.IsAsSettingsFilled) AND NOT BUSYPORT AND &ServerFeature <> 3 AND &ClientFeature <> 3)]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[ $(var.EcsSettingsValid) AND $(var.Inst_S1) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4"><![CDATA[ ($(var.EcsSettingsValid) AND $(var.Inst_S0C1)) ]]></Publish>
+            <Publish Dialog="AppServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4"><![CDATA[ ($(var.EcsSettingsValid) AND $(var.Inst_S0C0)) ]]></Publish>
             
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4">1</Publish>
             <Publish Dialog="AppServerDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">1</Publish>
@@ -1081,9 +1116,9 @@
             <Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
             <Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[$(var.VmsInstallingOrChanging) AND &AppServerFeature=3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[$(var.VmsInstallingOrChanging) AND &AppServerFeature<>3]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[NOT $(var.VmsInstallingOrChanging)]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="AppServerDlg"><![CDATA[ $(var.Inst_E1) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstalling) AND $(var.Inst_E0) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ $(var.VmsChanging) AND $(var.Inst_E0) ]]></Publish>
 
             
             <?define IsPortsValid="((&AppServerFeature=3 AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (&AppServerFeature<>3))" ?>
@@ -1094,8 +1129,8 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="AllFieldsAreMandatoryDlg"><![CDATA[ NOT $(var.IsSettingsFilled) ]]></Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Event="SpawnDialog" Value="PortDuplicateDlg"><![CDATA[ NOT $(var.IsPortsValid) AND $(var.IsSettingsFilled) ]]></Publish>
             
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND &ClientFeature = 3 ]]></Publish>
-            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid) AND $(var.Inst_C1) ]]></Publish>
+            <Publish Dialog="MediaServerDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2"><![CDATA[$(var.IsSettingsValid) AND $(var.IsPortsValid)  AND $(var.Inst_C0) ]]></Publish>
             
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Property="_BrowseProperty" Value="[WIXUI_SERVER_DIRECTORY]" Order="1">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="ChangeServerMediaDir" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
@@ -1116,20 +1151,18 @@
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="MediaServerDlg">1</Publish>
             <Publish Dialog="MediaServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="VerifyReadyDlg">1</Publish>
             
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="2"><![CDATA[ &ServerFeature <> 3 AND &AppServerFeature <> 3  ]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[ &ServerFeature <> 3 AND &AppServerFeature = 3 ]]></Publish>
-            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[ &ServerFeature = 3 ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="2"><![CDATA[ $(var.VmsInstalling) AND $(var.Inst_E0S0) ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ $(var.VmsChanging) AND $(var.Inst_E0S0) ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" Order="2"><![CDATA[ $(var.Inst_E1S0) ]]></Publish>
+            <Publish Dialog="ClientDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg" Order="2"><![CDATA[ $(var.Inst_S1) ]]></Publish>
             <Publish Dialog="ClientDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="2">1</Publish>
             
-            <?define EditingAppServer="(INSTALLTYPE=1 AND &AppServerFeature=3)"?>
-            <?define EditingMediaServer="(INSTALLTYPE=1 AND &ServerFeature=3)"?>
+            <?define EditingSettings="(($(var.VmsInstalling) AND INSTALLTYPE=1) OR $(var.VmsChanging))"?>
             
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ NOT $(var.VmsInstallingOrChanging) AND &ServerFeature<>3 AND &ClientFeature <> 3]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=0 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND $(var.EditingMediaServer) AND &ClientFeature <> 3]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" ><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND &ClientFeature = 3 ]]></Publish>
-            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg"><![CDATA[ $(var.VmsInstallingOrChanging) AND INSTALLTYPE=1 AND NOT $(var.EditingAppServer) AND NOT $(var.EditingMediaServer) AND &ClientFeature <> 3 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="PasswordDlg"><![CDATA[ $(var.VmsInstalling) AND INSTALLTYPE=0 ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="AppServerDlg" ><![CDATA[ $(var.EditingSettings) AND $(var.Inst_S0C0) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MediaServerDlg"><![CDATA[ $(var.EditingSettings) AND $(var.Inst_S1C0) ]]></Publish>
+            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="ClientDlg" ><![CDATA[ $(var.EditingSettings) AND $(var.Inst_C1) ]]></Publish>
             
             <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg"><![CDATA[$(var.VmsUpgrading)]]></Publish>
 <!--            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstallingOrChanging) AND &ServerFeature <> 3)) ]]></Publish>-->

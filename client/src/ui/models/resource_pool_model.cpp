@@ -196,9 +196,7 @@ public:
         bool bastard = false;
         switch(m_type) {
         case Qn::ItemNode:
-            /* Well, this is an ugly hack, as this case must be handled at different level, 
-             * but we want to feel safe even when it gets fixed. */
-            bastard = m_resource.isNull(); 
+            bastard = m_resource.isNull();
             break;
         case Qn::ResourceNode: 
             bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
@@ -207,6 +205,8 @@ public:
                     bastard = m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout); 
             if(!bastard)
                 bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
+            if(!bastard)
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); // TODO: hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
@@ -634,15 +634,13 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     if(node->resourceFlags() & QnResource::server)
         return m_serversNode;
 
-    if((node->resourceFlags() & QnResource::local_media) == QnResource::local_media)
-        return m_localNode;
-
-    if((node->resourceFlags() & QnResource::local_layout) == QnResource::local_layout)
-        return m_localNode;
-
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
-    if(!parentResource) {
-        return NULL;
+    if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
+        if(node->resourceFlags() & QnResource::local) {
+            return m_localNode;
+        } else {
+            return NULL;
+        }
     } else {
         return this->node(parentResource);
     }

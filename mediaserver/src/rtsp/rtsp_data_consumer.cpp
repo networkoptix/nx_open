@@ -12,7 +12,8 @@
 #include "utils/common/synctime.h"
 #include "core/resource/security_cam_resource.h"
 
-static const int MAX_QUEUE_SIZE = 10;
+static const int MAX_QUEUE_SIZE = 12;
+static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 1000ll * 1000ll; // 1 second
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
@@ -193,6 +194,39 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     return rez;
 }
 
+qint64 QnRtspDataConsumer::dataQueueDuration()
+{
+    qint64 firstVTime = AV_NOPTS_VALUE;
+    qint64 lastVTime = AV_NOPTS_VALUE;
+
+    m_dataQueue.lock();
+
+    for (int i = 0; i < m_dataQueue.size(); ++i)
+    {
+        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
+        if (video) {
+           firstVTime = video->timestamp;
+           break;
+        }
+    }
+
+    for (int i = m_dataQueue.size()-1; i >=0; --i)
+    {
+        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
+        if (video) {
+            lastVTime = video->timestamp;
+            break;
+        }
+    }
+
+    m_dataQueue.unlock();
+
+    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
+        return lastVTime - firstVTime;
+    else
+        return 0;
+}
+
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 {
 //    cl_log.log("queueSize=", m_dataQueue.size(), cl_logALWAYS);
@@ -224,7 +258,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
 
     // overflow control
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
+    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
         m_dataQueue.lock();
         QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();

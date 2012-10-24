@@ -200,6 +200,8 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_inFreespace(false),
     m_ignoreSliderResizerGeometryChanges(false),
     m_ignoreSliderResizerGeometryChanges2(false),
+    m_sliderZoomingIn(false),
+    m_sliderZoomingOut(false),
     m_lastThumbnailsHeight(48.0),
     m_inCalendarGeometryUpdate(false)
 {
@@ -230,6 +232,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     connect(deactivationSignalizer,     SIGNAL(activated(QObject *, QEvent *)),                                                     this,                           SLOT(at_controlsWidget_deactivated()));
     connect(m_controlsWidget,           SIGNAL(geometryChanged()),                                                                  this,                           SLOT(at_controlsWidget_geometryChanged()));
+
+
+    /* Animation. */
+    setTimer(m_instrumentManager->animationTimer());
+    startListening();
 
 
     /* Fps counter. */
@@ -597,9 +604,28 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
+    QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
+    sliderZoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));
+    sliderZoomOutButton->setPreferredSize(16, 16);
+
+    QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
+    sliderZoomInButton->setIcon(qnSkin->pixmap("item/zoom_in.png"));
+    sliderZoomInButton->setPreferredSize(16, 16);
+
+    QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    sliderZoomButtonsLayout->setSpacing(0.0);
+    sliderZoomButtonsLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    sliderZoomButtonsLayout->addItem(sliderZoomOutButton);
+    sliderZoomButtonsLayout->addItem(sliderZoomInButton);
+
+    m_sliderZoomButtonsWidget = new QGraphicsWidget(m_controlsWidget);
+    m_sliderZoomButtonsWidget->setLayout(sliderZoomButtonsLayout);
+    m_sliderZoomButtonsWidget->setOpacity(0.0);
+
     /* There is no stackAfter function, so we have to resort to ugly copypasta. */
     m_sliderShowButton->stackBefore(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderResizerItem->stackBefore(m_sliderShowButton);
+    m_sliderResizerItem->stackBefore(m_sliderZoomButtonsWidget);
     m_sliderItem->stackBefore(m_sliderResizerItem);
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
@@ -607,6 +633,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem->timeSlider()->toolTipItem());
     m_sliderOpacityProcessor->addTargetItem(m_sliderShowButton);
     m_sliderOpacityProcessor->addTargetItem(m_sliderResizerItem);
+    m_sliderOpacityProcessor->addTargetItem(m_sliderZoomButtonsWidget);
 
     m_sliderYAnimator = new VariantAnimator(this);
     m_sliderYAnimator->setTimer(m_instrumentManager->animationTimer());
@@ -620,6 +647,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderItem));
     m_sliderOpacityAnimatorGroup->addAnimator(opacityAnimator(m_sliderShowButton)); /* Speed of 1.0 is OK here. */
+
+    connect(sliderZoomInButton,         SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomInButton_pressed()));
+    connect(sliderZoomInButton,         SIGNAL(released()),                         this,           SLOT(at_sliderZoomInButton_released()));
+    connect(sliderZoomOutButton,        SIGNAL(pressed()),                          this,           SLOT(at_sliderZoomOutButton_pressed()));
+    connect(sliderZoomOutButton,        SIGNAL(released()),                         this,           SLOT(at_sliderZoomOutButton_released()));
 
     connect(m_sliderShowButton,         SIGNAL(toggled(bool)),                                                                      this,                           SLOT(at_sliderShowButton_toggled(bool)));
     connect(m_sliderOpacityProcessor,   SIGNAL(hoverEntered()),                                                                     this,                           SLOT(updateSliderOpacity()));
@@ -999,6 +1031,14 @@ void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
     }
 }
 
+void QnWorkbenchUi::setZoomButtonsOpacity(qreal opacity, bool animate) {
+    if(animate) {
+        opacityAnimator(m_sliderZoomButtonsWidget)->animateTo(opacity);
+    } else {
+        m_sliderZoomButtonsWidget->setOpacity(opacity);
+    }
+}
+
 void QnWorkbenchUi::updateTreeOpacity(bool animate) {
     if(!m_treeVisible) {
         setTreeOpacity(0.0, 0.0, animate);
@@ -1014,11 +1054,14 @@ void QnWorkbenchUi::updateTreeOpacity(bool animate) {
 void QnWorkbenchUi::updateSliderOpacity(bool animate) {
     if(!m_sliderVisible) {
         setSliderOpacity(0.0, animate);
+        setZoomButtonsOpacity(0.0, animate);
     } else {
         if(m_sliderOpacityProcessor->isHovered()) {
             setSliderOpacity(hoverSliderOpacity, animate);
+            setZoomButtonsOpacity(hoverSliderOpacity, animate);
         } else {
             setSliderOpacity(normalSliderOpacity, animate);
+            setZoomButtonsOpacity(0.0, animate);
         }
     }
 }
@@ -1300,6 +1343,12 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
     }
 }
 
+void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
+    QPointF pos = m_sliderItem->timeSlider()->mapToItem(m_controlsWidget, QPointF(0.0, 0.0));
+
+    m_sliderZoomButtonsWidget->setPos(pos);
+}
+
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpX) {
     return QMargins(
         m_treePinned ? std::floor(qMax(0.0, treeX + treeW)) : 0.0,
@@ -1474,6 +1523,29 @@ bool QnWorkbenchUi::event(QEvent *event) {
     return result;
 }
 
+void QnWorkbenchUi::tick(int deltaMSecs) {
+    if(!m_sliderZoomingIn && !m_sliderZoomingOut)
+        return;
+
+    if(!display()->scene())
+        return;
+
+    QnTimeSlider *slider = m_sliderItem->timeSlider();
+
+    QPointF pos;
+    if(slider->windowStart() <= slider->sliderPosition() && slider->sliderPosition() <= slider->windowEnd()) {
+        pos = slider->positionFromValue(slider->sliderPosition(), true);
+    } else {
+        pos = slider->rect().center();
+    }
+
+    QGraphicsSceneWheelEvent event(QEvent::GraphicsSceneWheel);
+    event.setDelta(360 * 8 * (m_sliderZoomingIn ? deltaMSecs : -deltaMSecs) / 1000); /* 360 degrees per sec, x8 since delta is measured in in eighths (1/8s) of a degree. */
+    event.setPos(pos);
+    event.setScenePos(slider->mapToScene(pos));
+    display()->scene()->sendEvent(slider, &event);
+}
+
 void QnWorkbenchUi::at_freespaceAction_triggered() {
     QAction *fullScreenAction = action(Qn::EffectiveMaximizeAction);
 
@@ -1615,6 +1687,7 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateViewportMargins();
     updateSliderResizerGeometry();
     updateCalendarGeometry();
+    updateSliderZoomButtonsGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
@@ -1870,4 +1943,20 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() {
 
 void QnWorkbenchUi::at_calendarHidingProcessor_hoverFocusLeft() {
     setCalendarOpened(false);
+}
+
+void QnWorkbenchUi::at_sliderZoomInButton_pressed() {
+    m_sliderZoomingIn = true;
+}
+
+void QnWorkbenchUi::at_sliderZoomInButton_released() {
+    m_sliderZoomingIn = false;
+}
+
+void QnWorkbenchUi::at_sliderZoomOutButton_pressed() {
+    m_sliderZoomingOut = true;
+}
+
+void QnWorkbenchUi::at_sliderZoomOutButton_released() {
+    m_sliderZoomingOut = false;
 }
