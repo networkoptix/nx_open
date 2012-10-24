@@ -5,7 +5,7 @@
 
 #define QN_HELP_WIDGET_NO_DONT_SHOW_AGAIN
 
-QnHelpWidget::QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent):
+QnHelpWidget::QnHelpWidget(QnHelpHandler *contextHelp, QWidget *parent):
     QWidget(parent),
     ui(new Ui::HelpWidget()),
     m_contextHelp(contextHelp)
@@ -19,7 +19,7 @@ QnHelpWidget::QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent):
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->textEdit->setWindowFlags(ui->textEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    connect(contextHelp,    SIGNAL(helpContextChanged(QnContextHelp::ContextId)),   this,   SLOT(at_contextHelp_helpContextChanged(QnContextHelp::ContextId)));
+    connect(contextHelp,    SIGNAL(helpContextChanged(QnHelpHandler::ContextId)),   this,   SLOT(at_contextHelp_helpContextChanged(QnHelpHandler::ContextId)));
     connect(ui->checkBox,   SIGNAL(clicked(bool)),                                  this,   SLOT(at_checkBox_clicked(bool)));
 }
 

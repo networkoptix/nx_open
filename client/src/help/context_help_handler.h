@@ -9,7 +9,7 @@
 class QGraphicsItem;
 class QGraphicsView;
 
-class QnContextHelp;
+class QnHelpHandler;
 class HelpTopicQueryable;
 
 class QnContextHelpHandler: public QObject {
@@ -18,8 +18,8 @@ public:
     QnContextHelpHandler(QObject *parent = NULL);
     virtual ~QnContextHelpHandler();
 
-    QnContextHelp *contextHelp() const;
-    void setContextHelp(QnContextHelp *contextHelp);
+    QnHelpHandler *contextHelp() const;
+    void setContextHelp(QnHelpHandler *contextHelp);
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
@@ -28,7 +28,7 @@ private:
     int helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp = false) const;
 
 private:
-    QWeakPointer<QnContextHelp> m_contextHelp;
+    QWeakPointer<QnHelpHandler> m_contextHelp;
 };
 
 #endif // QN_CONTEXT_HELP_HANDLER_H

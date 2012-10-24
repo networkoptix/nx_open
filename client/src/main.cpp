@@ -330,7 +330,7 @@ int qnMain(int argc, char *argv[])
         return 0;
 
 
-    QnContextHelp help;
+    QnHelpHandler help;
     QnContextHelpHandler helpHandler;
     helpHandler.setContextHelp(&help);
     qApp->installEventFilter(&helpHandler);

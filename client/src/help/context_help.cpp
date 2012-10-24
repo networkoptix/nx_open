@@ -2,6 +2,11 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtGui/QDesktopServices>
+#include <QtGui/QCursor>
+#include <QtGui/QHelpEvent>
+#include <QtGui/QWhatsThis>
+
+#include "help_topic_accessor.h"
 
 namespace {
     const char *relativeUrlForTopic(int topic) {
@@ -17,33 +22,65 @@ namespace {
 } // anonymous namespace
 
 
-QnContextHelp::QnContextHelp(QObject *parent):
+QnHelpHandler::QnHelpHandler(QObject *parent):
     QObject(parent),
     m_topic(Qn::Empty_Help)
 {
     m_helpRoot = qApp->applicationDirPath() + QLatin1String("/help");
 }
 
-QnContextHelp::~QnContextHelp() {
+QnHelpHandler::~QnHelpHandler() {
     return;
 }
 
-void QnContextHelp::show() {
+void QnHelpHandler::show() {
     return;
 }
 
-void QnContextHelp::hide() {
+void QnHelpHandler::hide() {
     return;
 }
 
-void QnContextHelp::setHelpTopic(int topic) {
+void QnHelpHandler::setHelpTopic(int topic) {
     m_topic = topic;
 
     QDesktopServices::openUrl(urlForTopic(topic));
 }
 
-QUrl QnContextHelp::urlForTopic(int topic) const {
+QUrl QnHelpHandler::urlForTopic(int topic) const {
     return QUrl::fromLocalFile(m_helpRoot + QLatin1String("/") + QLatin1String(relativeUrlForTopic(topic)));
 }
+
+bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
+    QWidget *widget = qobject_cast<QWidget *>(watched);
+    if(!widget)
+        return false;
+
+    switch(event->type()) {
+    case QEvent::QueryWhatsThis: {
+        bool accepted = QnHelpTopicAccessor::helpTopicAt(widget, widget->mapFromGlobal(QCursor::pos())) != -1;
+        event->setAccepted(accepted);
+        return accepted;
+    }
+    case QEvent::WhatsThis: {
+        int topicId = QnHelpTopicAccessor::helpTopicAt(widget, static_cast<QHelpEvent *>(event)->pos());
+
+        if(topicId != -1) {
+            event->accept();
+
+            setHelpTopic(topicId);
+            show();
+
+            QWhatsThis::leaveWhatsThisMode();
+            return true;
+        }
+
+        return false;
+    }
+    default:
+        return false;
+    }
+}
+
 
 

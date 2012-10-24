@@ -22,11 +22,11 @@ QnContextHelpHandler::~QnContextHelpHandler() {
     return;
 }
 
-QnContextHelp *QnContextHelpHandler::contextHelp() const {
+QnHelpHandler *QnContextHelpHandler::contextHelp() const {
     return m_contextHelp.data();
 }
 
-void QnContextHelpHandler::setContextHelp(QnContextHelp *contextHelp) {
+void QnContextHelpHandler::setContextHelp(QnHelpHandler *contextHelp) {
     m_contextHelp = contextHelp;
 }
 

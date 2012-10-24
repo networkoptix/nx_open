@@ -12,7 +12,7 @@ namespace Ui {
 class QnHelpWidget: public QWidget {
     Q_OBJECT;
 public:
-    QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent = NULL);
+    QnHelpWidget(QnHelpHandler *contextHelp, QWidget *parent = NULL);
     virtual ~QnHelpWidget();
 
 signals:
@@ -26,13 +26,13 @@ protected slots:
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 
-    QnContextHelp *contextHelp() const {
+    QnHelpHandler *contextHelp() const {
         return m_contextHelp.data();
     }
 
 private:
     QScopedPointer<Ui::HelpWidget> ui;
-    QWeakPointer<QnContextHelp> m_contextHelp;
+    QWeakPointer<QnHelpHandler> m_contextHelp;
     int m_id;
 };
 

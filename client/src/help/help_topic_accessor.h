@@ -17,11 +17,8 @@ public:
         setHelpTopic(object1, helpTopic);
     }
 
-    static int helpTopic(QObject *object);
-
-    static int helpTopicAt(QWidget *widget, const QPoint &pos);
-
-    static int helpTopicAt(QGraphicsItem *item, const QPointF &pos);
+    static int helpTopicAt(QWidget *widget, const QPoint &pos, bool bubbleUp = false);
+    static int helpTopicAt(QGraphicsItem *item, const QPointF &pos, bool bubbleUp = false);
 };
 
 

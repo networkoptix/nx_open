@@ -1,20 +1,22 @@
-#ifndef QN_CONTEXT_HELP_H
-#define QN_CONTEXT_HELP_H
+#ifndef QN_HELP_HANDLER_H
+#define QN_HELP_HANDLER_H
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 
 #include "help_topics.h"
 
-class QnContextHelp: public QObject {
+class QnHelpHandler: public QObject {
     Q_OBJECT;
 public:
-    QnContextHelp(QObject *parent = NULL);
-    virtual ~QnContextHelp();
+    QnHelpHandler(QObject *parent = NULL);
+    virtual ~QnHelpHandler();
     
     void show();
     void hide();
     void setHelpTopic(int topic);
+
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 protected:
     QUrl urlForTopic(int topic) const;
@@ -25,4 +27,4 @@ private:
 };
 
 
-#endif // QN_CONTEXT_HELP_H
+#endif // QN_HELP_HANDLER_H
