@@ -1,4 +1,5 @@
 ﻿#include "resource_tree_widget.h"
+#include "ui_resource_tree_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -23,24 +24,21 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
-#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
-
-#include "ui_resource_tree_widget.h"
-#include "ui/style/proxy_style.h"
-#include "ui/style/noptix_style.h"
-#include "ui/style/globals.h"
-
-#include <help/context_help_queryable.h>
-#include <help/help_topics.h>
+#include <ui/style/skin.h>
+#include <ui/style/proxy_style.h>
+#include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";

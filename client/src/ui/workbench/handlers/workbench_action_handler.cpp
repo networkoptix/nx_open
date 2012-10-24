@@ -60,6 +60,9 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -87,8 +90,6 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
-#include "help/context_help_queryable.h"
-#include "help/help_topics.h"
 
 
 

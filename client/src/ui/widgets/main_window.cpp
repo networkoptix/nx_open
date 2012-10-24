@@ -24,6 +24,8 @@
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include "ui/workbench/handlers/workbench_action_handler.h"
 #include "ui/workbench/handlers/workbench_panic_handler.h"
 #include "ui/workbench/workbench_controller.h"
@@ -41,9 +43,6 @@
 #include "ui/style/proxy_style.h"
 #include "ui/events/system_menu_event.h"
 #include <ui/screen_recording/screen_recorder.h>
-
-#include <help/context_help_queryable.h>
-#include <help/help_topics.h>
 
 #include "file_processor.h"
 #include "utils/settings.h"

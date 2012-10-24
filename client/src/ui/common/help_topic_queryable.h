@@ -3,8 +3,6 @@
 
 #include <QtCore/QPointF>
 
-class QObject;
-
 class HelpTopicQueryable {
 public:
     virtual ~HelpTopicQueryable() {}

@@ -81,8 +81,7 @@
     #include "ui/workaround/iexplore_url_handler.h"
 #endif
 
-#include "help/context_help.h"
-#include "help/context_help_handler.h"
+#include "ui/help/help_handler.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -330,9 +329,7 @@ int qnMain(int argc, char *argv[])
         return 0;
 
 
-    QnHelpHandler help;
-    QnContextHelpHandler helpHandler;
-    helpHandler.setContextHelp(&help);
+    QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
 

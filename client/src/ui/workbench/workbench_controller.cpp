@@ -69,6 +69,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/grid/grid_item.h>
 
+#include <ui/help/help_handler.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
 
@@ -82,8 +84,6 @@
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
-
-#include "help/context_help.h"
 
 
 //#define QN_WORKBENCH_CONTROLLER_DEBUG

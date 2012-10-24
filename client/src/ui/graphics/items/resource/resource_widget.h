@@ -13,12 +13,11 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
+#include <ui/common/help_topic_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/shadow/shaded.h>
-
-#include <help/context_help_queryable.h>
 
 class QGraphicsLinearLayout;
 

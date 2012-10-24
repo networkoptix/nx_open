@@ -12,14 +12,14 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/style/skin.h>
 
-#include <help/context_help_queryable.h>
-#include <help/help_topics.h>
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),

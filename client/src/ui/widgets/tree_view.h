@@ -5,7 +5,7 @@
 #include <QtGui/QTreeView>
 
 #include <ui/common/tool_tip_queryable.h>
-#include <help/context_help_queryable.h>
+#include <ui/common/help_topic_queryable.h>
 
 /**
  * This class fixes some bugs in <tt>QTreeView</tt> related to drag and drop

@@ -19,14 +19,13 @@
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <help/context_help_queryable.h>
-#include <help/help_topics.h>
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"

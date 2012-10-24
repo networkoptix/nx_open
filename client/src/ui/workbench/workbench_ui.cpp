@@ -53,6 +53,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/resource_tree_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
@@ -61,9 +63,6 @@
 #include <ui/style/noptix_style.h>
 #include <ui/events/system_menu_event.h>
 #include <ui/screen_recording/screen_recorder.h>
-
-#include <help/context_help.h>
-#include <help/context_help_queryable.h>
 
 #include "camera/video_camera.h"
 #include "openal/qtvaudiodevice.h"

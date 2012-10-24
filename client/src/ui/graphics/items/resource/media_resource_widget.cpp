@@ -19,12 +19,11 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/help/help_topics.h>
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_access_controller.h>
-
-#include <help/help_topics.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"

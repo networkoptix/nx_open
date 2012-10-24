@@ -16,14 +16,13 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_globals.h>
-
-#include <help/help_topics.h>
 
 #include "file_processor.h"
 

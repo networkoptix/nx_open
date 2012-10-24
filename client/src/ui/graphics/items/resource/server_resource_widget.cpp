@@ -12,18 +12,14 @@
 #include <api/media_server_statistics_data.h>
 
 #include <ui/style/globals.h>
-
+#include <ui/help/help_topics.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/painters/radial_gradient_painter.h>
-
 #include <ui/workbench/workbench_context.h>
 
-#include <help/help_topics.h>
-
-#include <QtCore/QHash>
 
 /** How many points of the chart are shown on the screen simultaneously */
 #define CHART_POINTS_LIMIT 60

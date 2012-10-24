@@ -13,12 +13,12 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/read_only.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
-#include <help/context_help_queryable.h>
-#include <help/context_help.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),

@@ -1,6 +1,5 @@
 #include "help_widget.h"
 #include <QWheelEvent>
-#include <help/context_help.h>
 #include "ui_help_widget.h"
 
 #define QN_HELP_WIDGET_NO_DONT_SHOW_AGAIN

@@ -9,7 +9,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/variant.h>
 
-#include "help_topic_queryable.h"
+#include <ui/common/help_topic_queryable.h>
 
 namespace {
     const char *qn_helpTopicPropertyName = "_qn_contextHelpId";

@@ -18,12 +18,11 @@
 #include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
-
-#include <help/context_help_queryable.h>
-#include <help/help_topics.h>
 
 QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *parent): 
     QDialog(parent),
