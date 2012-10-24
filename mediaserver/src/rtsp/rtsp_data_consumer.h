@@ -75,6 +75,7 @@ protected:
 
     bool isMediaTimingsSlow() const;
     void setLiveQualityInternal(MediaQuality quality);
+    qint64 dataQueueDuration();
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
