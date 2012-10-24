@@ -63,7 +63,9 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
         return accepted;
     }
     case QEvent::WhatsThis: {
-        int topicId = QnHelpTopicAccessor::helpTopicAt(widget, static_cast<QHelpEvent *>(event)->pos());
+        QHelpEvent *e = static_cast<QHelpEvent *>(event);
+
+        int topicId = QnHelpTopicAccessor::helpTopicAt(widget, e->pos());
 
         if(topicId != -1) {
             event->accept();
@@ -74,6 +76,14 @@ bool QnHelpHandler::eventFilter(QObject *watched, QEvent *event) {
             QWhatsThis::leaveWhatsThisMode();
             return true;
         }
+
+        return false;
+    }
+    case QEvent::MouseButtonPress: {
+        QMouseEvent *e = static_cast<QMouseEvent *>(event);
+        
+        if(e->button() == Qt::RightButton)
+            QWhatsThis::leaveWhatsThisMode();
 
         return false;
     }
