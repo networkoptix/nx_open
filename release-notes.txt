@@ -1,5 +1,68 @@
+----------------------------------------------- 1.4-Beta -----------------------------------------------
 
------------------------------------------------ 1.4 -----------------------------------------------
+New Features: 
+ - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help.
+ - Daylight Savings Time is Supported
+ - Logout is implemented 
+ 
+Improvements:
+ - System Settings form is resized to better fit in smaller resolutions.
+ - Camera motion web page in Camera Motion Setup was plain text. Now it's hyperlink
+ - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is displayed.
+ - Fixed "Unsupported audio format for capturing" error in screen recording caused by no sound device
+ - Licenses can be registered by admin users only.
+ - Many renamings is performed in UI.
+ - Added ability to find DW and Dahua manually with Auto discovery port.
+ - Added checkbox "Auto" to the form "Add camera(s)"
+ - Playback buttons are larger
+ - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
+ - Components can be selected separately during the installation (EC, Media Server, Client).'Will be installed on Local Hard Drive' and 
+   'Entire Feature will be installed on Local Hard Drive' options are removed
+ - Buttons that zoomtimeline in/out to the cursor position
+ - Current recording method is displayed in the top left corner of the item's info panel (according to schedule)
+ - If sync is disabled time line is not hidden
+ - "Rename" menu item is not displayed for items in search
+ - if set "Administrator" in custom access rights, all other permission are filled automatically.
+ - When the video reached the end of the recorded data, the watermark window doesn't appear
+ - Added a new installer logo for DW
+ - Default Root Media Folder is customized now (used to be C:\HD Witness) 
+
+Bugs Fixed: 
+ - On some randome machines software did not start.
+ - Camera URL in camera settings form could not be opened. Fixed
+ - If adding cameras manually "Add selected" are not active, if choose several cameras in search results. Fixed.
+ - If adding cameras manually camera will not be added If login and password are empty. Fixed.
+ - If try to add an image file and save layout, software crashed. Fixed.
+ - DW is offline if it has been added manual. Fixed.
+ - Fixed incorrect behavior when working offline. If click "Open in a New Window", file wasn't be opened.
+ - It took a very long time for playback functions such as fast forward and fast re-wind to start in full screen. Fixed
+ - Fixed a bug when "Pre-recording" and "Post-recording" were inactive, if choose "Record always".
+ - Sometimes the search bar jumped back and forth when click on the archive video. Fixed.
+ - If x86 was upgraded by x64 version old archive was inaccessible. Fixed
+ - If change time on EC mediaserver reported incorrect chunks and Time Line was grey. Fixed.
+ - If registry contained invalid data from previous installation (i.e media folders from absent disks) installer could fail. Fixed.
+ - If camera isn't athorized, than "Unathorized" and "No signal" were changing quickly. Fixed.
+ - Fixed calendar highlights: If a camera had been added when no one was chosen, calendar displayed archive (in green) for all cameras evenif you choose one.
+ - Timeline was broken, if client time was less than the time of video archive. Fixed.
+ - If a client is on the second display in fullscreen, context menu on tab navigator displayes on the first-one. Fixed.
+ - Timeline tooltip may end up detached from the timeline if enable thumbnails in Thumbnail Search. Fixed.
+ - If change Pre-recording or Post-recording but do not change the schedule, message was not fired. Fixed.
+ - Removed "New" in Cameras' context menu.
+ - Motion Settings Dialog fixed.
+ - Fixed Timeline representation bug if make a THMB search from a layout with a result of THMB search previously done 
+ - Not all cameras start playing live video in saved layout after log in. Fixed.
+ - Selection on timeline wasn't displayed after thumbnails searching. Fixed.
+ - If after removing items from Scene leave only one without video archive, it didn't go to live video. Fixed.
+ - Multi-video export in .exe format could not be run. Fixed.
+ - Tours (sequences) bug fixed:
+   - Do not work Alt+T if any item is chosen.
+   - if item is not chosen, tour has not been started.
+   - If start tour and double click on item, it's better to stay it not in fullscreen.
+ - Webclient fixes:
+   - It was possible to select a date in the future and if there was no recording in Webclient Calendar.
+   - It was possible to zoom out webclient timeline and it displayed dates in the future.
+
+----------------------------------------------- 1.4-Alpha -----------------------------------------------
 
 New Cameras and Recorders Supported:
  - D-Link cameras are able to do dual-streaming. This results in software motion detection support and RADASS capabilities on these cameras
@@ -39,7 +102,7 @@ Improvements:
  - FPS, second stream, Motion Detection settings improvements:
    - If MaxFPS is set up the second stream still should be acquired (2 FPS)
    - MaxFPS for low quality stream is 7
- - If a recording schedule has not been changed user is warned
+ - If a recording schedule has not been changed the user is warned
  - If user logs back in all saved layouts that have been opened are restored
  - New button on the top bar opens a drop-down menu with all saved layouts available for this user
  - Selection (selected items) is saved in layouts
@@ -62,7 +125,7 @@ Bugs Fixed:
  - If do not install EC (extend existing system) it was suggested to delete database during uninstall
  - If upgrade media server only (client is not installed) client launch is suggested at the end of the upgrade process
  - If install client only, Tray tool was also installed. Fixed
- - Cameras were not marked as being recorded in layouts if they had been moved between servers.Fixed
+ - Cameras were not marked as being recorded in layouts if they had been moved between servers. Fixed
  - If the same camera was in two different layouts video didn't play back in one of it. Fixed
  - Fixed a bug with frame by frame seek (back and forth jumping)
  - Fixed a bug with unsupported audio format for screen recording
