@@ -1971,6 +1971,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
 {
     bool nonUtcExists = false;
     bool utcExists = false;
+    bool imageExists = false;
 
     QnLayoutItemDataMap items = layout->getItems();
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
@@ -1979,6 +1980,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
         QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
         if (layoutItemRes) 
         {
+            imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
             bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
             if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
                 continue; // skip unaccessible local resources because is not possible to check utc flag
@@ -1988,11 +1990,21 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
                 nonUtcExists = true;
         }
     }
-    if (nonUtcExists && utcExists) {
+
+    if (imageExists) {
         QMessageBox::critical(
             this->widget(), 
             tr("Can't create local layout"), 
-            tr("Current layout has several cameras and several local files. You have to keep only cameras or only local files"), 
+            tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
+            QMessageBox::Ok
+            );
+        return false;
+    }
+    else if (nonUtcExists && utcExists) {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't create local layout"), 
+            tr("Current layout contains several cameras and several local files. You have to keep only cameras or only local files"), 
             QMessageBox::Ok
             );
         return false;
