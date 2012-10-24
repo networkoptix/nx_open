@@ -3,13 +3,13 @@
 New Features: 
  - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help.
  - Daylight Savings Time is Supported
- - Logout is implemented 
+ - Logout button is implemented 
  
 Improvements:
- - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is displayed.
- - Licenses should be registered by admins only
- - Many renamings is performed in UI
- - Added ability to find DW and Dahua manually with Auto discovery port
+ - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is shows that camera has recording enabled.
+ - Licenses could(allowed) be registered by admins only
+ - Many renamings are performed in UI
+ - Added ability to find DW and Dahua manually with Auto discovery port. Not need to remember DW Onvif port.
  - Added checkbox "Auto" to the form "Add camera(s)"
  - Playback buttons are larger
  - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
