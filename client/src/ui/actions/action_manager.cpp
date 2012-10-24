@@ -944,10 +944,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ToggleTourModeAction).
-        flags(Qn::Scene | Qn::NoTarget).
+        flags(Qn::Scene | Qn::NoTarget ).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(tr("Alt+T")).
+        autoRepeat(false).
+        condition(new QnToggleTourActionCondition(this));
+
+    factory(Qn::ToggleTourModeHotkeyAction).
+        flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
+        shortcut(tr("Alt+T")).
+        autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).

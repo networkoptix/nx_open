@@ -297,7 +297,6 @@ protected slots:
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_activityInstrument_activated();
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_layout_exportFinished();
