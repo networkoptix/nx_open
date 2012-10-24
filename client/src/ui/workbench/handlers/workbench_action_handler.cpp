@@ -2128,7 +2128,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             tr("Another export in progress"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
-            );
+        );
 
         return;
     }
@@ -2144,6 +2144,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
+    exportProgressDialog->setModal(true);
+    exportProgressDialog->show();
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
@@ -2501,7 +2503,7 @@ Do you want to continue?"),
                         tr("AVI format is not recommended"), 
                         tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
                         QMessageBox::Yes | QMessageBox::No
-                        );
+                    );
                     if (result != QMessageBox::Yes)
                         continue;
                 }

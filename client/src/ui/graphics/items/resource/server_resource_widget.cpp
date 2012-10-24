@@ -159,6 +159,12 @@ namespace {
         return path;
     }
 
+    bool statisticsDataLess(const QnStatisticsData &first, const QnStatisticsData &second) {
+        if (first.deviceType != second.deviceType)
+            return first.deviceType < second.deviceType;
+        return first.description.toLower() < second.description.toLower();
+    }
+
     class QnBackgroundGradientPainterFactory {
     public:
         QnRadialGradientPainter *operator()(const QGLContext *context) {
@@ -301,7 +307,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             values.append(currentValue);
             graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);
-
         }
     }
 
@@ -371,7 +376,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             legendPen.setWidthF(pen_width * 2 * unzoom);
 
             int counter = 0;
-            foreach(QString key, m_sortedKeys){
+            foreach(QString key, m_sortedKeys) {
                 legendPen.setColor(getColorById(counter++));
                 painter->setPen(legendPen);
                 painter->strokePath(legend, legendPen);
@@ -394,14 +399,6 @@ QString QnServerResourceWidget::calculateTitleText() const {
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
     return base_type::calculateButtonsVisibility() & (CloseButton | RotateButton);
 }
-
-
-bool statisticsDataLessThat(const QnStatisticsData &first, const QnStatisticsData &second)
- {
-    if (first.deviceType != second.deviceType)
-        return first.deviceType < second.deviceType;
-    return first.description.toLower() < second.description.toLower();
- }
 
 void QnServerResourceWidget::at_statistics_received() {
     QnStatisticsHistory history_update;
@@ -440,7 +437,7 @@ void QnServerResourceWidget::at_statistics_received() {
         m_sortedKeys.clear();
 
         QList<QnStatisticsData> tmp(m_history.values());
-        qSort(tmp.begin(), tmp.end(), statisticsDataLessThat);
+        qSort(tmp.begin(), tmp.end(), statisticsDataLess);
         foreach(QnStatisticsData key, tmp)
             m_sortedKeys.append(key.description);
     }

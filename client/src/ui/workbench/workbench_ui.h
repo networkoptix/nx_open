@@ -7,6 +7,7 @@
 
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
+#include <ui/animation/animation_timer_listener.h>
 
 #include "workbench_globals.h"
 #include "workbench_context_aware.h"
@@ -43,7 +44,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 
-class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected QnGeometry {
+class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
@@ -176,6 +177,8 @@ public slots:
 protected:
     virtual bool event(QEvent *event) override;
 
+    virtual void tick(int deltaMSecs) override;
+
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();
 
@@ -184,7 +187,7 @@ protected:
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
-    void updatePanicButtonGeometry();
+    void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
@@ -196,6 +199,7 @@ protected:
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
+    void setZoomButtonsOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
@@ -263,6 +267,12 @@ private slots:
     void at_calendarHidingProcessor_hoverFocusLeft();
 
     void at_fpsItem_geometryChanged();
+
+    void at_sliderZoomInButton_pressed();
+    void at_sliderZoomInButton_released();
+    void at_sliderZoomOutButton_pressed();
+    void at_sliderZoomOutButton_released();
+
 
 private:
     /* Global state. */
@@ -344,6 +354,10 @@ private:
 
     bool m_ignoreSliderResizerGeometryChanges;
     bool m_ignoreSliderResizerGeometryChanges2;
+
+    bool m_sliderZoomingIn, m_sliderZoomingOut;
+
+    QGraphicsWidget *m_sliderZoomButtonsWidget;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
