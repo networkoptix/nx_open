@@ -58,11 +58,11 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &s
     setButtonBox(ui->buttonBox);
 
     /* Set up context help. */
-    setHelpTopicId(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
-    setHelpTopicId(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
-    setHelpTopicId(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
-    setHelpTopicId(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
-    setHelpTopicId(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
+    setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
+    setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
     connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));

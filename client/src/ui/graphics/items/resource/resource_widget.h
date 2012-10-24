@@ -33,7 +33,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public QnContextHelpQueryable {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public HelpTopicQueryable {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)

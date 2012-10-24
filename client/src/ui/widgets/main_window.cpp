@@ -77,7 +77,7 @@ namespace {
         }
 
         if(helpTopicId != -1)
-            setHelpTopicId(button, helpTopicId);
+            setHelpTopic(button, helpTopicId);
 
 
         return button;
@@ -138,7 +138,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
-    setHelpTopicId(scene, Qn::MainWindow_Scene_Help);
+    setHelpTopic(scene, Qn::MainWindow_Scene_Help);
 
     m_view = new QnGraphicsView(scene);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);

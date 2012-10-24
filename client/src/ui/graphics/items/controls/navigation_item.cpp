@@ -95,22 +95,22 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_liveButton = newActionButton(action(Qn::JumpToLiveAction));
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
-    setHelpTopicId(m_liveButton, Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_liveButton, Qn::MainWindow_Navigation_Help);
 
     m_syncButton = newActionButton(action(Qn::ToggleSyncAction));
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
-    setHelpTopicId(m_syncButton, Qn::MainWindow_Sync_Help);
+    setHelpTopic(m_syncButton, Qn::MainWindow_Sync_Help);
 
     m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
     m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_thumbnailsButton->setPreferredSize(48, 24);
-    setHelpTopicId(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
+    setHelpTopic(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
-    setHelpTopicId(m_calendarButton, Qn::MainWindow_Calendar_Help);
+    setHelpTopic(m_calendarButton, Qn::MainWindow_Calendar_Help);
 
 
     /* Create sliders. */
@@ -137,7 +137,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
-    setHelpTopicId(m_timeSlider, m_timeScrollBar, Qn::MainWindow_Navigation_Help);
+    setHelpTopic(m_timeSlider, m_timeScrollBar, Qn::MainWindow_Navigation_Help);
 
 
     /* Initialize navigator. */
@@ -168,7 +168,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     QGraphicsWidget *leftWidget = new QGraphicsWidget();
     leftWidget->setLayout(leftLayoutV);
-    setHelpTopicId(leftWidget, Qn::MainWindow_Playback_Help);
+    setHelpTopic(leftWidget, Qn::MainWindow_Playback_Help);
 
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);

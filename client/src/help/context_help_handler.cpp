@@ -37,7 +37,7 @@ int QnContextHelpHandler::helpTopicAt(QGraphicsItem *item, const QPointF &pos) c
             return topicId;
     }
 
-    if(QnContextHelpQueryable *queryable = dynamic_cast<QnContextHelpQueryable *>(item))
+    if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(item))
         return queryable->helpTopicAt(pos);
 
     if(QGraphicsProxyWidget *proxy = dynamic_cast<QGraphicsProxyWidget *>(item)) {
@@ -62,7 +62,7 @@ int QnContextHelpHandler::helpTopicAt(QWidget *widget, const QPoint &pos, bool b
         if(topicId != -1)
             return topicId;
 
-        if(QnContextHelpQueryable *queryable = dynamic_cast<QnContextHelpQueryable *>(widget))
+        if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(widget))
             return queryable->helpTopicAt(widgetPos);
 
         if(QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget)) {

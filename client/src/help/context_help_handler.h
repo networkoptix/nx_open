@@ -10,7 +10,7 @@ class QGraphicsItem;
 class QGraphicsView;
 
 class QnContextHelp;
-class QnContextHelpQueryable;
+class HelpTopicQueryable;
 
 class QnContextHelpHandler: public QObject {
     Q_OBJECT;

@@ -4,7 +4,9 @@
 
 #include <utils/common/warnings.h>
 
-void setHelpTopicId(QObject *object, int helpTopic) {
+#define HelpTopicId _id("_qn_contextHelpId")
+
+void setHelpTopic(QObject *object, int helpTopic) {
     if(!object) {
         qnNullWarning(object);
         return;

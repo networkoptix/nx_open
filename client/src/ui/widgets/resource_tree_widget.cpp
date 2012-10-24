@@ -262,8 +262,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
 
     m_renameAction = new QAction(this);
 
-    setHelpTopicId(this,            Qn::MainWindow_Tree_Help);
-    setHelpTopicId(ui->searchTab,   Qn::MainWindow_Tree_Search_Help);
+    setHelpTopic(this,            Qn::MainWindow_Tree_Help);
+    setHelpTopic(ui->searchTab,   Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));

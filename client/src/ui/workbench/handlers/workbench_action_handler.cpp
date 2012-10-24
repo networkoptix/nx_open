@@ -1739,7 +1739,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    setHelpTopicId(dialog.data(), Qn::NewUser_Help);
+    setHelpTopic(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1875,7 +1875,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
-    setHelpTopicId(dialog.data(), Qn::UserSettings_Help);
+    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 

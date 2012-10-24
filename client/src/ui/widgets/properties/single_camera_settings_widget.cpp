@@ -44,13 +44,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
 
     /* Set up context help. */
-    setHelpTopicId(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
-    setHelpTopicId(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
-    setHelpTopicId(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
-    setHelpTopicId(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
-    setHelpTopicId(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopicId(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
-    setHelpTopicId(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
+    setHelpTopic(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
+    setHelpTopic(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
+    setHelpTopic(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
+    setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
+    setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
+    setHelpTopic(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();

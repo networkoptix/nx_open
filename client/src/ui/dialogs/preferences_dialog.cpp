@@ -66,15 +66,15 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
 #endif
 
     /* Set up context help. */
-    setHelpTopicId(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
-    setHelpTopicId(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
-    setHelpTopicId(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
-    setHelpTopicId(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
-    setHelpTopicId(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
     if(m_recordingSettingsWidget)
-        setHelpTopicId(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
+        setHelpTopic(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
     if(m_licenseManagerWidget)
-        setHelpTopicId(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
+        setHelpTopic(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
 
 
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));

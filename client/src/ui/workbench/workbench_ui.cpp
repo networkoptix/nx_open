@@ -106,7 +106,7 @@ namespace {
         button->setCached(true);
 
         if(helpTopicId != -1)
-            setHelpTopicId(button, helpTopicId);
+            setHelpTopic(button, helpTopicId);
 
         return button;
     }
@@ -116,7 +116,7 @@ namespace {
         button->resize(15, 45);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
         button->setCheckable(true);
-        setHelpTopicId(button, Qn::MainWindow_Pin_Help);
+        setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
 
@@ -125,7 +125,7 @@ namespace {
         button->resize(24, 24);
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
         button->setCheckable(true);
-        setHelpTopicId(button, Qn::MainWindow_Pin_Help);
+        setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
 

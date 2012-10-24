@@ -43,7 +43,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
 
-    setHelpTopicId(this, Qn::MainWindow_TabNavigator_Help);
+    setHelpTopic(this, Qn::MainWindow_TabNavigator_Help);
 
     connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
