@@ -238,7 +238,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
         aviResource->setStorage(storage);
         //aviResource->setId(item.resource.id);
-        aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+        aviResource->setParentId(layout->getId());
         QString itemName(itemNames.readLine());
         if (!itemName.isEmpty())
             aviResource->setName(itemName);

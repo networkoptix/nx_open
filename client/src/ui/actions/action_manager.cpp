@@ -648,7 +648,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
+        condition(new QnOpenInFolderActionCondition(this)); 
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
