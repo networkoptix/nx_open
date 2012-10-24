@@ -6,10 +6,13 @@ New Features:
  - Logout is implemented 
  
 Improvements:
+ - System Settings form is resized to better fit in smaller resolutions.
+ - Camera motion web page in Camera Motion Setup was plain text. Now it's hyperlink
  - If recording is enabled for a camera but it is not recorded right now, a specific icon in tree is displayed.
- - Licenses should be registered by admins only
- - Many renamings is performed in UI
- - Added ability to find DW and Dahua manually with Auto discovery port
+ - Fixed "Unsupported audio format for capturing" error in screen recording caused by no sound device
+ - Licenses can be registered by admin users only.
+ - Many renamings is performed in UI.
+ - Added ability to find DW and Dahua manually with Auto discovery port.
  - Added checkbox "Auto" to the form "Add camera(s)"
  - Playback buttons are larger
  - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
@@ -25,6 +28,8 @@ Improvements:
  - Default Root Media Folder is customized now (used to be C:\HD Witness) 
 
 Bugs Fixed: 
+ - On some randome machines software did not start.
+ - Camera URL in camera settings form could not be opened. Fixed
  - If adding cameras manually "Add selected" are not active, if choose several cameras in search results. Fixed.
  - If adding cameras manually camera will not be added If login and password are empty. Fixed.
  - If try to add an image file and save layout, software crashed. Fixed.
@@ -40,6 +45,7 @@ Bugs Fixed:
  - Fixed calendar highlights: If a camera had been added when no one was chosen, calendar displayed archive (in green) for all cameras evenif you choose one.
  - Timeline was broken, if client time was less than the time of video archive. Fixed.
  - If a client is on the second display in fullscreen, context menu on tab navigator displayes on the first-one. Fixed.
+ - Timeline tooltip may end up detached from the timeline if enable thumbnails in Thumbnail Search. Fixed.
  - If change Pre-recording or Post-recording but do not change the schedule, message was not fired. Fixed.
  - Removed "New" in Cameras' context menu.
  - Motion Settings Dialog fixed.
@@ -47,6 +53,7 @@ Bugs Fixed:
  - Not all cameras start playing live video in saved layout after log in. Fixed.
  - Selection on timeline wasn't displayed after thumbnails searching. Fixed.
  - If after removing items from Scene leave only one without video archive, it didn't go to live video. Fixed.
+ - Multi-video export in .exe format could not be run. Fixed.
  - Tours (sequences) bug fixed:
    - Do not work Alt+T if any item is chosen.
    - if item is not chosen, tour has not been started.
