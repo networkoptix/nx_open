@@ -1,4 +1,4 @@
-#include "context_help.h"
+#include "help_handler.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtGui/QDesktopServices>
