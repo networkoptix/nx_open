@@ -334,3 +334,11 @@ Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters 
 Qn::ActionVisibility QnDisconnectActionCondition::check(const QnActionParameters &) {
     return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    QnResourcePtr resource = resources[0];
+    return resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:")) ? Qn::EnabledAction : Qn::InvisibleAction;
+}

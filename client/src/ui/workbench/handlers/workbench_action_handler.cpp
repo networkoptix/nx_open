@@ -2503,7 +2503,7 @@ Do you want to continue?"),
                         tr("AVI format is not recommended"), 
                         tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
                         QMessageBox::Yes | QMessageBox::No
-                        );
+                    );
                     if (result != QMessageBox::Yes)
                         continue;
                 }
