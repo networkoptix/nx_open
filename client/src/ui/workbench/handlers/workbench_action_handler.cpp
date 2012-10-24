@@ -2128,7 +2128,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             tr("Another export in progress"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
-            );
+        );
 
         return;
     }
@@ -2144,6 +2144,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
+    exportProgressDialog->setModal(true);
+    exportProgressDialog->show();
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
