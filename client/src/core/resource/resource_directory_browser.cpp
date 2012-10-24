@@ -201,7 +201,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         {
             quint32 flags = *((quint32*) data.data());
             if (flags & 1) {
-                Qn::Permissions permissions = Qn::RemovePermission | Qn::AddRemoveItemsPermission;
+                Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
                 layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
             }
         }
