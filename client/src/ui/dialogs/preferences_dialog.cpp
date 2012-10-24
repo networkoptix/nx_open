@@ -39,10 +39,10 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->maxVideoItemsLabel->hide();
     ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
-    ui->backgroundColorPicker->setAutoFillBackground(false);
-    initColorPicker();
-
-    if(!m_settings->isBackgroundEditable()) {
+    if(m_settings->isBackgroundEditable()) {
+        ui->backgroundColorPicker->setAutoFillBackground(false);
+        initColorPicker();
+    } else {
         ui->animateBackgroundLabel->hide();
         ui->animateBackgroundCheckBox->hide();
         ui->backgroundColorLabel->hide();
@@ -63,6 +63,8 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseManagerWidget = new QnLicenseManagerWidget(this);
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
+
+    resize(1, 1); // set widget size to minimal possible
 
     /* Set up context help. */
     setHelpTopicId(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
