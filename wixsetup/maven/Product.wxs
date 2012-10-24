@@ -180,7 +180,7 @@
         <Property Id="APPSERVER_PASSWORD_CONFIRM" Secure="yes"/>
         
         <!-- MediaServer properties-->
-        <Property Id="SERVER_APPSERVER_HOST" Secure="yes" Value="localhost">
+        <Property Id="SERVER_APPSERVER_HOST" Secure="yes">
             <RegistrySearch Id="ServerEcsHostReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -189,7 +189,7 @@
                             Win64="yes"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_HOST32" Secure="yes" Value="localhost">
+        <Property Id="SERVER_APPSERVER_HOST32" Secure="yes">
             <RegistrySearch Id="ServerEcsHostReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -198,7 +198,7 @@
                             Win64="no"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_PORT" Secure="yes" Value="8000">
+        <Property Id="SERVER_APPSERVER_PORT" Secure="yes">
             <RegistrySearch Id="ServerEcsPortReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -207,7 +207,7 @@
                             Win64="yes"/>
         </Property>
             
-        <Property Id="SERVER_APPSERVER_PORT32" Secure="yes" Value="8000">
+        <Property Id="SERVER_APPSERVER_PORT32" Secure="yes">
             <RegistrySearch Id="ServerEcsPortReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -216,7 +216,7 @@
                             Win64="no"/>
         </Property>
         
-        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes" Value="admin">
+        <Property Id="SERVER_APPSERVER_LOGIN" Secure="yes">
             <RegistrySearch Id="ServerEcsLoginReg"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -225,7 +225,7 @@
                             Win64="yes"/>
         </Property>
             
-        <Property Id="SERVER_APPSERVER_LOGIN32" Secure="yes" Value="admin">
+        <Property Id="SERVER_APPSERVER_LOGIN32" Secure="yes">
             <RegistrySearch Id="ServerEcsLoginReg32"
                             Root="HKLM"
                             Key="Software\${company.name}\${mediaserver.name}"
@@ -437,7 +437,7 @@
             <Custom Action="AssignAppServerPort" Before="AssignServerPort">NOT APPSERVER_PORT</Custom>
             <Custom Action="AssignServerPort" Before="AssignProxyPort">NOT SERVER_PORT</Custom>
             <Custom Action="AssignProxyPort" Before="AssignServerAppServerPort">NOT PROXY_PORT</Custom>
-            <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">1</Custom>
+            <Custom Action="AssignServerAppServerPort" Before="AssignClientAppServerPort">NOT SERVER_APPSERVER_PORT</Custom>
             <Custom Action="AssignClientAppServerPort" Before="SetMoviesFolder">1</Custom>
             <Custom Action="SetMoviesFolder" Before="GenerateGuidsForServers">1</Custom>
             <Custom Action="GenerateGuidsForServers" Before="SetNewGuidForEcs"><![CDATA[ $(var.EcsNeedsGuid) OR $(var.ServerNeedsGuid) ]]></Custom>
