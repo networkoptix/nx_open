@@ -97,7 +97,7 @@ static QString get_window_title (Window win) {
     return title;
 }
 
-int setLauncherState(int action){
+int setLauncherState(int action) {
     QList<Window> client_list = get_client_list();
     foreach(Window win, client_list){
         if (get_window_title(win).compare(QLatin1String("launcher")) == 0){
@@ -107,21 +107,21 @@ int setLauncherState(int action){
     return 1;
 }
 
-int x11_showLauncher(){
+int x11_showLauncher() {
     return setLauncherState(_NET_WM_STATE_REMOVE);
 }
 
-int x11_hideLauncher(){
+int x11_hideLauncher() {
     return setLauncherState(_NET_WM_STATE_ADD);
 }
 
 #else // Q_WS_X11
 
-int x11_showLauncher(){
+int x11_showLauncher() {
     return 1;
 }
 
-int x11_hideLauncher(){
+int x11_hideLauncher() {
     return 1;
 }
 
