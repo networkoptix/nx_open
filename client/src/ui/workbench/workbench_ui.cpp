@@ -38,16 +38,16 @@
 #include <ui/graphics/instruments/focus_listener_instrument.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
-#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/clickable_widget.h>
 #include <ui/graphics/items/generic/simple_frame_widget.h>
-#include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/generic/tool_tip_item.h>
-
+#include <ui/graphics/items/controls/time_scroll_bar.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/processors/hover_processor.h>
 
 #include <ui/actions/action_manager.h>
@@ -1344,7 +1344,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
-    QPointF pos = m_sliderItem->timeSlider()->mapToItem(m_controlsWidget, QPointF(0.0, 0.0));
+    QPointF pos = m_sliderItem->timeScrollBar()->mapToItem(m_controlsWidget, m_sliderItem->timeScrollBar()->rect().bottomLeft() - toPoint(m_sliderZoomButtonsWidget->size()));
 
     m_sliderZoomButtonsWidget->setPos(pos);
 }
