@@ -361,6 +361,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
     }
 }
 
+// 5-7 fps
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion) {
     ensureMotionSensitivity();
 
@@ -445,7 +446,6 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     }
 
 
-    // 5-8 fps
     QnScopedPainterTransformRollback transformRollback(painter);
     painter->translate(rect.topLeft());
 
@@ -457,12 +457,11 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->drawLines(gridLines[1]);
 }
 
+// 4-6 fps
 void QnMediaResourceWidget::paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor) {
-
-    // 5-10 fps
     QPainterPath path;
     path.addRegion(selection);
-    path = path.simplified(); // TODO: this is slow.
+    path = path.simplified(); // TODO: #elrik: this is slow. // #gdm: not so slow, 1-2 fps at max
 
     QnScopedPainterTransformRollback transformRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter, color);
