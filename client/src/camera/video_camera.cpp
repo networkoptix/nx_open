@@ -1,7 +1,6 @@
 #include "video_camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "utils/client_util.h"
 #include "ui/style/skin.h"
 #include "core/resource/security_cam_resource.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
@@ -9,7 +8,6 @@
 QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
     m_camdispay(resource),
-    m_recorder(0),
     m_reader(reader),
     m_extTimeSrc(NULL),
     m_isVisible(true),
@@ -76,8 +74,6 @@ void QnVideoCamera::stopDisplay()
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay"), m_resource->getUniqueId(), cl_logDEBUG1);
     //CL_LOG(cl_logDEBUG1) cl_log.log(QLatin1String("QnVideoCamera::stopDisplay reader is about to pleases stop "), QString::number((long)m_reader,16), cl_logDEBUG1);
 
-    stopRecording();
-
     m_reader->stop();
     m_camdispay.stop();
     m_camdispay.clearUnprocessedData();
@@ -87,39 +83,6 @@ void QnVideoCamera::beforeStopDisplay()
 {
     m_reader->pleaseStop();
     m_camdispay.pleaseStop();
-    if (m_recorder)
-        m_recorder->pleaseStop();
-
-}
-
-void QnVideoCamera::startRecording()
-{
-    //m_reader->setQuality(QnQualityHighest);
-    if (m_recorder == 0) {
-        m_recorder = new QnStreamRecorder(m_resource);
-        QFileInfo fi(m_resource->getUniqueId());
-        m_recorder->setFileName(getTempRecordingDir() + fi.baseName());
-        m_recorder->setTruncateInterval(15);
-        connect(m_recorder, SIGNAL(recordingFailed(QString)), this, SIGNAL(recordingFailed(QString)));
-    }
-    m_reader->addDataProcessor(m_recorder);
-    m_reader->setNeedKeyData();
-    m_recorder->start();
-}
-
-void QnVideoCamera::stopRecording()
-{
-    if (m_recorder) 
-    {
-        m_recorder->stop();
-        m_reader->removeDataProcessor(m_recorder);
-    }
-    //m_reader->setQuality(QnQualityNormal);
-}
-
-bool QnVideoCamera::isRecording()
-{
-    return m_recorder ? m_recorder->isRunning() : false;
 }
 
 QnResourcePtr QnVideoCamera::getDevice() const
