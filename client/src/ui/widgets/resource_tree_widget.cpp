@@ -44,7 +44,7 @@ namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
     const char *qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
     const char *qn_filterPropertyName = "_qn_filter";
-    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
+//    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {

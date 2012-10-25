@@ -86,6 +86,8 @@ void QnToolTipSlider::init() {
 
     setToolTipItem(new QnSliderToolTipItem(this));
     setAcceptHoverEvents(true);
+
+    setFlag(ItemSendsScenePositionChanges, true);
 }
 
 QnToolTipSlider::~QnToolTipSlider() {
@@ -289,6 +291,9 @@ QVariant QnToolTipSlider::itemChange(GraphicsItemChange change, const QVariant &
         break;
     case ItemOpacityHasChanged:
         updateToolTipOpacity();
+        break;
+    case ItemScenePositionHasChanged:
+        updateToolTipPosition();
         break;
     default:
         break;

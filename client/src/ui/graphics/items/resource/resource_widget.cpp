@@ -539,6 +539,7 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
     return -1;
 }
 

@@ -34,7 +34,6 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource_managment/resource_pool.h"
-#include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -82,6 +81,7 @@
 #endif
 
 #include "ui/help/help_handler.h"
+#include "client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -216,8 +216,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
-    
+    QnClientModule client(argc, argv);
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 

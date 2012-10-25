@@ -18,14 +18,14 @@
 #define QN_FFMPEG_VERSION           "${ffmpeg.version}"
 #define QN_SIGAR_VERSION            "${sigar.version}"
 #define QN_BOOST_VERSION            "${boost.version}"
-#define QN_CUSTOMIZATION            "${installer.customization}"
+#define QN_CUSTOMIZATION_NAME       "${installer.customization}"
 
 /* 
  * These constans are here for windows resouce file.
  *
  * DO NOT USE THEM IN YOUR CODE. 
  */
-#define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move this one to the upper block?
+#define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move up
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
 #define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
@@ -37,7 +37,7 @@
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
-#define VER_CUSTOMIZEDFILENAME_STR  "${product.name}.exe"
+#define VER_CUSTOMIZEDFILENAME_STR  "${product.name}.exe" // TODO: move up
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
 

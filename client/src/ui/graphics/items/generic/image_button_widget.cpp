@@ -42,10 +42,10 @@ namespace {
 
     void glDrawTexturedRect(const QRectF &rect) {
         GLfloat vertices[] = {
-            rect.left(), rect.top(),
-            rect.right(), rect.top(), 
-            rect.right(), rect.bottom(),
-            rect.left(), rect.bottom()
+            (GLfloat)rect.left(),   (GLfloat)rect.top(),
+            (GLfloat)rect.right(),  (GLfloat)rect.top(),
+            (GLfloat)rect.right(),  (GLfloat)rect.bottom(),
+            (GLfloat)rect.left(),   (GLfloat)rect.bottom()
         };
 
         GLfloat texCoords[] = {

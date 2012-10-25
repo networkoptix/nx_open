@@ -31,6 +31,7 @@ void QnHelpWidget::wheelEvent(QWheelEvent *event) {
 }
 
 void QnHelpWidget::at_contextHelp_helpContextChanged(int id) {
+    Q_UNUSED(id)
     /*m_id = id;
     ui->textEdit->setText(contextHelp()->text(id));
     ui->checkBox->setCheckState(contextHelp()->isAutoShowNeeded() ? Qt::Unchecked : Qt::Checked);
@@ -42,6 +43,7 @@ void QnHelpWidget::at_contextHelp_helpContextChanged(int id) {
 }
 
 void QnHelpWidget::at_checkBox_clicked(bool checked) {
+    Q_UNUSED(checked)
     /*contextHelp()->setAutoShowNeeded(!checked);
 
 #ifndef QN_HELP_WIDGET_NO_DONT_SHOW_AGAIN
