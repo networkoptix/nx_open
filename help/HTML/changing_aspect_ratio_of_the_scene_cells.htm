@@ -2,92 +2,54 @@
 <html>
 <head>
    <title>Working with DW Spectrum &gt; Configuring Layouts &gt; Setting up a Layout &gt; Adjusting the Layout Look and Feel &gt; Changing Aspect Ratio of the Scene Cells</title>
-   <meta name="generator" content="Help & Manual">
-   <meta name="keywords" content="">
-   <meta name="description" content="Changing Aspect Ratio of the Scene Cells">
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet">
-   <script type="text/javascript" src="nsh.js"></script>
 
-<script type="text/javascript">   
-// Toggle Toggler 
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+             padding:0; 
+             overflow: hidden; 
+             background: #FFFFFF; 
+       } 
 
-var toggleCount=false;
-var switchState;
-
-function toggleToggles() {
-
-    if (!toggleCount) {
-     toggleCount = true;
-     HMToggleExpandAll(true);
-     switchState = true;
-     }
-   
-     else if (switchState) {
-        HMToggleExpandAll(false);
-        switchState = false;
-        }
-        
-     else  {
-        HMToggleExpandAll(true);
-        switchState = true;
-        } 
-    }
-</script>
-   
-<!-- non-scrolling headers for CHM and browser-based help, local styles-->
-<style type="text/css" media="screen"> 
-html, body { margin:0; 
-   padding:0; 
-   overflow: hidden; 
-   background: #FFFFFF; 
-  }
- 
-div#printheader { 
-   display: none;
-   padding-bottom: 10px;
-   }
-   #idheader { 
-      width:100%; 
-      height:auto; 
-      padding: 0; 
-      margin: 0; 
-} 
-    #idheaderbg  {
-    background: #6F6F6F; 
-}
-   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
-   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
-   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
-   #callout-table a {text-decoration: none; color: blue;}
-   #callout-table a:visited {text-decoration: none; color: blue;}
-   #overview-table a {text-decoration: none; color: black;}
-   #overview-table a:visited {text-decoration: none; color: black;}
-   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
-   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+      div#printheader { display: none; }
+      #idheader { width:100%; 
+                  height:auto; 
+                  padding: 0; 
+                  margin: 0; 
+       } 
+      #idcontent { position:relative }                                               
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}      
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
    </style>
-<!--[if lt IE 7]>
-<style type="text/css">
-  #idcontent {padding: 0px;} 
-  #innerdiv {padding: 10px 5px 5px 10px ;} 
-</style> 
-<![endif]-->
-<noscript>
-<style type="text/css">
-html, body { overflow: auto; }
-</style> 
-</noscript>
-<style type="text/css" media="print">
-span.f_Heading1 { color: black; }
-#idheader, #printheader img { display:none; }
-#printheader { display: block; margin-top: 20px; }
-#idcontent { margin-top: 10px; }
-</style>   
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+   <style type="text/css" media="print">
+      span.f_Heading1 { color: black; }
+      #idheader, #printheader img { display:none; }
+      #printheader { display: block; margin-top: 20px; }
+      #idcontent { margin-top: 10px; position:relative }
+   </style>   
+
    <script type="text/javascript" src="jquery.js"></script>
    <script type="text/javascript" src="helpman_settings.js"></script>
    <script type="text/javascript" src="helpman_topicinit.js"></script>
+   <script type="text/javascript" src="nsh.js"></script>
 
    <script type="text/javascript">
      HMSyncTOC("index.html", "changing_aspect_ratio_of_the_scene_cells.htm");
@@ -98,15 +60,13 @@ span.f_Heading1 { color: black; }
    </script>
 </head>
 <body>
-<!--ZOOMSTOP-->
+<div id="breadcrumbs" style="display:none">Working with DW Spectrum &gt; <a href="configuring_layouts.htm">Configuring Layouts</a> &gt; <a href="setting_up_a_layout.htm">Setting up a Layout</a> &gt; <a href="adjusting_the_layout_look_and_feel.htm">Adjusting the Layout Look and Feel</a></div>
 
 <div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Changing Aspect Ratio of the Scene Cells</span></h1>
-</div> 
+</div>
 <div id="idheader">
 <div id="idheaderbg">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" 
-       style="margin: 0px; background: url(header_bg.jpg);">
-
+<table style="width:100%;border:none;margin:0px;background:url(background-topic-header.jpg)" cellspacing="0" cellpadding="0"> 
   <tr valign="bottom">
     <td align="left" valign="bottom" class="topichead">
    <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
@@ -118,30 +78,28 @@ span.f_Heading1 { color: black; }
     <td align="right" width="120" valign="middle" class="topichead" id="idnav">
     
      <a href="changing_the_distance_between_items.htm"
-        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
-        onmouseout="document.images.prev.src='btn_prev_n.gif'"
-        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        onmouseover="document.images.prev.src='hm_btn_navigate_prev_orange.png'" 
+        onmouseout="document.images.prev.src='hm_btn_navigate_prev.png'"
+        ><img name="prev" src="hm_btn_navigate_prev.png" border=0 alt="Previous page"
         ></a><a href="adjusting_the_layout_look_and_feel.htm"
-        onmouseover="document.images.main.src='btn_home_h.gif'" 
-        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        onmouseover="document.images.main.src='hm_btn_navigate_top_orange.png'" 
+        onmouseout="document.images.main.src='hm_btn_navigate_top.png'"><img name=main src="hm_btn_navigate_top.png" border=0 alt="Return to chapter overview"
         ></a><a href="working_with_several_hd_witness_windows.htm"
-        onmouseover="document.images.next.src='btn_next_h.gif'" 
-        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        onmouseover="document.images.next.src='hm_btn_navigate_next_orange.png'" 
+        onmouseout="document.images.next.src='hm_btn_navigate_next.png'"><img name=next src="hm_btn_navigate_next.png" border=0 alt="Next page"
         ></a>
     </td>
-  </tr>
-  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+  </tr>  
 </table>
-</div>
-
 <!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
   
-
+</div>
 </div>  
 
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
 
-
-<div id="idcontent"><div id="innerdiv"> 
 <!--ZOOMRESTART-->
 <p>Some cameras provide video in 4:3 or 16:9 format. This feature is used in order to fill the <span style="font-weight: bold;">Scene</span> space more effectively: cells’ aspect ratio must be the same as cameras’ one.  </p>
 <p>To select aspect ratio use <span style="font-style: italic;">Change Cell Aspect Ratio </span><span style="font-weight: bold;">Context Menu</span> item<span style="font-weight: bold;">.</span></p>
@@ -163,11 +121,3 @@ if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-

@@ -2,92 +2,54 @@
 <html>
 <head>
    <title>Working with DW Spectrum &gt; Playback in DW Spectrum &gt; Watching Cameras in DW Spectrum &gt; Searching through Archive &gt; Using Thumbnails for Better Navigation</title>
-   <meta name="generator" content="Help & Manual">
-   <meta name="keywords" content="">
-   <meta name="description" content="Using Thumbnails for Better Navigation">
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet">
-   <script type="text/javascript" src="nsh.js"></script>
 
-<script type="text/javascript">   
-// Toggle Toggler 
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+             padding:0; 
+             overflow: hidden; 
+             background: #FFFFFF; 
+       } 
 
-var toggleCount=false;
-var switchState;
-
-function toggleToggles() {
-
-    if (!toggleCount) {
-     toggleCount = true;
-     HMToggleExpandAll(true);
-     switchState = true;
-     }
-   
-     else if (switchState) {
-        HMToggleExpandAll(false);
-        switchState = false;
-        }
-        
-     else  {
-        HMToggleExpandAll(true);
-        switchState = true;
-        } 
-    }
-</script>
-   
-<!-- non-scrolling headers for CHM and browser-based help, local styles-->
-<style type="text/css" media="screen"> 
-html, body { margin:0; 
-   padding:0; 
-   overflow: hidden; 
-   background: #FFFFFF; 
-  }
- 
-div#printheader { 
-   display: none;
-   padding-bottom: 10px;
-   }
-   #idheader { 
-      width:100%; 
-      height:auto; 
-      padding: 0; 
-      margin: 0; 
-} 
-    #idheaderbg  {
-    background: #6F6F6F; 
-}
-   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
-   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
-   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
-   #callout-table a {text-decoration: none; color: blue;}
-   #callout-table a:visited {text-decoration: none; color: blue;}
-   #overview-table a {text-decoration: none; color: black;}
-   #overview-table a:visited {text-decoration: none; color: black;}
-   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
-   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+      div#printheader { display: none; }
+      #idheader { width:100%; 
+                  height:auto; 
+                  padding: 0; 
+                  margin: 0; 
+       } 
+      #idcontent { position:relative }                                               
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}      
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
    </style>
-<!--[if lt IE 7]>
-<style type="text/css">
-  #idcontent {padding: 0px;} 
-  #innerdiv {padding: 10px 5px 5px 10px ;} 
-</style> 
-<![endif]-->
-<noscript>
-<style type="text/css">
-html, body { overflow: auto; }
-</style> 
-</noscript>
-<style type="text/css" media="print">
-span.f_Heading1 { color: black; }
-#idheader, #printheader img { display:none; }
-#printheader { display: block; margin-top: 20px; }
-#idcontent { margin-top: 10px; }
-</style>   
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+   <style type="text/css" media="print">
+      span.f_Heading1 { color: black; }
+      #idheader, #printheader img { display:none; }
+      #printheader { display: block; margin-top: 20px; }
+      #idcontent { margin-top: 10px; position:relative }
+   </style>   
+
    <script type="text/javascript" src="jquery.js"></script>
    <script type="text/javascript" src="helpman_settings.js"></script>
    <script type="text/javascript" src="helpman_topicinit.js"></script>
+   <script type="text/javascript" src="nsh.js"></script>
 
    <script type="text/javascript">
      HMSyncTOC("index.html", "using_thumbnails_for_better_navigation.htm");
@@ -98,15 +60,13 @@ span.f_Heading1 { color: black; }
    </script>
 </head>
 <body>
-<!--ZOOMSTOP-->
+<div id="breadcrumbs" style="display:none">Working with DW Spectrum &gt; <a href="playback_in_hd_witness.htm">Playback in DW Spectrum</a> &gt; <a href="watching_cameras_in_hd_witness.htm">Watching Cameras in DW Spectrum</a> &gt; <a href="searching_through_archive.htm">Searching through Archive</a></div>
 
 <div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Using Thumbnails for Better Navigation</span></h1>
-</div> 
+</div>
 <div id="idheader">
 <div id="idheaderbg">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" 
-       style="margin: 0px; background: url(header_bg.jpg);">
-
+<table style="width:100%;border:none;margin:0px;background:url(background-topic-header.jpg)" cellspacing="0" cellpadding="0"> 
   <tr valign="bottom">
     <td align="left" valign="bottom" class="topichead">
    <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
@@ -118,40 +78,38 @@ span.f_Heading1 { color: black; }
     <td align="right" width="120" valign="middle" class="topichead" id="idnav">
     
      <a href="performing_smart_search.htm"
-        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
-        onmouseout="document.images.prev.src='btn_prev_n.gif'"
-        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        onmouseover="document.images.prev.src='hm_btn_navigate_prev_orange.png'" 
+        onmouseout="document.images.prev.src='hm_btn_navigate_prev.png'"
+        ><img name="prev" src="hm_btn_navigate_prev.png" border=0 alt="Previous page"
         ></a><a href="searching_through_archive.htm"
-        onmouseover="document.images.main.src='btn_home_h.gif'" 
-        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        onmouseover="document.images.main.src='hm_btn_navigate_top_orange.png'" 
+        onmouseout="document.images.main.src='hm_btn_navigate_top.png'"><img name=main src="hm_btn_navigate_top.png" border=0 alt="Return to chapter overview"
         ></a><a href="thumbnail_search.htm"
-        onmouseover="document.images.next.src='btn_next_h.gif'" 
-        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        onmouseover="document.images.next.src='hm_btn_navigate_next_orange.png'" 
+        onmouseout="document.images.next.src='hm_btn_navigate_next.png'"><img name=next src="hm_btn_navigate_next.png" border=0 alt="Next page"
         ></a>
     </td>
-  </tr>
-  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+  </tr>  
 </table>
-</div>
-
 <!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
   
-
+</div>
 </div>  
 
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
 
-
-<div id="idcontent"><div id="innerdiv"> 
 <!--ZOOMRESTART-->
 <p>Thumbnails are fast and convenient way to navigate through archive. Thumbnails represent a single shots from archived videos that are displayed on the <span style="font-weight: bold;">Timeline</span>. This is used to better identify events in a particular moment.</p>
 <p>To open thumbnails:</p>
-<p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">1.</span><span class="f_ListNumber">Click on the desired camera.</span></p><p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">2.</span><span class="f_ListNumber">Click on </span></p><p class="p_ListNumber"><img src="_img59.png" width="32" height="32" alt="_img59" style="border:none" /><span class="f_ListNumber"> button or point a mouse cursor on the top of the </span><span class="f_ListNumber" style="font-weight: bold;">Timeline</span><span class="f_ListNumber">, click and pull it up:</span></p>
-<p><img src="_img60_zoom82.png" width="26" height="26" alt="_img60" style="border:none" /></p>
+<p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">1.</span><span class="f_ListNumber">Click on the desired camera.</span></p><p style="text-align: left; padding: 0px 0px 0px 24px; margin: 4px 0px 4px 0px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:24px;margin-left:-24px">2.</span><span class="f_ListNumber">Click on </span></p><p class="p_ListNumber"><img src="_img59.png" width="89" height="18" alt="_img59" style="border:none" /><span class="f_ListNumber"> button or point a mouse cursor on the top of the </span><span class="f_ListNumber" style="font-weight: bold;">Timeline</span><span class="f_ListNumber">, click and pull it up:</span></p>
+<p><img src="_img60_zoom82.png" width="640" height="109" alt="_img60" style="border:none" /></p>
 <p>Thumbnails panel can be resized. To resize, point a mouse cursor &nbsp;over tTime tline, click and scrow up or down with a mouse wheel:</p>
-<p><img src="_img32_zoom109.png" width="35" height="35" alt="_img32" style="border:none" /></p>
+<p><img src="_img32_zoom109.gif" width="638" height="132" alt="_img32" style="border:none" /></p>
 <p>The white dots under the picture point on the exact archive place where the shot has been taken. When clicking on a thumbnail, the current playback position will jump to the corresponding spot in the archive.</p>
 <p>To close thumbnails, press </p>
-<p><img src="_img59.png" width="32" height="32" alt="_img59" style="border:none" /> again or pull the thumbnails panel down.</p>
+<p><img src="_img59.png" width="89" height="18" alt="_img59" style="border:none" /> again or pull the thumbnails panel down.</p>
 <p style="text-align: center;"><span style="font-size: 8pt; color: #000000;">&nbsp;</span></p>
 <p style="text-align: center;"><span style="font-size: 8pt; color: #000000;"><a href="http://www.helpandmanual.com" target="_blank" class="weblink">This help system was created with an evaluation copy of Help &amp; Manual.</a></span></p>
 
@@ -170,11 +128,3 @@ if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-

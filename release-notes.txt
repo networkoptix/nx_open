@@ -1,11 +1,13 @@
 ----------------------------------------------- 1.4-Beta -----------------------------------------------
 
 New Features: 
- - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help.
+ - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help. Help text is in progress.
  - Daylight Savings Time is Supported
- - Logout button is implemented 
- 
+ - Logout function is implemented (Mein Menu item)
+
 Improvements:
+ - DW cameras could not be added manually if with others cameras. Fixed
+ - Buttons that zoom Timeline in/out to the cursor position are implemented (left hand side, under Playback buttons). Buttons will be redesigned
  - System Settings form is resized to better fit in smaller resolutions.
  - Camera motion web page in Camera Motion Setup was plain text. Now it's hyperlink
  - If recording is enabled for a camera but it is not recording at the moment, a specific icon in tree shows that camera has recording enabled.
@@ -16,18 +18,27 @@ Improvements:
  - Added checkbox "Auto" to the "Add camera(s)" form.
  - Playback buttons are larger
  - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
+ - Fixed bug with layout restoring after log in
  - Components can be selected separately during the installation (EC, Media Server, Client).'Will be installed on Local Hard Drive' and 
    'Entire Feature will be installed on Local Hard Drive' options are removed
- - Buttons that zoom timeline in/out to the cursor position
  - Current recording method is displayed in the top left corner of the item's info panel (according to schedule)
  - If sync is disabled time line is not hidden
  - "Rename" menu item is not displayed for items in search
  - if set "Administrator" in custom access rights, all other permission are filled automatically.
  - When the video reached the end of the recorded data, the watermark window doesn't appear
+ - Icons are added to Multi-Video exported videos' child elements
+ - When closing Multi-Video exported file that has two identical items, it was displayed as changed. Fixed
  - Added a new installer logo for DW
  - Default Root Media Folder is customized now (used to be C:\HD Witness) 
+ - Fixed a bug with changing installed components. If add client and remove EC, than installation was finished with fatal error
+ - It is not allowed to do Multi-Video export if images are on the layout
+ - Fixed a bug when "Save connection" dialog offered wrong name
+ - If exported file was read only, than it was not displayed under Local. Fixed
 
 Bugs Fixed: 
+ - If set 30 FPS and Motion+LQ recording warning was fired and FPS dropped down to 28. Fixed
+ - Fixed the problem when sometimes screen recording could not be saved.
+ - Fixed monitoring issue: if restart media server it could not be resumed.
  - On some randome machines software did not start.
  - Camera URL in camera settings form could not be opened. Fixed
  - If adding cameras manually "Add selected" are not active, if choose several cameras in search results. Fixed.
@@ -40,7 +51,7 @@ Bugs Fixed:
  - Sometimes the search bar jumped back and forth when click on the archive video. Fixed.
  - If x86 was upgraded by x64 version old archive was inaccessible. Fixed
  - If change time on EC mediaserver reported incorrect chunks and Time Line was grey. Fixed.
- - If registry contained invalid data from previous installation (i.e media folders from absent disks) installer could fail. Fixed.
+ - If registry contained invalid data from previous installation (i.e media folders from absent disks) installer could fail ("Invalid Drive" message). Fixed.
  - If camera isn't athorized, than "Unathorized" and "No signal" were changing quickly. Fixed.
  - Fixed calendar highlights: If a camera had been added when no one was chosen, calendar displayed archive (in green) for all cameras evenif you choose one.
  - Timeline was broken, if client time was less than the time of video archive. Fixed.
@@ -53,7 +64,9 @@ Bugs Fixed:
  - Not all cameras start playing live video in saved layout after log in. Fixed.
  - Selection on timeline wasn't displayed after thumbnails searching. Fixed.
  - If after removing items from Scene leave only one without video archive, it didn't go to live video. Fixed.
- - Multi-video export in .exe format could not be run. Fixed.
+ - Multi-video export in .exe format could not be run even if software is installed. Fixed.
+ - Fixed inability to change and save Multi-Video exported file if it contained any camera without video archive.
+ - If do not install EC it was suggested to delete database. Fixed
  - Tours (sequences) bug fixed:
    - Do not work Alt+T if any item is chosen.
    - if item is not chosen, tour has not been started.

@@ -1,17 +1,16 @@
 import os
 
 def fixasfiles():
-    fragment1 = r'''Id="jquery.js"'''
-
-    fragment2 = '''Id="skawixjquery.js"'''
-
-    fragment3 = r'''Id="index.html"''' 
-
-    fragment4 = '''Id="skawixindex.html"'''
+    fragments = (
+        (r'''Id="jquery.js"''', '''Id="skawixjquery.js"'''),
+        (r'''Id="index.html"''', '''Id="skawixindex.html"'''),
+		(r'''Id="calendar_checked.png"''', '''Id="skawixcalendar_checked.png"'''),
+		(r'''Id="live_checked.png"''', '''Id="skawixlive_checked.png"'''),
+	)
 
     text = open('ClientHelp.wxs', 'r').read()
-    text = text.replace(fragment1, fragment2)
-    text = text.replace(fragment3, fragment4)
+    for xfrom, xto in fragments:
+        text = text.replace(xfrom, xto)
     open('ClientHelp.wxs', 'w').write(text)
 
 if __name__ == '__main__':

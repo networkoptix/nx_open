@@ -14,24 +14,22 @@
   a.inline-toggle:visited {color: Green; }
   a.inline-toggle:hover {text-decoration: underline}
   .fsmall {
-  font-size: 10px;
+        font-size: 10px;
 	font-family: Verdana, Helvetica, sans-serif;
 	text-align: center;
 	margin: 10px 0px 0px 0px;
 	}
-  .crumbs {font-size: 8pt; margin-bottom: 3px; margin-top: 0px; color: #000000}
-  .crumbs a {text-decoration: underline; color: #000000}
-  .crumbs a:visited {text-decoration: underline; color: #000000}
+  .crumbs {font-size: 8pt; margin-bottom: 3px; margin-top: 0px; color: #FFFFFF}
+  .crumbs a {text-decoration: underline; color: #FFFFFF}
+  .crumbs a:visited {text-decoration: underline; color: #FFFFFF}
   .crumbs a:hover {color: #F4BC5C}
-  .expander {text-align: right; padding: 0; width: 100%; font-family: Verdana, Helvetica, sans-serif; font-size:9px; font-weight: bold; border-bottom: 2px; border-bottom-style: solid; border-bottom-color: grey;
-  margin-bottom: 1px;}
  
 @media screen{
   #idcontent {    
       width: 100%; 
       padding: 0px !important; 
-      padding: 10px 15px 5px 10px; 
-      position: relative;
+      padding: 10px 15px 5px 10px;
+      position: relative;  
    } 
   #innerdiv {    
       padding: 10px 5px 5px 10px !important;  
@@ -70,5 +68,9 @@
       overflow-y:scroll; 
    } 
 }
+
+
+
+
 
 
