@@ -82,6 +82,7 @@
 #endif
 
 #include "ui/help/help_handler.h"
+#include "client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -216,8 +217,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
-    
+    QnClientModule client(argc, argv);
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
