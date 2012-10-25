@@ -204,8 +204,10 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
         }
     }
 
-    if(changed)
+    if(changed){
+        invalidateMotionSelectionCache();
         emit motionSelectionChanged();
+    }
 }
 
 void QnMediaResourceWidget::clearMotionSelection() {
@@ -215,6 +217,7 @@ void QnMediaResourceWidget::clearMotionSelection() {
     for (int i = 0; i < m_motionSelection.size(); ++i)
         m_motionSelection[i] = QRegion();
 
+    invalidateMotionSelectionCache();
     emit motionSelectionChanged();
 }
 
@@ -315,6 +318,20 @@ void QnMediaResourceWidget::invalidateBinaryMotionMask() {
     m_binaryMotionMaskValid = false;
 }
 
+void QnMediaResourceWidget::ensureMotionSelectionCache() {
+    if (m_motionSelectionCacheValid)
+        return;
+
+    for (int i = 0; i < channelCount(); ++i){
+        QPainterPath path;
+        path.addRegion(m_motionSelection[i]);
+        m_motionSelectionPathCache[i] = path.simplified();
+    }
+}
+
+void QnMediaResourceWidget::invalidateMotionSelectionCache(){
+    m_motionSelectionCacheValid = false;
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -350,13 +367,15 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) {
     if (options() & DisplayMotion) {
+        ensureMotionSelectionCache();
+
         paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
         paintMotionSensitivity(painter, channel, rect);
 
         /* Motion selection. */
         if(!m_motionSelection[channel].isEmpty()) {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-            paintFilledRegion(painter, rect, m_motionSelection[channel], color, color);
+            paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
 }
@@ -458,13 +477,11 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
 }
 
 // 4-6 fps
-void QnMediaResourceWidget::paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor) {
-    QPainterPath path;
-    path.addRegion(selection);
-    path = path.simplified(); // TODO: #elrik: this is slow. // #gdm: not so slow, 1-2 fps at max
+void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
+    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
 
-    QnScopedPainterTransformRollback transformRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter, color);
+    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
+
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
     painter->setPen(QPen(penColor));
@@ -496,17 +513,15 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
     ensureMotionSensitivity();
 
     if (options() & DisplayMotionSensitivity) {
-        for (int i = 0; i < 10; ++i) {
+        for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i) {
             QColor color = i > 0 ? QColor(100 +  i * 3, 16 * (10 - i), 0, 96 + i * 2) : qnGlobals->motionMaskColor();
-            QRegion region = m_motionSensitivity[channel].getRegionBySens(i);
-            if (i > 0)
-                region -= m_motionSensitivity[channel].getRegionBySens(0);
-            paintFilledRegion(painter, rect, region, color, Qt::black);
+            QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
+            paintFilledRegionPath(painter, rect, path, color, Qt::black);
         }
 
         paintMotionSensitivityIndicators(painter, channel, rect, m_motionSensitivity[channel]);
     } else {
-        paintFilledRegion(painter, rect, m_motionSensitivity[channel].getMotionMask(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
+        paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
 }
 
@@ -607,7 +622,6 @@ int QnMediaResourceWidget::currentRecordingMode() {
     return QnScheduleTask::RecordingType_Never;
 }
 
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -632,6 +646,7 @@ void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 
     resizeList(m_motionSelection, channelCount());
+    resizeList(m_motionSelectionPathCache, channelCount());
     resizeList(m_motionSensitivity, channelCount());
 
     while(m_binaryMotionMask.size() > channelCount()) {

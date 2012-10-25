@@ -111,13 +111,16 @@ protected:
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
-    void paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor);
+    void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
 
     void ensureMotionSensitivity() const;
     void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
     void invalidateBinaryMotionMask();
+
+    void ensureMotionSelectionCache();
+    void invalidateMotionSelectionCache();
 
     int motionGridWidth() const;
     int motionGridHeight() const;
@@ -165,6 +168,9 @@ private:
     /** Selected region for search-by-motion, in parrots. */
     QList<QRegion> m_motionSelection;
 
+    /** Painter path cache for the list of selected regions. */
+    QList<QPainterPath> m_motionSelectionPathCache;
+
     /** Image region where motion is currently present, in parrots. */
     mutable QList<QnMotionRegion> m_motionSensitivity;
 
@@ -176,6 +182,9 @@ private:
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;
+
+    /** Whether motion selection cached paths are valid. */
+    mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
 
