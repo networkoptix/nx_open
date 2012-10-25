@@ -82,7 +82,7 @@ public:
                 if (!m_storageResource.addFileEntry(m_fileName))
                     return false;
             }
-            openMode |= QIODevice::Append;
+            openMode |= QIODevice::ReadOnly;
         }
         m_file.setFileName(QnLayoutFileStorageResource::removeProtocolPrefix(m_storageResource.getUrl()));
         if (!m_file.open(openMode))
@@ -388,7 +388,7 @@ bool QnLayoutFileStorageResource::addFileEntry(const QString& srcFileName)
 
     m_index.entries[m_index.entryCount++] = QnLayoutFileIndexEntry(fileSize - m_novFileOffset, qHash(fileName));
 
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Append))
+    if (!file.open(QIODevice::ReadWrite))
         return false;
     file.seek(m_novFileOffset);
     file.write((const char*) &m_index, sizeof(m_index));

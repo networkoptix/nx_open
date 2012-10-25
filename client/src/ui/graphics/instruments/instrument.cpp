@@ -312,7 +312,7 @@ bool Instrument::sceneEvent(QGraphicsItem *watched, QEvent *event) {
 
 template<class T>
 bool Instrument::dispatchEvent(T *watched, QEvent *event) {
-    switch (event->type()) {
+    switch ((int)event->type()) {
     case QEvent::MouseMove:
         return mouseMoveEvent(watched, static_cast<QMouseEvent *>(event));
     case QEvent::MouseButtonPress:
