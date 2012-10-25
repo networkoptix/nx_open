@@ -207,6 +207,7 @@ QnMediaServerResourcePtr QnServerResourceWidget::resource() const {
 }
 
 int QnServerResourceWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
     return Qn::MainWindow_MonitoringItem_Help;
 }
 
