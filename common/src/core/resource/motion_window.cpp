@@ -11,6 +11,7 @@ void QnMotionRegion::removeDefaultMotion()
 {
     for (int i = MIN_SENSITIVITY; i <= MAX_SENSITIVITY; ++i)
         m_data[i] = QRegion();
+     updatePathCache();
 }
 
 QRegion QnMotionRegion::getMotionMask() const
@@ -33,6 +34,14 @@ QMultiMap<int, QRect> QnMotionRegion::getAllMotionRects() const
             result.insert(sens, rects[i]);
     }
     return result;
+}
+
+QPainterPath QnMotionRegion::getMotionMaskPath() const {
+    return m_pathCache[0];
+}
+
+QPainterPath QnMotionRegion::getRegionBySensPath(int value) const {
+    return m_pathCache[value];
 }
 
 
@@ -69,6 +78,7 @@ void QnMotionRegion::addRect(int sensitivity, const QRect& rect)
         m_data[i] -= rect;
     }
     m_data[sensitivity] += rect;
+    updatePathCache();
 }
 
 bool QnMotionRegion::operator==(const QnMotionRegion& other) const
@@ -141,6 +151,7 @@ bool QnMotionRegion::updateSensitivityAt(const QPoint& pos, int newSens)
             for (int i = 0; i < rects.size(); ++i)
                 m_data[sens] += rects[i];
             m_data[newSens] += linkedRects;
+            updatePathCache();
             return true;
         }
     }
@@ -197,4 +208,15 @@ int QnMotionRegion::getMotionSensCount() const
             sens_count++;
     }
     return sens_count;
+}
+
+void QnMotionRegion::updatePathCache(){
+    for (int sens = QnMotionRegion::MIN_SENSITIVITY; sens <= QnMotionRegion::MAX_SENSITIVITY; ++sens){
+        QRegion region = m_data[sens];
+        if (sens > 0)
+            region -= m_data[0];
+        QPainterPath path;
+        path.addRegion(region);
+        m_pathCache[sens] = path.simplified();
+    }
 }
