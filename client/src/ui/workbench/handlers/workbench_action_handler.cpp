@@ -2166,7 +2166,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-    connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
@@ -2370,17 +2369,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage) 
 {
-    disconnect(sender(), NULL, this, NULL);
-
-    m_exportedMediaRes.clear();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionFileBuffer[i].clear();
-    m_exportStorage.clear();
-
-    if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
-        camera->stopExport();
-    m_exportedCamera = 0;
-
+    at_cancelExport();
+    if(m_exportProgressDialog)
+        m_exportProgressDialog.data()->deleteLater();
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
 }
 

@@ -82,21 +82,14 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     QPointF rotationCenter = geometry.center();
     qreal rotation;
     switch (m_fixedRotation){
-        case Qn::Angle0:
-            rotation = 0;
-            break;
-        case Qn::Angle180:
-            rotation = 180;
-            break;
         case Qn::Angle90:
-            rotation = 90;
             rotationCenter.setX(rotationCenter.y());
             break;
         case Qn::Angle270:
-            rotation = -90;
             rotationCenter.setY(rotationCenter.x());
             break;
     }
+    rotation = m_fixedRotation;
 
     setTransformOriginPoint(rotationCenter);
     setRotation(rotation);
