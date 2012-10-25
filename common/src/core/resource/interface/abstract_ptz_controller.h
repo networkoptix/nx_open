@@ -11,6 +11,8 @@ public:
     QnAbstractPtzController(QnResourcePtr netRes);
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) = 0;
+    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) = 0;
+    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) = 0;
     virtual int stopMove() = 0;
 
     bool calibrate(qreal xVelocityCoeff, qreal yVelocityCoeff, qreal zoomVelocityCoeff);

@@ -12,6 +12,8 @@ public:
 
     virtual int startMove(qreal xVelocity, qreal yVelocity, qreal zoomVelocity) override;
     virtual int stopMove() override;
+    virtual int moveTo(qreal xPos, qreal yPos, qreal zoomPos) override;
+    virtual int getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos) override;
 
     //QString getPtzNodeToken() const;
     QString getPtzConfigurationToken();
