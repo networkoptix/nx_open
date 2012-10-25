@@ -100,6 +100,15 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
     for (int i = 0; i < params.size(); ++i)
     {
         QPair<QString, QString> param = params[i];
+        if (param.first == "user")
+            auth.setUser(param.second);
+        else if (param.first == "password")
+            auth.setPassword(param.second);
+    }
+
+    for (int i = 0; i < params.size(); ++i)
+    {
+        QPair<QString, QString> param = params[i];
         if (param.first == "url") 
         {
             if (!url.isEmpty()) {
@@ -111,10 +120,6 @@ int QnManualCameraAdditionHandler::addAction(const QnRequestParamList& params, Q
             }
             url = param.second;
         }
-        else if (param.first == "user")
-            auth.setUser(param.second);
-        else if (param.first == "password")
-            auth.setPassword(param.second);
         else if (param.first == "manufacturer")
             resType = param.second;
     }

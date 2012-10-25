@@ -34,7 +34,7 @@ function pageOffset(win)
    } 
 
    function nsrInit() { 
-      contentbody = document.getElementById('idcontent'); 
+     contentbody = document.getElementById('idcontent'); 
      if (contentbody) { 
        aTop = pageOffset.top; //document.getElementById('body').scrollTop; 
        contentbody.className = 'nonscroll'; 
@@ -45,4 +45,4 @@ function pageOffset(win)
        if (contentbody.scrollTo) { contentbody.scrollTo(aTop,0); }
       } 
    } 
-   
+

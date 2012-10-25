@@ -2,92 +2,54 @@
 <html>
 <head>
    <title>Glossary</title>
-   <meta name="generator" content="Help & Manual">
-   <meta name="keywords" content="">
-   <meta name="description" content="Glossary">
-   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="generator" content="Help &amp; Manual" />
+   <meta name="keywords" content="" />
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />   
    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="default.css" rel="stylesheet" />
    <link type="text/css" href="custom.css" rel="stylesheet">
-   <script type="text/javascript" src="nsh.js"></script>
 
-<script type="text/javascript">   
-// Toggle Toggler 
+   <style TYPE="text/css" media="screen"> 
+      html, body { margin:0; 
+             padding:0; 
+             overflow: hidden; 
+             background: #FFFFFF; 
+       } 
 
-var toggleCount=false;
-var switchState;
-
-function toggleToggles() {
-
-    if (!toggleCount) {
-     toggleCount = true;
-     HMToggleExpandAll(true);
-     switchState = true;
-     }
-   
-     else if (switchState) {
-        HMToggleExpandAll(false);
-        switchState = false;
-        }
-        
-     else  {
-        HMToggleExpandAll(true);
-        switchState = true;
-        } 
-    }
-</script>
-   
-<!-- non-scrolling headers for CHM and browser-based help, local styles-->
-<style type="text/css" media="screen"> 
-html, body { margin:0; 
-   padding:0; 
-   overflow: hidden; 
-   background: #FFFFFF; 
-  }
- 
-div#printheader { 
-   display: none;
-   padding-bottom: 10px;
-   }
-   #idheader { 
-      width:100%; 
-      height:auto; 
-      padding: 0; 
-      margin: 0; 
-} 
-    #idheaderbg  {
-    background: #6F6F6F; 
-}
-   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
-   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
-   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
-   #callout-table a {text-decoration: none; color: blue;}
-   #callout-table a:visited {text-decoration: none; color: blue;}
-   #overview-table a {text-decoration: none; color: black;}
-   #overview-table a:visited {text-decoration: none; color: black;}
-   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
-   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+      div#printheader { display: none; }
+      #idheader { width:100%; 
+                  height:auto; 
+                  padding: 0; 
+                  margin: 0; 
+       } 
+      #idcontent { position:relative }                                               
+      #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+      #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+      #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+      #callout-table a {text-decoration: none; color: blue;}
+      #callout-table a:visited {text-decoration: none; color: blue;}
+      #overview-table a {text-decoration: none; color: black;}
+      #overview-table a:visited {text-decoration: none; color: black;}
+      #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}      
+      #switchtoggles { text-align: right; padding: 0 2px 0 0; font-size: 90%; } 
+      p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
    </style>
-<!--[if lt IE 7]>
-<style type="text/css">
-  #idcontent {padding: 0px;} 
-  #innerdiv {padding: 10px 5px 5px 10px ;} 
-</style> 
-<![endif]-->
-<noscript>
-<style type="text/css">
-html, body { overflow: auto; }
-</style> 
-</noscript>
-<style type="text/css" media="print">
-span.f_Heading1 { color: black; }
-#idheader, #printheader img { display:none; }
-#printheader { display: block; margin-top: 20px; }
-#idcontent { margin-top: 10px; }
-</style>   
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+   <style type="text/css" media="print">
+      span.f_Heading1 { color: black; }
+      #idheader, #printheader img { display:none; }
+      #printheader { display: block; margin-top: 20px; }
+      #idcontent { margin-top: 10px; position:relative }
+   </style>   
+
    <script type="text/javascript" src="jquery.js"></script>
    <script type="text/javascript" src="helpman_settings.js"></script>
    <script type="text/javascript" src="helpman_topicinit.js"></script>
+   <script type="text/javascript" src="nsh.js"></script>
 
    <script type="text/javascript">
      HMSyncTOC("index.html", "glossary.htm");
@@ -98,15 +60,13 @@ span.f_Heading1 { color: black; }
    </script>
 </head>
 <body>
-<!--ZOOMSTOP-->
+<div id="breadcrumbs" style="display:none"></div>
 
 <div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Glossary</span></h1>
-</div> 
+</div>
 <div id="idheader">
 <div id="idheaderbg">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" 
-       style="margin: 0px; background: url(header_bg.jpg);">
-
+<table style="width:100%;border:none;margin:0px;background:url(background-topic-header.jpg)" cellspacing="0" cellpadding="0"> 
   <tr valign="bottom">
     <td align="left" valign="bottom" class="topichead">
    <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
@@ -118,63 +78,60 @@ span.f_Heading1 { color: black; }
     <td align="right" width="120" valign="middle" class="topichead" id="idnav">
     
      <a href="obtaining_system_logs.htm"
-        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
-        onmouseout="document.images.prev.src='btn_prev_n.gif'"
-        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
-        ></a><a href="hd_witness%AE.htm"
-        onmouseover="document.images.main.src='btn_home_h.gif'" 
-        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
-        ></a><img src="btn_next_d.gif" border="0">
+        onmouseover="document.images.prev.src='hm_btn_navigate_prev_orange.png'" 
+        onmouseout="document.images.prev.src='hm_btn_navigate_prev.png'"
+        ><img name="prev" src="hm_btn_navigate_prev.png" border=0 alt="Previous page"
+        ></a><a href="launching_and_closing_hd_witness_client.htm"
+        onmouseover="document.images.main.src='hm_btn_navigate_top_orange.png'" 
+        onmouseout="document.images.main.src='hm_btn_navigate_top.png'"><img name=main src="hm_btn_navigate_top.png" border=0 alt="Return to chapter overview"
+        ></a><img src="hm_btn_navigate_next_d.png" border="0">
     </td>
-  </tr>
-  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+  </tr>  
 </table>
-</div>
-
 <!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
   
-
+</div>
 </div>  
 
+<div id="idcontent"><div id="innerdiv">
+<!-- Ask Internet Explorer 6.users to update their obsolete and dangerous browser --> 
+<!--[if lt IE 7]><div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;'><a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode"><img src="http://storage.ie6countdown.com/assets/100/images/banners/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today." /></a></div><![endif]-->
 
-
-<div id="idcontent"><div id="innerdiv"> 
 <!--ZOOMRESTART-->
-<p><span style="font-weight: bold;">Administrator</span> – user that can configure DW Spectrum.</p>
-<p><span style="font-weight: bold;">Archive</span></p>
-<p><span style="font-weight: bold;">Aspect Ratio (AR)</span> – Ratio of Height and Width of a video. Most commonly used are: 4:3 and 16:9</p>
-<p><span style="font-weight: bold;">API Port (Media Server HTTP Port)</span> – the port is used by Media Server to process requests for recorded fragments and other internal data from DW Spectrum Client. </p>
-<p><span style="font-weight: bold;">Bitrate</span> – amount of bytes per second. It is used to measure video stream. </p>
-<p><span style="font-weight: bold;">Client</span></p>
-<p><span style="font-weight: bold;">Codec</span> – video or audio compression that is used.</p>
-<p><span style="font-weight: bold;">Dual Streaming</span></p>
-<p><span style="font-weight: bold;">Export</span></p>
-<p><span style="font-weight: bold;">FPS</span> – Frames per Second. It is used to measure video stream.</p>
-<p><span style="font-weight: bold;">DW Spectrum Server Components</span> – DW Spectrum Media Server and Enterprise Controller.</p>
-<p><span style="font-weight: bold;">Item</span> – video or image on Scene.</p>
-<p><span style="font-weight: bold;">Layout</span> – the saved video items and their position size and orientation. It is used to present surveillance information to DW Spectrum user.</p>
-<p><span style="font-weight: bold;">Layout Export</span></p>
-<p><span style="font-weight: bold;">Live</span></p>
-<p><span style="font-weight: bold;">Motion Detection</span> – feature that indicates if the motion occurred in a camera’s viewing zone.</p>
-<p><span style="font-weight: bold;">Motion Mask</span> – the area in viewing zone that will not trigger <span style="font-weight: bold;">Motion Detection</span>.</p>
-<p><span style="font-weight: bold;">Multi-Channel Export</span></p>
-<p><span style="font-weight: bold;">OS</span> – Operating System.</p>
-<p><span style="font-weight: bold;">Private (cameras) Network</span> – the network used to transmit data from cameras to Media Server. It is not accessible from outside.</p>
-<p><span style="font-weight: bold;">Public (Intranet) Network</span> – the network used to connect to Media Server from outside. It can be used either for connecting Media Server to Enterprise Controller or to configure Server Components. It may or may not be connected to the Internet.</p>
-<p><span style="font-weight: bold;">PTZ</span></p>
-<p><span style="font-weight: bold;">Resources</span> – cameras, Media Servers, local video files, users and layouts.</p>
-<p><span style="font-weight: bold;">RADASS</span></p>
-<p><span style="font-weight: bold;">RTSP Port</span> – the port is used by Media Server to process requests for media streams from DW Spectrum Client. </p>
-<p><span style="font-weight: bold;">Server</span> – the computer DW Spectrum Media server is installed on.</p>
-<p><span style="font-weight: bold;">Smart Motion Search </span></p>
-<p><span style="font-weight: bold;">Super Administrator</span> – initial user that is allowed to do everything in DW Spectrum (his login is <span style="font-weight: bold;">admin</span>). It cannot be deleted.</p>
-<p><span style="font-weight: bold;">Sync</span></p>
-<p><span style="font-weight: bold;">Thumbnail Search</span></p>
-<p><span style="font-weight: bold;">Thumbnails</span></p>
-<p><span style="font-weight: bold;">URL</span> – uniform resource locator is a specific character string that constitutes a reference to an Internet/Intranet resource. It is used to establish connection to Enterprise Controller.</p>
-<p><span style="font-weight: bold;">Viewer</span> – user that can do a limited number of actions in DW Spectrum (usually he is not allowed to change configuration). </p>
-<p><span style="font-weight: bold;">Watermark </span>– the feature is used to check the validity of the exported files. If a file was changed somehow (even 1 byte of information is changed) the file will be indicated as invalid</p>
-<p>&nbsp;</p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Administrator</span><span class="f_BodyText"> – user that can configure DW Spectrum.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Archive</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Aspect Ratio (AR)</span><span class="f_BodyText"> – Ratio of Height and Width of a video. Most commonly used are: 4:3 and 16:9</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">API Port (Media Server HTTP Port)</span><span class="f_BodyText"> – the port is used by Media Server to process requests for recorded fragments and other internal data from DW Spectrum Client. </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Bitrate</span><span class="f_BodyText"> – amount of bytes per second. It is used to measure video stream. </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Client</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Codec</span><span class="f_BodyText"> – video or audio compression that is used.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Dual Streaming</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Export</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">FPS</span><span class="f_BodyText"> – Frames per Second. It is used to measure video stream.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">DW Spectrum Server Components</span><span class="f_BodyText"> – DW Spectrum Media Server and Enterprise Controller.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Item</span><span class="f_BodyText"> – video or image on Scene.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Layout</span><span class="f_BodyText"> – the saved video items and their position size and orientation. It is used to present surveillance information to DW Spectrum user.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Layout Export</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Live</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Motion Detection</span><span class="f_BodyText"> – feature that indicates if the motion occurred in a camera’s viewing zone.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Motion Mask</span><span class="f_BodyText"> – the area in viewing zone that will not trigger </span><span class="f_BodyText" style="font-weight: bold;">Motion Detection</span><span class="f_BodyText">.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Multi-Channel Export</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">OS</span><span class="f_BodyText"> – Operating System.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Private (cameras) Network</span><span class="f_BodyText"> – the network used to transmit data from cameras to Media Server. It is not accessible from outside.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Public (Intranet) Network</span><span class="f_BodyText"> – the network used to connect to Media Server from outside. It can be used either for connecting Media Server to Enterprise Controller or to configure Server Components. It may or may not be connected to the Internet.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">PTZ</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Resources</span><span class="f_BodyText"> – cameras, Media Servers, local video files, users and layouts.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">RADASS</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">RTSP Port</span><span class="f_BodyText"> – the port is used by Media Server to process requests for media streams from DW Spectrum Client. </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Server</span><span class="f_BodyText"> – the computer DW Spectrum Media server is installed on.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Smart Motion Search </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Super Administrator</span><span class="f_BodyText"> – initial user that is allowed to do everything in DW Spectrum (his login is </span><span class="f_BodyText" style="font-weight: bold;">admin</span><span class="f_BodyText">). It cannot be deleted.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Sync</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Thumbnail Search</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Thumbnails</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">URL</span><span class="f_BodyText"> – uniform resource locator is a specific character string that constitutes a reference to an Internet/Intranet resource. It is used to establish connection to Enterprise Controller.</span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Viewer</span><span class="f_BodyText"> – user that can do a limited number of actions in DW Spectrum (usually he is not allowed to change configuration). </span></p>
+<p class="p_BodyText"><span class="f_BodyText" style="font-weight: bold;">Watermark </span><span class="f_BodyText">– the feature is used to check the validity of the exported files. If a file was changed somehow (even 1 byte of information is changed) the file will be indicated as invalid</span></p>
 <p style="text-align: center;"><span style="font-size: 8pt; color: #000000;">&nbsp;</span></p>
 <p style="text-align: center;"><span style="font-size: 8pt; color: #000000;"><a href="http://www.helpandmanual.com" target="_blank" class="weblink">This help system was created with an evaluation copy of Help &amp; Manual.</a></span></p>
 
@@ -193,11 +150,3 @@ if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != 
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
