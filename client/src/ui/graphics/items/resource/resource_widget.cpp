@@ -119,7 +119,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
     m_aboutToBeDestroyedEmitted(false),
-    m_mouseInWidget(false)
+    m_mouseInWidget(false),
+    m_desiredRotation(0)
 {
     setAcceptHoverEvents(true);
 
@@ -346,26 +347,6 @@ void QnResourceWidget::setGeometry(const QRectF &geometry) {
     m_footerOverlayWidget->setDesiredSize(size());
 }
 
-void QnResourceWidget::updateOverlayRotation(qreal rotation) {
-    while (rotation < -180)
-        rotation += 360;
-    while (rotation > 180)
-        rotation -= 360;
-
-    Qn::FixedItemRotation fixed;
-    if (rotation >= -45 && rotation <= 45)
-        fixed = Qn::Angle0;
-    else if (rotation > 135 || rotation < -135)
-        fixed = Qn::Angle180;
-    else if (rotation > 0)
-        fixed = Qn::Angle270;
-    else
-        fixed = Qn::Angle90;
-
-    m_headerOverlayWidget->setDesiredRotation(fixed);
-    m_footerOverlayWidget->setDesiredRotation(fixed);
-}
-
 QString QnResourceWidget::titleText() const {
     return m_headerLeftLabel->text();
 }
@@ -435,6 +416,35 @@ QString QnResourceWidget::calculateInfoText() const {
 void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
+
+void QnResourceWidget::updateOverlayRotation(qreal rotation) {
+    while (rotation < -180)
+        rotation += 360;
+    while (rotation > 180)
+        rotation -= 360;
+
+    Qn::FixedItemRotation fixed;
+    if (rotation >= -45 && rotation <= 45) {
+        fixed = Qn::Angle0;
+        m_desiredRotation = 0;
+    }
+    else if (rotation > 135 || rotation < -135) {
+        fixed = Qn::Angle180;
+        m_desiredRotation = 180;
+    }
+    else if (rotation > 0) {
+        fixed = Qn::Angle270;
+        m_desiredRotation = 270;
+    }
+    else {
+        fixed = Qn::Angle90;
+        m_desiredRotation = 90;
+    }
+
+    m_headerOverlayWidget->setDesiredRotation(fixed);
+    m_footerOverlayWidget->setDesiredRotation(fixed);
+}
+
 
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
@@ -529,6 +539,7 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
 }
 
 int QnResourceWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
     return -1;
 }
 
@@ -722,13 +733,28 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     QFont font;
     font.setPointSizeF(textSize * unit);
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+
     QnScopedPainterFontRollback fontRollback(painter, font);
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
+    QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
-    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
+
+    painter->translate(rect().center());
+    painter->rotate(m_desiredRotation);
+    painter->translate(offset * unit);
+    if (m_desiredRotation % 180 != 0){
+        qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
+        painter->scale(ratio, ratio);
+    }
+
+    painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);
+
+    Q_UNUSED(transformRollback)
+    Q_UNUSED(penRollback)
+    Q_UNUSED(fontRollback)
 }
 
 void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
@@ -747,7 +773,7 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
 
     painter->fillRect(rect, QColor(0, 0, 0, 128));
 
-    if(overlay == LoadingOverlay || overlay == PausedOverlay) {
+    if(overlay == LoadingOverlay || overlay == PausedOverlay || overlay == EmptyOverlay) {
         qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
         qreal unit = qnGlobals->workbenchUnitSize();
 
@@ -763,6 +789,7 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glPushMatrix();
         glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
         glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        glRotatef(m_desiredRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
@@ -833,6 +860,13 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
+}
+
+QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
+    if (change == QGraphicsItem::ItemRotationHasChanged){
+        updateOverlayRotation(value.toReal());
+    }
+    return base_type::itemChange(change, value);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){

@@ -136,3 +136,13 @@ void QnVideoRecorderSettings::setScreen(int screen)
     settings.setValue(QLatin1String("screen"), screen);
     settings.setValue(QLatin1String("screenResolution"),  qApp->desktop()->screen(screen)->geometry());
 }
+
+QString QnVideoRecorderSettings::recordingFolder() const {
+    if (!settings.contains(QLatin1String("recordingFolder")))
+        return QDir::tempPath();
+    return settings.value(QLatin1String("recordingFolder")).toString();
+}
+
+void QnVideoRecorderSettings::setRecordingFolder(QString folder) {
+    settings.setValue(QLatin1String("recordingFolder"), folder);
+}

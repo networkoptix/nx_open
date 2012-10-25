@@ -197,7 +197,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     {
         QByteArray data = miscFile->readAll();
         delete miscFile;
-        if (data.size() >= sizeof(quint32))
+        if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*) data.data());
             if (flags & 1) {
