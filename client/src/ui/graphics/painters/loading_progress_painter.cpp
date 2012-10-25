@@ -9,8 +9,8 @@
 
 QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sectorCount, qreal sectorFill, const QColor &startColor, const QColor &endColor, const QGLContext *context):
     QnGlFunctions(context),
-    m_shader(QnColorShaderProgram::instance(context)),
-    m_sectorCount(sectorCount)
+    m_sectorCount(sectorCount),
+    m_shader(QnColorShaderProgram::instance(context))
 {
     if(context != QGLContext::currentContext())
         qnWarning("Invalid current OpenGL context.");

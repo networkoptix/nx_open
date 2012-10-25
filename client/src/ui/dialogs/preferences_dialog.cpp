@@ -199,6 +199,7 @@ void QnPreferencesDialog::openLicensesPage()
 // -------------------------------------------------------------------------- //
 void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    fileDialog.setDirectory(ui->mainMediaFolderLabel->text());
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
@@ -212,6 +213,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    //TODO: call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
