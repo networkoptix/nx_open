@@ -11,7 +11,8 @@
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
     base_type(parent),
     m_desiredSize(QSizeF(0.0, 0.0)),
-    m_inUpdateScale(false)
+    m_inUpdateScale(false),
+    m_fixedRotation(Qn::Angle0)
 {
     itemChange(ItemSceneHasChanged, QVariant::fromValue(scene()));
 }
@@ -87,6 +88,8 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
             break;
         case Qn::Angle270:
             rotationCenter.setY(rotationCenter.x());
+            break;
+        default:
             break;
     }
     rotation = m_fixedRotation;
