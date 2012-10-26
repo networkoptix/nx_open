@@ -555,6 +555,9 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         if (m_waitSCeq) {
             if (cseq != m_waitSCeq)
                 return true; // ignore data
+            else if (m_pauseNetwork)
+                return false; // wait
+
             m_waitSCeq = 0;
             m_rtStartTime = AV_NOPTS_VALUE;
             m_adaptiveSleep.afterdelay(); // same as reset call
