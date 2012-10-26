@@ -34,7 +34,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
-#define QN_MEDIA_RESOURCE_WIDGET_SHOW_HQ_LQ
+#define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
     template<class T>
@@ -702,8 +702,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     }
 
     QString hqLqString;
-#ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HQ_LQ
-    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" LQ") : tr(" HQ");
+#ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
+    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
 #endif
 
     QString timeString;
