@@ -780,9 +780,12 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     if(startDisplay) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->display()->start();
-            if(mediaWidget->display()->archiveReader() && m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
-            {
-                mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            if(mediaWidget->display()->archiveReader()) {
+                if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
+                    mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
+
+                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
             }
         }
     }
