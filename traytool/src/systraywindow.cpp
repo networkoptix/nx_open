@@ -52,11 +52,7 @@ bool MyIsUserAnAdmin()
 QnSystrayWindow::QnSystrayWindow():
     ui(new Ui::SettingsDialog),
     m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
-#ifdef _WIN64
-    m_appServerSettings(QString("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\") + qApp->organizationName() + "\\" + APP_SERVER_NAME, QSettings::NativeFormat)
-#else
-    m_appServerSettings(QSettings::SystemScope, qApp->organizationName())
-#endif
+    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
 {
     ui->setupUi(this);
 
