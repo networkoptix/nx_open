@@ -21,12 +21,12 @@ namespace Qn {
     Q_DECLARE_FLAGS(QnProductFeatures, QnProductFeature);
 
 
-    Qn::Customization calculateCustomization(const char *customizationName) {
-        if(std::strcmp(customizationName, "Vms")) {
+    inline Qn::Customization calculateCustomization(const char *customizationName) {
+        if(std::strcmp(customizationName, "Vms") == 0) {
             return HdWitnessCustomization;
-        } else if(std::strcmp(customizationName, "digitalwatchdog")) {
+        } else if(std::strcmp(customizationName, "digitalwatchdog") == 0) {
             return DwSpectrumCustomization;
-        } else if(std::strcmp(customizationName, "nnodal")) {
+        } else if(std::strcmp(customizationName, "nnodal") == 0) {
             return NVisionCustomization;
         } else {
             assert(false);
@@ -34,7 +34,7 @@ namespace Qn {
         }
     }
 
-    Qn::QnProductFeatures calculateProductFeatures(Qn::Customization customization) {
+    inline Qn::QnProductFeatures calculateProductFeatures(Qn::Customization customization) {
         switch(customization) {
         case HdWitnessCustomization:
             return FreeLicenseFeature;
