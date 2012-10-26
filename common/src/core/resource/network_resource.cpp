@@ -221,7 +221,12 @@ bool QnNetworkResource::shoudResolveConflicts() const
 
 bool QnNetworkResource::mergeResourcesIfNeeded( QnNetworkResourcePtr source )
 {
-    Q_UNUSED(source)
+    if (source->getHostAddress() != getHostAddress())
+    {
+        setHostAddress(source->getHostAddress());
+        return true;
+    }
+
     return false;
 }
 
