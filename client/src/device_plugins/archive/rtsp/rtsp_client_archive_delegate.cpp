@@ -820,7 +820,7 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)
 {
     m_rtspSession.setAdditionAttribute("x-send-motion", value ? "1" : "0");
-    //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+    m_rtspSession.sendSetParameter("x-send-motion", value ? "1" : "0");
 }
 
 void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)

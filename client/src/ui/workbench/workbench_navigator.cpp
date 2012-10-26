@@ -635,11 +635,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    if(m_currentMediaWidget) {
+    /*if(m_currentMediaWidget) {
         QnAbstractArchiveReader *archiveReader = m_currentMediaWidget->display()->archiveReader();
         if (archiveReader)
             archiveReader->setPlaybackMask(QnTimePeriodList());
-    }
+    }*/
 
     if (display() && display()->isChangingLayout()){
         m_currentWidget = NULL;
