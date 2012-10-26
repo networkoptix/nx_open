@@ -397,6 +397,9 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();
+            while (signPattern.size() < QnSignHelper::getMaxSignSize())
+                signPattern.append(" ");
+            signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
             av_dict_set(&m_formatCtx->metadata, QnAviArchiveDelegate::getTagName(QnAviArchiveDelegate::Tag_Signature, fileExt), signPattern.data(), 0);
         }
 #endif
