@@ -702,6 +702,7 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
     if (d->enabled)
         return;
     d->enabled = true;
+    d->speed = currentSpeed;
 
     bool isPaused = false;
     foreach(const ReaderInfo& info, d->readers) 
