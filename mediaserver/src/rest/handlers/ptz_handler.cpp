@@ -27,6 +27,9 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
     qreal xSpeed = 0;
     qreal ySpeed = 0;
     qreal zoomSpeed = 0;
+    qreal xPos = INT_MAX;
+    qreal yPos = INT_MAX;
+    qreal zoomPos = INT_MAX;
     
     bool resParamFound = false;
 
@@ -59,6 +62,12 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
             ySpeed = params[i].second.toDouble();
         else if (params[i].first == "zoomSpeed")
             zoomSpeed = params[i].second.toDouble();
+        else if (params[i].first == "xPos")
+            xPos = params[i].second.toDouble();
+        else if (params[i].first == "yPos")
+            yPos = params[i].second.toDouble();
+        else if (params[i].first == "zoomPos")
+            zoomPos = params[i].second.toDouble();
     }
     if (!resParamFound)
         errStr = QLatin1String("parameter 'res_id' is absent");
@@ -106,15 +115,34 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         if (ptz->startMove(xSpeed, ySpeed, zoomSpeed) != 0)
             errStr = "Error executing PTZ command";
     }
+    else if (action == "moveTo")
+    {
+        if (xPos == INT_MAX || yPos == INT_MAX) {
+            errStr = "Paremeters 'xPos', 'yPos' MUST be provided\n";
+        }
+        else if (ptz->moveTo(xPos, yPos, zoomPos) != 0)
+            errStr = "Error executing PTZ command";
+    }
+    else if (action == "getPosition")
+    {
+        if (ptz->getPosition(&xPos, &yPos, &zoomPos) != 0) {
+            errStr = "Error executing PTZ command";
+        }
+        else {
+            result.append("<root>\n");
+            QString posStr("<position xPos=\"\%1\" yPos=\"\%2\" zoomPos=\"\%3\"/>\n");
+            result.append(posStr.arg(xPos).arg(yPos).arg(zoomPos).toUtf8());
+            result.append("</root>\n");
+            return CODE_OK;
+        }
+    }
     else if (action == "stop")
     {
         if (ptz->stopMove() != 0)
             errStr = "Error executing PTZ command";
     }
     else {
-        result.append("<root>\n");
-        result.append("Unknown ptz command ").append(action.toUtf8()).append("\n");
-        result.append("</root>\n");
+        errStr = QByteArray("Unknown ptz command ").append(action.toUtf8()).append("\n");
     }
 
     result.append("<root>\n");
@@ -140,14 +168,21 @@ QString QnPtzHandler::description(TCPSocket* tcpSocket) const
     QString rez;
     rez += "There is several ptz command: <BR>";
     rez += "<b>api/ptz/move</b> - start camera moving <BR>";
+    rez += "<b>api/ptz/moveTo</b> - go to absolute position <BR>";
     rez += "<b>api/ptz/stop</b> - stop camera moving <BR>";
+    rez += "<b>api/ptz/getPosition</b> - return current camera position <BR>";
     rez += "<b>api/ptz/calibrate</b> - calibrate moving speed (addition speed coeff) <BR>";
     rez += "<b>api/ptz/getCalibrate</b> - read current calibration settings <BR>";
-    rez += "All commands uses same input arguments except of 'getCalibrate' there is not arguments";
     rez += "<BR>Param <b>res_id</b> - camera physicalID";
+    rez += "<BR><BR>Arguments for 'move' and 'calibrate commands:";
     rez += "<BR>Param <b>xSpeed</b> - rotation X velocity in range [-1..+1]";
     rez += "<BR>Param <b>ySpeed</b> - rotation Y velocity in range [-1..+1]";
     rez += "<BR>Param <b>zoomSpeed</b> - zoom velocity in range [-1..+1]";
-    rez += "<BR>Returns 'OK' if PTZ command complete success. Otherwise returns error message. For getCalibrate command returns XML with coeffecients";
+    rez += "<BR><BR>Arguments for 'moveTo' commands:";
+    rez += "<BR>Param <b>xPos</b> - go to absolute X position in range [-1..+1]";
+    rez += "<BR>Param <b>yPos</b> - go to absolute Y position in range [-1..+1]";
+    rez += "<BR>Param <b>zoomPos</b> - Optional. Go to absolute zoom position in range [0..+1]";
+    rez += "<BR><BR>If PTZ command do not return data, function return simple 'OK' message on success or error message if command fail. ";
+    rez += "For 'getCalibrate' command returns XML with coeffecients. For 'getPosition' command returns XML with current position.\n";
     return rez;
 }

@@ -150,3 +150,82 @@ void QnOnvifPtzController::setMediaProfileToken(const QString& value)
 {
     m_mediaProfile = value;
 }
+
+int QnOnvifPtzController::moveTo(qreal xPos, qreal yPos, qreal zoomPos)
+{
+    QAuthenticator auth(m_res->getAuth());
+    PtzSoapWrapper ptz (m_res->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
+    _onvifPtz__AbsoluteMove request;
+    _onvifPtz__AbsoluteMoveResponse response;
+
+    {
+        QMutexLocker lock(&m_mutex);
+        request.ProfileToken = m_mediaProfile.toStdString();
+    }
+
+
+    request.Position = new onvifXsd__PTZVector();
+    request.Position->PanTilt = new onvifXsd__Vector2D();
+    if (zoomPos != INT_MAX)
+        request.Position->Zoom = new onvifXsd__Vector1D();
+    request.Position->PanTilt->x = xPos;
+    request.Position->PanTilt->y = yPos;
+    if (request.Position->Zoom)
+        request.Position->Zoom->x = zoomPos;
+
+    request.Speed  = new onvifXsd__PTZSpeed();
+    request.Speed ->PanTilt = new onvifXsd__Vector2D();
+    request.Speed ->Zoom = new onvifXsd__Vector1D();
+    request.Speed ->PanTilt->x = 1.0;
+    request.Speed ->PanTilt->y = 1.0;
+    request.Speed ->Zoom->x = 1.0;
+
+    int rez = ptz.doAbsoluteMove(request, response);
+    if (rez != SOAP_OK)
+    {
+        qCritical() << "Error executing PTZ absolute move command for resource " << m_res->getUniqueId() << ". Error: " << ptz.getLastError();
+    }
+
+    delete request.Speed->Zoom;
+    delete request.Speed->PanTilt;
+    delete request.Speed;
+
+    if (request.Position->Zoom)
+        delete request.Position->Zoom;
+    delete request.Position->PanTilt;
+    delete request.Position;
+
+    return rez;
+}
+
+int QnOnvifPtzController::getPosition(qreal *xPos, qreal *yPos, qreal *zoomPos)
+{
+    QAuthenticator auth(m_res->getAuth());
+    PtzSoapWrapper ptz (m_res->getPtzfUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_res->getTimeDrift());
+    _onvifPtz__GetStatus request;
+    _onvifPtz__GetStatusResponse response;
+
+    {
+        QMutexLocker lock(&m_mutex);
+        request.ProfileToken = m_mediaProfile.toStdString();
+    }
+
+    *xPos = *yPos = *zoomPos = 0;
+
+    int rez = ptz.doGetStatus(request, response);
+    if (rez != SOAP_OK)
+    {
+        qCritical() << "Error executing PTZ move command for resource " << m_res->getUniqueId() << ". Error: " << ptz.getLastError();
+    }
+    else {
+        if (response.PTZStatus && response.PTZStatus->Position && response.PTZStatus->Position->PanTilt)
+        {
+            *xPos = response.PTZStatus->Position->PanTilt->x;
+            *yPos = response.PTZStatus->Position->PanTilt->y;
+        }
+        if (response.PTZStatus && response.PTZStatus->Position && response.PTZStatus->Position->Zoom)
+            *zoomPos = response.PTZStatus->Position->Zoom->x;
+    }
+
+    return rez;
+}

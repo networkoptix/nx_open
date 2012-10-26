@@ -687,6 +687,11 @@ char QnSignHelper::getSignPatternDelim()
     return SIGN_TEXT_DELIMITER;
 }
 
+int QnSignHelper::getMaxSignSize()
+{
+    return 512;
+}
+
 QByteArray QnSignHelper::getSignPattern()
 {
     QByteArray result;
