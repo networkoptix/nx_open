@@ -622,6 +622,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
     return QnScheduleTask::RecordingType_Never;
 }
 
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
