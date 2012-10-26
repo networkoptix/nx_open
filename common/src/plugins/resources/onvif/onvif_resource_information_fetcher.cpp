@@ -153,7 +153,8 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
 
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
-    resource->setName(manufacturer + QLatin1String(" - ") + name);
+    //resource->setName(manufacturer + QLatin1String(" - ") + name);
+    resource->setName(name); 
     resource->setMAC(mac);
 
     if (!mac.size())
