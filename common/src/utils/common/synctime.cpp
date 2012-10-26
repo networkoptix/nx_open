@@ -10,8 +10,8 @@ static const int SYNC_TIME_INTERVAL = 1000 * 60 * 5;
 class QnSyncTimeTask: public QRunnable {
 public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
-    void run()
-    {
+
+    void run() {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
         qint64 rez = appServerConnection->getCurrentTime();
         if (rez > 0) 
