@@ -1,5 +1,5 @@
-#ifndef LICENSEWIDGET_H
-#define LICENSEWIDGET_H
+#ifndef QN_LICENSE_WIDGET_H
+#define QN_LICENSE_WIDGET_H
 
 #include <QtGui/QWidget>
 
@@ -7,8 +7,7 @@ namespace Ui {
     class LicenseWidget;
 }
 
-class LicenseWidget : public QWidget
-{
+class QnLicenseWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -17,8 +16,8 @@ public:
         Waiting,    /**< Waiting for activation. */
     };
 
-    explicit LicenseWidget(QWidget *parent = 0);
-    virtual ~LicenseWidget();
+    explicit QnLicenseWidget(QWidget *parent = 0);
+    virtual ~QnLicenseWidget();
 
     bool isOnline() const;
     void setOnline(bool online);
@@ -51,10 +50,10 @@ private slots:
     void at_activationTypeComboBox_currentIndexChanged();
 
 private:
-    Q_DISABLE_COPY(LicenseWidget)
+    Q_DISABLE_COPY(QnLicenseWidget)
 
     QScopedPointer<Ui::LicenseWidget> ui;
     State m_state;
 };
 
-#endif // LICENSEWIDGET_H
+#endif // QN_LICENSE_WIDGET_H
