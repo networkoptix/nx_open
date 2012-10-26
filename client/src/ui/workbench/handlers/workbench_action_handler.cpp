@@ -2232,6 +2232,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = exportReadOnly ? 1 : 0;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i) {
+        if (m_layoutExportResources[i]->hasFlags(QnResource::utc))
+            flags |= 2; 
+    }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
 

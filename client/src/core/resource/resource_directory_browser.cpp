@@ -193,6 +193,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
     QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
+    bool layoutWithCameras = false;
     if (miscFile)
     {
         QByteArray data = miscFile->readAll();
@@ -204,6 +205,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
                 Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
                 layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
             }
+            if (flags & 2)
+                layoutWithCameras = true;
         }
         //layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
@@ -236,6 +239,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         storage->setUrl(xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+        if (layoutWithCameras)
+            aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
         aviResource->setStorage(storage);
         //aviResource->setId(item.resource.id);
         aviResource->setParentId(layout->getId());
