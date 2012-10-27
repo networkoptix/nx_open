@@ -152,6 +152,7 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    QnResourcePtr getParentResource() const;
 
     // ==================================================
 

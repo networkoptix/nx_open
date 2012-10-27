@@ -2,17 +2,21 @@
 #define __ABSTRACT_BUSINESS_ACTION_H_
 
 #include <QSharedPointer>
-#include "abstract_business_event.h"
+#include "business_logic_common.h"
 #include "core/resource/resource_fwd.h"
 
 enum BusinessActionType
 {
-    BA_CameraOutput,
+    // media server based actions
+    BA_CameraOutput,       // set camera output signal
+    BA_Bookmark,           // mark part of camera archive as undeleted
+    BA_CameraRecording,    // start camera recording
+    BA_PanicRecording,     // activate panic recording mode
+
+    // these actions can be executed from any endpoint. Actually these actions call specified function at EC
     BA_SendMail,
-    BA_Bookmark,
     BA_Alert,
-    BA_CameraRecording,
-    BA_PanicRecording
+    BA_ShowPopup
 };
 
 /*
@@ -30,17 +34,23 @@ public:
     virtual bool deserialize(const QByteArray& data) = 0;
 
     /*
-    * Execute action. Return true if execute success
+    * Resource depend of action type.
+    * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
+    * For actions: BA_SendMail, BA_Alert resource is not used
     */
-    virtual bool execute() = 0;
-
     void setResource(QnResourcePtr resource)   { m_resource = resource; }
+
     QnResourcePtr getResource()                { return m_resource;     }
+
+    void setParams(const QnBusinessParams& params) {m_params = params; }
+    QnBusinessParams getParams() const             { return m_params; }
+
 protected:
     void setActionType(BusinessActionType value) { m_actionType = value; }
-private:
+
     BusinessActionType m_actionType;
     QnResourcePtr m_resource;
+    QnBusinessParams m_params;
 };
 
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;

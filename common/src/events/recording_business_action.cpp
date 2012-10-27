@@ -4,12 +4,8 @@
 QnRecordingBusinessAction::QnRecordingBusinessAction()
 {
     setActionType(BA_CameraRecording);
-}
-
-bool QnRecordingBusinessAction::execute()
-{
-    // todo: implement me!
-    return true;
+    setFps(10);
+    setStreamQuality(QnQualityHighest);
 }
 
 QByteArray QnRecordingBusinessAction::serialize()

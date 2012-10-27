@@ -1,6 +1,7 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
+#include <QUrl>
 #include <QThread>
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
@@ -15,8 +16,8 @@
 class QnBusinessMessageBus: public QThread
 {
 public:
-    int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, QnResourcePtr destination);
-    int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, QnResourcePtr destination);
+    int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
+    int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, const QUrl& url);
 public slots:
 signals:
     void businessEventDelivered(int deliveryNum);

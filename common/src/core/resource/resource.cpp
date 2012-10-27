@@ -225,6 +225,12 @@ QnResourcePtr QnResource::toSharedPointer() const
     return res;*/
 }
 
+QnResourcePtr QnResource::getParentResource() const
+{
+    return m_resourcePool->getResourceById(getParentId());
+}
+
+
 QnParamList QnResource::getResourceParamList() const
 {
     QMutexLocker mutexLocker(&m_mutex);

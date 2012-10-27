@@ -27,7 +27,7 @@ public:
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
-    void startForcedRecording(QnStreamQuality quality = QnQualityHighest, int fps = 10);
+    void startForcedRecording(QnStreamQuality quality = QnQualityHighest, int fps = 10, int maxDuration = 0);
 
     /*
     * Switch from forced recording mode to normal recording mode specified by schedule task
@@ -36,7 +36,7 @@ public:
     void stopForcedRecording();
 signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
-    void motionDetected(bool value, qint64 time);
+    void motionDetected(QnResourcePtr resource, bool value, qint64 time);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 

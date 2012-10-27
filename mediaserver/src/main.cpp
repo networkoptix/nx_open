@@ -63,6 +63,9 @@
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
+#include "events/mserver_business_rule_processor.h"
+#include "events/business_event_rule.h"
+#include "events/business_rule_processor.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -368,6 +371,8 @@ int serverMain(int argc, char *argv[])
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
 
     return 0;
 }

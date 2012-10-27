@@ -1,6 +1,7 @@
 #include "business_event_connector.h"
 #include "motion_business_event.h"
 #include "core/resource/resource.h"
+#include "business_rule_processor.h"
 
 Q_GLOBAL_STATIC(QnBusinessEventConnector, static_instance)
 
@@ -10,12 +11,12 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 }
 
 
-void QnBusinessEventConnector::at_motionDetected(bool value, qint64 timestamp)
+void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timestamp)
 {
-    QnResource* resource = dynamic_cast<QnResource*>(sender());
-    Q_ASSERT(resource);
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent());
-    motionEvent->setToggleState(value ? QnToggleBusinessEvent::On : QnToggleBusinessEvent::Off);
+    motionEvent->setToggleState(value ? ToggleState_On : ToggleState_Off);
     motionEvent->setDateTime(timestamp);
     motionEvent->setResource(resource->toSharedPointer());
+
+    bRuleProcessor->processBusinessEvent(motionEvent);
 }

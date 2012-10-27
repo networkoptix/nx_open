@@ -2,14 +2,14 @@
 #define __TOGGLE_BUSINESS_EVENT_H__
 
 #include "abstract_business_event.h"
+#include "business_logic_common.h"
 
 class QnToggleBusinessEvent: public QnAbstractBusinessEvent
 {
 public:
-    enum ToggleState {Off = 0, On = 1};
-
-    QnToggleBusinessEvent(ToggleState state = Off);
+    QnToggleBusinessEvent(ToggleState state = ToggleState_Off);
     void setToggleState(ToggleState value) { m_toggleState = value; }
+    ToggleState getToggleState() const { return m_toggleState; }
 private:
     ToggleState m_toggleState;
 };
