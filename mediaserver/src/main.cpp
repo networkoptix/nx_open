@@ -66,6 +66,7 @@
 #include "events/mserver_business_rule_processor.h"
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
+#include "rest/handlers/gettime_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -566,6 +567,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

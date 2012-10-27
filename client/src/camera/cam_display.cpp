@@ -162,7 +162,7 @@ QnCamDisplay::~QnCamDisplay()
     {
         QMutexLocker lock(&m_qualityMutex);
         m_allCamDisplay.remove(this);
-        if (m_lastDecodedTime != AV_NOPTS_VALUE)
+        if ((quint64)m_lastDecodedTime != AV_NOPTS_VALUE)
         {
             // If camDisplay has decoded something and item is closing, some bandwidth appears. Change quality for other items
             foreach(QnCamDisplay* display, m_allCamDisplay)
@@ -241,7 +241,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 	{
 		if (m_speed < 1.0 || m_singleShotMode)
 			return;
-		if (m_firstAfterJumpTime == AV_NOPTS_VALUE) {
+        if ((quint64)m_firstAfterJumpTime == AV_NOPTS_VALUE) {
 			m_firstAfterJumpTime = media->timestamp;
 			m_receivedInterval = 0;
 			m_afterJumpTimer.restart();

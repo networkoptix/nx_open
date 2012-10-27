@@ -10,8 +10,8 @@ static const int SYNC_TIME_INTERVAL = 1000 * 60 * 5;
 class QnSyncTimeTask: public QRunnable {
 public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
-    void run()
-    {
+
+    void run() {
         QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
         qint64 rez = appServerConnection->getCurrentTime();
         if (rez > 0) 
@@ -28,10 +28,7 @@ private:
 
 QnSyncTime::QnSyncTime()
 {
-    m_lastReceivedTime = 0;
-    m_gotTimeTask = 0;
-    m_lastWarnTime = 0;
-    m_lastLocalTime = 0;
+    reset();
 }
 
 void QnSyncTime::updateTime(qint64 newTime)
@@ -52,12 +49,20 @@ qint64 QnSyncTime::currentUSecsSinceEpoch()
     return currentMSecsSinceEpoch() * 1000;
 }
 
+void QnSyncTime::reset()
+{
+    m_lastReceivedTime = 0;
+    m_gotTimeTask = 0;
+    m_lastWarnTime = 0;
+    m_lastLocalTime = 0;
+}
+
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
     qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL || qAbs(localTime-m_lastLocalTime) > SYNC_TIME_INTERVAL) && 
-         m_gotTimeTask == 0 && QnSessionManager::instance()->isReady())
+        m_gotTimeTask == 0 && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
         QThreadPool::globalInstance()->start(m_gotTimeTask);

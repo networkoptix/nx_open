@@ -15,6 +15,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "action.h"
@@ -388,6 +389,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F11")).
         autoRepeat(false);
 
+    factory(Qn::WhatsThisAction).
+        flags(Qn::NoTarget).
+        text(tr("Help")).
+        icon(qnSkin->icon("titlebar/whats_this.png"));
+
 
     /* Context menu actions. */
 
@@ -411,6 +417,16 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         autoRepeat(false);
 
+    factory(Qn::DisconnectAction).
+        flags(Qn::Main).
+        text(tr("Logout")).
+        autoRepeat(false).
+        condition(new QnDisconnectActionCondition(this));
+
+    factory().
+        flags(Qn::Main).
+        separator();
+
     factory(Qn::TogglePanicModeAction).
         flags(Qn::Main).
         text(tr("Start Panic Recording")).
@@ -419,7 +435,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+P")).
         icon(qnSkin->icon("titlebar/panic.png")).
         //requiredPermissions(Qn::AllMediaServersParameter, Qn::ReadWriteSavePermission).
-        condition(new QnPanicActionCondition(this)); // TODO: #gdm disable condition? ask Elric
+        condition(new QnPanicActionCondition(this));
 
     factory().
         flags(Qn::Main | Qn::Tree).
@@ -632,7 +648,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
+        condition(new QnOpenInFolderActionCondition(this)); 
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -872,14 +888,15 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("4:3")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 4.0/3.0);
 
         factory(Qn::SetCurrentLayoutAspectRatio16x9Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("16:9")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_ASPECT_RATIO ?
+            checked(qnGlobals->defaultLayoutCellAspectRatio() == 16.0/9.0);
 
         factory.endGroup();
     } factory.endSubMenu();
@@ -895,26 +912,29 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("None")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.0);
 
         factory(Qn::SetCurrentLayoutItemSpacing10Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(); // TODO: #gdm - runtime check of DEFAULT_LAYOUT_CELL_SPACING ?
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.1);
 
         factory(Qn::SetCurrentLayoutItemSpacing20Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Medium")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.2);
 
         factory(Qn::SetCurrentLayoutItemSpacing30Action).
             flags(Qn::Scene | Qn::NoTarget).
             requiredPermissions(Qn::CurrentLayoutParameter, Qn::WritePermission).
             text(tr("Large")).
-            checkable();
+            checkable().
+            checked(qnGlobals->defaultLayoutCellSpacing().width() == 0.3);
         factory.endGroup();
 
     } factory.endSubMenu();
@@ -924,10 +944,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ToggleTourModeAction).
-        flags(Qn::Scene | Qn::NoTarget).
+        flags(Qn::Scene | Qn::NoTarget ).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(tr("Alt+T")).
+        autoRepeat(false).
+        condition(new QnToggleTourActionCondition(this));
+
+    factory(Qn::ToggleTourModeHotkeyAction).
+        flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
+        shortcut(tr("Alt+T")).
+        autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).
@@ -951,13 +978,13 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ExportTimeSelectionAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Export Selection...")).
+        text(tr("Export Selected Area...")).
         requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));
 
     factory(Qn::ExportLayoutAction).
         flags(Qn::Slider | Qn::SingleTarget | Qn::MultiTarget | Qn::NoTarget). 
-        text(tr("Export Selection as Layout...")).
+        text(tr("Export Multi-Video...")).
         requiredPermissions(Qn::CurrentLayoutMediaItemsParameter, Qn::ExportPermission).
         condition(new QnExportActionCondition(false, this));
 

@@ -1080,11 +1080,12 @@ int QnRtspConnectionProcessor::composeSetParameter()
     QList<QByteArray> parameters = d->requestBody.split('\n');
     foreach(const QByteArray& parameter, parameters)
     {
-        if (parameter.trimmed().toLower().startsWith("x-media-quality"))
+        QByteArray normParam = parameter.trimmed().toLower();
+        QList<QByteArray> vals = parameter.split(':');
+        if (vals.size() < 2)
+            return CODE_INVALID_PARAMETER;
+        if (normParam.startsWith("x-media-quality"))
         {
-            QList<QByteArray> vals = parameter.split(':');
-            if (vals.size() < 2)
-                return CODE_INVALID_PARAMETER;
             if (vals[1].trimmed() == "alwaysHigh")
                 d->quality = MEDIA_Quality_AlwaysHigh;
             else if (vals[1].trimmed() == "low")
@@ -1111,6 +1112,11 @@ int QnRtspConnectionProcessor::composeSetParameter()
             }
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;
+        }
+        else if (normParam.startsWith("x-send-motion"))
+        {
+            QByteArray value = vals[1].trimmed();
+            d->archiveDP->setSendMotion(value == "1" || value == "true");
         }
     }
 

@@ -241,6 +241,7 @@ protected slots:
     void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
+    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
@@ -296,7 +297,6 @@ protected slots:
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_activityInstrument_activated();
 
     void at_layoutCamera_exportFinished(QString fileName);
     void at_layout_exportFinished();
@@ -306,12 +306,13 @@ protected slots:
 
     void at_cancelExport();
 
+    void at_whatsThisAction_triggered();
+
 private:
     enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
 
     void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
     void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
-    // void updateStoredConnections(QnConnectionData connectionData);
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout

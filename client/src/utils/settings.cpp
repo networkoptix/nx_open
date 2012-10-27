@@ -101,7 +101,7 @@ QnSettings::QnSettings():
 
     /* Set default values. */
     setBackgroundColor(qnGlobals->backgroundGradientColor());
-    setMediaFolder(getMoviesDirectory() + QLatin1String("/HD Witness Media/"));
+    setMediaFolder(getMoviesDirectory() + QLatin1String("/HD Witness Media/")); // TODO: #Elric customize
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif

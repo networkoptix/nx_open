@@ -10,8 +10,12 @@ public:
 
     qint64 findTimeAtPlaybackMask(qint64 timeUsec, bool isForwardDirection);
     void setPlaybackMask(const QnTimePeriodList& playbackMask);
+    void setPlaybackRange(const QnTimePeriod& playbackRange);
+    QnTimePeriod getPlaybackRange() const;
 private:
     QnTimePeriodList m_playbackMask;
+    QnTimePeriodList m_playBackMaskOrig;
+    QnTimePeriod m_playbackRange;
     QnTimePeriod m_curPlaybackPeriod;
 };
 

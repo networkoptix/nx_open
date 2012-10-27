@@ -103,7 +103,8 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
         if(FileInformation.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
         {
           // Copy subdirectory
-          return CopyDirectory(strSource, strDestination);
+          if(CopyDirectory(strSource, strDestination))
+            return ::GetLastError();
         }
         else
         {

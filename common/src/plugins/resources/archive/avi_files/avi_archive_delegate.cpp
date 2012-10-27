@@ -12,6 +12,7 @@
 #include "utils/media/nalUnits.h"
 #include "avi_resource.h"
 #include "motion/light_motion_archive_connection.h"
+#include "core/resource/media_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
@@ -322,8 +323,14 @@ void QnAviArchiveDelegate::close()
     m_lastPacketTimes.clear();
 }
 
-static QnDefaultResourceVideoLayout defaultVideoLayout;
+const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
+{
+    QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
+    AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, getTagName(tag, format), 0, 0);
+    return entry ? entry->value : 0;
+}
 
+static QnDefaultResourceVideoLayout defaultVideoLayout;
 QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
@@ -571,6 +578,8 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
             return "comment"; // "ICMT";
         case Tag_Software:
             return "encoded_by"; // "ITCH";
+        case Tag_Signature:
+            return "copyright"; // "ICOP";
         }
     }
     else {
@@ -584,6 +593,8 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
             return "video_layout"; // TrackNumber
         case Tag_Software:
             return "software";
+        case Tag_Signature:
+            return "signature"; // "ICOP";
         }
     }
     return "";

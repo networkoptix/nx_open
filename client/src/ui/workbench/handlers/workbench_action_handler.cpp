@@ -10,6 +10,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
+#include <QtGui/QWhatsThis>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -59,6 +60,9 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -77,6 +81,7 @@
 
 #include "client_message_processor.h"
 #include "file_processor.h"
+#include "version.h"
 
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
@@ -156,8 +161,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
-    m_tourTimer(new QTimer()),
-    m_exportedCamera(0)
+    m_exportedCamera(0),
+    m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -184,6 +189,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
+    connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -239,14 +245,17 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
+    connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
+    connect(action(Qn::ToggleTourModeHotkeyAction),             SIGNAL(triggered()),    action(Qn::ToggleTourModeAction),   SLOT(toggle()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
 
+    /*
     SignalingInstrument *activityInstrument = new SignalingInstrument(
         Instrument::makeSet(QEvent::MouseButtonRelease), 
         Instrument::makeSet(QEvent::KeyRelease),
@@ -260,6 +269,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     }
     connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
     connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
+    */
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -618,68 +628,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
-
-/*void QnWorkbenchActionHandler::updateStoredConnections(QnConnectionData connectionData){
-    QnConnectionDataList connections = qnSettings->customConnections();
-
-    // remove all existing duplicates
-    int i = 0;
-    int sameIdx = -1;
-    while (i < connections.count()){
-        QString url = connections[i].url.toString(QUrl::RemovePassword);
-        if (sameIdx < 0 && connectionData.url.toString(QUrl::RemovePassword) == url)
-            sameIdx = i;
-
-        int j = i + 1;
-        while (j < connections.count()){
-            if (connections[j].url.toString(QUrl::RemovePassword) == url){
-                connections.removeAt(j);
-            }
-            else{
-                j++;
-            }
-        }
-        i++;
-    }
-
-    if (sameIdx >= 0)
-        connections.removeAt(sameIdx);
-
-    connections.prepend(connectionData);
-
-    while (connections.count() > 10) // TODO: #gdm move const out of here
-        connections.removeLast();
-
-    for (QnConnectionDataList::iterator iter = connections.begin(); iter != connections.end(); ++iter){
-
-        // there is at least one connection with same port
-        bool samePort = false;
-
-        // there is at least one connection with different port
-        bool otherPort = false;
-
-        foreach(QnConnectionData compared, connections){
-            if (*iter == compared)
-                continue;
-
-            if (iter->url.host() != compared.url.host())
-                continue;
-
-            if (iter->url.port() != compared.url.port())
-                otherPort = true;
-            else
-                samePort = true;
-        }
-
-        iter->name = iter->url.host();
-        if (samePort)
-            iter->name.prepend(iter->url.userName() + QLatin1Char(' ') + tr("at") + QLatin1Char(' '));
-
-        if (otherPort)
-            iter->name.append(QLatin1Char(':') + QString::number(iter->url.port()));
-    }
-    qnSettings->setCustomConnections(connections);
-}*/
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
@@ -1354,6 +1302,24 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     at_eventManager_connectionOpened();
 }
 
+void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
+    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+//    QnSessionManager::instance()->stop(); // omfg... logic sucks
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+
+    //if(context()->user()) /* If we were connected... */
+        //workbench()->clear(); // TODO: ask to save?
+
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->setLayoutsUpdated(false);
+    resourcePool()->removeResources(remoteResources);
+    resourcePool()->setLayoutsUpdated(true);
+
+    qnLicensePool->reset();
+}
+
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(!resource)
@@ -1777,7 +1743,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-
+    setHelpTopic(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1913,6 +1879,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
+    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -2004,6 +1971,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
 {
     bool nonUtcExists = false;
     bool utcExists = false;
+    bool imageExists = false;
 
     QnLayoutItemDataMap items = layout->getItems();
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
@@ -2012,6 +1980,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
         QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
         if (layoutItemRes) 
         {
+            imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
             bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
             if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
                 continue; // skip unaccessible local resources because is not possible to check utc flag
@@ -2021,11 +1990,21 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
                 nonUtcExists = true;
         }
     }
-    if (nonUtcExists && utcExists) {
+
+    if (imageExists) {
         QMessageBox::critical(
             this->widget(), 
             tr("Can't create local layout"), 
-            tr("Current layout has several cameras and several local files. You have to keep only cameras or only local files"), 
+            tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
+            QMessageBox::Ok
+            );
+        return false;
+    }
+    else if (nonUtcExists && utcExists) {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't create local layout"), 
+            tr("Current layout contains several cameras and several local files. You have to keep only cameras or only local files"), 
             QMessageBox::Ok
             );
         return false;
@@ -2037,15 +2016,15 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
 {
     if (readOnly) {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86, read only) (*.exe)");
+            return tr("Executable %1 Media File (x86, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64, read only) (*.exe)");
+            return tr("Executable %1 Media File (x64, read only) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
     else {
         if (sizeof(char*) == 4)
-            return tr("Executable Network Optix Media File (x86) (*.exe)");
+            return tr("Executable %1 Media File (x86) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
         else
-            return tr("Executable Network Optix Media File (x64) (*.exe)");
+            return tr("Executable %1 Media File (x64) (*.exe)").arg(QLatin1String(QN_ORGANIZATION_NAME));
     }
 }
 
@@ -2075,14 +2054,23 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+
+    QString mediaFilter =
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+            + filterSeparator
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + filterSeparator
+            + binaryFilterName(false)
+            + filterSeparator
+            + binaryFilterName(true);
+
     while (true) {
         QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             dialogName,
             previousDir + QDir::separator() + suggestion,
-            tr("Network Optix Media File (*.nov)") + filterSeparator + tr("Network Optix Media File (read only) (*.nov)") + filterSeparator +
-            binaryFilterName(false) + filterSeparator + binaryFilterName(true),
+            mediaFilter,
             &selectedFilter,
             QFileDialog::DontUseNativeDialog
         );
@@ -2152,7 +2140,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             tr("Another export in progress"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
-            );
+        );
 
         return;
     }
@@ -2168,6 +2156,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
+    exportProgressDialog->setModal(true);
+    exportProgressDialog->show();
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
@@ -2176,7 +2166,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-    connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
@@ -2243,6 +2232,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = exportReadOnly ? 1 : 0;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i) {
+        if (m_layoutExportResources[i]->hasFlags(QnResource::utc))
+            flags |= 2; 
+    }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
 
@@ -2517,7 +2511,7 @@ Do you want to continue?"),
                         tr("AVI format is not recommended"), 
                         tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
                         QMessageBox::Yes | QMessageBox::No
-                        );
+                    );
                     if (result != QMessageBox::Yes)
                         continue;
                 }
@@ -2792,10 +2786,8 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
         action(Qn::ToggleTourModeAction)->setChecked(false);
 }
 
-void QnWorkbenchActionHandler::at_activityInstrument_activated() {
-    action(Qn::ToggleTourModeAction)->setChecked(false);
+void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
+    QWhatsThis::enterWhatsThisMode();
 }
-
-
 
 

@@ -6,24 +6,20 @@
 #include "Utils.h"
 
 
-UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
     Wow64DisableWow64FsRedirection(0);
 
-    CAtlString msg;
-    msg.Format(L"%d", GetCurrentProcessId());
-    MessageBox(0,msg, L"Pen2", 0);
-
     CAtlString foldersString, fromFolder, toFolder;
 
-    hr = WcaInitialize(hInstall, "CopyMediaServerProfile");
+    hr = WcaInitialize(hInstall, actionName);
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    // Get "from" and "to" folders from CopyMediaServerProfile
+    // Get "from" and "to" folders from msi property
     foldersString = GetProperty(hInstall, L"CustomActionData");
 
     // Extract "from" and "to" folders from foldersString
@@ -45,6 +41,14 @@ LExit:
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
+}
+
+UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyMediaServerProfile");
+}
+
+UINT __stdcall CopyAppServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyAppServerProfile");
 }
 
 UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
@@ -354,6 +358,28 @@ UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
         CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
         fixPath(clientFolder);
         MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "IsClientFolderExists");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+        if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
+            MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
     }
 
 LExit:

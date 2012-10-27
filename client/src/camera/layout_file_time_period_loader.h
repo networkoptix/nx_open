@@ -8,8 +8,6 @@
 #include "time_period_loader.h"
 #include "abstract_time_period_loader.h"
 
-class QnMetaDataV1Light;
-
 /**
  * Time period loader that can be used to load recorded time periods from exported layout
  * cameras.

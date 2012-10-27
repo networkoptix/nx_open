@@ -19,7 +19,7 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tabGeneral">
+     <widget class="QWidget" name="generalTab">
       <attribute name="title">
        <string>General</string>
       </attribute>
@@ -46,7 +46,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox">
+        <widget class="QGroupBox" name="addressGroupBox">
          <property name="title">
           <string>Address</string>
          </property>
@@ -133,7 +133,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="groupBox_2">
+        <widget class="QGroupBox" name="authenticationGroupBox">
          <property name="title">
           <string>Authentication</string>
          </property>
@@ -176,7 +176,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxEnableAudio">
+        <widget class="QCheckBox" name="enableAudioCheckBox">
          <property name="text">
           <string>Enable audio</string>
          </property>
@@ -197,7 +197,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabRecording">
+     <widget class="QWidget" name="recordingTab">
       <attribute name="title">
        <string>Recording</string>
       </attribute>
@@ -207,7 +207,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabMotion">
+     <widget class="QWidget" name="motionTab">
       <attribute name="title">
        <string>Motion</string>
       </attribute>
@@ -398,7 +398,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tabAdvanced">
+     <widget class="QWidget" name="advancedTab">
       <attribute name="title">
        <string>Advanced</string>
       </attribute>

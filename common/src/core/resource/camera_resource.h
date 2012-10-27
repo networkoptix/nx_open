@@ -48,6 +48,7 @@ public:
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
+    virtual void scheduleTasksChanged() override;
 
 private:
     bool m_scheduleDisabled;

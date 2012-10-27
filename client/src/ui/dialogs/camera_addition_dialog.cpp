@@ -9,6 +9,8 @@
 
 #include <core/resource/media_server_resource.h>
 
+#define PORT_AUTO 0
+
 QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
@@ -32,6 +34,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
 
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLineEdit, SLOT(setVisible(bool)));
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLabel, SLOT(setVisible(bool)));
+
+    connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),        ui->portSpinBox, SLOT(setDisabled(bool)));
 
     ui->scanProgressBar->setVisible(false);
     ui->stopScanButton->setVisible(false);
@@ -180,7 +184,9 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column){
 void QnCameraAdditionDialog::at_scanButton_clicked(){
     QString username(ui->loginLineEdit->text());
     QString password(ui->passwordLineEdit->text());
-    int port = ui->portSpinBox->value();
+    int port = ui->portAutoCheckBox->isChecked()
+            ? PORT_AUTO
+            : ui->portSpinBox->value();
 
     QString startAddrStr = ui->startIPLineEdit->text();
     QString endAddrStr = ui->endIPLineEdit->text();
@@ -205,6 +211,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     ui->startIPLineEdit->setEnabled(false);
     ui->endIPLineEdit->setEnabled(false);
+    ui->portAutoCheckBox->setEnabled(false);
     ui->portSpinBox->setEnabled(false);
     ui->subnetCheckbox->setEnabled(false);
     ui->loginLineEdit->setEnabled(false);
@@ -235,7 +242,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->scanButton->setEnabled(true);
     ui->startIPLineEdit->setEnabled(true);
     ui->endIPLineEdit->setEnabled(true);
-    ui->portSpinBox->setEnabled(true);
+    ui->portAutoCheckBox->setEnabled(true);
+    ui->portSpinBox->setEnabled(!ui->portAutoCheckBox->isChecked());
     ui->subnetCheckbox->setEnabled(true);
     ui->loginLineEdit->setEnabled(true);
     ui->passwordLineEdit->setEnabled(true);

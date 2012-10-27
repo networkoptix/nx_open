@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>738</width>
-    <height>542</height>
+    <width>428</width>
+    <height>337</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,7 +98,7 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="LicenseWidget" name="licenseWidget" native="true"/>
+         <widget class="QnLicenseWidget" name="licenseWidget" native="true"/>
         </item>
        </layout>
       </widget>
@@ -109,7 +109,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>LicenseWidget</class>
+   <class>QnLicenseWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/settings/license_widget.h</header>
    <container>1</container>

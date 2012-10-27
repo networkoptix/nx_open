@@ -12,11 +12,14 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/style/skin.h>
+
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
@@ -39,6 +42,8 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     /* Connect to context. */
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
+
+    setHelpTopic(this, Qn::MainWindow_TabNavigator_Help);
 
     connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));

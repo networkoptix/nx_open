@@ -198,7 +198,7 @@ void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* reply
 
     if (!m_accessManager)
     {
-        qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
+        qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
         return;
     }
 
@@ -220,7 +220,7 @@ void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* re
 
     if (!m_accessManager)
     {
-        qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
+        qWarning() << "doSendAsyncDeleteRequest is called, while accessManager = 0";
         return;
     }
 

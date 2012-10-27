@@ -152,6 +152,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
+    m_inChangeLayout(false),
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
@@ -776,9 +777,18 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if(startDisplay)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(startDisplay) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->display()->start();
+            if(mediaWidget->display()->archiveReader()) {
+                if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
+                    mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
+
+                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
+        }
+    }
 
     return true;
 }
@@ -1102,9 +1112,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
 
-    /* Update overlays rotation */
-    widget->updateOverlayRotation(item->rotation());
-
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
@@ -1297,6 +1304,10 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
+    if (m_inChangeLayout)
+        qWarning() << "Changing layout while changing layout. Error! #GDM";
+
+    m_inChangeLayout = true;
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     disconnect(layout, NULL, this, NULL);
@@ -1322,6 +1333,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    m_inChangeLayout = false;
 }
 
 

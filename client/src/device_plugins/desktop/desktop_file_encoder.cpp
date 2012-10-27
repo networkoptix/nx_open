@@ -475,13 +475,17 @@ bool QnDesktopFileEncoder::init()
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
     if(videoCodec == 0)
     {
-        m_lastErrorStr = QLatin1String("Can't find video encoder ") + videoCodecName;
+        m_lastErrorStr = tr("Can't find video encoder ") + videoCodecName;
         return false;
     }
 
     // allocate container
     m_device = new QFile(m_fileName);
-    m_device->open(QIODevice::WriteOnly);
+    if (!m_device->open(QIODevice::WriteOnly))
+    {
+        m_lastErrorStr = tr("Can't create temporary file in folder '%1'. Please check 'root media folder' setting.").arg(QFileInfo(m_fileName).path());
+        return false;
+    }
 
     m_formatCtx = avformat_alloc_context();
     initIOContext();

@@ -60,6 +60,7 @@ public:
     static QString updateNovParent(const QString& novName, const QString& itemName);
 
     virtual void setUrl(const QString& value) override;
+
 signals:
     void itemAdded(const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutItemData &item);

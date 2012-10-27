@@ -18,6 +18,8 @@
 #include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
@@ -37,17 +39,17 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->maxVideoItemsLabel->hide();
     ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
-    ui->backgroundColorPicker->setAutoFillBackground(false);
-    initColorPicker();
-
-    if(!m_settings->isBackgroundEditable()) {
+    if(m_settings->isBackgroundEditable()) {
+        ui->backgroundColorPicker->setAutoFillBackground(false);
+        initColorPicker();
+    } else {
         ui->animateBackgroundLabel->hide();
         ui->animateBackgroundCheckBox->hide();
         ui->backgroundColorLabel->hide();
         ui->backgroundColorWidget->hide();
     }
 
-    if (QnScreenRecorder::isSupported()){
+    if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
@@ -62,6 +64,20 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
+    resize(1, 1); // set widget size to minimal possible
+
+    /* Set up context help. */
+    setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    if(m_recordingSettingsWidget)
+        setHelpTopic(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
+    if(m_licenseManagerWidget)
+        setHelpTopic(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
+
+
     connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
     connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
     connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
@@ -70,7 +86,6 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
-
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
 
     initLanguages();
@@ -184,6 +199,7 @@ void QnPreferencesDialog::openLicensesPage()
 // -------------------------------------------------------------------------- //
 void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    fileDialog.setDirectory(ui->mainMediaFolderLabel->text());
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
@@ -197,6 +213,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    //TODO: call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;

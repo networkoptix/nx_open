@@ -1,14 +1,10 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-//#include "core/resource/video_server.h"
 #include <core/resource/media_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
 #include <QtCore/QProcess>
-#ifdef Q_OS_WIN
-    #include <QtCore/QSettings>
-#endif
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -17,9 +13,12 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/read_only.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -44,11 +43,20 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     
     ui->cameraScheduleWidget->setContext(context());
 
+    /* Set up context help. */
+    setHelpTopic(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
+    setHelpTopic(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
+    setHelpTopic(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
+    setHelpTopic(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
+    setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
+    setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
+    setHelpTopic(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
+
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
 
     connect(ui->nameEdit,               SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
-    connect(ui->checkBoxEnableAudio,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
+    connect(ui->enableAudioCheckBox,    SIGNAL(stateChanged(int)),              this,   SLOT(at_dbDataChanged()));
     connect(ui->loginEdit,              SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->passwordEdit,           SIGNAL(textChanged(const QString &)),   this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
@@ -98,10 +106,10 @@ void QnSingleCameraSettingsWidget::initAdvancedTab()
     {
         if (!m_widgetsRecreator)
         {
-            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->tabAdvanced->layout());
+            QHBoxLayout *layout = dynamic_cast<QHBoxLayout*>(ui->advancedTab->layout());
             if(!layout) {
-                delete ui->tabAdvanced->layout();
-                ui->tabAdvanced->setLayout(layout = new QHBoxLayout());
+                delete ui->advancedTab->layout();
+                ui->advancedTab->setLayout(layout = new QHBoxLayout());
             }
             
             QSplitter* advancedSplitter = new QSplitter();
@@ -214,13 +222,13 @@ Qn::CameraSettingsTab QnSingleCameraSettingsWidget::currentTab() const {
 
     QWidget *tab = ui->tabWidget->currentWidget();
     
-    if(tab == ui->tabGeneral) {
+    if(tab == ui->generalTab) {
         return Qn::GeneralSettingsTab;
-    } else if(tab == ui->tabRecording) {
+    } else if(tab == ui->recordingTab) {
         return Qn::RecordingSettingsTab;
-    } else if(tab == ui->tabMotion) {
+    } else if(tab == ui->motionTab) {
         return Qn::MotionSettingsTab;
-    } else if(tab == ui->tabAdvanced) {
+    } else if(tab == ui->advancedTab) {
         return Qn::AdvancedSettingsTab;
     } else {
         qnWarning("Current tab with index %1 was not recognized.", ui->tabWidget->currentIndex());
@@ -233,16 +241,16 @@ void QnSingleCameraSettingsWidget::setCurrentTab(Qn::CameraSettingsTab tab) {
 
     switch(tab) {
     case Qn::GeneralSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabGeneral);
+        ui->tabWidget->setCurrentWidget(ui->generalTab);
         break;
     case Qn::RecordingSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabRecording);
+        ui->tabWidget->setCurrentWidget(ui->recordingTab);
         break;
     case Qn::MotionSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabMotion);
+        ui->tabWidget->setCurrentWidget(ui->motionTab);
         break;
     case Qn::AdvancedSettingsTab:
-        ui->tabWidget->setCurrentWidget(ui->tabAdvanced);
+        ui->tabWidget->setCurrentWidget(ui->advancedTab);
         break;
     default:
         qnWarning("Invalid camera settings tab '%1'.", static_cast<int>(tab));
@@ -264,7 +272,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
 
     if (hasDbChanges()) {
         m_camera->setName(ui->nameEdit->text());
-        m_camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
+        m_camera->setAudioEnabled(ui->enableAudioCheckBox->isChecked());
         m_camera->setUrl(ui->ipAddressEdit->text());
         m_camera->setAuth(ui->loginEdit->text(), ui->passwordEdit->text());
         m_camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
@@ -301,7 +309,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     if(!m_camera) {
         ui->nameEdit->setText(QString());
-        ui->checkBoxEnableAudio->setChecked(false);
+        ui->enableAudioCheckBox->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->ipAddressEdit->setText(QString());
         ui->webPageLabel->setText(QString());
@@ -326,8 +334,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
         ui->nameEdit->setText(m_camera->getName());
-        ui->checkBoxEnableAudio->setChecked(m_camera->isAudioEnabled());
-        ui->checkBoxEnableAudio->setEnabled(m_camera->isAudioSupported());
+        ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
+        ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
         ui->ipAddressEdit->setText(m_camera->getUrl());
         ui->webPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
@@ -359,7 +367,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         updateMaxFPS();
 
-        ui->motionWebPageLabel->setText(webPageAddress); // TODO: wrong, need to get camera-specific web page
+        // TODO: wrong, need to get camera-specific web page
+        ui->motionWebPageLabel->setText(tr("<a href=\"%1\">%2</a>").arg(webPageAddress).arg(webPageAddress));
         ui->cameraMotionButton->setChecked(m_camera->getMotionType() != MT_SoftwareGrid);
         ui->softwareMotionButton->setChecked(m_camera->getMotionType() == MT_SoftwareGrid);
 
@@ -411,7 +420,7 @@ void QnSingleCameraSettingsWidget::setReadOnly(bool readOnly) {
 
     using ::setReadOnly;
     setReadOnly(ui->nameEdit, readOnly);
-    setReadOnly(ui->checkBoxEnableAudio, readOnly);
+    setReadOnly(ui->enableAudioCheckBox, readOnly);
     setReadOnly(ui->loginEdit, readOnly);
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
@@ -608,8 +617,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
-    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked() && m_camera->streamFpsSharingMethod() == shareFps )
-        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+    if (((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked()) || 
+        ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+        && m_camera->streamFpsSharingMethod() == shareFps )
     {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
@@ -631,24 +641,11 @@ void QnSingleCameraSettingsWidget::at_motionSelectionCleared() {
 }
 
 void QnSingleCameraSettingsWidget::at_linkActivated(const QString &urlString) {
-    bool canAuth = !m_readOnly;
-
-#ifdef Q_OS_WIN
-    if (canAuth) {
-        QSettings settings(QLatin1String("HKEY_CURRENT_USER\\Software\\Clients\\StartMenuInternet"), QSettings::NativeFormat);
-        QString defaultBrowser = settings.value(QLatin1String("Default")).toString().toLower();
-        if (defaultBrowser.isEmpty() || defaultBrowser.contains(QLatin1String("iexplore")))
-			canAuth = false;
-    }
-#endif
-
     QUrl url(urlString);
-
-    if (canAuth) {
+    if (!m_readOnly) {
         url.setUserName(ui->loginEdit->text());
         url.setPassword(ui->passwordEdit->text());
     }
-
     QDesktopServices::openUrl(url);
 }
 

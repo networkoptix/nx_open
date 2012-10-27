@@ -24,7 +24,7 @@
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-		<skip.sign>true</skip.sign>						
+        <ClientHelpSourceDir>${basedir}/../help/HTML</ClientHelpSourceDir>                     
     </properties>
 
     <build>
@@ -141,6 +141,21 @@
                             </execution>
 
                             <execution>
+                                <id>help-heat</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>python</executable>
+                                    <arguments>
+                                        <argument>generate-help-wxs.py</argument>
+                                    </arguments>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
+                                </configuration>                    
+                            </execution>
+
+                            <execution>
                                 <id>package-CustomActions-with-msbuild</id>
                                 <phase>generate-resources</phase>
                                 <goals>
@@ -163,6 +178,7 @@
                                     <workingDirectory>${project.build.directory}</workingDirectory>
                                     <arguments>
                                         <argument>-dAppServerSourceDir="${AppServerDir}"</argument>
+                                        <argument>-dClientHelpSourceDir="${ClientHelpSourceDir}"</argument>
                                         <argument>-arch</argument>
                                         <argument>${arch}</argument>
                                         <argument>-out</argument>
@@ -183,7 +199,6 @@
                                         <argument>EmptyPasswordDlg.wxs</argument>
                                         <argument>AllFieldsAreMandatoryDlg.wxs</argument>
                                         <argument>InstallTypeDlg.wxs</argument>
-                                        <argument>AdvancedTypeDlg.wxs</argument>
                                         <argument>PortDuplicateDlg.wxs</argument>
                                         <argument>PortIsBusyDlg.wxs</argument>
                                         <argument>InvalidPasswordDlg.wxs</argument>
@@ -195,6 +210,7 @@
                                         <argument>DowngradeWarningDlg.wxs</argument>
                                         <argument>Product.wxs</argument>
                                         <argument>AppServerFiles.wxs</argument>
+                                        <argument>ClientHelp.wxs</argument>
                                         <argument>AppServerDlg.wxs</argument> 
                                     </arguments>
                                 </configuration>                    
@@ -282,18 +298,18 @@
                                     <arguments>
                                         <argument>sign</argument>
                                         <argument>/v</argument>
-										<argument>/p</argument>
-										<argument>qweasd123</argument>
-										<argument>/d</argument>
-										<argument>"Network Optix HD Witness"</argument>
-										<argument>/f</argument>
-										<argument>${basedir}/sign/app.p12</argument>
+                                        <argument>/p</argument>
+                                        <argument>qweasd123</argument>
+                                        <argument>/d</argument>
+                                        <argument>"Network Optix HD Witness"</argument>
+                                        <argument>/f</argument>
+                                        <argument>${basedir}/sign/app.p12</argument>
                                         <argument>${project.build.finalName}.msi</argument>
                                     </arguments>
-									<skip>${skip.sign}</skip>						
+                                    <skip>${skip.sign}</skip>                       
                                 </configuration>                    
-                            </execution>    						
-							
+                            </execution>                            
+                            
                             <execution>
                                 <id>integration-test</id>
                                 <phase>integration-test</phase>

@@ -81,6 +81,7 @@ public:
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
     QnCachingTimePeriodLoader *loader(const QnResourcePtr &resource);
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();

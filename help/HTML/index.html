@@ -1,0 +1,128 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <title>DW Spectrum Guide</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">   
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <script type="text/javascript" src="jquery.js"></script>
+  <script type="text/javascript" src="helpman_settings.js"></script>
+  <script type="text/javascript" src="helpman_navigation.js"></script>
+
+  <link type="text/css" href="default.css" rel="stylesheet" />
+
+  <style type="text/css">
+    html {
+      overflow: hidden;
+    }    
+    body { 
+      margin:0;
+      padding:0;
+      height:100%;
+      overflow:hidden; 
+      background: #FFF url('background.jpg');
+    }
+
+    #hmheadbox {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 5px;
+      height: 100px;
+      background:url(background-logo.png) top center no-repeat;
+      z-index: 998; /* header to front -> menus overlap topic frame */  
+      }
+    #navbar {
+      margin:120px 0 0 15px;
+      z-index: 999;  
+      }
+    #navbar img {
+      border:none;      
+      margin-right:10px;
+      }             
+    #hmnavbox {
+      position: absolute;
+      left: 10px;
+      width: 245px;
+      min-width: 50px;
+      top: 156px;
+      bottom: 10px;                                    
+      /* Navigation panel background, remove for transparent: */
+      background: url('background-white50.png');  
+      border-radius: 8px;
+      }
+
+    #hmcontentbox {
+      position: absolute;
+      top: 110px;
+      right: 10px;
+      bottom: 10px;
+      left: 260px;      
+      background: #FFF;
+      box-shadow: 0px 4px 12px #777;
+      }
+
+    iframe {
+      position: absolute;left:0;top:0;width:100%;height:100%;border:none;
+      }
+  
+    
+  </style>
+
+  <script type="text/javascript">
+    $(document).ready(function(){
+      if (!hmSupportsAbspos()) {
+      	$(window).bind("resize", function() {
+      	  hmNoAbsposResize($("#hmheadbox"), true, false);
+      	  hmNoAbsposResize($("#hmnavbox"), false, true);
+      	  hmNoAbsposResize($("#hmcontentbox"), true, true);
+	    });
+	    $(window).trigger("resize");
+	  }
+      hmCreateVSplitter($("#hmnavbox"),$("#hmcontentbox"));
+    });
+  </script>
+
+</head>
+<body>
+<img src="background-img-screw.png" style="border:none;position:absolute;left:0;top:0"/>
+<img src="background-img-screw.png" style="border:none;position:absolute;right:0;top:0"/>
+<img src="background-img-screw.png" style="border:none;position:absolute;left:0;bottom:0"/>
+<img src="background-img-screw.png" style="border:none;position:absolute;right:0;bottom:0"/>
+<div id="hmheadbox">
+  
+  <div style="width:450px;margin:10px auto 0 auto;color:#fff">
+    After opening the skin, go to <i>Configuration &gt; Publishing Options &gt; Webhelp &gt; Layout</i> to 
+    customize this frame page. Modify the header background and size, change the menu entries and apply your CI
+    to this skin!   
+  </div>    
+
+  
+</div>
+<div id="navbar">
+  <a class="selected" href="hd_witness_1_2_-_variable_changed_content.htm" title="Table of Contents" target="hmnavigation"><img src="hm_btn_toc.png" alt="Table of Contents"
+      onmouseover="this.src='hm_btn_toc_orange.png'" 
+      onmouseout="this.src='hm_btn_toc.png'"/></a>
+<a href="hd_witness_1_2_-_variable_changed_kwindex.htm" title="Keyword Index" target="hmnavigation"><img src="hm_btn_index.png" alt="Keyword Index"
+      onmouseover="this.src='hm_btn_index_orange.png'" 
+      onmouseout="this.src='hm_btn_index.png'"/></a>
+<a href="hd_witness_1_2_-_variable_changed_ftsearch.htm" title="Search" target="hmnavigation"><img src="hm_btn_search.png" alt="Search"
+      onmouseover="this.src='hm_btn_search_orange.png'" 
+      onmouseout="this.src='hm_btn_search.png'"/></a>
+</div>
+<div id="hmnavbox">
+  <iframe name="hmnavigation" id="hmnavigation" src="hd_witness_1_2_-_variable_changed_content.htm" seamless="seamless" title="Navigation Pane" frameborder="0"></iframe>
+</div>
+
+<div id="hmcontentbox" >
+  <script type="text/javascript">
+    var defaulttopic="launching_and_closing_hd_witness_client.htm";
+    if (location.href.lastIndexOf("?") > 0) defaulttopic=location.href.substring(location.href.lastIndexOf("?")+1,location.href.length).replace(/:/g,"");
+    document.write('<iframe name="hmcontent" id="hmcontent" src="'+defaulttopic+'" seamless="seamless" title="Content Page" frameborder="0"></iframe>');
+  </script>
+  <noscript>
+    <iframe name="hmcontent" id="hmcontent" src="launching_and_closing_hd_witness_client.htm" seamless="seamless" title="Content Page" frameborder="0"></iframe>
+  </noscript>
+</div>
+</body>
+</html>
+

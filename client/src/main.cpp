@@ -34,7 +34,6 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "core/resource_managment/resource_discovery_manager.h"
 #include "core/resource_managment/resource_pool.h"
-#include "utils/client_util.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -76,6 +75,13 @@
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
 #include "ui/workaround/fglrx_full_screen.h"
+
+#ifdef Q_OS_WIN
+    #include "ui/workaround/iexplore_url_handler.h"
+#endif
+
+#include "ui/help/help_handler.h"
+#include "client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -210,8 +216,8 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
-    
+    QnClientModule client(argc, argv);
+
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
@@ -282,6 +288,12 @@ int qnMain(int argc, char *argv[])
  //   application->installEventFilter(&x11LauncherWorkaround);
 #endif
 
+#ifdef Q_OS_WIN
+    QnIexploreUrlHandler iexploreUrlHanderWorkaround;
+    // all effects are placed in the constructor
+    Q_UNUSED(iexploreUrlHanderWorkaround)
+#endif
+
     if(singleApplication) {
         QString argsMessage;
         for (int i = 1; i < argc; ++i)
@@ -315,6 +327,10 @@ int qnMain(int argc, char *argv[])
         return 0;
     if (!cl_log.create(dataLocation + QLatin1String("/log/log_file"), 1024*1024*10, 5, cl_logDEBUG1))
         return 0;
+
+
+    QnHelpHandler helpHandler;
+    qApp->installEventFilter(&helpHandler);
 
 
     QnLog::initLog(logLevel);

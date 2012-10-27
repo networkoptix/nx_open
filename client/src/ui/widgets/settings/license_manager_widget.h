@@ -1,5 +1,5 @@
-#ifndef LICENSEMANAGERWIDGET_H
-#define LICENSEMANAGERWIDGET_H
+#ifndef QN_LICENSE_MANAGER_WIDGET_H
+#define QN_LICENSE_MANAGER_WIDGET_H
 
 #include <QtGui/QWidget>
 
@@ -12,8 +12,7 @@ namespace Ui {
     class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public QWidget
-{
+class QnLicenseManagerWidget : public QWidget {
     Q_OBJECT
 
 public:
@@ -46,4 +45,4 @@ private:
     QnLicenseList m_licenses;
 };
 
-#endif // LICENSEMANAGERWIDGET_H
+#endif // QN_LICENSE_MANAGER_WIDGET_H

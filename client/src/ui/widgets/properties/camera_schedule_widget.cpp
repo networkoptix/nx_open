@@ -480,22 +480,35 @@ void QnCameraScheduleWidget::updateLicensesLabelText()
         if (!camera->isScheduleDisabled())
             alreadyActive++;
 
+    // how many licenses will be used if recording will be enabled on all cameras
     int toBeUsed = qnResPool->activeCameras() + m_cameras.size() - alreadyActive;
+
+    // how many licensed is used really
     int used = qnResPool->activeCameras() + activeCameraCount() - alreadyActive;
+
+    // how many licenses do we have
     int total = qnLicensePool->getLicenses().totalCameras();
 
     QPalette palette = this->palette();
-    if(toBeUsed > total)
+    if(used > total)
         palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->licensesLabel->setPalette(palette);
 
-    if(ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
-        ui->licensesLabel->setText(tr("%n license(s) are used out of %1.", NULL, used).arg(total));
+    QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);
+
+    if (ui->enableRecordingCheckBox->checkState() == Qt::Checked) {
+        ui->licensesLabel->setText(usageText);
+    } else if (toBeUsed > total){
+        ui->licensesLabel->setText(
+            QString(QLatin1String("%1 %2")).
+                arg(tr("Activate %n more license(s).", NULL, toBeUsed - total)).
+                arg(usageText)
+        );
     } else {
         ui->licensesLabel->setText(
-            tr("%1. %2.").
-                arg(tr("Requires %n license(s)", NULL, m_cameras.size() - alreadyActive)).
-                arg(tr("%n license(s) are used out of %1", NULL, used).arg(total))
+            QString(QLatin1String("%1 %2")).
+                arg(tr("%n license(s) will be used.", NULL, m_cameras.size() - alreadyActive)).
+                arg(usageText)
         );
     }
 }

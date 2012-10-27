@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QScopedPointer>
-#include <help/context_help.h>
+#include <ui/help/help_handler.h>
 
 namespace Ui {
     class HelpWidget;
@@ -12,7 +12,7 @@ namespace Ui {
 class QnHelpWidget: public QWidget {
     Q_OBJECT;
 public:
-    QnHelpWidget(QnContextHelp *contextHelp, QWidget *parent = NULL);
+    QnHelpWidget(QnHelpHandler *contextHelp, QWidget *parent = NULL);
     virtual ~QnHelpWidget();
 
 signals:
@@ -20,20 +20,20 @@ signals:
     void hideRequested();
 
 protected slots:
-    void at_contextHelp_helpContextChanged(QnContextHelp::ContextId id);
+    void at_contextHelp_helpContextChanged(int id);
     void at_checkBox_clicked(bool checked);
 
 protected:
     virtual void wheelEvent(QWheelEvent *event) override;
 
-    QnContextHelp *contextHelp() const {
+    QnHelpHandler *contextHelp() const {
         return m_contextHelp.data();
     }
 
 private:
     QScopedPointer<Ui::HelpWidget> ui;
-    QWeakPointer<QnContextHelp> m_contextHelp;
-    QnContextHelp::ContextId m_id;
+    QWeakPointer<QnHelpHandler> m_contextHelp;
+    int m_id;
 };
 
 #endif // QN_HELP_WIDGET_H

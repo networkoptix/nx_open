@@ -18,10 +18,6 @@ public:
     QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnVideoCamera();
 
-    void startRecording();
-    void stopRecording();
-    bool isRecording();
-
     QnMediaResourcePtr resource();
 
     // this function must be called if stream was interupted or so; to synch audio and video again 
@@ -78,7 +74,6 @@ private:
     mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
     QnCamDisplay m_camdispay;
-    QnStreamRecorder* m_recorder;
     QnAbstractMediaStreamDataProvider* m_reader;
 
     QnlTimeSource* m_extTimeSrc;

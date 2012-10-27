@@ -180,6 +180,7 @@ RTPSession::RTPSession():
     m_transport(TRANSPORT_UDP),
     m_selectedAudioChannel(0),
     m_startTime(AV_NOPTS_VALUE),
+    m_openedTime(AV_NOPTS_VALUE),
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(50 * 1000 * 1000),
@@ -387,7 +388,7 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
 bool RTPSession::open(const QString& url, qint64 startTime)
 {
     if (startTime != AV_NOPTS_VALUE)
-        m_startTime = startTime;
+        m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
     mUrl = url;
@@ -555,7 +556,8 @@ bool RTPSession::sendDescribe()
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
-    addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
+    if (m_openedTime != AV_NOPTS_VALUE)
+        addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
 

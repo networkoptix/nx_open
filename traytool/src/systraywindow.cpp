@@ -69,8 +69,8 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerHandle = 0;
     m_skipTicks = 0;
 
-    m_mediaServerServiceName = QString(QN_CUSTOMIZATION) + QString("MediaServer");
-    m_appServerServiceName = QString(QN_CUSTOMIZATION) + QString("AppServer");
+    m_mediaServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("MediaServer");
+    m_appServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;

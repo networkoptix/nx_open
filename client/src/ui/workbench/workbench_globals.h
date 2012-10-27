@@ -56,8 +56,11 @@ namespace Qn {
         ItemTimeRole,                               /**< Role for item's playback position, in milliseconds. Value of type qint64. */
         ItemPausedRole,                             /**< Role for item's paused state. Value of type bool. */
         ItemSpeedRole,                              /**< Role for item's playback speed. Value of type qreal. */
-        ItemSliderWindowRole,                       /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
-        ItemSliderSelectionRole                     /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
+        ItemSliderWindowRole,                       /**< Role for slider window that is displayed when the item is active. Value of type QnTimePeriod. */
+        ItemSliderSelectionRole,                    /**< Role for slider selection that is displayed when the items is active. Value of type QnTimePeriod. */
+
+        /* Others. */
+        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
     };
 
 

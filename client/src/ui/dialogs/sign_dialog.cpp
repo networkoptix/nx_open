@@ -74,19 +74,23 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_reader(NULL),
     m_renderer(NULL),
     m_glWindow(NULL),
+    m_srcVideoInfo(0),
+    m_layout(0),
     m_requestHandle(-1)
 {
     ui->setupUi(this);
 
-    QVBoxLayout* layout = new QVBoxLayout(ui->videoSpacer);
-    layout->setSpacing(0);
-    layout->setContentsMargins(0,0,0,0);
+    m_layout = new QVBoxLayout(ui->videoSpacer);
+    m_layout->setSpacing(0);
+    m_layout->setContentsMargins(0,0,0,0);
 
     QGLFormat glFormat;
     glFormat.setOption(QGL::SampleBuffers); /* Multisampling. */
     glFormat.setSwapInterval(1); /* Turn vsync on. */
     m_glWindow = new QnSignDialogGlWidget(glFormat);
-    layout->addWidget(m_glWindow);
+    m_layout->addWidget(m_glWindow);
+    
+    m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
     m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(QnResource::Role_Default));
@@ -95,7 +99,9 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
 
     connect(m_camDispay, SIGNAL(gotSignature(QByteArray, QByteArray)), ui->signInfoLabel, SLOT(at_gotSignature(QByteArray, QByteArray)));
     connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), ui->signInfoLabel, SLOT(at_calcSignInProgress(QByteArray, int)));
+    connect(m_camDispay, SIGNAL(gotSignatureDescription(QString, QString, QString)), ui->signInfoLabel, SLOT(at_gotSignatureDescription(QString, QString, QString)));
     connect(m_camDispay, SIGNAL(calcSignInProgress(QByteArray, int)), this, SLOT(at_calcSignInProgress(QByteArray, int)));
+    connect(m_camDispay, SIGNAL(gotSignature(QByteArray, QByteArray)), this, SLOT(at_gotSignature(QByteArray, QByteArray)));
 
     connect(m_camDispay, SIGNAL(gotImageSize(int, int)), this, SLOT(at_gotImageSize(int, int)));
 
@@ -194,4 +200,14 @@ void SignDialog::at_gotImageSize(int width, int height)
     if (m_glWindow) 
         m_glWindow->setImageSize(width, height);
     ui->signInfoLabel->setImageSize(width, height);
+}
+
+void SignDialog::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
+{
+#ifndef SIGN_FRAME_ENABLED
+    m_layout->addWidget(m_srcVideoInfo);
+    m_glWindow->hide();
+    m_srcVideoInfo->setDrawDetailTextMode(true);
+    m_srcVideoInfo->at_gotSignature(signFromFrame, calculatedSign); // it is correct. set parameters vise versa here
+#endif
 }

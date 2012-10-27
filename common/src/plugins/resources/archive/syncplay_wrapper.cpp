@@ -702,9 +702,13 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
     if (d->enabled)
         return;
     d->enabled = true;
+    d->speed = currentSpeed;
 
+    bool isPaused = false;
     foreach(const ReaderInfo& info, d->readers) 
     {
+        isPaused |= info.reader->isMediaPaused();
+
         if (currentTime != qint64(AV_NOPTS_VALUE)) {
             setJumpTime(currentTime);
             info.reader->jumpToPreviousFrame(currentTime);
@@ -716,6 +720,8 @@ void QnArchiveSyncPlayWrapper::enableSync(qint64 currentTime, float currentSpeed
 
         info.reader->setNavDelegate(this);
     }
+    if (isPaused)
+        pauseMedia();
 }
 
 bool QnArchiveSyncPlayWrapper::isEnabled() const

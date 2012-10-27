@@ -50,6 +50,7 @@ private slots:
 #endif
 
 private:
+    bool m_timeoutFlag;
     QUrl m_url;
     int m_retryTimeout;
     QNetworkAccessManager m_manager;
