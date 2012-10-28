@@ -11,6 +11,7 @@
 class QnMServerBusinessRuleProcessor: public QnBusinessRuleProcessor
 {
 public:
+    virtual QString getGuid() const override;
 protected:
     virtual bool executeActionInternal(QnAbstractBusinessActionPtr action) override;
 private:
