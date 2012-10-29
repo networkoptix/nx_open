@@ -264,9 +264,9 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     if(rez == qint64(AV_NOPTS_VALUE)) 
     {
         if (reverseMode)
-            return m_delegate->endTime();
+            return endTime();
         else
-            return m_delegate->startTime();
+            return startTime();
     }
     return rez;
 }

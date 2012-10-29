@@ -763,6 +763,7 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     m_blockReopening = false;
     int sign = value ? -1 : 1;
     bool fromLive = value && m_position == DATETIME_NOW;
+    close();
 
     if (!m_opened && m_resource) {
         m_rtspSession.setScale(qAbs(m_rtspSession.getScale()) * sign);
