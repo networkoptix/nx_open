@@ -48,6 +48,9 @@ public:
 
     void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
     QnId getBusinessRuleId() const             { return m_businessRuleId; }
+
+    QByteArray serializeParams() const;
+    bool deserializeParams(const QByteArray& value);
 protected:
     void setActionType(BusinessActionType value) { m_actionType = value; }
 
