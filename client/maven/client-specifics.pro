@@ -15,7 +15,7 @@ CONFIG(debug, debug|release) {
 }
 
 win32 {
-  QMAKE_LFLAGS += /MACHINE:${arch}
+  QMAKE_LFLAGS += /MACHINE:${arch} /LARGEADDRESSAWARE
 }
 
 mac {
@@ -34,4 +34,3 @@ mac {
 unix {
   LIBS += -lX11
 }
-
