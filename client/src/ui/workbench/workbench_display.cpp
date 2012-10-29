@@ -67,7 +67,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
 
 namespace {

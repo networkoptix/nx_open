@@ -48,7 +48,7 @@
 #include "resource_tree_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
-#include "../../ui/graphics/items/resource/decodedpicturetoopengluploader.h"
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
 
 namespace {
