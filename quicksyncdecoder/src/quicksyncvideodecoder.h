@@ -312,7 +312,6 @@ private:
     HDC m_glContextDevice;
     HGLRC m_glContext;
 #endif
-    IDirect3DDevice9* m_d3d9Device;
 
 #ifdef USE_ASYNC_IMPL
     std::vector<AsyncOperationContext> m_currentOperations;
