@@ -701,6 +701,10 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
         if(searchState.step > 0) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
+
+        QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
+        if(!period.isNull())
+            flags &= ~WidgetSupportsLive;
     } else {
         flags = 0;
     }
