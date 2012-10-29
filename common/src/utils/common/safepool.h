@@ -37,6 +37,10 @@ public:
         friend class SafePool;
 
     public:
+        const_iterator()
+        {
+        }
+
         const_reference operator*() const
         {
             return *m_iter;
@@ -344,6 +348,9 @@ public:
     private:
         const SafePool& m_pool;
         const typename SafePool::const_iterator m_iter;
+
+        ScopedReadLock( const ScopedReadLock& );
+        ScopedReadLock& operator=( const ScopedReadLock& );
     };
 
 private:
