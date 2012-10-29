@@ -1,3 +1,4 @@
+
 #include "resource_widget_renderer.h"
 
 #include <QtCore/QMutexLocker>
@@ -7,6 +8,8 @@
 #include <utils/common/performance.h>
 #include <utils/gl/glcontext.h>
 #include <utils/settings.h>
+
+#include "decodedpicturetoopengluploadercontextpool.h"
 
 
 QnResourceWidgetRenderer::QnResourceWidgetRenderer(
