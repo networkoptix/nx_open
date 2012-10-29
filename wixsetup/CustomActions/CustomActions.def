@@ -12,4 +12,5 @@ FindFreePorts
 FixServerFolder
 FixClientFolder
 CopyMediaServerProfile
+CopyAppServerProfile
 IsClientFolderExists

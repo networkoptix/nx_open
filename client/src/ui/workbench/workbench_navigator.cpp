@@ -635,11 +635,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    if(m_currentMediaWidget) {
+    /*if(m_currentMediaWidget) {
         QnAbstractArchiveReader *archiveReader = m_currentMediaWidget->display()->archiveReader();
         if (archiveReader)
             archiveReader->setPlaybackMask(QnTimePeriodList());
-    }
+    }*/
 
     if (display() && display()->isChangingLayout()){
         m_currentWidget = NULL;
@@ -701,6 +701,10 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
         if(searchState.step > 0) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
+
+        QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
+        if(!period.isNull())
+            flags &= ~WidgetSupportsLive;
     } else {
         flags = 0;
     }

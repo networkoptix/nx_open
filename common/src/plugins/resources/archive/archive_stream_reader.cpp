@@ -710,7 +710,7 @@ begin_label:
         m_playbackMaskSync.unlock();
 
         if (newTime == DATETIME_NOW || newTime == -1) {
-            internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
+            //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
             return createEmptyPacket(reverseMode); // EOF reached
         }
 
@@ -1010,6 +1010,18 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     */
 }
 
+
+void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
+{
+    QMutexLocker lock(&m_playbackMaskSync);
+    m_playbackMaskHelper.setPlaybackRange(playbackRange);
+}
+
+QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
+{
+    return m_playbackMaskHelper.getPlaybackRange();
+}
+
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
     QMutexLocker lock(&m_playbackMaskSync);
@@ -1113,4 +1125,24 @@ double QnArchiveStreamReader::getSpeed() const
 QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 {
     return m_codecContext;
+}
+
+qint64 QnArchiveStreamReader::startTime() const
+{
+    Q_ASSERT(m_delegate);
+    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    if (p.isEmpty())
+        return m_delegate->startTime();
+    else
+        return p.startTimeMs*1000;
+}
+
+qint64 QnArchiveStreamReader::endTime() const
+{
+    Q_ASSERT(m_delegate);
+    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    if (p.isEmpty())
+        return m_delegate->endTime();
+    else
+        return p.endTimeMs()*1000;
 }

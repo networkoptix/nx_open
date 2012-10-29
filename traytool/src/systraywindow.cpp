@@ -52,11 +52,7 @@ bool MyIsUserAnAdmin()
 QnSystrayWindow::QnSystrayWindow():
     ui(new Ui::SettingsDialog),
     m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
-#ifdef _WIN64
-    m_appServerSettings(QString("HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\") + qApp->organizationName() + "\\" + APP_SERVER_NAME, QSettings::NativeFormat)
-#else
-    m_appServerSettings(QSettings::SystemScope, qApp->organizationName())
-#endif
+    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
 {
     ui->setupUi(this);
 
@@ -114,12 +110,14 @@ QnSystrayWindow::QnSystrayWindow():
 
     ui->informationLabel->setText(
         tr(
-            "<b>%1</b> version %2 (%3).<br />\n"
-            "Built for %4-%5 with %6."
+            "<b>%1</b> version %2 (%3).<br/>\n"
+            "Engine version %4.<br/>\n"
+            "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_ENGINE_VERSION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER))

@@ -344,6 +344,7 @@
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="SetMoviesFolder" BinaryKey="CustomActions.dll" DllEntry="SetMoviesFolder" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
+        <CustomAction Id="CopyAppServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
@@ -389,6 +390,8 @@
         <CustomAction Id="SyncDatabaseAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="check" Impersonate="no" />
         
+        <CustomAction Id="CopyAppServerProfile_Cmd" Property="CopyAppServerProfile" Execute="immediate" Impersonate="yes"
+            Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller;[System64Folder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller"/>
         <CustomAction Id="CopyMediaServerProfile_Cmd" Property="CopyMediaServerProfile" Execute="immediate" Impersonate="yes"
             Value="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server;[System64Folder]config\systemprofile\AppData\Local\${company.name}\${company.name} Media Server"/>
         
@@ -471,18 +474,21 @@
             <Custom Action="CloseTrayToolAction_Cmd" Before="CloseTrayToolAction"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             <Custom Action="CloseTrayToolAction" Before="StopServices"><![CDATA[ NOT $(var.VmsInstalling) ]]></Custom>
             
-            <Custom Action="SyncDatabaseAction_Cmd" After="InstallFiles">      <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-
-            <Custom Action="CertGenAction_Cmd" After="InstallFiles">      <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
-            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyAppServerProfile_Cmd" After="InstallFiles"><![CDATA[ (&AppServerFeature=3 OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyAppServerProfile" After="CopyAppServerProfile_Cmd"><![CDATA[ (&AppServerFeature=3 OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
-            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]></Custom>
-            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]></Custom>
-            
-            <Custom Action="CopyMediaServerProfile_Cmd" After="InitDatabaseAction"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CopyMediaServerProfile_Cmd" After="InstallFiles"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             <Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd"><![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
             
+            <Custom Action="CertGenAction_Cmd" After="CopyAppServerProfile">      <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="CertGenAction" After="CertGenAction_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            
+            <Custom Action="SyncDatabaseAction_Cmd" After="CopyAppServerProfile">      <![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+            <Custom Action="SyncDatabaseAction" After="SyncDatabaseAction_Cmd"><![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
+
+            <Custom Action="InitDatabaseAction_Cmd" After="SyncDatabaseAction"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]></Custom>
+            <Custom Action="InitDatabaseAction" After="InitDatabaseAction_Cmd"><![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]></Custom>
+                        
             <Custom Action="LaunchTrayTool" After="InstallFinalize"><![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
         </InstallExecuteSequence>
         

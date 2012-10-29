@@ -1390,11 +1390,14 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
-                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+                int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
+                int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
-                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
+                startDateTime.setTime(QTime());
+                startDateTime = startDateTime.addMSecs(startMSecs);
+
+                endDateTime.setTime(QTime());
+                endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
@@ -2232,6 +2235,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = exportReadOnly ? 1 : 0;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i) {
+        if (m_layoutExportResources[i]->hasFlags(QnResource::utc))
+            flags |= 2; 
+    }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
 
@@ -2735,7 +2743,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     QMessageBox::information(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString())
     );
 }
 

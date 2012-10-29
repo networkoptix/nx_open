@@ -51,7 +51,9 @@ public:
 
     bool setSendMotion(bool value);
 
-    void setPlaybackMask(const QnTimePeriodList& playbackMask);
+    virtual void setPlaybackRange(const QnTimePeriod& playbackRange) override;
+    virtual QnTimePeriod getPlaybackRange() const override;
+    virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
     /*
     *   setQualityForced same as setQuality but ignore 'disableQualityChange' mode
@@ -74,6 +76,9 @@ public:
     virtual QnMediaContextPtr getCodecContext() const override;
 
     virtual void startPaused() override;
+
+    virtual qint64 startTime() const override;
+    virtual qint64 endTime() const override;
 protected:
     virtual bool init();
 

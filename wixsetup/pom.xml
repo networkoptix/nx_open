@@ -24,7 +24,6 @@
         <arch>x86</arch>
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
-        <skip.sign>true</skip.sign>
         <ClientHelpSourceDir>${basedir}/../help/HTML</ClientHelpSourceDir>                     
     </properties>
 
