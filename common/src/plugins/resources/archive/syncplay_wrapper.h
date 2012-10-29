@@ -52,6 +52,8 @@ public:
 
     virtual void reinitTime(qint64 newTime) override;
 
+    void setLiveModeEnabled(bool value);
+
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
     void onConsumerBlocksReader(QnAbstractStreamDataProvider* reader, bool value);

@@ -176,8 +176,7 @@ void QnWorkbenchStreamSynchronizer::at_renderWatcher_displayingChanged(QnAbstrac
 
 void QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged() {
     QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
-    if(!period.isEmpty())
-        ; // TODO: #VASILENKO
+    m_syncPlay->setLiveModeEnabled(period.isEmpty());
 }
 
 void QnWorkbenchStreamSynchronizer::at_resource_flagsChanged() {

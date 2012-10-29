@@ -58,6 +58,7 @@ public:
       timeMutex(QMutex::Recursive)
     {
         initValues();
+        liveModeEnabled = true;
     }
 
     QList<ReaderInfo> readers;
@@ -72,6 +73,7 @@ public:
     bool enabled;
     qint64 bufferingTime;
     bool paused;
+    bool liveModeEnabled;
     //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
@@ -542,7 +544,7 @@ void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)
             break;
         }
     }
-    if (value)
+    if (value && d->liveModeEnabled)
     {
         bool allReady = d->speed > 0;
         for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
@@ -728,4 +730,10 @@ bool QnArchiveSyncPlayWrapper::isEnabled() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     return d->enabled;
+}
+
+void QnArchiveSyncPlayWrapper::setLiveModeEnabled(bool value)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    d->liveModeEnabled = value;    
 }
