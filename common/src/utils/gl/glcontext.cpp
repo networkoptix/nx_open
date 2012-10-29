@@ -56,15 +56,13 @@ GLContext::~GLContext()
 
     if( m_handle != NULL )
     {
-        if( !wglDeleteContext( m_handle ) )
-            int x = 0;
+        wglDeleteContext( m_handle );
         m_handle = NULL;
     }
 
     if( m_dc != NULL )
     {
-        if( !DeleteDC( m_dc ) )
-            int x = 0;
+        DeleteDC( m_dc );
         m_dc = NULL;
     }
 }
