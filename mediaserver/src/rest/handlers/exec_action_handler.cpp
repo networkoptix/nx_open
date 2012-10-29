@@ -3,14 +3,6 @@
 #include "events/abstract_business_action.h"
 #include "events/business_message_bus.h"
 
-QnExecActionHandler::QnExecActionHandler() {
-}
-
-QnExecActionHandler::~QnExecActionHandler() 
-{
-
-}
-
 int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
     Q_UNUSED(params)
@@ -38,7 +30,5 @@ int QnExecActionHandler::executePost(const QString& path, const QnRequestParamLi
 QString QnExecActionHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
-    QString rez;
-    rez += "Execute business action. Action specified in POST request body at binary protobuf format. \n";
-    return rez;
+    return "Execute business action. Action specified in POST request body at binary protobuf format. \n";
 }
