@@ -31,7 +31,7 @@ bool QnVersion::isNull() const {
     return m_major == 0 && m_minor == 0 && m_bugfix == 0;
 }
 
-bool QnVersion::operator<(const QnVersion& other) const {
+bool QnVersion::operator<(const QnVersion &other) const {
     if (m_major < other.m_major) {
         return true;
     } else if (m_major == other.m_major) {
@@ -58,9 +58,9 @@ QString QnVersion::toString() const {
 
 
 bool QnUpdateInfoItem::isNull() const {
-    return version.isNull();
+    return productVersion.isNull();
 }
 
 bool QnUpdateInfoItem::operator==(const QnUpdateInfoItem &other) const {
-    return version == other.version && title == other.title && description == other.description && pubDate == other.pubDate && url == other.url;
+    return productVersion == other.productVersion && title == other.title && description == other.description && pubDate == other.pubDate && url == other.url;
 }

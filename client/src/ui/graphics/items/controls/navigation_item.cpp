@@ -394,7 +394,7 @@ void QnNavigationItem::updateMuteButtonChecked() {
 void QnNavigationItem::updateLiveButtonChecked() {
     m_liveButton->setChecked(navigator()->isLive());
 
-    /* This is needed as button's enabled state will be updated from its action. */
+    /* This is needed as button's enabled state will be updated from its action. */ // TODO
     updateLiveButtonEnabled();
 }
 

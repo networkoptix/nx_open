@@ -40,8 +40,11 @@ private:
 
 
 struct QnUpdateInfoItem {
-    /** Update version. */
-    QnVersion version;
+    /** Product version of the update. This is the version to be displayed to the user. */
+    QnVersion productVersion;
+
+    /** Engine version of the update. */
+    QnVersion engineVersion;
 
     /** Update information title. */
     QString title;

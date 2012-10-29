@@ -73,7 +73,7 @@ public:
         user = 0x2000,          /**< User resource. */
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
-        periods = 0x8000,       /**< Resource uses UTC-based timing. */
+        periods = 0x8000,       /**< Resource has recorded periods. */
         motion = 0x10000,       /**< Resource has motion */
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
 
