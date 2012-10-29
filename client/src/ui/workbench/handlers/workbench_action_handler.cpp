@@ -1390,11 +1390,14 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
-                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+                int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
+                int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
-                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
+                startDateTime.setTime(QTime());
+                startDateTime = startDateTime.addMSecs(startMSecs);
+
+                endDateTime.setTime(QTime());
+                endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
