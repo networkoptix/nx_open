@@ -92,6 +92,7 @@ public:
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
+    int addBusinessRule(const QnBusinessEventRule& businessRule, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);
@@ -99,6 +100,7 @@ public:
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
+    int getBusinessRules(QnBusinessEventRules& businessRules, QByteArray& errorString);
 
     int saveSync(const QnMediaServerResourcePtr&, QByteArray& errorString);
     int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);

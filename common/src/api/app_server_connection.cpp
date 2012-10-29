@@ -453,6 +453,15 @@ int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &camer
     return addObject(QLatin1String("cameraServerItem"), data, reply, errorString);
 }
 
+int QnAppServerConnection::addBusinessRule(const QnBusinessEventRule &businessRule, QByteArray &errorString)
+{
+    QByteArray data;
+    m_serializer.serializeBusinessRule(businessRule, data);
+
+    QByteArray reply;
+    return addObject(QLatin1String("businessRule"), data, reply, errorString);
+}
+
 
 int QnAppServerConnection::getServers(QnMediaServerResourceList &servers, QByteArray &errorString)
 {
@@ -535,6 +544,21 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 
     try {
         m_serializer.deserializeCameraHistoryList(cameraHistoryList, data);
+    } catch (const QnSerializeException& e) {
+        errorString += e.errorString();
+    }
+
+    return status;
+}
+
+int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules, QByteArray &errorString)
+{
+    QByteArray data;
+
+    int status = getObjects(QLatin1String("businessRule"), QString(), data, errorString);
+
+    try {
+        m_serializer.deserializeBusinessRules(businessRules, data);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }

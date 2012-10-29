@@ -21,13 +21,15 @@ public:
     void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) override;
     void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) override;
     void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) override;
-    void deserializeBusinessRules(QnAbstractBusinessEventRules&, const QByteArray& data);
+    void deserializeBusinessRules(QnBusinessEventRules&, const QByteArray& data);
 
     void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) override;
     void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) override;
     void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) override;
     void serializeLicense(const QnLicensePtr& license, QByteArray& data) override;
     void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) override;
+    void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
+    void serializeBusinessRule(const QnBusinessEventRule&, QByteArray& data) override;
 
 private:
     void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) override;

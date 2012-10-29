@@ -35,12 +35,18 @@ public:
     virtual bool checkCondition(const QnBusinessParams& params) const = 0;
 
     BusinessEventType getEventType() const { return m_eventType; }
+
+    void setToggleState(ToggleState value) { m_toggleState = value; }
+    ToggleState getToggleState() const { return m_toggleState; }
+
 protected:
     void setEventType(BusinessEventType value) { m_eventType = value;   }
+
 private:
     BusinessEventType m_eventType;
     qint64 m_dateTime; // event date and time in usec from UTC
     QnResourcePtr m_resource; // resource that provide this event
+    ToggleState m_toggleState;
 };
 
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;

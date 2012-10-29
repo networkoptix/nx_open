@@ -33,7 +33,7 @@ public:
     QnResourcePtr getDstResource() const { return m_destination; }
     void setDstResource(QnResourcePtr value) { m_destination = value; }
 
-    void getBusinessParams() const;
+    QnBusinessParams getBusinessParams() const;
     void setBusinessParams(const QnBusinessParams& params);
 
     /*

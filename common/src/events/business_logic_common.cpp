@@ -6,14 +6,23 @@
 QByteArray serializeBusinessParams(const QnBusinessParams& params)
 {
     QJson::Serializer serializer;
-    return serializer.serialize(QVariant(params));
+
+    QVariantMap paramMap;
+    foreach(QString key, params.keys())
+    {
+        paramMap[key] = params[key];
+    }
+
+    return serializer.serialize(paramMap);
 }
 
 QnBusinessParams deserializeBusinessParams(const QByteArray& value)
 {
     QJson::Parser parser;
     bool ok;
-    QVariant result = parser.parse(value, &ok);
+
+    QTextStream io(value);
+    QVariant result = parser.parse(io.device(), &ok);
     if (ok)
         return result.toMap();
 

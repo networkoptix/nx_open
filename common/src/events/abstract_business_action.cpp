@@ -1,16 +1,26 @@
+#include "core/resource/resource.h"
+#include "core/resource_managment/resource_pool.h"
+
+#include "businessRule.pb.h"
+
+#include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
 
 QByteArray QnAbstractBusinessAction::serialize()
 {
     pb::BusinessAction pb_businessAction;
 
-    pb_businessAction.set_actiontype(actionType());
+    pb_businessAction.set_actiontype((pb::BusinessActionType)actionType());
     pb_businessAction.set_actionresource(getResource()->getId());
-    pb_businessAction.set_actionParams(serializeBusinessParams(getParams()));
-    pb_businessAction.set_businessRuleId(getBusinessRuleId().toInt());
+    pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
+    pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
+
+    std::string str;
+    pb_businessAction.SerializeToString(&str);
+    return QByteArray(str.data(), str.length());
 }
 
-static QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
+QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
 
@@ -25,19 +35,19 @@ static QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const
 
     switch(pb_businessAction.actiontype())
     {
-        case pb::BusinessAction::CameraOutput:
-        case pb::BusinessAction::Bookmark:
-        case pb::BusinessAction::CameraRecording:
-        case pb::BusinessAction::PanicRecording:
-        case pb::BusinessAction::SendMail:
-        case pb::BusinessAction::Alert:
-        case pb::BusinessActio::ShowPopup:
-            businessAction = QnAbstractBusinessActionPtr(new QnBusinessEventRule());
+        case pb::BusinessActionType::CameraOutput:
+        case pb::BusinessActionType::Bookmark:
+        case pb::BusinessActionType::CameraRecording:
+        case pb::BusinessActionType::PanicRecording:
+        case pb::BusinessActionType::SendMail:
+        case pb::BusinessActionType::Alert:
+        case pb::BusinessActionType::ShowPopup:
+            businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction());
     }
 
-    businessAction->setActionType(pb_businessAction.actiontype());
-    businessAction->setResource(pb_businessAction.actionresource());
-    businessAction->setParams(deserializeBusinessParams(ci->actionparams.c_str()));
+    businessAction->setActionType((BusinessActionType)pb_businessAction.actiontype());
+    businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
+    businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
 
     return businessAction;

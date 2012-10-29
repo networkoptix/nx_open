@@ -4,13 +4,10 @@
 #include "toggle_business_action.h"
 #include "core/resource/media_resource.h"
 
-class QnRecordingBusinessAction: public QnToggleBusinessAction
+class QnRecordingBusinessAction: public QnAbstractBusinessAction
 {
 public:
     QnRecordingBusinessAction();
-
-    virtual QByteArray QnRecordingBusinessAction::serialize() override;
-    virtual bool QnRecordingBusinessAction::deserialize(const QByteArray& data) override;
 
     void setFps(int value) { m_params[QLatin1String("fps")] = value; }
     int getFps() const { return m_params.value(QLatin1String("fps")).toInt(); }
