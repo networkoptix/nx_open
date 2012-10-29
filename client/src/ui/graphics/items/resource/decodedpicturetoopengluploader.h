@@ -21,60 +21,18 @@
 #include <utils/gl/glcontext.h>
 #include <utils/media/frame_info.h>
 
+//#define GL_COPY_AGGREGATION
+#ifdef GL_COPY_AGGREGATION
+#include "aggregationsurface.h"
+#endif
 
-class GLContext;
+
+class AsyncPicDataUploader;
 class CLVideoDecoderOutput;
 class DecodedPictureToOpenGLUploaderPrivate;
+class DecodedPictureToOpenGLUploadThread;
+class GLContext;
 class QnGlRendererTexture;
-
-class DecodedPictureToOpenGLUploaderContextPool
-:
-    public QObject
-{
-    Q_OBJECT
-
-public:
-    DecodedPictureToOpenGLUploaderContextPool();
-    virtual ~DecodedPictureToOpenGLUploaderContextPool();
-
-    //!Set id of window to use for gl context creation
-    void setPaintWindowHandle( WId paintWindowId );
-    WId paintWindowHandle() const;
-    void setPaintWindow( QWidget* const paintWindow );
-    //!Checks, whether there are any contexts in pool shared with \a parentContext
-    /*!
-        If there are no contexts shared with \a parentContext, creates one (in this case \a winID is used)
-        \param winID Passed to \a GLContext constructor
-        \param poolSizeIncrement Number of gl contexts to create if pool is empty. If < 0, pool decides itself how much context to create
-        \note It is recommended to call this method from GUI thread. In other case, behavour can be implementation-specific
-    */
-    bool ensureThereAreContextsSharedWith(
-        GLContext::SYS_GL_CTX_HANDLE parentContext,
-        WId winID = NULL,
-        int poolSizeIncrement = -1 );
-    /*!
-        If on pool shared with \a parentContexts, an empty pool is created and returned
-    */
-    const SafePool<GLContext*, QSharedPointer<GLContext> >& getPoolOfContextsSharedWith( GLContext::SYS_GL_CTX_HANDLE parentContext ) const;
-
-    //!Implementation of QObject::eventFilter. Deleted all GLContexts, associated with window being closed
-    //virtual bool eventFilter( QObject* watched, QEvent* event );
-
-    static DecodedPictureToOpenGLUploaderContextPool* instance();
-
-public slots:
-    //!Equal to setPaintWindowHandle( NULL )
-    void resetPaintWindowHandle();
-
-private:
-    mutable QMutex m_mutex;
-    //map<parent context, pool of contexts shared with parent>
-    mutable std::map<GLContext::SYS_GL_CTX_HANDLE, SafePool<GLContext*, QSharedPointer<GLContext> >* > m_auxiliaryGLContextPool;
-    WId m_paintWindowId;
-    size_t m_optimalGLContextPoolSize;
-};
-
-class AsyncUploader;
 
 //!Used by decoding thread to load decoded picture from system memory to opengl texture(s)
 /*!
@@ -99,16 +57,15 @@ public:
     class UploadedPicture
     {
         friend class DecodedPictureToOpenGLUploader;
-        friend class AsyncUploader;
+        friend class AsyncPicDataUploader;
 
     public:
-        const SafePool<GLContext*, QSharedPointer<GLContext> >& glContextPool() const;
-        GLContext* glContext() const;
         PixelFormat colorFormat() const;
         void setColorFormat( PixelFormat newFormat );
         int width() const;
         int height() const;
-        const QVector2D& texCoords() const;
+        //const QVector2D& texCoords() const;
+        QRectF textureRect() const;
         /*!
             Number of textures depends on color format:\n
                 - 3 for YV12, one for each plane
@@ -122,12 +79,15 @@ public:
         QnMetaDataV1Ptr metadata() const;
         //!Returns opengl texture holding plane \a index data. Index of a plane depends on color format (Y, U, V for YV12; Y, UV for NV12 and RGB for rgb format)
         QnGlRendererTexture* texture( int index ) const;
+        GLuint pboID() const;
+#ifdef GL_COPY_AGGREGATION
+        void setAggregationSurfaceRect( const QSharedPointer<AggregationSurfaceRect>& surfaceRect );
+        const QSharedPointer<AggregationSurfaceRect>& aggregationSurfaceRect() const;
+#endif
 
     private:
         static const int TEXTURE_COUNT = 3;
 
-        const SafePool<GLContext*, QSharedPointer<GLContext> >& m_glContextPool;
-        GLContext* const m_glContext;
         PixelFormat m_colorFormat;
         int m_width;
         int m_height;
@@ -136,11 +96,13 @@ public:
         unsigned int m_sequence;
         quint64 m_pts;
         QnMetaDataV1Ptr m_metadata;
+        GLuint m_pboID;
+        size_t m_pboSizeBytes;
+#ifdef GL_COPY_AGGREGATION
+        QSharedPointer<AggregationSurfaceRect> m_surfaceRect;
+#endif
 
-        UploadedPicture(
-            DecodedPictureToOpenGLUploader* const uploader,
-            const SafePool<GLContext*, QSharedPointer<GLContext> >& _glContextPool,
-            GLContext* const _glContext );
+        UploadedPicture( DecodedPictureToOpenGLUploader* const uploader );
         UploadedPicture( const UploadedPicture& );
         UploadedPicture& operator=( const UploadedPicture& );
         ~UploadedPicture();
@@ -209,14 +171,15 @@ public:
     void setNV12ToRgbShaderUsed( bool nv12SharedUsed );
 
     //!This method is called by asynchronous uploader when upload is done
-    void pictureDataUploadSucceeded( AsyncUploader* const uploader, UploadedPicture* const picture );
+    void pictureDataUploadSucceeded( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
     //!This method is called by asynchronous uploader when upload has failed
-    void pictureDataUploadFailed( AsyncUploader* const uploader, UploadedPicture* const picture );
+    void pictureDataUploadFailed( AsyncPicDataUploader* const uploader, UploadedPicture* const picture );
     //!Uploader calles this method, if picture uploading has been cancelled from outside
-    void pictureDataUploadCancelled( AsyncUploader* const uploader );
+    void pictureDataUploadCancelled( AsyncPicDataUploader* const uploader );
 
     //!Loads picture with dat stored in \a planes to opengl \a dest
     /*!
+        \param glContext This context MUST be current in the current thread
         \param planes Array size must be >= 3. Although, only necessary planes are used (3 for YV12, 2 for NV12)
         \param lineSizes Array size must be >= 3
         \param isVideoMemory Should be set to true when data in \a planes is in USWC memory to optimize data reading. false otherwise. Currently unused
@@ -225,7 +188,6 @@ public:
         \return false, if failed to make \a glContext current. Otherwise, true
     */
     bool uploadDataToGl(
-        GLContext* const glContext,
         UploadedPicture* const dest,
         PixelFormat format,
         unsigned int width,
@@ -233,9 +195,20 @@ public:
         uint8_t* planes[],
         int lineSizes[],
         bool isVideoMemory );
+#ifdef GL_COPY_AGGREGATION
+    bool uploadDataToGlWithAggregation(
+        DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
+        const PixelFormat format,
+        const unsigned int width,
+        const unsigned int height,
+        uint8_t* planes[],
+        int lineSizes[],
+        bool /*isVideoMemory*/ );
+#endif
 
 private:
     friend class QnGlRendererTexture;
+    friend class DecodedPicturesDeleter;
 
     QSharedPointer<DecodedPictureToOpenGLUploaderPrivate> d;
     int m_format;
@@ -247,32 +220,24 @@ private:
     mutable QMutex m_uploadMutex;
     mutable QWaitCondition m_cond;
     unsigned int m_previousPicSequence;
-    std::deque<UploadedPicture*> m_emptyBuffers;
+    mutable std::deque<UploadedPicture*> m_emptyBuffers;
     mutable std::deque<UploadedPicture*> m_renderedPictures;
     mutable std::deque<UploadedPicture*> m_picturesWaitingRendering;
     mutable std::deque<UploadedPicture*> m_picturesBeingRendered;
     bool m_terminated;
     bool m_yv12SharedUsed;
     bool m_nv12SharedUsed;
-    mutable std::deque<AsyncUploader*> m_unusedUploaders;
-    std::deque<AsyncUploader*> m_usedUploaders;
+    mutable std::deque<AsyncPicDataUploader*> m_unusedUploaders;
+    std::deque<AsyncPicDataUploader*> m_usedUploaders;
+    QSharedPointer<DecodedPictureToOpenGLUploadThread> m_uploadThread;
 
-    bool updateTextures( UploadedPicture* const emptyPictureBuf, const QSharedPointer<CLVideoDecoderOutput>& curImg );
     bool usingShaderYuvToRgb() const;
     bool usingShaderNV12ToRgb() const;
     void releaseDecodedPicturePool( std::deque<UploadedPicture*>* const pool );
     //!Method is not thread-safe
     unsigned int nextPicSequenceValue();
-};
-
-class AuxiliaryGLContextDeleter
-:
-    public QObject
-{
-    Q_OBJECT
-
-public:
-    virtual bool event( QEvent* e );
+    void ensurePBOInitialized( DecodedPictureToOpenGLUploader::UploadedPicture* const picBuf, size_t sizeInBytes );
+    void releasePictureBuffers();
 };
 
 #endif  //DECODEDPICTURETOOPENGLUPLOADER_H
