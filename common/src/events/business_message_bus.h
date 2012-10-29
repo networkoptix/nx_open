@@ -24,6 +24,8 @@ class QnBusinessMessageBus: public QThread
 public:
     QnBusinessMessageBus();
 
+    static QnBusinessMessageBus* instance();
+
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 
     /** Delivery action to other module */
@@ -49,5 +51,7 @@ private:
     ActionMap m_actionsInProgress;
     mutable QMutex m_mutex;
 };
+
+#define qnBusinessMessageBus QnBusinessMessageBus::instance()
 
 #endif // __BUSINESS_MESSAGE_BUS_H_

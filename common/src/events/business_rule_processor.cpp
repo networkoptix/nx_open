@@ -7,10 +7,10 @@ QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
 QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 {
-    connect(&m_messageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
-    connect(&m_messageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
-    connect(&m_messageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
+    connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
 }
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
@@ -31,7 +31,7 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnMediaServerResourcePtr routeToServer = getDestMServer(action);
     if (routeToServer && routeToServer->getGuid() != getGuid())
-        getMessageBus().deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
+        qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
     else
         executeActionInternal(action);
 }

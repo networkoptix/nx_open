@@ -1,5 +1,11 @@
 #include "business_message_bus.h"
 
+Q_GLOBAL_STATIC(QnBusinessMessageBus, inst);
+QnBusinessMessageBus* QnBusinessMessageBus::instance()
+{
+    return inst();
+}
+
 QnBusinessMessageBus::QnBusinessMessageBus()
 {
     connect(&m_transport, SIGNAL(finished(QNetworkReply*)), this, SLOT(at_replyFinished(QNetworkReply*)));

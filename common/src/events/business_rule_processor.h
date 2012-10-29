@@ -47,7 +47,7 @@ private slots:
     void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 protected:
     QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
-    QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
+    //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
     * Execute action physically. Return true if action success executed
@@ -60,7 +60,7 @@ protected:
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action);
 private:
     QList<QnBusinessEventRulePtr> m_rules;
-    QnBusinessMessageBus m_messageBus;
+    //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 };
 
