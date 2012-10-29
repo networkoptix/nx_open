@@ -101,7 +101,7 @@ bool QnPlIsdResource::initInternal()
 
 
         double maxResolutionSquare = m_resolution1.width() * m_resolution1.height();
-        double requestSquare = 320 * 240;
+        double requestSquare = 480 * 316;
 
 
 
