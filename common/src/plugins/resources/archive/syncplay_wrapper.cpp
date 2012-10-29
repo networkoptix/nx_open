@@ -303,6 +303,7 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
         return;
 
     qint64 displayedTime = getDisplayedTimeInternal();
+    qint64 archiveEndTime = AV_NOPTS_VALUE;
     qDebug() << "Speed changed. CurrentTime" << QDateTime::fromMSecsSinceEpoch(displayedTime/1000).toString();
     foreach(const ReaderInfo& info, d->readers)
     {
@@ -310,15 +311,23 @@ void QnArchiveSyncPlayWrapper::setSpeed(double value, qint64 /*currentTimeHint*/
             info.reader->setNavDelegate(0);
             info.reader->setSpeed(value, d->lastJumpTime == DATETIME_NOW ? DATETIME_NOW : displayedTime);
             info.reader->setNavDelegate(this);
+            archiveEndTime = qMax(archiveEndTime, info.reader->endTime());
         }
     }
-    if (d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW)
-        displayedTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
+
     d->speed = value;
-    qint64 et = expectedTime();
-    int sign = d->speed >= 0 ? 1 : -1;
-    if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS) 
-        reinitTime(displayedTime);
+
+    if ((d->lastJumpTime == DATETIME_NOW || displayedTime == DATETIME_NOW) && value < 0)
+    {
+        // REW from live
+        reinitTime(archiveEndTime);
+    }
+    else {
+        qint64 et = expectedTime();
+        int sign = d->speed >= 0 ? 1 : -1;
+        if (d->speed != 0 && value != 0 && sign*(et - displayedTime) > SYNC_EPS) 
+            reinitTime(displayedTime);
+    }
 }
 
 qint64 QnArchiveSyncPlayWrapper::getNextTime() const
@@ -377,12 +386,30 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTimeInternal() const
     return displayTime;
 }
 
+qint64 QnArchiveSyncPlayWrapper::maxArchiveTime() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+
+    qint64 result = AV_NOPTS_VALUE;
+    foreach(const ReaderInfo& info, d->readers)
+    {
+        if (info.enabled)
+           result = qMax(result, info.reader->endTime());
+    }
+    return result;
+}
+
 void QnArchiveSyncPlayWrapper::reinitTime(qint64 newTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
 
-    if (newTime != qint64(AV_NOPTS_VALUE))
-        d->lastJumpTime = newTime;
+    if (newTime != qint64(AV_NOPTS_VALUE)) {
+        if (newTime == DATETIME_NOW && d->speed < 0)
+            d->lastJumpTime = maxArchiveTime();
+        else
+            d->lastJumpTime = newTime;
+    }
     else {
         //d->lastJumpTime = getCurrentTime();
         if (d->lastJumpTime != DATETIME_NOW)
