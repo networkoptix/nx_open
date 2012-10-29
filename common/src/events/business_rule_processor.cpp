@@ -68,7 +68,7 @@ void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
     m_instance = instance;
 }
 
-void QnBusinessRuleProcessor::addBusinessRule(QnAbstractBusinessEventRulePtr value)
+void QnBusinessRuleProcessor::addBusinessRule(QnBusinessEventRulePtr value)
 {
     m_rules << value;
 }
@@ -85,7 +85,7 @@ void QnBusinessRuleProcessor::processBusinessEvent(QnAbstractBusinessEventPtr bE
 QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstractBusinessEventPtr bEvent)
 {
     QList<QnAbstractBusinessActionPtr> result;
-    foreach(QnAbstractBusinessEventRulePtr rule, m_rules)    
+    foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
         bool typeOK = rule->getEventType() == bEvent->getEventType();
         bool resOK = !rule->getSrcResource() || !bEvent->getResource() || rule->getSrcResource()->getId() == bEvent->getResource()->getId();

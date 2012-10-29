@@ -23,7 +23,7 @@ public:
 
     QnResourcePtr getSrcResource() const { return m_source; }
     void setSrcResource(QnResourcePtr value) { m_source = value; }
-    
+
     BusinessEventType getEventType() const { return m_eventType; }
     void setEventType(BusinessEventType value) { m_eventType = value; }
 
@@ -32,6 +32,9 @@ public:
 
     QnResourcePtr getDstResource() const { return m_destination; }
     void setDstResource(QnResourcePtr value) { m_destination = value; }
+
+    QnBusinessParams getBusinessParams() const;
+    void setBusinessParams(const QnBusinessParams& params);
 
     /*
     * Return true if last returned action is toggledAction and action has ToggleState_On
@@ -45,10 +48,11 @@ private:
     BusinessActionType m_actionType;
     QnResourcePtr m_destination;
     QnBusinessParams m_actionParams;
-    
+
     bool m_actionInProgress;
 };
 
-typedef QSharedPointer<QnBusinessEventRule> QnAbstractBusinessEventRulePtr;
+typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QList<QnBusinessEventRulePtr> QnBusinessEventRules;
 
 #endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__

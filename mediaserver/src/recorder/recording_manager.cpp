@@ -407,7 +407,7 @@ void QnRecordingManager::onTimer()
     QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("urn_uuid_228e1c36-6128-d099-87b0-9a3d8a825e78");
     QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-40-8C-BF-92-CE");
     if (srcCamera && dstCamera) {
-        QnAbstractBusinessEventRulePtr bRule(new QnBusinessEventRule);
+        QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
         bRule->setEventType(BE_Camera_Motion);
         bRule->setSrcResource(srcCamera);
         bRule->setActionType(BA_CameraRecording);

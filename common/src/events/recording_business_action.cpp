@@ -7,15 +7,3 @@ QnRecordingBusinessAction::QnRecordingBusinessAction()
     setFps(10);
     setStreamQuality(QnQualityHighest);
 }
-
-QByteArray QnRecordingBusinessAction::serialize()
-{
-    // todo: implement me!
-    return QByteArray();
-}
-
-bool QnRecordingBusinessAction::deserialize(const QByteArray& data)
-{
-    // todo: implement me!
-    return true;
-}

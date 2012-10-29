@@ -20,6 +20,9 @@ enum BusinessActionType
     BA_ShowPopup
 };
 
+class QnAbstractBusinessAction;
+typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
+
 /*
 * Base class for business actions
 */
@@ -31,8 +34,8 @@ public:
     virtual ~QnAbstractBusinessAction() {}
     BusinessActionType actionType() const { return m_actionType; }
 
-    virtual QByteArray serialize() = 0;
-    virtual bool deserialize(const QByteArray& data) = 0;
+    QByteArray serialize();
+    static QnAbstractBusinessActionPtr fromByteArray(const QByteArray&);
 
     /*
     * Resource depend of action type.
@@ -49,8 +52,9 @@ public:
     void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
     QnId getBusinessRuleId() const             { return m_businessRuleId; }
 
-    QByteArray serializeParams() const;
-    bool deserializeParams(const QByteArray& value);
+    void setToggleState(ToggleState value) { m_toggleState = value; }
+    ToggleState getToggleState() const { return m_toggleState; }
+
 protected:
     void setActionType(BusinessActionType value) { m_actionType = value; }
 
@@ -58,9 +62,11 @@ protected:
     QnResourcePtr m_resource;
     QnBusinessParams m_params;
     QnId m_businessRuleId; // business rule, that generated this action
+
+private:
+    ToggleState m_toggleState;
 };
 
-typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
 
 

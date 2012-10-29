@@ -7,8 +7,11 @@
 #include "license.pb.h"
 #include "cameraServerItem.pb.h"
 #include "connectinfo.pb.h"
+#include "businessRule.pb.h"
 
 #include "pb_serializer.h"
+
+#include "core/resource_managment/resource_pool.h"
 
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
@@ -524,6 +527,21 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
     pb_cameraServerItem.set_serverguid(cameraServerItem.mediaServerGuid.toStdString());
 }
 
+void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRule& businessRuleIn)
+{
+    pb_businessRule.set_id(businessRuleIn.getId().toInt());
+    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRuleIn.getEventType());
+    if (businessRuleIn.getSrcResource())
+        pb_businessRule.set_eventresource(businessRuleIn.getSrcResource()->getId().toInt());
+    // TODO vasilenko
+    // pb_businessRule.set_eventcondition(businessRuleIn.getEventCondition());
+
+    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRuleIn.getActionType());
+    if (businessRuleIn.getDstResource())
+        pb_businessRule.set_actionresource(businessRuleIn.getDstResource()->getId().toInt());
+    pb_businessRule.set_actionparams(serializeBusinessParams(businessRuleIn.getBusinessParams()));
+}
+
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
 {
     pb_layoutResource.set_type(pb::Resource_Type_Layout);
@@ -602,7 +620,7 @@ void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QBy
     if (layouts.isEmpty())
         layout = QnLayoutResourcePtr();
     else
-        layout = layouts.at(0); 
+        layout = layouts.at(0);
 }
 
 void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)
@@ -688,10 +706,40 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci)
     {
         //TODO:UTF unuse std::string
-        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()), 
+        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()),
             QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
+}
+
+void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessRules, const QByteArray &data)
+{
+    pb::BusinessRules pb_businessRules;
+
+    if (!pb_businessRules.ParseFromArray(data.data(), data.size()))
+    {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeBusinessRules(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    typedef google::protobuf::RepeatedPtrField<pb::BusinessRule> PbBusinessRuleList;
+    PbBusinessRuleList businessRuleList = pb_businessRules.businessrule();
+    for (PbBusinessRuleList::const_iterator ci = businessRuleList.begin(); ci != businessRuleList.end(); ++ci)
+    {
+        QnBusinessEventRulePtr businessRule(new QnBusinessEventRule());
+
+        businessRule->setId(ci->id());
+        businessRule->setEventType((BusinessEventType)ci->eventtype());
+        businessRule->setSrcResource(qnResPool->getResourceById(ci->eventresource()));
+        // businessRule->setEventCondition();
+
+        businessRule->setActionType((BusinessActionType)ci->actiontype());
+        businessRule->setDstResource(qnResPool->getResourceById(ci->actionresource()));
+        businessRule->setBusinessParams(deserializeBusinessParams(ci->actionparams().c_str()));
+
+        businessRules.append(businessRule);
+    }
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)
@@ -821,6 +869,29 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
 
     std::string str;
     pb_cameraServerItems.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRules &businessRules, QByteArray &data)
+{
+    pb::BusinessRules pb_businessRules;
+
+    foreach(QnBusinessEventRulePtr businessRulePtr, businessRules)
+        serializeBusinessRule_i(*pb_businessRules.add_businessrule(), *businessRulePtr);
+
+    std::string str;
+    pb_businessRules.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRule &businessRule, QByteArray &data)
+{
+    pb::BusinessRules pb_businessRules;
+
+    serializeBusinessRule_i(*pb_businessRules.add_businessrule(), businessRule);
+
+    std::string str;
+    pb_businessRules.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 

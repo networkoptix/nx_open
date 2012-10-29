@@ -29,27 +29,35 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
         result->setParams(m_actionParams);
     result->setResource(m_destination);
 
-    QnToggleBusinessEventPtr toggleEvent = bEvent.dynamicCast<QnToggleBusinessEvent>();
-    QnToggleBusinessActionPtr toggleAction = result.dynamicCast<QnToggleBusinessAction>();
-    if (toggleEvent)
+    if (bEvent->getToggleState() != ToggleState_NotDefined)
     {
-        if (toggleAction){
-            ToggleState value = tState != ToggleState_NotDefined ? tState : toggleEvent->getToggleState();
-            toggleAction->setToggleState(value);
+        if (result->getToggleState() != ToggleState_NotDefined){
+            ToggleState value = tState != ToggleState_NotDefined ? tState : bEvent->getToggleState();
+            result->setToggleState(value);
         }
-        else if (toggleEvent->getToggleState() == ToggleState_Off) {
+        else if (bEvent->getToggleState() == ToggleState_Off) {
             return QnAbstractBusinessActionPtr(); // do not generate action (for example: if motion start/stop, send alert on start only)
         }
     }
-    else if (toggleAction)
+    else if (result->getToggleState() != ToggleState_NotDefined)
     {
         Q_ASSERT_X(false, Q_FUNC_INFO, "Toggle action MUST used with toggle events only!!!");
     }
 
-    m_actionInProgress = toggleAction && toggleAction->getToggleState() == ToggleState_On;
+    m_actionInProgress = result && result->getToggleState() == ToggleState_On;
     result->setBusinessRuleId(getId());
 
     return result;
+}
+
+QnBusinessParams QnBusinessEventRule::getBusinessParams() const
+{
+    return m_actionParams;
+}
+
+void QnBusinessEventRule::setBusinessParams(const QnBusinessParams &params)
+{
+    m_actionParams = params;
 }
 
 bool QnBusinessEventRule::isActionInProgress() const

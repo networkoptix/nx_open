@@ -19,7 +19,7 @@ public:
     QnBusinessRuleProcessor();
     virtual ~QnBusinessRuleProcessor();
 
-    void addBusinessRule(QnAbstractBusinessEventRulePtr value);
+    void addBusinessRule(QnBusinessEventRulePtr value);
     
     
     /*
@@ -59,7 +59,7 @@ protected:
     */
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action);
 private:
-    QList<QnAbstractBusinessEventRulePtr> m_rules;
+    QList<QnBusinessEventRulePtr> m_rules;
     QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 };
