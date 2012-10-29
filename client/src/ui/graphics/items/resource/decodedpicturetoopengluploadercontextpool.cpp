@@ -5,6 +5,8 @@
 
 #include "decodedpicturetoopengluploadercontextpool.h"
 
+#include <memory>
+
 
 static const size_t uploadingThreadCountOverride = 1;
 
@@ -101,7 +103,7 @@ void DecodedPictureToOpenGLUploaderContextPool::setPaintWindowHandle( WId paintW
 {
     QMutexLocker lk( &m_mutex );    //while this mutex is locked no change to pool context can occur
 
-    if( m_paintWindowId != NULL )
+    if( m_paintWindowId )
     {
         //deleting contexts using window m_paintWindowId
         for( std::map<GLContext::SYS_GL_CTX_HANDLE, std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> > >::iterator
@@ -128,8 +130,10 @@ void DecodedPictureToOpenGLUploaderContextPool::setPaintWindowHandle( WId paintW
 
     m_paintWindowId = paintWindowId;
 
+#ifdef _WIN32
     if( m_paintWindowId )
         Q_ASSERT( IsWindow(m_paintWindowId) );
+#endif
 }
 
 void DecodedPictureToOpenGLUploaderContextPool::setPaintWindow( QWidget* const paintWindow )
@@ -160,7 +164,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
         for( int i = 0; i < poolSizeIncrement; ++i )
         {
             //creating context
-            std::auto_ptr<GLContext> glCtx( new GLContext( winID != NULL ? winID : m_paintWindowId, parentContextID ) );
+            std::auto_ptr<GLContext> glCtx( new GLContext( winID ? winID : m_paintWindowId, parentContextID ) );
             if( !glCtx->isValid() )
                 break;
             QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( glCtx.release() ) );
@@ -178,7 +182,9 @@ const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& DecodedP
 {
     QMutexLocker lk( &m_mutex );
 
+#ifdef _WIN32
     Q_ASSERT( IsWindow(m_paintWindowId) );
+#endif
 
     std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >& pool = m_auxiliaryGLContextPool[parentContext];
     return pool;

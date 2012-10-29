@@ -7,14 +7,11 @@
 #include <camera/abstract_renderer.h>
 #include <camera/render_status.h>
 
-#include "decodedpicturetoopengluploader.h"
-
 
 class QThread;
 class QGLContext;
-
+class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
-
 
 class QnResourceWidgetRenderer
 :

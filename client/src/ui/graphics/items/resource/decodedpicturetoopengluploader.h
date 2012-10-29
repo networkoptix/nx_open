@@ -86,7 +86,7 @@ public:
 #endif
 
     private:
-        static const int TEXTURE_COUNT = 3;
+        static const size_t TEXTURE_COUNT = 3;
 
         PixelFormat m_colorFormat;
         int m_width;

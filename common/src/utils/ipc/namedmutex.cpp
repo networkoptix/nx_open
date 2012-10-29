@@ -25,7 +25,17 @@ public:
     }
 };
 #else
-typedef QSystemSemaphore NamedMutexImpl;
+class NamedMutexImpl
+:
+    public QSystemSemaphore
+{
+public:
+    NamedMutexImpl( const QString& name, int initialCount = 0 )
+    :
+        QSystemSemaphore( name, initialCount )
+    {
+    }
+};
 #endif
 
 NamedMutex::NamedMutex( const QString& name )
@@ -33,7 +43,7 @@ NamedMutex::NamedMutex( const QString& name )
 #ifdef _WIN32
     m_impl( new NamedMutexImpl( name ) )
 #else
-    m_impl( new QSystemSemaphore( name, 1 ) )
+    m_impl( new NamedMutexImpl( name, 1 ) )
 #endif
 {
 #ifdef _WIN32
@@ -58,7 +68,11 @@ NamedMutex::~NamedMutex()
 
 bool NamedMutex::isValid() const
 {
+#ifdef _WIN32
     return m_impl->mutexHandle != NULL;
+#else
+    return true;
+#endif
 }
 
 /*!

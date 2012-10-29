@@ -213,7 +213,7 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        const typename std::pair<InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
+        const typename std::pair<typename InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
         if( !p.second )
             return std::make_pair( iterator(p.first), false );
         m_syncCtxDict.insert( std::make_pair(val.first, SynchronizationContext()) );
@@ -229,7 +229,7 @@ public:
     {
         QMutexLocker lk( &m_mutex );
 
-        const typename std::pair<InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
+        const typename std::pair<typename InternalContainerType::iterator, bool>& p = m_dataDict.insert( val );
         if( !p.second )
             return std::make_pair( iterator(p.first), false );
         m_syncCtxDict.insert( std::make_pair(val.first, SynchronizationContext(true)) );

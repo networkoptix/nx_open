@@ -26,6 +26,7 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 
+#include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
@@ -33,7 +34,6 @@
 // TODO: remove
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
-#include "plugins/resources/camera_settings/camera_settings.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 

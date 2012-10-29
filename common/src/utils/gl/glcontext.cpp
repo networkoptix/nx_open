@@ -6,6 +6,11 @@
 #include "glcontext.h"
 
 #include <QGLContext>
+#include <QX11Info>
+
+#include <GL/glx.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
 
 #include "../common/log.h"
 
@@ -29,6 +34,7 @@ GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
     m_winID( wnd ),
     m_previousErrorCode( 0 )
 {
+#ifdef _WIN32
     HDC dc = GetDC( m_winID );
     m_handle = wglCreateContext( dc );
     ReleaseDC( m_winID, dc );
@@ -48,10 +54,27 @@ GLContext::GLContext( WId wnd, SYS_GL_CTX_HANDLE contextHandleToShareWith )
         wglDeleteContext( m_handle );
         m_handle = NULL;
     }
+#else
+    //creating OGL context shared with drawing context
+    static int visualAttribList[] = {
+        GLX_RGBA,
+        GLX_RED_SIZE, 4,
+        GLX_GREEN_SIZE, 4,
+        GLX_BLUE_SIZE, 4,
+        None };
+    XVisualInfo* visualInfo = glXChooseVisual( QX11Info::display(), QX11Info::appScreen(), visualAttribList );
+    m_handle = glXCreateContext(
+        QX11Info::display(),
+        visualInfo,
+        contextHandleToShareWith,
+        true );
+	m_previousErrorCode = errno;
+#endif
 }
 
 GLContext::~GLContext()
 {
+#ifdef _WIN32
     Q_ASSERT( IsWindow(m_winID) );
 
     if( m_handle != NULL )
@@ -65,10 +88,18 @@ GLContext::~GLContext()
         DeleteDC( m_dc );
         m_dc = NULL;
     }
+#else
+    if( m_handle )
+    {
+        glXDestroyContext( QX11Info::display(), m_handle );
+        m_handle = NULL;
+    }
+#endif
 }
 
 bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
 {
+#ifdef _WIN32
     if( paintDevToUse != NULL )
     {
         m_dc = paintDevToUse;
@@ -83,14 +114,31 @@ bool GLContext::makeCurrent( SYS_PAINT_DEVICE_HANDLE paintDevToUse )
     if( paintDevToUse != NULL )
         m_dc = NULL;    //no need to release device context at doneCurrent
     return res;
+#else
+    bool res = glXMakeCurrent(
+        QX11Info::display(),
+        QX11Info::appRootWindow(QX11Info::appScreen()),
+        m_handle );
+    m_previousErrorCode = glGetError();
+    return res;
+#endif
 }
 
 void GLContext::doneCurrent()
 {
+#ifdef _WIN32
     wglMakeCurrent( NULL, NULL );
     if( m_dc != NULL )
         ReleaseDC( m_winID, m_dc );
     m_dc = NULL;
+#else
+    bool res = glXMakeCurrent(
+        QX11Info::display(),
+        None,
+        NULL );
+    m_previousErrorCode = glGetError();
+    return res;
+#endif
 }
 
 GLContext::SYS_GL_CTX_HANDLE GLContext::handle() const
@@ -114,9 +162,10 @@ QString GLContext::getLastErrorString() const
 //    //TODO/IMPL
 //    return NULL;
 //}
-
+/*
 bool GLContext::shareWith( SYS_GL_CTX_HANDLE ctxID )
 {
+#ifdef _WIN32
     if( !wglShareLists( ctxID, m_handle ) )
     {
         m_previousErrorCode = GetLastError();
@@ -124,8 +173,11 @@ bool GLContext::shareWith( SYS_GL_CTX_HANDLE ctxID )
     }
 
     return true;
+#else
+    return false;
+#endif
 }
-
+*/
 WId GLContext::wnd() const
 {
     return m_winID;
@@ -168,8 +220,6 @@ GLContext::SYS_GL_CTX_HANDLE GLContext::getSysHandleOfQtContext( const QGLContex
 
         if( paintDeviceHandle && *paintDeviceHandle == NULL )
             *paintDeviceHandle = wglGetCurrentDC();
-#else
-#error "Not implemented"
 #endif
     }
 

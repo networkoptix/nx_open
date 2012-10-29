@@ -25,8 +25,6 @@ class GLContext;
 class AggregationSurface
 {
 public:
-    DWORD prevGLUploadClock;
-
     /*!
         Required opengl textures are created here, so appropriate opengl context MUST be current
         \param format Format is stored data. Supported formats are \a PIX_FMT_YUV420P and \a PIX_FMT_NV12 

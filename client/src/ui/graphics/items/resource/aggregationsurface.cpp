@@ -89,7 +89,7 @@ public:
     ~QnGlRendererTexture1()
     {
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
-        if( m_id != -1 )
+        if( m_id != (unsigned int)-1 )
         {
             glDeleteTextures(1, &m_id);
             m_id = -1;
@@ -174,15 +174,14 @@ static QAtomicInt totalLockedRectCount = 0;
 //////////////////////////////////////////////////////////
 AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
 :
-    m_fullRect( QPoint(0, 0), size ),
     m_format( format ),
     m_textureFormat( PIX_FMT_NONE ),
     m_convertToRgb( false ),
     m_yuv2rgbBuffer( NULL ),
     m_yuv2rgbBufferLen( 0 ),
+    m_fullRect( QPoint(0, 0), size ),
     m_lockedRectCount( 0 ),
-    m_planeCount( 0 ),
-    prevGLUploadClock( 0 )
+    m_planeCount( 0 )
 {
     for( int i = 0; i < MAX_PLANE_COUNT; ++i )
     {
@@ -227,6 +226,9 @@ AggregationSurface::AggregationSurface( PixelFormat format, const QSize& size )
             pitch[1] = pitch[0];
             height[1] = size.height() / 2;
             m_planeCount = 1;
+            break;
+
+        default:
             break;
     }
 

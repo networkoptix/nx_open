@@ -9,6 +9,7 @@
 #include <utils/gl/glcontext.h>
 #include <utils/settings.h>
 
+#include "decodedpicturetoopengluploader.h"
 #include "decodedpicturetoopengluploadercontextpool.h"
 
 
@@ -22,8 +23,6 @@ QnResourceWidgetRenderer::QnResourceWidgetRenderer(
 {
     if( !channelCount )
         return;
-
-    NX_LOG( QString::fromAscii("Creating widget renderer. clock %1").arg(GetTickCount()), cl_logDEBUG1 );
 
     Q_ASSERT( context != NULL );
 

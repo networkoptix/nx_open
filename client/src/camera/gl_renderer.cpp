@@ -133,7 +133,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
     } 
     else if( picLock->width() > 0 && picLock->height() > 0 )
     {
-        const float v_array[] = { r.left(), r.top(), r.right(), r.top(), r.right(), r.bottom(), r.left(), r.bottom() };
+        const float v_array[] = { (float)r.left(), (float)r.top(), (float)r.right(), (float)r.top(), (float)r.right(), (float)r.bottom(), (float)r.left(), (float)r.bottom() };
         switch( picLock->colorFormat() )
         {
             case PIX_FMT_RGBA:
@@ -220,10 +220,10 @@ void QnGLRenderer::drawYV12VideoTexture(
 	const float* v_array )
 {
     float tx_array[8] = {
-        tex0Coords.x(), tex0Coords.y(),
-        tex0Coords.right(), tex0Coords.top(),
-        tex0Coords.right(), tex0Coords.bottom(),
-        tex0Coords.x(), tex0Coords.bottom()
+        (float)tex0Coords.x(), (float)tex0Coords.y(),
+        (float)tex0Coords.right(), (float)tex0Coords.top(),
+        (float)tex0Coords.right(), (float)tex0Coords.bottom(),
+        (float)tex0Coords.x(), (float)tex0Coords.bottom()
     };
 
     //float tx_array[8] = {
@@ -267,9 +267,9 @@ void QnGLRenderer::drawNV12VideoTexture(
 {
     float tx_array[8] = {
         0.0f, 0.0f,
-        tex0Coords.x(), 0.0f,
-        tex0Coords.x(), tex0Coords.y(),
-        0.0f, tex0Coords.y()
+        (float)tex0Coords.x(), 0.0f,
+        (float)tex0Coords.x(), (float)tex0Coords.y(),
+        0.0f, (float)tex0Coords.y()
     };
 
     glEnable(GL_TEXTURE_2D);

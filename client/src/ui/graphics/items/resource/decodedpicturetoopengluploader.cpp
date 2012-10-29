@@ -24,7 +24,13 @@
 #include "decodedpicturetoopengluploadercontextpool.h"
 
 //#define RENDERER_SUPPORTS_NV12
+#ifdef _WIN32
 #define USE_PBO
+#endif
+
+#ifdef USE_PBO
+#include <smmintrin.h>
+#endif
 
 #define PERFORMANCE_TEST
 #ifdef PERFORMANCE_TEST
@@ -52,6 +58,16 @@ namespace
     }
 } // anonymous namespace
 
+#ifndef _WIN32
+unsigned int GetTickCount()
+{
+    struct timespec tp;
+    memset( &tp, 0, sizeof(tp) );
+    clock_gettime( CLOCK_MONOTONIC, &tp );
+    return tp.tv_sec*1000 + tp.tv_nsec / 1000000;
+}
+#endif
+
 class BitrateCalculator
 {
 public:
@@ -66,7 +82,7 @@ public:
     {
         m_mtx.lock();
 
-        const DWORD currentTick = GetTickCount();
+        const unsigned int currentTick = GetTickCount();
         if( currentTick - m_startCalcTick > 5000 )
         {
             NX_LOG( QString::fromAscii("In previous %1 ms to video mem moved %2 bytes. Transfer rate %3 byte/second").
@@ -80,7 +96,7 @@ public:
     }
 
 private:
-    DWORD m_startCalcTick;
+    unsigned int m_startCalcTick;
     quint64 m_bytes;
     QMutex m_mtx;
 };
@@ -174,7 +190,7 @@ public:
 
     ~QnGlRendererTexture() {
         //NOTE we do not delete texture here because it belongs to auxiliary gl context which will be removed when these textures are not needed anymore
-        if( m_id != -1 )
+        if( m_id != (unsigned int)-1 )
         {
             glDeleteTextures(1, &m_id);
             m_id = -1;
@@ -198,7 +214,7 @@ public:
     }
 
     void ensureInitialized(int width, int height, int stride, int pixelSize, GLint internalFormat, int internalFormatPixelSize, int fillValue) {
-        assert(m_renderer.data() != NULL);
+        Q_ASSERT(m_renderer.data() != NULL);
 
         ensureAllocated();
 
@@ -415,7 +431,7 @@ DecodedPictureToOpenGLUploader::UploadedPicture::UploadedPicture( DecodedPicture
     m_pboSizeBytes( 0 )
 {
     //TODO/IMPL allocate textures when needed, because not every format require 3 planes
-    for( int i = 0; i < TEXTURE_COUNT; ++i )
+    for( size_t i = 0; i < TEXTURE_COUNT; ++i )
         m_textures[i].reset( new QnGlRendererTexture(uploader->d) );
 }
 
@@ -469,6 +485,7 @@ const DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUpl
 // AsyncPicDataUploader
 //////////////////////////////////////////////////////////
 
+#ifdef _WIN32
 inline void memcpy_stream_load( __m128i* dst, __m128i* src, size_t sz )
 {
     const __m128i* const src_end = src + sz / sizeof(__m128i);
@@ -552,6 +569,7 @@ inline void streamLoadAndDeinterleaveNV12UVPlane(
         }
     }
 }
+#endif
 
 class ScopedAtomicLock
 {
@@ -594,7 +612,7 @@ public:
         memset( m_lineSizes, 0, sizeof(m_lineSizes) );
     }
 
-    AsyncPicDataUploader::~AsyncPicDataUploader()
+    ~AsyncPicDataUploader()
     {
         qFreeAligned( m_yv12Buffer );
         m_yv12Buffer = NULL;
@@ -843,10 +861,16 @@ private:
         surf->UnlockRect();
 
         return true;
-#endif
 #endif  //DISABLE_FRAME_DOWNLOAD
+#else
+        Q_UNUSED( pictureBuf );
+        Q_UNUSED( cropRect );
+        Q_ASSERT( false );
+        return false;
+#endif  //_WIN32
     }
 
+#ifdef _WIN32
     inline bool copyImageRectStreamLoad(
         const QnAbstractPictureDataRef& picDataRef,
         quint8* dstMem,
@@ -893,6 +917,7 @@ private:
 
         return true;
     }
+#endif
 };
 
 
@@ -1377,6 +1402,7 @@ static int glRGBFormat( PixelFormat format )
     return GL_RGBA;
 }
 
+#ifdef USE_PBO
 inline void memcpy_sse4_stream_stream( __m128i* dst, __m128i* src, size_t sz )
 {
     const __m128i* const src_end = src + sz / sizeof(__m128i);
@@ -1397,6 +1423,7 @@ inline void memcpy_sse4_stream_stream( __m128i* dst, __m128i* src, size_t sz )
          dst += 4;
     }
 }
+#endif
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,

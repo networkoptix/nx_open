@@ -77,7 +77,7 @@ public:
     //!Returns previous command error text
     QString getLastErrorString() const;
     //void* getProcAddress( const char* procName ) const;
-    bool shareWith( SYS_GL_CTX_HANDLE ctxID );
+    //bool shareWith( SYS_GL_CTX_HANDLE ctxID );
     //!Returns window ID, gl context has been reated with
     WId wnd() const;
 
