@@ -14,20 +14,40 @@
 
 class QnBusinessRuleProcessor: public QThread
 {
+    Q_OBJECT
 public:
+    QnBusinessRuleProcessor();
+    virtual ~QnBusinessRuleProcessor();
+
     void addBusinessRule(QnAbstractBusinessEventRulePtr value);
+    
+    
+    /*
+    * Return module GUID. if destination action intended for current module, no route through message bus is required
+    */
+
+    virtual QString getGuid() const { return QString(); }
 public slots:
     /*
     * This function matches all business actions for specified business event and execute it
+    * So, call this function if business event occured
     */
     void processBusinessEvent(QnAbstractBusinessEventPtr bEvent);
 
+    /*
+    * Execute business action.
+    * This function is called if business event already matched to action(s).
+    */
+    void executeAction(QnAbstractBusinessActionPtr action);
+
     static QnBusinessRuleProcessor* instance();
     static void init(QnBusinessRuleProcessor* instance);
+private slots:
+    void at_actionDelivered(QnAbstractBusinessActionPtr action);
+    void at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action);
 protected:
     QList <QnAbstractBusinessActionPtr> matchActions(QnAbstractBusinessEventPtr bEvent);
     QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
-    void executeAction(QnAbstractBusinessActionPtr action);
 
     /*
     * Execute action physically. Return true if action success executed

@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 #include "business_logic_common.h"
 #include "core/resource/resource_fwd.h"
+#include "utils/common/qnid.h"
 
 enum BusinessActionType
 {
@@ -45,14 +46,19 @@ public:
     void setParams(const QnBusinessParams& params) {m_params = params; }
     QnBusinessParams getParams() const             { return m_params; }
 
+    void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
+    QnId getBusinessRuleId() const             { return m_businessRuleId; }
 protected:
     void setActionType(BusinessActionType value) { m_actionType = value; }
 
     BusinessActionType m_actionType;
     QnResourcePtr m_resource;
     QnBusinessParams m_params;
+    QnId m_businessRuleId; // business rule, that generated this action
 };
 
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
+Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
+
 
 #endif // __ABSTRACT_BUSINESS_ACTION_H_

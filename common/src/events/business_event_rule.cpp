@@ -47,6 +47,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
     }
 
     m_actionInProgress = toggleAction && toggleAction->getToggleState() == ToggleState_On;
+    result->setBusinessRuleId(getId());
 
     return result;
 }
@@ -54,4 +55,9 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
 bool QnBusinessEventRule::isActionInProgress() const
 {
     return m_actionInProgress;
+}
+
+QString QnBusinessEventRule::getUniqueId() const
+{
+    return QString(QLatin1String("QnBusinessEventRule_")) + getId().toString();
 }

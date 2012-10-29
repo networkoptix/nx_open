@@ -5,6 +5,19 @@
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
+QnBusinessRuleProcessor::QnBusinessRuleProcessor()
+{
+    connect(&m_messageBus, SIGNAL(actionDelivered(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDelivered(QnAbstractBusinessActionPtr)));
+    connect(&m_messageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
+
+    connect(&m_messageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
+}
+
+QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
+{
+
+}
+
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action)
 {
     if (action->actionType() ==  BA_SendMail || action->actionType() ==  BA_Alert)
@@ -17,13 +30,10 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnMediaServerResourcePtr routeToServer = getDestMServer(action);
-    if (routeToServer && 0) {
-        // todo: ommit delivery to themself if running on media server
-        getMessageBus().deliveryBusinessAction(action, routeToServer->getApiUrl()); // delivery to other server
-    }
-    else {
+    if (routeToServer && routeToServer->getGuid() != getGuid())
+        getMessageBus().deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
+    else
         executeActionInternal(action);
-    }
 }
 
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
@@ -96,4 +106,14 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
         }
     }
     return result;
+}
+
+void QnBusinessRuleProcessor::at_actionDelivered(QnAbstractBusinessActionPtr action)
+{
+    // todo: implement me
+}
+
+void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action)
+{
+    // todo: implement me
 }

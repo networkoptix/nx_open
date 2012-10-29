@@ -3,6 +3,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "recorder/recording_manager.h"
+#include "serverutil.h"
 
 bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
@@ -38,4 +39,9 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(QnRecordingBusinessA
         return qnRecordingManager->startForcedRecording(camera, action->getStreamQuality(), action->getFps(), action->getRecordDuration());
     else
         return qnRecordingManager->stopForcedRecording(camera);
+}
+
+QString QnMServerBusinessRuleProcessor::getGuid() const
+{
+    return serverGuid();
 }

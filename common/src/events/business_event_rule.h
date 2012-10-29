@@ -4,20 +4,19 @@
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
 #include "business_logic_common.h"
+#include "core/resource/resource.h"
 
 /*
 * This class define relation between business event and action
 */
 
-class QnBusinessEventRule
+class QnBusinessEventRule: public QnResource
 {
 public:
 
     QnBusinessEventRule();
-    /*
-    * Check addition condition between event and action
-    */
-    //virtual bool checkCondtition(QnAbstractBusinessEventPtr bEvent) = 0;
+
+    virtual QString getUniqueId() const override;
 
     QnAbstractBusinessActionPtr getAction(QnAbstractBusinessEventPtr bEvent, ToggleState tstate = ToggleState_NotDefined);
     QnBusinessParams getEventCondition() const { return m_eventCondition; }

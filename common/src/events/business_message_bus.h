@@ -1,6 +1,11 @@
 #ifndef __BUSINESS_MESSAGE_BUS_H_
 #define __BUSINESS_MESSAGE_BUS_H_
 
+#include <QMutex>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QMap>
 #include <QUrl>
 #include <QThread>
 #include "abstract_business_event.h"
@@ -15,13 +20,34 @@
 
 class QnBusinessMessageBus: public QThread
 {
+    Q_OBJECT
 public:
-    int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
+    QnBusinessMessageBus();
+
+    //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
+
+    /** Delivery action to other module */
     int deliveryBusinessAction(QnAbstractBusinessActionPtr bAction, const QUrl& url);
-public slots:
 signals:
-    void businessEventDelivered(int deliveryNum);
-    void businessActionDelivered(int deliveryNum);
+    /** Action successfully delivered to other module*/
+    void actionDelivered(QnAbstractBusinessActionPtr action);
+
+    /** Fail to delivery action to other module*/
+    void actionDeliveryFail(QnAbstractBusinessActionPtr action);
+
+    /** Action received from other module */
+    void actionReceived(QnAbstractBusinessActionPtr action);
+public slots:
+    /** Action received from other module */
+    void at_actionReceived(QnAbstractBusinessActionPtr action);
+private slots:
+    void at_replyFinished(QNetworkReply* reply);
+    void at_replyError(QNetworkReply::NetworkError code);
+private:
+    QNetworkAccessManager m_transport;
+    typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;
+    ActionMap m_actionsInProgress;
+    mutable QMutex m_mutex;
 };
 
 #endif // __BUSINESS_MESSAGE_BUS_H_
