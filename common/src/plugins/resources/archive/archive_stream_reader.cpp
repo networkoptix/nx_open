@@ -1134,7 +1134,7 @@ qint64 QnArchiveStreamReader::startTime() const
     if (p.isEmpty())
         return m_delegate->startTime();
     else
-        return qMax(m_delegate->startTime(), p.startTimeMs*1000);
+		return p.startTimeMs*1000;
 }
 
 qint64 QnArchiveStreamReader::endTime() const
@@ -1144,5 +1144,5 @@ qint64 QnArchiveStreamReader::endTime() const
     if (p.isEmpty())
         return m_delegate->endTime();
     else
-        return qMin(m_delegate->endTime(), p.endTimeMs()*1000);
+		return p.endTimeMs()*1000;
 }
