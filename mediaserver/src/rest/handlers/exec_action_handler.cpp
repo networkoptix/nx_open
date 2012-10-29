@@ -1,5 +1,6 @@
 #include "exec_action_handler.h"
 #include "utils/network/tcp_connection_priv.h"
+#include "events/abstract_business_action.h"
 
 QnExecActionHandler::QnExecActionHandler() {
 }
@@ -23,7 +24,7 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 
 int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
-    deseri
+    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray(body);
     return executeGet(path, params, result, contentType);
 }
 
