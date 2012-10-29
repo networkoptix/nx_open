@@ -27,8 +27,6 @@ bool PredefinedUsageCalculator::isEnoughHWResourcesForAnotherDecoder(
     const stree::AbstractResourceReader& curUsageParams ) const
 {
     //retrieving existing sessions' info
-    //const stree::ResourceContainer& curUsageParams = m_usageWatcher->currentTotalUsage();
-
     //summarizing current sessions' parameters and new session parameters
     MediaStreamParameterSumContainer inputParams(
         m_rns,

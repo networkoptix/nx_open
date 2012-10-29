@@ -23,7 +23,7 @@ namespace stree
     }
 
 
-    MultiSourceResourceReader::MultiSourceResourceReader( AbstractResourceReader* const rc1, AbstractResourceReader* const rc2 )
+    MultiSourceResourceReader::MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 )
     :
         m_rc1( rc1 ),
         m_rc2( rc2 )
@@ -32,6 +32,6 @@ namespace stree
 
     bool MultiSourceResourceReader::get( int resID, QVariant* const value ) const
     {
-        return m_rc1->get( resID, value ) || m_rc2->get( resID, value );
+        return m_rc1.get( resID, value ) || m_rc2.get( resID, value );
     }
 }

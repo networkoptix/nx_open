@@ -72,7 +72,7 @@ namespace stree
         public AbstractResourceReader
     {
     public:
-        MultiSourceResourceReader( AbstractResourceReader* const rc1, AbstractResourceReader* const rc2 );
+        MultiSourceResourceReader( const AbstractResourceReader& rc1, const AbstractResourceReader& rc2 );
 
         //!Implementation of AbstractResourceReader::get
         /*!
@@ -81,8 +81,8 @@ namespace stree
         virtual bool get( int resID, QVariant* const value ) const;
 
     private:
-        AbstractResourceReader* const m_rc1;
-        AbstractResourceReader* const m_rc2;
+        const AbstractResourceReader& m_rc1;
+        const AbstractResourceReader& m_rc2;
     };
 }
 

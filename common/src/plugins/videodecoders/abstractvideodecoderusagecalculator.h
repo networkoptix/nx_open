@@ -12,7 +12,11 @@
 class AbstractVideoDecoderUsageCalculator
 {
 public:
-    //!Returns true, if there are free resources (defined in \a curUsageParams) to decode media stream with parameters \a mediaStreamParams
+    //!Returns true, if there are free resources to decode media stream with parameters \a mediaStreamParams
+    /*!
+        \param mediaStreamParams Params of new media stream
+        \param curUsageParams Currently used resources are taken from usage watcher
+    */
     virtual bool isEnoughHWResourcesForAnotherDecoder(
         const stree::AbstractResourceReader& mediaStreamParams,
         const stree::AbstractResourceReader& curUsageParams ) const = 0;

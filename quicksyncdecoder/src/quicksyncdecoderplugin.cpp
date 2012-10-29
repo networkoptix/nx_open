@@ -111,7 +111,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     QMutexLocker lk( &m_mutex );
 
 //#ifdef _DEBUG
-//    return NULL;
+    //return NULL;
 //#endif
 
     if( !m_initialized )
@@ -156,6 +156,7 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     DecoderStreamDescription desc;
     if( decoder->readSequenceHeader( data, &videoParam ) )
     {
+        //TODO/IMPL should use decoder as input container
         desc.put( DecoderParameter::framePictureWidth, videoParam.mfx.FrameInfo.Width );
         desc.put( DecoderParameter::framePictureHeight, videoParam.mfx.FrameInfo.Height );
         desc.put( DecoderParameter::framePictureSize, videoParam.mfx.FrameInfo.Width*videoParam.mfx.FrameInfo.Height );
@@ -172,11 +173,25 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     desc.put( DecoderParameter::cpuString, m_cpuString );
     desc.put( DecoderParameter::totalCurrentNumberOfDecoders, currentSWDecoderCount+m_usageWatcher->currentSessionCount() );
 
-    stree::MultiSourceResourceReader mediaStreamParams( &desc, m_graphicsDesc.get() );
+    stree::MultiSourceResourceReader mediaStreamParams( desc, *m_graphicsDesc.get() );
+
+    //locking shared memory region
+    PluginUsageWatcher::ScopedLock usageLock( m_usageWatcher.get() );
+    if( !usageLock.locked() )
+    {
+        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to lock shared usage watcher. Cannot create decoder"), cl_logWARNING );
+        return NULL;
+    }
+
+    if( !m_usageWatcher->readExternalUsage() )
+    {
+        NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin. Failed to read total usage. Cannot create decoder"), cl_logWARNING );
+        return NULL;
+    }
 
     //retrieving existing sessions' info
-    stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
     //adding availableVideoMemory param
+    stree::ResourceContainer curUsageParams = m_usageWatcher->currentTotalUsage();
     quint64 newStreamEstimatedVideoMemoryUsage = 0;
     mediaStreamParams.getTypedVal( DecoderParameter::videoMemoryUsage, &newStreamEstimatedVideoMemoryUsage );
     UINT availableVideoMem = d3d9Ctx.d3d9Device->GetAvailableTextureMem();
@@ -200,12 +215,15 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
     if( !decoder->isHardwareAccelerationEnabled() )
         return NULL;
 
+    //updating usage in shared memory...
+    m_usageWatcher->updateUsageParams();
+
     return new VideoDecoderSwitcher( decoder.release(), data );
 }
 
 bool QuicksyncDecoderPlugin::initialize() const
 {
-    m_usageWatcher.reset( new PluginUsageWatcher( QByteArray( QUICKSYNC_PLUGIN_ID ) ) );
+    m_usageWatcher.reset( new PluginUsageWatcher( QString::fromAscii( QUICKSYNC_PLUGIN_ID ) ) );
     m_usageCalculator.reset( new PredefinedUsageCalculator(
         m_resNameset,
         QString("%1/%2").arg(QApplication::instance()->applicationDirPath()).arg(quicksyncXmlFileName),
@@ -269,6 +287,8 @@ bool QuicksyncDecoderPlugin::initialize() const
     m_hardwareAccelerationEnabled = true;
 
     m_graphicsDesc.reset( new D3DGraphicsAdapterDescription( m_direct3D9, m_adapterNumber ) );
+
+    NX_LOG( QString::fromAscii("QuicksyncDecoderPlugin has been successfully initialized"), cl_logINFO );
 
     return true;
 }
@@ -371,19 +391,11 @@ void QuicksyncDecoderPlugin::closeD3D9Device()
     {
         //releasing device manager
         if( m_d3dDevices[i].d3d9manager )
-        {
-            ULONG refCount = m_d3dDevices[i].d3d9manager->Release();
-            if( refCount > 0 )
-                int x = 0;
-        }
+            m_d3dDevices[i].d3d9manager->Release();
 
         //closing device
         if( m_d3dDevices[i].d3d9Device )
-        {
-            ULONG refCount = m_d3dDevices[i].d3d9Device->Release();
-            if( refCount > 0 )
-                int x = 0;
-        }
+            m_d3dDevices[i].d3d9Device->Release();
     }
 
     m_d3dDevices.clear();
