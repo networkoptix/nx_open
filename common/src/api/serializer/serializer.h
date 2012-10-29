@@ -10,6 +10,7 @@
 #include "core/resource/storage_resource.h"
 #include "core/resource/user_resource.h"
 #include "core/resource/camera_history.h"
+#include "events/business_event_rule.h"
 #include "licensing/license.h"
 #include "connectinfo.h"
 
@@ -62,6 +63,7 @@ public:
     virtual void deserializeLicenses(QnLicenseList& licenses, const QByteArray& data) = 0;
     virtual void deserializeCameraHistoryList(QnCameraHistoryList& cameraServerItems, const QByteArray& data) = 0;
     virtual void deserializeConnectInfo(QnConnectInfoPtr& connectInfo, const QByteArray& data) = 0;
+    virtual void deserializeBusinessRules(QnAbstractBusinessEventRules&, const QByteArray& data) = 0;
 
     virtual void serializeLayout(const QnLayoutResourcePtr& resource, QByteArray& data) = 0;
     virtual void serializeLayouts(const QnLayoutResourceList& layouts, QByteArray& data) = 0;

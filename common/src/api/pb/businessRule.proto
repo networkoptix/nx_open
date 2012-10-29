@@ -1,0 +1,46 @@
+package pb;
+
+message BusinessRule {
+    enum EventType {
+        NotDefined         = 0;
+        Camera_Motion      = 1;
+        Camera_Input       = 2;
+        Camera_Disconnect  = 3;
+        Storage_Failure    = 4;
+        UserDefined        = 1000;
+    }
+
+    enum ActionType
+    {
+        // media server based actions
+        CameraOutput     = 0;    // set camera output signal
+        Bookmark         = 1;    // mark part of camera archive as undeleted
+        CameraRecording  = 2;    // start camera recording
+        PanicRecording   = 3;    // activate panic recording mode
+
+        // these actions can be executed from any endpoint. Actually these actions call specified function at EC
+        SendMail         = 4;
+        Alert            = 5;
+        ShowPopup        = 6;
+    }
+
+
+    optional EventType eventType   = 1;
+    optional int32  eventResource  = 2;
+    optional string eventCondition = 3;
+
+    optional ActionType actionType = 4;
+    optional int32 actionResource  = 5;
+    optional string actionParams   = 6;
+}
+
+message BusinessAction {
+    optional ActionType actionType = 1;
+    optional int32 actionResource  = 2;
+    optional string actionParams   = 3;
+    optional int32 businessRuleId  = 4;
+}
+
+message BusinessRules {
+    repeated BusinessRule businessRule = 1;
+}

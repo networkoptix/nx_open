@@ -7,6 +7,7 @@
 #include "license.pb.h"
 #include "cameraServerItem.pb.h"
 #include "connectinfo.pb.h"
+#include "businessRule.pb.h
 
 #include "pb_serializer.h"
 
@@ -602,7 +603,7 @@ void QnApiPbSerializer::deserializeLayout(QnLayoutResourcePtr& layout, const QBy
     if (layouts.isEmpty())
         layout = QnLayoutResourcePtr();
     else
-        layout = layouts.at(0); 
+        layout = layouts.at(0);
 }
 
 void QnApiPbSerializer::deserializeUsers(QnUserResourceList& users, const QByteArray& data)
@@ -688,10 +689,39 @@ void QnApiPbSerializer::deserializeConnectInfo(QnConnectInfoPtr& connectInfo, co
     for (PbCompatibilityItemList::const_iterator ci = items.begin(); ci != items.end(); ++ci)
     {
         //TODO:UTF unuse std::string
-        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()), 
+        connectInfo->compatibilityItems.append(QnCompatibilityItem(QString::fromStdString(ci->ver1()),
             QString::fromStdString(ci->comp1()), QString::fromStdString(ci->ver2())));
     }
     connectInfo->proxyPort = pb_connectInfo.proxyport();
+}
+
+void QnApiPbSerializer::deserializeBusinessRules(QnAbstractBusinessEventRules &businessRules, const QByteArray &data)
+{
+    pb::BusinessRules pb_businessRules;
+
+    if (!pb_businessRules.ParseFromArray(data.data(), data.size()))
+    {
+        QByteArray errorString;
+        errorString = "QnApiPbSerializer::deserializeBusinessRules(): Can't parse message";
+        throw QnSerializeException(errorString);
+    }
+
+    typedef google::protobuf::RepeatedPtrField<pb::BusinessRule> PbBusinessRuleList;
+    PbBusinessRuleList businessRuleList = businessRules.businessrule();
+    for (PbBusinessRuleList::const_iterator ci = businessRuleList.begin(); ci != businessRuleList.end(); ++ci)
+    {
+        QnBusinessEventRulePtr businessRule(new QnBusinessEventRule());
+
+        businessRule->setEventType(ci->eventtype());
+        businessRule->setSrcResource(QnResourcePtr()); // TODO: vig
+        // businessRule->setEventCondition();
+
+        businessRule->setActionType(ci->actiontype());
+        businessRule->setDstResource(QnResourcePtr()); // TODO: vig
+        businessRule->setBusinessParams(deserializeBusinessParams(ci->actionparams.c_str()));
+
+        businessRules.append(businessRule);
+    }
 }
 
 void QnApiPbSerializer::serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data)

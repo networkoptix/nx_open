@@ -52,6 +52,16 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
     return result;
 }
 
+void QnBusinessEventRule::getBusinessParams() const
+{
+    return m_actionParams;
+}
+
+void QnBusinessEventRule::setBusinessParams(const QnBusinessParams &params)
+{
+    m_actionParams = params;
+}
+
 bool QnBusinessEventRule::isActionInProgress() const
 {
     return m_actionInProgress;
