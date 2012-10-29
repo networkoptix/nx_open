@@ -138,7 +138,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
         {
             case PIX_FMT_RGBA:
         	    drawVideoTextureDirectly(
-           		    picLock->texCoords(),
+           		    picLock->textureRect(),
            		    picLock->glTextures()[0],
            		    v_array );
                 break;
@@ -146,7 +146,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
             case PIX_FMT_YUV420P:
                 Q_ASSERT( isYV12ToRgbShaderUsed() );
         	    drawYV12VideoTexture(
-                    picLock->texCoords(),
+                    picLock->textureRect(),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     picLock->glTextures()[2],
@@ -156,7 +156,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
             case PIX_FMT_NV12:
                 Q_ASSERT( isNV12ToRgbShaderUsed() );
         	    drawNV12VideoTexture(
-                    picLock->texCoords(),
+                    picLock->textureRect(),
                     picLock->glTextures()[0],
                     picLock->glTextures()[1],
                     v_array );
@@ -181,7 +181,7 @@ Qn::RenderStatus QnGLRenderer::paint( const QRectF& r )
 }
 
 void QnGLRenderer::drawVideoTextureDirectly(
-	const QVector2D& tex0Coords,
+	const QRectF& tex0Coords,
 	unsigned int tex0ID,
 	const float* v_array )
 {
@@ -213,18 +213,25 @@ void QnGLRenderer::drawVideoTextureDirectly(
 }
 
 void QnGLRenderer::drawYV12VideoTexture(
-	const QVector2D& tex0Coords,
+	const QRectF& tex0Coords,
 	unsigned int tex0ID,
 	unsigned int tex1ID,
 	unsigned int tex2ID,
 	const float* v_array )
 {
     float tx_array[8] = {
-        0.0f, 0.0f,
-        tex0Coords.x(), 0.0f,
         tex0Coords.x(), tex0Coords.y(),
-        0.0f, tex0Coords.y()
+        tex0Coords.right(), tex0Coords.top(),
+        tex0Coords.right(), tex0Coords.bottom(),
+        tex0Coords.x(), tex0Coords.bottom()
     };
+
+    //float tx_array[8] = {
+    //    0.0f, 0.0f,
+    //    tex0Coords.x(), 0.0f,
+    //    tex0Coords.x(), tex0Coords.y(),
+    //    0.0f, tex0Coords.y()
+    //};
 
     glEnable(GL_TEXTURE_2D);
     glCheckError("glEnable");
@@ -253,7 +260,7 @@ void QnGLRenderer::drawYV12VideoTexture(
 }
 
 void QnGLRenderer::drawNV12VideoTexture(
-	const QVector2D& tex0Coords,
+	const QRectF& tex0Coords,
 	unsigned int yPlaneTexID,
 	unsigned int uvPlaneTexID,
 	const float* v_array )
