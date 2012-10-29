@@ -31,8 +31,32 @@ qint64 QnPlaybackMaskHelper::findTimeAtPlaybackMask(qint64 timeUsec, bool isForw
     }
 }
 
+QnTimePeriod QnPlaybackMaskHelper::getPlaybackRange() const
+{
+    return m_playbackRange;
+}
+
+void QnPlaybackMaskHelper::setPlaybackRange(const QnTimePeriod& playbackRange)
+{
+    m_playbackRange = playbackRange;
+    
+    if (m_playbackRange.isEmpty())
+        m_playbackMask = m_playBackMaskOrig;
+    else if (m_playbackMask.isEmpty())
+        m_playbackMask << playbackRange;
+    else
+        m_playbackMask = m_playbackMask.intersected(playbackRange);
+    m_curPlaybackPeriod.clear();
+
+}
+
 void QnPlaybackMaskHelper::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
-    m_playbackMask = playbackMask;
+    m_playBackMaskOrig = playbackMask;
+
+    if (m_playbackRange.isEmpty())
+        m_playbackMask = playbackMask;
+    else
+        m_playbackMask = playbackMask.intersected(m_playbackRange);
     m_curPlaybackPeriod.clear();
 }

@@ -1,14 +1,10 @@
 #include "single_camera_settings_widget.h"
 #include "ui_single_camera_settings_widget.h"
-//#include "core/resource/video_server.h"
 #include <core/resource/media_server_resource.h>
 #include "core/resource/resource_fwd.h"
 
 #include <QtCore/QUrl>
 #include <QtCore/QProcess>
-#ifdef Q_OS_WIN
-    #include <QtCore/QSettings>
-#endif
 #include <QtGui/QMessageBox>
 #include <QtGui/QDesktopServices>
 
@@ -17,11 +13,12 @@
 #include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/read_only.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
-#include <help/context_help_queryable.h>
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -47,13 +44,13 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     ui->cameraScheduleWidget->setContext(context());
 
     /* Set up context help. */
-    setHelpTopicId(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
-    setHelpTopicId(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
-    setHelpTopicId(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
-    setHelpTopicId(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
-    setHelpTopicId(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
-    setHelpTopicId(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
-    setHelpTopicId(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
+    setHelpTopic(ui->nameLabel,       ui->nameEdit,                           Qn::CameraSettings_General_Name_Help);
+    setHelpTopic(ui->addressGroupBox,                                         Qn::CameraSettings_General_Address_Help);
+    setHelpTopic(ui->enableAudioCheckBox,                                     Qn::CameraSettings_General_Audio_Help);
+    setHelpTopic(ui->authenticationGroupBox,                                  Qn::CameraSettings_General_Auth_Help);
+    setHelpTopic(ui->recordingTab,                                            Qn::CameraSettings_Recording_Help);
+    setHelpTopic(ui->motionTab,                                               Qn::CameraSettings_Motion_Help);
+    setHelpTopic(ui->advancedTab,                                             Qn::CameraSettings_Advanced_Help);
 
     connect(ui->tabWidget,              SIGNAL(currentChanged(int)),            this,   SLOT(at_tabWidget_currentChanged()));
     at_tabWidget_currentChanged();
@@ -620,8 +617,9 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
-    if ((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked() && m_camera->streamFpsSharingMethod() == shareFps )
-        || ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+    if (((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked()) || 
+        ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
+        && m_camera->streamFpsSharingMethod() == shareFps )
     {
         float maxFps = m_camera->getMaxFps()-2;
         float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();

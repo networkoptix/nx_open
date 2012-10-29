@@ -193,17 +193,20 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
     }
 
     QIODevice* miscFile = layoutStorage.open(QLatin1String("misc.bin"), QIODevice::ReadOnly);
+    bool layoutWithCameras = false;
     if (miscFile)
     {
         QByteArray data = miscFile->readAll();
         delete miscFile;
-        if (data.size() >= sizeof(quint32))
+        if (data.size() >= (int)sizeof(quint32))
         {
             quint32 flags = *((quint32*) data.data());
             if (flags & 1) {
-                Qn::Permissions permissions = Qn::RemovePermission | Qn::AddRemoveItemsPermission;
+                Qn::Permissions permissions = Qn::ReadPermission | Qn::RemovePermission;
                 layout->setData(Qn::LayoutPermissionsRole, (int) permissions);
             }
+            if (flags & 2)
+                layoutWithCameras = true;
         }
         //layout->setLocalRange(QnTimePeriod().deserialize(data));
     }
@@ -236,9 +239,11 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         storage->setUrl(xfile);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
+        if (layoutWithCameras)
+            aviResource->addFlags(QnResource::utc | QnResource::sync | QnResource::periods | QnResource::motion);
         aviResource->setStorage(storage);
         //aviResource->setId(item.resource.id);
-        aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
+        aviResource->setParentId(layout->getId());
         QString itemName(itemNames.readLine());
         if (!itemName.isEmpty())
             aviResource->setName(itemName);

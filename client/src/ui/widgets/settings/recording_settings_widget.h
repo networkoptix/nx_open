@@ -48,6 +48,8 @@ private slots:
     void onDisableAeroChecked(bool);
     void updateRecordingWarning();
 
+    void at_browseRecordingFolderButton_clicked();
+
 private:
     QScopedPointer<Ui::RecordingSettings> ui;
     QnVideoRecorderSettings *m_settings;

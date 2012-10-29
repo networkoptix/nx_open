@@ -69,6 +69,7 @@ bool QnPbStreamParser::nextMessage(pb::Message& parsed)
 // QnMessageSource
 // -------------------------------------------------------------------------- //
 QnMessageSource::QnMessageSource(QUrl url, int retryTimeout): 
+    m_timeoutFlag(false),
     m_url(url),
     m_retryTimeout(retryTimeout),
     m_reply(NULL),
@@ -109,6 +110,7 @@ void QnMessageSource::startRequest()
 {
     m_streamParser->reset();
 
+    m_timeoutFlag = false;
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
@@ -125,8 +127,12 @@ void QnMessageSource::httpFinished()
         return;
 
     QVariant redirectionTarget = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    if (m_reply->error()) {
-        QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
+    if (QNetworkReply::NetworkError err = m_reply->error()) {
+
+        /** Operation was cancelled intentionally */
+        if (err != QNetworkReply::OperationCanceledError || m_timeoutFlag)
+            QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
+
         emit connectionClosed(m_reply->errorString());
     } else if (!redirectionTarget.isNull()) {
         m_url = m_url.resolved(redirectionTarget.toUrl());
@@ -195,6 +201,7 @@ void QnMessageSource::onPingTimer()
 {
     if (m_eventWaitTimer.elapsed() > 2 * PING_INTERVAL)
     {
+        m_timeoutFlag = true;
         doStop();
 
         emit connectionClosed(QLatin1String("Timeout"));

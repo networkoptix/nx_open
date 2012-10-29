@@ -1,5 +1,5 @@
-#ifndef NAVIGATIONITEM_H
-#define NAVIGATIONITEM_H
+#ifndef QN_NAVIGATION_ITEM_H
+#define QN_NAVIGATION_ITEM_H
 
 #include <ui/graphics/items/generic/simple_frame_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -47,7 +47,6 @@ private slots:
     void updatePlayButtonChecked();
     void updateJumpButtonsTooltips();
     
-
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_liveButton_clicked();
     void at_syncButton_clicked();
@@ -82,4 +81,4 @@ private:
     QnVolumeSlider *m_volumeSlider;
 };
 
-#endif // NAVIGATIONITEM_H
+#endif // QN_NAVIGATION_ITEM_H

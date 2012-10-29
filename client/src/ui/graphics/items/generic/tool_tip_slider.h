@@ -33,6 +33,8 @@ public:
 
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 protected:
     QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
 
@@ -69,6 +71,7 @@ private:
     bool m_sliderUnderMouse;
     bool m_toolTipUnderMouse;
     bool m_pendingPositionUpdate;
+    bool m_instantPositionUpdate;
     QPointF m_dragOffset;
 };
 

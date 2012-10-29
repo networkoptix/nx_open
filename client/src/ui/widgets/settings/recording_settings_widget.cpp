@@ -60,6 +60,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     connect(ui->primaryAudioDeviceComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(onMonitorChanged(int)));
+    connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
     setDefaultSoundIcon(ui->label_primaryDeviceIcon);
     setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
 
@@ -113,6 +114,7 @@ void QnRecordingSettingsWidget::updateFromSettings() {
     setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().deviceName());
     
     ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
+    ui->recordingFolderLabel->setText(m_settings->recordingFolder());
 }
 
 void QnRecordingSettingsWidget::submitToSettings() {
@@ -123,6 +125,7 @@ void QnRecordingSettingsWidget::submitToSettings() {
     m_settings->setPrimaryAudioDeviceByName(primaryAudioDeviceName());
     m_settings->setSecondaryAudioDeviceByName(secondaryAudioDeviceName());
     m_settings->setCaptureCursor(ui->captureCursorCheckBox->isChecked());
+    m_settings->setRecordingFolder(ui->recordingFolderLabel->text());
 }
 
 Qn::CaptureMode QnRecordingSettingsWidget::captureMode() const
@@ -313,6 +316,20 @@ void QnRecordingSettingsWidget::onComboboxChanged(int index)
 #else
     Q_UNUSED(index)
 #endif
+}
+
+void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
+    QFileDialog fileDialog(this);
+    fileDialog.setDirectory(ui->recordingFolderLabel->text());
+    fileDialog.setFileMode(QFileDialog::DirectoryOnly);
+    if (!fileDialog.exec())
+        return;
+
+    QString dir = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+    if (dir.isEmpty())
+        return;
+
+    ui->recordingFolderLabel->setText(dir);
 }
 
 void QnRecordingSettingsWidget::updateRecordingWarning(){

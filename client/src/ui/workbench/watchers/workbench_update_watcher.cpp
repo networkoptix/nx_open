@@ -11,7 +11,7 @@
 namespace {
     struct UpdateVersionLess {
         bool operator()(const QnUpdateInfoItem &l, const QnUpdateInfoItem &r) {
-            return l.version < r.version;
+            return l.productVersion < r.productVersion;
         }
     };
 
@@ -53,10 +53,10 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     QnUpdateInfoItem lastUpdate = updates.last();
 
     QnVersion currentVersion = QnVersion(QLatin1String(QN_APPLICATION_VERSION));
-    if(lastUpdate.version == currentVersion || lastUpdate.version < currentVersion) // TODO: use <=
+    if(lastUpdate.productVersion == currentVersion || lastUpdate.productVersion < currentVersion) // TODO: use <=
         return;
 
-    if(lastUpdate.version == m_availableUpdate.version)
+    if(lastUpdate.productVersion == m_availableUpdate.productVersion)
         return;
 
     m_availableUpdate = lastUpdate;

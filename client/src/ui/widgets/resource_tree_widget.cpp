@@ -1,4 +1,5 @@
 ﻿#include "resource_tree_widget.h"
+#include "ui_resource_tree_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -23,27 +24,27 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
-#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
-
-#include "ui_resource_tree_widget.h"
-#include "ui/style/proxy_style.h"
-#include "ui/style/noptix_style.h"
-#include "ui/style/globals.h"
+#include <ui/style/skin.h>
+#include <ui/style/proxy_style.h>
+#include <ui/style/noptix_style.h>
+#include <ui/style/globals.h>
 
 namespace {
     const char *qn_searchModelPropertyName = "_qn_searchModel";
     const char *qn_searchSynchronizerPropertyName = "_qn_searchSynchronizer";
     const char *qn_filterPropertyName = "_qn_filter";
-    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
+//    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
@@ -258,6 +259,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
+
+    setHelpTopic(this,            Qn::MainWindow_Tree_Help);
+    setHelpTopic(ui->searchTab,   Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));

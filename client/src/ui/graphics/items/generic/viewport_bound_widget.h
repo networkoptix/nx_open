@@ -5,12 +5,13 @@
 
 class Instrument;
 
+//TODO: #gdm move out to common module
 namespace Qn{
     enum FixedItemRotation{
-        Angle0,
-        Angle90,
-        Angle180,
-        Angle270
+        Angle0 = 0,
+        Angle90 = 90,
+        Angle180 = 180,
+        Angle270 = 270
     };
 }
 

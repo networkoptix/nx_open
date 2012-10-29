@@ -10,6 +10,7 @@
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 #include <QtGui/QImage>
+#include <QtGui/QWhatsThis>
 
 #include <utils/common/environment.h>
 #include <utils/common/delete_later.h>
@@ -59,6 +60,9 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -86,8 +90,6 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
-#include "help/context_help_queryable.h"
-#include "help/help_topics.h"
 
 
 
@@ -159,8 +161,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     m_selectionUpdatePending(false),
     m_selectionScope(Qn::SceneScope),
     m_layoutExportCamera(0),
-    m_tourTimer(new QTimer()),
-    m_exportedCamera(0)
+    m_exportedCamera(0),
+    m_tourTimer(new QTimer())
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
@@ -187,6 +189,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::ConnectToServerAction),                  SIGNAL(triggered()),    this,   SLOT(at_connectToServerAction_triggered()));
     connect(action(Qn::GetMoreLicensesAction),                  SIGNAL(triggered()),    this,   SLOT(at_getMoreLicensesAction_triggered()));
     connect(action(Qn::ReconnectAction),                        SIGNAL(triggered()),    this,   SLOT(at_reconnectAction_triggered()));
+    connect(action(Qn::DisconnectAction),                       SIGNAL(triggered()),    this,   SLOT(at_disconnectAction_triggered()));
     connect(action(Qn::NextLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_nextLayoutAction_triggered()));
     connect(action(Qn::PreviousLayoutAction),                   SIGNAL(triggered()),    this,   SLOT(at_previousLayoutAction_triggered()));
     connect(action(Qn::OpenInLayoutAction),                     SIGNAL(triggered()),    this,   SLOT(at_openInLayoutAction_triggered()));
@@ -242,14 +245,17 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
+    connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
     connect(action(Qn::ToggleTourModeAction),                   SIGNAL(toggled(bool)),  this,   SLOT(at_toggleTourAction_toggled(bool)));
+    connect(action(Qn::ToggleTourModeHotkeyAction),             SIGNAL(triggered()),    action(Qn::ToggleTourModeAction),   SLOT(toggle()));
     connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(),  SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
     connect(context()->instance<QnWorkbenchUpdateWatcher>(),    SIGNAL(availableUpdateChanged()), this, SLOT(at_updateWatcher_availableUpdateChanged()));
     //connect(context()->instance<QnWorkbenchUserLayoutCountWatcher>(), SIGNAL(layoutCountChangeD()), this, SLOT(at_layoutCountWatcher_layoutCountChanged())); // TODO: not needed?
 
+    /*
     SignalingInstrument *activityInstrument = new SignalingInstrument(
         Instrument::makeSet(QEvent::MouseButtonRelease), 
         Instrument::makeSet(QEvent::KeyRelease),
@@ -263,6 +269,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     }
     connect(activityInstrument, SIGNAL(activated(QGraphicsView *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
     connect(activityInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_activityInstrument_activated()));
+    */
 
     /* Run handlers that update state. */
     at_eventManager_connectionClosed();
@@ -1295,6 +1302,24 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     at_eventManager_connectionOpened();
 }
 
+void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
+    QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
+//    QnSessionManager::instance()->stop(); // omfg... logic sucks
+    QnResource::stopCommandProc();
+    QnResourceDiscoveryManager::instance().stop();
+
+    //if(context()->user()) /* If we were connected... */
+        //workbench()->clear(); // TODO: ask to save?
+
+    // don't remove local resources
+    const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
+    resourcePool()->setLayoutsUpdated(false);
+    resourcePool()->removeResources(remoteResources);
+    resourcePool()->setLayoutsUpdated(true);
+
+    qnLicensePool->reset();
+}
+
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
     QnResourcePtr resource = menu()->currentParameters(sender()).resource();
     if(!resource)
@@ -1365,11 +1390,14 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
-                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+                int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
+                int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
-                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
+                startDateTime.setTime(QTime());
+                startDateTime = startDateTime.addMSecs(startMSecs);
+
+                endDateTime.setTime(QTime());
+                endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
@@ -1718,7 +1746,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
     dialog->setEditorPermissions(accessController()->globalPermissions());
     dialog->setUser(user);
     dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
-    setHelpTopicId(dialog.data(), Qn::NewUser_Help);
+    setHelpTopic(dialog.data(), Qn::NewUser_Help);
 
     if(!dialog->exec())
         return;
@@ -1854,7 +1882,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     QScopedPointer<QnUserSettingsDialog> dialog(new QnUserSettingsDialog(context(), widget()));
     dialog->setWindowModality(Qt::ApplicationModal);
     dialog->setWindowTitle(tr("User Settings"));
-    setHelpTopicId(dialog.data(), Qn::UserSettings_Help);
+    setHelpTopic(dialog.data(), Qn::UserSettings_Help);
 
     QnUserSettingsDialog::ElementFlags zero(0);
 
@@ -1946,6 +1974,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
 {
     bool nonUtcExists = false;
     bool utcExists = false;
+    bool imageExists = false;
 
     QnLayoutItemDataMap items = layout->getItems();
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
@@ -1954,6 +1983,7 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
         QnResourcePtr layoutItemRes = qnResPool->getResourceByUniqId(item.resource.path);
         if (layoutItemRes) 
         {
+            imageExists |= layoutItemRes->hasFlags(QnResource::still_image);
             bool isLocalItem = layoutItemRes->hasFlags(QnResource::local) || layoutItemRes->getUrl().startsWith(QLatin1String("layout://")); // layout item remove 'local' flag.
             if (isLocalItem && layoutItemRes->getStatus() == QnResource::Offline)
                 continue; // skip unaccessible local resources because is not possible to check utc flag
@@ -1963,11 +1993,21 @@ bool QnWorkbenchActionHandler::validateItemTypes(QnLayoutResourcePtr layout)
                 nonUtcExists = true;
         }
     }
-    if (nonUtcExists && utcExists) {
+
+    if (imageExists) {
         QMessageBox::critical(
             this->widget(), 
             tr("Can't create local layout"), 
-            tr("Current layout has several cameras and several local files. You have to keep only cameras or only local files"), 
+            tr("Current layout contains image files. Images are not allowed for Multi-Video export."),
+            QMessageBox::Ok
+            );
+        return false;
+    }
+    else if (nonUtcExists && utcExists) {
+        QMessageBox::critical(
+            this->widget(), 
+            tr("Can't create local layout"), 
+            tr("Current layout contains several cameras and several local files. You have to keep only cameras or only local files"), 
             QMessageBox::Ok
             );
         return false;
@@ -2103,7 +2143,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
             tr("Another export in progress"),
             tr("Another export in progress. Please wait"), 
             QMessageBox::Ok
-            );
+        );
 
         return;
     }
@@ -2119,6 +2159,8 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     QnProgressDialog *exportProgressDialog = new QnProgressDialog(this->widget());
     exportProgressDialog->setWindowTitle(tr("Exporting Layout"));
     exportProgressDialog->setMinimumDuration(1000);
+    exportProgressDialog->setModal(true);
+    exportProgressDialog->show();
     m_exportProgressDialog = exportProgressDialog;
 
     if (!m_layoutExportCamera)
@@ -2127,7 +2169,6 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     connect(exportProgressDialog,   SIGNAL(canceled()),                 this,                   SLOT(at_cancelExport()));
     connect(exportProgressDialog,   SIGNAL(canceled()),                 exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportProgress(int)),        exportProgressDialog,   SLOT(setValue(int)));
-    connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      exportProgressDialog,   SLOT(deleteLater()));
     connect(m_layoutExportCamera,   SIGNAL(exportFailed(QString)),      this,                   SLOT(at_layoutCamera_exportFailed(QString)));
     connect(m_layoutExportCamera,   SIGNAL(exportFinished(QString)),    this,                   SLOT(at_layoutCamera_exportFinished(QString)));
 
@@ -2194,6 +2235,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     device = m_exportStorage->open(QLatin1String("misc.bin"), QIODevice::WriteOnly);
     quint32 flags = exportReadOnly ? 1 : 0;
+
+    for (int i = 0; i < m_layoutExportResources.size(); ++i) {
+        if (m_layoutExportResources[i]->hasFlags(QnResource::utc))
+            flags |= 2; 
+    }
     device->write((const char*) &flags, sizeof(flags));
     delete device;
 
@@ -2331,17 +2377,9 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
 
 void QnWorkbenchActionHandler::at_layoutCamera_exportFailed(QString errorMessage) 
 {
-    disconnect(sender(), NULL, this, NULL);
-
-    m_exportedMediaRes.clear();
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
-        m_motionFileBuffer[i].clear();
-    m_exportStorage.clear();
-
-    if(QnVideoCamera *camera = dynamic_cast<QnVideoCamera *>(sender()))
-        camera->stopExport();
-    m_exportedCamera = 0;
-
+    at_cancelExport();
+    if(m_exportProgressDialog)
+        m_exportProgressDialog.data()->deleteLater();
     QMessageBox::warning(widget(), tr("Could not export layout"), errorMessage, QMessageBox::Ok);
 }
 
@@ -2476,7 +2514,7 @@ Do you want to continue?"),
                         tr("AVI format is not recommended"), 
                         tr("AVI format is not recommended for camera with audio track there is some recording holes exists. Press 'Yes' to continue export or 'No' to select other format"),
                         QMessageBox::Yes | QMessageBox::No
-                        );
+                    );
                     if (result != QMessageBox::Yes)
                         continue;
                 }
@@ -2705,7 +2743,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     QMessageBox::information(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString())
     );
 }
 
@@ -2751,10 +2789,8 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
         action(Qn::ToggleTourModeAction)->setChecked(false);
 }
 
-void QnWorkbenchActionHandler::at_activityInstrument_activated() {
-    action(Qn::ToggleTourModeAction)->setChecked(false);
+void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
+    QWhatsThis::enterWhatsThisMode();
 }
-
-
 
 

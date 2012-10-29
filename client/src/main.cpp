@@ -82,8 +82,8 @@
     #include "ui/workaround/iexplore_url_handler.h"
 #endif
 
-#include "help/context_help.h"
-#include "help/context_help_handler.h"
+#include "ui/help/help_handler.h"
+#include "client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -222,7 +222,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
+    QnClientModule client(argc, argv);
     
 #ifdef Q_WS_X11
 	XInitThreads();
@@ -339,9 +339,7 @@ int qnMain(int argc, char *argv[])
         return 0;
 
 
-    QnContextHelp help;
-    QnContextHelpHandler helpHandler;
-    helpHandler.setContextHelp(&help);
+    QnHelpHandler helpHandler;
     qApp->installEventFilter(&helpHandler);
 
 

@@ -40,6 +40,7 @@ public:
 
     /** Return initial signature as filler */
     static QByteArray getSignPattern();
+    static int getMaxSignSize();
     static char getSignPatternDelim();
 
     static QByteArray getSignMagic();

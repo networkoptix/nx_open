@@ -73,6 +73,7 @@ void QnToolTipSlider::init() {
     m_sliderUnderMouse = false;
     m_toolTipUnderMouse = false;
     m_pendingPositionUpdate = false;
+    m_instantPositionUpdate = false;
 
     m_toolTipItemVisibilityAnimator = new VariantAnimator(this);
     m_toolTipItemVisibilityAnimator->setSpeed(2.0);
@@ -85,6 +86,8 @@ void QnToolTipSlider::init() {
 
     setToolTipItem(new QnSliderToolTipItem(this));
     setAcceptHoverEvents(true);
+
+    setFlag(ItemSendsScenePositionChanges, true);
 }
 
 QnToolTipSlider::~QnToolTipSlider() {
@@ -167,6 +170,11 @@ void QnToolTipSlider::updateToolTipText() {
 }
 
 void QnToolTipSlider::updateToolTipPosition() {
+    if(!m_instantPositionUpdate) {
+        m_pendingPositionUpdate = true;
+        return;
+    }
+
     m_pendingPositionUpdate = false;
 
     if(!toolTipItem())
@@ -192,8 +200,17 @@ void QnToolTipSliderAnimationListener::tick(int) {
      * paint event). */
     m_slider->updateToolTipOpacity();
 
+    /* All position updates in [tick, paint] time period are instant. */
+    m_slider->m_instantPositionUpdate = true;
+
     if(m_slider->m_pendingPositionUpdate)
         m_slider->updateToolTipPosition();
+}
+
+void QnToolTipSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    m_instantPositionUpdate = false;
+
+    base_type::paint(painter, option, widget);
 }
 
 QString QnToolTipSlider::toolTipAt(const QPointF &) const {
@@ -260,7 +277,7 @@ void QnToolTipSlider::sliderChange(SliderChange change) {
             updateToolTipVisibility();
             updateToolTipPosition();
         } else if(change == SliderMappingChange) {
-            m_pendingPositionUpdate = true;
+            updateToolTipPosition();
         }
     }
 }
@@ -274,6 +291,9 @@ QVariant QnToolTipSlider::itemChange(GraphicsItemChange change, const QVariant &
         break;
     case ItemOpacityHasChanged:
         updateToolTipOpacity();
+        break;
+    case ItemScenePositionHasChanged:
+        updateToolTipPosition();
         break;
     default:
         break;
@@ -310,6 +330,6 @@ void QnToolTipSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 void QnToolTipSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
     base_type::resizeEvent(event);
 
-    m_pendingPositionUpdate = true;
+    updateToolTipPosition();
 }
 

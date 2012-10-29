@@ -389,6 +389,11 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("F11")).
         autoRepeat(false);
 
+    factory(Qn::WhatsThisAction).
+        flags(Qn::NoTarget).
+        text(tr("Help")).
+        icon(qnSkin->icon("titlebar/whats_this.png"));
+
 
     /* Context menu actions. */
 
@@ -411,6 +416,16 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::ConnectToServerAction).
         flags(Qn::Main).
         autoRepeat(false);
+
+    factory(Qn::DisconnectAction).
+        flags(Qn::Main).
+        text(tr("Logout")).
+        autoRepeat(false).
+        condition(new QnDisconnectActionCondition(this));
+
+    factory().
+        flags(Qn::Main).
+        separator();
 
     factory(Qn::TogglePanicModeAction).
         flags(Qn::Main).
@@ -633,7 +648,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+Enter")).
         shortcut(tr("Ctrl+Return")).
         autoRepeat(false).
-        condition(hasFlags(QnResource::url | QnResource::local | QnResource::media));
+        condition(new QnOpenInFolderActionCondition(this)); 
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
@@ -929,10 +944,17 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ToggleTourModeAction).
-        flags(Qn::Scene | Qn::NoTarget).
+        flags(Qn::Scene | Qn::NoTarget ).
         text(tr("Start Tour")).
         toggledText(tr("Stop Tour")).
         shortcut(tr("Alt+T")).
+        autoRepeat(false).
+        condition(new QnToggleTourActionCondition(this));
+
+    factory(Qn::ToggleTourModeHotkeyAction).
+        flags(Qn::Scene  | Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly ).
+        shortcut(tr("Alt+T")).
+        autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
 
     factory(Qn::StartTimeSelectionAction).

@@ -617,6 +617,12 @@ int PtzSoapWrapper::doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifP
     return m_soapProxy->ContinuousMove(m_endpoint, NULL, &request, &response);
 }
 
+int PtzSoapWrapper::doGetStatus(_onvifPtz__GetStatus& request, _onvifPtz__GetStatusResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetStatus(m_endpoint, NULL, &request, &response);
+}
+
 int PtzSoapWrapper::doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response)
 {
     beforeMethodInvocation();

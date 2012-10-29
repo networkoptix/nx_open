@@ -6,7 +6,7 @@
 #include "Utils.h"
 
 
-UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
@@ -14,12 +14,12 @@ UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
 
     CAtlString foldersString, fromFolder, toFolder;
 
-    hr = WcaInitialize(hInstall, "CopyMediaServerProfile");
+    hr = WcaInitialize(hInstall, actionName);
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-    // Get "from" and "to" folders from CopyMediaServerProfile
+    // Get "from" and "to" folders from msi property
     foldersString = GetProperty(hInstall, L"CustomActionData");
 
     // Extract "from" and "to" folders from foldersString
@@ -41,6 +41,14 @@ LExit:
 
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
+}
+
+UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyMediaServerProfile");
+}
+
+UINT __stdcall CopyAppServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyAppServerProfile");
 }
 
 UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)

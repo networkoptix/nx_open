@@ -12,6 +12,7 @@
 #include <QtNetwork/QNetworkRequest>
 
 #include <core/resource_managment/resource_pool.h>
+#include <common/customization.h>
 
 #include <ui/style/globals.h>
 
@@ -51,7 +52,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(m_licenses.hardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY));
+    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY) && (qnProductFeatures() & Qn::FreeLicenseFeature));
 
     /* Update grid. */
     ui->gridLicenses->clear();
@@ -77,7 +78,10 @@ void QnLicenseManagerWidget::updateLicenses() {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
             useRedLabel = false;
         } else {
-            ui->infoLabel->setText(tr("You do not have a valid License installed. Please activate your commercial or free license."));
+            QString text = (qnProductFeatures() & Qn::FreeLicenseFeature) ?
+                tr("You do not have a valid License installed. Please activate your commercial or free license.") :
+                tr("You do not have a valid License installed. Please activate your commercial license.");
+            ui->infoLabel->setText(text);
             useRedLabel = true;
         }
     }
@@ -168,7 +172,7 @@ void QnLicenseManagerWidget::at_downloadError() {
         reply->deleteLater();
     }
 
-    ui->licenseWidget->setState(LicenseWidget::Normal);
+    ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
 void QnLicenseManagerWidget::at_downloadFinished() {
@@ -178,7 +182,7 @@ void QnLicenseManagerWidget::at_downloadFinished() {
         reply->deleteLater();
     }
 
-    ui->licenseWidget->setState(LicenseWidget::Normal);
+    ui->licenseWidget->setState(QnLicenseWidget::Normal);
 }
 
 void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
@@ -196,14 +200,14 @@ void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
 }
 
 void QnLicenseManagerWidget::at_licenseWidget_stateChanged() {
-    if(ui->licenseWidget->state() != LicenseWidget::Waiting)
+    if(ui->licenseWidget->state() != QnLicenseWidget::Waiting)
         return;
 
     if (ui->licenseWidget->isOnline()) {
         updateFromServer(ui->licenseWidget->serialKey(), QLatin1String(m_licenses.hardwareId()));
     } else {
         validateLicense(QnLicensePtr(new QnLicense(QnLicense::fromString(ui->licenseWidget->activationKey()))));
-        ui->licenseWidget->setState(LicenseWidget::Normal);
+        ui->licenseWidget->setState(QnLicenseWidget::Normal);
     }
 }
 

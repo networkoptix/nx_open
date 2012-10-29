@@ -49,20 +49,6 @@ void QnAbstractArchiveReader::setCycleMode(bool value)
     m_cycleMode = value;
 }
 
-qint64 QnAbstractArchiveReader::startTime() const
-{
-    Q_ASSERT(m_delegate);
-    //m_delegate->open(m_resource);
-    return m_delegate->startTime();
-}
-
-qint64 QnAbstractArchiveReader::endTime() const
-{
-    Q_ASSERT(m_delegate);
-    //m_delegate->open(m_resource);
-    return m_delegate->endTime();
-}
-
 bool QnAbstractArchiveReader::open()
 {
     return m_delegate && m_delegate->open(m_resource);

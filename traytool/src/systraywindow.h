@@ -80,6 +80,7 @@ private slots:
     void onShowAppServerLogAction();
 
     void onTestButtonClicked();
+
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);

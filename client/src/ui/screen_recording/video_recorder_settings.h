@@ -57,6 +57,9 @@ public:
     int screen() const;
     void setScreen(int screen);
 
+    QString recordingFolder() const;
+    void setRecordingFolder(QString folder);
+
 private:
     QSettings settings;
 };

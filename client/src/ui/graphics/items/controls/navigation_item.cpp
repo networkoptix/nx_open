@@ -19,6 +19,8 @@
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/workbench_display.h>
@@ -87,18 +89,22 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_liveButton = newActionButton(action(Qn::JumpToLiveAction));
     m_liveButton->setIcon(qnSkin->icon("slider/buttons/live.png"));
     m_liveButton->setPreferredSize(48, 24);
+    setHelpTopic(m_liveButton, Qn::MainWindow_Navigation_Help);
 
     m_syncButton = newActionButton(action(Qn::ToggleSyncAction));
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
+    setHelpTopic(m_syncButton, Qn::MainWindow_Sync_Help);
 
     m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
     m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
     m_thumbnailsButton->setPreferredSize(48, 24);
+    setHelpTopic(m_thumbnailsButton, Qn::MainWindow_Thumbnails_Help);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
     m_calendarButton->setPreferredSize(48, 24);
+    setHelpTopic(m_calendarButton, Qn::MainWindow_Calendar_Help);
 
 
     /* Create sliders. */
@@ -115,6 +121,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_timeScrollBar = new QnTimeScrollBar(this);
     
+    setHelpTopic(m_timeSlider, m_timeScrollBar, Qn::MainWindow_Navigation_Help);
+
+
     /* Initialize navigator. */
     navigator()->setTimeSlider(m_timeSlider);
     navigator()->setTimeScrollBar(m_timeScrollBar);
@@ -140,6 +149,10 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutV->setMinimumHeight(87.0);
     leftLayoutV->addItem(m_speedSlider);
     leftLayoutV->addItem(buttonsLayout);
+
+    QGraphicsWidget *leftWidget = new QGraphicsWidget();
+    leftWidget->setLayout(leftLayoutV);
+    setHelpTopic(leftWidget, Qn::MainWindow_Playback_Help);
 
     QGraphicsLinearLayout *rightLayoutHU = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHU->setContentsMargins(0, 0, 0, 0);
@@ -179,7 +192,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     leftLayoutVV->setContentsMargins(0, 0, 0, 0);
     leftLayoutVV->setSpacing(0);
     leftLayoutVV->addStretch(1);
-    leftLayoutVV->addItem(leftLayoutV);
+    leftLayoutVV->addItem(leftWidget);
 
     QGraphicsLinearLayout *rightLayoutVV = new QGraphicsLinearLayout(Qt::Vertical);
     rightLayoutVV->setContentsMargins(0, 0, 0, 0);
@@ -192,6 +205,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     mainLayout->setSpacing(10);
     mainLayout->addItem(leftLayoutVV);
     mainLayout->addItem(sliderLayout);
+    mainLayout->setStretchFactor(sliderLayout, 0x1000);
     mainLayout->addItem(rightLayoutVV);
     setLayout(mainLayout);
 
@@ -257,15 +271,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
-
-    /*connect(action(Qn::PlayPauseAction),        SIGNAL(triggered()), m_playButton,          SLOT(click()));
-    connect(action(Qn::PreviousFrameAction),    SIGNAL(triggered()), m_stepBackwardButton,  SLOT(click()));
-    connect(action(Qn::NextFrameAction),        SIGNAL(triggered()), m_stepForwardButton,   SLOT(click()));
-    connect(action(Qn::JumpToStartAction),      SIGNAL(triggered()), m_jumpBackwardButton,  SLOT(click()));
-    connect(action(Qn::JumpToEndAction),        SIGNAL(triggered()), m_jumpForwardButton,   SLOT(click()));
-    connect(action(Qn::ToggleMuteAction),       SIGNAL(triggered()), m_muteButton,          SLOT(click()));
-    connect(action(Qn::JumpToLiveAction),       SIGNAL(triggered()), m_liveButton,          SLOT(click()));
-    connect(action(Qn::ToggleSyncAction),       SIGNAL(triggered()), m_syncButton,          SLOT(click()));*/
 
     /* Run handlers */
     updateMuteButtonChecked();
@@ -388,6 +393,9 @@ void QnNavigationItem::updateMuteButtonChecked() {
 
 void QnNavigationItem::updateLiveButtonChecked() {
     m_liveButton->setChecked(navigator()->isLive());
+
+    /* This is needed as button's enabled state will be updated from its action. */ // TODO
+    updateLiveButtonEnabled();
 }
 
 void QnNavigationItem::updateLiveButtonEnabled() {
@@ -491,3 +499,4 @@ void QnNavigationItem::at_stepForwardButton_clicked() {
         navigator()->stepForward();
     }
 }
+

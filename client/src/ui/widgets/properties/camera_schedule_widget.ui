@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Camera schedule editor</string>
+   <string>Camera Schedule Editor</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
    <item>
@@ -19,7 +19,7 @@
      <item>
       <widget class="QCheckBox" name="enableRecordingCheckBox">
        <property name="text">
-        <string>Enable recording</string>
+        <string>Enable Recording</string>
        </property>
        <property name="tristate">
         <bool>true</bool>
@@ -58,7 +58,7 @@
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
-      <string>Schedule grid</string>
+      <string>Schedule Grid</string>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -75,7 +75,7 @@
         <item>
          <widget class="QCheckBox" name="displayQualityCheckBox">
           <property name="text">
-           <string>Display quality on grid</string>
+           <string>Display Quality on Grid</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -101,7 +101,7 @@
         <item>
          <widget class="QCheckBox" name="displayFpsCheckBox">
           <property name="text">
-           <string>Display fps on grid</string>
+           <string>Display FPS on Grid</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -124,7 +124,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Panic mode: </string>
+           <string>Panic Mode: </string>
           </property>
          </widget>
         </item>
@@ -170,7 +170,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Schedule settings</string>
+        <string>Schedule Settings</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
@@ -178,7 +178,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>fps</string>
+             <string>FPS</string>
             </property>
            </widget>
           </item>
@@ -201,7 +201,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>quality</string>
+             <string>Quality</string>
             </property>
            </widget>
           </item>
@@ -287,7 +287,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Record always</string>
+               <string>Record Always</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -341,7 +341,7 @@
             <item>
              <widget class="QLabel" name="labelMotionOnly">
               <property name="text">
-               <string>Motion only</string>
+               <string>Motion Only</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -392,7 +392,7 @@
             <item>
              <widget class="QLabel" name="labelMotionPlusLQ">
               <property name="text">
-               <string>Motion+ low quality always</string>
+               <string>Motion+ Lo-Res Always</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -443,7 +443,7 @@
             <item>
              <widget class="QLabel" name="label_8">
               <property name="text">
-               <string>Do not record</string>
+               <string>Do not Record</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -463,7 +463,7 @@
      <item>
       <widget class="QGroupBox" name="motionGroupBox">
        <property name="title">
-        <string>Motion recording</string>
+        <string>Motion Recording</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -483,7 +483,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Pre-recording</string>
+             <string>Pre-Recording</string>
             </property>
            </widget>
           </item>
@@ -512,7 +512,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Post-recording</string>
+             <string>Post-Recording</string>
             </property>
            </widget>
           </item>

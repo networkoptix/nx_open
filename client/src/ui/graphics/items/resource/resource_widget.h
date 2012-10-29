@@ -13,6 +13,7 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
+#include <ui/common/help_topic_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -31,7 +32,7 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public HelpTopicQueryable {
     Q_OBJECT
     Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
     Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
@@ -230,14 +231,6 @@ public:
      */
     void setInfoTextFormat(const QString &infoTextFormat);
 
-    // TODO: #gdm move to private interface, update on rotation change.
-    /**
-     * Updates overlay widget's rotation.
-     *
-     * \param rotation - target rotation angle in degrees.
-     */
-    void updateOverlayRotation(qreal rotation);
-
     bool isDecorationsVisible() const;
     Q_SLOT void setDecorationsVisible(bool visible = true, bool animate = true);
 
@@ -267,11 +260,13 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -300,6 +295,13 @@ protected:
 
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
+
+    /**
+     * Updates overlay widget's rotation.
+     *
+     * \param rotation                  Target rotation angle in degrees.
+     */
+    void updateOverlayRotation(qreal rotation);
 
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
@@ -414,6 +416,10 @@ private:
 
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
+
+    // TODO: #gdm move Qn::FixedAngle out in common module and use here.
+    /** Rotation angle in degrees, shall be multiple of 90. Used to rotate static text and images. */
+    int m_desiredRotation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

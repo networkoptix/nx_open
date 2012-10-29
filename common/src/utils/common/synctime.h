@@ -18,7 +18,9 @@ public:
     qint64 currentUSecsSinceEpoch();
 
     QDateTime currentDateTime();
-    
+
+    void reset();
+
 private:
     void updateTime(qint64 newTime);
 

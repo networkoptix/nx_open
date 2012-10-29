@@ -276,6 +276,7 @@ private:
 
     QString m_realm;
     QString m_nonce;
+    qint64 m_openedTime;
 };
 
 #endif //rtp_session_h_1935_h

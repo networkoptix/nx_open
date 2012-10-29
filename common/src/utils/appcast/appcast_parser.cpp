@@ -26,7 +26,7 @@ QnUpdateInfoItemList QnAppCastParser::newItems(const QnVersion& version) const {
     QnUpdateInfoItemList filtered;
 
     foreach(const QnUpdateInfoItem &item, m_items)
-        if (version < item.version)
+        if (version < item.productVersion)
             filtered.append(item);
 
     return filtered;
@@ -52,7 +52,7 @@ void QnAppCastParser::parse(const QByteArray& data) {
 
                 if (m_platform.isEmpty() || m_platform == attributes.value(TAG_PLATFORM).toString()) {
                     currentItem.url = QUrl(attributes.value(TAG_URL).toString());
-                    currentItem.version = attributes.value(TAG_VERSION).toString();
+                    currentItem.productVersion = attributes.value(TAG_VERSION).toString();
                 }
             }
 

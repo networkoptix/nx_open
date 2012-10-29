@@ -69,8 +69,8 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerHandle = 0;
     m_skipTicks = 0;
 
-    m_mediaServerServiceName = QString(QN_CUSTOMIZATION) + QString("MediaServer");
-    m_appServerServiceName = QString(QN_CUSTOMIZATION) + QString("AppServer");
+    m_mediaServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("MediaServer");
+    m_appServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -110,12 +110,14 @@ QnSystrayWindow::QnSystrayWindow():
 
     ui->informationLabel->setText(
         tr(
-            "<b>%1</b> version %2 (%3).<br />\n"
-            "Built for %4-%5 with %6."
+            "<b>%1</b> version %2 (%3).<br/>\n"
+            "Engine version %4.<br/>\n"
+            "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_ENGINE_VERSION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER))

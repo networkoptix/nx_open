@@ -783,9 +783,18 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if(startDisplay)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(startDisplay) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->display()->start();
+            if(mediaWidget->display()->archiveReader()) {
+                if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
+                    mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
+
+                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
+        }
+    }
 
     return true;
 }
@@ -1108,9 +1117,6 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
 
     /* Update enclosing aspect ratio. */
     widget->setEnclosingAspectRatio(enclosingGeometry.width() / enclosingGeometry.height());
-
-    /* Update overlays rotation */
-    widget->updateOverlayRotation(item->rotation());
 
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
