@@ -1,7 +1,15 @@
+
 #include "gl_functions.h"
+
+#define GL_GLEXT_PROTOTYPES 1
+#include <GL/glext.h>
+
 #include <QMutex>
+
 #include <utils/common/warnings.h>
+
 #include "gl_context_data.h"
+
 
 #ifndef APIENTRY
 #   define APIENTRY
@@ -56,6 +64,14 @@ namespace QnGl {
     void APIENTRY glVertexAttribPointer(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *) { WARN(); }
     void APIENTRY glDisableVertexAttribArray(GLuint) { WARN(); };
     void APIENTRY glEnableVertexAttribArray(GLuint) { WARN(); };
+
+    void APIENTRY glGenBuffersARB( GLsizei, GLuint* ) { WARN(); }
+    void APIENTRY glDeleteBuffersARB( GLsizei /*n*/, const GLuint* /*buffers*/ ) { WARN(); }
+    void APIENTRY glBindBufferARB( GLenum /*target*/, GLuint /*buffer*/ ) { WARN(); }
+    void APIENTRY glBufferDataARB( GLenum /*target*/, GLsizeiptrARB /*size*/, const GLvoid* /*data*/, GLenum /*usage*/ ) { WARN(); }
+    void APIENTRY glBufferSubDataARB( GLenum /*target*/, GLintptrARB /*offset*/, GLsizeiptrARB /*size*/, const GLvoid* /*data*/ ) { WARN(); }
+    GLvoid* APIENTRY glMapBufferARB( GLenum /*target*/, GLenum /*access*/ ) { WARN(); return NULL; }
+    GLboolean APIENTRY glUnmapBufferARB( GLenum /*target*/ ) { WARN(); return false; }
 
 #undef WARN
 
@@ -129,6 +145,8 @@ public:
 #define RESOLVE(FUNCTION)                                                       \
         status &= resolve<QN_CAT(PFN, FUNCTION)>("gl" QN_STRINGIZE(FUNCTION), &QnGl::QN_CAT(gl, FUNCTION), &QN_CAT(gl, FUNCTION))
 
+#define RESOLVE_PBO(FUNCTION_TYPE, FUNCTION_NAME) status &= resolve<FUNCTION_TYPE>(FUNCTION_NAME, &QnGl::FUNCTION_NAME, &FUNCTION_NAME)
+
         status = true;
         RESOLVE(ProgramStringARB);
         RESOLVE(BindProgramARB);
@@ -157,6 +175,17 @@ public:
         RESOLVE(EnableVertexAttribArray);
         if(status)
             m_features |= QnGlFunctions::OpenGL2_0;
+
+        status = true;
+        status &= resolve<PFNGLGENBUFFERSARBPROC>( "glGenBuffersARB", QnGl::glGenBuffersARB, &glGenBuffersARB );
+        status &= resolve<PFNGLDELETEBUFFERSARBPROC>( "glDeleteBuffersARB", QnGl::glDeleteBuffersARB, &glDeleteBuffersARB );
+        status &= resolve<PFNGLBINDBUFFERARBPROC>( "glBindBufferARB", QnGl::glBindBufferARB, &glBindBufferARB );
+        status &= resolve<PFNGLBUFFERDATAARBPROC>( "glBufferDataARB", QnGl::glBufferDataARB, &glBufferDataARB );
+        status &= resolve<PFNGLBUFFERSUBDATAARBPROC>( "glBufferSubDataARB", QnGl::glBufferSubDataARB, &glBufferSubDataARB );
+        status &= resolve<PFNGLMAPBUFFERARBPROC>( "glMapBufferARB", QnGl::glMapBufferARB, &glMapBufferARB );
+        status &= resolve<PFNGLUNMAPBUFFERARBPROC>( "glUnmapBufferARB", QnGl::glUnmapBufferARB, &glUnmapBufferARB );
+        if(status)
+            m_features |= QnGlFunctions::PBO;
 #undef RESOLVE
 
         QByteArray renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
@@ -194,6 +223,14 @@ public:
     PFNVertexAttribPointer glVertexAttribPointer;
     PFNDisableVertexAttribArray glDisableVertexAttribArray;
     PFNEnableVertexAttribArray glEnableVertexAttribArray;
+
+    PFNGLGENBUFFERSARBPROC glGenBuffersARB;
+    PFNGLDELETEBUFFERSARBPROC glDeleteBuffersARB;
+    PFNGLBINDBUFFERARBPROC glBindBufferARB;
+    PFNGLBUFFERDATAARBPROC glBufferDataARB;
+    PFNGLBUFFERSUBDATAARBPROC glBufferSubDataARB;
+    PFNGLMAPBUFFERARBPROC glMapBufferARB;
+    PFNGLUNMAPBUFFERARBPROC glUnmapBufferARB;
 
 private:
     template<class Function>
@@ -296,6 +333,34 @@ void QnGlFunctions::glEnableVertexAttribArray(GLuint index) {
 
 void QnGlFunctions::glDisableVertexAttribArray(GLuint index) {
     d->glDisableVertexAttribArray(index);
+}
+
+void QnGlFunctions::glGenBuffersARB( GLsizei n, GLuint* buffers ) {
+    d->glGenBuffersARB( n, buffers );
+}
+
+void QnGlFunctions::glDeleteBuffersARB( GLsizei n, const GLuint* buffers ) {
+    d->glDeleteBuffersARB( n, buffers );
+}
+
+void QnGlFunctions::glBindBufferARB( GLenum target, GLuint buffer ) {
+    d->glBindBufferARB( target, buffer );
+}
+
+void QnGlFunctions::glBufferDataARB( GLenum target, GLsizeiptrARB size, const GLvoid* data, GLenum usage ) {
+    d->glBufferDataARB( target, size, data, usage );
+}
+
+void QnGlFunctions::glBufferSubDataARB( GLenum target, GLintptrARB offset, GLsizeiptrARB size, const GLvoid* data ) {
+    d->glBufferSubDataARB( target, offset, size, data );
+}
+
+GLvoid* QnGlFunctions::glMapBufferARB( GLenum target, GLenum access ) {
+    return d->glMapBufferARB( target, access );
+}
+
+GLboolean QnGlFunctions::glUnmapBufferARB( GLenum target ) {
+    return d->glUnmapBufferARB( target );
 }
 
 #ifdef Q_OS_WIN
