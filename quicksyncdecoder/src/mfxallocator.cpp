@@ -140,6 +140,8 @@ mfxStatus AbstractMFXFrameAllocator::fa_free( mfxHDL pthis, mfxFrameAllocRespons
 //////////////////////////////////////////////////////////
 mfxStatus BaseMFXFrameAllocator::_free( mfxFrameAllocResponse* response )
 {
+    NX_LOG( QString::fromAscii("BaseMFXFrameAllocator(%1)::_free( %2 )").arg((size_t)this, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+
     //checking, if we created this response
     std::list<AllocResponseCtx>::iterator responseIter = m_responses.begin();
     for( ;
@@ -169,6 +171,8 @@ void BaseMFXFrameAllocator::allocationResponseSuccessfullyProcessed(
     const mfxFrameAllocRequest& request,
     const mfxFrameAllocResponse& response )
 {
+    NX_LOG( QString::fromAscii("BaseMFXFrameAllocator(%1)::allocationResponseSuccessfullyProcessed").arg((size_t)this, 0, 16), cl_logDEBUG2 );
+
     AllocResponseCtx ctx;
     ctx.response = response;
     ctx.refCount = 1;
@@ -178,6 +182,8 @@ void BaseMFXFrameAllocator::allocationResponseSuccessfullyProcessed(
 
 void BaseMFXFrameAllocator::releaseRemainingFrames()
 {
+    NX_LOG( QString::fromAscii("BaseMFXFrameAllocator(%1)::releaseRemainingFrames").arg((size_t)this, 0, 16), cl_logDEBUG2 );
+
     for( std::list<AllocResponseCtx>::iterator
         it = m_responses.begin();
         it != m_responses.end();
@@ -191,6 +197,9 @@ void BaseMFXFrameAllocator::releaseRemainingFrames()
 
 bool BaseMFXFrameAllocator::getCachedResponse( mfxFrameAllocRequest* const request, mfxFrameAllocResponse* const response )
 {
+    NX_LOG( QString::fromAscii("BaseMFXFrameAllocator(%1)::getCachedResponse( %2, %3 )").arg((size_t)this, 0, 16)
+        .arg((size_t)request, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+
     for( std::list<AllocResponseCtx>::iterator
         it = m_responses.begin();
         it != m_responses.end();
@@ -209,6 +218,8 @@ bool BaseMFXFrameAllocator::getCachedResponse( mfxFrameAllocRequest* const reque
 
 void BaseMFXFrameAllocator::releaseFrameSurfaces( mfxFrameAllocResponse* const response )
 {
+    NX_LOG( QString::fromAscii("BaseMFXFrameAllocator(%1)::releaseFrameSurfaces( %2 )").arg((size_t)this, 0, 16).arg((size_t)response, 0, 16), cl_logDEBUG2 );
+
     for( int i = 0; i < response->NumFrameActual; ++i )
     {
         BaseFrameContext* ctx = ((BaseFrameContext**)response->mids)[i];
@@ -256,9 +267,9 @@ mfxStatus MFXSysMemFrameAllocator::alloc( mfxFrameAllocRequest* request, mfxFram
             mmid->chromaFormat = request->Info.ChromaFormat;
             mmid->fourCC = request->Info.FourCC;
             if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV420 )
-                mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*3/2);
+                mmid->base = (mfxU8*)_aligned_malloc( mmid->width*mmid->height*3/2, 128 );
             else if( request->Info.ChromaFormat == MFX_CHROMAFORMAT_YUV422 )
-                mmid->base = (mfxU8*)malloc(mmid->width*mmid->height*2);
+                mmid->base = (mfxU8*)_aligned_malloc( mmid->width*mmid->height*2, 128 );
             response->mids[i] = mmid;
             ++response->NumFrameActual;
         }
@@ -312,7 +323,7 @@ mfxStatus MFXSysMemFrameAllocator::gethdl( mfxMemId /*mid*/, mfxHDL* /*handle*/ 
 
 void MFXSysMemFrameAllocator::deinitializeFrame( BaseFrameContext* const frameCtx )
 {
-    free( static_cast<SysMemoryFrameContext*>(frameCtx)->base );
+    _aligned_free( static_cast<SysMemoryFrameContext*>(frameCtx)->base );
 }
 
 
@@ -363,6 +374,9 @@ mfxStatus MFXDirect3DSurfaceAllocator::alloc( mfxFrameAllocRequest* request, mfx
 {
     //MFX_MEMTYPE_INTERNAL_FRAME, MFX_MEMTYPE_EXTERNAL_FRAME support:
         //for MFX_MEMTYPE_EXTERNAL_FRAME only increase ref count of allocation response (if already exists)
+
+    if( !m_decoderService )
+        return MFX_ERR_UNSUPPORTED;
 
     if( request->NumFrameSuggested == 0 )
         return MFX_ERR_NONE;
