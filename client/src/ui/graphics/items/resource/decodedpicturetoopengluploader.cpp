@@ -38,8 +38,6 @@
 #endif
 
 
-static const size_t uploadingThreadCountOverride = 1;
-
 namespace
 {
     const int ROUND_COEFF = 8;
