@@ -12,7 +12,7 @@ class QnVideoCameraGopKeeper: public QnResourceConsumer, public QnAbstractDataCo
 {
 public:
     virtual void beforeDisconnectFromResource();
-    QnVideoCameraGopKeeper(QnResourcePtr resource);
+    QnVideoCameraGopKeeper(QnResourcePtr resource, bool isSecondaryStream);
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
@@ -34,14 +34,16 @@ private:
     QnCompressedVideoDataPtr m_lastKeyFrame;
     int m_gotIFramesMask;
     int m_allChannelsMask;
+    bool m_isSecondaryStream;
 };
 
-QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
+QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource, bool isSecondaryStream): 
     QnResourceConsumer(resource),
     QnAbstractDataConsumer(100),
     m_lastKeyFrameChannel(0),
     m_gotIFramesMask(0),
-    m_allChannelsMask(0)
+    m_allChannelsMask(0),
+    m_isSecondaryStream(isSecondaryStream)
 {
     const QnResourceVideoLayout* layout = (qSharedPointerDynamicCast<QnMediaResource>(resource))->getVideoLayout();
     m_allChannelsMask = (1 << layout->numberOfChannels()) - 1;
@@ -145,10 +147,13 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     {
         QnAbstractDataPacketPtr data = m_dataQueue.at(i);
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-        if (skipTime && video && video->timestamp <= skipTime)
+        if (video && (skipTime && video->timestamp <= skipTime || m_isSecondaryStream))
         {
             QnCompressedVideoData* newData = video->clone();
-            newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            if (skipTime && video->timestamp <= skipTime)
+                newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            if (m_isSecondaryStream)
+                newData->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
             dstQueue.push(QnAbstractMediaDataPtr(newData));
         }
         else { 
@@ -212,7 +217,7 @@ void QnVideoCamera::createReader(QnResource::ConnectionRole role)
         if (reader == 0)
             return;
 
-        QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(m_resource);
+        QnVideoCameraGopKeeper* gopKeeper = new QnVideoCameraGopKeeper(m_resource, !primaryLiveStream);
         if (primaryLiveStream)
             m_primaryGopKeeper = gopKeeper;
         else
