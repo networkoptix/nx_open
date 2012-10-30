@@ -14,7 +14,11 @@
 
 CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;
 
-QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressedVideoDataPtr data, bool mtDecoding, const QGLContext* glContext )
+QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
+    const QnCompressedVideoDataPtr data,
+    bool mtDecoding,
+    const QGLContext* glContext,
+    bool allowHardwareDecoding )
 {
     //TODO/IMPL this is a quick solution. Need something more beautiful (static counter is not beautiful at all...)
     static QAtomicInt swDecoderCount = 0;
@@ -29,23 +33,26 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder( const QnCompressed
 
 		case AUTO:
 		{
-            //searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
-            QnAbstractVideoDecoderPlugin* videoDecoderPlugin = NULL;
-            const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
-            foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
+            if( allowHardwareDecoding )
             {
-                if( !plugin->isHardwareAccelerated() || plugin->supportedCodecTypes().indexOf(data->compressionType) == -1 )
-                    continue;
-                videoDecoderPlugin = plugin;
-                break;
+                //searching for a video decoder with hardware acceleration, supporting codec type data->compressionType
+                QnAbstractVideoDecoderPlugin* videoDecoderPlugin = NULL;
+                const QList<QnAbstractVideoDecoderPlugin*>& plugins = PluginManager::instance()->findPlugins<QnAbstractVideoDecoderPlugin>();
+                foreach( QnAbstractVideoDecoderPlugin* plugin, plugins )
+                {
+                    if( !plugin->isHardwareAccelerated() || plugin->supportedCodecTypes().indexOf(data->compressionType) == -1 )
+                        continue;
+                    videoDecoderPlugin = plugin;
+                    break;
+                }
+                if( videoDecoderPlugin )
+                {
+                    std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount ) );
+                    if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
+                        return decoder.release();
+                }
+                cl_log.log( QString::fromAscii("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
             }
-            if( videoDecoderPlugin )
-            {
-                std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount ) );
-                if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
-                    return decoder.release();
-            }
-            cl_log.log( QString::fromAscii("Hardware acceleration is not supported. Switching to software decoding..."), cl_logWARNING );
 		}
 
         case FFMPEG:
