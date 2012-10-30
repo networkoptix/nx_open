@@ -593,6 +593,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Navigation slider. */
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
+    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
     m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
