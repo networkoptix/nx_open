@@ -152,12 +152,15 @@ void QnClientPullMediaStreamProvider::run()
         if(data)
             data->dataProvider = this;
 
+        QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
             m_stat[videoData->channelNumber].onData(videoData->data.size());
-            if (QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this))
+            if (lp)
                 lp->onGotVideoFrame(videoData);
         }
+        if (data && lp && lp->getRole() == QnResource::Role_SecondaryLiveVideo)
+            data->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
 
         putData(data);
