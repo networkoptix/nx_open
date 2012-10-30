@@ -115,6 +115,7 @@ namespace {
         button->resize(15, 45);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
         button->setCheckable(true);
+        button->setProperty(Qn::NoHandScrollOver, true);
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
@@ -290,6 +291,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_treeItem->setWidget(m_treeWidget);
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
+    m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
     m_treePinButton->setDefaultAction(action(Qn::PinTreeAction));
@@ -366,6 +368,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleItem = new QnClickableWidget(m_controlsWidget);
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setClickableButtons(Qt::LeftButton);
+    m_titleItem->setProperty(Qn::NoHandScrollOver, true);
 
     QnSingleEventSignalizer *titleMenuSignalizer = new QnSingleEventSignalizer(this);
     titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
@@ -486,9 +489,9 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     }
     m_helpWidget->resize(250, 0);
 
-
     m_helpItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_helpItem->setWidget(m_helpWidget);
+    m_helpItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_helpPinButton = newPinButton(m_controlsWidget);
     m_helpPinButton->setFocusProxy(m_helpItem);
@@ -546,6 +549,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarItem = new QnMaskedProxyWidget(m_controlsWidget);
     m_calendarItem->setWidget(calendarWidget);
     m_calendarItem->resize(250, 200);
+    m_calendarItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_calendarShowButton = newShowHideButton(m_controlsWidget);
     {
@@ -591,13 +595,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Navigation slider. */
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
-    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
     m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
     m_sliderItem->setFrameColor(QColor(110, 110, 110, 255));
     m_sliderItem->setFrameWidth(0.5);
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
+    m_sliderItem->setProperty(Qn::NoHandScrollOver, true);
 
     m_sliderShowButton = new QnImageButtonWidget(m_controlsWidget);
     m_sliderShowButton->setDefaultAction(action(Qn::ToggleSliderAction));
