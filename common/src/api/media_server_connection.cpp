@@ -537,17 +537,16 @@ void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(int status,
     deleteLater();
 }
 
-void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
     Q_UNUSED(errorString)
     Q_UNUSED(handle)
 
     QnCamerasFoundInfoList result;
-    if (status == 0){
+    if (status == 0) {
         QByteArray root = extractXmlBody(reply, "reply");
         QByteArray resource;
         int from = 0;
-        do
-        {
+        do {
             resource = extractXmlBody(root, "resource", &from);
             if (resource.length() == 0)
                 break;
@@ -555,7 +554,6 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int
             QString name = QLatin1String(extractXmlBody(resource, "name"));
             QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
             result.append(QnCamerasFoundInfo(url, name, manufacture));
-
         } while (resource.length() > 0);
     }
 
@@ -572,7 +570,7 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_addReplyReceived(int st
 }
 
 int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot) {
-    detail::QnMediaServerSimpleReplyProcessor* processor = new detail::QnMediaServerSimpleReplyProcessor();
+    detail::QnMediaServerSimpleReplyProcessor *processor = new detail::QnMediaServerSimpleReplyProcessor();
     connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
@@ -585,7 +583,7 @@ int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qr
 }
 
 int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    detail::QnMediaServerSimpleReplyProcessor* processor = new detail::QnMediaServerSimpleReplyProcessor();
+    detail::QnMediaServerSimpleReplyProcessor *processor = new detail::QnMediaServerSimpleReplyProcessor();
     connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
@@ -594,4 +592,25 @@ int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QO
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/stop"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
+int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {
+    detail::QnMediaServerGetTimeReplyProcessor *processor = new detail::QnMediaServerGetTimeReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QDateTime &, int, int)), target, slot, Qt::QueuedConnection);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("gettime"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+void detail::QnMediaServerGetTimeReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
+    Q_UNUSED(errorString)
+
+    QDateTime dateTime;
+    int utcOffset = 0;
+
+    if (status == 0) {
+        dateTime = QDateTime::fromString(QString::fromLatin1(extractXmlBody(reply, "clock")), Qt::ISODate);
+        utcOffset = QString::fromLatin1(extractXmlBody(reply, "utcOffset")).toInt();
+    }
+
+    emit finished(status, dateTime, utcOffset, handle);
+    deleteLater();
+}
 

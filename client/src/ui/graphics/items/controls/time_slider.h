@@ -156,6 +156,9 @@ public:
     const QVector<qint64> &indicators() const;
     void setIndicators(const QVector<qint64> &indicators);
 
+    qint64 localOffset() const;
+    void setLocalOffset(qint64 utcOffset);
+
 signals:
     void windowChanged(qint64 windowStart, qint64 windowEnd);
     void selectionChanged(qint64 selectionStart, qint64 selectionEnd);
@@ -342,6 +345,8 @@ private:
     QnTimeSliderPixmapCache *m_pixmapCache;
 
     QVector<qint64> m_indicators;
+
+    qint64 m_localOffset;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
