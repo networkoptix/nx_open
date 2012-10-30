@@ -10,6 +10,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
+    Q_OBJECT;
 public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
