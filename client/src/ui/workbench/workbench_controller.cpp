@@ -396,7 +396,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(Qn::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
     connect(action(Qn::UnmaximizeItemAction), SIGNAL(triggered()),                                                                  this,                           SLOT(at_unmaximizeItemAction_triggered()));
     if (QnScreenRecorder::isSupported())
-        connect(action(Qn::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                             this,                           SLOT(at_recordingAction_triggered(bool)));
+        connect(action(Qn::ToggleScreenRecordingAction), SIGNAL(triggered(bool)),                                                   this,                           SLOT(at_recordingAction_triggered(bool)));
     connect(action(Qn::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
 
     /* Init screen recorder. */
