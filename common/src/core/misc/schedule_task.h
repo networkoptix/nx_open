@@ -59,7 +59,7 @@ public:
     }
 
     QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
-                   RecordingType recordType, int beforeThreshold, int afterThreshold,
+                   RecordingType recordType =  RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
                    QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
         : m_id(id), m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
@@ -72,6 +72,9 @@ public:
     QnId getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_data.m_dayOfWeek; }
     int getStartTime() const { return m_data.m_startTime; }
+    int getHour() const;
+    int getMinute() const;
+    int getSecond() const;
     int getEndTime() const { return m_data.m_endTime; }
     RecordingType getRecordingType() const { return m_data.m_recordType; }
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
