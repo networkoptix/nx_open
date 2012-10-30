@@ -820,6 +820,8 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
+    // todo: #Sasha. Invalid boundingPeriod near daylight time
+    boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);

@@ -93,7 +93,6 @@ void QnServerStreamRecorder::updateStreamParams()
             liveProvider->setFps(camera->getMaxFps()-5);
             liveProvider->setQuality(QnQualityHighest);
         }
-        emit fpsChanged(this, m_currentScheduleTask.getFps());
     }
 }
 
@@ -201,10 +200,12 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
 
     if (!isMotionRec(scheduleTask.getRecordingType()))
     {
+        // switch from motion to non-motion recording
         flushPrebuffer();
         setPrebufferingUsec(0);
     }
-    else {
+    else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.getRecordingType())) {
+        // do not change prebuffer if previous recording is motion and motion in progress
         setPrebufferingUsec(scheduleTask.getBeforeThreshold()*1000000ll);
     }
     m_currentScheduleTask = scheduleTask;
@@ -256,42 +257,24 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
         if (!m_lastSchedulePeriod.contains(timeMs))
         {
             // find new schedule
-            QDateTime packetDateTime = QDateTime::fromMSecsSinceEpoch(timeMs);
-            QDateTime weekStartDateTime = QDateTime(packetDateTime.addDays(1 - packetDateTime.date().dayOfWeek()).date());
-            int scheduleTimeMs = (packetDateTime.date().dayOfWeek()-1)*3600*24 + packetDateTime.time().hour()*3600+packetDateTime.time().minute()*60+packetDateTime.time().second();
+            QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeMs);
+            int scheduleTimeMs = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600+dt.time().minute()*60+dt.time().second();
             scheduleTimeMs *= 1000;
 
             QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
             if (itr > m_schedule.begin())
                 --itr;
 
-            // truncate current date to a start of week
-            QDateTime scheduleStart = weekStartDateTime.addDays(itr->getDayOfWeek()-1);
-            scheduleStart.time().setHMS(itr->getHour(), itr->getMinute(), itr->getSecond());
-
             if (itr->containTimeMs(scheduleTimeMs)) {
-                QDateTime scheduleEnd = scheduleStart;
-                
-                QnScheduleTask tmpTask(-1, -1, 1, itr->getEndTime()%(24*3600), 0); // next schedule after current
-                QTime newTime(tmpTask.getHour(), tmpTask.getMinute(), tmpTask.getSecond());
-                scheduleEnd = QDateTime(scheduleEnd.date(), newTime);
-                if (scheduleEnd <= scheduleStart)
-                    scheduleEnd = scheduleEnd.addDays(1);
-                m_lastSchedulePeriod = QnTimePeriod(scheduleStart.toMSecsSinceEpoch(), scheduleStart.msecsTo(scheduleEnd));
                 updateRecordingType(*itr);
                 updateStreamParams();
             }
             else {
-                if (scheduleTimeMs > itr->startTimeMs()) {
-                    scheduleStart = weekStartDateTime.addDays(7 + m_schedule.first().getDayOfWeek()-1); // go to first record from the next week
-                    QTime newTime(m_schedule.first().getHour(), m_schedule.first().getMinute(), m_schedule.first().getSecond());
-                    scheduleStart = QDateTime(scheduleStart.date(), newTime);
-                }
-
                 QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 1, 0, 0, QnScheduleTask::RecordingType_Never, 0, 0);
-                m_lastSchedulePeriod = QnTimePeriod(packetDateTime.toMSecsSinceEpoch(), packetDateTime.msecsTo(scheduleStart));
                 updateRecordingType(noRecordTask);
             }
+            static const qint64 SCHEDULE_AGGREGATION = 1000*60*15;
+            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION); // check period each 15 min
         }
     }
     else if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never) 
