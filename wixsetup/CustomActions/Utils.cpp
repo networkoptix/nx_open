@@ -130,7 +130,7 @@ UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    Wow64DisableWow64FsRedirection(0);
+//    Wow64DisableWow64FsRedirection(0);
 
     CAtlString foldersString, fromFolder, toFolder;
 
