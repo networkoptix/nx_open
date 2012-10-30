@@ -581,6 +581,11 @@ namespace Qn {
         ToggleTreeAction,
 
         /**
+         * Pins/unpins tree.
+         */
+        PinTreeAction,
+
+        /**
          * Shows/hides slider.
          */
         ToggleSliderAction,
