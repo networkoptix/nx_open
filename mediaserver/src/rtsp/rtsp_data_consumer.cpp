@@ -83,11 +83,11 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
             {
                 if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
                 {
-                    if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                    if (consumer->m_liveQuality == MEDIA_Quality_Low && consumer->m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
                     {
                         consumer->resetQualityStatistics();
-                        if (m_liveQuality == MEDIA_Quality_Low)
-                            break; // try only one camera is current quality is low
+                        //if (m_liveQuality == MEDIA_Quality_Low)
+                        break; // try only one camera is current quality is low
                     }
                 }
             }
