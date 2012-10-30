@@ -1097,26 +1097,22 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ToggleTitleBarAction).
         flags(Qn::TitleBar | Qn::NoTarget | Qn::SingleTarget).
-        icon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png")).
         text(tr("Show Title Bar")).
         toggledText(tr("Hide Title Bar")).
         condition(new QnToggleTitleBarActionCondition(this));
 
     factory(Qn::PinTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
-        icon(qnSkin->icon("panel/pin.png", "panel/unpin.png")).
         text(tr("Pin Tree")).
         toggledText(tr("Unpin Tree"));
 
     factory(Qn::ToggleTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
-        icon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png")).
         text(tr("Show Tree")).
         toggledText(tr("Hide Tree"));
 
     factory(Qn::ToggleSliderAction).
         flags(Qn::Slider | Qn::NoTarget | Qn::SingleTarget).
-        icon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png")).
         text(tr("Show Timeline")).
         toggledText(tr("Hide Timeline"));
 }
