@@ -15,8 +15,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/weak_graphics_item_pointer.h>
 
-#define NOPARENT
-
 namespace {
     const qreal toolTipMargin = 5.0;
 }
@@ -91,15 +89,12 @@ void GraphicsTooltipLabel::reuseTip(const QString &newText, QGraphicsItem *newIt
 {
     if (item())
         item()->removeSceneEventFilter(this);
-#ifdef NOPARENT
+
     if (scene() != newItem->scene()) {
         if (scene())
             scene()->removeItem(this);
         newItem->scene()->addItem(this);
     }
-#else
-    this->setParentItem(newItem);
-#endif
 
     m_item = newItem;
 
@@ -157,11 +152,10 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     //p.setY(qMax(p.y() + cursorRect.height(), item()->sceneBoundingRect().y() + item()->sceneBoundingRect().height()));
     p.setY(p.y() + cursorRect.height());
 
-#ifdef NOPARENT
     QRectF self = item()->sceneTransform().mapRect(this->boundingRect());
-#else
-    QRectF self = this->sceneBoundingRect();
-#endif
+    if (!item()->transform().isIdentity()){
+        self = item()->transform().inverted().mapRect(self);
+    }
 
     if (p.x() + self.width() > viewport.x() + viewport.width())
         p.setX(viewport.x() + viewport.width() - self.width());
@@ -177,11 +171,7 @@ void GraphicsTooltipLabel::placeTip(const QPointF &pos, const QRectF &viewport)
     if (p.y() + self.height() > viewport.y() + viewport.height())
         p.setY(item()->sceneBoundingRect().y() - self.height());
 
-#ifdef NOPARENT
     this->setPos(p);
-#else
-    this->setPos(item()->mapFromScene(p));
-#endif
 }
 
 bool GraphicsTooltipLabel::tipChanged(const QString &newText, QGraphicsItem *parent) {

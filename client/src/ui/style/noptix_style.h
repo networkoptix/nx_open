@@ -89,5 +89,11 @@ private:
  */
 #define ToolButtonCheckedRotationSpeed  _id("_qn_toolButtonCheckedRotationSpeed")
 
+/**
+ * Name of a property to set on a <tt>QTreeView</tt> to make it hide
+ * last row if there is not enough space for it.
+ */
+#define HideLastRowInTreeIfNotEnoughSpace _id("_qn_hideLastRowInTreeIfNotEnoughSpace")
+
 
 #endif // QN_NOPTIX_STYLE_H

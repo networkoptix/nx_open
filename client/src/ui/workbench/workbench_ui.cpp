@@ -110,21 +110,28 @@ namespace {
         return button;
     }
 
-    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL) {
+    QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
+
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
+        if (action)
+            button->setDefaultAction(action);
+        else
+            button->setCheckable(true);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-        button->setCheckable(true);
         button->setProperty(Qn::NoHandScrollOver, true);
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
 
-    QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL) {
+    QnImageButtonWidget *newPinButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(24, 24);
+        if (action)
+            button->setDefaultAction(action);
+        else
+            button->setCheckable(true);
         button->setIcon(qnSkin->icon("panel/pin.png", "panel/unpin.png"));
-        button->setCheckable(true);
         setHelpTopic(button, Qn::MainWindow_Pin_Help);
         return button;
     }
@@ -293,17 +300,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeItem->setFocusPolicy(Qt::StrongFocus);
     m_treeItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_treePinButton = new QnImageButtonWidget(m_controlsWidget);
-    m_treePinButton->setDefaultAction(action(Qn::PinTreeAction));
-    m_treePinButton->resize(24, 24);
+    m_treePinButton = newPinButton(m_controlsWidget, action(Qn::PinTreeAction));
     m_treePinButton->setFocusProxy(m_treeItem);
-    setHelpTopic(m_treePinButton, Qn::MainWindow_Pin_Help);
 
-    m_treeShowButton = new QnImageButtonWidget(m_controlsWidget);
-    m_treeShowButton->setDefaultAction(action(Qn::ToggleTreeAction));
-    m_treeShowButton->resize(15, 45);
+    m_treeShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTreeAction));
     m_treeShowButton->setFocusProxy(m_treeItem);
-    setHelpTopic(m_treeShowButton, Qn::MainWindow_Pin_Help);
 
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
@@ -420,9 +421,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_titleItem->setLayout(titleLayout);
     titleLayout->activate(); /* So that it would set title's size. */
 
-    m_titleShowButton = new QnImageButtonWidget(m_controlsWidget);
-    m_titleShowButton->setDefaultAction(action(Qn::ToggleTitleBarAction));
-    m_titleShowButton->resize(15, 45);
+    m_titleShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleTitleBarAction));
     {
         QTransform transform;
         transform.rotate(-90);
@@ -430,7 +429,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
         m_titleShowButton->setTransform(transform);
     }
     m_titleShowButton->setFocusProxy(m_titleItem);
-    setHelpTopic(m_titleShowButton, Qn::MainWindow_Pin_Help);
 
     m_titleOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_titleOpacityProcessor->addTargetItem(m_titleItem);
@@ -595,6 +593,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Navigation slider. */
     m_sliderResizerItem = new QnTopResizerWidget(m_controlsWidget);
+    m_sliderResizerItem->setProperty(Qn::NoHandScrollOver, true);
     m_instrumentManager->registerItem(m_sliderResizerItem); /* We want it registered right away. */
 
     m_sliderItem = new QnNavigationItem(m_controlsWidget);
@@ -603,16 +602,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderItem->timeSlider()->toolTipItem()->setParentItem(m_controlsWidget);
     m_sliderItem->setProperty(Qn::NoHandScrollOver, true);
 
-    m_sliderShowButton = new QnImageButtonWidget(m_controlsWidget);
-    m_sliderShowButton->setDefaultAction(action(Qn::ToggleSliderAction));
-    m_sliderShowButton->resize(15, 45);
+    m_sliderShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleSliderAction));
     {
         QTransform transform;
         transform.rotate(-90);
         m_sliderShowButton->setTransform(transform);
     }
     m_sliderShowButton->setFocusProxy(m_sliderItem);
-    setHelpTopic(m_sliderShowButton, Qn::MainWindow_Pin_Help);
 
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
     sliderZoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));

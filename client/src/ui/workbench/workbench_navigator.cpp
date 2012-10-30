@@ -31,6 +31,7 @@
 #include <ui/widgets/calendar_widget.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
+#include "watchers/workbench_server_time_watcher.h"
 #include "workbench.h"
 #include "workbench_display.h"
 #include "workbench_context.h"
@@ -74,7 +75,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this))
-{}
+{
+    /* We'll be using this one, so make sure it's created. */
+    context()->instance<QnWorkbenchServerTimeWatcher>();
+}
     
 QnWorkbenchNavigator::~QnWorkbenchNavigator() {
     foreach(QnThumbnailsLoader *loader, m_thumbnailLoaderByResource)
