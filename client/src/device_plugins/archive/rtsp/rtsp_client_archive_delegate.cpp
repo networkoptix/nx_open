@@ -303,10 +303,10 @@ qint64 QnRtspClientArchiveDelegate::startTime()
         result = m_globalMinArchiveTime;
     else
         result = m_rtspSession.startTime();
-    if (result < qnSyncTime->currentMSecsSinceEpoch()*1000)
+    if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
     else
-        return AV_NOPTS_VALUE; // archive in a future
+        return DATETIME_NOW; // archive in a future
 }
 
 qint64 QnRtspClientArchiveDelegate::endTime()
