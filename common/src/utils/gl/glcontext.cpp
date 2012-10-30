@@ -6,11 +6,14 @@
 #include "glcontext.h"
 
 #include <QGLContext>
+
+#ifndef _WIN32
 #include <QX11Info>
 
 #include <GL/glx.h>
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#endif
 
 #include "../common/log.h"
 
