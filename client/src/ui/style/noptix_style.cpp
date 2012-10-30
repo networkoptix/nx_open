@@ -516,6 +516,9 @@ bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *pa
     if(!option->rect.isValid())
         return false;
 
+    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
+        return true;
+
     if (option->state & State_Children) {
         const QIcon &icon = (option->state & State_Open) ? m_branchOpen : m_branchClosed;
         icon.paint(painter, option->rect);
