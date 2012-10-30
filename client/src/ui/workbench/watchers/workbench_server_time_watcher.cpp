@@ -53,6 +53,7 @@ void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    m_utcOffsetByResource[server] = utcOffset;
+    if(m_utcOffsetByResource.contains(server))
+        m_utcOffsetByResource[server] = utcOffset;
 }
 
