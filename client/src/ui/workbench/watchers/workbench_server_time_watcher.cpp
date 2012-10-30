@@ -34,8 +34,6 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
 
     int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
     m_resourceByHandle[handle] = server;
-
-    m_utcOffsetByResource[server] = 0;
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -53,7 +51,6 @@ void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    if(m_utcOffsetByResource.contains(server))
-        m_utcOffsetByResource[server] = utcOffset;
+    m_utcOffsetByResource[server] = utcOffset;
 }
 

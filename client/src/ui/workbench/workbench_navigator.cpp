@@ -775,7 +775,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : ((quint64)timeUSec == AV_NOPTS_VALUE ? m_timeSlider->value() : timeUSec / 1000);
         qint64 timeNext = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? AV_NOPTS_VALUE : m_currentMediaWidget->display()->camDisplay()->getNextTime();
 
-        if (timeUSec != DATETIME_NOW && (quint64)timeUSec != AV_NOPTS_VALUE){
+        if (timeUSec != DATETIME_NOW && (quint64)timeUSec != AV_NOPTS_VALUE) {
             qint64 now = QDateTime::currentDateTimeUtc().toMSecsSinceEpoch();
             if (m_lastUpdateSlider && m_lastCameraTime == timeMSec && (quint64)timeNext != AV_NOPTS_VALUE && timeNext - timeMSec <= MAX_FRAME_DURATION){
                 qint64 timeDiff = (now - m_lastUpdateSlider) * speed();
