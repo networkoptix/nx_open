@@ -298,18 +298,25 @@ qint64 QnRtspClientArchiveDelegate::startTime()
     if ((quint64)m_globalMinArchiveTime == AV_NOPTS_VALUE)
         return AV_NOPTS_VALUE;
 
+    qint64 result;
     if (m_globalMinArchiveTime != 0)
-        return m_globalMinArchiveTime;
+        result = m_globalMinArchiveTime;
     else
-        return m_rtspSession.startTime();
+        result = m_rtspSession.startTime();
+    if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
+        return result;
+    else
+        return DATETIME_NOW; // archive in a future
 }
 
 qint64 QnRtspClientArchiveDelegate::endTime()
 {
+    /*
     if (m_rtspSession.endTime() > qnSyncTime->currentUSecsSinceEpoch())
         return m_rtspSession.endTime();
     else
-        return DATETIME_NOW; // LIVE or archive future point as right edge for server video
+    */
+    return DATETIME_NOW; // LIVE or archive future point as right edge for server video
 }
 
 void QnRtspClientArchiveDelegate::reopen()
