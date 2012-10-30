@@ -1905,14 +1905,7 @@ QSharedPointer<QuickSyncVideoDecoder::SurfaceContext> QuickSyncVideoDecoder::fin
             }
             //waiting for the surface to become unused (usage counter must drop to zero)
             while( surfaceCtx.syncCtx.usageCounter > 0 )
-            {
-#ifdef _WIN32
-                __asm pause
-                //::Sleep(1);
-#else
-                __asm__("pause");
-#endif
-            }
+                _mm_pause();    //we're in spin loop
 
             //by this moment all external refs to the surface are invalidated (since sequence is modified) and are not allowed to use surface contexts
             surfaceCtx.syncCtx.externalRefCounter.deref();
