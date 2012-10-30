@@ -2,6 +2,8 @@
 #define QN_WORKBENCH_SERVER_TIME_WATCHER_H
 
 #include <QtCore/QObject>
+#include <QtCore/QHash>
+#include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
 
@@ -18,8 +20,11 @@ private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
+    void at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle);
+
 private:
-    QSet<QnMediaServerResourcePtr> m_servers;
+    QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
+    QHash<QnMediaServerResourcePtr, int> m_utcOffsetByResource;
 };
 
 

@@ -20,7 +20,7 @@ int QnGetTimeHandler::executeGet(const QString& path, const QnRequestParamList& 
         offsetStr = QLatin1String("+") + offsetStr;
 
     QString dateStr = dt.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
-    result.append(QString("<time clock=\"%1\" timezone=\"%2\"/>\n").arg(dateStr).arg(offsetStr).toUtf8());
+    result.append(QString("<time><clock>%1</clock><utcOffset>%2</utcOffset></time>\n").arg(dateStr).arg(offsetStr).toUtf8());
     return CODE_OK;
 }
 
