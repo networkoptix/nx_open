@@ -1,10 +1,15 @@
 #include "tool_tip_item.h"
+
 #include <cmath>
+
 #include <QtGui/QPainter>
 #include <QtGui/QGraphicsSceneEvent>
 #include <QtGui/QApplication>
 #include <QtGui/QStyle>
+
 #include <utils/common/scoped_painter_rollback.h>
+
+#include <ui/graphics/instruments/hand_scroll_instrument.h>
 
 namespace  {
     const qreal roundingRadius = 5.0;
@@ -21,6 +26,7 @@ QnToolTipItem::QnToolTipItem(QGraphicsItem *parent):
     setFlag(ItemIsSelectable, false);
 
     setCacheMode(ItemCoordinateCache);
+    setProperty(Qn::NoHandScrollOver, true);
 
     /* Set up default colors. */
     QStyle *style = QApplication::style();
