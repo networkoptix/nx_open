@@ -126,3 +126,45 @@ int CopyDirectory(const CAtlString &refcstrSourceDirectory,
   return 0;
 }
 
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    Wow64DisableWow64FsRedirection(0);
+
+    CAtlString foldersString, fromFolder, toFolder;
+
+    hr = WcaInitialize(hInstall, actionName);
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    // Get "from" and "to" folders from msi property
+    foldersString = GetProperty(hInstall, L"CustomActionData");
+
+    // Extract "from" and "to" folders from foldersString
+    int curPos = 0;
+    fromFolder = foldersString.Tokenize(_T(";"), curPos);
+    toFolder = foldersString.Tokenize(_T(";"), curPos);
+
+    // Exit if "from" folder is not exists
+    if (GetFileAttributes(fromFolder) == INVALID_FILE_ATTRIBUTES)
+        goto LExit;
+
+    // Exit if "to" folder is already exists
+    if (GetFileAttributes(toFolder) != INVALID_FILE_ATTRIBUTES)
+        goto LExit;
+
+    CopyDirectory(fromFolder, toFolder);
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+void fixPath(CString& path)
+{
+    path.Replace(L"/", L"\\");
+}
+
