@@ -57,6 +57,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				ResourceOutputFileName="$(IntDir)/CustomActions.res"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -135,6 +136,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				ResourceOutputFileName="$(IntDir)/CustomActions.res"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
