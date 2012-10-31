@@ -123,6 +123,7 @@
 								<argument>-u</argument>
 							</arguments>
 							<workingDirectory>${environment.dir}</workingDirectory>		
+							<skip>${rsync.skip}</skip>
 						</configuration>
 					</execution>
 				</executions>
@@ -196,7 +197,7 @@
 								<configuration>
 									<executable>${environment.dir}/get_buildenv.bat</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
-									<skip>rsync.skip</skip>
+									<skip>${rsync.skip}</skip>
 								</configuration>
 							</execution>
 						</executions>
@@ -291,7 +292,7 @@
 								<configuration>
 									<executable>${environment.dir}/get_buildenv.sh</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
-									<skip>rsync.skip</skip>
+									<skip>${rsync.skip}</skip>
 								</configuration>
 							</execution>
 						</executions>
