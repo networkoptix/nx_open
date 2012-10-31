@@ -196,6 +196,7 @@
 								<configuration>
 									<executable>${environment.dir}/get_buildenv.bat</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
+									<skip>rsync.skip</skip>
 								</configuration>
 							</execution>
 						</executions>
