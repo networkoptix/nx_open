@@ -99,10 +99,10 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
 
 
 
-const int SOAP_RECEIVE_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
-const int SOAP_SEND_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
-const int SOAP_CONNECT_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
-const int SOAP_ACCEPT_TIMEOUT = 4; // "+" in seconds, "-" in mseconds
+const int SOAP_RECEIVE_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
+const int SOAP_SEND_TIMEOUT = 30; // "+" in seconds, "-" in mseconds
+const int SOAP_CONNECT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
+const int SOAP_ACCEPT_TIMEOUT = 5; // "+" in seconds, "-" in mseconds
 const std::string DEFAULT_ONVIF_LOGIN = "admin";
 const std::string DEFAULT_ONVIF_PASSWORD = "admin";
 static const int DIGEST_TIMEOUT_SEC = 60;
