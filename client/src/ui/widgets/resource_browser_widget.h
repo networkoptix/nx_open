@@ -1,5 +1,5 @@
-#ifndef QN_RESOURCE_TREE_WIDGET_H
-#define QN_RESOURCE_TREE_WIDGET_H
+#ifndef QN_RESOURCE_BROWSER_WIDGET_H
+#define QN_RESOURCE_BROWSER_WIDGET_H
 
 #include <QWidget>
 #include <core/resource/resource_fwd.h>
@@ -28,10 +28,10 @@ class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
 
 namespace Ui {
-    class ResourceTreeWidget;
+    class ResourceBrowserWidget;
 }
 
-class QnResourceTreeWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
+class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
 
 public:
@@ -41,9 +41,9 @@ public:
         TabCount
     };
 
-    QnResourceTreeWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+    QnResourceBrowserWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
 
-    virtual ~QnResourceTreeWidget();
+    virtual ~QnResourceBrowserWidget();
 
     Tab currentTab() const;
 
@@ -109,7 +109,7 @@ private slots:
     void at_showUrlsInTree_changed();
 
 private:
-    QScopedPointer<Ui::ResourceTreeWidget> ui;
+    QScopedPointer<Ui::ResourceBrowserWidget> ui;
 
     bool m_ignoreFilterChanges;
     int m_filterTimerId;
@@ -122,4 +122,4 @@ private:
     QAction *m_renameAction;
 };
 
-#endif // QN_RESOURCE_TREE_WIDGET_H
+#endif // QN_RESOURCE_BROWSER_WIDGET_H

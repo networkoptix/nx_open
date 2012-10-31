@@ -1,5 +1,5 @@
-﻿#include "resource_tree_widget.h"
-#include "ui_resource_tree_widget.h"
+﻿#include "resource_browser_widget.h"
+#include "ui_resource_browser_widget.h"
 
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
@@ -88,7 +88,7 @@ protected:
                 bold = true; /* Bold current layout. */
             } else if(parentResource == currentLayoutResource) {
                 bold = true; /* Bold items of the current layout. */
-            } else if(uuid.isNull() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
+            } else if(uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
                 bold = true; /* Bold items of the current layout in servers. */
             }
 
@@ -214,10 +214,10 @@ protected:
 };
 
 
-QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *context): 
+QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
     QWidget(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
-    ui(new Ui::ResourceTreeWidget()),
+    ui(new Ui::ResourceBrowserWidget()),
     m_ignoreFilterChanges(false),
     m_filterTimerId(0)
 {
@@ -295,7 +295,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
     at_resourceProxyModel_rowsInserted(QModelIndex());
 }
 
-QnResourceTreeWidget::~QnResourceTreeWidget() {
+QnResourceBrowserWidget::~QnResourceBrowserWidget() {
     disconnect(workbench(), NULL, this, NULL);
 
     at_workbench_currentLayoutAboutToBeChanged();
@@ -304,19 +304,19 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
     m_resourceDelegate->setWorkbench(NULL);
 }
 
-QPalette QnResourceTreeWidget::comboBoxPalette() const {
+QPalette QnResourceBrowserWidget::comboBoxPalette() const {
     return ui->typeComboBox->palette();
 }
 
-void QnResourceTreeWidget::setComboBoxPalette(const QPalette &palette) {
+void QnResourceBrowserWidget::setComboBoxPalette(const QPalette &palette) {
     ui->typeComboBox->setPalette(palette);
 }
 
-QnResourceTreeWidget::Tab QnResourceTreeWidget::currentTab() const {
+QnResourceBrowserWidget::Tab QnResourceBrowserWidget::currentTab() const {
     return static_cast<Tab>(ui->tabWidget->currentIndex());
 }
 
-void QnResourceTreeWidget::setCurrentTab(Tab tab) {
+void QnResourceBrowserWidget::setCurrentTab(Tab tab) {
     if(tab < 0 || tab >= TabCount) {
         qnWarning("Invalid resource tree widget tab '%1'.", static_cast<int>(tab));
         return;
@@ -325,11 +325,11 @@ void QnResourceTreeWidget::setCurrentTab(Tab tab) {
     ui->tabWidget->setCurrentIndex(tab);
 }
 
-bool QnResourceTreeWidget::isLayoutSearchable(QnWorkbenchLayout *layout) const {
+bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout *layout) const {
     return accessController()->permissions(layout->resource()) & Qn::WritePermission;
 }
 
-QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout *layout, bool create) const {
+QnResourceSearchProxyModel *QnResourceBrowserWidget::layoutModel(QnWorkbenchLayout *layout, bool create) const {
     QnResourceSearchProxyModel *result = layout->property(qn_searchModelPropertyName).value<QnResourceSearchProxyModel *>();
     if(create && result == NULL && isLayoutSearchable(layout)) {
         result = new QnResourceSearchProxyModel(layout);
@@ -347,7 +347,7 @@ QnResourceSearchProxyModel *QnResourceTreeWidget::layoutModel(QnWorkbenchLayout 
     return result;
 }
 
-QnResourceSearchSynchronizer *QnResourceTreeWidget::layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const {
+QnResourceSearchSynchronizer *QnResourceBrowserWidget::layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const {
     QnResourceSearchSynchronizer *result = layout->property(qn_searchSynchronizerPropertyName).value<QnResourceSearchSynchronizer *>();
     if(create && result == NULL && isLayoutSearchable(layout)) {
         result = new QnResourceSearchSynchronizer(layout);
@@ -358,15 +358,15 @@ QnResourceSearchSynchronizer *QnResourceTreeWidget::layoutSynchronizer(QnWorkben
     return result;
 }
 
-QString QnResourceTreeWidget::layoutFilter(QnWorkbenchLayout *layout) const {
+QString QnResourceBrowserWidget::layoutFilter(QnWorkbenchLayout *layout) const {
     return layout->property(qn_filterPropertyName).toString();
 }
 
-void QnResourceTreeWidget::setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const {
+void QnResourceBrowserWidget::setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const {
     layout->setProperty(qn_filterPropertyName, filter);
 }
 
-void QnResourceTreeWidget::killSearchTimer() {
+void QnResourceBrowserWidget::killSearchTimer() {
     if (m_filterTimerId == 0) 
         return;
 
@@ -374,7 +374,7 @@ void QnResourceTreeWidget::killSearchTimer() {
     m_filterTimerId = 0; 
 }
 
-void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelection) {
+void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelection) {
     if(!context() || !context()->menu()) {
         qnWarning("Requesting context menu for a tree widget while no menu manager instance is available.");
         return;
@@ -405,7 +405,7 @@ void QnResourceTreeWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelec
         currentItemView()->edit(currentSelectionModel()->currentIndex());
 }
 
-QTreeView *QnResourceTreeWidget::currentItemView() const {
+QTreeView *QnResourceBrowserWidget::currentItemView() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
         return ui->resourceTreeView;
     } else {
@@ -413,11 +413,11 @@ QTreeView *QnResourceTreeWidget::currentItemView() const {
     }
 }
 
-QItemSelectionModel *QnResourceTreeWidget::currentSelectionModel() const {
+QItemSelectionModel *QnResourceBrowserWidget::currentSelectionModel() const {
     return currentItemView()->selectionModel();
 }
 
-QnResourceList QnResourceTreeWidget::selectedResources() const {
+QnResourceList QnResourceBrowserWidget::selectedResources() const {
     QnResourceList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
@@ -429,7 +429,7 @@ QnResourceList QnResourceTreeWidget::selectedResources() const {
     return result;
 }
 
-QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
+QnLayoutItemIndexList QnResourceBrowserWidget::selectedLayoutItems() const {
     QnLayoutItemIndexList result;
 
     foreach (const QModelIndex &index, currentSelectionModel()->selectedRows()) {
@@ -447,11 +447,11 @@ QnLayoutItemIndexList QnResourceTreeWidget::selectedLayoutItems() const {
     return result;
 }
 
-Qn::ActionScope QnResourceTreeWidget::currentScope() const {
+Qn::ActionScope QnResourceBrowserWidget::currentScope() const {
     return Qn::TreeScope;
 }
 
-QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
+QVariant QnResourceBrowserWidget::currentTarget(Qn::ActionScope scope) const {
     if(scope != Qn::TreeScope)
         return QVariant();
 
@@ -464,7 +464,7 @@ QVariant QnResourceTreeWidget::currentTarget(Qn::ActionScope scope) const {
     }
 }
 
-void QnResourceTreeWidget::updateFilter(bool force) {
+void QnResourceBrowserWidget::updateFilter(bool force) {
     QString filter = ui->filterLineEdit->text();
 
     /* Don't allow empty filters. */
@@ -505,7 +505,7 @@ void QnResourceTreeWidget::updateFilter(bool force) {
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
 }
 
-void QnResourceTreeWidget::expandAll() {
+void QnResourceBrowserWidget::expandAll() {
     currentItemView()->expandAll();
 }
 
@@ -513,7 +513,7 @@ void QnResourceTreeWidget::expandAll() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
+void QnResourceBrowserWidget::contextMenuEvent(QContextMenuEvent *event) {
     QWidget *child = childAt(event->pos());
     while(child && child != ui->resourceTreeView && child != ui->searchTreeView)
         child = child->parentWidget();
@@ -525,19 +525,19 @@ void QnResourceTreeWidget::contextMenuEvent(QContextMenuEvent *event) {
     showContextMenuAt(QCursor::pos(), !child);
 }
 
-void QnResourceTreeWidget::wheelEvent(QWheelEvent *event) {
+void QnResourceBrowserWidget::wheelEvent(QWheelEvent *event) {
     event->accept(); /* Do not propagate wheel events past the tree widget. */
 }
 
-void QnResourceTreeWidget::mousePressEvent(QMouseEvent *event) {
+void QnResourceBrowserWidget::mousePressEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
-void QnResourceTreeWidget::mouseReleaseEvent(QMouseEvent *event) {
+void QnResourceBrowserWidget::mouseReleaseEvent(QMouseEvent *event) {
     event->accept(); /* Prevent surprising click-through scenarios. */
 }
 
-void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
+void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
     event->accept();
     if (event->key() == Qt::Key_Menu) {
         if (ui->filterLineEdit->hasFocus())
@@ -560,11 +560,11 @@ void QnResourceTreeWidget::keyPressEvent(QKeyEvent *event) {
     }
 }
 
-void QnResourceTreeWidget::keyReleaseEvent(QKeyEvent *event) {
+void QnResourceBrowserWidget::keyReleaseEvent(QKeyEvent *event) {
     event->accept();
 }
 
-void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
+void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
     if (event->timerId() == m_filterTimerId) {
         killTimer(m_filterTimerId);
         m_filterTimerId = 0;
@@ -596,7 +596,7 @@ void QnResourceTreeWidget::timerEvent(QTimerEvent *event) {
     QWidget::timerEvent(event);
 }
 
-void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
+void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     disconnect(layout, NULL, this, NULL);
@@ -612,7 +612,7 @@ void QnResourceTreeWidget::at_workbench_currentLayoutAboutToBeChanged() {
     killSearchTimer();
 }
 
-void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
+void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     QnResourceSearchSynchronizer *synchronizer = layoutSynchronizer(layout, false);
@@ -631,22 +631,22 @@ void QnResourceTreeWidget::at_workbench_currentLayoutChanged() {
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),             this,   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
 }
 
-void QnResourceTreeWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
+void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     /* Raised state has changed. */
     ui->resourceTreeView->update();
 }
 
-void QnResourceTreeWidget::at_layout_itemAdded(QnWorkbenchItem *) {
+void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
+void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem *) {
     /* Bold state has changed. */
     currentItemView()->update();
 }
 
-void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
+void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     if(index == SearchTab) {
         QnWorkbenchLayout *layout = workbench()->currentLayout();
 
@@ -664,13 +664,13 @@ void QnResourceTreeWidget::at_tabWidget_currentChanged(int index) {
     emit currentTabChanged();
 }
 
-void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
+void QnResourceBrowserWidget::at_treeView_enterPressed(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     if (resource)
         emit activated(resource);
 }
 
-void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
+void QnResourceBrowserWidget::at_treeView_doubleClicked(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
     if (resource && 
@@ -679,12 +679,12 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
         emit activated(resource);
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
+void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
     for(int i = start; i <= end; i++)
         at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
+void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
     if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
@@ -693,7 +693,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
 
-void QnResourceTreeWidget::at_showUrlsInTree_changed() {
+void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
     bool urlsShown = qnSettings->isIpShownInTree();
 
     m_resourceModel->setUrlsShown(urlsShown);

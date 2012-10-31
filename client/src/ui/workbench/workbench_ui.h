@@ -27,7 +27,7 @@ class AnimatorGroup;
 class HoverFocusProcessor;
 
 class QnNavigationItem;
-class QnResourceTreeWidget;
+class QnResourceBrowserWidget;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
@@ -361,7 +361,7 @@ private:
     /* Tree-related state. */
 
     /** Navigation tree widget. */
-    QnResourceTreeWidget *m_treeWidget;
+    QnResourceBrowserWidget *m_treeWidget;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;

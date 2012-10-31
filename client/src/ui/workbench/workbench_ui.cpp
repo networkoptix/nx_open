@@ -56,7 +56,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
-#include <ui/widgets/resource_tree_widget.h>
+#include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
@@ -262,7 +262,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Tree widget. */
-    m_treeWidget = new QnResourceTreeWidget(NULL, context());
+    m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
