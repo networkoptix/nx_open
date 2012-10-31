@@ -11,16 +11,17 @@
 #include <QtGui/QToolButton>
 #include <QtGui/QTreeView>
 #include <QtGui/QWheelEvent>
-#include <QtGui/QStyledItemDelegate>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/settings.h>
+
 #include <common/common_meta_types.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/camera_history.h>
+
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action.h>
@@ -29,6 +30,7 @@
 #include <ui/models/resource_pool_model.h>
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/models/resource_search_synchronizer.h>
+#include <ui/widgets/resource_tree_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
@@ -37,7 +39,7 @@
 #include <ui/workbench/workbench_display.h>
 #include <ui/style/skin.h>
 #include <ui/style/proxy_style.h>
-#include <ui/style/noptix_style.h>
+
 #include <ui/style/globals.h>
 
 namespace {
@@ -47,123 +49,7 @@ namespace {
 //    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
 
-class QnResourceTreeItemDelegate: public QStyledItemDelegate {
-    typedef QStyledItemDelegate base_type;
 
-public:
-    explicit QnResourceTreeItemDelegate(QObject *parent = NULL): 
-        base_type(parent)
-    {
-        m_recordingIcon = qnSkin->icon("tree/recording.png");
-        m_raisedIcon = qnSkin->icon("tree/raised.png");
-        m_scheduledIcon = qnSkin->icon("tree/scheduled.png");
-    }
-
-    QnWorkbench *workbench() const {
-        return m_workbench.data();
-    }
-
-    void setWorkbench(QnWorkbench *workbench) {
-        m_workbench = workbench;
-    }
-
-protected:
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-        QStyleOptionViewItemV4 optionV4 = option;
-        initStyleOption(&optionV4, index);
-
-        if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom()
-                && optionV4.widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
-            return;
-
-        QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
-        QnResourcePtr parentResource = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
-        QUuid uuid = index.data(Qn::ItemUuidRole).value<QUuid>();
-
-        /* Bold items of current layout in tree. */
-        if(!resource.isNull() && !currentLayoutResource.isNull()) {
-            bool bold = false;
-            if(resource == currentLayoutResource) {
-                bold = true; /* Bold current layout. */
-            } else if(parentResource == currentLayoutResource) {
-                bold = true; /* Bold items of the current layout. */
-            } else if(uuid.isNull() && workbench() && !workbench()->currentLayout()->items(resource->getUniqueId()).isEmpty()) {
-                bold = true; /* Bold items of the current layout in servers. */
-            }
-
-            optionV4.font.setBold(bold);
-        }
-
-        QStyle *style = optionV4.widget ? optionV4.widget->style() : QApplication::style();
-
-        /* Highlight currently raised/zoomed item. */
-        QnWorkbenchItem *raisedItem = NULL;
-        if(workbench()) {
-            raisedItem = workbench()->item(Qn::RaisedRole);
-            if(!raisedItem)
-                raisedItem = workbench()->item(Qn::ZoomedRole);
-        }
-
-        QRect decorationRect = style->subElementRect(QStyle::SE_ItemViewItemDecoration, &optionV4, optionV4.widget);
-
-        if(raisedItem && (raisedItem->uuid() == uuid || (resource && uuid.isNull() && raisedItem->resourceUid() == resource->getUniqueId()))) {
-            m_raisedIcon.paint(painter, decorationRect);
-
-            QRect rect = optionV4.rect;
-            QRect skipRect(
-                rect.topLeft(),
-                QPoint(
-                    decorationRect.right() + decorationRect.left() - rect.left(),
-                    rect.bottom()
-                )
-            );
-            rect.setLeft(skipRect.right() + 1);
-
-            optionV4.rect = skipRect;
-            style->drawPrimitive(QStyle::PE_PanelItemViewItem, &optionV4, painter, optionV4.widget);
-            optionV4.rect = rect;
-        }
-
-        /* Draw 'recording' icon. */
-        bool recording = false, scheduled = false;
-        if(resource) {
-            if(resource->getStatus() == QnResource::Recording) {
-                recording = true;
-            } else if(QnNetworkResourcePtr camera = resource.dynamicCast<QnNetworkResource>()) {
-                foreach(const QnNetworkResourcePtr &otherCamera, QnCameraHistoryPool::instance()->getAllCamerasWithSamePhysicalId(camera)) {
-                    if(otherCamera->getStatus() == QnResource::Recording) {
-                        recording = true;
-                        break;
-                    }
-                }
-            }
-
-            if(!recording)
-                if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-                    scheduled = !camera->isScheduleDisabled();
-        }
-
-        if(recording || scheduled) {
-            QRect iconRect = decorationRect;
-            iconRect.moveLeft(iconRect.left() - iconRect.width() - 2);
-
-            (recording ? m_recordingIcon : m_scheduledIcon).paint(painter, iconRect);
-        }
-
-        /* Draw item. */
-        style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter, optionV4.widget);
-    }
-
-    virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override {
-        base_type::initStyleOption(option, index);
-
-    }
-
-private:
-    QWeakPointer<QnWorkbench> m_workbench;
-    QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
-};
 
 class QnResourceTreeStyle: public QnProxyStyle {
 public:
@@ -239,27 +125,14 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_resourceProxyModel->setSortRole(Qt::DisplayRole);
     m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_resourceProxyModel->sort(0);
-    ui->resourceTreeView->setModel(m_resourceProxyModel);
-
-    m_resourceDelegate = new QnResourceTreeItemDelegate(this);
-    ui->resourceTreeView->setItemDelegate(m_resourceDelegate);
-    ui->resourceTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
-
-    m_searchDelegate = new QnResourceTreeItemDelegate(this);
-    ui->searchTreeView->setItemDelegate(m_searchDelegate);
-    ui->searchTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
+    ui->resourceTreeWidget->setModel(m_resourceProxyModel);
 
     QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
-    ui->resourceTreeView->setStyle(treeStyle);
-    ui->searchTreeView->setStyle(treeStyle);
-
-    ui->resourceTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
-    ui->searchTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
+    ui->resourceTreeWidget->setStyle(treeStyle);
+    ui->searchTreeWidget->setStyle(treeStyle);
 
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    ui->resourceTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    ui->searchTreeView->setWindowFlags(ui->resourceTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     m_renameAction = new QAction(this);
 
@@ -270,17 +143,17 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(editingFinished()),          this,               SLOT(forceUpdateFilter()));
     connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
-    connect(ui->resourceTreeView,   SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->resourceTreeView,   SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
-    connect(ui->searchTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->searchTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->resourceTreeWidget,   SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourceTreeWidget,   SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->searchTreeWidget,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->searchTreeWidget,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
-    connect(ui->resourceTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
+    connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
     connect(m_resourceProxyModel,   SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
 
     /* Connect to context. */
-    m_searchDelegate->setWorkbench(workbench());
-    m_resourceDelegate->setWorkbench(workbench());
+    ui->resourceTreeWidget->setWorkbench(workbench());
+    ui->searchTreeWidget->setWorkbench(workbench());
 
     connect(workbench(),        SIGNAL(currentLayoutAboutToBeChanged()),            this,   SLOT(at_workbench_currentLayoutAboutToBeChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this,   SLOT(at_workbench_currentLayoutChanged()));
@@ -300,8 +173,8 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget() {
 
     at_workbench_currentLayoutAboutToBeChanged();
 
-    m_searchDelegate->setWorkbench(NULL);
-    m_resourceDelegate->setWorkbench(NULL);
+    ui->searchTreeWidget->setWorkbench(NULL);\
+    ui->resourceTreeWidget->setWorkbench(NULL);
 }
 
 QPalette QnResourceBrowserWidget::comboBoxPalette() const {
@@ -387,7 +260,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
     if(currentSelectionModel()->currentIndex().data(Qn::NodeTypeRole) != Qn::UsersNode || !currentSelectionModel()->selection().contains(currentSelectionModel()->currentIndex()) || ignoreSelection)
         manager->redirectAction(menu.data(), Qn::NewUserAction, NULL); /* Show 'New User' item only when clicking on 'Users' node. */ // TODO: implement with action parameters
     
-    if(currentItemView() == ui->searchTreeView) {
+    if(currentItemView() == ui->searchTreeWidget) {
         /* Disable rename action for search view. */
         manager->redirectAction(menu.data(), Qn::RenameAction, NULL);
     } else {
@@ -402,14 +275,14 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     /* Process tree-local actions. */
     if(action == m_renameAction)
-        currentItemView()->edit(currentSelectionModel()->currentIndex());
+        currentItemView()->edit();
 }
 
-QTreeView *QnResourceBrowserWidget::currentItemView() const {
+QnResourceTreeWidget *QnResourceBrowserWidget::currentItemView() const {
     if (ui->tabWidget->currentIndex() == ResourcesTab) {
-        return ui->resourceTreeView;
+        return ui->resourceTreeWidget;
     } else {
-        return ui->searchTreeView;
+        return ui->searchTreeWidget;
     }
 }
 
@@ -505,17 +378,12 @@ void QnResourceBrowserWidget::updateFilter(bool force) {
     m_filterTimerId = startTimer(filter.isEmpty() ? 0 : 300);
 }
 
-void QnResourceBrowserWidget::expandAll() {
-    currentItemView()->expandAll();
-}
-
-
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnResourceBrowserWidget::contextMenuEvent(QContextMenuEvent *event) {
     QWidget *child = childAt(event->pos());
-    while(child && child != ui->resourceTreeView && child != ui->searchTreeView)
+    while(child && child != ui->resourceTreeWidget && child != ui->searchTreeWidget)
         child = child->parentWidget();
 
     /** 
@@ -543,9 +411,8 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
         if (ui->filterLineEdit->hasFocus())
             return;
 
-        QnTreeView* treeView = ui->searchTab->isActiveWindow() 
-            ? ui->searchTreeView 
-            : ui->resourceTreeView; 
+        QPoint pos = currentItemView()->selectionPos();
+        QnResourceTreeWidget* treeView = currentItemView();
 
         QModelIndexList selectedRows = treeView->selectionModel()->selectedRows();
         if (selectedRows.isEmpty())
@@ -556,6 +423,8 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
       
         // mapToGlobal works incorrectly here, using two-step transformation
         pos = treeView->mapToGlobal(pos);
+
+
         showContextMenuAt(display()->view()->mapToGlobal(pos));
     }
 }
@@ -607,7 +476,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged() {
     setLayoutFilter(layout, ui->filterLineEdit->text());
 
     QnScopedValueRollback<bool> guard(&m_ignoreFilterChanges, true);
-    ui->searchTreeView->setModel(NULL);
+    ui->searchTreeWidget->setModel(NULL);
     ui->filterLineEdit->setText(QString());
     killSearchTimer();
 }
@@ -633,7 +502,7 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
 
 void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     /* Raised state has changed. */
-    ui->resourceTreeView->update();
+    ui->resourceTreeWidget->update();
 }
 
 void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem *) {
@@ -653,12 +522,12 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
         layoutSynchronizer(layout, true); /* Just initialize the synchronizer. */
         QnResourceSearchProxyModel *model = layoutModel(layout, true);
 
-        ui->searchTreeView->setModel(model);
-        ui->searchTreeView->expandAll();
+        ui->searchTreeWidget->setModel(model);
+        ui->searchTreeWidget->expandAll();
 
         /* View re-creates selection model for each model that is supplied to it, 
          * so we have to re-connect each time the model changes. */
-        connect(ui->searchTreeView->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
+        connect(ui->searchTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
     }
 
     emit currentTabChanged();
@@ -688,7 +557,7 @@ void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelInd
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
     if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
-        ui->resourceTreeView->expand(index);
+        ui->resourceTreeWidget->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

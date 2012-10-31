@@ -26,36 +26,10 @@
       <attribute name="title">
        <string>Resources</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <property name="margin">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <widget class="QnTreeView" name="resourceTreeView">
-         <property name="editTriggers">
-          <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-         </property>
-         <property name="dragDropMode">
-          <enum>QAbstractItemView::DragDrop</enum>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="autoExpandDelay">
-          <number>500</number>
-         </property>
-         <property name="uniformRowHeights">
-          <bool>true</bool>
-         </property>
-         <property name="allColumnsShowFocus">
-          <bool>true</bool>
-         </property>
-         <property name="headerHidden">
-          <bool>true</bool>
-         </property>
-         <property name="expandsOnDoubleClick">
-          <bool>true</bool>
-         </property>
+        <widget class="QnResourceTreeWidget" name="resourceTreeWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_3"/>
         </widget>
        </item>
       </layout>
@@ -64,10 +38,7 @@
       <attribute name="title">
        <string>Search</string>
       </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="margin">
-        <number>0</number>
-       </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
        <item>
         <widget class="QComboBox" name="typeComboBox"/>
        </item>
@@ -96,34 +67,8 @@
         </layout>
        </item>
        <item>
-        <widget class="QnTreeView" name="searchTreeView">
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="dragDropMode">
-          <enum>QAbstractItemView::DragOnly</enum>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="autoExpandDelay">
-          <number>500</number>
-         </property>
-         <property name="uniformRowHeights">
-          <bool>true</bool>
-         </property>
-         <property name="sortingEnabled">
-          <bool>false</bool>
-         </property>
-         <property name="allColumnsShowFocus">
-          <bool>true</bool>
-         </property>
-         <property name="headerHidden">
-          <bool>true</bool>
-         </property>
-         <property name="expandsOnDoubleClick">
-          <bool>true</bool>
-         </property>
+        <widget class="QnResourceTreeWidget" name="searchTreeWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_2"/>
         </widget>
        </item>
       </layout>
@@ -134,9 +79,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QnTreeView</class>
-   <extends>QTreeView</extends>
-   <header location="global">ui/widgets/tree_view.h</header>
+   <class>QnResourceTreeWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/resource_tree_widget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

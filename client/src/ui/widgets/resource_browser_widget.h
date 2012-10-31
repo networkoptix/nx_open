@@ -25,7 +25,7 @@ class QnResourceCriterion;
 class QnResourcePoolModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
-class QnResourceTreeItemDelegate;
+class QnResourceTreeWidget;
 
 namespace Ui {
     class ResourceBrowserWidget;
@@ -75,7 +75,7 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
     virtual void timerEvent(QTimerEvent *event) override;
 
-    QTreeView *currentItemView() const;
+    QnResourceTreeWidget *currentItemView() const;
     QItemSelectionModel *currentSelectionModel() const;
 
     bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
@@ -88,8 +88,6 @@ protected:
     void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
 
 private slots:
-    void expandAll();
-
     void updateFilter(bool force = false);
     void forceUpdateFilter() { updateFilter(true); }
     
@@ -116,8 +114,6 @@ private:
 
     QnResourcePoolModel *m_resourceModel;
     QSortFilterProxyModel *m_resourceProxyModel;
-    QnResourceTreeItemDelegate *m_resourceDelegate;
-    QnResourceTreeItemDelegate *m_searchDelegate;
 
     QAction *m_renameAction;
 };
