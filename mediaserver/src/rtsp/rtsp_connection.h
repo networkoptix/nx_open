@@ -61,8 +61,6 @@ public:
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
 
     void setQuality(MediaQuality quality);
-    bool isSecondaryLiveDP(QnAbstractStreamDataProvider* provider) const;
-    bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
     QString getRangeHeaderIfChanged();

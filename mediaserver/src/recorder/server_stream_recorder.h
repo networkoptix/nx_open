@@ -21,8 +21,6 @@ public:
     void updateScheduleInfo(qint64 timeMs);
 
     void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
-signals:
-    void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 

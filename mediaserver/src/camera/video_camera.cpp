@@ -34,6 +34,7 @@ private:
     QnCompressedVideoDataPtr m_lastKeyFrame;
     int m_gotIFramesMask;
     int m_allChannelsMask;
+    bool m_isSecondaryStream;
 };
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
@@ -145,7 +146,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     {
         QnAbstractDataPacketPtr data = m_dataQueue.at(i);
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-        if (skipTime && video && video->timestamp <= skipTime)
+        if (video && skipTime && video->timestamp <= skipTime)
         {
             QnCompressedVideoData* newData = video->clone();
             newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;

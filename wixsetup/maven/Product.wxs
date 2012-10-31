@@ -71,7 +71,7 @@
         <SetProperty Id="SERVER_DIRECTORY_REG" Value="[SERVER_DIRECTORY_REG32]" After="AppSearch"><![CDATA[ SERVER_DIRECTORY_REG = "" ]]></SetProperty>
         <SetProperty Id="SERVER_GUID" Value="[SERVER_GUID32]" After="AppSearch"><![CDATA[ SERVER_GUID = "" ]]></SetProperty>
         <SetProperty Id="CLIENT_DIRECTORY_REG" Value="[CLIENT_DIRECTORY_REG32]" After="AppSearch"><![CDATA[ CLIENT_DIRECTORY_REG = "" ]]></SetProperty>        
-        
+
         <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
         <WixVariable Id="WixUIBannerBmp" Value="Binary\eve\eve_logo-493x58.bmp" />
         <WixVariable Id="WixUIDialogBmp" Value="Binary\eve\eve_logo-493x312.bmp" />
@@ -382,7 +382,7 @@
         
         <CustomAction Id="SetServerDirectoryLocal" Property="SERVER_DIRECTORY_DIR" Value="[SERVER_DIRECTORY]" />
         <CustomAction Id="SetServerDirectoryColdstore" Property="SERVER_DIRECTORY_DIR" Value="[TARGETDIR]" />
-        
+
         <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
         

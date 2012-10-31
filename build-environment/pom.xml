@@ -16,6 +16,7 @@
 
 	<properties>
 		<libdir>${project.build.directory}</libdir>
+		<rsync.skip>false</rsync.skip>
 		<buildLib/>
 	</properties>
 
@@ -289,6 +290,7 @@
 								<configuration>
 									<executable>${environment.dir}/get_buildenv.sh</executable>
 									<workingDirectory>${environment.dir}</workingDirectory>		
+									<skip>rsync.skip</skip>
 								</configuration>
 							</execution>
 						</executions>
