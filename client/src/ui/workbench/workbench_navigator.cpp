@@ -205,6 +205,8 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(dateClicked(const QDate&)),                  this,   SLOT(at_calendar_dateChanged(const QDate&)));
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
+    connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
+
     updateLines();
     updateCalendar();
     updateScrollBarFromSlider();
@@ -224,6 +226,8 @@ void QnWorkbenchNavigator::deinitialize() {
 
     disconnect(m_timeScrollBar,                     NULL, this, NULL);
     m_timeScrollBar->removeEventFilter(this);
+
+    disconnect(context()->instance<QnWorkbenchServerTimeWatcher>(), NULL, this, NULL);
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
@@ -664,26 +668,12 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
 
-    qint64 localOffset = 0;
     if(m_currentMediaWidget) {
         QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: evil hacks...
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
-
-        if(m_currentWidgetFlags & WidgetUsesUTC) {
-            if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_currentMediaWidget->resource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
-                qint64 utcOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server);
-                if(utcOffset != QnWorkbenchServerTimeWatcher::InvalidOffset) {
-                    QDateTime dt1 = QDateTime::currentDateTime();
-                    QDateTime dt2 = dt1.toUTC();
-                    dt1.setTimeSpec(Qt::UTC);
-
-                    localOffset = utcOffset - dt2.msecsTo(dt1);
-                }
-            }
-        }
     }
-    m_timeSlider->setLocalOffset(localOffset);
 
+    updateLocalOffset();
     updateCurrentPeriods();
     updateLiveSupported();
     updateLive();
@@ -693,6 +683,23 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSpeed();
 
     emit currentWidgetChanged();
+}
+
+void QnWorkbenchNavigator::updateLocalOffset() {
+    qint64 localOffset = 0;
+    if(m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC)) {
+        if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_currentMediaWidget->resource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
+            qint64 utcOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server);
+            if(utcOffset != QnWorkbenchServerTimeWatcher::InvalidOffset) {
+                QDateTime dt1 = QDateTime::currentDateTime();
+                QDateTime dt2 = dt1.toUTC();
+                dt1.setTimeSpec(Qt::UTC);
+
+                localOffset = utcOffset - dt2.msecsTo(dt1);
+            }
+        }
+    }
+    m_timeSlider->setLocalOffset(localOffset);
 }
 
 void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
