@@ -302,6 +302,30 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall AnalizeServerDirectoryReg(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "AnalizeServerDirectoryReg");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
+        if (serverFolder.Find(L"coldstore://") == 0)
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"");
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
