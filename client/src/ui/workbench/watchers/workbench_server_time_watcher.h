@@ -22,6 +22,9 @@ signals:
     void offsetsChanged();
 
 private slots:
+    void at_server_serverIFFound(const QnMediaServerResourcePtr &server);
+    void at_server_serverIFFound();
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
