@@ -133,6 +133,7 @@ traytool/x64
 
 wixsetup/CustomStrings.wxl
 wixsetup/AppServerFiles.wxs
+wixsetup/CustomActions/CustomActions.aps
 wixsetup/version.bat
 wixsetup/bin
 wixsetup/x86

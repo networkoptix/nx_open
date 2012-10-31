@@ -268,7 +268,8 @@ public:
      * Status function to know if we are changing layout now.
      * \returns true if we are changing layout
      */
-    bool isChangingLayout() const {return m_inChangeLayout; }
+    bool isChangingLayout() const { return m_inChangeLayout; }
+
 public slots:
     void fitInView(bool animate = true);
 
