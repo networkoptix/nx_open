@@ -242,11 +242,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (isLive)
     {
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
-        if (isSecondaryProvider)
-            media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
-
-
         QMutexLocker lock(&m_qualityChangeMutex);
         if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None && m_liveQuality != MEDIA_Quality_AlwaysHigh)
         {
@@ -529,7 +524,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
+        bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
             QMutexLocker lock(&m_qualityChangeMutex);
             if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
@@ -547,7 +542,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 
         if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
             return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
+        else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
             return true; // data for other live quality stream
     }
 

@@ -236,22 +236,10 @@ bool QnRtspConnectionProcessor::isLiveDP(QnAbstractStreamDataProvider* dp)
     return dp == d->liveDpHi || dp == d->liveDpLow;
 }
 
-bool QnRtspConnectionProcessor::isSecondaryLiveDP(QnAbstractStreamDataProvider* dp) const
-{
-    Q_D(const QnRtspConnectionProcessor);
-    return dp == d->liveDpLow;
-}
-
 QHostAddress QnRtspConnectionProcessor::getPeerAddress() const
 {
     Q_D(const QnRtspConnectionProcessor);
     return QHostAddress(d->socket->getPeerAddressUint());
-}
-
-bool QnRtspConnectionProcessor::isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const
-{
-    Q_D(const QnRtspConnectionProcessor);
-    return dp == d->liveDpHi;
 }
 
 void QnRtspConnectionProcessor::initResponse(int code, const QString& message)
