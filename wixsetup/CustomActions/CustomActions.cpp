@@ -302,12 +302,12 @@ LExit:
     return WcaFinalize(er);
 }
 
-UINT __stdcall AnalizeServerDirectoryReg(MSIHANDLE hInstall)
+UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
     UINT er = ERROR_SUCCESS;
 
-    hr = WcaInitialize(hInstall, "AnalizeServerDirectoryReg");
+    hr = WcaInitialize(hInstall, "AnalyzeServerDirectoryReg");
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");

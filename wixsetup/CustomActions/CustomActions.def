@@ -14,4 +14,4 @@ FixClientFolder
 CopyMediaServerProfile
 CopyAppServerProfile
 IsClientFolderExists
-AnalizeServerDirectoryReg
+AnalyzeServerDirectoryReg

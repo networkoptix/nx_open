@@ -348,7 +348,7 @@
         <CustomAction Id="CopyAppServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
-        <CustomAction Id="AnalizeServerDirectoryReg" BinaryKey="CustomActions.dll" DllEntry="AnalizeServerDirectoryReg"/>
+        <CustomAction Id="AnalyzeServerDirectoryReg" BinaryKey="CustomActions.dll" DllEntry="AnalyzeServerDirectoryReg"/>
         
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
@@ -461,7 +461,7 @@
             
             <?define UseColdstore="$(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE" ?>
             
-            <Custom Action="AnalizeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
+            <Custom Action="AnalyzeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
             <Custom Action="SetServerDirectoryToRegistry" Before="CostInitialize">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
             <Custom Action="FixServerFolder" After="SetServerDirectoryToRegistry">IS_SERVER_DIRECTORY_REG</Custom>
             <Custom Action="SetServerDirectoryToDefault" After="CostInitialize">SERVER_DIRECTORY="" OR ( NOT $(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE )</Custom>
