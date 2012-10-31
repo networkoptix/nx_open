@@ -12,10 +12,13 @@
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
+    static const qint64 InvalidOffset = 0x8000000000000000;
+#define InvalidOffset InvalidOffset
+
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
-    int utcOffset(const QnMediaServerResourcePtr &server) const;
+    qint64 utcOffset(const QnMediaServerResourcePtr &server) const;
 
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -25,8 +28,7 @@ private slots:
 
 private:
     QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
-    QHash<QnMediaServerResourcePtr, int> m_utcOffsetByResource;
+    QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };
-
 
 #endif // QN_WORKBENCH_SERVER_TIME_WATCHER_H
