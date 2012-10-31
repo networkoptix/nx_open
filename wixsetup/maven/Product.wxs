@@ -339,7 +339,7 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
