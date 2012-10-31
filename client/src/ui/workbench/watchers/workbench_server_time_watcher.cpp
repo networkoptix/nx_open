@@ -51,7 +51,9 @@ void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    if(dateTime.isValid())
+    if(dateTime.isValid()) {
         m_utcOffsetByResource[server] = utcOffset * 1000ll; /* Convert seconds to milliseconds. */
+        emit offsetsChanged();
+    }
 }
 
