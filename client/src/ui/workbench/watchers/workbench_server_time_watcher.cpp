@@ -23,8 +23,8 @@ QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
     disconnect(resourcePool(), NULL, this, NULL);
 }
 
-int QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
-    return m_utcOffsetByResource.value(server, 0);
+qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
+    return m_utcOffsetByResource.value(server, InvalidOffset);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -51,6 +51,7 @@ void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    m_utcOffsetByResource[server] = utcOffset;
+    if(dateTime.isValid())
+        m_utcOffsetByResource[server] = utcOffset * 1000ll; /* Convert seconds to milliseconds. */
 }
 

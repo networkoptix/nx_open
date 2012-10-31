@@ -15,6 +15,8 @@
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <camera/caching_time_period_loader.h>
 #include <camera/time_period_loader.h>
@@ -639,13 +641,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    /*if(m_currentMediaWidget) {
-        QnAbstractArchiveReader *archiveReader = m_currentMediaWidget->display()->archiveReader();
-        if (archiveReader)
-            archiveReader->setPlaybackMask(QnTimePeriodList());
-    }*/
-
-    if (display() && display()->isChangingLayout()){
+    if (display() && display()->isChangingLayout()) { // TODO: wtf?
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
     } else {
@@ -668,10 +664,25 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSliderFromReader(false);
     m_timeSlider->finishAnimations();
 
+    qint64 localOffset = 0;
     if(m_currentMediaWidget) {
         QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: evil hacks...
         QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
+
+        if(m_currentWidgetFlags & WidgetUsesUTC) {
+            if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_currentMediaWidget->resource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
+                qint64 utcOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server);
+                if(utcOffset != QnWorkbenchServerTimeWatcher::InvalidOffset) {
+                    QDateTime dt1 = QDateTime::currentDateTime();
+                    QDateTime dt2 = dt1.toUTC();
+                    dt1.setTimeSpec(Qt::UTC);
+
+                    localOffset = utcOffset - dt2.msecsTo(dt1);
+                }
+            }
+        }
     }
+    m_timeSlider->setLocalOffset(localOffset);
 
     updateCurrentPeriods();
     updateLiveSupported();
