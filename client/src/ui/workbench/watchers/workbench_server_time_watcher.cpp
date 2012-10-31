@@ -24,7 +24,7 @@ QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
 }
 
 qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
-    return m_utcOffsetByResource.value(server, InvalidOffset);
+    return m_utcOffsetByResource.value(server, Qn::InvalidUtcOffset);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
