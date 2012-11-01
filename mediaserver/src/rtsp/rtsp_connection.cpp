@@ -551,6 +551,11 @@ int QnRtspConnectionProcessor::composeDescribe()
 
     addResponseRangeHeader();
 
+
+    sdp << "v=0" << ENDL;
+    sdp << "s=" << d->mediaRes->getName() << ENDL;
+    sdp << "c=IN IP4 " << d->socket->getLocalAddress() << ENDL;
+
     int i = 0;
     for (; i < numVideo + numAudio; ++i)
     {
