@@ -149,7 +149,8 @@ public:
         case PE_PanelItemViewRow:
             /* Don't draw elements that are only partially visible.
              * Note that this won't work with partial updates of tree widget's viewport. */
-            if(widget && widget->rect().bottom() < option->rect.bottom())
+            if(widget && widget->rect().bottom() < option->rect.bottom()
+                    && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
                 return;
             break;
         default:

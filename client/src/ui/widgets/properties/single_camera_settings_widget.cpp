@@ -19,6 +19,8 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
+#include <ui/dialogs/resource_tree_dialog.h>
+
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -72,7 +74,9 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
-    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButtonClicked()));
+    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
+
+    connect(ui->bigTestButton,          SIGNAL(clicked()),                      this,   SLOT(at_bigTestButton_clicked()));
 
     updateFromResource();
 }
@@ -599,7 +603,7 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     //}
 }
 
-void QnSingleCameraSettingsWidget::at_pingButtonClicked() {
+void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 #ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
@@ -607,6 +611,11 @@ void QnSingleCameraSettingsWidget::at_pingButtonClicked() {
 #endif
     QString ipAddress = m_camera->getUrl();
     QProcess::startDetached(cmd.arg(ipAddress));
+}
+
+void QnSingleCameraSettingsWidget::at_bigTestButton_clicked() {
+    QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog());
+    dialog->exec();
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {
