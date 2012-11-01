@@ -46,6 +46,12 @@ public:
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
 
+    QString getModel() const;
+    void setModel(QString model);
+
+    QString getFirmware() const;
+    void setFirmware(QString firmware);
+
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
     virtual void scheduleTasksChanged() override;
@@ -55,6 +61,9 @@ private:
     bool m_audioEnabled;
     bool m_manuallyAdded;
     bool m_advancedWorking;
+
+    QString m_model;
+    QString m_firmware;
 
     QnAbstractDTSFactory* m_dtsFactory;
 };
