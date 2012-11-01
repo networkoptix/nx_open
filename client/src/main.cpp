@@ -144,11 +144,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
-
+ 
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
+    testCamera->setMAC(QnMacAddress("00000"));    
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -212,10 +212,18 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#include <utils/network/networkoptixmodulefinder.h>
+
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
+    NetworkOptixModuleFinder networkOptixModuleFinder;
+    networkOptixModuleFinder.start();
+    //::Sleep( 2000 );
+    ////enterpriseControllerSearcher->pleaseStop();
+    //delete enterpriseControllerSearcher;
+
     QnClientModule client(argc, argv);
 
     QTextStream out(stdout);
