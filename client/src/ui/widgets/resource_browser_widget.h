@@ -90,9 +90,7 @@ protected:
 private slots:
     void updateFilter(bool force = false);
     void forceUpdateFilter() { updateFilter(true); }
-    
-    void at_treeView_enterPressed(const QModelIndex &index);
-    void at_treeView_doubleClicked(const QModelIndex &index);
+
     void at_tabWidget_currentChanged(int index);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);

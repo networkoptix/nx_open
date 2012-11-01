@@ -10,11 +10,14 @@
 #include <core/resource/media_server_resource.h>
 
 #include <ui/style/noptix_style.h>
+#include <ui/style/proxy_style.h>
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
+
+// ------ Delegate class -----
 
 class QnResourceTreeItemDelegate: public QStyledItemDelegate {
     typedef QStyledItemDelegate base_type;
@@ -134,6 +137,29 @@ private:
     QIcon m_recordingIcon, m_scheduledIcon, m_raisedIcon;
 };
 
+// ------ Style class -----
+
+class QnResourceTreeStyle: public QnProxyStyle {
+public:
+    explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
+
+    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const override {
+        switch(element) {
+        case PE_PanelItemViewItem:
+        case PE_PanelItemViewRow:
+            /* Don't draw elements that are only partially visible.
+             * Note that this won't work with partial updates of tree widget's viewport. */
+            if(widget && widget->rect().bottom() < option->rect.bottom())
+                return;
+            break;
+        default:
+            break;
+        }
+
+        QnProxyStyle::drawPrimitive(element, option, painter, widget);
+    }
+};
+
 // ------ Widget class -----
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
@@ -148,12 +174,18 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
+    QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
+    ui->resourcesTreeView->setStyle(treeStyle);
+
     ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
+
+    connect(ui->resourcesTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourcesTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
-
+    setWorkbench(NULL);
 }
 
 
@@ -182,6 +214,34 @@ void QnResourceTreeWidget::expandAll() {
     ui->resourcesTreeView->expandAll();
 }
 
-QPoint QnResourceWidget::selectionPos() const {
+QPoint QnResourceTreeWidget::selectionPos() const {
+    QModelIndexList selectedRows = ui->resourcesTreeView->selectionModel()->selectedRows();
+    if (selectedRows.isEmpty())
+        return QPoint();
 
+    QModelIndex selected = selectedRows.back();
+    QPoint pos = ui->resourcesTreeView->visualRect(selected).bottomRight();
+
+    // mapToGlobal works incorrectly here, using two-step transformation
+    pos = ui->resourcesTreeView->mapToGlobal(pos);
+    return pos;
+}
+
+
+// -------------------------------------------------------------------------- //
+// Handlers
+// -------------------------------------------------------------------------- //
+void QnResourceTreeWidget::at_treeView_enterPressed(const QModelIndex &index) {
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    if (resource)
+        emit activated(resource);
+}
+
+void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+
+    if (resource &&
+        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
+        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
+        emit activated(resource);
 }

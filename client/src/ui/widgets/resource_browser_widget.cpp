@@ -38,7 +38,6 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/style/skin.h>
-#include <ui/style/proxy_style.h>
 
 #include <ui/style/globals.h>
 
@@ -48,29 +47,6 @@ namespace {
     const char *qn_filterPropertyName = "_qn_filter";
 //    const char *qn_searchCriterionPropertyName = "_qn_searchCriterion";
 }
-
-
-
-class QnResourceTreeStyle: public QnProxyStyle {
-public:
-    explicit QnResourceTreeStyle(QStyle *baseStyle, QObject *parent = NULL): QnProxyStyle(baseStyle, parent) {}
-
-    virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const override {
-        switch(element) {
-        case PE_PanelItemViewItem:
-        case PE_PanelItemViewRow:
-            /* Don't draw elements that are only partially visible.
-             * Note that this won't work with partial updates of tree widget's viewport. */
-            if(widget && widget->rect().bottom() < option->rect.bottom())
-                return;
-            break;
-        default:
-            break;
-        }
-
-        QnProxyStyle::drawPrimitive(element, option, painter, widget);
-    }
-};
 
 class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
 public:
@@ -127,10 +103,6 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_resourceProxyModel->sort(0);
     ui->resourceTreeWidget->setModel(m_resourceProxyModel);
 
-    QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
-    ui->resourceTreeWidget->setStyle(treeStyle);
-    ui->searchTreeWidget->setStyle(treeStyle);
-
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
@@ -143,10 +115,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(editingFinished()),          this,               SLOT(forceUpdateFilter()));
     connect(ui->clearFilterButton,  SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
-    connect(ui->resourceTreeWidget,   SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->resourceTreeWidget,   SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
-    connect(ui->searchTreeWidget,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->searchTreeWidget,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+
+    connect(ui->resourceTreeWidget, SIGNAL(activated(const QnResourcePtr &)),  this,        SIGNAL(activated(const QnResourcePtr &)));
+    connect(ui->searchTreeWidget,   SIGNAL(activated(const QnResourcePtr &)),  this,        SIGNAL(activated(const QnResourcePtr &)));
+
     connect(ui->tabWidget,          SIGNAL(currentChanged(int)),        this,               SLOT(at_tabWidget_currentChanged(int)));
     connect(ui->resourceTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()));
     connect(m_resourceProxyModel,   SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
@@ -412,19 +384,8 @@ void QnResourceBrowserWidget::keyPressEvent(QKeyEvent *event) {
             return;
 
         QPoint pos = currentItemView()->selectionPos();
-        QnResourceTreeWidget* treeView = currentItemView();
-
-        QModelIndexList selectedRows = treeView->selectionModel()->selectedRows();
-        if (selectedRows.isEmpty())
+        if (pos.isNull())
             return;
-        
-        QModelIndex selected = selectedRows.back();
-        QPoint pos = treeView->visualRect(selected).bottomRight();
-      
-        // mapToGlobal works incorrectly here, using two-step transformation
-        pos = treeView->mapToGlobal(pos);
-
-
         showContextMenuAt(display()->view()->mapToGlobal(pos));
     }
 }
@@ -533,21 +494,6 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
     emit currentTabChanged();
 }
 
-void QnResourceBrowserWidget::at_treeView_enterPressed(const QModelIndex &index) {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource)
-        emit activated(resource);
-}
-
-void QnResourceBrowserWidget::at_treeView_doubleClicked(const QModelIndex &index) {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-
-    if (resource && 
-        !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
-        !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
-        emit activated(resource);
-}
-
 void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
     for(int i = start; i <= end; i++)
         at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
@@ -556,7 +502,7 @@ void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelInd
 void QnResourceBrowserWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
-    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode) 
+    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
         ui->resourceTreeWidget->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
@@ -567,4 +513,3 @@ void QnResourceBrowserWidget::at_showUrlsInTree_changed() {
 
     m_resourceModel->setUrlsShown(urlsShown);
 }
-

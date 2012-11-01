@@ -6,6 +6,8 @@
 #include <QtGui/QWidget>
 #include <QtGui/QItemSelectionModel>
 
+#include <core/resource/resource_fwd.h>
+
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
 
@@ -34,6 +36,14 @@ public:
     void expandAll();
 
     QPoint selectionPos() const;
+
+signals:
+    void activated(const QnResourcePtr &resource);
+
+private slots:
+    void at_treeView_enterPressed(const QModelIndex &index);
+    void at_treeView_doubleClicked(const QModelIndex &index);
+
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
