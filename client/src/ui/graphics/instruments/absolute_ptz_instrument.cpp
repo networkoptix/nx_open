@@ -310,12 +310,56 @@ private:
 };
 
 
+// -------------------------------------------------------------------------- //
+// PtzManipulatorWidget
+// -------------------------------------------------------------------------- //
+class PtzZoomButtonWidget: public QnImageButtonWidget {
+    typedef QnImageButtonWidget base_type;
+
+public:
+    PtzZoomButtonWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0):
+        base_type(parent, windowFlags)
+    {}
+
+    QnMediaResourceWidget *target() const {
+        return m_target.data();
+    }
+
+    void setTarget(QnMediaResourceWidget *target) {
+        m_target = target;
+    }
+
+protected:
+    virtual void paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget) {
+        qreal opacity = painter->opacity();
+        painter->setOpacity(opacity * (stateOpacity(startState) * (1.0 - progress) + stateOpacity(endState) * progress));
+
+        bool isPressed = (startState & PRESSED) || (endState & PRESSED);
+        {
+            QnScopedPainterPenRollback penRollback(painter, QPen(isPressed ? ptzArrowBorderColor : ptzItemBorderColor, qMax(size().height(), size().width()) / 16.0));
+            QnScopedPainterBrushRollback brushRollback(painter, isPressed ? ptzArrowBaseColor : ptzItemBaseColor);
+            painter->drawEllipse(rect());
+        }
+
+        base_type::paint(painter, startState, endState, progress, widget);
+
+        painter->setOpacity(opacity);
+    }
+
+    qreal stateOpacity(StateFlags stateFlags) {
+        return (stateFlags & HOVERED) ? 1.0 : 0.5;
+    }
+
+private:
+    QWeakPointer<QnMediaResourceWidget> m_target;
+};
+
 
 // -------------------------------------------------------------------------- //
 // PtzManipulatorWidget
 // -------------------------------------------------------------------------- //
-class PtzManipulatorWidget: public Instrumented<QGraphicsWidget> {
-    typedef Instrumented<QGraphicsWidget> base_type;
+class PtzManipulatorWidget: public QGraphicsWidget {
+    typedef QGraphicsWidget base_type;
 
 public:
     PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
@@ -347,12 +391,12 @@ public:
     PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
         base_type(parent, windowFlags),
         m_manipulatorWidget(new PtzManipulatorWidget(this)),
-        m_arrowItem(new PtzArrowItem(this))/*,
-        m_zoomInButton(new QnImageButtonWidget(this)),
-        m_zoomOutButton(new QnImageButtonWidget(this))*/
+        m_arrowItem(new PtzArrowItem(this)),
+        m_zoomInButton(new PtzZoomButtonWidget(this)),
+        m_zoomOutButton(new PtzZoomButtonWidget(this))
     {
-        //m_zoomInButton->setIcon(qnSkin->icon("ptz_zoom"));
-        //m_zoomOutButton->setIcon(qnSkin->icon("ptz_unzoom"));
+        m_zoomInButton->setIcon(qnSkin->icon("item/ptz_zoom_in.png"));
+        m_zoomOutButton->setIcon(qnSkin->icon("item/ptz_zoom_out.png"));
 
         m_arrowItem->setOpacity(0.0);
 
@@ -365,6 +409,14 @@ public:
 
     PtzArrowItem *arrowItem() const {
         return m_arrowItem;
+    }
+
+    PtzZoomButtonWidget *zoomInButton() const {
+        return m_zoomInButton;
+    }
+
+    PtzZoomButtonWidget *zoomOutButton() const {
+        return m_zoomOutButton;
     }
 
     virtual void setGeometry(const QRectF &rect) override {
@@ -426,16 +478,19 @@ private:
         QRectF rect = this->rect();
         QPointF center = rect.center();
         qreal centralWidth = qMin(rect.width(), rect.height()) / 32;
-        QPointF centralStep(centralWidth, centralWidth);
+        QPointF xStep(centralWidth, 0), yStep(0, centralWidth);
 
-        m_manipulatorWidget->setGeometry(QRectF(center - centralStep, center + centralStep));
+        m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
+
+        m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
+        m_zoomOutButton->setGeometry(QRectF(center + xStep * 1.5 - yStep * 2.5, 1.5 * QnGeometry::toSize(xStep + yStep)));
     }
 
 private:
     PtzManipulatorWidget *m_manipulatorWidget;
     PtzArrowItem *m_arrowItem;
-    QnImageButtonWidget *m_zoomInButton;
-    QnImageButtonWidget *m_zoomOutButton;
+    PtzZoomButtonWidget *m_zoomInButton;
+    PtzZoomButtonWidget *m_zoomOutButton;
 };
 
 Q_DECLARE_METATYPE(PtzOverlayWidget *);
@@ -492,7 +547,15 @@ void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
     overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
     overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+    overlay->zoomInButton()->setTarget(widget);
+    overlay->zoomOutButton()->setTarget(widget);
     m_dataByWidget[widget].overlayWidget = overlay;
+
+    connect(overlay->zoomInButton(),    SIGNAL(pressed()),  this, SLOT(at_zoomInButton_pressed()));
+    connect(overlay->zoomInButton(),    SIGNAL(released()), this, SLOT(at_zoomInButton_released()));
+    connect(overlay->zoomOutButton(),   SIGNAL(pressed()),  this, SLOT(at_zoomOutButton_pressed()));
+    connect(overlay->zoomOutButton(),   SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
+
 
     widget->addOverlayWidget(overlay, false, false);
 }
@@ -896,4 +959,27 @@ void AbsolutePtzInstrument::at_ptzController_positionChanged(const QnVirtualCame
 
     data.pendingAbsoluteMove = QRectF();
     ptzMoveTo(target(), rect);
+}
+
+void AbsolutePtzInstrument::at_zoomInButton_pressed() {
+    at_zoomButton_activated(1.0);
+}
+
+void AbsolutePtzInstrument::at_zoomInButton_released() {
+    at_zoomButton_activated(0.0);
+}
+
+void AbsolutePtzInstrument::at_zoomOutButton_pressed() {
+    at_zoomButton_activated(-1.0);
+}
+
+void AbsolutePtzInstrument::at_zoomOutButton_released() {
+    at_zoomButton_activated(0.0);
+}
+
+void AbsolutePtzInstrument::at_zoomButton_activated(qreal speed) {
+    PtzZoomButtonWidget *button = checked_cast<PtzZoomButtonWidget *>(sender());
+    
+    if(QnMediaResourceWidget *widget = button->target())
+        ptzMove(widget, QVector3D(0.0, 0.0, speed), true);
 }

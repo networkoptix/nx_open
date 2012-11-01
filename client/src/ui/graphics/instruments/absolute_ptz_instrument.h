@@ -62,6 +62,12 @@ private slots:
 
     void at_ptzController_positionChanged(const QnVirtualCameraResourcePtr &camera);
 
+    void at_zoomInButton_pressed();
+    void at_zoomInButton_released();
+    void at_zoomOutButton_pressed();
+    void at_zoomOutButton_released();
+    void at_zoomButton_activated(qreal speed);
+
     void updateOverlayWidget();
     void updateOverlayWidget(QnMediaResourceWidget *widget);
 

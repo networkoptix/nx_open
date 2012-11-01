@@ -18,7 +18,7 @@ QnTextureTransitionShaderProgram::QnTextureTransitionShaderProgram(const QGLCont
         void main() {                                                           \
             vec4 color0 = texture2D(texture0, gl_TexCoord[0].st);               \
             vec4 color1 = texture2D(texture1, gl_TexCoord[0].st);               \
-            gl_FragColor = gl_Color * (color0 * progress + color1 * (1.0 - progress)); \
+            gl_FragColor = gl_Color * (color0 * (1.0 - progress) + color1 * progress); \
         }                                                                       \
     ");
     link();
