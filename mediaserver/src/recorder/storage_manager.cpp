@@ -176,11 +176,13 @@ QnStorageManager* QnStorageManager::instance()
     return inst();
 }
 
-QString QnStorageManager::dateTimeStr(qint64 dateTimeMs)
+QString QnStorageManager::dateTimeStr(qint64 dateTimeMs, qint16 timeZone)
 {
     QString text;
     QTextStream str(&text);
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(dateTimeMs);
+    if (timeZone != -1)
+        fileDate = fileDate.toUTC().addSecs(timeZone*60);
     str << QString::number(fileDate.date().year()) << '/';
     str << strPadLeft(QString::number(fileDate.date().month()), 2, '0') << '/';
     str << strPadLeft(QString::number(fileDate.date().day()), 2, '0') << '/';
@@ -439,7 +441,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     return result;
 }
 
-QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
+QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
 {
     if (!storage) {
         qWarning() << "No disk storages";
@@ -453,7 +455,7 @@ QString QnStorageManager::getFileName(const qint64& dateTime, const QnNetworkRes
 
     QString text = base + camera->getPhysicalId();
     Q_ASSERT(!camera->getPhysicalId().isEmpty());
-    text += QString("/") + dateTimeStr(dateTime);
+    text += QString("/") + dateTimeStr(dateTime, timeZone);
     QList<QFileInfo> list = storage->getFileList(text);
     QList<QString> baseNameList;
     foreach(const QFileInfo& info, list)
@@ -548,6 +550,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fil
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1));
+    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) (currentTimeZone()/60)));
     return true;
 }
