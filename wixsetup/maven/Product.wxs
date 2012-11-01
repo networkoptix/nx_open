@@ -26,7 +26,7 @@
         <?define commonProgramFiles = "c:\Program Files\Common Files\" ?>
         <?endif?>
         
-        <?if ${build.configuration} = Debug ?>
+        <?if ${build.configuration} = debug ?>
         <?define suffix = "d" ?>
         <?else?>
         <?define suffix = "" ?>
@@ -47,7 +47,7 @@
             </Condition>
         <?endif?>
         
-        <SystemTools:DeleteFile Id="test1" File="[SystemFolder]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db" DeleteOnUnInstall="yes" CheckIfExists="yes" > REMOVE_DATABASE = "1" </SystemTools:DeleteFile>
+        <SystemTools:DeleteFile Id="test1" File="$(var.SystemFolderActual)config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db" DeleteOnUnInstall="yes" CheckIfExists="yes" > REMOVE_DATABASE = "1" </SystemTools:DeleteFile>
         
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
@@ -91,6 +91,7 @@
         <Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
         
         <Property Id="INSTALLTYPE" Value="0"/>
+        <Property Id="SERVER_DIRECTORY_REG_IS_COLDSTORE" Secure="yes"/>
         
         <Property Id="BUSYPORT" Secure="yes"/>
         <Property Id="DUMMY_APPSERVER_LOGIN" Value="admin"/>
@@ -338,7 +339,7 @@
                             Win64="no"/>
         </Property>
 
-        <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
+        <Binary Id="CustomActions.dll" SourceFile="CustomActions\${build.configuration}\CustomActions.dll" />
         
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
@@ -347,6 +348,8 @@
         <CustomAction Id="CopyAppServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyAppServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
+        <CustomAction Id="AnalyzeServerDirectoryReg" BinaryKey="CustomActions.dll" DllEntry="AnalyzeServerDirectoryReg"/>
+        
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
         
         <CustomAction Id="CheckServerDriveLowSpace" BinaryKey="CustomActions.dll" DllEntry="CheckServerDriveLowSpace"/>
@@ -374,8 +377,11 @@
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
-        <CustomAction Id="AssignServerFolder" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
-        <CustomAction Id="ResetServerFolder" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
+        <CustomAction Id="SetServerDirectoryToDefault" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
+        <CustomAction Id="SetServerDirectoryToRegistry" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
+        
+        <CustomAction Id="SetServerDirectoryLocal" Property="SERVER_DIRECTORY_DIR" Value="[SERVER_DIRECTORY]" />
+        <CustomAction Id="SetServerDirectoryColdstore" Property="SERVER_DIRECTORY_DIR" Value="[TARGETDIR]" />
 
         <CustomAction Id="SetClientFolderToDefault" Property="CLIENT_DIRECTORY" Value="[MOVIESFOLDER]\${product.name} Client Media" />
         <CustomAction Id="SetClientFolderToRegistry" Property="CLIENT_DIRECTORY" Value="[CLIENT_DIRECTORY_REG]" />
@@ -453,12 +459,18 @@
             <Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
             <Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
             
-            <Custom Action="ResetServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
-            <Custom Action="FixServerFolder" After="ResetServerFolder">IS_SERVER_DIRECTORY_REG</Custom>
-            <Custom Action="AssignServerFolder" After="CostInitialize">SERVER_DIRECTORY=""</Custom>
+            <?define UseColdstore="$(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE" ?>
+            
+            <Custom Action="AnalyzeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
+            <Custom Action="SetServerDirectoryToRegistry" Before="CostInitialize">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
+            <Custom Action="FixServerFolder" After="SetServerDirectoryToRegistry">IS_SERVER_DIRECTORY_REG</Custom>
+            <Custom Action="SetServerDirectoryToDefault" After="CostInitialize">SERVER_DIRECTORY="" OR ( NOT $(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE )</Custom>
+            <Custom Action="SetServerDirectoryLocal" After="SetServerDirectoryToDefault">NOT $(var.UseColdstore)</Custom>
+            <Custom Action="SetServerDirectoryColdstore" After="SetServerDirectoryToDefault">$(var.UseColdstore)</Custom>
+            
             
             <!--          <Custom Action="SetClientFolderToRegistry" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
-            <Custom Action="ResetServerFolder" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
+            <Custom Action="SetServerDirectoryToRegistry" Before="CostFinalize">Installed AND NOT UPGRADINGPRODUCTCODE</Custom>
   -->      </InstallUISequence>
         
         <?define InstallECS="&AppServerFeature = 3 AND !AppServerFeature <> 3"?>
@@ -512,9 +524,10 @@
                 </Directory>
             </Directory>
             
-            <Directory Id="SERVER_DIRECTORY" Name="Server Media">
+            <Directory Id="SERVER_DIRECTORY_DIR" Name="Server Media">
                 <Component Id="ServerDirectoryComponent" Guid="{C259A76D-4CAA-489f-A18F-28AED0232853}" Permanent="yes">
-                    <CreateFolder Directory="SERVER_DIRECTORY"/>
+                    <Condition>NOT SERVER_DIRECTORY_REG_IS_COLDSTORE</Condition>
+                    <CreateFolder Directory="SERVER_DIRECTORY_DIR"/>
                     <RegistryValue Root='HKLM' Key='Software\[Manufacturer]\${mediaserver.name}' Type='string' Value='' KeyPath='yes' />
                 </Component>
             </Directory>
@@ -922,7 +935,7 @@
         </Feature>
         
         <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
-        <Property Id="WIXUI_SERVER_DIRECTORY" Value="SERVER_DIRECTORY"/>
+        <Property Id="WIXUI_SERVER_DIRECTORY" Value="SERVER_DIRECTORY_DIR"/>
         <Property Id="WIXUI_CLIENT_DIRECTORY" Value="CLIENT_DIRECTORY"/>
         <Property Id="WIXUI_SERVER_ALLOWCHANGEIP" Value="SERVER_ALLOWCHANGEIP"/>
         
