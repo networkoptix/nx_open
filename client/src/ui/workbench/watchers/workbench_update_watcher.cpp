@@ -9,9 +9,9 @@
 #include "version.h"
 
 namespace {
-    struct UpdateVersionLess {
+    struct UpdateEngineVersionLess {
         bool operator()(const QnUpdateInfoItem &l, const QnUpdateInfoItem &r) {
-            return l.productVersion < r.productVersion;
+            return l.engineVersion < r.engineVersion;
         }
     };
 
@@ -27,7 +27,7 @@ QnWorkbenchUpdateWatcher::QnWorkbenchUpdateWatcher(QObject *parent):
         return; 
 
     QString platform = QString(QLatin1String("%1-%2")).arg(QLatin1String(QN_APPLICATION_PLATFORM)).arg(QLatin1String(QN_APPLICATION_ARCH));
-    QString version = QLatin1String(QN_APPLICATION_VERSION);
+    QString version = QLatin1String(QN_ENGINE_VERSION);
 
     qnDebug("Settings up update watcher for %1 build of version %2 at %3.", platform, version, updateFeedUrl);
 
@@ -49,14 +49,14 @@ void QnWorkbenchUpdateWatcher::at_checker_updatesAvailable(QnUpdateInfoItemList 
     if(updates.isEmpty())
         return;
 
-    qSort(updates.begin(), updates.end(), UpdateVersionLess());
+    qSort(updates.begin(), updates.end(), UpdateEngineVersionLess());
     QnUpdateInfoItem lastUpdate = updates.last();
 
-    QnVersion currentVersion = QnVersion(QLatin1String(QN_APPLICATION_VERSION));
-    if(lastUpdate.productVersion == currentVersion || lastUpdate.productVersion < currentVersion) // TODO: use <=
+    QnVersion currentVersion = QnVersion(QLatin1String(QN_ENGINE_VERSION));
+    if(lastUpdate.engineVersion == currentVersion || lastUpdate.engineVersion < currentVersion) // TODO: use <=
         return;
 
-    if(lastUpdate.productVersion == m_availableUpdate.productVersion)
+    if(lastUpdate.engineVersion == m_availableUpdate.engineVersion)
         return;
 
     m_availableUpdate = lastUpdate;

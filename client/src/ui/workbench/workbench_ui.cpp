@@ -111,7 +111,6 @@ namespace {
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
         if (action)
