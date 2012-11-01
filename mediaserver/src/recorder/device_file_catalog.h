@@ -18,9 +18,9 @@ signals:
 public:
     struct Chunk
     {
-        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0) {}
-        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration) : 
-            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex)
+        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
+        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone) : 
+            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone)
         {
             Q_ASSERT_X(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
         }
@@ -36,6 +36,7 @@ public:
 
         quint16 storageIndex;
         quint16 fileIndex;
+        qint16 timeZone;
     };
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};

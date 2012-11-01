@@ -531,7 +531,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QString hardwareId;
     
     //Trying to get name
-    if (getName().isEmpty())
+    if (getName().isEmpty() || getModel().isEmpty())
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
@@ -547,7 +547,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         } 
         else
         {
-            setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            if (getName().isEmpty())
+                setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            setModel(QLatin1String(response.Model.c_str()));
+            setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
         }
     }

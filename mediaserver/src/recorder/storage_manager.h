@@ -30,11 +30,17 @@ public:
     void addStorage(QnStorageResourcePtr storage);
 
 
-    QString getFileName(const qint64& fileDate, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
+    QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr netResource, const QString& prefix, QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
     bool fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider,  qint64 fileSize);
 
-    static QString dateTimeStr(qint64 dateTimeMs);
+    /*
+    * convert UTC time to folder name. Used for server archive catalog.
+    * @param dateTimeMs UTC time in ms
+    * timeZone media server time zone offset in munutes. If value==-1 - current(system) time zone is used
+    */
+    static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone);
+
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
     QnStorageResourcePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const 

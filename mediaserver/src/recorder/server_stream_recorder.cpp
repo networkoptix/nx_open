@@ -324,7 +324,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
             setTruncateInterval(m_storage->getChunkLen());
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
+        return qnStorageMan->getFileName(m_startDateTime/1000, -1, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
     }
     else {
         return m_fixedFileName;
