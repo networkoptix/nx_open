@@ -520,6 +520,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
     if (metadata == 0)
     {
@@ -539,11 +540,12 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                 }
             }
         }
-
-        if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
-            return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
-            return true; // data for other live quality stream
+        if (isLive) {
+            if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
+                return true; // data for other live quality stream
+            else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
+                return true; // data for other live quality stream
+        }
     }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
@@ -571,7 +573,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_lastMediaTime = media->timestamp;
     }
 
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (m_realtimeMode && !isLive)
         doRealtimeDelay(media);
 
