@@ -15,7 +15,7 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
 public:
     // TODO: move to QnSecurityCamResource
     enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag)
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
 
 
     QnVirtualCameraResource();
@@ -46,9 +46,11 @@ public:
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
 
+    // TODO: move to QnSecurityCamResource
     QString getModel() const;
     void setModel(QString model);
 
+    // TODO: move to QnSecurityCamResource
     QString getFirmware() const;
     void setFirmware(QString firmware);
 
