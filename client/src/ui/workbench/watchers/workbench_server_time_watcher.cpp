@@ -1,5 +1,7 @@
 #include "workbench_server_time_watcher.h"
 
+#include <utils/common/checked_cast.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
@@ -24,7 +26,7 @@ QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
 }
 
 qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
-    return m_utcOffsetByResource.value(server, InvalidOffset);
+    return m_utcOffsetByResource.value(server, Qn::InvalidUtcOffset);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -32,8 +34,8 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
     if(!server)
         return;
 
-    int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
-    m_resourceByHandle[handle] = server;
+    connect(server.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_server_serverIFFound()));
+    at_server_serverIFFound(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -42,6 +44,19 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
         return;
 
     m_utcOffsetByResource.remove(server);
+    disconnect(server.data(), NULL, this, NULL);
+}
+
+void QnWorkbenchServerTimeWatcher::at_server_serverIFFound(const QnMediaServerResourcePtr &server) {
+    if(server->getPrimaryIF().isEmpty())
+        return;
+
+    int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
+    m_resourceByHandle[handle] = server;
+}
+
+void QnWorkbenchServerTimeWatcher::at_server_serverIFFound() {
+    at_server_serverIFFound(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
 }
 
 void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle) {

@@ -602,7 +602,7 @@ int QnRtspConnectionProcessor::composeDescribe()
         sdp << additionSDP;
     }
 
-    if (d->liveMode != Mode_ThumbNails)
+    if (d->liveMode != Mode_ThumbNails && d->useProprietaryFormat)
     {
         RtspServerTrackInfoPtr trackInfo(new RtspServerTrackInfo());
         d->trackInfo.insert(d->metadataChannelNum, trackInfo);

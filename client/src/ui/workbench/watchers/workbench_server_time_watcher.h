@@ -5,6 +5,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QDateTime>
 
+#include <utils/common/math.h>
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -12,9 +13,6 @@
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
-    static const qint64 InvalidOffset = 0x7FFFFFFFFFFFFFFF;
-#define InvalidOffset InvalidOffset
-
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
@@ -24,6 +22,9 @@ signals:
     void offsetsChanged();
 
 private slots:
+    void at_server_serverIFFound(const QnMediaServerResourcePtr &server);
+    void at_server_serverIFFound();
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
@@ -33,5 +34,7 @@ private:
     QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
     QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };
+
+#define InvalidUtcOffset _id(INT64_MAX)
 
 #endif // QN_WORKBENCH_SERVER_TIME_WATCHER_H

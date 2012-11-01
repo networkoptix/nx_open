@@ -690,7 +690,7 @@ void QnWorkbenchNavigator::updateLocalOffset() {
     if(m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC)) {
         if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_currentMediaWidget->resource()->getParentId()).dynamicCast<QnMediaServerResource>()) {
             qint64 utcOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(server);
-            if(utcOffset != QnWorkbenchServerTimeWatcher::InvalidOffset) {
+            if(utcOffset != Qn::InvalidUtcOffset) {
                 QDateTime dt1 = QDateTime::currentDateTime();
                 QDateTime dt2 = dt1.toUTC();
                 dt1.setTimeSpec(Qt::UTC);
