@@ -1,9 +1,13 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <QSystemTrayIcon>
 #include <QDialog>
 #include <QString>
+#include <QStringListModel>
+#include <QSystemTrayIcon>
+
+
+class FoundEnterpriseControllersModel;
 
 class QAction;
 class QCheckBox;
@@ -18,6 +22,7 @@ class QTextEdit;
 
 namespace Ui {
     class SettingsDialog;
+    class FindAppServerDialog;
 }
 
 bool MyIsUserAnAdmin();
@@ -47,7 +52,8 @@ class QnSystrayWindow : public QDialog
     Q_OBJECT
 
 public:
-    QnSystrayWindow();
+    QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel );
+
     virtual ~QnSystrayWindow();
     QSystemTrayIcon* getTrayIcon() const { return trayIcon; }
     void executeAction(QString cmd);
@@ -81,6 +87,9 @@ private slots:
 
     void onTestButtonClicked();
 
+    void onFindAppServerButtonClicked();
+    void onAppServerUrlHistoryComboBoxCurrentChanged( int index );
+
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);
@@ -101,6 +110,8 @@ private:
     bool isMediaServerParamChanged() const;
 
     QScopedPointer<Ui::SettingsDialog> ui;
+    QScopedPointer<QDialog> m_findAppServerDialog;
+    QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
 
     QSettings m_settings;
     QSettings m_mServerSettings;
@@ -145,6 +156,7 @@ private:
     QQueue<QString> m_delayedMessages;
     QString m_mediaServerServiceName;
     QString m_appServerServiceName;
+    FoundEnterpriseControllersModel* const m_foundEnterpriseControllersModel;
 };
 
 #endif

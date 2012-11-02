@@ -3,7 +3,9 @@
 
 #include "systraywindow.h"
 #include "ui_settings.h"
+#include "ui_findappserverdialog.h"
 #include "connectiontestingdialog.h"
+#include "foundenterprisecontrollersmodel.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -49,12 +51,24 @@ bool MyIsUserAnAdmin()
    return isAdmin;
 }
 
-QnSystrayWindow::QnSystrayWindow():
+QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel )
+:
     ui(new Ui::SettingsDialog),
+    m_findAppServerDialog(new QDialog()),
+    m_findAppServerDialogUI( new Ui::FindAppServerDialog() ),
     m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
-    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
+    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME),
+    m_foundEnterpriseControllersModel( foundEnterpriseControllersModel )
 {
     ui->setupUi(this);
+    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
+    m_findAppServerDialogUI->foundEnterpriseControllersListView->setModel( m_foundEnterpriseControllersModel );
+
+    connect(
+        m_findAppServerDialogUI->foundEnterpriseControllersListView,
+        SIGNAL(doubleClicked(const QModelIndex&)),
+        m_findAppServerDialog.data(),
+        SLOT(accept()) );
 
 #ifdef USE_SINGLE_STREAMING_PORT
     ui->apiPortLineEdit->setVisible(false);
@@ -104,6 +118,10 @@ QnSystrayWindow::QnSystrayWindow():
 
     connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
     connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
+
+    connect(ui->findAppServerButton, SIGNAL(clicked()), this, SLOT(onFindAppServerButtonClicked()));
+
+    connect(ui->appServerUrlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAppServerUrlHistoryComboBoxCurrentChanged(int)));
     
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
@@ -219,7 +237,7 @@ void QnSystrayWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void QnSystrayWindow::setIcon(int index)
+void QnSystrayWindow::setIcon(int /*index*/)
 {
     //QIcon icon = iconComboBox->itemIcon(index);
     //trayIcon->setIcon(icon);
@@ -613,12 +631,15 @@ void QnSystrayWindow::onSettingsAction()
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, appServerUrl.toString());
     urlList.removeDuplicates();
-    
+
     ui->appServerUrlComboBox->clear();
+    ui->appServerUrlComboBox->addItem( tr("* Last used connection *") );
     foreach(const QString& value, urlList) {
         ui->appServerUrlComboBox->addItem(value);
     }
 
+    ui->appIPEdit->setText(m_mServerSettings.value("appserverHost").toString());
+    ui->appPortSpinBox->setValue(m_mServerSettings.value("appserverPort").toInt());
     ui->appServerLogin->setText(m_mServerSettings.value("appserverLogin").toString());
     ui->appServerPassword->setText(m_mServerSettings.value("appserverPassword").toString());
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
@@ -652,10 +673,9 @@ bool QnSystrayWindow::isAppServerParamChanged() const
 bool QnSystrayWindow::isMediaServerParamChanged() const
 {
     QUrl savedURL = getAppServerURL();
-    QUrl currentURL(ui->appServerUrlComboBox->currentText());
+    QUrl currentURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
     if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
         return true;
-
 
     if (ui->appServerLogin->text() != m_mServerSettings.value("appserverLogin").toString())
         return true;
@@ -822,19 +842,13 @@ void QnSystrayWindow::saveData()
     }
     m_settings.setValue("appserverUrlHistory", rez);
 
-    QString text = ui->appServerUrlComboBox->currentText();
-    if (text.indexOf("://") == -1)
-        text = QString("https://") + text;
-    setAppServerURL(text);
+    setAppServerURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 }
 
 void QnSystrayWindow::onTestButtonClicked()
 {
-    QString text = ui->appServerUrlComboBox->currentText();
-    if (text.indexOf("://") == -1)
-        text = QString("https://") + text;
+    QUrl url( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 
-    QUrl url(text);
     url.setUserName(ui->appServerLogin->text());
     url.setPassword(ui->appServerPassword->text());
 
@@ -847,4 +861,29 @@ void QnSystrayWindow::onTestButtonClicked()
     ConnectionTestingDialog dialog(this, url);
     dialog.setModal(true);
     dialog.exec();
+}
+
+void QnSystrayWindow::onFindAppServerButtonClicked()
+{
+    if( !m_findAppServerDialog->exec() )
+        return; //cancel pressed
+    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersListView->currentIndex();
+    if( !selectedSrvIndex.isValid() )
+        return;
+
+    ui->appIPEdit->setText( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
+    ui->appPortSpinBox->setValue( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
+}
+
+void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
+{
+    if( index == 0 )
+        return; //selected "Last used connection" element
+
+    //filling in edits with values
+    const QUrl urlToSet( ui->appServerUrlComboBox->currentText() );
+    ui->appIPEdit->setText( urlToSet.host() );
+    ui->appPortSpinBox->setValue( urlToSet.port() );
+    //ui->appServerLogin->setText( urlToSet.userName() );
+    //ui->appServerPassword->setText( urlToSet.password() );
 }

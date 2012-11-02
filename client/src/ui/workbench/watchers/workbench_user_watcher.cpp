@@ -2,7 +2,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_managment/resource_pool.h>

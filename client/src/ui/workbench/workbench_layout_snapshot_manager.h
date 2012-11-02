@@ -1,11 +1,14 @@
 #ifndef QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
 #define QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <api/app_server_connection.h>
+
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
-#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotStorage;

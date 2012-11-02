@@ -111,6 +111,9 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
    
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
+	if (chunk.timeZone != -1)
+		fileDate = fileDate.toUTC().addSecs(chunk.timeZone*60);
+
     int currentParts[4];
     currentParts[0] = fileDate.date().year();
     currentParts[1] = fileDate.date().month();
