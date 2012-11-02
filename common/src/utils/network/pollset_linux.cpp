@@ -15,6 +15,8 @@
 #include "socket.h"
 
 
+using namespace std;
+
 //////////////////////////////////////////////////////////
 // PollSetImpl
 //////////////////////////////////////////////////////////
@@ -69,10 +71,11 @@ public:
     {
     }
 
-    ConstIteratorImpl& operator=( const ConstIteratorImpl& right )
+    const ConstIteratorImpl& operator=( const ConstIteratorImpl& right )
     {
         currentIndex = right.currentIndex;
         pollSetImpl = right.pollSetImpl;
+		return *this;
     }
 };
 
@@ -274,8 +277,8 @@ int PollSet::poll( int millisToWait )
 PollSet::const_iterator PollSet::begin() const
 {
     const_iterator _begin;
-    _begin->m_impl->currentIndex = 0;
-    _begin->m_impl->pollSetImpl = m_impl;
+    _begin.m_impl->currentIndex = 0;
+    _begin.m_impl->pollSetImpl = m_impl;
     return _begin;
 }
 
@@ -283,8 +286,8 @@ PollSet::const_iterator PollSet::begin() const
 PollSet::const_iterator PollSet::end() const
 {
     const_iterator _end;
-    _end->m_impl->currentIndex = m_impl->signalledSockCount;
-    _end->m_impl->pollSetImpl = m_impl;
+    _end.m_impl->currentIndex = m_impl->signalledSockCount;
+    _end.m_impl->pollSetImpl = m_impl;
     return _end;
 }
 

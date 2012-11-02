@@ -5,6 +5,8 @@
 
 #include "networkoptixmodulerevealer.h"
 
+#include <memory>
+
 #include "socket.h"
 #include "../common/log.h"
 #include "../common/systemerror.h"

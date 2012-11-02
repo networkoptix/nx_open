@@ -5,6 +5,8 @@
 
 #include "networkoptixmodulefinder.h"
 
+#include <memory>
+
 #include <QNetworkInterface>
 #include <QScopedArrayPointer>
 
@@ -12,6 +14,9 @@
 #include "../common/log.h"
 #include "../common/systemerror.h"
 
+
+const unsigned int NetworkOptixModuleFinder::defaultPingTimeoutMillis;
+const unsigned int NetworkOptixModuleFinder::defaultKeepAliveMultiply;
 
 //!Creates socket and binds it to random unused udp port
 /*!
