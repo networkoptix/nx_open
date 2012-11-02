@@ -298,6 +298,20 @@
             </property>
            </widget>
           </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>Use Server Time on Timeline:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QCheckBox" name="serverTimeCheckBox">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

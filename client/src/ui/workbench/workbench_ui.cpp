@@ -111,7 +111,6 @@ namespace {
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
         if (action)
@@ -1387,7 +1386,7 @@ bool QnWorkbenchUi::isSliderOpened() const {
 }
 
 bool QnWorkbenchUi::isTitleOpened() const {
-    return m_titleUsed && action(Qn::ToggleTitleBarAction)->isChecked();
+    return action(Qn::ToggleTitleBarAction)->isChecked();
 }
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
@@ -1632,7 +1631,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::ZoomedRole) {
         if(newWidget) {
             m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(NoPanel);
+            setOpenedPanels(openedPanels() & SliderPanel); /* Leave slider open. */
         } else {
             /* User may have opened some panels while zoomed, 
              * we want to leave them opened even if they were closed before. */

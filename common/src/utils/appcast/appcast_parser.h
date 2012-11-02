@@ -9,7 +9,7 @@ public:
     void parse(const QByteArray& data);
 
     QnUpdateInfoItemList items() const;
-    QnUpdateInfoItemList newItems(const QnVersion &) const;
+    QnUpdateInfoItemList newItems(const QnVersion &engineVersion) const;
 
 private:
     QString m_platform;
