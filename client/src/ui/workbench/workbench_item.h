@@ -6,7 +6,7 @@
 #include <QtCore/QUuid>
 #include <QtCore/QScopedPointer>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
 
 class QnWorkbenchLayout;
 class QnLayoutItemData;

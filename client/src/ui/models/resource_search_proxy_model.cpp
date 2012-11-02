@@ -5,7 +5,7 @@
 #include <core/resource_managment/resource_criterion.h>
 #include <core/resource/resource.h>
 
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),

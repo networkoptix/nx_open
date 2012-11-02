@@ -4,7 +4,7 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/layout_resource.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include <ui/workbench/workbench_context.h>
 

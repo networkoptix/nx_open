@@ -377,7 +377,7 @@
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
-        <CustomAction Id="SetServerDirectoryToDefault" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
+        <CustomAction Id="SetServerDirectoryToDefault" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]${product.name}" />
         <CustomAction Id="SetServerDirectoryToRegistry" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
         
         <CustomAction Id="SetServerDirectoryLocal" Property="SERVER_DIRECTORY_DIR" Value="[SERVER_DIRECTORY]" />
@@ -462,8 +462,8 @@
             <?define UseColdstore="$(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE" ?>
             
             <Custom Action="AnalyzeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
-            <Custom Action="SetServerDirectoryToRegistry" Before="CostInitialize">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
-            <Custom Action="FixServerFolder" After="SetServerDirectoryToRegistry">IS_SERVER_DIRECTORY_REG</Custom>
+            <Custom Action="SetServerDirectoryToRegistry" Before="FixServerFolder">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
+            <Custom Action="FixServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
             <Custom Action="SetServerDirectoryToDefault" After="CostInitialize">SERVER_DIRECTORY="" OR ( NOT $(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE )</Custom>
             <Custom Action="SetServerDirectoryLocal" After="SetServerDirectoryToDefault">NOT $(var.UseColdstore)</Custom>
             <Custom Action="SetServerDirectoryColdstore" After="SetServerDirectoryToDefault">$(var.UseColdstore)</Custom>
@@ -972,8 +972,8 @@
             
             <Binary Id="Warning" SourceFile="Binary\Exclam.ico" />
             
-            <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
-            <Publish Dialog="ExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchClient">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
+            <Publish Dialog="MyExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+            <Publish Dialog="MyExitDialog" Control="Finish" Order="1" Event="DoAction" Value="LaunchClient">WIXUI_EXITDIALOGOPTIONALCHECKBOX</Publish>
             
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">NOT PREVIOUSVERSIONSINSTALLED</Publish>          
             <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="UpgradeDlg">PREVIOUSVERSIONSINSTALLED</Publish>
@@ -1066,8 +1066,8 @@
             
             <!-- Reset values in case when user returns to this dialog after AppServerDlg -->
 
-            <?define AppServerInstallingMediaServer="($(var.VmsChanging) AND !AppServerFeature=3 AND &ServerFeature=3)"?>
-            <?define AppServerInstallingClient="($(var.VmsChanging) AND !AppServerFeature=3 AND &ClientFeature=3)"?>
+            <?define AppServerInstallingMediaServer="($(var.VmsChanging) AND !AppServerFeature=3 AND $(var.Inst_S1))"?>
+            <?define AppServerInstallingClient="($(var.VmsChanging) AND !AppServerFeature=3 AND $(var.Inst_C1))"?>
             
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4"><![CDATA[ $(var.AppServerInstallingMediaServer) ]]></Publish>
@@ -1086,8 +1086,8 @@
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
             <Publish Dialog="MyFeaturesDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="{}" Order="4"><![CDATA[ NOT $(var.AppServerInstallingClient) ]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ &ClientFeature <> 3 ]]></Publish>
-            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ &ClientFeature = 3 ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="{}"><![CDATA[ $(var.Inst_C0) ]]></Publish>
+            <Publish Dialog="MyFeaturesDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)"><![CDATA[ $(var.Inst_C1) ]]></Publish>
             
             <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
             <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>

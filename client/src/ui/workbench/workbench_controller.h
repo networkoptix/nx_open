@@ -1,12 +1,16 @@
 #ifndef QN_WORKBENCH_CONTROLLER_H
 #define QN_WORKBENCH_CONTROLLER_H
 
-#include <QObject>
-#include <QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/common/geometry.h>
 #include <ui/actions/actions.h>
-#include <core/resource/resource_fwd.h>
-#include "workbench_globals.h"
+
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;

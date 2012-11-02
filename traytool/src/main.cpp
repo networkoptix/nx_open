@@ -1,12 +1,36 @@
+
 #include "version.h"
 
 #include <QtSingleApplication>
 #include <QtGui>
+#include <QMetaType>
 
+#include <utils/network/networkoptixmodulefinder.h>
+
+#include "foundenterprisecontrollersmodel.h"
 #include "systraywindow.h"
+
 
 int main(int argc, char *argv[])
 {
+    qRegisterMetaType<TypeSpecificParamMap>( "TypeSpecificParamMap" );
+
+    //RevealResponse response;
+    //const char* str = 
+    //    "{\n"
+    //        "'version' : 1.3.1,\n"
+    //        "'port' : 7001,\n"
+    //        "'application' : \"enterprise ctrl\",\n"
+    //        "'customization' : DW\n"
+    //    "}";
+    //const quint8* bufStart = (const quint8*)str;
+    //const quint8* bufEnd = (const quint8*)str + strlen(str);
+    //if( !response.deserialize( &bufStart, bufEnd ) )
+    //    int x = 0;
+    //return 0;
+
+
+
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         QMessageBox::critical(
             NULL, 
@@ -49,7 +73,11 @@ int main(int argc, char *argv[])
         }
     }
 
-    QnSystrayWindow window;
+    NetworkOptixModuleFinder nxModuleFinder;
+    FoundEnterpriseControllersModel foundEnterpriseControllersModel( &nxModuleFinder );
+    nxModuleFinder.start();
+
+    QnSystrayWindow window( &foundEnterpriseControllersModel );
 
     QObject::connect(&app, SIGNAL(messageReceived(const QString&)),
         &window, SLOT(handleMessage(const QString&)));

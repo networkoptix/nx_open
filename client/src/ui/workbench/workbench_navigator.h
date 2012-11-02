@@ -6,12 +6,13 @@
 
 #include <utils/common/long_runnable.h>
 #include <core/resource/resource_fwd.h>
+#include <recording/time_period.h>
 
 #include <ui/actions/action_target_provider.h>
 
-#include "recording/time_period.h"
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
-#include "workbench_globals.h"
 
 class QAction;
 
