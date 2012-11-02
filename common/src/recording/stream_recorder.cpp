@@ -364,7 +364,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
-    m_currentTimeZone = currentTimeZone();
+    m_currentTimeZone = currentTimeZone()/60;
     QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
     m_fileName = fillFileName(m_mediaProvider);
     if (m_fileName.isEmpty()) 
