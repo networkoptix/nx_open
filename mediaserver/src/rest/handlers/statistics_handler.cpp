@@ -3,8 +3,8 @@
 #include <QtCore/QFileInfo>
 
 #include "utils/common/util.h"
-#include "utils/monitoring/global_monitor.h"
 #include "utils/network/tcp_connection_priv.h"
+#include "platform/monitoring/global_monitor.h"
 
 #include "core/resource_managment/resource_pool.h"
 
@@ -17,11 +17,9 @@ QnStatisticsHandler::QnStatisticsHandler() {
     m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(), this);
 }
 
-QnStatisticsHandler::~QnStatisticsHandler() 
-{
-
+QnStatisticsHandler::~QnStatisticsHandler() {
+    return;
 }
-
 
 int QnStatisticsHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& resultByteArray, QByteArray& contentType)
 {
