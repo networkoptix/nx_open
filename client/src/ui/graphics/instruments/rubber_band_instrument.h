@@ -15,6 +15,7 @@ class RubberBandInstrument: public DragProcessingInstrument {
     Q_OBJECT;
 
     typedef DragProcessingInstrument base_type;
+
 public:
     RubberBandInstrument(QObject *parent);
     virtual ~RubberBandInstrument();
@@ -37,6 +38,7 @@ protected:
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool paintEvent(QWidget *viewport, QPaintEvent *event) override;
+    virtual bool focusOutEvent(QGraphicsView *view, QFocusEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;

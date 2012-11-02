@@ -12,6 +12,9 @@
 
 #include <ui/workbench/workbench_state.h>
 
+#include <client/client_globals.h>
+
+
 class QSettings;
 
 // TODO: #gdm move these two classes into separate file.
@@ -68,7 +71,7 @@ public:
      * Finds the first occurrence of a connection with the url provided
      * and places it in the head of the list.
      * \param url - url of the connection (password is not used)
-     * \returns true if the reorder was successfull.
+     * \returns true if the reorder was successful.
      */
     bool reorderByUrl(const QUrl &url);
 
@@ -123,6 +126,8 @@ public:
         TOUR_CYCLE_TIME,
         IP_SHOWN_IN_TREE,
 
+        TIME_MODE,
+
         VARIABLE_COUNT
     };
     
@@ -164,6 +169,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QUrl,                    updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QUrl())
         QN_DECLARE_RW_PROPERTY(int,                     tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
+        QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
     QN_END_PROPERTY_STORAGE()
 
 private:

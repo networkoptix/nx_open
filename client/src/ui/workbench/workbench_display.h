@@ -10,7 +10,8 @@
 #include <ui/common/geometry.h>
 #include <ui/common/scene_transformations.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;

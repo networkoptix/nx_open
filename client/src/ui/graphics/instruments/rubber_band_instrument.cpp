@@ -24,9 +24,7 @@ namespace {
 /**
  * Item that implements a rubber band. The downside of implementing rubber band
  * as an item is that <tt>QGraphicsView</tt>'s foreground will be drawn atop of it.
- * 
- * Unfortunately, it is impossible to hook into QGraphicsView's rendering
- * pipeline except by subclassing it, so this is probably the best non-intrusive solution.
+ * The upside is that some items can be drawn atop the rubber band.
  */
 class RubberBandItem: public QGraphicsObject {
 public:
@@ -183,7 +181,13 @@ private:
 };
 
 RubberBandInstrument::RubberBandInstrument(QObject *parent):
-    base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), parent),
+    base_type(
+        makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, QEvent::Paint), 
+        makeSet(QEvent::FocusOut), 
+        makeSet(), 
+        makeSet(), 
+        parent
+    ),
     m_rubberBandZValue(std::numeric_limits<qreal>::max())
 {}
 
@@ -253,6 +257,12 @@ bool RubberBandInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     dragProcessor()->mousePressEvent(viewport, event);
         
     event->accept();
+    return false;
+}
+
+bool RubberBandInstrument::focusOutEvent(QGraphicsView *, QFocusEvent *) {
+    reset();
+
     return false;
 }
 

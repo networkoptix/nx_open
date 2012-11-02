@@ -712,6 +712,13 @@ begin_label:
     //    qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << "flags=" << m_currentData->flags;
 
 
+    // Do not display archive in a future
+    if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+    {
+        m_outOfPlaybackMask = true;
+        return createEmptyPacket(reverseMode); // EOF reached
+    }
+
     // ensure Pos At playback mask
     if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)

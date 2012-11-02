@@ -9,7 +9,8 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;

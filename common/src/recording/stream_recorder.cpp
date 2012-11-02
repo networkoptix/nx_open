@@ -44,7 +44,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_isAudioPresent(false),
     m_audioTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
-    m_role(Role_ServerRecording)
+    m_role(Role_ServerRecording),
+    m_currentTimeZone(-1)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -363,6 +364,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         return false;
     }
 
+    m_currentTimeZone = currentTimeZone()/60;
     QString fileExt = QString(QLatin1String(outputCtx->extensions)).split(QLatin1Char(','))[0];
     m_fileName = fillFileName(m_mediaProvider);
     if (m_fileName.isEmpty()) 
@@ -386,7 +388,6 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
     QnMediaResourcePtr mediaDev = qSharedPointerDynamicCast<QnMediaResource>(m_device);
     const QnResourceVideoLayout* layout = mediaDev->getVideoLayout(m_mediaProvider);
     QString layoutStr = QnArchiveStreamReader::serializeLayout(layout);
-
     {
         QMutexLocker mutex(&global_ffmpeg_mutex);
         
@@ -515,7 +516,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             return false;
         }
     }
-    fileStarted(m_startDateTime/1000, m_fileName, m_mediaProvider);
+    fileStarted(m_startDateTime/1000, m_currentTimeZone, m_fileName, m_mediaProvider);
 
     return true;
 }

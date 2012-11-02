@@ -8,6 +8,7 @@ namespace {
     static const QString TAG_ENCLOSURE(QLatin1String("enclosure"));
     static const QString TAG_PLATFORM(QLatin1String("sparkle:os"));
     static const QString TAG_VERSION(QLatin1String("sparkle:version"));
+    static const QString TAG_ENGINEVERSION(QLatin1String("sparkle:engineVersion"));
     static const QString TAG_URL(QLatin1String("url"));
     static const QString TAG_TITLE(QLatin1String("title"));
     static const QString TAG_DESCRIPTION(QLatin1String("description"));
@@ -22,11 +23,11 @@ QnUpdateInfoItemList QnAppCastParser::items() const {
     return m_items;
 }
 
-QnUpdateInfoItemList QnAppCastParser::newItems(const QnVersion& version) const {
+QnUpdateInfoItemList QnAppCastParser::newItems(const QnVersion& engineVersion) const {
     QnUpdateInfoItemList filtered;
 
     foreach(const QnUpdateInfoItem &item, m_items)
-        if (version < item.productVersion)
+        if (engineVersion < item.engineVersion)
             filtered.append(item);
 
     return filtered;
@@ -53,6 +54,7 @@ void QnAppCastParser::parse(const QByteArray& data) {
                 if (m_platform.isEmpty() || m_platform == attributes.value(TAG_PLATFORM).toString()) {
                     currentItem.url = QUrl(attributes.value(TAG_URL).toString());
                     currentItem.productVersion = attributes.value(TAG_VERSION).toString();
+                    currentItem.engineVersion = attributes.value(TAG_ENGINEVERSION).toString();
                 }
             }
 

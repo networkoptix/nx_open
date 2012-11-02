@@ -186,12 +186,12 @@ void QnRtspConnectionProcessor::parseRequest()
         d->socket->setReadTimeOut(d->sessionTimeOut * 1500);
     }
 
-    QString pos = url.queryItemValue("pos");
+    QString pos = url.queryItemValue("pos").split('/')[0];
     if (pos.isEmpty())
         processRangeHeader();
     else
         d->startTime = pos.toLongLong();
-    QByteArray resolutionStr = url.queryItemValue("resolution").toUtf8();
+    QByteArray resolutionStr = url.queryItemValue("resolution").split('/')[0].toUtf8();
     if (!resolutionStr.isEmpty())
     {
         QSize videoSize(640,480);
