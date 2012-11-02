@@ -94,7 +94,7 @@ protected:
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider, qint64 fileSize) {
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
-    virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
+    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
         Q_UNUSED(startTimeMs) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
@@ -116,6 +116,7 @@ protected:
     qint64 m_startDateTime;
     bool m_stopOnWriteError;
     QnStorageResourcePtr m_storage;
+    int m_currentTimeZone;
 private:
     bool m_waitEOF;
 

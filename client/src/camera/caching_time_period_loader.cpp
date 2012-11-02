@@ -4,7 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include "time_period_loader.h"
 #include "multi_camera_time_period_loader.h"

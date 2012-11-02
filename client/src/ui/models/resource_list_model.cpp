@@ -4,7 +4,7 @@
 #include <core/resource/resource.h>
 
 #include <ui/style/resource_icon_cache.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 QnResourceListModel::QnResourceListModel(QObject *parent): 
     QAbstractListModel(parent),

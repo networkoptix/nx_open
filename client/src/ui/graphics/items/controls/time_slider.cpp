@@ -24,7 +24,6 @@
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
@@ -305,7 +304,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_thumbnailsVisible(false),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance())
+    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_localOffset(0)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -340,7 +340,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Set default property values. */
     setAcceptHoverEvents(true);
     setProperty(Qn::SliderLength, 0);
-    setProperty(Qn::NoHandScrollOver, true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     setWindowStart(minimum());
@@ -900,6 +899,14 @@ void QnTimeSlider::setIndicators(const QVector<qint64> &indicators) {
     m_indicators = indicators;
 }
 
+qint64 QnTimeSlider::localOffset() const {
+    return m_localOffset;
+}
+
+void QnTimeSlider::setLocalOffset(qint64 localOffset) {
+    m_localOffset = localOffset;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -918,7 +925,7 @@ void QnTimeSlider::updateToolTipText() {
 
     QString toolTip;
     if(m_options & UseUTC) {
-        toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
+        toolTip = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset).toString(m_toolTipFormat);
     } else {
         toolTip = msecsToTime(pos).toString(m_toolTipFormat);
     }
@@ -1515,7 +1522,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos + m_localOffset, m_stepData[index].currentTextHeight, m_steps[index]);
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1571,7 +1578,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
         painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0 + m_localOffset, textHeight, highlightStep);
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())

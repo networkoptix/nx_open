@@ -59,7 +59,7 @@ public:
     }
 
     QnScheduleTask(QnId id, QnId resourceId, int dayOfWeek, int startTime, int endTime,
-                   RecordingType recordType, int beforeThreshold, int afterThreshold,
+                   RecordingType recordType =  RecordingType_Never, int beforeThreshold = 0, int afterThreshold = 0,
                    QnStreamQuality streamQuality = QnQualityHighest, int fps = 10, bool doRecordAudio = false)
         : m_id(id), m_resourceId(resourceId),
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
@@ -74,15 +74,16 @@ public:
     QnId getResourceId() const { return m_resourceId; }
     int getDayOfWeek() const { return m_data.m_dayOfWeek; }
     int getStartTime() const { return m_data.m_startTime; }
-    
-    int getEndTime() const     { return m_data.m_endTime;  }
+    int getHour() const;
+    int getMinute() const;
+    int getSecond() const;
+    int getEndTime() const { return m_data.m_endTime; }
     void setEndTime(int value) { m_data.m_endTime = value; }
 
     RecordingType getRecordingType() const { return m_data.m_recordType; }
     int getBeforeThreshold() const { return m_data.m_beforeThreshold; }
     int getAfterThreshold() const { return m_data.m_afterThreshold; }
-    
-    QnStreamQuality getStreamQuality() const     { return m_data.m_streamQuality; }
+    QnStreamQuality getStreamQuality() const { return m_data.m_streamQuality; }
     void setStreamQuality(QnStreamQuality value) { m_data.m_streamQuality = value; }
     
     int getFps() const { return m_data.m_fps; }

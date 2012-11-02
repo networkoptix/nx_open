@@ -7,6 +7,8 @@
 #  include <iphlpapi.h>
 #endif
 
+#include "../common/systemerror.h"
+
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
@@ -240,7 +242,8 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        m_lastError = tr("Set of local address and port failed (bind()).");
+        SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(errorCode));
         return false;
     }
 
@@ -573,12 +576,13 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
+    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP),
+      m_destAddr( NULL )
 {
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
         qnWarning("Can't create socket: %1.", m_lastError);
-        return;
+        throw SocketException( QString::fromAscii("Failed to bind socket to address %1:%2. %3").arg(localAddress).arg(localPort).arg(m_lastError) );
     }
 
     setBroadcast();

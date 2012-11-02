@@ -9,7 +9,8 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/animation/animation_timer_listener.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;
@@ -96,17 +97,17 @@ public:
 
     bool isFpsVisible() const;
 
-    bool isTreeOpened() const {
-        return m_treeOpened;
-    }
+    /** Whether the tree is opened */
+    bool isTreeOpened() const;
 
-    bool isSliderOpened() const {
-        return m_sliderOpened;
-    }
+    /** Whether the tree is pinned */
+    bool isTreePinned() const;
 
-    bool isTitleOpened() const {
-        return m_titleUsed && m_titleOpened;
-    }
+    /** Whether navigation slider is opened. */
+    bool isSliderOpened() const;
+
+    /** Whether title bar is opened. */
+    bool isTitleOpened() const;
 
     bool isHelpOpened() const {
         return m_helpOpened;
@@ -235,7 +236,6 @@ private slots:
 
     void at_sliderItem_geometryChanged();
     void at_sliderResizerItem_geometryChanged();
-    void at_sliderShowButton_toggled(bool checked);
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
     void at_toggleSliderAction_toggled(bool checked);
@@ -245,13 +245,12 @@ private slots:
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
-    void at_treePinButton_toggled(bool checked);
     void at_toggleTreeAction_toggled(bool checked);
+    void at_pinTreeAction_toggled(bool checked);
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
     void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
-    void at_titleShowButton_toggled(bool checked);
     void at_toggleTitleBarAction_toggled(bool checked);
 
     void at_helpPinButton_toggled(bool checked);
@@ -301,23 +300,11 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
-    /** Whether the tree is pinned. */
-    bool m_treePinned;
-
-    /** Whether the tree is opened. */
-    bool m_treeOpened;
-
     bool m_treeVisible;
 
     bool m_titleUsed;
 
-    /** Whether title bar is opened. */
-    bool m_titleOpened;
-
     bool m_titleVisible;
-
-    /** Whether navigation slider is opened. */
-    bool m_sliderOpened;
 
     bool m_sliderVisible;
 

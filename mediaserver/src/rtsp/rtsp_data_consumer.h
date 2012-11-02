@@ -89,6 +89,7 @@ private:
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
     QMutex m_mutex;
+    QMutex m_qualityChangeMutex;
     int m_waitSCeq;
     bool m_liveMode;
     bool m_pauseNetwork;

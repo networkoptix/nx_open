@@ -83,11 +83,11 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
             {
                 if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
                 {
-                    if (consumer->m_liveQuality == MEDIA_Quality_Low)
+                    if (consumer->m_liveQuality == MEDIA_Quality_Low && consumer->m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
                     {
                         consumer->resetQualityStatistics();
-                        if (m_liveQuality == MEDIA_Quality_Low)
-                            break; // try only one camera is current quality is low
+                        //if (m_liveQuality == MEDIA_Quality_Low)
+                        break; // try only one camera is current quality is low
                     }
                 }
             }
@@ -242,11 +242,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (isLive)
     {
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
-        if (isSecondaryProvider)
-            media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
-
-
+        QMutexLocker lock(&m_qualityChangeMutex);
         if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None && m_liveQuality != MEDIA_Quality_AlwaysHigh)
         {
             //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
@@ -262,6 +258,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     {
         m_dataQueue.lock();
         QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();
+        QMutexLocker lock(&m_qualityChangeMutex);
         if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh)
         {
             qint64 skipTime = m_dataQueue.front()->timestamp;
@@ -350,6 +347,7 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
+    QMutexLocker lock(&m_qualityChangeMutex);
     m_newLiveQuality = liveQuality;
 }
 
@@ -522,27 +520,32 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
 
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
-        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
-            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-            else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_AlwaysHigh) && !isSecondaryProvider) {
-                setLiveQualityInternal(m_newLiveQuality);
-                m_newLiveQuality = MEDIA_Quality_None;
+            QMutexLocker lock(&m_qualityChangeMutex);
+            if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+            {
+                if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                    setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
+                    m_newLiveQuality = MEDIA_Quality_None;
+                }
+                else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_AlwaysHigh) && !isSecondaryProvider) {
+                    setLiveQualityInternal(m_newLiveQuality);
+                    m_newLiveQuality = MEDIA_Quality_None;
+                }
             }
         }
-
-        if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
-            return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
-            return true; // data for other live quality stream
+        if (isLive) {
+            if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
+                return true; // data for other live quality stream
+            else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
+                return true; // data for other live quality stream
+        }
     }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
@@ -570,7 +573,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_lastMediaTime = media->timestamp;
     }
 
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (m_realtimeMode && !isLive)
         doRealtimeDelay(media);
 

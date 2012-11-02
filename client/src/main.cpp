@@ -81,7 +81,7 @@
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client_module.h"
+#include "client/client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -144,11 +144,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
-
+ 
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
+    testCamera->setMAC(QnMacAddress("00000"));    
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -190,7 +190,7 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // TODO: #Ivan. Enable it when removing all places on receiving messages.
     // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
@@ -212,10 +212,18 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#include <utils/network/networkoptixmodulefinder.h>
+
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
+    NetworkOptixModuleFinder networkOptixModuleFinder;
+    networkOptixModuleFinder.start();
+    //::Sleep( 2000 );
+    ////enterpriseControllerSearcher->pleaseStop();
+    //delete enterpriseControllerSearcher;
+
     QnClientModule client(argc, argv);
 
     QTextStream out(stdout);
@@ -229,6 +237,9 @@ int qnMain(int argc, char *argv[])
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+
+    /* We don't want changes in desktop color settings to mess up our custom style. */
+    QApplication::setDesktopSettingsAware(false);
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);

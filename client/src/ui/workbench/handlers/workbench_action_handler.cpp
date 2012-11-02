@@ -1390,11 +1390,14 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
             if(step < dayMSecs) {
                 QTime base;
 
-                int startMSecs = qFloor(timeToMSecs(startDateTime.time()), step);
-                int endMSecs = qCeil(timeToMSecs(endDateTime.time()), step);
+                int startMSecs = qFloor(QDateTime(startDateTime.date()).msecsTo(startDateTime), step);
+                int endMSecs = qCeil(QDateTime(endDateTime.date()).msecsTo(endDateTime), step);
 
-                startDateTime = QDateTime(startDateTime.date(), QTime(), startDateTime.timeSpec()).addMSecs(startMSecs);
-                endDateTime = QDateTime(endDateTime.date(), QTime(), endDateTime.timeSpec()).addMSecs(endMSecs);
+                startDateTime.setTime(QTime());
+                startDateTime = startDateTime.addMSecs(startMSecs);
+
+                endDateTime.setTime(QTime());
+                endDateTime = endDateTime.addMSecs(endMSecs);
             } else {
                 int stepDays = step / dayMSecs;
 
@@ -2028,6 +2031,19 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
     }
 }
 
+void QnWorkbenchActionHandler::removeLayoutFromPool(QnLayoutResourcePtr existingLayout)
+{
+    QnLayoutItemDataMap items = existingLayout->getItems();
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        QnLayoutItemData& item = itr.value();
+        QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+        if (layoutRes)
+            qnResPool->removeResource(layoutRes);
+    }
+    qnResPool->removeResource(existingLayout);
+}
+
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
     if (!validateItemTypes(layout))
@@ -2113,18 +2129,8 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
         existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-    if (existingLayout) {
-        QnLayoutItemDataMap items = existingLayout->getItems();
-        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-        {
-            QnLayoutItemData& item = itr.value();
-            QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
-            if (layoutRes)
-                qnResPool->removeResource(layoutRes);
-        }
-        qnResPool->removeResource(existingLayout);
-    }
-
+    if (existingLayout) 
+        removeLayoutFromPool(existingLayout);
 
     saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, exportReadOnly);
 
@@ -2534,6 +2540,12 @@ Do you want to continue?"),
 
     if (selectedExtension.toLower() == QLatin1String(".exe")) 
     {
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
+        if (!existingLayout)
+            existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            removeLayoutFromPool(existingLayout);
+
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
         QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
@@ -2740,7 +2752,7 @@ void QnWorkbenchActionHandler::at_updateWatcher_availableUpdateChanged() {
     QMessageBox::information(
         widget(), 
         tr("Software Update is Available"), 
-        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.version.toString()).arg(update.url.toString())
+        tr("Version %1 is available for download at <a href=\"%2\">%2</a>.").arg(update.productVersion.toString()).arg(update.url.toString())
     );
 }
 

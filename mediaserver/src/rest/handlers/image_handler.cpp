@@ -105,7 +105,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
     }
 
     bool useHQ = true;
-    if (dstSize.width() > 0 && dstSize.width() <= 320 || dstSize.height() > 0 && dstSize.height() <= 240)
+    if (dstSize.width() > 0 && dstSize.width() <= 480 || dstSize.height() > 0 && dstSize.height() <= 316)
         useHQ = false;
 
     QnServerArchiveDelegate serverDelegate;

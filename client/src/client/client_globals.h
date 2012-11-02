@@ -1,5 +1,5 @@
-#ifndef QN_WORKBENCH_GLOBALS_H
-#define QN_WORKBENCH_GLOBALS_H
+#ifndef QN_CLIENT_GLOBALS_H
+#define QN_CLIENT_GLOBALS_H
 
 #include <QtCore/QMetaType>
 
@@ -67,7 +67,7 @@ namespace Qn {
     /**
      * Role of an item on the scene. 
      * 
-     * Note that at any time there may exist no more than a single item for each role.
+     * Note that at any time there may exist no more than one item for each role.
      */
     enum ItemRole {
         SingleSelectedRole, /**< Item is the only selected item on a workbench. */
@@ -210,6 +210,14 @@ namespace Qn {
     Q_DECLARE_FLAGS(Permissions, Permission)
 
 
+    /**
+     * Time display mode. 
+     */
+    enum TimeMode {
+        ServerTimeMode, 
+        ClientTimeMode  
+    };
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
@@ -220,5 +228,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
 Q_DECLARE_METATYPE(Qn::ItemRole);
+Q_DECLARE_METATYPE(Qn::TimeMode);
 
-#endif // QN_WORKBENCH_GLOBALS_H
+#endif // QN_CLIENT_GLOBALS_H

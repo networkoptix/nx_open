@@ -40,5 +40,6 @@
 #define VER_CUSTOMIZEDFILENAME_STR  "${product.name}.exe" // TODO: move up
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
+#define VER_COMPANYSUPPORT_STR      "${company.support.address}"
 
 #endif // ${artifactId}_VERSION_H

@@ -51,4 +51,6 @@ message Camera {
     optional bool         audioEnabled     = 8;
     optional string       physicalId       = 9;
     optional bool         manuallyAdded    = 10;
+    optional string       model            = 11;
+    optional string       firmware         = 12;
 }

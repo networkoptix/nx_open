@@ -6,7 +6,7 @@
 QnUpdateChecker::QnUpdateChecker(const QUrl& url, const QString& platform, const QString& version, QObject *parent)
     : QObject(parent),
       m_url(url),
-      m_version(version) 
+      m_engineVersion(version) 
 {
     m_parser.setPlatform(platform);
     connect(&m_accessManager, SIGNAL(finished(QNetworkReply *)), this, SLOT(finished(QNetworkReply *)));    
@@ -23,7 +23,7 @@ void QnUpdateChecker::finished(QNetworkReply *reply) {
 
     m_parser.parse(reply->readAll());
 
-    QnUpdateInfoItemList items = m_parser.newItems(m_version);
+    QnUpdateInfoItemList items = m_parser.newItems(m_engineVersion);
     if (!items.isEmpty())
         emit updatesAvailable(items);
 }

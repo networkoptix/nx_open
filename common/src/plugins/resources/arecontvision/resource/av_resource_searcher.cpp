@@ -256,6 +256,7 @@ QnResourcePtr QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url, const 
 
     res->setTypeId(rt);
     res->setName(model);
+    res->setModel(model);
     res->setMAC(mac);
     res->setHostAddress(QHostAddress(host), QnDomainMemory);
     res->setAuth(auth);

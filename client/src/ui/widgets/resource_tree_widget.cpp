@@ -72,7 +72,8 @@ protected:
         QStyleOptionViewItemV4 optionV4 = option;
         initStyleOption(&optionV4, index);
 
-        if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom())
+        if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom()
+                && optionV4.widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
             return;
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
@@ -242,9 +243,11 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent, QnWorkbenchContext *
 
     m_resourceDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourceTreeView->setItemDelegate(m_resourceDelegate);
+    ui->resourceTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
 
     m_searchDelegate = new QnResourceTreeItemDelegate(this);
     ui->searchTreeView->setItemDelegate(m_searchDelegate);
+    ui->searchTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
 
     QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
     ui->resourceTreeView->setStyle(treeStyle);

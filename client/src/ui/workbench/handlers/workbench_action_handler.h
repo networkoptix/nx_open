@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 #include <utils/settings.h>
 
 class QAction;
@@ -316,7 +316,7 @@ private:
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-
+    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 

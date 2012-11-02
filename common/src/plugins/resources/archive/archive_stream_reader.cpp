@@ -59,7 +59,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_speed(1.0),
     m_pausedStart(false),
     m_sendMotion(false),
-    m_jumpInSilenceMode(false)
+    m_jumpInSilenceMode(false),
+    m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -263,9 +264,9 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     if(rez == qint64(AV_NOPTS_VALUE)) 
     {
         if (reverseMode)
-            return m_delegate->endTime();
+            return endTime();
         else
-            return m_delegate->startTime();
+            return startTime();
     }
     return rez;
 }
@@ -384,6 +385,7 @@ begin_label:
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
+        		m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
@@ -397,6 +399,7 @@ begin_label:
     // jump command
     if (jumpTime != qint64(AV_NOPTS_VALUE) && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
+        m_outOfPlaybackMask = false;
         /*
         if (m_newDataMarker) {
             QString s;
@@ -420,9 +423,14 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
+        m_outOfPlaybackMask = false;
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == qint64(AV_NOPTS_VALUE)) 
+        if (currentTimeHint == DATETIME_NOW) {
+            if (reverseMode)
+                displayTime = endTime()-BACKWARD_SEEK_STEP;
+        }
+        else if (currentTimeHint == qint64(AV_NOPTS_VALUE))
         {
             if (jumpTime != qint64(AV_NOPTS_VALUE))
                 displayTime = jumpTime;
@@ -452,6 +460,9 @@ begin_label:
             emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
+
+    if (m_outOfPlaybackMask)
+        return createEmptyPacket(reverseMode); // EOF reached
 
     if (m_afterMotionData)
     {
@@ -701,6 +712,13 @@ begin_label:
     //    qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << "flags=" << m_currentData->flags;
 
 
+    // Do not display archive in a future
+    if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+    {
+        m_outOfPlaybackMask = true;
+        return createEmptyPacket(reverseMode); // EOF reached
+    }
+
     // ensure Pos At playback mask
     if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
@@ -710,7 +728,8 @@ begin_label:
         m_playbackMaskSync.unlock();
 
         if (newTime == DATETIME_NOW || newTime == -1) {
-            internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
+            //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
+            m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
         }
 
@@ -1014,6 +1033,7 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
     QMutexLocker lock(&m_playbackMaskSync);
+    m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackRange(playbackRange);
 }
 
@@ -1025,6 +1045,7 @@ QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
     QMutexLocker lock(&m_playbackMaskSync);
+    m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
@@ -1134,7 +1155,7 @@ qint64 QnArchiveStreamReader::startTime() const
     if (p.isEmpty())
         return m_delegate->startTime();
     else
-		return p.startTimeMs*1000;
+        return p.startTimeMs*1000;
 }
 
 qint64 QnArchiveStreamReader::endTime() const
@@ -1144,5 +1165,5 @@ qint64 QnArchiveStreamReader::endTime() const
     if (p.isEmpty())
         return m_delegate->endTime();
     else
-		return p.endTimeMs()*1000;
+        return p.endTimeMs()*1000;
 }

@@ -1101,6 +1101,11 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Hide Title Bar")).
         condition(new QnToggleTitleBarActionCondition(this));
 
+    factory(Qn::PinTreeAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Pin Tree")).
+        toggledText(tr("Unpin Tree"));
+
     factory(Qn::ToggleTreeAction).
         flags(Qn::Tree | Qn::NoTarget).
         text(tr("Show Tree")).

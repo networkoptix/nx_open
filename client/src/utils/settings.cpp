@@ -8,7 +8,7 @@
 
 #include <ui/style/globals.h>
 
-#include "client_meta_types.h"
+#include <client/client_meta_types.h>
 
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)

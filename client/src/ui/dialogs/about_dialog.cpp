@@ -63,27 +63,29 @@ void QnAboutDialog::retranslateUi()
 
     QString version = 
         tr(
-            "<b>%1</b> version %2 (%3).<br />\n"
-            "Built for %4-%5 with %6."
+            "<b>%1</b> version %2 (%3).<br/>\n"
+            "Engine version %4.<br/>\n"
+            "Built for %5-%6 with %7.<br/>\n"
         ).
         arg(QLatin1String(QN_APPLICATION_NAME)).
         arg(QLatin1String(QN_APPLICATION_VERSION)).
         arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_ENGINE_VERSION)).
         arg(QLatin1String(QN_APPLICATION_PLATFORM)).
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
     QString credits = 
         tr(
-            "<b>%1 %2</b> uses the following external libraries:<br />\n"
+            "<b>%1 %2</b> uses the following external libraries:<br/>\n"
             "<br />\n"
-            "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
-            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br />\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />\n"
-            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br />\n"
-            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br />\n"
-            "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br />\n"
-            "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br />\n"
+            "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
+            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
+            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
+            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
+            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br/>\n"
+            "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
+            "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
         arg(QString::fromLatin1(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
         arg(QString::fromLatin1(QN_APPLICATION_NAME)).
@@ -95,7 +97,7 @@ void QnAboutDialog::retranslateUi()
         arg(versionString(QN_BOOST_VERSION));
 
 #ifndef Q_OS_DARWIN
-    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
+    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
 #endif
 
     int maxTextureSize = 0;
@@ -103,10 +105,10 @@ void QnAboutDialog::retranslateUi()
 
     QString gpu = 
         tr(
-            "<b>OpenGL version</b>: %1.<br />"
+            "<b>OpenGL version</b>: %1.<br/>"
             "<b>OpenGL renderer</b>: %2.<br/>"
-            "<b>OpenGL vendor</b>: %3.<br />"
-            "<b>OpenGL max texture size</b>: %4.<br />"
+            "<b>OpenGL vendor</b>: %3.<br/>"
+            "<b>OpenGL max texture size</b>: %4.<br/>"
         ).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: same shit, OpenGL calls.

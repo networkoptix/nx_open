@@ -1,6 +1,7 @@
 #include "gettime_handler.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 
 QnGetTimeHandler::QnGetTimeHandler()
 {
@@ -9,18 +10,13 @@ QnGetTimeHandler::QnGetTimeHandler()
 
 int QnGetTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
-    QDateTime dt = qnSyncTime->currentDateTime();
-
-    QDateTime dt1 = dt;
-    QDateTime dt2 = dt1.toUTC();
-    dt1.setTimeSpec(Qt::UTC);
-    int offset = dt2.secsTo(dt1);
+    int offset = currentTimeZone();
     QString offsetStr = QString::number(offset);
     if (offset >= 0)
         offsetStr = QLatin1String("+") + offsetStr;
 
-    QString dateStr = dt.toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
-    result.append(QString("<time clock=\"%1\" timezone=\"%2\"/>\n").arg(dateStr).arg(offsetStr).toUtf8());
+    QString dateStr = qnSyncTime->currentDateTime().toUTC().toString("yyyy-MM-ddThh:mm:ss.zzzZ");
+    result.append(QString("<time><clock>%1</clock><utcOffset>%2</utcOffset></time>\n").arg(dateStr).arg(offsetStr).toUtf8());
     return CODE_OK;
 }
 
