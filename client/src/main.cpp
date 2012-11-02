@@ -82,6 +82,7 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
+#include "platform/notification/windows_notifier.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -307,6 +308,9 @@ int qnMain(int argc, char *argv[])
                 return 0;
         }
     }
+
+    QnWindowsNotifier n;
+
 
     /* Initialize connections. */
     initAppServerConnection();

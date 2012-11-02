@@ -1,7 +1,8 @@
 #include "system_menu_event.h"
-#include <QAbstractEventDispatcher>
-#include <QWidget>
-#include <QCoreApplication>
+
+#include <QtCore/QAbstractEventDispatcher>
+#include <QtCore/QCoreApplication>
+#include <QtGui/QWidget>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -26,7 +27,6 @@ namespace {
         if(qn_sysMenu_oldEventFilter) {
             return qn_sysMenu_oldEventFilter(message);
         } else {
-            
             return false;
         }
     }
