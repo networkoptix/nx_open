@@ -536,7 +536,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
     return true;
 }
 
-bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     QMutexLocker lock(&m_mutex);
     int storageIndex;
@@ -550,6 +550,6 @@ bool QnStorageManager::fileStarted(const qint64& startDateMs, const QString& fil
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) (currentTimeZone()/60)));
+    catalog->addRecord(DeviceFileCatalog::Chunk(startDateMs, storageIndex, QFileInfo(fileName).baseName().toInt(), -1, (qint16) timeZone));
     return true;
 }
