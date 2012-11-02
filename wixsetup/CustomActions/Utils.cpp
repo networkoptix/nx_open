@@ -40,7 +40,7 @@ LPCWSTR GetProperty(MSIHANDLE hInstall, LPCWSTR name)
 
 bool IsPortAvailable(int port)
 {
-    int serverfd = socket(AF_INET, SOCK_STREAM, 0);
+    SOCKET serverfd = socket(AF_INET, SOCK_STREAM, 0);
 
     sockaddr_in channel;
     memset(&channel, 0, sizeof(channel));
