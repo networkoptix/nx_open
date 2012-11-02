@@ -15,8 +15,10 @@
 #include "../common/systemerror.h"
 
 
+#ifndef _WIN32
 const unsigned int NetworkOptixModuleFinder::defaultPingTimeoutMillis;
 const unsigned int NetworkOptixModuleFinder::defaultKeepAliveMultiply;
+#endif
 
 //!Creates socket and binds it to random unused udp port
 /*!
