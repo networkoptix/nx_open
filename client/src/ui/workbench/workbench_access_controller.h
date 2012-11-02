@@ -1,11 +1,14 @@
 #ifndef QN_WORKBENCH_ACCESS_CONTROLLER_H
 #define QN_WORKBENCH_ACCESS_CONTROLLER_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
+
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
-#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;

@@ -11,16 +11,7 @@
 #include "core/resource/layout_resource.h"
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
-#include "ui/workbench/workbench_globals.h"
-
-namespace {
-    class QnResourceDirectoryBrowserInstance: public QnResourceDirectoryBrowser {};
-
-   // defined but never used
-   // Q_GLOBAL_STATIC(QnResourceDirectoryBrowserInstance, qnResourceDirectoryBrowserInstance);
-}
-
-
+#include "client/client_globals.h"
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {

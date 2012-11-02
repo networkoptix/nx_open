@@ -4,11 +4,14 @@
 
 #include <camera/thumbnail.h>
 
-#include <ui/workbench/workbench_globals.h>
 #include <ui/workbench/workbench_state.h>
+
+#include "client_globals.h"
 
 namespace {
     volatile bool qn_clientMetaTypes_initialized = false;
+
+    QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode);
 }
 
 void QnClientMetaTypes::initialize() {
@@ -26,6 +29,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchStateHash>();
+    qRegisterMetaType<Qn::TimeMode>();
+    qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
 
     qn_clientMetaTypes_initialized = true;
 }

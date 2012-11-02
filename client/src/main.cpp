@@ -81,7 +81,7 @@
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client_module.h"
+#include "client/client_module.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -190,7 +190,7 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // TODO: #Ivan. Enable it when removing all places on receiving messages.
     // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
