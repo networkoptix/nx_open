@@ -377,7 +377,7 @@
         <CustomAction Id="AssignServerAppServerPort" Property="SERVER_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         <CustomAction Id="AssignClientAppServerPort" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]"/>
         
-        <CustomAction Id="SetServerDirectoryToDefault" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]\${product.name}" />
+        <CustomAction Id="SetServerDirectoryToDefault" Property="SERVER_DIRECTORY" Value="[ROOTDRIVE]${product.name}" />
         <CustomAction Id="SetServerDirectoryToRegistry" Property="SERVER_DIRECTORY" Value="[SERVER_DIRECTORY_REG]" />
         
         <CustomAction Id="SetServerDirectoryLocal" Property="SERVER_DIRECTORY_DIR" Value="[SERVER_DIRECTORY]" />
@@ -462,8 +462,8 @@
             <?define UseColdstore="$(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE" ?>
             
             <Custom Action="AnalyzeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
-            <Custom Action="SetServerDirectoryToRegistry" Before="CostInitialize">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
-            <Custom Action="FixServerFolder" After="SetServerDirectoryToRegistry">IS_SERVER_DIRECTORY_REG</Custom>
+            <Custom Action="SetServerDirectoryToRegistry" Before="FixServerFolder">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
+            <Custom Action="FixServerFolder" Before="CostInitialize">IS_SERVER_DIRECTORY_REG</Custom>
             <Custom Action="SetServerDirectoryToDefault" After="CostInitialize">SERVER_DIRECTORY="" OR ( NOT $(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE )</Custom>
             <Custom Action="SetServerDirectoryLocal" After="SetServerDirectoryToDefault">NOT $(var.UseColdstore)</Custom>
             <Custom Action="SetServerDirectoryColdstore" After="SetServerDirectoryToDefault">$(var.UseColdstore)</Custom>
