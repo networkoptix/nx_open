@@ -35,7 +35,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent):
     ui->manualActivationInfoLabel->setText(tr(
         "Please send E-Mail with the Serial Key and the Hardware ID provided to <a href=\"mailto:%1\">%1</a>. "
         "Then we'll send you an Activation Key which should be filled in the field below."
-    ).arg(QN_LICENSING_MAIL_ADDRESS));
+    ).arg(QLatin1String(QN_LICENSING_MAIL_ADDRESS)));
 
     connect(ui->serialKeyEdit,              SIGNAL(textChanged(QString)),       this,   SLOT(updateControls()));
     connect(ui->activationTypeComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(at_activationTypeComboBox_currentIndexChanged()));
