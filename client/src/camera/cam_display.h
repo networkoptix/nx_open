@@ -13,6 +13,7 @@ class QnAbstractRenderer;
 class QnVideoStreamDisplay;
 class QnAudioStreamDisplay;
 struct QnCompressedVideoData;
+class QnArchiveStreamReader;
 
 /**
   * Stores QnVideoStreamDisplay for each channel/sensor
@@ -62,6 +63,8 @@ public:
     bool isNoData() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
+    QSize getScreenSize() const;
+    QnArchiveStreamReader* getArchiveReader();
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -205,6 +208,7 @@ protected:
 	QTime m_afterJumpTimer;
 	qint64 m_firstAfterJumpTime;
 	qint64 m_receivedInterval;
+    QnArchiveStreamReader* m_archiveReader;
 };
 
 #endif //QN_CAM_DISPLAY_H

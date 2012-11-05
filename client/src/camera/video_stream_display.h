@@ -48,6 +48,7 @@ public:
     void canUseBufferedFrameDisplayer(bool value);
     qint64 nextReverseTime() const;
     QSize getImageSize() const;
+    QSize getScreenSize() const;
 
     /**
       * Return last decoded frame
