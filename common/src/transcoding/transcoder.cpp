@@ -63,7 +63,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     CLVideoDecoderOutput decodedVideoFrame;
     decoder.decode(video, &decodedVideoFrame);
-    if (m_resolution.width() == 0 && m_resolution.height() == 0)
+    if (m_resolution.width() == 0 && m_resolution.height() == 0 || m_resolution.isEmpty())
         m_resolution = QSize(decodedVideoFrame.width, decodedVideoFrame.height);
     else if (m_resolution.width() == 0)
     {
@@ -97,7 +97,7 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-int QnTranscoder::suggestBitrate(QSize resolution) const
+int QnTranscoder::suggestBitrate(QSize resolution)
 {
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps

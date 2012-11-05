@@ -9,6 +9,7 @@
 #include "export/sign_helper.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "transcoding/ffmpeg_audio_transcoder.h"
+#include "transcoding/ffmpeg_video_transcoder.h"
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -43,7 +44,9 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_needReopen(false),
     m_isAudioPresent(false),
     m_audioTranscoder(0),
+    m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
+    m_dstVideoCodec(CODEC_ID_NONE),
     m_role(Role_ServerRecording),
     m_currentTimeZone(-1)
 {
@@ -56,6 +59,7 @@ QnStreamRecorder::~QnStreamRecorder()
     stop();
     close();
     delete m_audioTranscoder;
+    delete m_videoTranscoder;
 }
 
 /* It is impossible to write avi/mkv attribute in the end
@@ -297,6 +301,13 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
             md.clear();
         } while (result);
     }
+    else if (md->dataType == QnAbstractMediaData::VIDEO && m_videoTranscoder)
+    {
+        QnAbstractMediaDataPtr result;
+        m_videoTranscoder->transcodePacket(md, result);
+        if (result && result->data.size() > 0)
+            writeData(result, streamIndex);
+    }
     else {
         writeData(md, streamIndex);
     }
@@ -436,13 +447,25 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                 AVCodecContext* srcContext = mediaData->context->ctx();
                 avcodec_copy_context(videoCodecCtx, srcContext);
             }
+            else if (m_role == Role_FileExportWithTime || m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id)
+            {
+                // transcode video
+                if (m_dstVideoCodec == CODEC_ID_NONE)
+                    m_dstVideoCodec = CODEC_ID_MPEG4; // default value
+                m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
+                m_videoTranscoder->setMTMode(true);
+                m_videoTranscoder->setDrawTime(true);
+                m_videoTranscoder->open(mediaData);
+                avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
+            }
             else if (m_role == Role_FileExport || m_role == Role_FileExportWithEmptyContext)
             {
                 // determine real width and height
                 CLVideoDecoderOutput outFrame;
                 CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
-                if (m_role == Role_FileExport) {
+                if (m_role == Role_FileExport) 
+                {
                     avcodec_copy_context(videoStream->codec, decoder.getContext());
                 }
                 else {
