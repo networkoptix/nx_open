@@ -1604,7 +1604,8 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        widget->setDecorationsVisible(false);
+        if(!(widget->options() & QnResourceWidget::DisplayInfo))
+            widget->setDecorationsVisible(false);
 }
 
 void QnWorkbenchUi::at_activityStarted() {
