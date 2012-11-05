@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 #include <utils/settings.h>
 
 class QAction;

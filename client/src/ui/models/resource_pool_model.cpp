@@ -22,7 +22,7 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 #include "file_processor.h"
 

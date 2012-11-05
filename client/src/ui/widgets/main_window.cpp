@@ -41,7 +41,7 @@
 #include "ui/style/globals.h"
 #include "ui/style/noptix_style.h"
 #include "ui/style/proxy_style.h"
-#include "ui/events/system_menu_event.h"
+#include "ui/workaround/system_menu_event.h"
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"

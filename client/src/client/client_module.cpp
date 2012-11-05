@@ -4,6 +4,8 @@
 
 #include <common/common_module.h>
 
+#include "client_meta_types.h"
+
 QnClientModule::QnClientModule(int &argc, char **argv, QObject *parent): QObject(parent) {
     QN_INIT_MODULE_RESOURCES(client);
 

@@ -79,7 +79,7 @@ Bugs Fixed:
 
 New Cameras and Recorders Supported:
  - D-Link cameras are able to do dual-streaming. This results in software motion detection support and RADASS capabilities on these cameras
- - Camera models that can be addable manually are extended. Now Arecont, D-Link and ISD cameras can be added manually
+ - Camera models that can be added manually are extended. Now Arecont, D-Link and ISD cameras can be added manually
 
 New Features: 
  - Multi-channel export. Now it is possible to export whole videos on layouts in a single file. This file is in proprietary format (*.nov), that can be played back in the client.

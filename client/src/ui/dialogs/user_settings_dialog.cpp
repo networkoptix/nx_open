@@ -14,7 +14,7 @@
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
 

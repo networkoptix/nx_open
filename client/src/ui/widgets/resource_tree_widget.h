@@ -6,7 +6,7 @@
 #include <core/resource/layout_item_index.h>
 #include <ui/actions/action_target_provider.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 class QLineEdit;
 class QTabWidget;

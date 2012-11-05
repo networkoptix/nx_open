@@ -324,7 +324,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
             setTruncateInterval(m_storage->getChunkLen());
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
+        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
     }
     else {
         return m_fixedFileName;
@@ -337,10 +337,10 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
         qnStorageMan->fileFinished(durationMs, fileName, provider, fileSize);
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(startTimeMs, fileName, provider);
+        qnStorageMan->fileStarted(startTimeMs, timeZone, fileName, provider);
     }
 }
 

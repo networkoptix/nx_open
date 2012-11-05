@@ -1,5 +1,7 @@
 #include "workbench_server_time_watcher.h"
 
+#include <utils/common/checked_cast.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
@@ -23,8 +25,20 @@ QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
     disconnect(resourcePool(), NULL, this, NULL);
 }
 
-int QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
-    return m_utcOffsetByResource.value(server, 0);
+qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
+    return m_utcOffsetByResource.value(server, defaultValue);
+}
+
+qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
+    qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
+    if(utcOffset == Qn::InvalidUtcOffset)
+        return defaultValue;
+
+    QDateTime localDateTime = QDateTime::currentDateTime();
+    QDateTime utcDateTime = localDateTime.toUTC();
+    localDateTime.setTimeSpec(Qt::UTC);
+
+    return utcOffset - utcDateTime.msecsTo(localDateTime);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
@@ -32,8 +46,8 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourc
     if(!server)
         return;
 
-    int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
-    m_resourceByHandle[handle] = server;
+    connect(server.data(), SIGNAL(serverIFFound(const QString &)), this, SLOT(at_server_serverIFFound()));
+    at_server_serverIFFound(server);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
@@ -42,6 +56,19 @@ void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved(const QnResou
         return;
 
     m_utcOffsetByResource.remove(server);
+    disconnect(server.data(), NULL, this, NULL);
+}
+
+void QnWorkbenchServerTimeWatcher::at_server_serverIFFound(const QnMediaServerResourcePtr &server) {
+    if(server->getPrimaryIF().isEmpty())
+        return;
+
+    int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
+    m_resourceByHandle[handle] = server;
+}
+
+void QnWorkbenchServerTimeWatcher::at_server_serverIFFound() {
+    at_server_serverIFFound(toSharedPointer(checked_cast<QnMediaServerResource *>(sender())));
 }
 
 void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle) {
@@ -51,6 +78,9 @@ void QnWorkbenchServerTimeWatcher::at_replyReceived(int status, const QDateTime 
     QnMediaServerResourcePtr server = m_resourceByHandle.value(handle);
     m_resourceByHandle.remove(handle);
 
-    m_utcOffsetByResource[server] = utcOffset;
+    if(dateTime.isValid()) {
+        m_utcOffsetByResource[server] = utcOffset * 1000ll; /* Convert seconds to milliseconds. */
+        emit offsetsChanged();
+    }
 }
 

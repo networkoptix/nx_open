@@ -309,6 +309,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     if(!m_camera) {
         ui->nameEdit->setText(QString());
+        ui->modelEdit->setText(QString());
         ui->enableAudioCheckBox->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->ipAddressEdit->setText(QString());
@@ -334,6 +335,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
         ui->nameEdit->setText(m_camera->getName());
+        ui->modelEdit->setText(m_camera->getModel());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());

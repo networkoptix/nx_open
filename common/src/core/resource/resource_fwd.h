@@ -84,4 +84,10 @@ class QnPlIsdResource;
 typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
 
+class QnPlPulseResource;
+typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+
+class QnPlIqResource;
+typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
+
 #endif // QN_RESOURCE_FWD_H

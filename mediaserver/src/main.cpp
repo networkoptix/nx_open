@@ -64,6 +64,7 @@
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/gettime_handler.h"
+#include "platform/platform_abstraction.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -724,7 +725,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
@@ -791,6 +792,8 @@ protected:
     {
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
+
+        new QnPlatformAbstraction(app);
 
         if (guid.isEmpty())
         {

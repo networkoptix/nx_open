@@ -608,6 +608,8 @@ void detail::QnMediaServerGetTimeReplyProcessor::at_replyReceived(int status, co
     if (status == 0) {
         dateTime = QDateTime::fromString(QString::fromLatin1(extractXmlBody(reply, "clock")), Qt::ISODate);
         utcOffset = QString::fromLatin1(extractXmlBody(reply, "utcOffset")).toInt();
+    } else {
+        qnWarning("Could not get time from media server: %1.", errorString);
     }
 
     emit finished(status, dateTime, utcOffset, handle);

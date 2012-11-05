@@ -7,7 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;

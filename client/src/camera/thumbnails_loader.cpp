@@ -10,7 +10,7 @@
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"

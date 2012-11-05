@@ -6,7 +6,7 @@
 #include <QtGui/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 #include "action_fwd.h"
 #include "actions.h"

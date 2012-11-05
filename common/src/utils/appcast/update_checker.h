@@ -12,7 +12,13 @@
 class QnUpdateChecker : public QObject {
     Q_OBJECT
 public:
-    QnUpdateChecker(const QUrl& url, const QString& platform, const QString& version, QObject *parent = NULL);
+    /**
+     * \param url                       Url of the update feed.
+     * \param platform                  Platform to get updates for, e.g. <tt>"windows-x64"</tt>.
+     * \param engineVersion             Current engine version.
+     * \param parent                    Parent object.
+     */
+    QnUpdateChecker(const QUrl& url, const QString& platform, const QString& engineVersion, QObject *parent = NULL);
 
     void checkForUpdates();
 
@@ -27,8 +33,7 @@ private:
     QNetworkAccessManager m_accessManager;
     QNetworkReply *m_reply;
     QUrl m_url;
-
-    QnVersion m_version;
+    QnVersion m_engineVersion;
 };
 
 #endif // UPDATE_CHECKER_H_

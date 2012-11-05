@@ -1,5 +1,5 @@
-#ifndef QN_SYSTEM_MENU_HOTKEY_H
-#define QN_SYSTEM_MENU_HOTKEY_H
+#ifndef QN_SYSTEM_MENU_EVENT_H
+#define QN_SYSTEM_MENU_EVENT_H
 
 #include <QEvent>
 
@@ -22,4 +22,4 @@ public:
     static void initialize();
 };
 
-#endif //QN_SYSTEM_MENU_HOTKEY_H
+#endif // QN_SYSTEM_MENU_EVENT_H

@@ -301,6 +301,8 @@ private:
 class UDPSocket : public CommunicatingSocket {
     Q_DECLARE_TR_FUNCTIONS(UDPSocket)
 public:
+    static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
+
     /**
      *   Construct a UDP socket
      *   @exception SocketException thrown if unable to create UDP socket
@@ -358,7 +360,6 @@ public:
      *   @param sourceAddress address of datagram source
      *   @param sourcePort port of data source
      *   @return number of bytes received and -1 for error
-     *   @exception SocketException thrown if unable to receive datagram
      */
     int recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
                  unsigned short &sourcePort) ;

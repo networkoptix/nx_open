@@ -52,7 +52,7 @@ public:
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x20, // TODO
         ControlPtz                  = 0x40, // TODO
-        DisplayInfo                 = 0x80  /** Whether info widget is to be displayed. */
+        DisplayInfo                 = 0x80  /** Whether info panel is to be displayed. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 

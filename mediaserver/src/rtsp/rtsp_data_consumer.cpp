@@ -574,11 +574,12 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
             }
         }
 
-        if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
-            return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
-            return true; // data for other live quality stream
-    }
+        if (isLive) {
+            if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
+                return true; // data for other live quality stream
+            else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
+                return true; // data for other live quality stream
+        }    }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
     if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
