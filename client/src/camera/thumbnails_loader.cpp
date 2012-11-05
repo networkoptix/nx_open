@@ -372,7 +372,7 @@ void QnThumbnailsLoader::process() {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getOnlineCamerasWithSamePhysicalId(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
         {
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
             rtspDelegate->setMultiserverAllowed(false);
             if (m_decode)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true);

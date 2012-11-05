@@ -16,13 +16,11 @@
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
-#include "redass/redass_controller.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int TRY_HIGH_QUALITY_INTERVAL = 1000 * 30;
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
-static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll;
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 
 
@@ -129,8 +127,7 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     m_resource(resource),
     m_isLastVideoQualityLow(false),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
-	m_receivedInterval(0),
-    m_archiveReader(0)
+	m_receivedInterval(0)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -149,12 +146,19 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     QMutexLocker lock(&m_qualityMutex);
     m_allCamDisplay << this;
     m_ignoreTime = AV_NOPTS_VALUE;
-    qnRedAssController->registerConsumer(this);
+}
+
+void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
+{
+    m_audioBufferSize = bufferSize;
+    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
+    QMutexLocker lock(&m_audioChangeMutex);
+    delete m_audioDisplay;
+    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
 }
 
 QnCamDisplay::~QnCamDisplay()
 {
-    qnRedAssController->unregisterConsumer(this);
     {
         QMutexLocker lock(&m_qualityMutex);
         m_allCamDisplay.remove(this);
@@ -180,16 +184,6 @@ QnCamDisplay::~QnCamDisplay()
 
     clearVideoQueue();
     delete m_audioDisplay;
-}
-
-void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
-{
-    m_audioBufferSize = bufferSize;
-    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
-    QMutexLocker lock(&m_audioChangeMutex);
-    delete m_audioDisplay;
-    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
-
 }
 
 void QnCamDisplay::pause()
@@ -280,17 +274,9 @@ bool QnCamDisplay::canSwitchToHighQuality()
     return true;
 }
 
-QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
-{
-    return m_archiveReader;
-}
-
-
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     Q_UNUSED(needToSleep)
-    m_archiveReader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
-
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
     {
         bool isLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
@@ -306,19 +292,18 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
     if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
         return;
 
-    if (m_archiveReader)
+    QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
+    if (reader)
     {
-        if (realSleepTime <= -REDASS_DELAY_INTERVAL) 
+        if (realSleepTime <= -1000*1000) 
         {
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
-            if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
+            if (m_delayedFrameCount > 10 && reader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
             {
                 //bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
-                //reader->setQualityForced(MEDIA_Quality_Low);
-                //qnRedAssController->setQuality(this, MEDIA_Quality_Low);
-                qnRedAssController->onSlowStream(m_archiveReader);
+                reader->setQualityForced(MEDIA_Quality_Low);
                 m_toLowQSpeed = speed;
                 //m_toLowQTimer.restart();
             }
@@ -331,13 +316,11 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             {
                 if (qAbs(speed) < m_toLowQSpeed || (m_toLowQSpeed < 0 && speed > 0))
                 {
-                    //reader->setQualityForced(MEDIA_Quality_High); // speed decreased, try to Hi quality again
-                    qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    reader->setQualityForced(MEDIA_Quality_High); // speed decreased, try to Hi quality again
                 }
-                else if(qAbs(speed) < 1.0 + FPS_EPS /*&& canSwitchToHighQuality() */)
+                else if(qAbs(speed) < 1.0 + FPS_EPS && canSwitchToHighQuality())
                 {
-                    //reader->setQuality(MEDIA_Quality_High, false); 
-                    qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    reader->setQuality(MEDIA_Quality_High, false); 
                     m_hiQualityRetryCounter++;
                 }
             }
@@ -1519,9 +1502,4 @@ bool QnCamDisplay::isNoData() const
 bool QnCamDisplay::isLastVideoQualityLow() const
 {
     return m_isLastVideoQualityLow;
-}
-
-QSize QnCamDisplay::getScreenSize() const
-{
-    return m_display[0]->getScreenSize();
 }

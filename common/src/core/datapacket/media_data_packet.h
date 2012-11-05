@@ -20,7 +20,7 @@
 
 struct AVCodecContext;
 
-enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_AlwaysLow, MEDIA_Quality_AlwaysHigh, MEDIA_Quality_None};
+enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_AlwaysHigh, MEDIA_Quality_None};
 
 class QnMediaContext {
 public:

@@ -11,13 +11,11 @@
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
-class QnArchiveStreamReader;
 
 class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
-    Q_OBJECT
 public:
-    QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader);
+    QnRtspClientArchiveDelegate();
     virtual ~QnRtspClientArchiveDelegate();
 
     void setResource(QnResourcePtr resource);
@@ -54,8 +52,6 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
-signals:
-    void dataDropped(QnArchiveStreamReader* reader);
 private:
     QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum);
     void processMetadata(const quint8* data, int dataSize);
@@ -104,7 +100,6 @@ private:
     bool m_isMultiserverAllowed;
     QnResourceCustomAudioLayout* m_audioLayout;
     bool m_playNowModeAllowed; // fast open mode without DESCRIBE
-    QnArchiveStreamReader* m_reader;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
