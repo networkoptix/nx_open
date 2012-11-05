@@ -64,6 +64,7 @@
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/gettime_handler.h"
+#include "platform/platform_abstraction.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -784,6 +785,8 @@ public:
         m_main(argc, argv)
     {
         setServiceDescription(SERVICE_NAME);
+
+        new QnPlatformAbstraction(this);
     }
 
 protected:
