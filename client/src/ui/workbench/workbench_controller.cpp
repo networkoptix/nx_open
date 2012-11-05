@@ -290,6 +290,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                this,                           SLOT(at_rotationStarted(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               this,                           SLOT(at_rotationFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)));
+    connect(m_motionSelectionInstrument, SIGNAL(selectionStarted(QGraphicsView *, QnMediaResourceWidget *)),                        this,                           SLOT(at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),     this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
@@ -1033,12 +1034,15 @@ void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget
 }
 
 void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    if(!(widget->resource()->flags() & QnResource::motion)) { // TODO: #Elric maybe there is a better place for this check?
+    if(!(widget->resource()->flags() & QnResource::motion)) { // TODO: move to instrument item condition
         m_motionSelectionInstrument->resetLater();
         return;
     }
 
     widget->setOption(QnResourceWidget::DisplayMotion, true);
+}
+
+void QnWorkbenchController::at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
     foreach(QnResourceWidget *otherWidget, display()->widgets())
         if(otherWidget != widget)
             if(QnMediaResourceWidget *otherMediaWidget = dynamic_cast<QnMediaResourceWidget *>(otherWidget))

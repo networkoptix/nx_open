@@ -125,6 +125,7 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionSelectionStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
