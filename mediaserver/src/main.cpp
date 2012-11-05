@@ -785,8 +785,6 @@ public:
         m_main(argc, argv)
     {
         setServiceDescription(SERVICE_NAME);
-
-        new QnPlatformAbstraction(this);
     }
 
 protected:
@@ -794,6 +792,8 @@ protected:
     {
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
+
+        new QnPlatformAbstraction(app);
 
         if (guid.isEmpty())
         {
