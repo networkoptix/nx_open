@@ -4,7 +4,7 @@
 
 #include "utils/common/util.h"
 #include "utils/network/tcp_connection_priv.h"
-#include "platform/monitoring/global_monitor.h"
+#include "platform/platform_abstraction.h"
 
 #include "core/resource_managment/resource_pool.h"
 
@@ -14,7 +14,7 @@
 #include "recorder/storage_manager.h"
 
 QnStatisticsHandler::QnStatisticsHandler() {
-    m_monitor = new QnGlobalMonitor(QnPlatformMonitor::newInstance(), this);
+    m_monitor = qnPlatform->monitor();
 }
 
 QnStatisticsHandler::~QnStatisticsHandler() {

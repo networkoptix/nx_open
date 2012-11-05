@@ -84,8 +84,6 @@ private:
 Q_GLOBAL_STATIC(QnWindowsNotifierWindow, qn_windowsNotifierWindow);
 
 LRESULT CALLBACK qn_windowsNotifierWidgetProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
-    qDebug() << message;
-
     switch (message) {
     case WM_TIMECHANGE:
         QCoreApplication::postEvent(qn_windowsNotifierWindow(), new QnInvocationEvent(UpdateTimeInvocation));
@@ -129,11 +127,11 @@ void QnWindowsNotifier::updateTime(bool notify) {
     }
 
     if(notify)
-        timeChanged();
+        emit timeChanged();
 }
 
 bool QnWindowsNotifier::eventFilter(QObject *watched, QEvent *event) {
-    if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->type() == UpdateTimeInvocation) {
+    if(event->type() == QnInvocationEvent::Invocation && static_cast<QnInvocationEvent *>(event)->id() == UpdateTimeInvocation) {
         updateTime(true);
         return false;
     } else {

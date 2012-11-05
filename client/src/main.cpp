@@ -82,7 +82,7 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
-#include "platform/notification/windows_notifier.h"
+#include "platform/platform_abstraction.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -287,6 +287,8 @@ int qnMain(int argc, char *argv[])
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;
  //   application->installEventFilter(&x11LauncherWorkaround);
@@ -308,9 +310,6 @@ int qnMain(int argc, char *argv[])
                 return 0;
         }
     }
-
-    QnWindowsNotifier n;
-
 
     /* Initialize connections. */
     initAppServerConnection();

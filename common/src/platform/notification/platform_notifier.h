@@ -12,7 +12,14 @@ public:
     static QnPlatformNotifier *newInstance(QObject *parent = NULL);
 
 signals:
+    /**
+     * This signal is emitted whenever system time changes. 
+     */
     void timeChanged();
+
+    /**
+     * This signal is emitted whenever system time zone changes.
+     */
     void timeZoneChanged();
 
 private:
