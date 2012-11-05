@@ -303,7 +303,10 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             {
                 //bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
-                reader->setQualityForced(MEDIA_Quality_Low);
+                if (qAbs(speed) > 1.0)
+                    reader->setQualityForced(MEDIA_Quality_Low);
+                else
+                    reader->setQuality(MEDIA_Quality_Low, true); // do not change to LQ if fullscreen and speed=1
                 m_toLowQSpeed = speed;
                 //m_toLowQTimer.restart();
             }
