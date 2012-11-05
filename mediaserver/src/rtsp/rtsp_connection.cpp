@@ -984,21 +984,6 @@ int QnRtspConnectionProcessor::composePlay()
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0);
         }
 
-        if (copySize == 0) {
-            // no data from the camera. Insert several empty packets to inform client about it
-            for (int i = 0; i < 3; ++i)
-            {
-                QnEmptyMediaDataPtr emptyData(new QnEmptyMediaData());
-                emptyData->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                if (i == 0)
-                    emptyData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-                emptyData->timestamp = DATETIME_NOW;
-                emptyData->opaque = d->lastPlayCSeq;
-
-                d->dataProcessor->addData(emptyData);
-            }
-        }
-
         d->dataProcessor->unlockDataQueue();
         d->dataProcessor->setWaitCSeq(d->startTime, 0); // ignore rest packets before new position
         connectToLiveDataProviders();
