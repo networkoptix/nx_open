@@ -30,6 +30,7 @@
 #include "time_slider_pixmap_cache.h"
 
 namespace {
+
     QTime msecsToTime(qint64 msecs) {
         return QTime(0, 0, 0, 0).addMSecs(msecs); 
     }
@@ -570,8 +571,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
         if(animate) {
             kineticProcessor()->reset(); /* Stop kinetic zoom. */
             m_animating = true;
-            m_animationStart = start;
-            m_animationEnd = end;
+            setAnimationStart(start);
+            setAnimationEnd(end);
         } else {
             m_windowStart = start;
             m_windowEnd = end;
@@ -738,11 +739,27 @@ void QnTimeSlider::finishAnimations() {
     animateThumbnails(10 * 1000);
 
     if(m_animating) {
-        setWindow(m_animationStart, m_animationEnd);
+        setWindow(animationStart(), animationEnd());
         m_animating = false;
     }
 
     kineticProcessor()->reset();
+}
+
+void QnTimeSlider::setAnimationStart(qint64 start) {
+    m_animationStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
+}
+
+void QnTimeSlider::setAnimationEnd(qint64 end) {
+    m_animationEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
+}
+
+qint64 QnTimeSlider::animationStart() {
+    return m_animationStart == std::numeric_limits<qint64>::min() ? minimum() : m_animationStart;
+}
+
+qint64 QnTimeSlider::animationEnd() {
+    return m_animationEnd == std::numeric_limits<qint64>::max() ? maximum() : m_animationEnd;
 }
 
 bool QnTimeSlider::isAnimatingWindow() const {
@@ -1748,14 +1765,17 @@ void QnTimeSlider::tick(int deltaMSecs) {
     if(!m_animating) {
         animateStepValues(deltaMSecs);
     } else {
-        qreal distance = qAbs(m_animationStart - m_windowStart) + qAbs(m_animationEnd - m_windowEnd);
+        qint64 animationStart = this->animationStart();
+        qint64 animationEnd = this->animationEnd();
+
+        qreal distance = qAbs(animationStart - m_windowStart) + qAbs(animationEnd - m_windowEnd);
         qreal delta = 8.0 * deltaMSecs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
 
         if(delta > distance) {
-            setWindow(m_animationStart, m_animationEnd);
+            setWindow(animationStart, animationEnd);
         } else {
-            qreal startFraction = (m_animationStart - m_windowStart) / distance;
-            qreal endFraction  = (m_animationEnd - m_windowEnd) / distance;
+            qreal startFraction = (animationStart - m_windowStart) / distance;
+            qreal endFraction  = (animationEnd - m_windowEnd) / distance;
 
             setWindow(
                 m_windowStart + static_cast<qint64>(delta * startFraction),
@@ -1763,7 +1783,7 @@ void QnTimeSlider::tick(int deltaMSecs) {
             );
         }
 
-        if(m_animationStart == m_windowStart && m_animationEnd == m_windowEnd)
+        if(animationStart == m_windowStart && animationEnd == m_windowEnd)
             m_animating = false;
 
         animateStepValues(8.0 * deltaMSecs);
