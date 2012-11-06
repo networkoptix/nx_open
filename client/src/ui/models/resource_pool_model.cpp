@@ -22,7 +22,6 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_globals.h>
 
 #include "file_processor.h"
 
@@ -58,7 +57,7 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourcePoolModel::Node {
-    Q_DECLARE_TR_FUNCTIONS(Node);
+    Q_DECLARE_TR_FUNCTIONS(Node)
 public:
     enum State {
         Normal,     /**< Normal node. */
@@ -79,7 +78,7 @@ public:
         m_status(QnResource::Online),
         m_modified(false)
     {
-        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode);
+        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
 
         switch(type) {
         case Qn::RootNode:
@@ -96,6 +95,9 @@ public:
         case Qn::UsersNode:
             m_displayName = m_name = tr("Users");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+            break;
+        case Qn::BastardNode:
+            m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
             break;
         default:
             break;
@@ -213,6 +215,9 @@ public:
             break;
         case Qn::ServersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+            break;
+        case Qn::BastardNode:
+            bastard = true;
             break;
         default:
             break;
@@ -525,10 +530,11 @@ private:
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
+QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
-    m_urlsShown(true)
+    m_urlsShown(true),
+    m_rootNodeType(rootNodeType)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
@@ -540,18 +546,36 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent):
     roles.insert(Qn::NodeTypeRole,      "nodeType");
     setRoleNames(roles);
 
-    /* Create root. */
-    m_rootNode = new Node(this, Qn::RootNode);
-
     /* Create top-level nodes. */
     m_localNode = new Node(this, Qn::LocalNode);
-    m_localNode->setParent(m_rootNode);
-
     m_usersNode = new Node(this, Qn::UsersNode);
-    m_usersNode->setParent(m_rootNode);
-
     m_serversNode = new Node(this, Qn::ServersNode);
-    m_serversNode->setParent(m_rootNode);
+    m_bastardNode = new Node(this, Qn::BastardNode);
+
+    /* Create root. */
+    switch (rootNodeType) {
+    case Qn::LocalNode:
+        m_rootNode = m_localNode;
+        break;
+    case Qn::UsersNode:
+        m_rootNode = m_usersNode;
+        break;
+    case Qn::ServersNode:
+        m_rootNode = m_serversNode;
+        break;
+    default:
+        Q_ASSERT(rootNodeType == Qn::RootNode);
+        m_rootNode = new Node(this, Qn::RootNode);
+        break;
+    }
+
+    if (rootNodeType != Qn::LocalNode)
+        m_localNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+    if (rootNodeType != Qn::UsersNode)
+        m_usersNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+    if (rootNodeType != Qn::ServersNode)
+        m_serversNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+
 
     /* Connect to context. */
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
@@ -582,10 +606,12 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
 
-    delete m_rootNode;
+    if (m_rootNodeType == Qn::RootNode)
+        delete m_rootNode;
     delete m_localNode;
     delete m_serversNode;
     delete m_usersNode;
+    delete m_bastardNode;
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {

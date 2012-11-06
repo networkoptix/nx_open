@@ -11,7 +11,7 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
 {
     ui->setupUi(this);
 
-    m_resourceModel = new QnResourcePoolModel(this);
+    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     ui->resourcesWidget->setModel(m_resourceModel); //TODO: move proxy model out of browser class
 }
 
