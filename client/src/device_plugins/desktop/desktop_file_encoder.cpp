@@ -183,15 +183,19 @@ QnDesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
-    QString name(m_audioDevice.deviceName());
+    QString name;
+    int devNum = 1;
+    m_audioDevice.splitFullName(name, devNum);
     for(int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name.startsWith(tmp))
-                return i;
+            if (name == tmp) {
+                if (--devNum == 0)
+                    return i;
+            }
         }
     }
     return WAVE_MAPPER;
@@ -360,8 +364,8 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 QnDesktopFileEncoder::QnDesktopFileEncoder (
                    const QString& fileName,
                    int desktopNum,
-                   const QAudioDeviceInfo* audioDevice,
-                   const QAudioDeviceInfo* audioDevice2,
+                   const QnAudioDeviceInfo* audioDevice,
+                   const QnAudioDeviceInfo* audioDevice2,
                    QnScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
