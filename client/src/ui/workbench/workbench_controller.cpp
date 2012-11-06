@@ -427,12 +427,9 @@ bool QnWorkbenchController::eventFilter(QObject *watched, QEvent *event)
 {
     if (event->type() == QEvent::Close) {
         if (QnResourceWidget *widget = qobject_cast<QnResourceWidget *>(watched)) {
-            /* Clicking on close button of a widget that is not selected should select it,
-             * thus clearing the existing selection. */
-            if(!widget->isSelected()) {
+            /* Clicking on close button of a widget that is not selected should clear selection. */
+            if(!widget->isSelected())
                 display()->scene()->clearSelection();
-                widget->setSelected(true);
-            }
 
             menu()->trigger(Qn::RemoveLayoutItemAction, widget);
             event->ignore();
