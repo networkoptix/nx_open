@@ -1,3 +1,13 @@
+----------------------------------------------- 1.4-Release-Candidate -----------------------------------------------
+Improvements:
+ - Item's info panel is not hidden if go to fullscreen
+ - Playback control is not hidden if go to fullscreen
+
+Bugs Fixed.
+ - Fixed incorrect support email if click on link on the Licenses page (2 slashes before address).
+ - Fixed misclicks on Time Line (clicks were sent underneath)
+ - IF double click on the bottom of Time Line zoom out occured but Time Line started moving. Fixed.
+ - Sometimes Menu co
 ----------------------------------------------- 1.4-Beta -----------------------------------------------
 
 New Features: 
