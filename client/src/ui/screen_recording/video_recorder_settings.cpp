@@ -4,11 +4,26 @@
 #include <QtGui/QApplication>
 #include <QtGui/QDesktopWidget>
 #include <QtGui/QFileDialog>
+#ifdef Q_OS_WIN32
+#   include "device_plugins/desktop/win_audio_helper.h"
+#endif
 
 QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_devNumberExpr(QLatin1String(" \\([0-9]+\\)$"))
 {
     settings.beginGroup(QLatin1String("videoRecording"));
+    
+    // update settings from previous version
+    QString primary = settings.value(QLatin1String("primaryAudioDevice")).toString();
+    QString secondary = primary; //settings.value(QLatin1String("secondaryAudioDevice")).toString();
+    if (primary == secondary && !primary.isEmpty() && primary != QLatin1String("default") && !primary.contains(m_devNumberExpr))
+    {
+        primary   += QLatin1String(" (1)");
+        secondary += QLatin1String(" (2)");
+        settings.setValue(QLatin1String("primaryAudioDevice"), primary);
+        settings.setValue(QLatin1String("secondaryAudioDevice"), secondary);
+    }
 }
 
 QnVideoRecorderSettings::~QnVideoRecorderSettings()
@@ -16,16 +31,63 @@ QnVideoRecorderSettings::~QnVideoRecorderSettings()
     settings.endGroup();
 }
 
-QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0)
+QString QnVideoRecorderSettings::getFullDeviceName(const QString& shortName)
 {
+#ifdef Q_OS_WIN
+    return WinAudioExtendInfo(shortName).fullName();
+#else
+    return shortName;
+#endif
+}
+
+QStringList QnVideoRecorderSettings::availableDeviceNames(QAudio::Mode mode)
+{
+    QMap<QString, int> devices;
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) 
+    {
+        QMap<QString, int>::iterator existingDevice = devices.find(info.deviceName());
+        if (existingDevice == devices.end())
+            devices.insert(getFullDeviceName(info.deviceName()), 1);
+        else
+            existingDevice.value()++;
+    }
+
+    QStringList result;
+    for(QMap<QString, int>::iterator itr = devices.begin(); itr != devices.end(); ++itr)
+    {
+        if (itr.value() == 1) {
+            result << itr.key();
+        }
+        else {
+            for (int i = 1; i <= itr.value(); ++itr)
+                result << (itr.key() + QString(QLatin1String(" (%1)")).arg(i));
+        }
+    }
+    return result;
+}
+
+
+QAudioDeviceInfo QnVideoRecorderSettings::getDeviceByName(const QString& _name, QAudio::Mode mode, bool *isDefault) const
+{
+    QString name = _name;
+    int sameNamePos = name.lastIndexOf(m_devNumberExpr);
+    int devNum = 1;
+    if (sameNamePos > 0) {
+        devNum = name.mid(sameNamePos+2, name.lastIndexOf(QLatin1String(")")) - sameNamePos - 2).toInt();
+        name = name.left(sameNamePos);
+    }
+
     if (isDefault)
         *isDefault = false;
     if (name == QObject::tr("None"))
         return QAudioDeviceInfo();
 
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) {
-        if (name.startsWith(info.deviceName()))
-            return info;
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(mode)) 
+    {
+        if (name.startsWith(info.deviceName())) {
+            if (--devNum == 0)
+                return info;
+        }
     }
 
     if (isDefault)
