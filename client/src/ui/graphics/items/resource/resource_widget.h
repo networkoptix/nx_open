@@ -237,6 +237,12 @@ public:
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
 
+    Buttons checkedButtons() const;
+    void setCheckedButtons(Buttons checkedButtons);
+
+    Buttons visibleButtons() const;
+
+    // TODO: #gdm implement via visibleButtons() function, then remove this one.
     bool isInfoButtonVisible() const;
 
     using base_type::mapRectToScene;

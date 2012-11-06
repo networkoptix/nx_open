@@ -524,6 +524,18 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
         infoButton->setChecked(visible);
 }
 
+QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
+    return buttonBar()->checkedButtons();
+}
+
+void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
+    buttonBar()->setCheckedButtons(checkedButtons);
+}
+
+QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
+    return buttonBar()->visibleButtons();
+}
+
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
     return Qn::toQtFrameSection(static_cast<Qn::WindowFrameSection>(static_cast<int>(windowFrameSectionsAt(QRectF(pos, QSizeF(0.0, 0.0))))));
 }
