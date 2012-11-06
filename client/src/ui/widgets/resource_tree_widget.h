@@ -19,6 +19,8 @@ namespace Ui {
 class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
+    typedef QWidget base_type;
+
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
@@ -39,11 +41,11 @@ public:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
-
-    void updateColumnsSize();
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void activated(const QnResourcePtr &resource);
+    void viewportSizeChanged();
 
 private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
@@ -51,6 +53,8 @@ private slots:
 
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
+
+    void updateColumnsSize();
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 

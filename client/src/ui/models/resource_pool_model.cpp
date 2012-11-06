@@ -346,7 +346,8 @@ public:
 
     Qt::ItemFlags flags(const QModelIndex &index) const {
         if (index.column() == CheckColumn)
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable
+                    | Qt::ItemIsEditable | Qt::ItemIsTristate;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
@@ -427,8 +428,11 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        if (/*column == CheckColumn &&*/ role == Qt::CheckStateRole){
-            m_checked = (Qt::CheckState)value.toInt();
+        if (column == CheckColumn && role == Qt::CheckStateRole){
+            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+            setCheckStateRecursive(checkState);
+            if (m_parent)
+                m_parent->updateParentCheckStateRecursive(checkState);
             return true;
         }
 
@@ -489,6 +493,25 @@ protected:
         
         QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
+    }
+
+    void setCheckStateRecursive(Qt::CheckState state){
+        m_checked = state;
+        foreach(Node* child, m_children)
+            child->setCheckStateRecursive(state);
+    }
+
+    void updateParentCheckStateRecursive(Qt::CheckState state){
+        foreach(Node* child, m_children)
+            if (child->m_checked != state) {
+                m_checked = Qt::Unchecked;
+                if (m_parent)
+                    m_parent->updateParentCheckStateRecursive(Qt::Unchecked);
+                return;
+            }
+        m_checked = state;
+        if (m_parent)
+            m_parent->updateParentCheckStateRecursive(state);
     }
 
 private:

@@ -42,18 +42,18 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-        if (index.column() == 1){
-            //TODO: #gdm make enum public
-            base_type::paint(painter, option, index);
-            return;
-        }
-
         QStyleOptionViewItemV4 optionV4 = option;
         initStyleOption(&optionV4, index);
 
         if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom()
                 && optionV4.widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
             return;
+
+        if (index.column() == 1){
+            //TODO: #gdm make enum public
+            base_type::paint(painter, option, index);
+            return;
+        }
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
@@ -201,7 +201,7 @@ protected:
 // ------ Widget class -----
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0)
 {
@@ -219,10 +219,12 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    connect(ui->resourcesTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->resourcesTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
 
-    ui->resourcesTreeView->installEventFilter(this);
+    connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
+
+    ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -254,7 +256,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
-    updateColumnsSize();
+    emit viewportSizeChanged();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
@@ -292,20 +294,27 @@ QPoint QnResourceTreeWidget::selectionPos() const {
 }
 
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView && event->type() == QEvent::Resize){
-        updateColumnsSize();
-        return true;
+    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Show){
+        emit viewportSizeChanged();
     }
-    return QWidget::eventFilter(obj, event);
+    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Hide){
+        emit viewportSizeChanged();
+    }
+    return base_type::eventFilter(obj, event);
+}
+
+void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
+    qDebug() << "resizeevent override" << ui->resourcesTreeView->viewport()->width()
+             << ui->resourcesTreeView->viewport()->width() << event->size();
+    emit viewportSizeChanged();
+
+    base_type::resizeEvent(event);
 }
 
 void QnResourceTreeWidget::updateColumnsSize(){
-    //ui->resourcesTreeView->resizeColumnToContents(1);
     ui->resourcesTreeView->setColumnWidth(1, 16);
     int offset = 24;
-    if (ui->resourcesTreeView->verticalScrollBar()->isVisible())
-        offset += ui->resourcesTreeView->verticalScrollBar()->width();
-    ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->width() - offset);
+    ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->viewport()->width() - offset);
 }
 
 // -------------------------------------------------------------------------- //
@@ -336,7 +345,5 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
     if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
         ui->resourcesTreeView->expand(index);
-  //  ui->resourcesTreeView->resizeColumnToContents(0);
-
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
