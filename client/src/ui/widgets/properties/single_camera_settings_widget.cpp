@@ -616,8 +616,38 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 }
 
 void QnSingleCameraSettingsWidget::at_bigTestButton_clicked() {
-    QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog());
-    dialog->exec();
+    //QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog(NULL, context()));
+
+    QnResourceTreeDialog dialog(NULL, context());
+
+    dialog.exec();
+
+    QnResourceList resources = dialog.getSelectedResources();
+//     resources.toSet().toList();
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+
+    QnScheduleTaskList scheduleTasks;
+    foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
+        scheduleTasks.append(QnScheduleTask(data));
+
+    foreach(QnVirtualCameraResourcePtr camera, cameras) {
+/*
+        QString cameraLogin = camera->getAuth().user();
+        if (!login.isEmpty())
+            cameraLogin = login;
+
+        QString cameraPassword = camera->getAuth().password();
+        if (!password.isEmpty())
+            cameraPassword = password;
+        camera->setAuth(cameraLogin, cameraPassword);
+
+        if (ui->checkBoxEnableAudio->checkState() != Qt::PartiallyChecked && ui->checkBoxEnableAudio->isEnabled())
+            camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
+*/
+
+        camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
+        camera->setScheduleTasks(scheduleTasks);
+    }
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

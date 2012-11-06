@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_globals.h>
 
 class QnResourceModelPrivate;
 class QnResourcePool;
@@ -20,7 +21,7 @@ class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContext
     Q_OBJECT;
 
 public:
-    explicit QnResourcePoolModel(QObject *parent = 0);
+    explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -77,6 +78,9 @@ private:
     /** Root node. */
     Node *m_rootNode;
 
+    /** Bastard node for hidden resources. */
+    Node *m_bastardNode;
+
     Node *m_serversNode, *m_localNode, *m_usersNode;
 
     /** Mapping for resource nodes, by resource. */
@@ -90,6 +94,9 @@ private:
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;
+
+    /** Type of root node - for the models with narrowed scopes */
+    Qn::NodeType m_rootNodeType;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

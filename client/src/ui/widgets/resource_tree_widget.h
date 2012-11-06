@@ -10,15 +10,17 @@
 
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
+class QSortFilterProxyModel;
 
 namespace Ui {
     class QnResourceTreeWidget;
 }
 
-class QnResourceTreeWidget : public QWidget
-{
+class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
+    typedef QWidget base_type;
+
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
@@ -37,17 +39,28 @@ public:
 
     QPoint selectionPos() const;
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+
 signals:
     void activated(const QnResourcePtr &resource);
+    void viewportSizeChanged();
 
 private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
 
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
+
+    void updateColumnsSize();
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
+
+    QSortFilterProxyModel *m_resourceProxyModel;
 };
 
 #endif // RESOURCE_TREE_WIDGET_H

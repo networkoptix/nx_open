@@ -2,6 +2,7 @@
 #include "ui_resource_tree_widget.h"
 
 #include <QtGui/QStyledItemDelegate>
+#include <QtGui/QScrollBar>
 
 #include <common/common_meta_types.h>
 
@@ -47,6 +48,12 @@ protected:
         if(optionV4.widget && optionV4.widget->rect().bottom() < optionV4.rect.bottom()
                 && optionV4.widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
             return;
+
+        if (index.column() == 1){
+            //TODO: #gdm make enum public
+            base_type::paint(painter, option, index);
+            return;
+        }
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr currentLayoutResource = workbench() ? workbench()->currentLayout()->resource() : QnLayoutResourcePtr();
@@ -161,11 +168,42 @@ public:
     }
 };
 
+// ------ Sort model class ------
+
+class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+public:
+    QnResourceTreeSortProxyModel(QObject *parent = NULL): QSortFilterProxyModel(parent) {}
+
+protected:
+    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
+        bool leftLocal = left.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
+        bool rightLocal = right.data(Qn::NodeTypeRole).toInt() == Qn::LocalNode;
+        if(leftLocal ^ rightLocal) /* One of the nodes is a local node, but not both. */
+            return rightLocal;
+
+        QString leftDisplay = left.data(Qt::DisplayRole).toString();
+        QString rightDisplay = right.data(Qt::DisplayRole).toString();
+        int result = leftDisplay.compare(rightDisplay);
+        if(result < 0) {
+            return true;
+        } else if(result > 0) {
+            return false;
+        }
+
+        /* We want the order to be defined even for items with the same name. */
+        QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
+        QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
+        return leftResource < rightResource;
+    }
+};
+
+
 // ------ Widget class -----
 
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::QnResourceTreeWidget())
+    base_type(parent),
+    ui(new Ui::QnResourceTreeWidget()),
+    m_resourceProxyModel(0)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false); //TODO: set visible from property
@@ -181,8 +219,12 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
-    connect(ui->resourcesTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
-    connect(ui->resourcesTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
+    connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+
+    connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
+
+    ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -191,7 +233,30 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
 
 
 void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
-    ui->resourcesTreeView->setModel(model);
+    if (m_resourceProxyModel){
+        disconnect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+        delete m_resourceProxyModel;
+        m_resourceProxyModel = NULL;
+    }
+
+    if (model){
+        m_resourceProxyModel = new QnResourceTreeSortProxyModel(this);
+        m_resourceProxyModel->setSourceModel(model);
+        m_resourceProxyModel->setSupportedDragActions(model->supportedDragActions());
+        m_resourceProxyModel->setDynamicSortFilter(true);
+        m_resourceProxyModel->setSortRole(Qt::DisplayRole);
+        m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+        m_resourceProxyModel->sort(0);
+
+        ui->resourcesTreeView->setModel(m_resourceProxyModel);
+
+        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
+
+        at_resourceProxyModel_rowsInserted(QModelIndex());
+    } else {
+        ui->resourcesTreeView->setModel(NULL);
+    }
+    emit viewportSizeChanged();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
@@ -228,6 +293,29 @@ QPoint QnResourceTreeWidget::selectionPos() const {
     return pos;
 }
 
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
+    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Show){
+        emit viewportSizeChanged();
+    }
+    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Hide){
+        emit viewportSizeChanged();
+    }
+    return base_type::eventFilter(obj, event);
+}
+
+void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
+    qDebug() << "resizeevent override" << ui->resourcesTreeView->viewport()->width()
+             << ui->resourcesTreeView->viewport()->width() << event->size();
+    emit viewportSizeChanged();
+
+    base_type::resizeEvent(event);
+}
+
+void QnResourceTreeWidget::updateColumnsSize(){
+    ui->resourcesTreeView->setColumnWidth(1, 16);
+    int offset = 24;
+    ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->viewport()->width() - offset);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -245,4 +333,17 @@ void QnResourceTreeWidget::at_treeView_doubleClicked(const QModelIndex &index) {
         !(resource->flags() & QnResource::layout) &&    /* Layouts cannot be activated by double clicking. */
         !(resource->flags() & QnResource::server))      /* Bug #1009: Servers should not be activated by double clicking. */
         emit activated(resource);
+}
+
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end) {
+    for(int i = start; i <= end; i++)
+        at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
+}
+
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index) {
+    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    int nodeType = index.data(Qn::NodeTypeRole).toInt();
+    if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
+        ui->resourcesTreeView->expand(index);
+    at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
