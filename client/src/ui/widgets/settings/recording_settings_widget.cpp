@@ -64,15 +64,9 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
     setDefaultSoundIcon(ui->label_primaryDeviceIcon);
     setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
 
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-#ifdef Q_OS_WIN
-        WinAudioExtendInfo ext1(info.deviceName());
-        ui->primaryAudioDeviceComboBox->addItem(ext1.fullName());
-        ui->secondaryAudioDeviceComboBox->addItem(ext1.fullName());
-#else
-        ui->primaryAudioDeviceComboBox->addItem(info.deviceName());
-        ui->secondaryAudioDeviceComboBox->addItem(info.deviceName());
-#endif
+    foreach (const QString& deviceName, QnVideoRecorderSettings::availableDeviceNames(QAudio::AudioInput)) {
+        ui->primaryAudioDeviceComboBox->addItem(deviceName);
+        ui->secondaryAudioDeviceComboBox->addItem(deviceName);
     }
 
     QScopedPointer<QnDwm> dwm(new QnDwm(this));
@@ -110,8 +104,8 @@ void QnRecordingSettingsWidget::updateFromSettings() {
     setDecoderQuality(m_settings->decoderQuality());
     setResolution(m_settings->resolution());
     setScreen(m_settings->screen());
-    setPrimaryAudioDeviceName(m_settings->primaryAudioDevice().deviceName());
-    setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().deviceName());
+    setPrimaryAudioDeviceName(m_settings->primaryAudioDeviceName());
+    setSecondaryAudioDeviceName(m_settings->secondaryAudioDeviceName());
     
     ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
     ui->recordingFolderLabel->setText(m_settings->recordingFolder());
