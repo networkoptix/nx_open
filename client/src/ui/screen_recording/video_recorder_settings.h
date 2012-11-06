@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSettings>
 #include <QtMultimedia/QAudioDeviceInfo>
+#include "qnaudio_device_info.h"
 
 namespace Qn {
     enum CaptureMode { 
@@ -37,13 +38,11 @@ public:
     explicit QnVideoRecorderSettings(QObject *parent = 0);
     ~QnVideoRecorderSettings();
 
-    QAudioDeviceInfo primaryAudioDevice() const;
-    QString primaryAudioDeviceName() const;
+    QnAudioDeviceInfo primaryAudioDevice() const;
 
     void setPrimaryAudioDeviceByName(const QString &name);
 
-    QAudioDeviceInfo secondaryAudioDevice() const;
-    QString secondaryAudioDeviceName() const;
+    QnAudioDeviceInfo secondaryAudioDevice() const;
 
     void setSecondaryAudioDeviceByName(const QString &name);
 
@@ -67,11 +66,12 @@ public:
 
     static QString getFullDeviceName(const QString& shortName);
     static QStringList availableDeviceNames(QAudio::Mode mode);
+    static void splitFullName(const QString& name, QString& shortName, int& index);
 private:
-    QAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
+    QnAudioDeviceInfo getDeviceByName(const QString &name, QAudio::Mode mode, bool *isDefault = 0) const;
 private:
     QSettings settings;
-    QRegExp m_devNumberExpr;
+    static QRegExp m_devNumberExpr;
 };
 
 #endif // VIDEORECORDERSETTINGS_H

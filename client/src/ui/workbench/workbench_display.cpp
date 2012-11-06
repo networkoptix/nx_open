@@ -598,7 +598,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             oldWidget->setLocalActive(false);
         if(newWidget)
             newWidget->setLocalActive(true);
-        updateFrameWidths();
+        m_frameWidthsDirty = true;
         break;
     }
     case Qn::CentralRole: {
