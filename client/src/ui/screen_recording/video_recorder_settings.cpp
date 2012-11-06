@@ -15,6 +15,7 @@ QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
 {
     settings.beginGroup(QLatin1String("videoRecording"));
     
+    /*
     // update settings from previous version
     QString primary = settings.value(QLatin1String("primaryAudioDevice")).toString();
     QString secondary = settings.value(QLatin1String("secondaryAudioDevice")).toString();
@@ -31,6 +32,7 @@ QnVideoRecorderSettings::QnVideoRecorderSettings(QObject *parent) :
             }
         }
     }
+    */
 }
 
 QnVideoRecorderSettings::~QnVideoRecorderSettings()
@@ -74,9 +76,9 @@ void QnVideoRecorderSettings::splitFullName(const QString& name, QString& shortN
 {
     shortName = name;
     int sameNamePos = name.lastIndexOf(m_devNumberExpr);
-    int devNum = 1;
+    index = 1;
     if (sameNamePos > 0) {
-        devNum = name.mid(sameNamePos+2, name.lastIndexOf(QLatin1String(")")) - sameNamePos - 2).toInt();
+        index = name.mid(sameNamePos+2, name.lastIndexOf(QLatin1String(")")) - sameNamePos - 2).toInt();
         shortName = name.left(sameNamePos);
     }
 }
