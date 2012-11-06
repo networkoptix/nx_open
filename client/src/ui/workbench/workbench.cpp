@@ -216,6 +216,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
 
         foreach(QnWorkbenchItem *item, m_currentLayout->items())
             at_layout_itemAdded(item);
+        updateActiveRoleItem();
     }
 }
 
@@ -241,8 +242,11 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
     emit itemChanged(role);
 
     /* Update items for derived roles. */
-    updateActiveRoleItem();
-    updateCentralRoleItem();
+    if(role < Qn::ActiveRole) {
+        updateActiveRoleItem();
+        if(role < Qn::CentralRole)
+            updateCentralRoleItem();
+    }
 }
 
 void QnWorkbench::updateSingleRoleItem() {
@@ -307,7 +311,7 @@ void QnWorkbench::at_layout_itemAdded(QnWorkbenchItem *item) {
 }
 
 void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
-    for(int i = 0; i <= Qn::ItemRoleCount; i++)
+    for(int i = 0; i < Qn::ItemRoleCount; i++)
         if(item == m_itemByRole[i])
             setItem(static_cast<Qn::ItemRole>(i), NULL);
 
