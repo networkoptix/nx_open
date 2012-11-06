@@ -23,6 +23,8 @@ public:
     /* Draw video frames time on the screen */
     void setDrawDateTime(OnScreenDatePos value);
 
+    void setOnScreenDateOffset(int timeOffsetMs);
+
     void setQuality(QnStreamQuality quality);
 private:
     int rescaleFrame();
@@ -49,6 +51,7 @@ private:
     QnStreamQuality m_quality;
     int m_bufferYOffs;
     int m_bufferUVOffs;
+    int m_onscreenDateOffset;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

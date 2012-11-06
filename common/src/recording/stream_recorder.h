@@ -75,6 +75,8 @@ public:
     * Transcode to specified audio codec is source codec is different
     */
     void setAudioCodec(CodecID codec);
+
+    void setOnScreenDateOffset(int timeOffsetMs);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -153,6 +155,7 @@ private:
     QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
+    int m_onscreenDateOffset;
 };
 
 #endif // _STREAM_RECORDER_H__

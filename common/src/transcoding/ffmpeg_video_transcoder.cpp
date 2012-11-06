@@ -4,6 +4,7 @@
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
 static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
+static const int MIN_TEXT_HEIGHT = 14;
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnVideoTranscoder(codecId),
@@ -21,7 +22,8 @@ m_dateTimeXOffs(0),
 m_dateTimeYOffs(0),
 m_quality(QnQualityNormal),
 m_bufferYOffs(0),
-m_bufferUVOffs(0)
+m_bufferUVOffs(0),
+m_onscreenDateOffset(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -122,13 +124,14 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
     m_timeFont.setBold(true);
     QFontMetrics metric(m_timeFont);
     int bufYOffs = 0;
+    int requiredDrawHeight = qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS);
     for (int i = 0; i < 100; ++i)
     {
         metric = QFontMetrics(m_timeFont);
         drawWidth = metric.width(timeStr);
         drawHeight = metric.height();
 
-        if (drawHeight > frame->height / TEXT_HEIGHT_IN_FRAME_PARTS)
+        if (drawHeight > requiredDrawHeight)
             break;
         m_timeFont.setPointSize(m_timeFont.pointSize() + 1);
         switch(m_dateTextPos)
@@ -156,7 +159,7 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
     m_bufferYOffs  = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT)   + bufYOffs * frame->linesize[0];
     m_bufferUVOffs = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT)/2 + bufYOffs * frame->linesize[1] / 2;
 
-        m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
+    m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
     m_dateTimeYOffs = metric.ascent();
 
     drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
@@ -167,7 +170,7 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
 void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 {
     QString timeStr;
-    QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000);
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000 + m_onscreenDateOffset);
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD) {
         timeStr = dt.toString(Qt::SystemLocaleShortDate);
         timeStr += dt.toString(QLatin1String(".zzz"));
@@ -266,4 +269,9 @@ void QnFfmpegVideoTranscoder::setDrawDateTime(OnScreenDatePos value)
 void QnFfmpegVideoTranscoder::setQuality(QnStreamQuality quality)
 {
     m_quality = quality;
+}
+
+void QnFfmpegVideoTranscoder::setOnScreenDateOffset(int timeOffsetMs)
+{
+    m_onscreenDateOffset = timeOffsetMs;
 }

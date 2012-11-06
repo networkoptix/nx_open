@@ -90,6 +90,7 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
+#include "../watchers/workbench_server_time_watcher.h"
 
 
 
@@ -2472,8 +2473,8 @@ Do you want to continue?"),
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;");
-    allowedFormatFilter += tr("AVI with date(Audio/Video Interleaved)(*.avi);;Matroska  with date(*.mkv);;");
+    QString allowedFormatFilter = tr("AVI (*.avi);;Matroska (*.mkv);;");
+    allowedFormatFilter += tr("AVI with Timestamps (Requires Transcoding)(*.avi);;Matroska  with Timestamps (Requires Transcoding)(*.mkv);;");
     allowedFormatFilter += binaryFilterName(false);
     while (true) {
         fileName = QFileDialog::getSaveFileName(
@@ -2573,9 +2574,15 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (selectedFilter.contains(tr("with date")))
+        if (selectedFilter.contains(tr("with Timestamps")))
             role = QnStreamRecorder::Role_FileExportWithTime;
-        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), QnStorageResourcePtr(), role);
+        int timeOffset = 0;
+        if (qnSettings->timeMode() == Qn::ServerTimeMode) {
+            if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_exportedCamera->getDevice()->getParentId()).dynamicCast<QnMediaServerResource>())
+                timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(server, 0);
+        }
+        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
+                                                  QnStorageResourcePtr(), role, timeOffset);
         exportProgressDialog->exec();
     }
 }

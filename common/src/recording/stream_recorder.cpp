@@ -48,7 +48,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_role(Role_ServerRecording),
-    m_currentTimeZone(-1)
+    m_currentTimeZone(-1),
+    m_onscreenDateOffset(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -449,7 +450,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
                     m_dstVideoCodec = CODEC_ID_MPEG4; // default value
                 m_videoTranscoder = new QnFfmpegVideoTranscoder(m_dstVideoCodec);
                 m_videoTranscoder->setMTMode(true);
-                m_videoTranscoder->setDrawDateTime(QnFfmpegVideoTranscoder::Date_LeftTop);
+                m_videoTranscoder->setDrawDateTime(QnFfmpegVideoTranscoder::Date_RightBottom);
+                m_videoTranscoder->setOnScreenDateOffset(m_onscreenDateOffset);
                 m_videoTranscoder->setQuality(QnQualityHighest);
                 m_videoTranscoder->open(mediaData);
                 avcodec_copy_context(videoStream->codec, m_videoTranscoder->getCodecContext());
@@ -697,4 +699,9 @@ bool QnStreamRecorder::isAudioPresent() const
 void QnStreamRecorder::setAudioCodec(CodecID codec)
 {
     m_dstAudioCodec = codec;
+}
+
+void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
+{
+    m_onscreenDateOffset = timeOffsetMs;
 }
