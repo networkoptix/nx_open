@@ -37,6 +37,11 @@ public:
 
     QPoint selectionPos() const;
 
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+
+    void updateColumnsSize();
+
 signals:
     void activated(const QnResourcePtr &resource);
 

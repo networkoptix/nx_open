@@ -27,8 +27,8 @@
 
 namespace {
     enum Columns {
-        CheckColumn,
         NameColumn,
+        CheckColumn,
         ColumnCount
     };
 
@@ -349,7 +349,6 @@ public:
             return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
-                //| Qt::ItemIsUserCheckable;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -368,12 +367,6 @@ public:
     }
 
     QVariant data(int role, int column) const {
-        if (column == CheckColumn){
-            if (role == Qt::CheckStateRole)
-                return m_checked;
-            return QVariant();
-        }
-
         switch(role) {
         case Qt::DisplayRole:
         case Qt::ToolTipRole:
@@ -381,13 +374,21 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            if (column == NameColumn)
+                return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            break;
         case Qt::DecorationRole:
             if (column == NameColumn)
                 return m_icon;
             break;
         case Qt::EditRole:
-            return m_name;
+            if (column == NameColumn)
+                return m_name;
+            break;
+        case Qt::CheckStateRole:
+            if (column == CheckColumn)
+                return m_checked;
+            break;
         case Qn::ResourceRole:
             if(m_resource)
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
@@ -456,7 +457,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(NameColumn);
             int row = m_children.indexOf(child);
 
             m_model->beginRemoveRows(index, row, row);
@@ -471,7 +472,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(NameColumn);
             int row = m_children.size();
 
             m_model->beginInsertRows(index, row, row);
@@ -486,7 +487,7 @@ protected:
         if(!isValid() || isBastard())
             return;
         
-        QModelIndex index = this->index(0);
+        QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
     }
 
@@ -717,14 +718,14 @@ QModelIndex QnResourcePoolModel::index(int row, int column, const QModelIndex &p
 }
 
 QModelIndex QnResourcePoolModel::buddy(const QModelIndex &index) const {
-    return index.sibling(index.row(), 0);
+    return index;
 }
 
 QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
     if(!index.isValid())
         return QModelIndex();
 
-    return node(index)->parent()->index(0);
+    return node(index)->parent()->index(NameColumn);
 }
 
 bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
@@ -732,7 +733,7 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    if (parent.column() > 0)
+    if (parent.column() >= ColumnCount)
         return 0;
 
     return node(parent)->children().size();

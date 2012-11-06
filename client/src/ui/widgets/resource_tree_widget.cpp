@@ -2,6 +2,7 @@
 #include "ui_resource_tree_widget.h"
 
 #include <QtGui/QStyledItemDelegate>
+#include <QtGui/QScrollBar>
 
 #include <common/common_meta_types.h>
 
@@ -42,6 +43,7 @@ public:
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
         if (index.column() == 1){
+            //TODO: #gdm make enum public
             base_type::paint(painter, option, index);
             return;
         }
@@ -219,6 +221,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     connect(ui->resourcesTreeView,     SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView,     SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
+
+    ui->resourcesTreeView->installEventFilter(this);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -250,6 +254,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
+    updateColumnsSize();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel() {
@@ -286,6 +291,22 @@ QPoint QnResourceTreeWidget::selectionPos() const {
     return pos;
 }
 
+bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
+    if (obj == ui->resourcesTreeView && event->type() == QEvent::Resize){
+        updateColumnsSize();
+        return true;
+    }
+    return QWidget::eventFilter(obj, event);
+}
+
+void QnResourceTreeWidget::updateColumnsSize(){
+    //ui->resourcesTreeView->resizeColumnToContents(1);
+    ui->resourcesTreeView->setColumnWidth(1, 16);
+    int offset = 24;
+    if (ui->resourcesTreeView->verticalScrollBar()->isVisible())
+        offset += ui->resourcesTreeView->verticalScrollBar()->width();
+    ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->width() - offset);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -315,6 +336,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     int nodeType = index.data(Qn::NodeTypeRole).toInt();
     if((resource && resource->hasFlags(QnResource::server)) || nodeType == Qn::ServersNode)
         ui->resourcesTreeView->expand(index);
+  //  ui->resourcesTreeView->resizeColumnToContents(0);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

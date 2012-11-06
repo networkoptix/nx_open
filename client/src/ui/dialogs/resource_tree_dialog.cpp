@@ -15,7 +15,12 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
     ui->resourcesWidget->setModel(m_resourceModel); //TODO: move proxy model out of browser class
 }
 
-QnResourceTreeDialog::~QnResourceTreeDialog()
-{
+QnResourceTreeDialog::~QnResourceTreeDialog() {
 
+}
+
+QnResourceList QnResourceTreeDialog::getSelectedResources() {
+    QnResourceList result;
+
+    return result;
 }

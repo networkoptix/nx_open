@@ -3,7 +3,10 @@
 
 #include <QDialog>
 
+#include "core/resource/resource_fwd.h"
+
 #include <ui/workbench/workbench_context_aware.h>
+
 
 namespace Ui {
     class QnResourceTreeDialog;
@@ -18,6 +21,8 @@ class QnResourceTreeDialog : public QDialog, public QnWorkbenchContextAware
 public:
     explicit QnResourceTreeDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnResourceTreeDialog();
+
+    QnResourceList getSelectedResources();
     
 private:
     QScopedPointer<Ui::QnResourceTreeDialog> ui;
