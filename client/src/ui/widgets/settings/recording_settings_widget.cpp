@@ -104,8 +104,8 @@ void QnRecordingSettingsWidget::updateFromSettings() {
     setDecoderQuality(m_settings->decoderQuality());
     setResolution(m_settings->resolution());
     setScreen(m_settings->screen());
-    setPrimaryAudioDeviceName(m_settings->primaryAudioDevice().deviceName());
-    setSecondaryAudioDeviceName(m_settings->secondaryAudioDevice().deviceName());
+    setPrimaryAudioDeviceName(m_settings->primaryAudioDeviceName());
+    setSecondaryAudioDeviceName(m_settings->secondaryAudioDeviceName());
     
     ui->captureCursorCheckBox->setChecked(m_settings->captureCursor());
     ui->recordingFolderLabel->setText(m_settings->recordingFolder());

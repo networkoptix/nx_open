@@ -404,7 +404,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
         m_audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
     }
 
-    if (audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName())
+    if (audioDevice && audioDevice2)
     {
         m_audioInfo << new EncodedAudioInfo(this); // second channel
         m_audioInfo[1]->m_audioDevice = *audioDevice2;

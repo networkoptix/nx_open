@@ -122,7 +122,9 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
 
     QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
     QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
-    QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
+    QAudioDeviceInfo secondAudioDevice;
+    if (recorderSettings.primaryAudioDeviceName() != recorderSettings.secondaryAudioDeviceName())
+        secondAudioDevice = recorderSettings.secondaryAudioDevice();
     if (QAudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
         audioDevice = QAudioDeviceInfo(); // no audio devices
         secondAudioDevice = QAudioDeviceInfo();
