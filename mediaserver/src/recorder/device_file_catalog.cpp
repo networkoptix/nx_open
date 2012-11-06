@@ -84,7 +84,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     if (m_file.size() == 0) 
     {
         QTextStream str(&m_file);
-        str << "start; storage; index; duration\n"; // write CSV header
+        str << "timezone; start; storage; index; duration\n"; // write CSV header
         str.flush();
     }
     else {
@@ -111,6 +111,9 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
    
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
+	if (chunk.timeZone != -1)
+		fileDate = fileDate.toUTC().addSecs(chunk.timeZone*60);
+
     int currentParts[4];
     currentParts[0] = fileDate.date().year();
     currentParts[1] = fileDate.date().month();
@@ -246,24 +249,28 @@ void DeviceFileCatalog::deserializeTitleFile()
     bool needRewriteCatalog = false;
     QFile newFile(m_file.fileName() + QString(".tmp"));
 
-    m_file.readLine(); // read header
+    int timeZoneExist = 0;
+    QByteArray headerLine = m_file.readLine();
+    if (headerLine.contains("timezone"))
+        timeZoneExist = 1;
     QByteArray line;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
-        if (fields.size() < 4) {
+        if (fields.size() < 4 + timeZoneExist) {
             continue;
         }
         int coeff = 1; // compabiliy with previous version (convert usec to ms)
-        if (fields[0].length() >= 16)
+        if (fields[0+timeZoneExist].length() >= 16)
             coeff = 1000;
-        qint64 startTime = fields[0].toLongLong()/coeff;
-        QString durationStr = fields[3].trimmed();
-        int duration = fields[3].trimmed().toInt()/coeff;
-        Chunk chunk(startTime, fields[1].toInt(), fields[2].toInt(), duration);
+        qint16 timeZone = timeZoneExist ? fields[0].toInt() : -1;
+        qint64 startTime = fields[0+timeZoneExist].toLongLong()/coeff;
+        QString durationStr = fields[3+timeZoneExist].trimmed();
+        int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
+        Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
         QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
-        if (fields[3].trimmed().isEmpty()) 
+        if (fields[3+timeZoneExist].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
@@ -312,13 +319,17 @@ void DeviceFileCatalog::deserializeTitleFile()
 
     } while (!line.isEmpty());
     newFile.close();
+    
+    if (!timeZoneExist)
+        needRewriteCatalog = true; // update catalog to new version
+
     if (needRewriteCatalog && newFile.open(QFile::WriteOnly))
     {
         QTextStream str(&newFile);
-        str << "start; storage; index; duration\n"; // write CSV header
+        str << "timezone; start; storage; index; duration\n"; // write CSV header
 
         foreach(Chunk chunk, m_chunks)
-            str << chunk.startTimeMs  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.durationMs << '\n';
+            str << chunk.timeZone << ';' << chunk.startTimeMs  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.durationMs << '\n';
         str.flush();
 
         m_file.close();
@@ -345,7 +356,7 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
         itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
     QTextStream str(&m_file);
 
-    str << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
+    str << chunk.timeZone << ';' << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
     if (chunk.durationMs >= 0)
         str << chunk.durationMs  << '\n';
     str.flush();
@@ -499,7 +510,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
     return closeDirPath(storage->getUrl()) + 
                 prefixForRole(m_role) + QString('/') +
                 m_macAddress + QString('/') +
-                QnStorageManager::dateTimeStr(chunk.startTimeMs) + 
+                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");
 }

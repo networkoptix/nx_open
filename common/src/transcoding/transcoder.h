@@ -142,6 +142,7 @@ public:
     int writeBuffer(const char* data, int size);
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
+    static int suggestBitrate(QSize resolution);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -161,8 +162,6 @@ protected:
     QnByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
     qint64 m_firstTime;
-private:
-    int suggestBitrate(QSize resolution) const;
 protected:
     bool m_initialized;
 private:

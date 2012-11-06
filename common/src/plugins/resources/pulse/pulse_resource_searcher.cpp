@@ -26,8 +26,11 @@ QnResourceList QnPlPulseSearcher::findResources()
         QnNetworkResourcePtr res = createResource(r.manufacture, r.name);
         if (!res)
             continue;
+        QnPhysicalCameraResourcePtr cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
         
         res->setName(r.name);
+        if (cameraRes)
+            cameraRes->setModel(r.name);
         res->setMAC(r.mac);
         res->setHostAddress(QHostAddress(r.ip), QnDomainMemory);
         res->setDiscoveryAddr(QHostAddress(r.disc_ip));

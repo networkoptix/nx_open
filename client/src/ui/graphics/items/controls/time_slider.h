@@ -294,6 +294,11 @@ private:
 
     void setThumbnailSelecting(qint64 time, bool selecting);
 
+    void setAnimationStart(qint64 start);
+    void setAnimationEnd(qint64 end);
+    qint64 animationStart();
+    qint64 animationEnd();
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 

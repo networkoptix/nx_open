@@ -64,6 +64,7 @@
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/gettime_handler.h"
+#include "platform/platform_abstraction.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -791,6 +792,8 @@ protected:
     {
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
+
+        new QnPlatformAbstraction(app);
 
         if (guid.isEmpty())
         {

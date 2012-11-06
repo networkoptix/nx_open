@@ -2,7 +2,7 @@
 #define QN_PLATFORM_MONITOR_H
 
 #if defined(_MSC_VER) && _MSC_VER<1600 
-// TODO: msvc2008
+// TODO: msvc2008, remove this hell after transition to msvc2010
 #   ifdef _WIN64
 namespace std { typedef __int64 intptr_t; }
 #   else

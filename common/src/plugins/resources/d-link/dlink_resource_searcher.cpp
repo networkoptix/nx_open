@@ -134,7 +134,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
                 break;
 
 
-            QnNetworkResourcePtr resource ( new QnPlDlinkResource() );
+            QnPlDlinkResourcePtr resource ( new QnPlDlinkResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
             if (!rt.isValid())
@@ -142,6 +142,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
 
             resource->setTypeId(rt);
             resource->setName(name);
+            resource->setModel(name);
             resource->setMAC(smac);
             resource->setHostAddress(sender, QnDomainMemory);
 

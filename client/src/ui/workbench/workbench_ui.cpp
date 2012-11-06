@@ -61,7 +61,7 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
-#include <ui/events/system_menu_event.h>
+#include <ui/workaround/system_menu_event.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "camera/video_camera.h"
@@ -111,7 +111,6 @@ namespace {
     }
 
     QnImageButtonWidget *newShowHideButton(QGraphicsItem *parent = NULL, QAction *action = NULL) {
-
         QnImageButtonWidget *button = new QnImageButtonWidget(parent);
         button->resize(15, 45);
         if (action)
@@ -1387,7 +1386,7 @@ bool QnWorkbenchUi::isSliderOpened() const {
 }
 
 bool QnWorkbenchUi::isTitleOpened() const {
-    return m_titleUsed && action(Qn::ToggleTitleBarAction)->isChecked();
+    return action(Qn::ToggleTitleBarAction)->isChecked();
 }
 
 void QnWorkbenchUi::setTreeShowButtonUsed(bool used) {
@@ -1605,7 +1604,8 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        widget->setDecorationsVisible(false);
+        if(!(widget->options() & QnResourceWidget::DisplayInfo))
+            widget->setDecorationsVisible(false);
 }
 
 void QnWorkbenchUi::at_activityStarted() {
@@ -1632,7 +1632,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::ZoomedRole) {
         if(newWidget) {
             m_unzoomedOpenedPanels = openedPanels();
-            setOpenedPanels(NoPanel);
+            setOpenedPanels(openedPanels() & SliderPanel); /* Leave slider open. */
         } else {
             /* User may have opened some panels while zoomed, 
              * we want to leave them opened even if they were closed before. */

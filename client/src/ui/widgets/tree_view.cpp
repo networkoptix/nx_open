@@ -3,7 +3,7 @@
 #include <QtCore/QTimerEvent>
 #include <QtGui/QDragMoveEvent>
 
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 QnTreeView::QnTreeView(QWidget *parent): 
     QTreeView(parent)

@@ -10,7 +10,9 @@ scaleContext(0),
 m_encoderCtx(0),
 m_firstEncodedPts(AV_NOPTS_VALUE),
 m_lastSrcWidth(-1),
-m_lastSrcHeight(-1)
+m_lastSrcHeight(-1),
+m_mtMode(false),
+m_drawTime(false)
 
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
@@ -68,7 +70,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
     QnVideoTranscoder::open(video);
 
-    m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, false);
+    m_videoDecoder = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
@@ -85,18 +87,28 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->pix_fmt = PIX_FMT_YUV420P;
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
-
+    if (m_bitrate == -1)
+        m_bitrate = QnTranscoder::suggestBitrate(QSize(m_encoderCtx->width,m_encoderCtx->height));
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
     m_encoderCtx->time_base.den = 60;
     m_encoderCtx->sample_aspect_ratio.den = m_encoderCtx->sample_aspect_ratio.num = 1;
+    if (m_mtMode)
+        m_encoderCtx->thread_count = QThread::idealThreadCount();
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
         m_lastErrMessage = QObject::tr("Can't initialize video encoder");
         return false;
     }
     return true;
+}
+
+void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
+{
+    QString timeStr = QDateTime::fromMSecsSinceEpoch(frame->pts/1000).toString();
+    // todo: draw time here
+    //QImage img((uchar*) frame->data[0], frame->width, frame->height, frame->linesize[0], QImage::Format_Indexed8);
 }
 
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
@@ -118,12 +130,13 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             decodedFrame = &m_scaledVideoFrame;
         }
 
+        if (m_drawTime)
+            doDrawOnScreenTime(decodedFrame);
+
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
         if (m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
-        //decodedFrame->pts -= m_firstEncodedPts;
-
 
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
 
@@ -147,4 +160,15 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
 AVCodecContext* QnFfmpegVideoTranscoder::getCodecContext()
 {
     return m_encoderCtx;
+}
+
+void QnFfmpegVideoTranscoder::setMTMode(bool value)
+{
+    m_mtMode = value;
+}
+
+
+void QnFfmpegVideoTranscoder::setDrawTime(bool value)
+{
+    m_drawTime = true;
 }

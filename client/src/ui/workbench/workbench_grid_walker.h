@@ -1,9 +1,10 @@
 #ifndef QN_WORKBENCH_GRID_WALKER_H
 #define QN_WORKBENCH_GRID_WALKER_H
 
-#include <QRect>
-#include <QPoint>
-#include "workbench_globals.h"
+#include <QtCore/QRect>
+#include <QtCore/QPoint>
+
+#include <client/client_globals.h>
 
 /**
  * This is a helper class for guided iteration over workbench layout grid.

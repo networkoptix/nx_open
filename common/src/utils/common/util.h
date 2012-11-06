@@ -157,6 +157,12 @@ public:
     }
 };
 
+/*
+* Returns current time zone offset in seconds
+*/
+qint16 currentTimeZone();
+
+
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

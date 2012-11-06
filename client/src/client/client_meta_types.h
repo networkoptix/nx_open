@@ -5,10 +5,10 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 
-// TODO: move this file to /client/
-
 /**
  * Convenience class for uniform initialization of metatypes in client module.
+ * 
+ * Also initializes metatypes from common module.
  */
 class QnClientMetaTypes {
 public:
