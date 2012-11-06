@@ -27,6 +27,7 @@
 
 namespace {
     enum Columns {
+        CheckColumn,
         NameColumn,
         ColumnCount
     };
@@ -76,7 +77,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Online),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Checked)
     {
         assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
 
@@ -114,7 +116,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Checked)
     {
         assert(model != NULL);
 
@@ -132,7 +135,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Checked)
     {
         assert(model != NULL);
     }
@@ -340,8 +344,12 @@ public:
         return m_model->createIndex(row, col, this);
     }
 
-    Qt::ItemFlags flags() const {
+    Qt::ItemFlags flags(const QModelIndex &index) const {
+        if (index.column() == CheckColumn)
+            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
+                //| Qt::ItemIsUserCheckable;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -360,6 +368,12 @@ public:
     }
 
     QVariant data(int role, int column) const {
+        if (column == CheckColumn){
+            if (role == Qt::CheckStateRole)
+                return m_checked;
+            return QVariant();
+        }
+
         switch(role) {
         case Qt::DisplayRole:
         case Qt::ToolTipRole:
@@ -369,7 +383,7 @@ public:
         case Qt::AccessibleDescriptionRole:
             return m_displayName + (m_modified ? QLatin1String("*") : QString());
         case Qt::DecorationRole:
-            if (column == 0)
+            if (column == NameColumn)
                 return m_icon;
             break;
         case Qt::EditRole:
@@ -412,7 +426,10 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        Q_UNUSED(column);
+        if (/*column == CheckColumn &&*/ role == Qt::CheckStateRole){
+            m_checked = (Qt::CheckState)value.toInt();
+            return true;
+        }
 
         if(role != Qt::EditRole)
             return false;
@@ -524,6 +541,9 @@ private:
 
     /** Whether this resource is modified. */
     bool m_modified;
+
+    /** Whether this resource is checked. */
+    Qt::CheckState m_checked;
 };
 
 
@@ -726,7 +746,7 @@ Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
 
-    return node(index)->flags();
+    return node(index)->flags(index);
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {

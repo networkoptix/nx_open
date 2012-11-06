@@ -41,6 +41,11 @@ public:
 
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
+        if (index.column() == 1){
+            base_type::paint(painter, option, index);
+            return;
+        }
+
         QStyleOptionViewItemV4 optionV4 = option;
         initStyleOption(&optionV4, index);
 
