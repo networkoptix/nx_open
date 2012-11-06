@@ -10,13 +10,13 @@
 
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
+class QSortFilterProxyModel;
 
 namespace Ui {
     class QnResourceTreeWidget;
 }
 
-class QnResourceTreeWidget : public QWidget
-{
+class QnResourceTreeWidget : public QWidget {
     Q_OBJECT
     
 public:
@@ -44,10 +44,14 @@ private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
 
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
+
+    QSortFilterProxyModel *m_resourceProxyModel;
 };
 
 #endif // RESOURCE_TREE_WIDGET_H

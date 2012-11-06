@@ -614,7 +614,7 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 }
 
 void QnSingleCameraSettingsWidget::at_bigTestButton_clicked() {
-    QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog());
+    QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog(NULL, context()));
     dialog->exec();
 }
 
