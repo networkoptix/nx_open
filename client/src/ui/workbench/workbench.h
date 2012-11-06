@@ -214,6 +214,8 @@ private slots:
     void at_layout_cellSpacingChanged();
 
     void updateSingleRoleItem();
+    void updateActiveRoleItem();
+    void updateCentralRoleItem();
 
 private:
     /** Current layout. */
