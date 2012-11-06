@@ -2471,9 +2471,11 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName(false);
+    QString selectedFilter;
+    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;");
+    allowedFormatFilter += tr("AVI with date(Audio/Video Interleaved)(*.avi);;Matroska  with date(*.mkv);;");
+    allowedFormatFilter += binaryFilterName(false);
     while (true) {
-        QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             tr("Export Video As..."),
@@ -2570,7 +2572,10 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
+        QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
+        if (selectedFilter.contains(tr("with date")))
+            role = QnStreamRecorder::Role_FileExportWithTime;
+        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), QnStorageResourcePtr(), role);
         exportProgressDialog->exec();
     }
 }

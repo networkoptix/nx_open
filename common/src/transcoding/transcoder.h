@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/resource/media_resource.h"
 
 
 //!Base class for all raw media stream transcoders
@@ -142,7 +143,7 @@ public:
     int writeBuffer(const char* data, int size);
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
-    static int suggestBitrate(QSize resolution);
+    static int suggestBitrate(QSize resolution, QnStreamQuality quality = QnQualityNormal);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data

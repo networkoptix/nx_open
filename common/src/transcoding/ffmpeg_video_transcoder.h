@@ -8,6 +8,8 @@
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
 public:
+    enum OnScreenDatePos {Date_None, Date_LeftTop, Date_RightTop, Date_RightBottom, Date_LeftBottom};
+
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
@@ -19,10 +21,13 @@ public:
     void setMTMode(bool value);
 
     /* Draw video frames time on the screen */
-    void setDrawTime(bool value);
+    void setDrawDateTime(OnScreenDatePos value);
+
+    void setQuality(QnStreamQuality quality);
 private:
     int rescaleFrame();
     void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
+    void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
     CLFFmpegVideoDecoder* m_videoDecoder;
     CLVideoDecoderOutput m_decodedVideoFrame;
@@ -34,7 +39,16 @@ private:
     int m_lastSrcWidth;
     int m_lastSrcHeight;
     bool m_mtMode;
-    bool m_drawTime;
+    
+    OnScreenDatePos m_dateTextPos;
+    uchar* m_imageBuffer;
+    QImage* m_timeImg;
+    QFont m_timeFont;
+    int m_dateTimeXOffs;
+    int m_dateTimeYOffs;
+    QnStreamQuality m_quality;
+    int m_bufferYOffs;
+    int m_bufferUVOffs;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
