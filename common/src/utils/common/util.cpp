@@ -196,7 +196,7 @@ QString getValueFromString(const QString& line)
     return line.mid(index+1);
 }
 
-qint16 currentTimeZone()
+int currentTimeZone()
 {
     QDateTime dt1(QDateTime::currentDateTime());
     QDateTime dt2 = dt1.toUTC();

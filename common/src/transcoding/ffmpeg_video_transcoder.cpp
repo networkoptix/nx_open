@@ -1,7 +1,10 @@
 #include "ffmpeg_video_transcoder.h"
 #include "decoders/video/ffmpeg.h"
+#include <utils/color_space/yuvconvert.h>
 
 const static int MAX_VIDEO_FRAME = 1024 * 1024 * 3;
+static const int TEXT_HEIGHT_IN_FRAME_PARTS = 25;
+static const int MIN_TEXT_HEIGHT = 14;
 
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnVideoTranscoder(codecId),
@@ -12,8 +15,15 @@ m_firstEncodedPts(AV_NOPTS_VALUE),
 m_lastSrcWidth(-1),
 m_lastSrcHeight(-1),
 m_mtMode(false),
-m_drawTime(false)
-
+m_dateTextPos(Date_None),
+m_timeImg(0),
+m_imageBuffer(0),
+m_dateTimeXOffs(0),
+m_dateTimeYOffs(0),
+m_quality(QnQualityNormal),
+m_bufferYOffs(0),
+m_bufferUVOffs(0),
+m_onscreenDateOffset(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -30,6 +40,8 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
     }
 
     delete m_videoDecoder;
+    delete m_timeImg;
+    qFreeAligned(m_imageBuffer);
 }
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
@@ -88,7 +100,7 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     m_encoderCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
     //m_encoderCtx->flags |= CODEC_FLAG_LOW_DELAY;
     if (m_bitrate == -1)
-        m_bitrate = QnTranscoder::suggestBitrate(QSize(m_encoderCtx->width,m_encoderCtx->height));
+        m_bitrate = QnTranscoder::suggestBitrate(QSize(m_encoderCtx->width,m_encoderCtx->height), m_quality);
     m_encoderCtx->bit_rate = m_bitrate;
     m_encoderCtx->gop_size = 32;
     m_encoderCtx->time_base.num = 1;
@@ -104,11 +116,81 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
     return true;
 }
 
+void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr)
+{
+    m_timeFont.setBold(true);
+    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
+    QFontMetrics metric(m_timeFont);
+    int bufYOffs = 0;
+
+    switch(m_dateTextPos)
+    {
+    case Date_LeftTop:
+        bufYOffs = 0;
+        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        break;
+    case Date_RightTop:
+        bufYOffs = 0;
+        m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
+        break;
+    case Date_RightBottom:
+        bufYOffs = frame->height - metric.height();
+        m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
+        break;
+    case Date_LeftBottom:
+    default:
+        bufYOffs = frame->height - metric.height();
+        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        break;
+    }
+
+    bufYOffs = qPower2Floor(bufYOffs, 2);
+    int srcBufOffset = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    m_bufferYOffs  = srcBufOffset + bufYOffs * frame->linesize[0];
+    m_bufferUVOffs = srcBufOffset/2 + bufYOffs * frame->linesize[1] / 2;
+
+    m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
+    m_dateTimeYOffs = metric.ascent();
+
+    int drawWidth = metric.width(timeStr);
+    int drawHeight = metric.height();
+    drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
+    m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
+}
+
 void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 {
-    QString timeStr = QDateTime::fromMSecsSinceEpoch(frame->pts/1000).toString();
-    // todo: draw time here
-    //QImage img((uchar*) frame->data[0], frame->width, frame->height, frame->linesize[0], QImage::Format_Indexed8);
+    QString timeStr;
+    QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000 + m_onscreenDateOffset);
+    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
+        timeStr = dt.toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+    else
+        timeStr = dt.toString(QLatin1String("hh:mm:ss.zzz"));
+
+    if (m_timeImg == 0)
+        initTimeDrawing(frame, timeStr);
+
+    // copy and convert frame buffer to image
+    yuv420_argb32_sse2_intr(m_imageBuffer,
+        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        m_timeImg->width(), m_timeImg->height(),
+        m_timeImg->bytesPerLine(), 
+        frame->linesize[0], frame->linesize[1], 255);
+
+    QPainter p(m_timeImg);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+    QPainterPath path;
+    path.addText(m_dateTimeXOffs, m_dateTimeYOffs, m_timeFont, timeStr);
+    p.setBrush(Qt::white);
+    p.drawPath(path);
+    p.strokePath(path, QPen(QColor(32,32,32,80)));
+
+    // copy and convert RGBA32 image back to frame buffer
+    bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
+        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        frame->linesize[0], frame->linesize[1], 
+        m_timeImg->width(), m_timeImg->height(), false);
 }
 
 int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result)
@@ -130,7 +212,7 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
             decodedFrame = &m_scaledVideoFrame;
         }
 
-        if (m_drawTime)
+        if (m_dateTextPos != Date_None)
             doDrawOnScreenTime(decodedFrame);
 
         static AVRational r = {1, 1000000};
@@ -168,7 +250,17 @@ void QnFfmpegVideoTranscoder::setMTMode(bool value)
 }
 
 
-void QnFfmpegVideoTranscoder::setDrawTime(bool value)
+void QnFfmpegVideoTranscoder::setDrawDateTime(OnScreenDatePos value)
 {
-    m_drawTime = true;
+    m_dateTextPos = value;
+}
+
+void QnFfmpegVideoTranscoder::setQuality(QnStreamQuality quality)
+{
+    m_quality = quality;
+}
+
+void QnFfmpegVideoTranscoder::setOnScreenDateOffset(int timeOffsetMs)
+{
+    m_onscreenDateOffset = timeOffsetMs;
 }
