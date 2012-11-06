@@ -118,50 +118,42 @@ bool QnFfmpegVideoTranscoder::open(QnCompressedVideoDataPtr video)
 
 void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr)
 {
-    int drawWidth = 0;
-    int drawHeight = 0;
-    m_timeFont.setPointSize(1);
     m_timeFont.setBold(true);
+    m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
     int bufYOffs = 0;
-    int requiredDrawHeight = qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS);
-    for (int i = 0; i < 100; ++i)
-    {
-        metric = QFontMetrics(m_timeFont);
-        drawWidth = metric.width(timeStr);
-        drawHeight = metric.height();
 
-        if (drawHeight > requiredDrawHeight)
-            break;
-        m_timeFont.setPointSize(m_timeFont.pointSize() + 1);
-        switch(m_dateTextPos)
-        {
-        case Date_LeftTop:
-            bufYOffs = 0;
-            m_dateTimeXOffs = metric.averageCharWidth()/2;
-            break;
-        case Date_RightTop:
-            bufYOffs = 0;
-            m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
-            break;
-        case Date_RightBottom:
-            bufYOffs = frame->height - metric.height();
-            m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
-            break;
-        case Date_LeftBottom:
-        default:
-            bufYOffs = frame->height - metric.height();
-            m_dateTimeXOffs = metric.averageCharWidth()/2;
-            break;
-        }
+    switch(m_dateTextPos)
+    {
+    case Date_LeftTop:
+        bufYOffs = 0;
+        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        break;
+    case Date_RightTop:
+        bufYOffs = 0;
+        m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
+        break;
+    case Date_RightBottom:
+        bufYOffs = frame->height - metric.height();
+        m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
+        break;
+    case Date_LeftBottom:
+    default:
+        bufYOffs = frame->height - metric.height();
+        m_dateTimeXOffs = metric.averageCharWidth()/2;
+        break;
     }
+
     bufYOffs = qPower2Floor(bufYOffs, 2);
-    m_bufferYOffs  = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT)   + bufYOffs * frame->linesize[0];
-    m_bufferUVOffs = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT)/2 + bufYOffs * frame->linesize[1] / 2;
+    int srcBufOffset = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
+    m_bufferYOffs  = srcBufOffset + bufYOffs * frame->linesize[0];
+    m_bufferUVOffs = srcBufOffset/2 + bufYOffs * frame->linesize[1] / 2;
 
     m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
     m_dateTimeYOffs = metric.ascent();
 
+    int drawWidth = metric.width(timeStr);
+    int drawHeight = metric.height();
     drawWidth = qPower2Ceil((unsigned) drawWidth + m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
     m_imageBuffer = (uchar*) qMallocAligned(drawWidth * drawHeight * 4, CL_MEDIA_ALIGNMENT);
     m_timeImg = new QImage(m_imageBuffer, drawWidth, drawHeight, drawWidth*4, QImage::Format_ARGB32_Premultiplied);
@@ -171,13 +163,10 @@ void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 {
     QString timeStr;
     QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000 + m_onscreenDateOffset);
-    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD) {
-        timeStr = dt.toString(Qt::SystemLocaleShortDate);
-        timeStr += dt.toString(QLatin1String(".zzz"));
-    }
-    else {
+    if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
+        timeStr = dt.toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+    else
         timeStr = dt.toString(QLatin1String("hh:mm:ss.zzz"));
-    }
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);
