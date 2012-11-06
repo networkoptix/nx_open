@@ -262,3 +262,13 @@ int QnMediaServerResource::getProxyPort() const
 {
     return m_restConnection->getProxyPort();
 }
+
+QString QnMediaServerResource::getVersion() const
+{
+    return m_version;
+}
+
+void QnMediaServerResource::setVersion(const QString &version)
+{
+    m_version = version;
+}
