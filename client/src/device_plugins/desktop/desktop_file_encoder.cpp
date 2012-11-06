@@ -192,7 +192,7 @@ int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name == tmp) {
+            if (name.startsWith(tmp)) {
                 if (--devNum == 0)
                     return i;
             }
