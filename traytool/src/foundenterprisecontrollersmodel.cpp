@@ -80,20 +80,24 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     if( !moduleParameters.contains("port") )
         return;
 
+    const QString& url = "https://"+remoteHostAddress+":"+moduleParameters["port"];
     bool isNewElement = false;
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
     if( it == m_foundModules.end() )
     {
+        FoundModuleData newModuleData;
+        newModuleData.url = url;
+        newModuleData.seed = seed;
         beginResetModel();
-
-        m_foundModules.push_back( FoundModuleData() );
-        it = --m_foundModules.end();
-        it->seed = seed;
+        //searching place to insert new element in order of increase of url
+        it = std::lower_bound( m_foundModules.begin(), m_foundModules.end(), newModuleData );
+        if( it == m_foundModules.end() || it->url != newModuleData.url )
+            it = m_foundModules.insert( it, newModuleData );
         isNewElement = true;
     }
 
     //if such already exists, updating it's data
-    it->url = "https://"+remoteHostAddress+":"+moduleParameters["port"];
+    it->url = url;
     it->ipAddress = remoteHostAddress;
     it->params = moduleParameters;
     if( isNewElement )
