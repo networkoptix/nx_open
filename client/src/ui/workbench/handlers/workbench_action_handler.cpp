@@ -1318,6 +1318,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
+
+    // TODO: save workbench state on logout.
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
