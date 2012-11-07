@@ -39,10 +39,13 @@ public:
 
     QPoint selectionPos() const;
 
+    void setCheckboxesHidden(bool hidden = true);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
 
+    void updateCheckboxesVisibility();
 signals:
     void activated(const QnResourcePtr &resource);
     void viewportSizeChanged();
@@ -61,6 +64,8 @@ private:
     QnResourceTreeItemDelegate *m_itemDelegate;
 
     QSortFilterProxyModel *m_resourceProxyModel;
+
+    bool m_checkboxesHidden;
 };
 
 #endif // RESOURCE_TREE_WIDGET_H

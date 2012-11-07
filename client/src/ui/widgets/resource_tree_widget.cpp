@@ -203,7 +203,8 @@ protected:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
-    m_resourceProxyModel(0)
+    m_resourceProxyModel(0),
+    m_checkboxesHidden(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false); //TODO: set visible from property
@@ -250,6 +251,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
+        updateCheckboxesVisibility();
+
+
         connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
 
         at_resourceProxyModel_rowsInserted(QModelIndex());
@@ -293,27 +297,34 @@ QPoint QnResourceTreeWidget::selectionPos() const {
     return pos;
 }
 
+void QnResourceTreeWidget::setCheckboxesHidden(bool hidden){
+    if (m_checkboxesHidden == hidden)
+        return;
+    m_checkboxesHidden = hidden;
+    updateCheckboxesVisibility();
+}
+
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
-    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Show){
-        emit viewportSizeChanged();
-    }
-    if (obj == ui->resourcesTreeView->verticalScrollBar() && event->type() == QEvent::Hide){
+    if (obj == ui->resourcesTreeView->verticalScrollBar() &&
+            (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
         emit viewportSizeChanged();
     }
     return base_type::eventFilter(obj, event);
 }
 
 void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
-    qDebug() << "resizeevent override" << ui->resourcesTreeView->viewport()->width()
-             << ui->resourcesTreeView->viewport()->width() << event->size();
     emit viewportSizeChanged();
-
     base_type::resizeEvent(event);
 }
 
+void QnResourceTreeWidget::updateCheckboxesVisibility(){
+    ui->resourcesTreeView->setColumnHidden(1, m_checkboxesHidden);
+}
+
 void QnResourceTreeWidget::updateColumnsSize(){
-    ui->resourcesTreeView->setColumnWidth(1, 16);
-    int offset = 24;
+    const int checkBoxSize = 16;
+    const int offset = checkBoxSize * 1.5;
+    ui->resourcesTreeView->setColumnWidth(1, checkBoxSize);
     ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->viewport()->width() - offset);
 }
 

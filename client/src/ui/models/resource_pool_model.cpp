@@ -499,6 +499,7 @@ protected:
         m_checked = state;
         foreach(Node* child, m_children)
             child->setCheckStateRecursive(state);
+        changeInternal();
     }
 
     void updateParentCheckStateRecursive(Qt::CheckState state){
@@ -512,6 +513,7 @@ protected:
         m_checked = state;
         if (m_parent)
             m_parent->updateParentCheckStateRecursive(state);
+        changeInternal();
     }
 
 private:
