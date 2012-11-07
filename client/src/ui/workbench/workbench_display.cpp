@@ -593,6 +593,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         break;
     }
+    case Qn::ActiveRole: {
+        if(oldWidget)
+            oldWidget->setLocalActive(false);
+        if(newWidget)
+            newWidget->setLocalActive(true);
+        m_frameWidthsDirty = true;
+        break;
+    }
     case Qn::CentralRole: {
         /* Update audio playback. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
@@ -1261,7 +1269,7 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {

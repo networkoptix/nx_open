@@ -69,6 +69,8 @@ namespace {
 
     const QColor frameColor = qnGlobals->frameColor();
 
+    const QColor activeFrameColor = frameColor.lighter();
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -109,6 +111,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnWorkbenchContextAware(context),
     m_item(item),
     m_options(DisplaySelectionOverlay | DisplayButtons),
+    m_localActive(false),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
@@ -509,6 +512,14 @@ bool QnResourceWidget::isInfoButtonVisible() const {
     return calculateButtonsVisibility() & InfoButton;
 }
 
+bool QnResourceWidget::isLocalActive() const {
+    return m_localActive;
+}
+
+void QnResourceWidget::setLocalActive(bool localActive) {
+    m_localActive = localActive;
+}
+
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
     setOption(DisplayInfo, visible);
 
@@ -525,7 +536,7 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
-    return buttonBar()->checkedButtons();
+    return (QnResourceWidget::Buttons)buttonBar()->checkedButtons();
 }
 
 void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
@@ -533,7 +544,7 @@ void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
-    return buttonBar()->visibleButtons();
+    return (QnResourceWidget::Buttons)buttonBar()->visibleButtons();
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
@@ -729,7 +740,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor : frameColor;
+    QColor color = isSelected() ? selectedFrameColor : isLocalActive() ? activeFrameColor : frameColor;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */

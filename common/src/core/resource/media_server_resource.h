@@ -63,6 +63,9 @@ public:
     QString getProxyHost() const;
     int getProxyPort() const;
 
+    QString getVersion() const;
+    void setVersion(const QString& version);
+
 signals:
     void serverIFFound(const QString &);
     void panicModeChanged(const QnMediaServerResourcePtr &resource);
@@ -80,6 +83,7 @@ private:
     bool m_primaryIFSelected;
     bool m_reserve;
     bool m_panicMode;
+    QString m_version;
 };
 
 class QnMediaServerResourceFactory : public QnResourceFactory

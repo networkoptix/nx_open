@@ -155,6 +155,9 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
     if (pb_server.has_streamingurl())
         server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
 
+    if (pb_server.has_version())
+        server->setVersion(QString::fromUtf8(pb_server.version().c_str()));
+
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
 
