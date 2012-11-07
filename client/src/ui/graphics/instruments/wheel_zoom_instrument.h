@@ -2,7 +2,7 @@
 #define QN_WHEEL_ZOOM_INSTRUMENT_H
 
 #include "instrument.h"
-#include <QWeakPointer>
+#include <QtCore/QWeakPointer>
 #include <ui/processors/kinetic_processor.h>
 
 /**

@@ -32,7 +32,7 @@ static void updateActivity()
 {
     QMutexLocker locker(activityMutex());
 
-    if (qnSyncTime->currentMSecsSinceEpoch() >= activityTime)
+    if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
     {
 #ifdef Q_OS_MAC
         UpdateSystemActivity(UsrActivity);
@@ -48,7 +48,7 @@ static void updateActivity()
             SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
 #endif
         // Update system activity timer once per 20 seconds
-        activityTime = qnSyncTime->currentMSecsSinceEpoch() + 20000;
+        activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
     }
 }
 

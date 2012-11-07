@@ -112,7 +112,7 @@ bool QnCalendarWidget::isEmpty() {
     return m_empty;
 }
 
-bool QnCalendarWidget::eventFilter(QObject *watched, QEvent *event){
+bool QnCalendarWidget::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::Paint && watched == m_tableView->viewport())
         m_currentTime = qnSyncTime->currentMSecsSinceEpoch();
     return base_type::eventFilter(watched, event);
