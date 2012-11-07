@@ -10,7 +10,7 @@ public:
     QnAudioDeviceInfo(const QAudioDeviceInfo& other, const QString& fullName);
 
     QString fullName() const { return m_fullName.isEmpty() ? deviceName() : m_fullName; }
-    void splitFullName(QString& name, int devNum) const;
+    void splitFullName(QString& name, int& devNum) const;
 private:
     QString m_fullName;
 };

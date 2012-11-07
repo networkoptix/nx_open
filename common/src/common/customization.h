@@ -35,17 +35,12 @@ namespace Qn {
     }
 
     inline Qn::QnProductFeatures calculateProductFeatures(Qn::Customization customization) {
-        switch(customization) {
-        case HdWitnessCustomization:
-            return FreeLicenseFeature;
-        case DwSpectrumCustomization:
-            return QnProductFeatures();
-        case NVisionCustomization:
-            return FreeLicenseFeature;
-        default:
-            assert(false);
-            return 0;
-        }
+        Q_UNUSED(customization);
+
+        QnProductFeatures result;
+        if(QN_HAS_FREE_LICENSES)
+            result |= FreeLicenseFeature;
+        return result;
     }
 
 } // namespace Qn

@@ -536,7 +536,7 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
-    return buttonBar()->checkedButtons();
+    return (QnResourceWidget::Buttons)buttonBar()->checkedButtons();
 }
 
 void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
@@ -544,7 +544,7 @@ void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
 }
 
 QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
-    return buttonBar()->visibleButtons();
+    return (QnResourceWidget::Buttons)buttonBar()->visibleButtons();
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {

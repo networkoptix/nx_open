@@ -644,8 +644,7 @@ bool QnDesktopFileEncoder::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                WinAudioExtendInfo extInfo(audioChannel->m_audioDevice.deviceName());
-                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + extInfo.fullName() + QLatin1Char('\'');
+                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + audioChannel->m_audioDevice.fullName() + QLatin1Char('\'');
                 return false;
             }
         }

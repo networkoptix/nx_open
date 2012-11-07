@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QDateTime>
+#include <QtCore/QBasicTimer>
 
 #include <utils/common/math.h>
 #include <core/resource/resource_fwd.h>
@@ -14,6 +15,9 @@
 
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
+
+    typedef QObject base_type;
+
 public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
@@ -25,8 +29,13 @@ public:
 signals:
     void offsetsChanged();
 
+protected:
+    virtual void timerEvent(QTimerEvent *event) override;
+
+private:
+    void updateServerTime(const QnMediaServerResourcePtr &server);
+
 private slots:
-    void at_server_serverIFFound(const QnMediaServerResourcePtr &server);
     void at_server_serverIFFound();
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -35,6 +44,7 @@ private slots:
     void at_replyReceived(int status, const QDateTime &dateTime, int utcOffset, int handle);
 
 private:
+    QBasicTimer m_timer;
     QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
     QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };

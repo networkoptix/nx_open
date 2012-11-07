@@ -13,7 +13,7 @@ QnAudioDeviceInfo::QnAudioDeviceInfo(const QAudioDeviceInfo& other, const QStrin
 }
 
 
-void QnAudioDeviceInfo::splitFullName(QString& name, int devNum) const
+void QnAudioDeviceInfo::splitFullName(QString& name, int& devNum) const
 {
     QnVideoRecorderSettings::splitFullName(m_fullName, name, devNum);
 }
