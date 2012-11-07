@@ -23,6 +23,12 @@ public:
     void setSyncedTimePeriods(Qn::TimePeriodRole type, QnTimePeriodList periods);
     void setSelectedWindow(quint64 windowStart, quint64 windowEnd);
 
+    // TODO: #gdm function/accessor name should convey what it does/modifies,
+    // not where it should be used in some other class. 
+    // 
+    // Calendar knows nothing about central / non-central widgets, resources,
+    // and other our stuff, and it really shouldn't. If it is used outside of
+    // the context of our application, its method names should still make sense.
     /**
      * If current widget is not central, calendar should not draw current periods.
      */

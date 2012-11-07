@@ -177,8 +177,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
-        foreach(QnWorkbenchItem *item, m_currentLayout->items())
-            at_layout_itemRemoved(item);
+        for(int i = 0; i < Qn::ItemRoleCount; i++)
+            setItem(static_cast<Qn::ItemRole>(i), NULL);
 
         disconnect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),           this, NULL);
         disconnect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, NULL);
@@ -214,8 +214,6 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         if(!qFuzzyCompare(newCellSpacing, oldCellSpacing))
             at_layout_cellSpacingChanged();
 
-        foreach(QnWorkbenchItem *item, m_currentLayout->items())
-            at_layout_itemAdded(item);
         updateActiveRoleItem();
     }
 }
@@ -242,11 +240,10 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
     emit itemChanged(role);
 
     /* Update items for derived roles. */
-    if(role < Qn::ActiveRole) {
+    if(role < Qn::ActiveRole)
         updateActiveRoleItem();
-        if(role < Qn::CentralRole)
-            updateCentralRoleItem();
-    }
+    if(role < Qn::CentralRole)
+        updateCentralRoleItem();
 }
 
 void QnWorkbench::updateSingleRoleItem() {

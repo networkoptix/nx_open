@@ -21,7 +21,7 @@
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
 #define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
 #define QN_LICENSING_MAIL_ADDRESS   "${company.support.address}"
-
+#define QN_HAS_FREE_LICENSES        ${freeLicenses}
 
 /* 
  * These constans are here for windows resouce file.
