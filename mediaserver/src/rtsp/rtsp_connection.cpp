@@ -213,9 +213,7 @@ void QnRtspConnectionProcessor::parseRequest()
     }
 
     QString q = d->requestHeaders.value("x-media-quality");
-    if (q == QString("alwaysHigh"))
-        d->quality = MEDIA_Quality_AlwaysHigh;
-    else if (q == QString("low"))
+    if (q == QString("low"))
         d->quality = MEDIA_Quality_Low;
     else
         d->quality = MEDIA_Quality_High;
@@ -477,7 +475,7 @@ QnAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractMediaD
 
     QnAbstractMediaDataPtr rez;
     
-    bool isHQ = d->quality == MEDIA_Quality_High || d->quality == MEDIA_Quality_AlwaysHigh;
+    bool isHQ = d->quality == MEDIA_Quality_High;
  
     // 1. check packet in GOP keeper
     // Do not check audio for live point if not proprietary client
@@ -857,11 +855,11 @@ void QnRtspConnectionProcessor::checkQuality()
     if (d->liveDpHi && d->quality == MEDIA_Quality_Low)
     {
         if (d->liveDpLow == 0) {
-            d->quality = MEDIA_Quality_AlwaysHigh;
+            d->quality = MEDIA_Quality_High;
             qWarning() << "Low quality not supported for camera" << d->mediaRes->getUniqueId();
         }
         else if (d->liveDpLow->isPaused()) {
-            d->quality = MEDIA_Quality_AlwaysHigh;
+            d->quality = MEDIA_Quality_High;
             qWarning() << "Primary stream has big fps for camera" << d->mediaRes->getUniqueId() << ". Secondary stream is disabled.";
         }
     }
@@ -965,7 +963,7 @@ int QnRtspConnectionProcessor::composePlay()
     d->dataProcessor->setLiveMode(d->liveMode == Mode_Live);
 
     if (!d->useProprietaryFormat)
-        d->quality = MEDIA_Quality_AlwaysHigh; // keep redAss for native client only
+        d->quality = MEDIA_Quality_High; 
     
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 
@@ -1064,9 +1062,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             return CODE_INVALID_PARAMETER;
         if (normParam.startsWith("x-media-quality"))
         {
-            if (vals[1].trimmed() == "alwaysHigh")
-                d->quality = MEDIA_Quality_AlwaysHigh;
-            else if (vals[1].trimmed() == "low")
+            if (vals[1].trimmed() == "low")
                 d->quality = MEDIA_Quality_Low;
             else
                 d->quality = MEDIA_Quality_High;

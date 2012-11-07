@@ -22,7 +22,7 @@ class QnCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
     Q_OBJECT
 public:
-    QnCamDisplay(QnMediaResourcePtr resource);
+    QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader);
     ~QnCamDisplay();
 
     void addVideoChannel(int index, QnAbstractRenderer* vw, bool can_downsacle);
@@ -115,7 +115,6 @@ private:
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
     void setAudioBufferSize(int bufferSize, int prebufferMs);
-    bool isLastVideoQualityLow() const;
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];
@@ -124,17 +123,12 @@ protected:
 
     QnAdaptiveSleep m_delay;
 
-    bool m_playAudioSet;
     float m_speed;
     float m_prevSpeed;
 
     bool m_playAudio;
     bool m_needChangePriority;
-
-    /**
-     * got at least one audio packet
-     */
-    bool m_hadAudio;
+    bool m_hadAudio; // got at least one audio packet
 
     qint64 m_lastAudioPacketTime;
     qint64 m_syncAudioTime;
@@ -144,20 +138,13 @@ protected:
     qint64 m_lastVideoPacketTime;
     qint64 m_lastDecodedTime;
     qint64 m_ignoreTime;
-
     qint64 m_previousVideoTime;
     quint64 m_lastNonZerroDuration;
     qint64 m_lastSleepInterval;
-    //quint64 m_previousVideoDisplayedTime;
-
     bool m_afterJump;
-
     bool m_bofReceived;
-
     int m_displayLasts;
-
     bool m_ignoringVideo;
-
     bool m_isRealTimeSource;
     QnAudioFormat m_expectedAudioFormat;
     QMutex m_audioChangeMutex;
@@ -166,9 +153,6 @@ protected:
     bool m_singleShotQuantProcessed;
     qint64 m_jumpTime;
     QnCodecAudioFormat m_playingFormat;
-    int m_playingCompress;
-    int m_playingBitrate;
-    int m_tooSlowCounter;
     int m_storedMaxQueueSize;
     QnAbstractVideoDecoder::DecodeMode m_lightCpuMode;
     QnVideoStreamDisplay::FrameDisplayStatus m_lastFrameDisplayed;
@@ -176,7 +160,6 @@ protected:
     int m_delayedFrameCount;
     QnlTimeSource* m_extTimeSrc;
     
-    //qint64 m_nextTime;
     bool m_useMtDecoding;
     int m_buffering;
     int m_executingJump;
@@ -188,10 +171,6 @@ protected:
     bool m_isStillImage;
     bool m_isLongWaiting;
     
-
-    static QSet<QnCamDisplay*> m_allCamDisplay;
-    static QMutex m_qualityMutex;
-    static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
     int m_audioBufferSize;
@@ -201,7 +180,6 @@ protected:
 
     mutable QMutex m_timeMutex;
     QnMediaResourcePtr m_resource;
-    bool m_isLastVideoQualityLow;
 	QTime m_afterJumpTimer;
 	qint64 m_firstAfterJumpTime;
 	qint64 m_receivedInterval;

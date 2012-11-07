@@ -810,9 +810,7 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_qualityFastSwitch = fastSwitch;
 
     QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
-    if (quality == MEDIA_Quality_AlwaysHigh)
-        value = "alwaysHigh";
-    else if (quality == MEDIA_Quality_High)
+    if (quality == MEDIA_Quality_High)
         value = "high";
     else
         value = "low";

@@ -294,7 +294,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
         m_dataQueue.lock();
-        bool clearHiQ = m_liveQuality != MEDIA_Quality_Low && m_liveQuality != MEDIA_Quality_AlwaysLow; // remove LQ packets, keep HQ
+        bool clearHiQ = m_liveQuality != MEDIA_Quality_Low; // remove LQ packets, keep HQ
 
         // try to reduce queue by removed packets in specified quality
         bool somethingDeleted = false;
@@ -567,7 +567,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                     setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
                     m_newLiveQuality = MEDIA_Quality_None;
                 }
-                else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_AlwaysHigh) && !isSecondaryProvider) {
+                else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
                     setLiveQualityInternal(m_newLiveQuality);
                     m_newLiveQuality = MEDIA_Quality_None;
                 }

@@ -31,11 +31,13 @@ private:
 
     /** try LQ->HQ once more */
     void addHQTry(); 
+
+    MediaQuality getPrefferedQuality(QnCamDisplay* display);
 private:
     enum FindMethod {Find_Biggest, Find_Least};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(AV_NOPTS_VALUE), hiQualityRetryCounter(0), toLQSpeed(0.0) {}
+        RedAssInfo(): lqTime(0), hiQualityRetryCounter(0), toLQSpeed(0.0) {}
         qint64 lqTime;
         int hiQualityRetryCounter;
         float toLQSpeed;
@@ -50,6 +52,7 @@ private:
     QTimer m_timer;
     QTime m_lastSwitchTimer;
     int m_hiQualityRetryCounter;
+    //bool m_someStreamIsSlow;
 private:
     QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0);
 };

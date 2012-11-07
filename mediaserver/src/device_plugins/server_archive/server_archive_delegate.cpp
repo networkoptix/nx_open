@@ -371,9 +371,6 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 
 bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive)
 {
-    if (quality == MEDIA_Quality_AlwaysHigh)
-        quality = MEDIA_Quality_High;
-
     m_dialQualityHelper.setPrefferedQuality(quality);
     m_quality = quality;
     m_newQualityTmpData.clear();
