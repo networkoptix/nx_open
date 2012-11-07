@@ -15,14 +15,24 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
     QDialog(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnResourceTreeDialog()),
-    m_recordingEnabled(true)
+    m_recordingEnabled(true),
+    m_motionUsed(false),
+    m_dualStreamingUsed(false),
+    m_licensesOk(true),
+    m_motionOk(true)
 {
     ui->setupUi(this);
 
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
-    updateLicensesLabelText();
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
+    ui->motionLabel->setPalette(palette);
+    ui->motionLabel->setVisible(false);
+
+    at_resourceModel_dataChanged();
 }
 
 QnResourceTreeDialog::~QnResourceTreeDialog() {
@@ -54,14 +64,21 @@ void QnResourceTreeDialog::setRecordingEnabled(bool enabled){
     if (m_recordingEnabled == enabled)
         return;
     m_recordingEnabled = enabled;
-    updateLicensesLabelText();
+    updateLicensesStatus();
+}
+
+void QnResourceTreeDialog::setMotionParams(bool motionUsed, bool dualStreamingUsed){
+    m_motionUsed = motionUsed;
+    m_dualStreamingUsed = dualStreamingUsed;
+    updateMotionStatus();
 }
 
 void QnResourceTreeDialog::at_resourceModel_dataChanged(){
-    updateLicensesLabelText();
+    updateLicensesStatus();
+    updateMotionStatus();
 }
 
-void QnResourceTreeDialog::updateLicensesLabelText(){
+void QnResourceTreeDialog::updateLicensesStatus(){
     int alreadyActive = 0;
 
     QnVirtualCameraResourceList cameras = getSelectedCameras();
@@ -85,5 +102,31 @@ void QnResourceTreeDialog::updateLicensesLabelText(){
     QString usageText = tr("%n license(s) will be used out of %1.", NULL, used).arg(total);
     ui->licenseLabel->setText(usageText);
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(used <= total);
+    m_licensesOk = used <= total;
+    updateOkStatus();
+}
+
+void QnResourceTreeDialog::updateMotionStatus(){
+    m_motionOk = true;
+
+    if (m_motionUsed){
+        QnVirtualCameraResourceList cameras = getSelectedCameras();
+        foreach (const QnVirtualCameraResourcePtr &camera, cameras){
+            bool hasMotion = camera->supportedMotionType() != MT_NoMotion;
+            if (!hasMotion){
+                m_motionOk = false;
+                break;
+            }
+            if (m_dualStreamingUsed && !camera->hasDualStreaming()){
+                m_motionOk = false;
+                break;
+            }
+        }
+    }
+    ui->motionLabel->setVisible(!m_motionOk);
+    updateOkStatus();
+}
+
+void QnResourceTreeDialog::updateOkStatus(){
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk);
 }

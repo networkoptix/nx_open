@@ -303,6 +303,7 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     } else {
         setAnyCameraChanges(false);
     }
+    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {

@@ -211,14 +211,9 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     m_itemDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
-    ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
-    ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
 
     QnResourceTreeStyle *treeStyle = new QnResourceTreeStyle(style(), this);
     ui->resourcesTreeView->setStyle(treeStyle);
-
-    ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
-    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 
     connect(ui->resourcesTreeView,      SIGNAL(enterPressed(QModelIndex)),  this,               SLOT(at_treeView_enterPressed(QModelIndex)));
     connect(ui->resourcesTreeView,      SIGNAL(doubleClicked(QModelIndex)), this,               SLOT(at_treeView_doubleClicked(QModelIndex)));
@@ -302,6 +297,15 @@ void QnResourceTreeWidget::setCheckboxesHidden(bool hidden){
         return;
     m_checkboxesHidden = hidden;
     updateCheckboxesVisibility();
+}
+
+void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks){
+    Q_UNUSED(enableTweaks)
+
+    ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
+    ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);
+    ui->resourcesTreeView->setWindowFlags(ui->resourcesTreeView->windowFlags() | Qt::BypassGraphicsProxyWidget);
+    ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 }
 
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){

@@ -41,6 +41,9 @@ public:
 
     void setCheckboxesHidden(bool hidden = true);
 
+    //TODO: #gdm flags?
+    void enableGraphicsTweaks(bool enableTweaks = true);
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;

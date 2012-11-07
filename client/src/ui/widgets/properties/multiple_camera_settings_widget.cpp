@@ -128,6 +128,7 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     }
 
     setHasDbChanges(false);
+    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {

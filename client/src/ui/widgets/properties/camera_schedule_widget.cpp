@@ -680,6 +680,12 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked(){
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     QnResourceTreeDialog dialog(NULL, context());
     dialog.setRecordingEnabled(recordingEnabled);
+
+    bool motionUsed = recordingEnabled && hasMotionOnGrid();
+    bool dualStreamingUsed = motionUsed && hasDualStreamingMotionOnGrid();
+
+    dialog.setMotionParams(motionUsed, dualStreamingUsed);
+
     if (dialog.exec() == QDialog::Rejected)
         return;
 
@@ -699,7 +705,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked(){
     emit scheduleExported(cameras);
 }
 
-bool QnCameraScheduleWidget::hasMotionOnGrid() const{
+bool QnCameraScheduleWidget::hasMotionOnGrid() const {
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
         for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
             const QPoint cell(col, row);
@@ -728,3 +734,31 @@ bool QnCameraScheduleWidget::hasMotionOnGrid() const{
     return false;
 }
 
+bool QnCameraScheduleWidget::hasDualStreamingMotionOnGrid() const {
+    for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
+        for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
+            const QPoint cell(col, row);
+
+            // TODO: swordsmanship skills must be used here.
+            QnScheduleTask::RecordingType recordType = QnScheduleTask::RecordingType_Run;
+            {
+                QColor color(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::ColorParam).toUInt());
+                if (color == ui->recordAlwaysButton->color())
+                    recordType = QnScheduleTask::RecordingType_Run;
+                else if (color == ui->recordMotionButton->color())
+                    recordType = QnScheduleTask::RecordingType_MotionOnly;
+                else if (color == ui->recordMotionPlusLQButton->color())
+                    recordType = QnScheduleTask::RecordingType_MotionPlusLQ;
+                else if (color == ui->noRecordButton->color())
+                    recordType = QnScheduleTask::RecordingType_Never;
+                else
+                    qWarning("ColorParam wasn't acknowledged. fallback to 'Always'");
+            }
+
+            if(recordType == QnScheduleTask::RecordingType_MotionPlusLQ) {
+                return true;
+            }
+        }
+    }
+    return false;
+}

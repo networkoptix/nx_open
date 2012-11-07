@@ -48,6 +48,9 @@ public:
     /** Returns true if there is at least one "record-motion" square on the grid */
     bool hasMotionOnGrid() const;
 
+    /** Returns true if there is at least one "record-motion-plus-LQ-always" square on the grid */
+    bool hasDualStreamingMotionOnGrid() const;
+
     // TODO
     QnWorkbenchContext *context() const { return m_context; }
     void setContext(QnWorkbenchContext *context);

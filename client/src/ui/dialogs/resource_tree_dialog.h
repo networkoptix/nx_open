@@ -25,16 +25,25 @@ public:
     QnVirtualCameraResourceList getSelectedCameras() const;
 
     void setRecordingEnabled(bool enabled = true);
+
+    void setMotionParams(bool motionUsed, bool dualStreamingUsed);
 private slots:
     void at_resourceModel_dataChanged();
 
-    void updateLicensesLabelText();
+    void updateLicensesStatus();
+    void updateMotionStatus();
+    void updateOkStatus();
 private:
     QScopedPointer<Ui::QnResourceTreeDialog> ui;
 
     QnResourcePoolModel *m_resourceModel;
 
     bool m_recordingEnabled;
+    bool m_motionUsed;
+    bool m_dualStreamingUsed;
+
+    bool m_licensesOk;
+    bool m_motionOk;
 };
 
 #endif // RESOURCE_TREE_DIALOG_H
