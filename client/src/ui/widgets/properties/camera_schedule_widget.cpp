@@ -28,7 +28,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
     m_changesDisabled(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_hasChanges(false)
 {
     ui->setupUi(this);
 
@@ -69,6 +70,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
 
     connect(ui->exportScheduleButton,   SIGNAL(clicked()),                   this,   SLOT(at_exportScheduleButton_clicked()));
+    ui->exportWarningLabel->setVisible(false);
     
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
     releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
@@ -129,6 +131,7 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->enableRecordingCheckBox, readOnly);
     setReadOnly(ui->gridWidget, readOnly);
     setReadOnly(ui->exportScheduleButton, readOnly);
+    setReadOnly(ui->exportWarningLabel, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -166,6 +169,18 @@ void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
         updatePanicLabelText();
         updateLicensesButtonVisible();
     }
+}
+
+void QnCameraScheduleWidget::setHasChanges(bool hasChanges){
+    if (m_hasChanges == hasChanges)
+        return;
+
+    qDebug() << "set has changes " << hasChanges;
+    m_hasChanges = hasChanges;
+    ui->exportScheduleButton->setEnabled(!hasChanges
+                                         && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
+    ui->exportWarningLabel->setVisible(hasChanges
+                                       && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
 }
 
 void QnCameraScheduleWidget::updatePanicLabelText() {
@@ -207,6 +222,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                     qWarning("ColorParam wasn't acknowledged. fallback to 'Always'");
             }
             QnStreamQuality streamQuality = QnQualityHighest;
+            if (recordType != QnScheduleTask::RecordingType_Never)
             {
                 QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: Oh crap. This string-switching is totally evil.
                 if (shortQuality == QLatin1String("Lo"))
@@ -406,6 +422,8 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
             ui->gridWidget->setDefaultParam(QnScheduleGridWidget::SecondParam, getShortText(ui->qualityComboBox->currentText()));
         }
     }
+
+    setHasChanges(true);
     emit gridParamsChanged();
 }
 
@@ -478,7 +496,8 @@ void QnCameraScheduleWidget::updateGridEnabledState()
     ui->settingsGroupBox->setEnabled(enabled);
     ui->motionGroupBox->setEnabled(enabled);
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
-    ui->exportScheduleButton->setEnabled(ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
+
+    setHasChanges(true);
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText() 

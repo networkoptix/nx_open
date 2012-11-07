@@ -52,6 +52,9 @@ public:
     QnWorkbenchContext *context() const { return m_context; }
     void setContext(QnWorkbenchContext *context);
 
+    /** Set if widget has unsaved changes. */
+    void setHasChanges(bool hasChanges);
+
 signals:
     void scheduleTasksChanged();
     void recordingSettingsChanged();
@@ -94,6 +97,9 @@ private:
     bool m_motionAvailable;
     bool m_changesDisabled;
     bool m_readOnly;
+
+    /** Widget has unsaved changes */
+    bool m_hasChanges;
 };
 
 

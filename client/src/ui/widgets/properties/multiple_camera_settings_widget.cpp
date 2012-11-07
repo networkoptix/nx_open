@@ -222,6 +222,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
     setHasDbChanges(false);
     m_hasControlsChanges = false;
+    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {

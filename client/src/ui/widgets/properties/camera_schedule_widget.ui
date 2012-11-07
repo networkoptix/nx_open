@@ -560,6 +560,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="exportWarningLabel">
+         <property name="text">
+          <string>Apply settings before export</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

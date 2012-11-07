@@ -455,6 +455,7 @@ void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
     if(!m_hasCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
+    ui->cameraScheduleWidget->setHasChanges(hasChanges);
     emit hasChangesChanged();
 }
 
@@ -466,6 +467,7 @@ void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
     if(!m_anyCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
+    ui->cameraScheduleWidget->setHasChanges(hasChanges);
     emit hasChangesChanged();
 }
 
