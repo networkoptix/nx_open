@@ -95,7 +95,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
         return -3;
 
     if (media) {
-        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER)
+        if (qAbs(media->timestamp - m_lastTimestamp) > MAX_AUDIO_JITTER || m_lastTimestamp == AV_NOPTS_VALUE)
         {
             m_encoderCtx->frame_number = 0;
             m_firstEncodedPts = media->timestamp;

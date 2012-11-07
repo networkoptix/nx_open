@@ -495,7 +495,7 @@
 			<Custom Action="IsClientFolderExists" After="FixClientFolder">1</Custom>
 			<Custom Action="SetClientFolderToDefault" After="CostInitialize">CLIENT_DIRECTORY=""</Custom>
 
-			<?define UseColdstore="$(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE" ?>
+			<?define UseColdstore="($(var.VmsUpgrading) AND SERVER_DIRECTORY_REG_IS_COLDSTORE)" ?>
 
 			<Custom Action="AnalyzeServerDirectoryReg" Before="SetServerDirectoryToRegistry">1</Custom>
 			<Custom Action="SetServerDirectoryToRegistry" Before="FixServerFolder">IS_SERVER_DIRECTORY_REG OR $(var.UseColdstore)</Custom>
@@ -864,7 +864,7 @@
 								<File Id="Clientssleay32.dll" Name="ssleay32.dll" Source="${libdir}/bin/${build.configuration}\ssleay32.dll"/>
 							</Component>
 
-							<Component Id="ClientSigar" Guid="{15E53052-24D8-4c7f-ACBB-2D404BE06A03}">
+							<Component Id="ClientSigar" Guid="{B2CBBF7C-55F2-4c8a-89A6-2F9053BC4E7B}">
 								<File Id="ClientSigar.dll" Name="sigar.dll" Source="${libdir}/bin/${build.configuration}\sigar.dll"/>
 							</Component>
 
