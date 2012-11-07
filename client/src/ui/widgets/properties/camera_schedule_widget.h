@@ -58,6 +58,7 @@ signals:
     void scheduleEnabledChanged();
     void moreLicensesRequested();
     void gridParamsChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void updateGridParams(bool fromUserInput = false);
@@ -74,6 +75,7 @@ private slots:
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();
     void at_releaseSignalizer_activated(QObject *target);
+    void at_exportScheduleButton_clicked();
 
 private:
     int qualityTextToIndex(const QString &text);

@@ -197,13 +197,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="bigTestButton">
-         <property name="text">
-          <string>BIG TEST BUTTON</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

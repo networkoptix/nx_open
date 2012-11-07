@@ -8,11 +8,15 @@
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+
 #include <licensing/license.h>
 
-#include <ui/style/globals.h>
 #include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
+
+#include <ui/dialogs/resource_tree_dialog.h>
+
+#include <ui/style/globals.h>
 
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
@@ -63,6 +67,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(qnLicensePool,              SIGNAL(licensesChanged()),          this,   SLOT(updateLicensesLabelText()), Qt::QueuedConnection);
 
     connect(ui->gridWidget,             SIGNAL(cellActivated(QPoint)),      this,   SLOT(at_gridWidget_cellActivated(QPoint)));
+
+    connect(ui->exportScheduleButton,   SIGNAL(clicked()),                   this,   SLOT(at_exportScheduleButton_clicked()));
     
     QnSingleEventSignalizer *releaseSignalizer = new QnSingleEventSignalizer(this);
     releaseSignalizer->setEventType(QEvent::MouseButtonRelease);
@@ -122,6 +128,7 @@ void QnCameraScheduleWidget::setReadOnly(bool readOnly)
     setReadOnly(ui->fpsSpinBox, readOnly);
     setReadOnly(ui->enableRecordingCheckBox, readOnly);
     setReadOnly(ui->gridWidget, readOnly);
+    setReadOnly(ui->exportScheduleButton, readOnly);
     m_readOnly = readOnly;
 }
 
@@ -471,6 +478,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
     ui->settingsGroupBox->setEnabled(enabled);
     ui->motionGroupBox->setEnabled(enabled);
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
+    ui->exportScheduleButton->setEnabled(ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText() 
@@ -649,6 +657,29 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
 }
 
+void QnCameraScheduleWidget::at_exportScheduleButton_clicked(){
+    bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
+    QnResourceTreeDialog dialog(NULL, context());
+    dialog.setRecordingEnabled(recordingEnabled);
+    if (dialog.exec() == QDialog::Rejected)
+        return;
+
+    QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
+    QnScheduleTaskList tasks;
+    if (recordingEnabled && cameras.size() > 0) {
+        foreach(const QnScheduleTask::Data &data, scheduleTasks())
+            tasks.append(QnScheduleTask(data));
+    }
+
+    foreach(QnVirtualCameraResourcePtr camera, cameras) {
+        camera->setScheduleDisabled(!recordingEnabled);
+        if (recordingEnabled)
+            camera->setScheduleTasks(tasks);
+    }
+    updateLicensesLabelText();
+    emit scheduleExported(cameras);
+}
+
 bool QnCameraScheduleWidget::hasMotionOnGrid() const{
     for (int row = 0; row < ui->gridWidget->rowCount(); ++row) {
         for (int col = 0; col < ui->gridWidget->columnCount(); ++col) {
@@ -677,5 +708,4 @@ bool QnCameraScheduleWidget::hasMotionOnGrid() const{
     }
     return false;
 }
-
 

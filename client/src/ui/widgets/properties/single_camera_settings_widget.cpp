@@ -19,8 +19,6 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
-#include <ui/dialogs/resource_tree_dialog.h>
-
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -67,6 +65,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
@@ -75,8 +74,6 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
     connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
-
-    connect(ui->bigTestButton,          SIGNAL(clicked()),                      this,   SLOT(at_bigTestButton_clicked()));
 
     updateFromResource();
 }
@@ -613,28 +610,6 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 #endif
     QString ipAddress = m_camera->getUrl();
     QProcess::startDetached(cmd.arg(ipAddress));
-}
-
-void QnSingleCameraSettingsWidget::at_bigTestButton_clicked() {
-    //QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog(NULL, context()));
-    bool recordingEnabled = ui->cameraScheduleWidget->activeCameraCount() != 0;
-    QnResourceTreeDialog dialog(NULL, context());
-    dialog.setRecordingEnabled(recordingEnabled);
-    if (dialog.exec() == QDialog::Rejected)
-        return;
-
-    QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
-    QnScheduleTaskList scheduleTasks;
-    if (recordingEnabled && cameras.size() > 0) {
-        foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
-            scheduleTasks.append(QnScheduleTask(data));
-    }
-
-    foreach(QnVirtualCameraResourcePtr camera, cameras) {
-        camera->setScheduleDisabled(!recordingEnabled);
-        if (recordingEnabled)
-            camera->setScheduleTasks(scheduleTasks);
-    }
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

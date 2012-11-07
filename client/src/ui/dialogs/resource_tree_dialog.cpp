@@ -22,6 +22,7 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
+    updateLicensesLabelText();
 }
 
 QnResourceTreeDialog::~QnResourceTreeDialog() {
@@ -68,8 +69,10 @@ void QnResourceTreeDialog::updateLicensesLabelText(){
         if (!camera->isScheduleDisabled())
             alreadyActive++;
 
-    // how many licensed is used really
-    int used = qnResPool->activeCameras() + cameras.size() - alreadyActive;
+    // how many licensed will be used if OK clicked
+    int used = qnResPool->activeCameras() - alreadyActive;
+    if (m_recordingEnabled)
+        used += cameras.size();
 
     // how many licenses do we have
     int total = qnLicensePool->getLicenses().totalCameras();
@@ -79,22 +82,8 @@ void QnResourceTreeDialog::updateLicensesLabelText(){
         palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->licenseLabel->setPalette(palette);
 
-    QString usageText = tr("%n license(s) are used out of %1.", NULL, used).arg(total);
+    QString usageText = tr("%n license(s) will be used out of %1.", NULL, used).arg(total);
+    ui->licenseLabel->setText(usageText);
 
-    if (m_recordingEnabled) {
-        ui->licenseLabel->setText(usageText);
- /*   } else if (toBeUsed > total){
-        ui->licenseLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("Activate %n more license(s).", NULL, toBeUsed - total)).
-                arg(usageText)
-        ); */
-    } else {
-        ui->licenseLabel->setText(
-            QString(QLatin1String("%1 %2")).
-                arg(tr("%n license(s) will be used.", NULL, cameras.size() - alreadyActive)).
-                arg(usageText)
-        );
-    }
-
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(used <= total);
 }
