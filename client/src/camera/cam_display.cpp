@@ -23,7 +23,6 @@ static qint64 activityTime = 0;
 static const int TRY_HIGH_QUALITY_INTERVAL = 1000 * 30;
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll;
-static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 
 
 QSet<QnCamDisplay*> QnCamDisplay::m_allCamDisplay;
@@ -267,6 +266,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 	}
 };
 
+/*
 bool QnCamDisplay::canSwitchToHighQuality()
 {
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
@@ -279,6 +279,7 @@ bool QnCamDisplay::canSwitchToHighQuality()
     m_lastQualitySwitchTime = currentTime;
     return true;
 }
+*/
 
 QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
 {
@@ -317,7 +318,6 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
                 //bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
                 // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
                 //reader->setQualityForced(MEDIA_Quality_Low);
-                //qnRedAssController->setQuality(this, MEDIA_Quality_Low);
                 qnRedAssController->onSlowStream(m_archiveReader);
                 m_toLowQSpeed = speed;
                 //m_toLowQTimer.restart();
@@ -332,12 +332,14 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
                 if (qAbs(speed) < m_toLowQSpeed || (m_toLowQSpeed < 0 && speed > 0))
                 {
                     //reader->setQualityForced(MEDIA_Quality_High); // speed decreased, try to Hi quality again
-                    qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    //qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    qnRedAssController->streamBackToNormal(m_archiveReader);
                 }
                 else if(qAbs(speed) < 1.0 + FPS_EPS /*&& canSwitchToHighQuality() */)
                 {
                     //reader->setQuality(MEDIA_Quality_High, false); 
-                    qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    //qnRedAssController->setQuality(this, MEDIA_Quality_High);
+                    qnRedAssController->streamBackToNormal(m_archiveReader);
                     m_hiQualityRetryCounter++;
                 }
             }

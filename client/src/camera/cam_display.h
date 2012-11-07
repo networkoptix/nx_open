@@ -107,7 +107,7 @@ private:
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
 	void hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media);
-    bool canSwitchToHighQuality();
+    //bool canSwitchToHighQuality();
     void resetQualityStatistics();
     qint64 getMinReverseTime() const;
 

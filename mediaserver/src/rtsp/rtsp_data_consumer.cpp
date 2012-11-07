@@ -293,7 +293,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 
     if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
-        m_someDataIsDropped = true;
         m_dataQueue.lock();
         bool clearHiQ = m_liveQuality != MEDIA_Quality_Low && m_liveQuality != MEDIA_Quality_AlwaysLow; // remove LQ packets, keep HQ
 
@@ -328,6 +327,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             }
         }
         m_dataQueue.unlock();
+        m_someDataIsDropped = true;
     }
 
     while(m_dataQueue.size() > 120) // queue to large
@@ -554,11 +554,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
+        bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
             QMutexLocker lock(&m_qualityChangeMutex);
             if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
@@ -573,13 +573,13 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
                 }
             }
         }
-
         if (isLive) {
             if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
                 return true; // data for other live quality stream
             else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
                 return true; // data for other live quality stream
-        }    }
+        }
+    }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
     if (trackInfo == 0 || trackInfo->encoder == 0 || trackInfo->clientPort == -1)
@@ -606,10 +606,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_lastMediaTime = media->timestamp;
     }
 
-    if (m_someDataIsDropped)
+    if (m_someDataIsDropped) {
         sendMetadata("drop-report");
+        m_someDataIsDropped = false;
+    }
 
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (m_realtimeMode && !isLive)
         doRealtimeDelay(media);
 

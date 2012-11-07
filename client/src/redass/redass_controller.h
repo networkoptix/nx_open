@@ -18,15 +18,24 @@ public:
     void unregisterConsumer(QnCamDisplay* display);
 
     /** Inform that not enought CPU or badnwidth */
-    void setQuality(QnCamDisplay* display, MediaQuality quality);
+    //void setQuality(QnCamDisplay* display, MediaQuality quality);
 public slots:
     void onSlowStream(QnArchiveStreamReader* reader);
+    void streamBackToNormal(QnArchiveStreamReader* reader);
 private:
     void onTimer();
+    QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
 private:
+    struct RedAssInfo
+    {
+        RedAssInfo(): lqTime(AV_NOPTS_VALUE), hiQualityRetryCounter(0) {}
+        qint64 lqTime;
+        int hiQualityRetryCounter;
+    };
+
     QMutex m_mutex;
     QSet<QnCamDisplay*> m_consumers;
-    QMap<QnCamDisplay*, qint64> m_lowQualityRequests;
+    QMap<QnCamDisplay*, RedAssInfo> m_redAssInfo;
     QTimer m_timer;
     QTime m_lastSwitchTimer;
 };

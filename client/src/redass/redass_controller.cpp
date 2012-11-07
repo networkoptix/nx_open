@@ -6,6 +6,7 @@
 Q_GLOBAL_STATIC(QnRedAssController, inst);
 
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 
 QnRedAssController* QnRedAssController::instance()
 {
@@ -23,6 +24,7 @@ void QnRedAssController::onTimer()
 
 }
 
+/*
 void QnRedAssController::setQuality(QnCamDisplay* display, MediaQuality quality)
 {
     if (quality == MEDIA_Quality_Low)
@@ -36,6 +38,7 @@ void QnRedAssController::setQuality(QnCamDisplay* display, MediaQuality quality)
             display->getArchiveReader()->setQualityForced(quality);
     }   
 }
+*/
 
 void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 {
@@ -58,9 +61,31 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         if (reader && reader->getQuality() == MEDIA_Quality_High)
         {
             reader->setQuality(MEDIA_Quality_Low, true);
+            m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
         }
     }
     m_lastSwitchTimer.restart();
+}
+
+QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* reader)
+{
+    for(QMap<QnCamDisplay*, RedAssInfo>::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    {
+        QnCamDisplay* display = itr.key();
+        if (display->getArchiveReader() == reader)
+            return display;
+    }
+    return 0;
+}
+
+void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
+{
+    QnCamDisplay* display = getDisplayByReader(reader);
+    if (display && m_redAssInfo[display].hiQualityRetryCounter < HIGH_QUALITY_RETRY_COUNTER)
+    {
+        m_redAssInfo[display].hiQualityRetryCounter++;
+        reader->setQuality(MEDIA_Quality_High, true);
+    }
 }
 
 void QnRedAssController::registerConsumer(QnCamDisplay* display)

@@ -160,7 +160,7 @@ public:
 /*
 * Returns current time zone offset in seconds
 */
-qint16 currentTimeZone();
+int currentTimeZone();
 
 
 
