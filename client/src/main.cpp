@@ -213,8 +213,6 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
-#include <utils/network/networkoptixmodulefinder.h>
-
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])

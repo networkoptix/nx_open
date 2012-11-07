@@ -58,7 +58,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_currentMediaWidget(NULL),
     m_currentWidgetFlags(0),
     m_currentWidgetLoaded(false),
-    m_currentWidgetIsCentral(false),
     m_sliderDataInvalid(false),
     m_updatingSliderFromReader(false),
     m_updatingSliderFromScrollBar(false),
@@ -175,8 +174,6 @@ void QnWorkbenchNavigator::initialize() {
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
     connect(display(),                          SIGNAL(widgetAboutToBeRemoved(QnResourceWidget *)), this,   SLOT(at_display_widgetAboutToBeRemoved(QnResourceWidget *)));
     connect(display()->beforePaintInstrument(), SIGNAL(activated(QWidget *, QEvent *)),             this,   SLOT(updateSliderFromReader()));
-
-    connect(m_streamSynchronizer,               SIGNAL(runningChanged()),                           this,   SLOT(updateCurrentWidget()));
 
     connect(m_timeSlider,                       SIGNAL(valueChanged(qint64)),                       this,   SLOT(at_timeSlider_valueChanged(qint64)));
     connect(m_timeSlider,                       SIGNAL(sliderPressed()),                            this,   SLOT(at_timeSlider_sliderPressed()));
@@ -611,29 +608,11 @@ void QnWorkbenchNavigator::updateCentralWidget() {
 }
 
 void QnWorkbenchNavigator::updateCurrentWidget() {
-    QnResourceWidget *widget = NULL;
-    bool isCentral = false;
-    if (m_centralWidget != NULL /*|| !m_streamSynchronizer->isRunning()*/) {
-        widget = m_centralWidget;
-        isCentral = true;
-    } else if(m_syncedWidgets.contains(m_currentMediaWidget)) {
-        widget = m_currentMediaWidget;
-    } else if (m_syncedWidgets.empty()) {
-        widget = NULL;
-    } else {
-        widget = *m_syncedWidgets.begin();
-    }
-    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
-
-    if (m_currentWidget == widget) {
-        if(m_currentWidgetIsCentral != isCentral) {
-            m_currentWidgetIsCentral = isCentral;
-            updateLines();
-            updateCalendar();
-        }
-
+    QnResourceWidget *widget = m_centralWidget;
+    if (m_currentWidget == widget)
         return;
-    }
+    
+    QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
 
     emit currentWidgetAboutToBeChanged();
 
@@ -646,7 +625,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    if (display() && display()->isChangingLayout()) { // TODO: wtf?
+    if (display() && display()->isChangingLayout()) { // TODO: #gdm isChangingLayout is your code? WTF? Where are the comments that would prevent the WTFs?
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
     } else {
@@ -656,7 +635,6 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     m_pausedOverride = false;
     m_currentWidgetLoaded = false;
-    m_currentWidgetIsCentral = isCentral;
 
     updateCurrentWidgetFlags();
     updateLines();
@@ -910,7 +888,7 @@ void QnWorkbenchNavigator::updateLines() {
     bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
 
     if(m_currentWidgetFlags & WidgetSupportsPeriods) {
-        m_timeSlider->setLineVisible(CurrentLine, m_currentWidgetIsCentral);
+        m_timeSlider->setLineVisible(CurrentLine, true);
         m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
@@ -921,11 +899,11 @@ void QnWorkbenchNavigator::updateLines() {
     }
 }
 
-void QnWorkbenchNavigator::updateCalendar(){
+void QnWorkbenchNavigator::updateCalendar() {
     if (!m_calendar)
         return;
     if(m_currentWidgetFlags & WidgetSupportsPeriods)
-        m_calendar->setCurrentWidgetIsCentral(m_currentWidgetIsCentral);
+        m_calendar->setCurrentWidgetIsCentral(true);
     else
         m_calendar->setCurrentWidgetIsCentral(false);
 }
