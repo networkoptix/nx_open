@@ -13,10 +13,17 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
    <item>
     <widget class="QnResourceTreeWidget" name="resourcesWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout"/>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="licenseLabel">
+     <property name="text">
+      <string/>
+     </property>
     </widget>
    </item>
    <item>

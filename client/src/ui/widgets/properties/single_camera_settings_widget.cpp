@@ -617,36 +617,23 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 
 void QnSingleCameraSettingsWidget::at_bigTestButton_clicked() {
     //QScopedPointer<QnResourceTreeDialog> dialog(new QnResourceTreeDialog(NULL, context()));
-
+    bool recordingEnabled = ui->cameraScheduleWidget->activeCameraCount() != 0;
     QnResourceTreeDialog dialog(NULL, context());
+    dialog.setRecordingEnabled(recordingEnabled);
+    if (dialog.exec() == QDialog::Rejected)
+        return;
 
-    dialog.exec();
-
-    QnResourceList resources = dialog.getSelectedResources();
-//     resources.toSet().toList();
-    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-
+    QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
     QnScheduleTaskList scheduleTasks;
-    foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
-        scheduleTasks.append(QnScheduleTask(data));
+    if (recordingEnabled && cameras.size() > 0) {
+        foreach(const QnScheduleTask::Data &data, ui->cameraScheduleWidget->scheduleTasks())
+            scheduleTasks.append(QnScheduleTask(data));
+    }
 
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
-/*
-        QString cameraLogin = camera->getAuth().user();
-        if (!login.isEmpty())
-            cameraLogin = login;
-
-        QString cameraPassword = camera->getAuth().password();
-        if (!password.isEmpty())
-            cameraPassword = password;
-        camera->setAuth(cameraLogin, cameraPassword);
-
-        if (ui->checkBoxEnableAudio->checkState() != Qt::PartiallyChecked && ui->checkBoxEnableAudio->isEnabled())
-            camera->setAudioEnabled(ui->checkBoxEnableAudio->isChecked());
-*/
-
-        camera->setScheduleDisabled(ui->cameraScheduleWidget->activeCameraCount() == 0);
-        camera->setScheduleTasks(scheduleTasks);
+        camera->setScheduleDisabled(!recordingEnabled);
+        if (recordingEnabled)
+            camera->setScheduleTasks(scheduleTasks);
     }
 }
 

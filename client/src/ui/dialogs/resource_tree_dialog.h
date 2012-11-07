@@ -22,12 +22,19 @@ public:
     explicit QnResourceTreeDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnResourceTreeDialog();
 
-    QnResourceList getSelectedResources();
-    
+    QnVirtualCameraResourceList getSelectedCameras() const;
+
+    void setRecordingEnabled(bool enabled = true);
+private slots:
+    void at_resourceModel_dataChanged();
+
+    void updateLicensesLabelText();
 private:
     QScopedPointer<Ui::QnResourceTreeDialog> ui;
 
     QnResourcePoolModel *m_resourceModel;
+
+    bool m_recordingEnabled;
 };
 
 #endif // RESOURCE_TREE_DIALOG_H
