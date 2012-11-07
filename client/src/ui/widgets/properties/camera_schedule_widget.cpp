@@ -646,7 +646,23 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     if(widget->isEnabled() || (widget->parentWidget() && !widget->parentWidget()->isEnabled()))
         return;
 
-    QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+    // TODO: duplicate code.
+    bool hasDualStreaming = !m_cameras.isEmpty();
+    bool hasMotion = !m_cameras.isEmpty();
+    foreach(const QnVirtualCameraResourcePtr &camera, m_cameras) {
+        hasDualStreaming &= camera->hasDualStreaming();
+        hasMotion &= camera->supportedMotionType() != MT_NoMotion;
+    }
+
+    if(m_cameras.size() > 1) {
+        QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled or not supported by some of the selected cameras. Please go to the cameras' motion setup page to ensure it is supported and enabled."));
+    } else {
+        if(!(hasMotion && hasDualStreaming)) {
+            QMessageBox::warning(this, tr("Warning"), tr("Dual-Streaming and Motion Detection is not available for this camera."));
+        } else {
+            QMessageBox::warning(this, tr("Warning"), tr("Motion Recording is disabled. Please go to the motion setup page to setup the camera's motion area and sensitivity."));
+        }
+    }
 }
 
 bool QnCameraScheduleWidget::hasMotionOnGrid() const{

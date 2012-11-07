@@ -1280,9 +1280,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     }
 #endif
 
-    //if(context()->user()) /* If we were connected... */
-        //workbench()->clear(); // TODO: ask to save?
-
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->setLayoutsUpdated(false);
@@ -1303,14 +1300,16 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     at_eventManager_connectionOpened();
 }
 
-void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
+void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
+    if(context()->user() && !closeAllLayouts(true))
+        return;
+
+    // TODO: Factor out common code from reconnect/disconnect/login actions.
+
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-    //if(context()->user()) /* If we were connected... */
-        //workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1319,6 +1318,8 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
     resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
+
+    // TODO: save workbench state on logout.
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
