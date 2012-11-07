@@ -84,9 +84,9 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         return QDateTime::currentMSecsSinceEpoch();
 }
 
-Q_GLOBAL_STATIC(QnSyncTime, getInstance);
+Q_GLOBAL_STATIC(QnSyncTime, qn_syncTime_instance);
 
 QnSyncTime* QnSyncTime::instance()
 {
-    return getInstance();
+    return qn_syncTime_instance();
 }

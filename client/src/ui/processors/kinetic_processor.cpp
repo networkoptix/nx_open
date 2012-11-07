@@ -1,5 +1,6 @@
 #include "kinetic_processor.h"
-#include "utils/common/synctime.h"
+
+#include <utils/common/warnings.h>
 
 KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),
@@ -36,7 +37,7 @@ void KineticProcessor::reset() {
     transition(Measuring);
 
     mShifts.clear();
-    mLastShiftTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+    mLastShiftTimeMSec = QDateTime::currentMSecsSinceEpoch();
 }
 
 void KineticProcessor::shift(const QVariant &dv) {
@@ -48,7 +49,7 @@ void KineticProcessor::shift(const QVariant &dv) {
     /* QDateTime::currentMSecsSinceEpoch gives the most accurate timestamp on
      * Windows, even more accurate than QElapsedTimer. Not monotonic, so we
      * may want to create a monotonic wrapper one day. */
-    qint64 currentTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
 
     Shift shift;
     shift.dv = dv;
@@ -131,7 +132,7 @@ QVariant KineticProcessor::calculateSpeed(const ShiftList &shifts) const {
 
 QVariant KineticProcessor::calculateSpeed() {
     /* Check if the motion has expired. */
-    if(!mShifts.empty() && (qnSyncTime->currentMSecsSinceEpoch() - mLastShiftTimeMSec) / 1000.0 > mMaxShiftInterval)
+    if(!mShifts.empty() && (QDateTime::currentMSecsSinceEpoch() - mLastShiftTimeMSec) / 1000.0 > mMaxShiftInterval)
         mShifts.clear();
 
     QVariant result = calculateSpeed(mShifts);

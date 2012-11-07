@@ -2,13 +2,15 @@
 #define QN_KINETIC_PROCESSOR_H
 
 #include <limits>
-#include <QList>
-#include <QVariant>
-#include <QDateTime>
-#include <ui/animation/animation_timer.h>
-#include <utils/common/warnings.h>
+
+#include <QtCore/QList>
+#include <QtCore/QVariant>
+#include <QtCore/QDateTime>
+
+#include <ui/animation/animation_timer_listener.h>
 #include <ui/common/magnitude.h>
 #include <ui/common/linear_combination.h>
+
 #include "kinetic_process_handler.h"
 
 /**

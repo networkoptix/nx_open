@@ -1,14 +1,16 @@
 #include "bounding_instrument.h"
+
 #include <cassert>
 #include <cmath> /* For std::log, std::exp, std::abs. */
 #include <limits>
-#include <QGraphicsView>
-#include <QDateTime>
-#include <QMatrix4x4>
+
+#include <QtGui/QGraphicsView>
+#include <QtCore/QDateTime>
+#include <QtGui/QMatrix4x4>
+
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
 #include <ui/animation/animation_event.h>
-#include "utils/common/synctime.h"
 
 namespace {
 
@@ -531,7 +533,7 @@ BoundingInstrument::~BoundingInstrument() {
 }
 
 void BoundingInstrument::enabledNotify() {
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
 
     foreach(ViewData *d, m_data) {
         if(d->view() != NULL) {
@@ -567,7 +569,7 @@ bool BoundingInstrument::paintEvent(QWidget *viewport, QPaintEvent *) {
     if(d == NULL)
         return false;
 
-    d->tick(qnSyncTime->currentMSecsSinceEpoch());
+    d->tick(QDateTime::currentMSecsSinceEpoch());
 
     return false;
 }

@@ -303,4 +303,4 @@ public:
 
 };
 
-#endif // QN_SCENE_UTILITY_H
+#endif // QN_GEOMETRY_H
