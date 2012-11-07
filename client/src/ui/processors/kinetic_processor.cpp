@@ -2,6 +2,8 @@
 
 #include <utils/common/warnings.h>
 
+#include <ui/animation/animation_timer.h>
+
 KineticProcessor::KineticProcessor(int type, QObject *parent):
     QObject(parent),
     mState(Measuring),
