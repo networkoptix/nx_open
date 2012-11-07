@@ -1,12 +1,16 @@
 #include "wheel_zoom_instrument.h"
+
 #include <cmath> /* For std::pow. */
-#include <QWheelEvent>
-#include <QGraphicsSceneWheelEvent>
-#include <QGraphicsView>
-#include <QCursor>
-#include <QDateTime>
+
+#include <QtCore/QDateTime>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QGraphicsSceneWheelEvent>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QCursor>
+
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
+#include <ui/animation/animation_timer.h>
 
 namespace {
     const qreal degreesFor2x = 180.0;

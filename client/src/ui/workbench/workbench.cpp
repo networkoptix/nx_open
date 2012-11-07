@@ -313,6 +313,7 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
             setItem(static_cast<Qn::ItemRole>(i), NULL);
 
     updateSingleRoleItem();
+    updateActiveRoleItem();
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

@@ -363,7 +363,7 @@ void QnThumbnailsLoader::process() {
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
     qDebug() << "QnThumbnailsLoader::process START [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
-    qint64 startRealTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 startRealTime = QDateTime::currentMSecsSinceEpoch();
     qint64 startCpuTime = QnPerformance::currentThreadTimeMSecs();
 #endif
 
@@ -467,7 +467,7 @@ void QnThumbnailsLoader::process() {
     }
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
-    qint64 totalRealTime = qnSyncTime->currentMSecsSinceEpoch() - startRealTime;
+    qint64 totalRealTime = QDateTime::currentMSecsSinceEpoch() - startRealTime;
     qint64 totalCpuTime = QnPerformance::currentThreadTimeMSecs() - startCpuTime;
     qDebug() << "QnThumbnailsLoader::process END [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ") IN " << totalCpuTime << "/" << totalRealTime << "ms cpu/real time";
 #endif
