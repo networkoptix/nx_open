@@ -65,6 +65,9 @@ public:
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
     QnArchiveStreamReader* getArchiveReader();
+    bool isFullScreen() const;
+    void setFullScreen(bool fullScreen);
+
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -107,8 +110,6 @@ private:
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
 	void hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media);
-    //bool canSwitchToHighQuality();
-    void resetQualityStatistics();
     qint64 getMinReverseTime() const;
 
     qint64 getDisplayedMax() const;
@@ -183,10 +184,7 @@ protected:
     int m_processedPackets;
     QnMetaDataV1Ptr m_lastMetadata[CL_MAX_CHANNELS];
     qint64 m_nextReverseTime[CL_MAX_CHANNELS];
-    float m_toLowQSpeed; // speed then switching to low quality for camera
-    //QTime m_toLowQTimer; // try to change low to high quality (for normal playback speed every N seconds)
     int m_emptyPacketCounter;
-    int m_hiQualityRetryCounter;
     bool m_isStillImage;
     bool m_isLongWaiting;
     
@@ -196,7 +194,6 @@ protected:
     static qint64 m_lastQualitySwitchTime;
     bool m_executingChangeSpeed;
     bool m_eofSignalSended;
-    bool m_lastLiveIsLowQuality;
     int m_audioBufferSize;
     qint64 m_minAudioDetectJumpInterval;
     qint64 m_videoQueueDuration;
@@ -209,6 +206,8 @@ protected:
 	qint64 m_firstAfterJumpTime;
 	qint64 m_receivedInterval;
     QnArchiveStreamReader* m_archiveReader;
+
+    bool m_fullScreen;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -114,14 +114,11 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     m_executingJump(0),
     m_skipPrevJumpSignal(0),
     m_processedPackets(0),
-    m_toLowQSpeed(1.0),
     m_emptyPacketCounter(0),
-    m_hiQualityRetryCounter(0),
     m_isStillImage(false),
     m_isLongWaiting(false),
     m_executingChangeSpeed(false),
     m_eofSignalSended(false),
-    m_lastLiveIsLowQuality(false),
     m_videoQueueDuration(0),
     m_useMTRealTimeDecode(false),
     m_timeMutex(QMutex::Recursive),
@@ -129,7 +126,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
     m_isLastVideoQualityLow(false),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
 	m_receivedInterval(0),
-    m_archiveReader(0)
+    m_archiveReader(0),
+    m_fullScreen(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -154,23 +152,6 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource):
 QnCamDisplay::~QnCamDisplay()
 {
     qnRedAssController->unregisterConsumer(this);
-    {
-        QMutexLocker lock(&m_qualityMutex);
-        m_allCamDisplay.remove(this);
-        if ((quint64)m_lastDecodedTime != AV_NOPTS_VALUE)
-        {
-            // If camDisplay has decoded something and item is closing, some bandwidth appears. Change quality for other items
-            foreach(QnCamDisplay* display, m_allCamDisplay)
-            {
-                if (display->isLastVideoQualityLow())
-                {
-                    display->resetQualityStatistics();
-                    if (isLastVideoQualityLow())
-                        break; // try only one camera is current quality is low
-                }
-            }
-        }
-    }
 
     Q_ASSERT(!isRunning());
     stop();
@@ -260,53 +241,28 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
 			{
 				QnArchiveStreamReader* reader = dynamic_cast<QnArchiveStreamReader*> (media->dataProvider);
-				reader->setQuality(MEDIA_Quality_Low, true);
+                qnRedAssController->onSlowStream(reader);
+				//reader->setQuality(MEDIA_Quality_Low, true);
 			}
 		}
 	}
 };
-
-/*
-bool QnCamDisplay::canSwitchToHighQuality()
-{
-    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return false;
-
-    QMutexLocker lock(&m_qualityMutex);
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    if (currentTime - m_lastQualitySwitchTime < QUALITY_SWITCH_INTERVAL)
-        return false;
-    m_lastQualitySwitchTime = currentTime;
-    return true;
-}
-*/
 
 QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
 {
     return m_archiveReader;
 }
 
-
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
     Q_UNUSED(needToSleep)
-    m_archiveReader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
 
     if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE) 
-    {
-        bool isLow = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-        if (m_lastLiveIsLowQuality && !isLow)
-            m_hiQualityRetryCounter++; 
-        m_lastLiveIsLowQuality = isLow;
         return;
-    }
-    else {
-        m_lastLiveIsLowQuality = false;
-    }
-
     if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
         return;
 
+    m_archiveReader = dynamic_cast<QnArchiveStreamReader*> (vd->dataProvider);
     if (m_archiveReader)
     {
         if (realSleepTime <= -REDASS_DELAY_INTERVAL) 
@@ -314,42 +270,16 @@ void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float spee
             m_delayedFrameCount = qMax(0, m_delayedFrameCount);
             m_delayedFrameCount++;
             if (m_delayedFrameCount > 10 && m_archiveReader->getQuality() != MEDIA_Quality_Low /*&& canSwitchQuality()*/)
-            {
-                //bool fastSwitch = true; // m_dataQueue.size() >= m_dataQueue.maxSize()*0.75;
-                // if CPU is slow use fat switch, if problem with network - use slow switch to save already received data
-                //reader->setQualityForced(MEDIA_Quality_Low);
                 qnRedAssController->onSlowStream(m_archiveReader);
-                m_toLowQSpeed = speed;
-                //m_toLowQTimer.restart();
-            }
         }
         else if (realSleepTime >= 0)
         {
             m_delayedFrameCount = qMin(0, m_delayedFrameCount);
             m_delayedFrameCount--;
             if (m_delayedFrameCount < -10 && m_dataQueue.size() >= m_dataQueue.size()*0.75)
-            {
-                if (qAbs(speed) < m_toLowQSpeed || (m_toLowQSpeed < 0 && speed > 0))
-                {
-                    //reader->setQualityForced(MEDIA_Quality_High); // speed decreased, try to Hi quality again
-                    //qnRedAssController->setQuality(this, MEDIA_Quality_High);
-                    qnRedAssController->streamBackToNormal(m_archiveReader);
-                }
-                else if(qAbs(speed) < 1.0 + FPS_EPS /*&& canSwitchToHighQuality() */)
-                {
-                    //reader->setQuality(MEDIA_Quality_High, false); 
-                    //qnRedAssController->setQuality(this, MEDIA_Quality_High);
-                    qnRedAssController->streamBackToNormal(m_archiveReader);
-                    m_hiQualityRetryCounter++;
-                }
-            }
+                qnRedAssController->streamBackToNormal(m_archiveReader);
         }
     }
-}
-
-void QnCamDisplay::resetQualityStatistics()
-{
-    m_hiQualityRetryCounter = 0;
 }
 
 void QnCamDisplay::hurryUpCheckForLocalFile(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
@@ -1526,4 +1456,14 @@ bool QnCamDisplay::isLastVideoQualityLow() const
 QSize QnCamDisplay::getScreenSize() const
 {
     return m_display[0]->getScreenSize();
+}
+
+bool QnCamDisplay::isFullScreen() const
+{
+    return m_fullScreen;
+}
+
+void QnCamDisplay::setFullScreen(bool fullScreen)
+{
+    m_fullScreen = fullScreen;
 }

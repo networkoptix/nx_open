@@ -22,22 +22,36 @@ public:
 public slots:
     void onSlowStream(QnArchiveStreamReader* reader);
     void streamBackToNormal(QnArchiveStreamReader* reader);
-private:
+private slots:
     void onTimer();
-    QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
 private:
+    QnCamDisplay* getDisplayByReader(QnArchiveStreamReader* reader);
+    bool isSmallItem(QnCamDisplay* display);
+    bool isNotSmallItem(QnCamDisplay* display);
+
+    /** try LQ->HQ once more */
+    void addHQTry(); 
+private:
+    enum FindMethod {Find_Biggest, Find_Least};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(AV_NOPTS_VALUE), hiQualityRetryCounter(0) {}
+        RedAssInfo(): lqTime(AV_NOPTS_VALUE), hiQualityRetryCounter(0), toLQSpeed(0.0) {}
         qint64 lqTime;
         int hiQualityRetryCounter;
+        float toLQSpeed;
     };
 
+    typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
+
     QMutex m_mutex;
-    QSet<QnCamDisplay*> m_consumers;
-    QMap<QnCamDisplay*, RedAssInfo> m_redAssInfo;
+    //QSet<QnCamDisplay*> m_consumers;
+    typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
+    ConsumersMap m_redAssInfo;
     QTimer m_timer;
     QTime m_lastSwitchTimer;
+    int m_hiQualityRetryCounter;
+private:
+    QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0);
 };
 
 #define qnRedAssController QnRedAssController::instance()

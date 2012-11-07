@@ -560,12 +560,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             workbench()->setItem(Qn::RaisedRole, NULL);
 
         /* Update media quality. */
-        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget))
+        if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
             if (oldMediaWidget->display()->archiveReader()) {
                 oldMediaWidget->display()->archiveReader()->enableQualityChange();
                 if (oldMediaWidget->display()->camDisplay()->isRealTimeSource())
                     oldMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true); // disable alwaysHi mode
             }
+            oldMediaWidget->display()->camDisplay()->setFullScreen(false);
+        }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             if (newMediaWidget->display()->archiveReader()) {
                 if (newMediaWidget->display()->camDisplay()->isRealTimeSource())
@@ -574,6 +576,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
                     newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
                 newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
+            newMediaWidget->display()->camDisplay()->setFullScreen(true);
         }
 
         /* Hide / show other items when zoomed. */
