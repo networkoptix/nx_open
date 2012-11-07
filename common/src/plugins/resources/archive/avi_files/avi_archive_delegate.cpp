@@ -204,7 +204,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
-                audioData->channelNumber = stream->index; // m_indexToChannel[packet.stream_index]; // defalut value
+                audioData->channelNumber = m_indexToChannel[packet.stream_index];
                 packetTimestamp(audioData, packet);
                 break;
             default:
@@ -418,7 +418,6 @@ bool QnAviArchiveDelegate::findStreams()
 void QnAviArchiveDelegate::initLayoutStreams()
 {
     int videoNum= 0;
-    //int audioNum = 0;
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
 
@@ -445,10 +444,31 @@ void QnAviArchiveDelegate::initLayoutStreams()
             videoNum++;
             break;
 
+        default:
+            break;
+        }
+    }
+
+    lastStreamID = -1;
+    int audioNum = 0;
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
+    {
+        AVStream *strm= m_formatContext->streams[i];
+        AVCodecContext *codecContext = strm->codec;
+
+        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            continue;
+
+        if (strm->id && strm->id == lastStreamID)
+            continue; // duplicate
+        lastStreamID = strm->id;
+
+        switch(codecContext->codec_type)
+        {
         case AVMEDIA_TYPE_AUDIO:
-            //while (m_indexToChannel.size() <= i)
-            //    m_indexToChannel << -1;
-            //m_indexToChannel << audioNum++;
+            while (m_indexToChannel.size() <= i)
+                m_indexToChannel << -1;
+            m_indexToChannel[i] = videoNum + audioNum++;
             break;
 
         default:
