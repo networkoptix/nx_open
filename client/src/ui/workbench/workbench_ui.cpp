@@ -61,7 +61,7 @@
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
-#include <ui/events/system_menu_event.h>
+#include <ui/workaround/system_menu_event.h>
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "camera/video_camera.h"
@@ -610,11 +610,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
-    sliderZoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));
+    sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(16, 16);
 
     QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
-    sliderZoomInButton->setIcon(qnSkin->pixmap("item/zoom_in.png"));
+    sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
     sliderZoomInButton->setPreferredSize(16, 16);
 
     QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -1339,7 +1339,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
-    QPointF pos = m_sliderItem->timeScrollBar()->mapToItem(m_controlsWidget, m_sliderItem->timeScrollBar()->rect().bottomLeft() - toPoint(m_sliderZoomButtonsWidget->size()));
+    QPointF pos = m_sliderItem->timeSlider()->mapToItem(m_controlsWidget, m_sliderItem->timeSlider()->rect().topLeft());
 
     m_sliderZoomButtonsWidget->setPos(pos);
 }
@@ -1604,7 +1604,8 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
-        widget->setDecorationsVisible(false);
+        if(!(widget->options() & QnResourceWidget::DisplayInfo))
+            widget->setDecorationsVisible(false);
 }
 
 void QnWorkbenchUi::at_activityStarted() {

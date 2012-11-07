@@ -68,6 +68,7 @@
 #include "events/business_rule_processor.h"
 #include "rest/handlers/gettime_handler.h"
 #include "rest/handlers/exec_action_handler.h"
+#include "platform/platform_abstraction.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -411,6 +412,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrl.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
@@ -798,6 +800,8 @@ protected:
     {
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
+
+        new QnPlatformAbstraction(app);
 
         if (guid.isEmpty())
         {

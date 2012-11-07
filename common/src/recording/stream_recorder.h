@@ -14,13 +14,14 @@
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
+class QnFfmpegVideoTranscoder;
 
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
     Q_OBJECT
 
 public:
-    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithTime, Role_FileExportWithEmptyContext};
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -74,6 +75,8 @@ public:
     * Transcode to specified audio codec is source codec is different
     */
     void setAudioCodec(CodecID codec);
+
+    void setOnScreenDateOffset(int timeOffsetMs);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -149,7 +152,10 @@ private:
     QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
+    QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
+    CodecID m_dstVideoCodec;
+    int m_onscreenDateOffset;
 };
 
 #endif // _STREAM_RECORDER_H__

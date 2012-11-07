@@ -593,6 +593,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
 
         break;
     }
+    case Qn::ActiveRole: {
+        if(oldWidget)
+            oldWidget->setLocalActive(false);
+        if(newWidget)
+            newWidget->setLocalActive(true);
+        m_frameWidthsDirty = true;
+        break;
+    }
     case Qn::CentralRole: {
         /* Update audio playback. */
         if(QnMediaResourceWidget *oldMediaWidget = dynamic_cast<QnMediaResourceWidget *>(oldWidget)) {
@@ -1261,7 +1269,7 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
@@ -1329,6 +1337,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
 
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
+
+        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())
@@ -1414,6 +1424,9 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(time).toString(tr("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
+
+        int checkedButtons = widget->item()->data(Qn::ItemCheckedButtonsRole).toInt();
+        widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
     }
 
     QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();

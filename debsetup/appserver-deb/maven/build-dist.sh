@@ -52,8 +52,6 @@ find $PKGSTAGE -type f -print0 | xargs -0 chmod 644
 chmod -R 755 $BINSTAGE
 chmod 644 $BINSTAGE/library.zip
 
-touch $ETCSTAGE/entcontroller.conf
-
 # Copy upstart and sysv scripts
 install -m 644 init/networkoptix-entcontroller.conf $INITSTAGE/${COMPANY_NAME}-entcontroller.conf
 install -m 755 init.d/networkoptix-entcontroller $INITDSTAGE/${COMPANY_NAME}-entcontroller

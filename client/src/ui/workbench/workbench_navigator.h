@@ -196,7 +196,6 @@ private:
     QnMediaResourceWidget *m_currentMediaWidget;
     WidgetFlags m_currentWidgetFlags;
     bool m_currentWidgetLoaded;
-    bool m_currentWidgetIsCentral;
     bool m_sliderDataInvalid;
     bool m_sliderWindowInvalid;
 

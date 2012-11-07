@@ -160,9 +160,10 @@ public:
 /*
 * Returns current time zone offset in seconds
 */
-qint16 currentTimeZone();
+int currentTimeZone();
 
 
+static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 
 #endif // _UNIVERSAL_CLIENT_UTIL_H

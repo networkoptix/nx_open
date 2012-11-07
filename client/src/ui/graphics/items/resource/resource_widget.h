@@ -39,6 +39,7 @@ class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnW
     Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
     Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
     Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
+    Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
     Q_FLAGS(Options Option)
 
     typedef Shaded<Instrumented<GraphicsWidget> > base_type;
@@ -52,7 +53,7 @@ public:
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x20, // TODO
         ControlPtz                  = 0x40, // TODO
-        DisplayInfo                 = 0x80  /** Whether info widget is to be displayed. */
+        DisplayInfo                 = 0x80  /** Whether info panel is to be displayed. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -237,7 +238,16 @@ public:
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
 
+    Buttons checkedButtons() const;
+    void setCheckedButtons(Buttons checkedButtons);
+
+    Buttons visibleButtons() const;
+
+    // TODO: #gdm implement via visibleButtons() function, then remove this one.
     bool isInfoButtonVisible() const;
+
+    bool isLocalActive() const;
+    void setLocalActive(bool localActive);
 
     using base_type::mapRectToScene;
 
@@ -364,8 +374,11 @@ private:
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
 
-    /* Display flags. */
+    /** Options that control display & behavior. */
     Options m_options;
+
+    /** Whether this item is 'locally active'. This affects the color of item's border. */
+    bool m_localActive;
 
     /** Layout of this widget's channels. */
     const QnResourceVideoLayout *m_channelsLayout;

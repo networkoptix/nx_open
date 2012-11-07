@@ -82,6 +82,7 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
+#include "platform/platform_abstraction.h"
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -212,18 +213,10 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
-#include <utils/network/networkoptixmodulefinder.h>
-
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
-    NetworkOptixModuleFinder networkOptixModuleFinder;
-    networkOptixModuleFinder.start();
-    //::Sleep( 2000 );
-    ////enterpriseControllerSearcher->pleaseStop();
-    //delete enterpriseControllerSearcher;
-
     QnClientModule client(argc, argv);
 
     QTextStream out(stdout);
@@ -293,6 +286,8 @@ int qnMain(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
 
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;

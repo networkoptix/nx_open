@@ -23,4 +23,5 @@ message Server {
     repeated Storage      storage      = 4;
     optional bool         panicMode    = 5;
     optional string       streamingUrl = 6;
+    optional string       version      = 7;
 }

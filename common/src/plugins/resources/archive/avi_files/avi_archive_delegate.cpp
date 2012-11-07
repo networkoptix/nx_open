@@ -15,7 +15,6 @@
 #include "core/resource/media_resource.h"
 
 extern QMutex global_ffmpeg_mutex;
-static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {

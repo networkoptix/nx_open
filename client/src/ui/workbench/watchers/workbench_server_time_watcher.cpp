@@ -25,8 +25,20 @@ QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {
     disconnect(resourcePool(), NULL, this, NULL);
 }
 
-qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server) const {
-    return m_utcOffsetByResource.value(server, Qn::InvalidUtcOffset);
+qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
+    return m_utcOffsetByResource.value(server, defaultValue);
+}
+
+qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
+    qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
+    if(utcOffset == Qn::InvalidUtcOffset)
+        return defaultValue;
+
+    QDateTime localDateTime = QDateTime::currentDateTime();
+    QDateTime utcDateTime = localDateTime.toUTC();
+    localDateTime.setTimeSpec(Qt::UTC);
+
+    return utcOffset - utcDateTime.msecsTo(localDateTime);
 }
 
 void QnWorkbenchServerTimeWatcher::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {

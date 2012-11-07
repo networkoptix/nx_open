@@ -19,11 +19,15 @@
 #define QN_SIGAR_VERSION            "${sigar.version}"
 #define QN_BOOST_VERSION            "${boost.version}"
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
+#define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
+#define QN_LICENSING_MAIL_ADDRESS   "${company.support.address}"
+#define QN_HAS_FREE_LICENSES        ${freeLicenses}
 
 /* 
  * These constans are here for windows resouce file.
  *
  * DO NOT USE THEM IN YOUR CODE. 
+ * DO NOT ADD NEW CONSTANTS HERE.
  */
 #define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move up
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
@@ -37,9 +41,8 @@
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
-#define VER_CUSTOMIZEDFILENAME_STR  "${product.name}.exe" // TODO: move up
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
-#define VER_COMPANYSUPPORT_STR      "${company.support.address}"
+/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. */
 
 #endif // ${artifactId}_VERSION_H

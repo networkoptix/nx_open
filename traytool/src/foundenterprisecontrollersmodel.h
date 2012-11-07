@@ -61,6 +61,11 @@ private:
         QString url;
         QString ipAddress;
         TypeSpecificParamMap params;
+
+        bool operator<( const FoundModuleData& right ) const
+        {
+            return url < right.url; //sorting by url
+        }
     };
 
     class IsSeedEqualPred

@@ -10,13 +10,17 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#define InvalidUtcOffset _id(INT64_MAX)
+
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
-    qint64 utcOffset(const QnMediaServerResourcePtr &server) const;
+    qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
+    qint64 localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
 signals:
     void offsetsChanged();
@@ -34,7 +38,5 @@ private:
     QHash<int, QnMediaServerResourcePtr> m_resourceByHandle;
     QHash<QnMediaServerResourcePtr, qint64> m_utcOffsetByResource;
 };
-
-#define InvalidUtcOffset _id(INT64_MAX)
 
 #endif // QN_WORKBENCH_SERVER_TIME_WATCHER_H
