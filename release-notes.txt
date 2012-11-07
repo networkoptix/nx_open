@@ -2,18 +2,33 @@
 Improvements:
  - Item's info panel is not hidden if go to fullscreen
  - Playback control is not hidden if go to fullscreen
+ - CAL is replaced to CLND
+ - Items' buttons states are saved when switching between layouts
+ - Tooltips to Pin/Unpin and Show/Hide buttons are added
+ - Items' Panels and Text (NO DATA etc.) are rotated correctly if rotate them
+ - Time Line is never hidden if at least one video is on Scene. Lastly selected video remains selected even if click on empty space (grey frame is drawn around it).
 
 Bugs Fixed.
  - Fixed incorrect support email if click on link on the Licenses page (2 slashes before address).
  - Fixed misclicks on Time Line (clicks were sent underneath)
  - IF double click on the bottom of Time Line zoom out occured but Time Line started moving. Fixed.
- - Sometimes Menu co
+ - Sometimes Menu color is changed from grey to white (especially if remote log in to the computer Client is opened on). Fixed
+ - Logout didn't clear workspace. Fixed.
+ - License could not be reused if deinstall database and reinstall the software again. Fixed
+ - Expand tree icon is drawn near the bottom element of the tree, even though the element itself is not drawn
+ - Fixed the problem when sometimes screen recording could not be saved. Screen recording TEMP folder was equal to Root Media Folder. 
+ - Fixed Screen Recording if several microphone devices with identical names were registered (usually happens in laptops)
+   If it was inaccessible Screen Recording could not be saved even if it had been performed. Now new setting for Temp Folder is introduced. 
+   By default it's User's Temp Folder
+ - Multi-Video Export fix: if one exported camera contained no data Time Line displayed time in incorrect format  
+ - Installer bugs:
+   - Option "Run Client after installation" was not shown if Client was added via "change" method. Fixed
 ----------------------------------------------- 1.4-Beta -----------------------------------------------
 
 New Features: 
- - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help. Help text is in progress.
+ - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help. Help text is in progress
  - Daylight Savings Time is Supported
- - Logout function is implemented (Mein Menu item)
+ - Logout function is implemented (Main Menu item).
 
 Improvements:
  - DW cameras could not be added manually if with others cameras. Fixed
@@ -27,8 +42,7 @@ Improvements:
  - Added ability to find DW and Dahua manually with Auto discovery port. Not need to remember Onvif port.
  - Added checkbox "Auto" to the "Add camera(s)" form.
  - Playback buttons are larger
- - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
- - Fixed bug with layout restoring after log in
+ - "Show info" context menu item is added. It is possible to show info for several cameras simultaneously.
  - Components can be selected separately during the installation (EC, Media Server, Client).'Will be installed on Local Hard Drive' and 
    'Entire Feature will be installed on Local Hard Drive' options are removed
  - Current recording method is displayed in the top left corner of the item's info panel (according to schedule)
@@ -46,8 +60,8 @@ Improvements:
  - If exported file was read only, than it was not displayed under Local. Fixed
 
 Bugs Fixed: 
+ - Fixed bug with layout restoring after log in
  - If set 30 FPS and Motion+LQ recording warning was fired and FPS dropped down to 28. Fixed
- - Fixed the problem when sometimes screen recording could not be saved.
  - Fixed monitoring issue: if restart media server it could not be resumed.
  - On some randome machines software did not start.
  - Camera URL in camera settings form could not be opened. Fixed
