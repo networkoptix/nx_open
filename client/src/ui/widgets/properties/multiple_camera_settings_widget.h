@@ -58,6 +58,7 @@ public:
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void at_dbDataChanged();

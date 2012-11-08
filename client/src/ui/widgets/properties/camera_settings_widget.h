@@ -62,6 +62,7 @@ signals:
     void modeChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected slots:
     void at_moreLicensesRequested();
