@@ -10,51 +10,42 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>300</width>
+    <height>170</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Found enterprise controllers</string>
   </property>
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>260</y>
-     <width>341</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>371</width>
-     <height>231</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Choose one from list below</string>
-   </property>
-   <widget class="QListView" name="foundEnterpriseControllersListView">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>19</y>
-      <width>351</width>
-      <height>201</height>
-     </rect>
-    </property>
-   </widget>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Choose one from list below</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QTreeView" name="foundEnterpriseControllersView"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections>

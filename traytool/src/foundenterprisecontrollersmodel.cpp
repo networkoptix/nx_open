@@ -27,44 +27,151 @@ FoundEnterpriseControllersModel::FoundEnterpriseControllersModel( NetworkOptixMo
 //!Implementation of QAbstractItemModel::data
 QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int role ) const
 {
-    if( index.column() > 0 || index.row() >= static_cast<int>(m_foundModules.size()) )
+    if( index.column() != 0 )
         return QVariant();
+    size_t foundModuleIndex = 0;
+    size_t moduleAddressIndex = 0;
+    if( index.internalId() == 0 )
+    {
+        if( index.row() >= static_cast<int>(m_foundModules.size()) )
+            return QVariant();
+        foundModuleIndex = index.row();
+        moduleAddressIndex = 0;
+        if( role == Qt::DisplayRole )
+        {
+            QString displayString;
+            //displayString += tr("Enterprise controller (");
+            displayString += tr("port ");
+            displayString += QString::fromAscii(" ") + m_foundModules[foundModuleIndex].params["port"];
+            displayString += QString::fromAscii(", ip: ");
+            for( std::vector<QString>::size_type
+                i = 0;
+                i < m_foundModules[foundModuleIndex].ipAddresses.size();
+                ++i )
+            {
+                if( i > 0 )
+                    displayString += QString::fromAscii(", ");
+                displayString += m_foundModules[foundModuleIndex].ipAddresses[i];
+            }
+            //displayString += QString::fromAscii(")");
+            return displayString;
+        }
+    }
+    else
+    {
+        foundModuleIndex = index.internalId() & 0x00ffffff;
+        if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) ||
+            index.row() >= static_cast<int>(m_foundModules[foundModuleIndex].ipAddresses.size()) )   //invalid address index
+        {
+            return QVariant();
+        }
+        moduleAddressIndex = index.row();
+        if( role == Qt::DisplayRole )
+            return m_foundModules[foundModuleIndex].ipAddresses[index.row()];
+    }
+    const FoundModuleData& moduleData = m_foundModules[foundModuleIndex];
 
     switch( role )
     {
-        case urlRole:   //same as Qt::DisplayRole
-            return m_foundModules[index.row()].url;
+        case urlRole:
+            return "https://"+moduleData.ipAddresses[moduleAddressIndex]+":"+moduleData.params["port"];
 
         case seedRole:
-            return m_foundModules[index.row()].seed;
+            return moduleData.seed;
 
         case appServerIPRole:
-            return m_foundModules[index.row()].ipAddress;
+            return moduleData.ipAddresses[moduleAddressIndex];
 
         case appServerPortRole:
-            return m_foundModules[index.row()].params["port"].toInt();
+            return moduleData.params["port"].toInt();
 
         default:
             return QVariant();
     }
 }
 
+bool FoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) const
+{
+    if( !parent.isValid() )
+        return true;
+
+    if( parent.internalId() != 0 ||
+        parent.column() > 0 ||
+        parent.row() < 0 ||
+        parent.row() >= static_cast<int>(m_foundModules.size()) )
+    {
+        return false;
+    }
+
+    return m_foundModules[parent.row()].ipAddresses.size() > 1;
+}
+
+QVariant FoundEnterpriseControllersModel::headerData( int section, Qt::Orientation orientation, int role ) const
+{
+    if( role != Qt::DisplayRole ||
+        orientation != Qt::Horizontal ||
+        section != 0 )
+    {
+        return QVariant();
+    }
+
+    return tr("Enterprise controller address");
+}
+
 //!Implementation of QAbstractItemModel::index
 QModelIndex	FoundEnterpriseControllersModel::index( int row, int column, const QModelIndex& parent ) const
 {
-    if( parent.isValid() || column > 0 || row >= static_cast<int>(m_foundModules.size()) )
+    if( column != 0 )
+        return QModelIndex();
+    if( !parent.isValid() )
+    {
+        if( row >= static_cast<int>(m_foundModules.size()) )
+            return QModelIndex();
+        return createIndex( row, column, 0 );
+    }
+    else
+    {
+        if( parent.internalId() != 0 ||
+            parent.row() >= static_cast<int>(m_foundModules.size()) ||
+            parent.column() > 0 )
+        {
+            return QModelIndex();
+        }
+        const FoundModuleData& moduleData = m_foundModules[parent.row()];
+        if( row >= static_cast<int>(moduleData.ipAddresses.size()) )
+            return QModelIndex();
+        return createIndex( row, column, (1 << 24) | parent.row() ); //using non-zero internalId
+    }
+}
+
+QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) const
+{
+    if( index.column() != 0 || index.internalId() == 0 )
         return QModelIndex();
 
-    return createIndex( row, column, NULL );
+    const size_t foundModuleIndex = index.internalId() & 0x00ffffff;
+    if( foundModuleIndex >= static_cast<int>(m_foundModules.size()) )
+        return QModelIndex();
+
+    return createIndex( foundModuleIndex, 0, 0 );
 }
 
 //!Implementation of QAbstractItemModel::rowCount
 int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 {
-    if( parent.isValid() )
-        return 0;
+    if( !parent.isValid() )
+        return m_foundModules.size();
 
-    return m_foundModules.size();
+    if( parent.internalId() != 0 || //element with ip address
+        parent.column() != 0 ||
+        parent.row() < 0 ||
+        parent.row() >= static_cast<int>(m_foundModules.size()) )
+    {
+        return 0;
+    }
+
+    //returning number of IPs of enterprise controller
+    return m_foundModules[parent.row()].ipAddresses.size();
 }
 
 void FoundEnterpriseControllersModel::remoteModuleFound(
@@ -98,7 +205,7 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
 
     //if such already exists, updating it's data
     it->url = url;
-    it->ipAddress = remoteHostAddress;
+    it->ipAddresses.push_back( remoteHostAddress );
     it->params = moduleParameters;
     if( isNewElement )
     {
