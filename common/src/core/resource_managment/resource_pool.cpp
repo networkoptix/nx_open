@@ -363,6 +363,16 @@ QnResourceList QnResourcePool::getResourcesWithParentId(QnId id) const
     return result;
 }
 
+QnResourceList QnResourcePool::getResourcesWithTypeId(QnId id) const
+{
+    QMutexLocker locker(&m_resourcesMtx);
+
+    QnResourceList result;
+    foreach(const QnResourcePtr &resource, m_resources)
+        if(resource->getTypeId() == id)
+            result.push_back(resource);
+    return result;
+}
 
 QStringList QnResourcePool::allTags() const
 {

@@ -1300,6 +1300,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
     QnSessionManager::instance()->stop();
 
+    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
     QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
@@ -1353,6 +1354,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     qnLicensePool->reset();
 
+    QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: save workbench state on logout.
 }
 
