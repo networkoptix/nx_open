@@ -159,7 +159,7 @@ PollSet::PollSet()
 :
     m_impl( new PollSetImpl() )
 {
-    m_impl->epollSetFD = epoll_create( 0 );
+    m_impl->epollSetFD = epoll_create( 256 );
 }
 
 PollSet::~PollSet()
