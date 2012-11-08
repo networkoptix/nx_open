@@ -692,7 +692,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
     }
 }
 
-void QnCameraScheduleWidget::at_exportScheduleButton_clicked(){
+void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
     QnResourceTreeDialog dialog(NULL, context());
     dialog.setRecordingEnabled(recordingEnabled);

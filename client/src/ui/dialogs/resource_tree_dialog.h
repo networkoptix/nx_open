@@ -14,6 +14,9 @@ namespace Ui {
 
 class QnResourcePoolModel;
 
+// TODO: #gdm this is camera settings export dialog.
+//
+// you have camera-specific warnings and motion/recording params in it.
 class QnResourceTreeDialog : public QDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -27,12 +30,14 @@ public:
     void setRecordingEnabled(bool enabled = true);
 
     void setMotionParams(bool motionUsed, bool dualStreamingUsed);
+
 private slots:
     void at_resourceModel_dataChanged();
 
     void updateLicensesStatus();
     void updateMotionStatus();
     void updateOkStatus();
+
 private:
     QScopedPointer<Ui::QnResourceTreeDialog> ui;
 

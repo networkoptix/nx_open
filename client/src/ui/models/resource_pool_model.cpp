@@ -78,7 +78,7 @@ public:
         m_parent(NULL),
         m_status(QnResource::Online),
         m_modified(false),
-        m_checked(Qt::Checked)
+        m_checked(Qt::Unchecked)
     {
         assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
 
@@ -117,7 +117,7 @@ public:
         m_parent(NULL),
         m_status(QnResource::Offline),
         m_modified(false),
-        m_checked(Qt::Checked)
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
 
@@ -136,7 +136,7 @@ public:
         m_parent(NULL),
         m_status(QnResource::Offline),
         m_modified(false),
-        m_checked(Qt::Checked)
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
     }

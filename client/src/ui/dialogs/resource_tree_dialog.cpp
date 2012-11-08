@@ -112,8 +112,8 @@ void QnResourceTreeDialog::updateMotionStatus(){
     if (m_motionUsed){
         QnVirtualCameraResourceList cameras = getSelectedCameras();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras){
-            bool hasMotion = camera->supportedMotionType() != MT_NoMotion;
-            if (!hasMotion){
+            bool hasMotion = /*camera->supportedMotionType() != MT_NoMotion &&*/ camera->getMotionType() != MT_NoMotion;
+            if (!hasMotion) {
                 m_motionOk = false;
                 break;
             }
