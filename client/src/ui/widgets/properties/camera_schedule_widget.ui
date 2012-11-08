@@ -150,6 +150,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Note: Recording Schedule is based on Server Time</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

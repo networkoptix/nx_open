@@ -715,7 +715,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled)
-            camera->setScheduleTasks(tasks);
+            camera->setScheduleTasks(tasks); // TODO: #gdm there is a problem with FPS-2 for arecont resources. Ask medved.
     }
     updateLicensesLabelText();
     emit scheduleExported(cameras);

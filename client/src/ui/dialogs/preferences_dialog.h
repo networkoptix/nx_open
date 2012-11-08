@@ -47,7 +47,7 @@ private slots:
     void at_removeExtraMediaFolderButton_clicked();
     void at_extraMediaFoldersList_selectionChanged();
     void at_context_userChanged();
-
+    void at_timeModeComboBox_activated();
 
 private:
     Q_DISABLE_COPY(QnPreferencesDialog)
