@@ -201,12 +201,18 @@ PollSet::PollSet()
     m_impl( new PollSetImpl() )
 {
     m_impl->readSockets.push_back( &m_impl->dummySocket );
+    m_impl->dummySocket.setNonBlockingMode( true );
 }
 
 PollSet::~PollSet()
 {
     delete m_impl;
     m_impl = NULL;
+}
+
+bool PollSet::isValid() const
+{
+    return m_impl->dummySocket.handle() > 0;
 }
 
 //!Interrupts \a poll method, blocked in other thread
@@ -309,7 +315,12 @@ int PollSet::poll( int millisToWait )
     }
     int result = select( 0, &m_impl->readfds, &m_impl->writefds, &m_impl->exceptfds, millisToWait >= 0 ? &timeout : NULL );
     if( (result > 0) && FD_ISSET( m_impl->dummySocket.handle(), &m_impl->readfds ) )
+    {
+        //reading dummy socket
+        quint8 buf[128];
+        m_impl->dummySocket.recv( buf, sizeof(buf) );   //ignoring result and data...
         --result;
+    }
     return result;
 }
 
