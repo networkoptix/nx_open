@@ -584,13 +584,16 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeT
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qn::ResourceRole,      "resource");
-    roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::ItemUuidRole,          "uuid");
+    roles.insert(Qn::ResourceRole,              "resource");
+    roles.insert(Qn::ResourceFlagsRole,         "flags");
+    roles.insert(Qn::ItemUuidRole,              "uuid");
     roles.insert(Qn::ResourceSearchStringRole,  "searchString");
     roles.insert(Qn::ResourceStatusRole,        "status");
-    roles.insert(Qn::NodeTypeRole,      "nodeType");
+    roles.insert(Qn::NodeTypeRole,              "nodeType");
     setRoleNames(roles);
+
+    // TODO: #gdm looks like we need an array indexed by Qn::NodeType here,
+    // it will make the code shorter.
 
     /* Create top-level nodes. */
     m_localNode = new Node(this, Qn::LocalNode);
@@ -758,6 +761,11 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
+    // TODO: #gdm 
+    // Only children of the first column are considered when TreeView is
+    // building a tree.
+    // You should always return zero for other columns,
+    // so the condition should be (parent.column() >= 0).
     if (parent.column() >= ColumnCount)
         return 0;
 
@@ -772,6 +780,9 @@ Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
 
+    // TODO: #gdm this looks strange. 
+    // Node::flags doesn't need index, only column, so this is what you should pass.
+    // i.e. node(index)->flags(index.column())
     return node(index)->flags(index);
 }
 

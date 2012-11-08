@@ -51,6 +51,7 @@ protected:
 
         if (index.column() == 1){
             //TODO: #gdm make enum public
+            // +1 =)
             base_type::paint(painter, option, index);
             return;
         }
@@ -287,20 +288,23 @@ QPoint QnResourceTreeWidget::selectionPos() const {
     QModelIndex selected = selectedRows.back();
     QPoint pos = ui->resourcesTreeView->visualRect(selected).bottomRight();
 
+    // TODO: #gdm looks like this comment was written by me, but I don't see
+    // the two-step transformation here %). Did you change anything?
+
     // mapToGlobal works incorrectly here, using two-step transformation
     pos = ui->resourcesTreeView->mapToGlobal(pos);
     return pos;
 }
 
-void QnResourceTreeWidget::setCheckboxesHidden(bool hidden){
+void QnResourceTreeWidget::setCheckboxesHidden(bool hidden) {
     if (m_checkboxesHidden == hidden)
         return;
     m_checkboxesHidden = hidden;
     updateCheckboxesVisibility();
 }
 
-void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks){
-    Q_UNUSED(enableTweaks)
+void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks) {
+    Q_UNUSED(enableTweaks) // TODO: #gdm This is just cruel.
 
     ui->resourcesTreeView->setProperty(Qn::HideLastRowInTreeIfNotEnoughSpace, true);
     ui->resourcesTreeView->setProperty(Qn::ItemViewItemBackgroundOpacity, 0.5);

@@ -39,9 +39,11 @@ public:
 
     QPoint selectionPos() const;
 
+    // TODO: #gdm Better use setCheckboxesVisible. And add a getter (bool isCheckboxesVisible() const).
     void setCheckboxesHidden(bool hidden = true);
 
     //TODO: #gdm flags?
+    // TODO: #gdm setter starts with set, e.g. setGraphicsTweaksEnabled. And add a getter.
     void enableGraphicsTweaks(bool enableTweaks = true);
 
 protected:
