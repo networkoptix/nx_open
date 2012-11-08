@@ -14,6 +14,10 @@
 
 #include <ui/graphics/opengl/gl_functions.h>
 
+#include "api/app_server_connection.h"
+#include "core/resource/resource_type.h"
+#include "core/resource_managment/resource_pool.h"
+
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
 
@@ -75,6 +79,43 @@ void QnAboutDialog::retranslateUi()
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER));
 
+    QString ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
+    QString servers;
+
+    if (ecsVersion.isEmpty()) {
+        servers =         tr(
+            "<b>Enterprise controller</b>: not connected."
+            );
+    } else {
+        servers =         tr(
+            "<b>Enterprise controller: %1</b> version: %2.<br>\n"
+            ).
+            arg(ecsUrl.host() + QLatin1String(":") + QString::number(ecsUrl.port())).
+            arg(ecsVersion);
+    }
+
+    QnId serverTypeId = qnResTypePool->getResourceTypeByName(QLatin1String("Server"))->getId();
+    QnResourceList serverResources = qnResPool->getResourcesWithTypeId(serverTypeId);
+
+    QStringList serverVersions;
+    foreach (QnResourcePtr resource, serverResources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+
+        if (server->getStatus() != QnResource::Online)
+            continue;
+
+        QUrl serverUrl(server->getUrl());
+        QString serverString = QString(QLatin1String("%1 (%2)")).
+            arg(server->getName()).
+            arg(serverUrl.host());
+        serverVersions.append(tr("<b>Media Server: %1</b> version: %2.").arg(serverString).arg(server->getVersion()));
+    }
+    
+    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty()) {
+        servers += serverVersions.join(QLatin1String("<br>"));
+    }
+
     QString credits = 
         tr(
             "<b>%1 %2</b> uses the following external libraries:<br/>\n"
@@ -83,7 +124,7 @@ void QnAboutDialog::retranslateUi()
             "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
             "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
             "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
-            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br/>\n"
+            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
             "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
             "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
@@ -119,6 +160,7 @@ void QnAboutDialog::retranslateUi()
     ui->versionLabel->setText(version);
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
+    ui->serversLabel->setText(servers);
 }
 
 // -------------------------------------------------------------------------- //

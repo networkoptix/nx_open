@@ -34,8 +34,14 @@ public:
 
     //!Implementation of QAbstractItemModel::data
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;
+    //!Implementation of QAbstractItemModel::hasChildren
+    virtual bool hasChildren( const QModelIndex& parent = QModelIndex() ) const;
+    //!Implementation of QAbstractItemModel::headerData
+    virtual QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
     //!Implementation of QAbstractItemModel::index
     virtual QModelIndex	index( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
+    //!Implementation of QAbstractItemModel::parent
+    virtual QModelIndex	parent( const QModelIndex& index ) const;
     //!Implementation of QAbstractItemModel::rowCount
     virtual int	rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
@@ -59,7 +65,7 @@ private:
     public:
         QString seed;
         QString url;
-        QString ipAddress;
+        std::vector<QString> ipAddresses;
         TypeSpecificParamMap params;
 
         bool operator<( const FoundModuleData& right ) const

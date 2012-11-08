@@ -69,6 +69,7 @@ public:
     QnResourceList getResourcesWithFlag(QnResource::Flag flag) const;
 
     QnResourceList getResourcesWithParentId(QnId id) const;
+    QnResourceList getResourcesWithTypeId(QnId id) const;
 
     QStringList allTags() const;
 
