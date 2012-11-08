@@ -6,6 +6,7 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
+#include <set>
 #include <vector>
 
 #include <QHostAddress>
@@ -18,7 +19,7 @@
 
 class UDPSocket;
 
-//!Searches for all Network Optix enterprise controllers in local network environment
+//!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
     Search is done by sending multicast packet to predefined multicast group and waiting for an answer.
     Requests are sent periodically every \a pingTimeoutMillis milliseconds.
@@ -92,6 +93,7 @@ private:
         QHostAddress address;
         RevealResponse response;
         quint64 prevResponseReceiveClock;
+        std::set<QString> signalledAddresses;
 
         ModuleContext()
         :
