@@ -279,8 +279,8 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
         return QString();
 
     qint64 endTime = d->archiveDP->endTime();
-    bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture)
+    //bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
         endTime = DATETIME_NOW;
 
     if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
@@ -368,8 +368,8 @@ QString QnRtspConnectionProcessor::getRangeStr()
         d->archiveDP->open();
         d->prevStartTime = d->archiveDP->startTime();
         qint64 archiveEndTime = d->archiveDP->endTime();
-        bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture;
+        //bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes); // && !endTimeInFuture;
         if (endTimeIsNow)
             d->prevEndTime = DATETIME_NOW;
         else
