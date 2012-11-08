@@ -259,7 +259,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
         m_dataQueue.lock();
         QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();
         QMutexLocker lock(&m_qualityChangeMutex);
-        if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh)
+        if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh && m_newLiveQuality != MEDIA_Quality_AlwaysHigh)
         {
             qint64 skipTime = m_dataQueue.front()->timestamp;
             m_dataQueue.clear();
