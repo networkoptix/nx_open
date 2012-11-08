@@ -251,8 +251,10 @@ void QnCachingTimePeriodLoader::at_loader_failed(int /*status*/, int handle) {
 }
 
 void QnCachingTimePeriodLoader::at_syncTime_timeChanged() {
-    for(int i = 0; i < Qn::TimePeriodRoleCount; i++)
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        m_loaders[i]->discardCachedData();
         load(static_cast<Qn::TimePeriodRole>(i));
+    }
 }
 
 

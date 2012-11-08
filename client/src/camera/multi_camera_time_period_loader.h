@@ -16,10 +16,12 @@ class QnMultiCameraTimePeriodLoader: public QnAbstractTimePeriodLoader
 {
     Q_OBJECT
 public:
-    QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent);
-    static QnMultiCameraTimePeriodLoader* newInstance(QnResourcePtr resource, QObject *parent = 0);
+    QnMultiCameraTimePeriodLoader(QnResourcePtr resource, QObject *parent = 0);
+    static QnMultiCameraTimePeriodLoader *newInstance(QnResourcePtr resource, QObject *parent = 0);
 
     virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
+
+    virtual void discardCachedData() override;
 
 private slots:
     void onDataLoaded(const QnTimePeriodList &periods, int handle);
