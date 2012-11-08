@@ -341,10 +341,7 @@
                             Win64="no"/>
 		</Property>
 
-		<Property Id="IS_SERVER_DIRECTORY_REG" Secure="yes">
-			<DirectorySearch Id='DirectorySearch1' Path='[SERVER_DIRECTORY_REG]'/>
-		</Property>
-
+		<Property Id="IS_SERVER_DIRECTORY_REG" Secure="yes"/>
 
 		<!-- Client properties-->
 		<Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>
