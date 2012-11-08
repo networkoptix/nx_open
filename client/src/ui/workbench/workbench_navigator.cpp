@@ -203,7 +203,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_calendar,                         SIGNAL(currentPageChanged(int,int)),                this,   SLOT(updateTargetPeriod()));
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()),          this,   SLOT(updateLocalOffset()));
-    connect(qnSettings->notifier(QnSettings::TIME_MODE), SIGNAL(valueChanged(int)),         this,   SLOT(updateLocalOffset()));
+    connect(qnSettings->notifier(QnSettings::TIME_MODE), SIGNAL(valueChanged(int)),                 this,   SLOT(updateLocalOffset()));
 
     updateLines();
     updateCalendar();

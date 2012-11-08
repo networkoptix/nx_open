@@ -47,7 +47,7 @@
 #include "file_processor.h"
 #include "utils/settings.h"
 
-#include "resource_tree_widget.h"
+#include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
 

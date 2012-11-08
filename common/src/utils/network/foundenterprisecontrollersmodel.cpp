@@ -7,6 +7,8 @@
 
 #include <algorithm>
 
+#include <QMutexLocker>
+
 
 using namespace std;
 
@@ -16,17 +18,21 @@ FoundEnterpriseControllersModel::FoundEnterpriseControllersModel( NetworkOptixMo
         finder,
         SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, const QString&)),
         this,
-        SLOT(remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, const QString&)) );
+        SLOT(remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, const QString&)),
+        Qt::DirectConnection );
     QObject::connect(
         finder,
         SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, const QString&)),
         this,
-        SLOT(remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, const QString&)) );
+        SLOT(remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, const QString&)),
+        Qt::DirectConnection );
 }
 
 //!Implementation of QAbstractItemModel::data
 QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int role ) const
 {
+    QMutexLocker lk( &m_mutex );
+
     if( index.column() != 0 )
         return QVariant();
     size_t foundModuleIndex = 0;
@@ -38,24 +44,7 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
         foundModuleIndex = index.row();
         moduleAddressIndex = 0;
         if( role == Qt::DisplayRole )
-        {
-            QString displayString;
-            //displayString += tr("Enterprise controller (");
-            displayString += tr("port ");
-            displayString += QString::fromAscii(" ") + m_foundModules[foundModuleIndex].params["port"];
-            displayString += QString::fromAscii(", ip: ");
-            for( std::vector<QString>::size_type
-                i = 0;
-                i < m_foundModules[foundModuleIndex].ipAddresses.size();
-                ++i )
-            {
-                if( i > 0 )
-                    displayString += QString::fromAscii(", ");
-                displayString += m_foundModules[foundModuleIndex].ipAddresses[i];
-            }
-            //displayString += QString::fromAscii(")");
-            return displayString;
-        }
+            return getDisplayStringForEnterpriseControllerRootNode( m_foundModules[foundModuleIndex] );
     }
     else
     {
@@ -67,14 +56,14 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
         }
         moduleAddressIndex = index.row();
         if( role == Qt::DisplayRole )
-            return m_foundModules[foundModuleIndex].ipAddresses[index.row()];
+            return getDisplayStringForEnterpriseControllerAddressNode( m_foundModules[foundModuleIndex], m_foundModules[foundModuleIndex].ipAddresses[index.row()] );
     }
     const FoundModuleData& moduleData = m_foundModules[foundModuleIndex];
 
     switch( role )
     {
         case urlRole:
-            return "https://"+moduleData.ipAddresses[moduleAddressIndex]+":"+moduleData.params["port"];
+            return QString::fromAscii("https://%1:%2").arg(moduleData.ipAddresses[moduleAddressIndex]).arg(moduleData.params[QString::fromAscii("port")]);
 
         case seedRole:
             return moduleData.seed;
@@ -83,7 +72,7 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
             return moduleData.ipAddresses[moduleAddressIndex];
 
         case appServerPortRole:
-            return moduleData.params["port"].toInt();
+            return moduleData.params[QString::fromAscii("port")].toInt();
 
         default:
             return QVariant();
@@ -92,6 +81,8 @@ QVariant FoundEnterpriseControllersModel::data( const QModelIndex& index, int ro
 
 bool FoundEnterpriseControllersModel::hasChildren( const QModelIndex& parent ) const
 {
+    QMutexLocker lk( &m_mutex );
+
     if( !parent.isValid() )
         return true;
 
@@ -121,27 +112,9 @@ QVariant FoundEnterpriseControllersModel::headerData( int section, Qt::Orientati
 //!Implementation of QAbstractItemModel::index
 QModelIndex	FoundEnterpriseControllersModel::index( int row, int column, const QModelIndex& parent ) const
 {
-    if( column != 0 )
-        return QModelIndex();
-    if( !parent.isValid() )
-    {
-        if( row >= static_cast<int>(m_foundModules.size()) )
-            return QModelIndex();
-        return createIndex( row, column, 0 );
-    }
-    else
-    {
-        if( parent.internalId() != 0 ||
-            parent.row() >= static_cast<int>(m_foundModules.size()) ||
-            parent.column() > 0 )
-        {
-            return QModelIndex();
-        }
-        const FoundModuleData& moduleData = m_foundModules[parent.row()];
-        if( row >= static_cast<int>(moduleData.ipAddresses.size()) )
-            return QModelIndex();
-        return createIndex( row, column, (1 << 24) | parent.row() ); //using non-zero internalId
-    }
+    QMutexLocker lk( &m_mutex );
+
+    return indexNonSafe( row, column, parent );
 }
 
 QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) const
@@ -154,6 +127,11 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
         return QModelIndex();
 
     return createIndex( foundModuleIndex, 0, 0 );
+}
+
+int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
+{
+    return 1;
 }
 
 //!Implementation of QAbstractItemModel::rowCount
@@ -182,12 +160,14 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     const QString& remoteHostAddress,
     const QString& seed )
 {
-    if( moduleID != NX_ENTERPISE_CONTROLLER_ID )
+    QMutexLocker lk( &m_mutex );
+
+    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
         return;
-    if( !moduleParameters.contains("port") )
+    if( !moduleParameters.contains(QString::fromAscii("port")) )
         return;
 
-    const QString& url = "https://"+remoteHostAddress+":"+moduleParameters["port"];
+    const QString& url = QString::fromAscii("https://%1:%2").arg(remoteHostAddress).arg(moduleParameters[QString::fromAscii("port")]);
     bool isNewElement = false;
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
     if( it == m_foundModules.end() )
@@ -207,13 +187,16 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     it->url = url;
     it->ipAddresses.push_back( remoteHostAddress );
     it->params = moduleParameters;
+    const QModelIndex& updatedElemIndex = indexNonSafe( it - m_foundModules.begin(), 0 );
+
+    lk.unlock();
+
     if( isNewElement )
     {
         endResetModel();
     }
     else
     {
-        const QModelIndex& updatedElemIndex = index(it - m_foundModules.begin(), 0);
         emit dataChanged( updatedElemIndex, updatedElemIndex );
     }
 }
@@ -224,7 +207,9 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     const QString& /*remoteHostAddress*/,
     const QString& seed )
 {
-    if( moduleID != NX_ENTERPISE_CONTROLLER_ID )
+    QMutexLocker lk( &m_mutex );
+
+    if( moduleID != QString::fromAscii(NX_ENTERPISE_CONTROLLER_ID) )
         return;
 
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
@@ -233,4 +218,54 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     beginResetModel();
     m_foundModules.erase( it );
     endResetModel();
+}
+
+QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const
+{
+    QString displayString;
+    //displayString += tr("Enterprise controller (");
+    displayString += tr("Port ");
+    displayString += QString::fromAscii(" ") + moduleData.params[QString::fromAscii("port")];
+    displayString += tr(", Ip: ");
+    for( std::vector<QString>::size_type
+        i = 0;
+        i < moduleData.ipAddresses.size();
+        ++i )
+    {
+        if( i > 0 )
+            displayString += QString::fromAscii(", ");
+        displayString += moduleData.ipAddresses[i];
+    }
+    //displayString += QString::fromAscii(")");
+    return displayString;
+}
+
+QString FoundEnterpriseControllersModel::getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& /*moduleData*/, const QString& address ) const
+{
+    return address;
+}
+
+QModelIndex	FoundEnterpriseControllersModel::indexNonSafe( int row, int column, const QModelIndex& parent ) const
+{
+    if( column != 0 )
+        return QModelIndex();
+    if( !parent.isValid() )
+    {
+        if( row >= static_cast<int>(m_foundModules.size()) )
+            return QModelIndex();
+        return createIndex( row, column, 0 );
+    }
+    else
+    {
+        if( parent.internalId() != 0 ||
+            parent.row() >= static_cast<int>(m_foundModules.size()) ||
+            parent.column() > 0 )
+        {
+            return QModelIndex();
+        }
+        const FoundModuleData& moduleData = m_foundModules[parent.row()];
+        if( row >= static_cast<int>(moduleData.ipAddresses.size()) )
+            return QModelIndex();
+        return createIndex( row, column, (1 << 24) | parent.row() ); //using non-zero internalId
+    }
 }

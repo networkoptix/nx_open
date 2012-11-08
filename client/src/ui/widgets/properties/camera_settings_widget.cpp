@@ -34,6 +34,8 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
+    connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+    connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);

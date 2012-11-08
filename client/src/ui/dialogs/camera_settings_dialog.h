@@ -14,7 +14,7 @@ class QnCameraSettingsWidget;
 class QnWorkbenchContext;
 
 class QnCameraSettingsDialog: public QDialog {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnCameraSettingsDialog(QWidget *parent = NULL, Qt::WindowFlags windowFlags = 0);
     virtual ~QnCameraSettingsDialog();
@@ -30,6 +30,7 @@ public:
 signals:
     void buttonClicked(QDialogButtonBox::StandardButton button);
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &cameras);
 
 private slots:
     void at_buttonBox_clicked(QAbstractButton *button);
