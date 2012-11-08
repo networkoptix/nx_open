@@ -1,11 +1,12 @@
 #include <QtGui>
 #include <QTcpServer>
 
+#include <utils/network/foundenterprisecontrollersmodel.h>
+
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
 #include "connectiontestingdialog.h"
-#include "foundenterprisecontrollersmodel.h"
 
 #include <shlobj.h>
 #include "version.h"

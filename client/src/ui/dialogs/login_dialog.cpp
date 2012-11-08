@@ -21,6 +21,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
+#include "ui_findappserverdialog.h"
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
@@ -40,9 +41,12 @@ namespace {
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
+    m_findAppServerDialog(new QDialog),
+    m_findAppServerDialogUI( new Ui::FindAppServerDialog ),
     m_context(context),
     m_requestHandle(-1),
-    m_renderingWidget(NULL)
+    m_renderingWidget(NULL),
+    m_foundEntCtrlModel( &m_entCtrlFinder )
 {
     if(!context)
         qnNullWarning(context);
@@ -94,6 +98,18 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     resetConnectionsModel();
     updateFocus();
+
+    m_entCtrlFinder.start();
+    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
+    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( &m_foundEntCtrlModel );
+
+    connect(
+        m_findAppServerDialogUI->foundEnterpriseControllersView,
+        SIGNAL(doubleClicked(const QModelIndex&)),
+        m_findAppServerDialog.data(),
+        SLOT(accept()) );
+
+    connect( ui->selectEntCtrlButton, SIGNAL(clicked()), this, SLOT(onSelectEntCtrlButtonClicked()) );
 }
 
 LoginDialog::~LoginDialog() {
@@ -324,4 +340,16 @@ void LoginDialog::at_deleteButton_clicked() {
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();
+}
+
+void LoginDialog::onSelectEntCtrlButtonClicked()
+{
+    if( !m_findAppServerDialog->exec() )
+        return; //cancel pressed
+    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
+    if( !selectedSrvIndex.isValid() )
+        return;
+
+    ui->hostnameLineEdit->setText( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
+    ui->portSpinBox->setValue( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
 }
