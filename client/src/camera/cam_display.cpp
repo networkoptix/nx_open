@@ -743,11 +743,15 @@ void QnCamDisplay::onPrevFrameOccured()
 {
     m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::onNextFrameOccured()
 {
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::setSingleShotMode(bool single)
@@ -756,7 +760,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
     if (m_singleShotMode) {
         m_isRealTimeSource = false;
         emit liveMode(false);
-        playAudio(false);
+        pauseAudio();
     }
 }
 
@@ -1251,6 +1255,16 @@ void QnCamDisplay::playAudio(bool play)
         setMTDecoding(play && m_useMTRealTimeDecode);
     else
         setMTDecoding(play);
+}
+
+void QnCamDisplay::pauseAudio()
+{
+    m_playAudio = false;
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->suspend();
+    }
+    setMTDecoding(false);
 }
 
 //==========================================================================
