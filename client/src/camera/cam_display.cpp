@@ -756,7 +756,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
     if (m_singleShotMode) {
         m_isRealTimeSource = false;
         emit liveMode(false);
-        playAudio(false);
+        pauseAudio();
     }
 }
 
@@ -1251,6 +1251,16 @@ void QnCamDisplay::playAudio(bool play)
         setMTDecoding(play && m_useMTRealTimeDecode);
     else
         setMTDecoding(play);
+}
+
+void QnCamDisplay::pauseAudio()
+{
+    m_playAudio = false;
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->suspend();
+    }
+    setMTDecoding(false);
 }
 
 //==========================================================================
