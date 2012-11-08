@@ -476,8 +476,43 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
 }
 
 void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot) {
-    if(!saveResources.empty())
-        snapshotManager()->save(saveResources, object, slot);
+    if(!saveResources.empty()) {
+        QnLayoutResourceList fileResources, normalResources;
+        foreach(const QnLayoutResourcePtr &resource, saveResources) {
+            if(snapshotManager()->isFile(resource)) {
+                fileResources.push_back(resource);
+            } else {
+                normalResources.push_back(resource);
+            }
+        }
+        
+        if(!normalResources.isEmpty())
+            snapshotManager()->save(normalResources, object, slot);
+
+        foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
+            if (validateItemTypes(fileResource)) { // TODO: and if not?
+                bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
+                saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+            }
+        }
+
+        if(normalResources.isEmpty()) {
+            QByteArray method(slot && *slot ? slot + 1 : slot);
+            int index = method.indexOf('(');
+            if(index != -1)
+                method.truncate(index);
+
+            QMetaObject::invokeMethod(
+                object, 
+                method.constData(), 
+                Qt::QueuedConnection, 
+                Q_ARG(int, 0),
+                Q_ARG(QByteArray, QByteArray()),
+                Q_ARG(QnResourceList, QnResourceList()),
+                Q_ARG(int, 0)
+            );
+        }
+    }
 
     foreach(const QnLayoutResourcePtr &resource, rollbackResources)
         snapshotManager()->restore(resource);
@@ -896,13 +931,12 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if(!(accessController()->permissions(layout) & Qn::SavePermission))
         return;
 
-    if (layout->flags() & QnResource::local) {
+    if (snapshotManager()->isFile(layout)) {
         if (!validateItemTypes(layout))
             return;
-        bool isReadOnly = !(accessController()->permissions(layout) & Qn::ReadWriteSavePermission);
-        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // override layout
-    }
-    else {
+        bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+    } else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
     }
 }

@@ -263,14 +263,14 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
     fillFileNames(msTime, 0, &indexFile);
     if (!indexFile.open(QFile::ReadOnly)) 
         return false;
+    return loadIndexFile(index, indexHeader, indexFile);
+}
 
-    //qint64 indexSize = (indexFile.size()-MOTION_INDEX_HEADER_SIZE);
-    //if (indexSize == 0)
-    //    return false;
-    //index.resize(indexSize/MOTION_INDEX_RECORD_SIZE);
+bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile)
+{
     index.clear();
+    indexFile.seek(0);
     indexFile.read((char*) &indexHeader, MOTION_INDEX_HEADER_SIZE);
-    //indexFile.read((char*) &index[0], indexSize);
 
     quint8 tmpBuffer[1024*128];
     while(1)
@@ -297,11 +297,21 @@ void QnMotionArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& max
     maxDate = nextMonth.toMSecsSinceEpoch()-1;
 }
 
+int QnMotionArchive::getSizeForTime(qint64 timeMs)
+{
+    QVector<IndexRecord> index;
+    IndexHeader indexHeader;
+    loadIndexFile(index, indexHeader, m_detailedIndexFile);
+    QVector<IndexRecord>::iterator indexIterator = qLowerBound(index.begin(), index.end(), timeMs - indexHeader.startTime);
+    return indexIterator - index.begin();
+}
+
 bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
 {
     qint64 timestamp = data->timestamp/1000;
-    if (timestamp > m_lastDateForCurrentFile)
+    if (timestamp > m_lastDateForCurrentFile || timestamp < m_firstTime)
     {
+        // go to new file
 
         dateBounds(timestamp, m_firstTime, m_lastDateForCurrentFile);
 
@@ -309,12 +319,12 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
         m_detailedMotionFile.close();
         m_detailedIndexFile.close();
         fillFileNames(timestamp, &m_detailedMotionFile, &m_detailedIndexFile);
-        if (!m_detailedMotionFile.open(QFile::WriteOnly | QFile::Append))
+        if (!m_detailedMotionFile.open(QFile::ReadWrite))
             return false;
 
-        if (!m_detailedIndexFile.open(QFile::WriteOnly | QFile::Append))
+        if (!m_detailedIndexFile.open(QFile::ReadWrite))
             return false;
-
+        
         // truncate biggest file. So, it is error checking
         int indexRecords = qMax((m_detailedIndexFile.size() - MOTION_INDEX_HEADER_SIZE) / MOTION_INDEX_RECORD_SIZE, 0ll);
         int dataRecords  = m_detailedMotionFile.size() / MOTION_DATA_RECORD_SIZE;
@@ -337,7 +347,27 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
             header.startTime = m_firstTime;
             m_detailedIndexFile.write((const char*) &header, sizeof(IndexHeader));
         }
+        else {
+            QVector<IndexRecord> index;
+            IndexHeader indexHeader;
+            loadIndexFile(index, indexHeader, m_detailedIndexFile);
+            if (index.size() > 0) {
+                m_minMotionTime = index.first().start + indexHeader.startTime;
+                m_maxMotionTime = index.last().start + indexHeader.startTime;
+            }
+        }
+        m_detailedMotionFile.seek(m_detailedMotionFile.size());
+        m_detailedIndexFile.seek(m_detailedIndexFile.size());
     }
+    
+    if (timestamp < m_maxMotionTime)
+    {
+        int dataRecords = getSizeForTime(timestamp);
+        m_detailedIndexFile.seek(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE);
+        m_detailedMotionFile.seek(dataRecords*MOTION_DATA_RECORD_SIZE);
+        m_minMotionTime = qMin(m_minMotionTime, timestamp);
+    }
+
     quint32 relTime = quint32(timestamp - m_firstTime);
     quint32 duration = int(data->m_duration/1000);
     if (m_detailedIndexFile.write((const char*) &relTime, 4) != 4)
@@ -357,7 +387,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     m_detailedIndexFile.flush();
     m_detailedMotionFile.flush();
 
-    m_maxMotionTime = data->timestamp/1000;
+    m_maxMotionTime = timestamp;
     if (m_minMotionTime == AV_NOPTS_VALUE)
         m_minMotionTime = m_maxMotionTime;
     return true;
@@ -372,7 +402,7 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         m_lastDetailedData->timestamp = data->timestamp;
     }
     else {
-        if(data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION*1000ll) {
+        if(data->timestamp >= m_lastTimestamp && data->timestamp - m_lastTimestamp <= MAX_FRAME_DURATION*1000ll) {
             m_lastDetailedData->m_duration = data->timestamp - m_lastDetailedData->timestamp;
         }
         else {
@@ -380,7 +410,7 @@ bool QnMotionArchive::saveToArchive(QnMetaDataV1Ptr data)
         }
     }
 
-    if (data->timestamp - m_lastDetailedData->timestamp < DETAILED_AGGREGATE_INTERVAL*1000000ll)
+    if (data->timestamp >= m_lastDetailedData->timestamp && data->timestamp - m_lastDetailedData->timestamp < DETAILED_AGGREGATE_INTERVAL*1000000ll)
     {
         //qDebug() << "addMotion=" << QDateTime::fromMSecsSinceEpoch(data->timestamp/1000).toString("hh.mm.ss.zzz")
         //    << "to" << QDateTime::fromMSecsSinceEpoch(m_lastDetailedData->timestamp).toString("hh.mm.ss.zzz");

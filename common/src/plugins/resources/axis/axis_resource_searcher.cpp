@@ -104,6 +104,7 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
 
     resource->setTypeId(rt);
     resource->setName(name);
+    (resource.dynamicCast<QnPlAxisResource>())->setModel(name);
     resource->setMAC(mac);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
     resource->setAuth(auth);
