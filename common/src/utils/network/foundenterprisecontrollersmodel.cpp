@@ -129,6 +129,11 @@ QModelIndex	FoundEnterpriseControllersModel::parent( const QModelIndex& index ) 
     return createIndex( foundModuleIndex, 0, 0 );
 }
 
+int FoundEnterpriseControllersModel::columnCount( const QModelIndex& index ) const
+{
+    return 1;
+}
+
 //!Implementation of QAbstractItemModel::rowCount
 int	FoundEnterpriseControllersModel::rowCount( const QModelIndex& parent ) const
 {

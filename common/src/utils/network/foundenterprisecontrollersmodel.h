@@ -17,7 +17,7 @@
 //!Connects to NetworkOptixModuleFinder and holds found enterprise controllers list
 class FoundEnterpriseControllersModel
 :
-    public QAbstractListModel
+    public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -43,6 +43,8 @@ public:
     virtual QModelIndex	index( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
     //!Implementation of QAbstractItemModel::parent
     virtual QModelIndex	parent( const QModelIndex& index ) const;
+    //!Implementation of QAbstractItemModel::columnCount
+    virtual int columnCount( const QModelIndex& index ) const;
     //!Implementation of QAbstractItemModel::rowCount
     virtual int	rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
