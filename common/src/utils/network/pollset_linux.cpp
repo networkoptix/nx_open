@@ -85,7 +85,7 @@ public:
     void selectNextSocket()
     {
         ++currentIndex;
-        if( pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr == NULL )
+        if( (currentIndex < pollSetImpl->signalledSockCount) && (pollSetImpl->epollEventsArray[currentIndex].data.ptr == NULL) )
         {
             //reading eventfd and selecting next socket
             uint64_t val = 0;
@@ -93,7 +93,7 @@ public:
             {
                 //TODO ???
             }
-            ++m_impl->currentIndex;
+            ++currentIndex;
         }
     }
 };
