@@ -743,11 +743,15 @@ void QnCamDisplay::onPrevFrameOccured()
 {
     m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::onNextFrameOccured()
 {
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::setSingleShotMode(bool single)
