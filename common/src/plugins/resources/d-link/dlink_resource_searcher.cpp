@@ -215,6 +215,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setMAC(mac);
+    (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
     resource->setAuth(auth);
 
