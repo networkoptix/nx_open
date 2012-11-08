@@ -33,6 +33,7 @@ public:
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
     bool display(QnCompressedVideoDataPtr vd, bool sleep, float speed);
+    void pauseAudio();
     void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;

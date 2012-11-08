@@ -13,6 +13,7 @@
 
 #include <tchar.h>
 #include <atlstr.h>
+#include <atlpath.h>
 #include <strsafe.h>
 #include <msiquery.h>
 

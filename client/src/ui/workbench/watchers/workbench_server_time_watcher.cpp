@@ -49,9 +49,6 @@ qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr 
 }
 
 void QnWorkbenchServerTimeWatcher::updateServerTime(const QnMediaServerResourcePtr &server) {
-    if(server->getPrimaryIF().isEmpty())
-        return;
-
     int handle = server->apiConnection()->asyncGetTime(this, SLOT(at_replyReceived(int, const QDateTime &, int, int)));
     m_resourceByHandle[handle] = server;
 }

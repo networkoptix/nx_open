@@ -314,6 +314,12 @@ UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
 
     {
         CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
+
+        if (CPath(serverFolder).IsDirectory())
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"");
+
         if (serverFolder.Find(L"coldstore://") == 0)
             MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
         else
