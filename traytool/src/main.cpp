@@ -6,8 +6,8 @@
 #include <QMetaType>
 
 #include <utils/network/networkoptixmodulefinder.h>
+#include <utils/network/foundenterprisecontrollersmodel.h>
 
-#include "foundenterprisecontrollersmodel.h"
 #include "systraywindow.h"
 
 
