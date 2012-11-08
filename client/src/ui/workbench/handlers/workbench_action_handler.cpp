@@ -2231,6 +2231,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
     QTextStream itemNames(itemNamesIO);
+    QList<qint64> itemTimeZones;
 
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
@@ -2251,11 +2252,25 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
                 }
+                QnMediaServerResourcePtr videoServer = qnResPool->getResourceById(mediaRes->getParentId()).dynamicCast<QnMediaServerResource>();
+                if (videoServer)
+                    itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(videoServer, Qn::InvalidUtcOffset);
+                else 
+                    itemTimeZones << Qn::InvalidUtcOffset;
             }
+            else 
+                itemTimeZones << Qn::InvalidUtcOffset;
         }
     }
     itemNames.flush();
     delete itemNamesIO;
+
+    QIODevice* itemTimezonesIO = m_exportStorage->open(QLatin1String("item_timezones.txt"), QIODevice::WriteOnly);
+    QTextStream itemTimeZonesStream(itemTimezonesIO);
+    foreach(qint64 timeZone, itemTimeZones)
+        itemTimeZonesStream << timeZone << QLatin1String("\n");
+    itemTimeZonesStream.flush();
+    delete itemTimezonesIO;
 
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)

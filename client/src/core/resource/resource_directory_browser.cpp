@@ -12,6 +12,7 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "client/client_globals.h"
+#include "ui/workbench/watchers/workbench_server_time_watcher.h"
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser()
 {
@@ -214,6 +215,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
 
     QIODevice* itemNamesIO = layoutStorage.open(QLatin1String("item_names.txt"), QIODevice::ReadOnly);
     QTextStream itemNames(itemNamesIO);
+    QIODevice* itemTimeZonesIO = layoutStorage.open(QLatin1String("item_timezones.txt"), QIODevice::ReadOnly);
+    QTextStream itemTimeZones(itemTimeZonesIO);
 
     // TODO: here is bad place to add resources to pool. need refactor
     for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
@@ -238,6 +241,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         QString itemName(itemNames.readLine());
         if (!itemName.isEmpty())
             aviResource->setName(itemName);
+        qint64 timeZoneOffset = itemTimeZones.readLine().toLongLong();
+        if (timeZoneOffset != Qn::InvalidUtcOffset)
+            aviResource->setTimeZoneOffset(timeZoneOffset);
 
         qnResPool->addResource(aviResource);
         aviResource = qnResPool->getResourceByUniqId(aviResource->getUniqueId()).dynamicCast<QnAviResource>(); // It may have already been in the pool!
@@ -271,6 +277,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         updatedItems.insert(item.uuid, item);
     }
     delete itemNamesIO;
+    delete itemTimeZonesIO;
     layout->setItems(updatedItems);
     //layout->addFlags(QnResource::local_media);
     layout->addFlags(QnResource::local);
