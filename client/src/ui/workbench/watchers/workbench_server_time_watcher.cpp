@@ -8,7 +8,7 @@
 #include <api/media_server_connection.h>
 
 enum {
-    ServerTimeRequestPeriod = 1000 * 60 * 2, /* 2 minutes. */
+    ServerTimeUpdatePeriod = 1000 * 60 * 2, /* 2 minutes. */
 };  
 
 
@@ -22,7 +22,7 @@ QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent):
     foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 
-    m_timer.start(ServerTimeRequestPeriod, this);
+    m_timer.start(ServerTimeUpdatePeriod, this);
 }
 
 QnWorkbenchServerTimeWatcher::~QnWorkbenchServerTimeWatcher() {

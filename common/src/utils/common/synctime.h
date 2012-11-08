@@ -1,6 +1,7 @@
 #ifndef QN_SYNC_TIME_H
 #define QN_SYNC_TIME_H
 
+#include <QtCore/QObject>
 #include <QtCore/QDateTime>
 #include <QtCore/QMutex>
 
@@ -9,17 +10,25 @@ class QnSyncTimeTask;
 /** 
  * Time provider that is synchronized with Enterprise Controller.
  */
-class QnSyncTime {
+class QnSyncTime: public QObject {
+    Q_OBJECT;
+
 public:
     QnSyncTime();
 
     static QnSyncTime *instance();
+
     qint64 currentMSecsSinceEpoch();
     qint64 currentUSecsSinceEpoch();
-
     QDateTime currentDateTime();
 
     void reset();
+
+signals:
+    /**
+     * This signal is emitted whenever time on EC changes. 
+     */
+    void timeChanged();
 
 private:
     void updateTime(qint64 newTime);

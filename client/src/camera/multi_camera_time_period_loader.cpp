@@ -52,6 +52,11 @@ int QnMultiCameraTimePeriodLoader::load(const QnTimePeriod &period, const QList<
     return multiHandle;
 }
 
+void QnMultiCameraTimePeriodLoader::discardCachedData() {
+    foreach(QnTimePeriodLoader *loader, m_cache)
+        loader->discardCachedData();
+}
+
 int QnMultiCameraTimePeriodLoader::loadInternal(QnNetworkResourcePtr networkResource, const QnTimePeriod &period, const QList<QRegion> &motionRegions)
 {
     QMutexLocker lock(&m_mutex);
