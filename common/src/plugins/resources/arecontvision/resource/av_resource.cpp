@@ -206,6 +206,7 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
     {
         result->setName(model.toString());
         result->setHostAddress(getHostAddress(), QnDomainMemory);
+        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model.toString());
         result->setMAC(getMAC());
         result->setId(getId());
         result->setFlags(flags());

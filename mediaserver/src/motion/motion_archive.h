@@ -85,8 +85,10 @@ private:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime);
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile);
 
     void loadRecordedRange();
+    int getSizeForTime(qint64 timeMs);
 
     friend class QnMotionArchiveConnection;
 private:
