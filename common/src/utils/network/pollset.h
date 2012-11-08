@@ -66,7 +66,8 @@ public:
 
     //!Interrupts \a poll method, blocked in other thread
     /*!
-        This is the only method which is allowed to be called from different thread
+        This is the only method which is allowed to be called from different thread.
+        poll, called after interrupt, will return immediately. But, it is unspecified whether it will return multiple times if interrupt has been called multiple times
     */
     void interrupt();
 
