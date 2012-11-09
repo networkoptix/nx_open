@@ -83,6 +83,9 @@ protected slots:
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
 
+    void at_audioDevice_volumeChanged();
+    void at_volumeSliderNotifier_manipulated();
+
 private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
     QnWorkbenchController *m_controller;
@@ -106,6 +109,8 @@ private:
 
     Options m_options;
     QMargins m_frameMargins;
+
+    bool m_changeOpacity;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

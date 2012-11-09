@@ -345,14 +345,9 @@ public:
     }
 
     Qt::ItemFlags flags(int column) const {
-        if (column== CheckColumn)
-            return Qt::ItemIsEnabled
-                    | Qt::ItemIsSelectable
-                    | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable
-                    | Qt::ItemIsTristate;
-
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
+        if (column== CheckColumn)
+            result |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -741,12 +736,7 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    // TODO: #gdm 
-    // Only children of the first column are considered when TreeView is
-    // building a tree.
-    // You should always return zero for other columns,
-    // so the condition should be (parent.column() >= 0).
-    if (parent.column() >= ColumnCount)
+    if (parent.column() > 0)
         return 0;
 
     return node(parent)->children().size();

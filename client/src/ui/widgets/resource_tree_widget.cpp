@@ -258,6 +258,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     m_searchModel->setFilterRole(Qn::ResourceSearchStringRole);
     m_searchModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_searchModel->setDynamicSortFilter(true);
+
+    ui->resourcesTreeView->setAcceptDrops(true);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {

@@ -1,5 +1,5 @@
-export OLD_VERSION=1.3.0
-export NEW_VERSION=1.3.1
+export OLD_VERSION=1.3.1
+export NEW_VERSION=1.3.9
 
 OLD_VERSION=${OLD_VERSION//./\\.}
 
