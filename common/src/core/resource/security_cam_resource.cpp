@@ -196,7 +196,16 @@ void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleT
 {
     // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
 
-    m_scheduleTasks = scheduleTasks;
+    //m_scheduleTasks = scheduleTasks;
+    int maxFps = getMaxFps();
+    if (streamFpsSharingMethod() == shareFps && getMotionType() == MT_SoftwareGrid)
+        maxFps = maxFps - reservedSecondStreamFps();
+
+    m_scheduleTasks.clear();
+    foreach(const QnScheduleTask::Data &data, scheduleTasks){
+        data.m_fps = qMin(data.m_fps, maxFps);
+        m_scheduleTasks.append(QnScheduleTask(data));
+    }
 
     emit scheduleTasksChanged();
 }
