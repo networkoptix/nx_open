@@ -14,7 +14,7 @@
 #include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
 
-#include <ui/dialogs/resource_tree_dialog.h>
+#include <ui/dialogs/export_camera_settings_dialog.h>
 
 #include <ui/style/globals.h>
 
@@ -175,7 +175,6 @@ void QnCameraScheduleWidget::setHasChanges(bool hasChanges){
     if (m_hasChanges == hasChanges)
         return;
 
-    qDebug() << "set has changes " << hasChanges;
     m_hasChanges = hasChanges;
     ui->exportScheduleButton->setEnabled(!hasChanges
                                          && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
@@ -694,7 +693,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    QnResourceTreeDialog dialog(NULL, context());
+    QnExportCameraSettingsDialog dialog(NULL, context());
     dialog.setRecordingEnabled(recordingEnabled);
 
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
@@ -706,16 +705,22 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         return;
 
     QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
-    QnScheduleTaskList tasks;
-    if (recordingEnabled && cameras.size() > 0) {
-        foreach(const QnScheduleTask::Data &data, scheduleTasks())
-            tasks.append(QnScheduleTask(data));
-    }
-
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
-        if (recordingEnabled)
-            camera->setScheduleTasks(tasks); // TODO: #gdm there is a problem with FPS-2 for arecont resources. Ask medved.
+        if (recordingEnabled){
+            int maxFps = camera->getMaxFps();
+            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+                maxFps = maxFps - camera->reservedSecondStreamFps();
+
+            QnScheduleTaskList tasks;
+            foreach(const QnScheduleTask::Data &data, scheduleTasks()){
+                QnScheduleTask task(data);
+                task.setFps(qMin(task.getFps(), maxFps));
+                tasks.append(task);
+            }
+
+            camera->setScheduleTasks(tasks);
+        }
     }
     updateLicensesLabelText();
     emit scheduleExported(cameras);

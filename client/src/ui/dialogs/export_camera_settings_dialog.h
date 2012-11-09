@@ -9,7 +9,7 @@
 
 
 namespace Ui {
-    class QnResourceTreeDialog;
+    class QnExportCameraSettingsDialog;
 }
 
 class QnResourcePoolModel;
@@ -17,13 +17,13 @@ class QnResourcePoolModel;
 // TODO: #gdm this is camera settings export dialog.
 //
 // you have camera-specific warnings and motion/recording params in it.
-class QnResourceTreeDialog : public QDialog, public QnWorkbenchContextAware
+class QnExportCameraSettingsDialog : public QDialog, public QnWorkbenchContextAware
 {
     Q_OBJECT
     
 public:
-    explicit QnResourceTreeDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
-    ~QnResourceTreeDialog();
+    explicit QnExportCameraSettingsDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    ~QnExportCameraSettingsDialog();
 
     QnVirtualCameraResourceList getSelectedCameras() const;
 
@@ -39,7 +39,7 @@ private slots:
     void updateOkStatus();
 
 private:
-    QScopedPointer<Ui::QnResourceTreeDialog> ui;
+    QScopedPointer<Ui::QnExportCameraSettingsDialog> ui;
 
     QnResourcePoolModel *m_resourceModel;
 
