@@ -67,10 +67,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
 
     m_resourceModel = new QnResourcePoolModel(this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
-    ui->resourceTreeWidget->setCheckboxesHidden();
+    ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->enableGraphicsTweaks();
 //    ui->resourceTreeWidget->setFilterVisible();
-    ui->searchTreeWidget->setCheckboxesHidden();
+    ui->searchTreeWidget->setCheckboxesVisible(false);
     ui->searchTreeWidget->enableGraphicsTweaks();
 
     /* This is needed so that control's context menu is not embedded into the scene. */

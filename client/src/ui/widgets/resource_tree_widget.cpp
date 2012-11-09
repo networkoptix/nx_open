@@ -207,7 +207,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0),
-    m_checkboxesHidden(false)
+    m_checkboxesVisible(true)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -303,20 +303,19 @@ QPoint QnResourceTreeWidget::selectionPos() const {
 
     QModelIndex selected = selectedRows.back();
     QPoint pos = ui->resourcesTreeView->visualRect(selected).bottomRight();
-
-    // TODO: #gdm looks like this comment was written by me, but I don't see
-    // the two-step transformation here %). Did you change anything?
-
-    // mapToGlobal works incorrectly here, using two-step transformation
     pos = ui->resourcesTreeView->mapToGlobal(pos);
     return pos;
 }
 
-void QnResourceTreeWidget::setCheckboxesHidden(bool hidden) {
-    if (m_checkboxesHidden == hidden)
+void QnResourceTreeWidget::setCheckboxesVisible(bool visible) {
+    if (m_checkboxesVisible == visible)
         return;
-    m_checkboxesHidden = hidden;
+    m_checkboxesVisible = visible;
     updateCheckboxesVisibility();
+}
+
+bool QnResourceTreeWidget::isCheckboxesVisible() const {
+    return m_checkboxesVisible;
 }
 
 void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks) {
@@ -352,7 +351,7 @@ void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void QnResourceTreeWidget::updateCheckboxesVisibility(){
-    ui->resourcesTreeView->setColumnHidden(1, m_checkboxesHidden);
+    ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
 }
 
 void QnResourceTreeWidget::updateColumnsSize(){
