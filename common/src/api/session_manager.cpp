@@ -6,6 +6,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/common/warnings.h"
+#include "common/common_meta_types.h"
 
 Q_GLOBAL_STATIC(QnSessionManager, qn_sessionManagerInstance);
 QAtomicInt QnSessionManager::m_handle(1);
@@ -55,7 +56,7 @@ void SyncRequestProcessor::at_destroy()
 QnSessionManager::QnSessionManager()
     : m_accessManager(0)
 {
-    qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
+    QnCommonMetaTypes::initilize();
 
     connect(this, SIGNAL(asyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestParamList, QObject*, const char*, int)), this, SLOT(doSendAsyncGetRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QObject*,const char*, int)));
     connect(this, SIGNAL(asyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString, QnRequestParamList, QByteArray, QObject*, const char*, int)), this, SLOT(doSendAsyncPostRequest(SessionManagerReplyProcessor*, QUrl, QString,QnRequestParamList,QByteArray,QObject*,const char*, int)));
@@ -197,7 +198,7 @@ void QnSessionManager::doSendAsyncGetRequest(SessionManagerReplyProcessor* reply
 
     if (!m_accessManager)
     {
-        qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
+        qWarning() << "doSendAsyncGetRequest is called, while accessManager = 0";
         return;
     }
 
@@ -219,7 +220,7 @@ void QnSessionManager::doSendAsyncDeleteRequest(SessionManagerReplyProcessor* re
 
     if (!m_accessManager)
     {
-        qWarning() << "doSendAsyncPostRequest is called, while accessManager = 0";
+        qWarning() << "doSendAsyncDeleteRequest is called, while accessManager = 0";
         return;
     }
 

@@ -8,7 +8,7 @@
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
@@ -101,7 +101,7 @@ public:
     /**
      * \returns                         Video resource layout, if any, 
      */
-    const QnVideoResourceLayout *videoLayout() const;
+    const QnResourceVideoLayout *videoLayout() const;
 
     /**
      * \returns                         Length of this display, in microseconds. If the length is not defined, returns -1.

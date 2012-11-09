@@ -7,8 +7,8 @@
 #include "core/resource/camera_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource_managment/resource_pool.h"
+#include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
@@ -24,7 +24,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
     m_stopOnWriteError = false;
-    m_videoServer = qSharedPointerDynamicCast<QnVideoServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
     
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
@@ -64,9 +64,8 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
     QnStreamRecorder::putData(data);
 }
 
-bool QnServerStreamRecorder::saveMotion(QnAbstractMediaDataPtr media)
+bool QnServerStreamRecorder::saveMotion(QnMetaDataV1Ptr motion)
 {
-    QnMetaDataV1Ptr motion = qSharedPointerDynamicCast<QnMetaDataV1>(media);
     if (motion)
         QnMotionHelper::instance()->saveToArchive(motion);
     return true;
@@ -94,7 +93,6 @@ void QnServerStreamRecorder::updateStreamParams()
             liveProvider->setFps(camera->getMaxFps()-5);
             liveProvider->setQuality(QnQualityHighest);
         }
-        emit fpsChanged(this, m_currentScheduleTask.getFps());
     }
 }
 
@@ -202,10 +200,12 @@ void QnServerStreamRecorder::updateRecordingType(const QnScheduleTask& scheduleT
 
     if (!isMotionRec(scheduleTask.getRecordingType()))
     {
+        // switch from motion to non-motion recording
         flushPrebuffer();
         setPrebufferingUsec(0);
     }
-    else {
+    else if (getPrebufferingUsec() != 0 || !isMotionRec(m_currentScheduleTask.getRecordingType())) {
+        // do not change prebuffer if previous recording is motion and motion in progress
         setPrebufferingUsec(scheduleTask.getBeforeThreshold()*1000000ll);
     }
     m_currentScheduleTask = scheduleTask;
@@ -215,15 +215,27 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
 {
     QMutexLocker lock(&m_scheduleMutex);
 
-    if (m_videoServer && m_videoServer->isPanicMode())
+    if (m_mediaServer && m_mediaServer->isPanicMode())
     {
         if (!m_usedPanicMode)
         {
             QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource>(m_device);
-            if (m_role == QnResource::Role_LiveVideo)
-                m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
+
+            if (camera->streamFpsSharingMethod()==shareFps)
+            {
+                if (m_role == QnResource::Role_LiveVideo)
+                    m_panicSchedileRecord.setFps(camera->getMaxFps()-2);
+                else
+                    m_panicSchedileRecord.setFps(2);
+            }
             else
-                m_panicSchedileRecord.setFps(2);
+            {
+                if (m_role == QnResource::Role_LiveVideo)
+                    m_panicSchedileRecord.setFps(camera->getMaxFps());
+                else
+                    m_panicSchedileRecord.setFps(DESIRED_SECOND_STREAM_FPS);
+            }
+
 
             // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
             CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
@@ -245,33 +257,24 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
         if (!m_lastSchedulePeriod.contains(timeMs))
         {
             // find new schedule
-            QDateTime packetDateTime = QDateTime::fromMSecsSinceEpoch(timeMs);
-            QDateTime weekStartDateTime = QDateTime(packetDateTime.addDays(1 - packetDateTime.date().dayOfWeek()).date());
-            int scheduleTimeMs = weekStartDateTime.msecsTo(packetDateTime);
+            QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeMs);
+            int scheduleTimeMs = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600+dt.time().minute()*60+dt.time().second();
+            scheduleTimeMs *= 1000;
 
             QnScheduleTaskList::iterator itr = qUpperBound(m_schedule.begin(), m_schedule.end(), scheduleTimeMs);
             if (itr > m_schedule.begin())
                 --itr;
 
-            // truncate current date to a start of week
-            qint64 absoluteScheduleTime = weekStartDateTime.toMSecsSinceEpoch() + itr->startTimeMs();
-
             if (itr->containTimeMs(scheduleTimeMs)) {
-                m_lastSchedulePeriod = QnTimePeriod(absoluteScheduleTime, itr->durationMs());
                 updateRecordingType(*itr);
-                //m_needUpdateStreamParams = true;
                 updateStreamParams();
-                //m_skipDataToTime = AV_NOPTS_VALUE;
             }
             else {
-                if (timeMs > absoluteScheduleTime)
-                    absoluteScheduleTime = weekStartDateTime.addDays(7).toMSecsSinceEpoch() + itr->startTimeMs();
-                //m_skipDataToTime = absoluteScheduleTime;
                 QnScheduleTask noRecordTask(QnId::generateSpecialId(), m_device->getId(), 1, 0, 0, QnScheduleTask::RecordingType_Never, 0, 0);
-                qint64 curTime = packetDateTime.toMSecsSinceEpoch();
-                m_lastSchedulePeriod = QnTimePeriod(curTime, absoluteScheduleTime - curTime);
                 updateRecordingType(noRecordTask);
             }
+            static const qint64 SCHEDULE_AGGREGATION = 1000*60*15;
+            m_lastSchedulePeriod = QnTimePeriod(qFloor(timeMs, SCHEDULE_AGGREGATION)-MAX_FRAME_DURATION, SCHEDULE_AGGREGATION+MAX_FRAME_DURATION); // check period each 15 min
         }
     }
     else if (m_currentScheduleTask.getRecordingType() != QnScheduleTask::RecordingType_Never) 
@@ -321,7 +324,7 @@ QString QnServerStreamRecorder::fillFileName(QnAbstractMediaStreamDataProvider* 
         m_storage = qnStorageMan->getOptimalStorageRoot(provider);
         if (m_storage)
             setTruncateInterval(m_storage->getChunkLen());
-        return qnStorageMan->getFileName(m_startDateTime/1000, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
+        return qnStorageMan->getFileName(m_startDateTime/1000, m_currentTimeZone, netResource, DeviceFileCatalog::prefixForRole(m_role), m_storage);
     }
     else {
         return m_fixedFileName;
@@ -334,10 +337,10 @@ void QnServerStreamRecorder::fileFinished(qint64 durationMs, const QString& file
         qnStorageMan->fileFinished(durationMs, fileName, provider, fileSize);
 };
 
-void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
+void QnServerStreamRecorder::fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
     if (m_truncateInterval > 0) {
-        qnStorageMan->fileStarted(startTimeMs, fileName, provider);
+        qnStorageMan->fileStarted(startTimeMs, timeZone, fileName, provider);
     }
 }
 

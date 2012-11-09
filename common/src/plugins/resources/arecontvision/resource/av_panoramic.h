@@ -24,7 +24,7 @@ private:
     bool setCamQuality(int q);
 
 protected:
-    QnVideoResourceLayout* m_vrl;
+    QnResourceVideoLayout* m_vrl;
 
     
 };

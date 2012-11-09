@@ -3,9 +3,10 @@
 #include <QtCore/QtGlobal>
 #include <QtCore/QThread>
 
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "device_plugins/server_camera/server_camera.h"
+#include "utils/common/synctime.h"
 
 #include "client_message_processor.h"
 
@@ -193,6 +194,7 @@ void QnClientMessageProcessor::at_connectionOpened()
 {
     qDebug() << "Connection opened";
 
+    qnSyncTime->reset();
     emit connectionOpened();
 }
 

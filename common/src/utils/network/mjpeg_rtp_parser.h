@@ -16,7 +16,7 @@ public:
     virtual ~QnMjpegRtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBuffer, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, QnAbstractMediaDataPtr& result) override;
 private:
     int makeHeaders(quint8 *p, int type, int w, int h, u_char *lqt, u_char *cqt, u_short dri);
     void updateHeaderTables(quint8* lummaTable, quint8* chromaTable);
@@ -43,7 +43,8 @@ private:
     quint8* m_lummaTablePos;
     quint8* m_chromaTablePos;
 
-    QnByteArray m_frameData;
+    //QnByteArray m_frameData;
+    int m_frameSize;
 };
 
 #endif

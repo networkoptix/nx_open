@@ -71,18 +71,20 @@ protected:
 protected slots:
     void setTitleVisible(bool visible);
     void setWindowButtonsVisible(bool visible);
+    void setMaximized(bool maximized);
     void setFullScreen(bool fullScreen);
     void minimize();
 
-    void toggleFullScreen();
     void toggleTitleVisibility();
 
-    void updateFullScreenState();
+    void updateDecorationsState();
     void updateDwmState();
 
     void at_fileOpenSignalizer_activated(QObject *object, QEvent *event);
-    void at_sessionManager_error(int error);
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
+
+    void at_audioDevice_volumeChanged();
+    void at_volumeSliderNotifier_manipulated();
 
 private:
     QScopedPointer<QnGradientBackgroundPainter> m_backgroundPainter;
@@ -107,6 +109,8 @@ private:
 
     Options m_options;
     QMargins m_frameMargins;
+
+    bool m_changeOpacity;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);

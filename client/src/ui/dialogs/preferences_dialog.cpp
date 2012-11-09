@@ -10,13 +10,16 @@
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/network/nettools.h>
-#include "utils/settings.h"
+#include <utils/settings.h>
 
 #include "ui/actions/action_manager.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/workbench_translation_manager.h"
+#include "ui/workbench/workbench_access_controller.h"
 #include "ui/screen_recording/screen_recorder.h"
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/widgets/settings/license_manager_widget.h>
 #include <ui/widgets/settings/recording_settings_widget.h>
 #include <youtube/youtubesettingswidget.h>
@@ -36,17 +39,20 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     ui->maxVideoItemsLabel->hide();
     ui->maxVideoItemsSpinBox->hide(); // TODO: Cannot edit max number of items on the scene.
 
-    ui->backgroundColorPicker->setAutoFillBackground(false);
-    initColorPicker();
-
-    if(!m_settings->isBackgroundEditable()) {
+    if(m_settings->isBackgroundEditable()) {
+        ui->backgroundColorPicker->setAutoFillBackground(false);
+        initColorPicker();
+    } else {
         ui->animateBackgroundLabel->hide();
         ui->animateBackgroundCheckBox->hide();
         ui->backgroundColorLabel->hide();
         ui->backgroundColorWidget->hide();
     }
 
-    if (QnScreenRecorder::isSupported()){
+    ui->timeModeComboBox->addItem(tr("Server Time"), Qn::ServerTimeMode);
+    ui->timeModeComboBox->addItem(tr("Client Time"), Qn::ClientTimeMode);
+
+    if (QnScreenRecorder::isSupported()) {
         m_recordingSettingsWidget = new QnRecordingSettingsWidget(this);
         ui->tabWidget->addTab(m_recordingSettingsWidget, tr("Screen Recorder"));
     }
@@ -61,18 +67,34 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     m_licenseTabIndex = ui->tabWidget->addTab(m_licenseManagerWidget, tr("Licenses"));
 #endif
 
-    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this, SLOT(at_browseMainMediaFolderButton_clicked()));
-    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this, SLOT(at_addExtraMediaFolderButton_clicked()));
-    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this, SLOT(at_removeExtraMediaFolderButton_clicked()));
-    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this, SLOT(at_extraMediaFoldersList_selectionChanged()));
-    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this, SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
-    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this, SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
-    connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this, SLOT(accept()));
-    connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this, SLOT(reject()));
+    resize(1, 1); // set widget size to minimal possible
+
+    /* Set up context help. */
+    setHelpTopic(ui->mainMediaFolderGroupBox, ui->extraMediaFoldersGroupBox,  Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
+    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
+    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
+    setHelpTopic(ui->networkInterfacesGroupBox,                               Qn::SystemSettings_General_NetworkInterfaces_Help);
+    if(m_recordingSettingsWidget)
+        setHelpTopic(m_recordingSettingsWidget,                               Qn::SystemSettings_ScreenRecording_Help);
+    if(m_licenseManagerWidget)
+        setHelpTopic(m_licenseManagerWidget,                                  Qn::SystemSettings_Licenses_Help);
+
+
+    connect(ui->browseMainMediaFolderButton,            SIGNAL(clicked()),                                          this,   SLOT(at_browseMainMediaFolderButton_clicked()));
+    connect(ui->addExtraMediaFolderButton,              SIGNAL(clicked()),                                          this,   SLOT(at_addExtraMediaFolderButton_clicked()));
+    connect(ui->removeExtraMediaFolderButton,           SIGNAL(clicked()),                                          this,   SLOT(at_removeExtraMediaFolderButton_clicked()));
+    connect(ui->extraMediaFoldersList->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),   this,   SLOT(at_extraMediaFoldersList_selectionChanged()));
+    connect(ui->animateBackgroundCheckBox,              SIGNAL(stateChanged(int)),                                  this,   SLOT(at_animateBackgroundCheckBox_stateChanged(int)));
+    connect(ui->backgroundColorPicker,                  SIGNAL(colorChanged(const QColor &)),                       this,   SLOT(at_backgroundColorPicker_colorChanged(const QColor &)));
+    connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
+    connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
+    connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
+    connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
 
     initLanguages();
-
     updateFromSettings();
+    at_context_userChanged();
 }
 
 QnPreferencesDialog::~QnPreferencesDialog() {
@@ -108,10 +130,6 @@ void QnPreferencesDialog::initLanguages() {
         QIcon icon(QString(QLatin1String(":/flags/%1.png")).arg(translation.localeCode));
         ui->languageComboBox->addItem(icon, translation.languageName, translation.translationPath);
     }
-
-    //TODO: #gdm remove after release
-    //ui->languageLabel->setVisible(false);
-    //ui->languageComboBox->setVisible(false);
 }
 
 void QnPreferencesDialog::accept() {
@@ -130,6 +148,8 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setMaxVideoItems(ui->maxVideoItemsSpinBox->value());
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
+    m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
     for(int i = 0; i < ui->extraMediaFoldersList->count(); i++)
@@ -155,6 +175,8 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->maxVideoItemsSpinBox->setValue(m_settings->maxVideoItems());
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
+    ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
+    ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
 
     ui->extraMediaFoldersList->clear();
     foreach (const QString &extraMediaFolder, m_settings->extraMediaFolders())
@@ -172,8 +194,7 @@ void QnPreferencesDialog::updateFromSettings() {
         ui->languageComboBox->setCurrentIndex(id);
 }
 
-void QnPreferencesDialog::openLicensesPage()
-{
+void QnPreferencesDialog::openLicensesPage() {
     ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
 }
 
@@ -183,6 +204,7 @@ void QnPreferencesDialog::openLicensesPage()
 // -------------------------------------------------------------------------- //
 void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    fileDialog.setDirectory(ui->mainMediaFolderLabel->text());
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
@@ -196,6 +218,7 @@ void QnPreferencesDialog::at_browseMainMediaFolderButton_clicked() {
 
 void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     QFileDialog fileDialog(this);
+    //TODO: call setDirectory
     fileDialog.setFileMode(QFileDialog::DirectoryOnly);
     if (!fileDialog.exec())
         return;
@@ -212,8 +235,7 @@ void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     ui->extraMediaFoldersList->addItem(dir);
 }
 
-void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked()
-{
+void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked() {
     foreach(QListWidgetItem *item, ui->extraMediaFoldersList->selectedItems())
         delete item;
 }
@@ -222,18 +244,26 @@ void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged() {
     ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
 }
 
-void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) 
-{
+void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) {
     bool enabled = state == Qt::Checked;
 
     ui->backgroundColorLabel->setEnabled(enabled);
     ui->backgroundColorPicker->setEnabled(enabled);
 }
 
-void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) 
-{
+void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) {
     if(color == Qt::black) {
         ui->backgroundColorPicker->setCurrentColor(Qt::white);
         ui->animateBackgroundCheckBox->setChecked(false);
+    }
+}
+
+void QnPreferencesDialog::at_context_userChanged() {
+    ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
+void QnPreferencesDialog::at_timeModeComboBox_activated() {
+    if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
+        QMessageBox::warning(this, tr("Warning"), tr("This settings will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
     }
 }

@@ -1,8 +1,8 @@
 #ifndef __RTSP_ENCODER_H__
 #define __RTSP_ENCODER_H__
 
-#include "core/datapacket/mediadatapacket.h"
-#include "utils/common/bytearray.h"
+#include "core/datapacket/media_data_packet.h"
+#include "utils/common/byte_array.h"
 
 /*
 * Base class for RTSP codec. Used for encode data only
@@ -11,7 +11,8 @@
 class QnRtspEncoder
 {
 public:
-
+    QnRtspEncoder();
+    virtual ~QnRtspEncoder() {}
     void setMediaData(QnAbstractMediaDataPtr ctx);
     
     virtual QByteArray getAdditionSDP() = 0;
@@ -38,6 +39,11 @@ public:
     virtual quint32 getFrequency() = 0;
     virtual quint8 getPayloadtype() = 0;
     virtual QString getName() = 0;
+
+    /*
+    * Return true if codec can produce RTP header
+    */
+    virtual bool isRtpHeaderExists() const = 0;
 
 protected:
     QnAbstractMediaDataPtr m_sdpMediaPacket;

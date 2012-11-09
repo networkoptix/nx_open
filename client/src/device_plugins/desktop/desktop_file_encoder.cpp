@@ -8,6 +8,7 @@ static const int DEFAULT_VIDEO_STREAM_ID = 0;
 static const int DEFAULT_AUDIO_STREAM_ID = 1;
 static const int AUDIO_QUEUE_MAX_SIZE = 256;
 static const int AUDIO_CAUPTURE_FREQUENCY = 44100;
+static const int AUDIO_CAUPTURE_ALT_FREQUENCY = 48000;
 static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality for fullHD mode;
 
 static const int MAX_VIDEO_JITTER = 2;
@@ -22,7 +23,7 @@ extern "C"
     int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out);
 }
 
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "win_audio_helper.h"
 #include "decoders/audio/ffmpeg_audio.h"
 
@@ -182,15 +183,19 @@ QnDesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
-    QString name(m_audioDevice.deviceName());
+    QString name;
+    int devNum = 1;
+    m_audioDevice.splitFullName(name, devNum);
     for(int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name.startsWith(tmp))
-                return i;
+            if (name.startsWith(tmp)) {
+                if (--devNum == 0)
+                    return i;
+            }
         }
     }
     return WAVE_MAPPER;
@@ -305,8 +310,11 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupFormat(QString& errMessage)
         m_audioFormat.setChannels(1);
         if (!m_audioDevice.isFormatSupported(m_audioFormat))
         {
-            errMessage = QLatin1String("Unsupported audio format specified for capturing!");
-            return false;
+            m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
+            if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
+                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings");
+                return false;
+            }
         }
     }
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
@@ -356,8 +364,8 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 QnDesktopFileEncoder::QnDesktopFileEncoder (
                    const QString& fileName,
                    int desktopNum,
-                   const QAudioDeviceInfo* audioDevice,
-                   const QAudioDeviceInfo* audioDevice2,
+                   const QnAudioDeviceInfo* audioDevice,
+                   const QnAudioDeviceInfo* audioDevice2,
                    QnScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
@@ -400,7 +408,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
         m_audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
     }
 
-    if (audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName())
+    if (audioDevice && audioDevice2)
     {
         m_audioInfo << new EncodedAudioInfo(this); // second channel
         m_audioInfo[1]->m_audioDevice = *audioDevice2;
@@ -471,13 +479,17 @@ bool QnDesktopFileEncoder::init()
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toAscii().constData());
     if(videoCodec == 0)
     {
-        m_lastErrorStr = QLatin1String("Can't find video encoder ") + videoCodecName;
+        m_lastErrorStr = tr("Can't find video encoder ") + videoCodecName;
         return false;
     }
 
     // allocate container
     m_device = new QFile(m_fileName);
-    m_device->open(QIODevice::WriteOnly);
+    if (!m_device->open(QIODevice::WriteOnly))
+    {
+        m_lastErrorStr = tr("Can't create temporary file in folder '%1'. Please check 'root media folder' setting.").arg(QFileInfo(m_fileName).path());
+        return false;
+    }
 
     m_formatCtx = avformat_alloc_context();
     initIOContext();
@@ -632,8 +644,7 @@ bool QnDesktopFileEncoder::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                WinAudioExtendInfo extInfo(audioChannel->m_audioDevice.deviceName());
-                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + extInfo.fullName() + QLatin1Char('\'');
+                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + audioChannel->m_audioDevice.fullName() + QLatin1Char('\'');
                 return false;
             }
         }

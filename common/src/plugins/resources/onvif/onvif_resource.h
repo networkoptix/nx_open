@@ -9,7 +9,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "soap_wrapper.h"
 #include "onvif_resource_settings.h"
 #include "core/resource/interface/abstract_ptz_controller.h"
@@ -27,7 +27,7 @@ typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
-const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
+const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
 const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
 
 

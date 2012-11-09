@@ -10,9 +10,9 @@
 
 
 struct AVFormatContext;
-class QnCustomDeviceVideoLayout;
+class QnCustomResourceVideoLayout;
 
-class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate, public QnAbstractFilterPlaybackDelegate
+class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
 public:
     QnRtspClientArchiveDelegate();
@@ -26,7 +26,7 @@ public:
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
     qint64 seek(qint64 startTime, qint64 endTime);
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
 
     virtual void onReverseMode(qint64 displayTime, bool value);
@@ -39,7 +39,7 @@ public:
     virtual void setMotionRegion(const QRegion& region);
 
     // Send motion data to client
-    virtual void setSendMotion(bool value);
+    virtual void setSendMotion(bool value) override;
 
     virtual bool setQuality(MediaQuality quality, bool fastSwitch);
 
@@ -50,19 +50,22 @@ public:
     virtual void setRange(qint64 startTime, qint64 endTime, qint64 frameStep) override;
 
     void setMultiserverAllowed(bool value);
+
+    void setPlayNowModeAllowed(bool value);
 private:
-    QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize);
+    QnAbstractDataPacketPtr processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal(QnResourcePtr resource);
     void reopen();
 
     // determine camera's video server on specified time
     QnResourcePtr getResourceOnTime(QnResourcePtr resource, qint64 time);
-    QnResourcePtr getNextVideoServerFromTime(QnResourcePtr resource, qint64 time);
+    QnResourcePtr getNextMediaServerFromTime(QnResourcePtr resource, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(QnResourcePtr server);
     qint64 checkMinTimeFromOtherServer(QnResourcePtr resource);
     void updateRtpParam(QnResourcePtr resource);
+    void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QMutex m_mutex;
     RTPSession m_rtspSession;
@@ -74,7 +77,7 @@ private:
     QMap<quint32, quint16> m_prevTimestamp;
     QMap<int, QnAbstractDataPacketPtr> m_nextDataPacket;
     qint64 m_position;
-    QnDefaultDeviceVideoLayout m_defaultVideoLayout;
+    QnDefaultResourceVideoLayout m_defaultVideoLayout;
     bool m_opened;
     qint64 m_lastRtspTime;
     QnResourcePtr m_resource;
@@ -95,6 +98,8 @@ private:
 
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
+    QnResourceCustomAudioLayout* m_audioLayout;
+    bool m_playNowModeAllowed; // fast open mode without DESCRIBE
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

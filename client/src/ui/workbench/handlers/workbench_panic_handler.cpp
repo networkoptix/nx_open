@@ -7,8 +7,8 @@
 
 #include <api/app_server_connection.h>
 
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/video_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 QnWorkbenchPanicHandler::QnWorkbenchPanicHandler(QObject *parent):  
     QObject(parent),

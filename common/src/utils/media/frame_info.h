@@ -2,7 +2,7 @@
 #define frame_info_1730
 
 #include "libavcodec/avcodec.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 #define AV_REVERSE_BLOCK_START QnAbstractMediaData::MediaFlags_ReverseBlockStart
 #define AV_REVERSE_REORDERED   QnAbstractMediaData::MediaFlags_ReverseReordered

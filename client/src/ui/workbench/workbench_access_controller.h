@@ -1,11 +1,14 @@
 #ifndef QN_WORKBENCH_ACCESS_CONTROLLER_H
 #define QN_WORKBENCH_ACCESS_CONTROLLER_H
 
-#include <QObject>
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
+
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
-#include "workbench_globals.h"
 
 class QnWorkbenchContext;
 class QnResourcePool;
@@ -60,10 +63,18 @@ public:
     }
 
     /**
-     * \returns                         Global permissions of the current user. 
+     * \returns                         Global permissions of the current user,
+     *                                  adjusted to take deprecation and superuser status into account.
      *                                  Same as <tt>permissions(context()->user())</tt>.
      */
     Qn::Permissions globalPermissions() const;
+
+    /**
+     * \param user                      User to get global permissions for.
+     * \returns                         Global permissions of the given user,
+     *                                  adjusted to take deprecation and superuser status into account.
+     */
+    Qn::Permissions globalPermissions(const QnUserResourcePtr &user);
 
     /**
      * \param requiredPermissions       Global permissions to check.
@@ -78,9 +89,6 @@ public:
      *                                  the given resource.
      */
     QnWorkbenchPermissionsNotifier *notifier(const QnResourcePtr &resource) const;
-
-    // TODO: #Elric rename and add sane comment
-    Qn::Permissions calculateGlobalPermissions(const QnUserResourcePtr &user);
 
 signals:
     /**
@@ -109,7 +117,7 @@ private:
     Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout);
     Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera);
     Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive);
-    Qn::Permissions calculatePermissions(const QnVideoServerResourcePtr &server);
+    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server);
 
 private:
     struct PermissionsData {

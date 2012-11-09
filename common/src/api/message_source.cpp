@@ -4,6 +4,7 @@
 #include "api/app_server_connection.h"
 #include <utils/common/warnings.h>
 #include "message.pb.h"
+#include "common/common_meta_types.h"
 
 #define QN_EVENT_SOURCE_DEBUG
 
@@ -68,17 +69,14 @@ bool QnPbStreamParser::nextMessage(pb::Message& parsed)
 // QnMessageSource
 // -------------------------------------------------------------------------- //
 QnMessageSource::QnMessageSource(QUrl url, int retryTimeout): 
+    m_timeoutFlag(false),
     m_url(url),
     m_retryTimeout(retryTimeout),
     m_reply(NULL),
     m_seqNumber(0),
     m_streamParser(new QnPbStreamParser())
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnMessage>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 
     connect(this, SIGNAL(stopped()), this, SLOT(doStop()));
     connect(&m_manager, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
@@ -112,6 +110,7 @@ void QnMessageSource::startRequest()
 {
     m_streamParser->reset();
 
+    m_timeoutFlag = false;
     m_reply = m_manager.post(QNetworkRequest(m_url), "");
     connect(m_reply, SIGNAL(finished()),
             this, SLOT(httpFinished()));
@@ -128,9 +127,19 @@ void QnMessageSource::httpFinished()
         return;
 
     QVariant redirectionTarget = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-    if (m_reply->error()) {
-        QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
+    if (QNetworkReply::NetworkError err = m_reply->error()) {
         emit connectionClosed(m_reply->errorString());
+
+        /** Operation was cancelled intentionally */
+        if (m_timeoutFlag) {
+            m_reply->deleteLater();
+            startRequest();
+            return;
+        }
+        else if (err != QNetworkReply::OperationCanceledError) {
+            QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
+        }
+
     } else if (!redirectionTarget.isNull()) {
         m_url = m_url.resolved(redirectionTarget.toUrl());
         m_reply->deleteLater();
@@ -198,6 +207,7 @@ void QnMessageSource::onPingTimer()
 {
     if (m_eventWaitTimer.elapsed() > 2 * PING_INTERVAL)
     {
+        m_timeoutFlag = true;
         doStop();
 
         emit connectionClosed(QLatin1String("Timeout"));

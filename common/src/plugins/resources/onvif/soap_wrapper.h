@@ -154,6 +154,8 @@ class _onvifPtz__AbsoluteMove;
 class _onvifPtz__AbsoluteMoveResponse;
 class _onvifPtz__RelativeMove;
 class _onvifPtz__RelativeMoveResponse;
+class _onvifPtz__GetStatus;
+class _onvifPtz__GetStatusResponse;
 class _onvifPtz__GetNode;
 class _onvifPtz__GetNodeResponse;
 class _onvifPtz__GetNodes;
@@ -314,6 +316,7 @@ public:
     int doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& request, PtzPtzGetServiceCapabilitiesResp& response);
     int doAbsoluteMove(AbsoluteMoveReq& request, AbsoluteMoveResp& response);
     int doContinuousMove(_onvifPtz__ContinuousMove& request, _onvifPtz__ContinuousMoveResponse& response);
+    int doGetStatus(_onvifPtz__GetStatus& request, _onvifPtz__GetStatusResponse& response);
     int doStop(_onvifPtz__Stop& request, _onvifPtz__StopResponse& response);
 private:
     PtzSoapWrapper();

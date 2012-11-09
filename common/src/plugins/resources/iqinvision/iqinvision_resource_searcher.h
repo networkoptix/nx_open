@@ -1,7 +1,7 @@
 #ifndef iq_device_server_h_1825
 #define iq_device_server_h_1825
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 

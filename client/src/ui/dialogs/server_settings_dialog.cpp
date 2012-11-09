@@ -14,7 +14,10 @@
 #include <utils/common/counter.h>
 
 #include <core/resource/storage_resource.h>
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
+
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 
@@ -36,7 +39,7 @@ namespace {
 
 } // anonymous namespace
 
-QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &server, QWidget *parent):
+QnServerSettingsDialog::QnServerSettingsDialog(const QnMediaServerResourcePtr &server, QWidget *parent):
     base_type(parent),
     ui(new Ui::ServerSettingsDialog),
     m_server(server),
@@ -53,6 +56,13 @@ QnServerSettingsDialog::QnServerSettingsDialog(const QnVideoServerResourcePtr &s
     ui->storagesTable->setItemDelegate(itemDelegate);
 
     setButtonBox(ui->buttonBox);
+
+    /* Set up context help. */
+    setHelpTopic(ui->nameLabel,           ui->nameLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->ipAddressLabel,      ui->ipAddressLineEdit,              Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->portLabel,           ui->portLineEdit,                   Qn::ServerSettings_General_Help);
+    setHelpTopic(ui->panicModeTextLabel,  ui->panicModeLabel,                 Qn::ServerSettings_Panic_Help);
+    setHelpTopic(ui->storagesGroupBox,                                        Qn::ServerSettings_Storages_Help);
 
     connect(ui->storageAddButton,       SIGNAL(clicked()),              this,   SLOT(at_storageAddButton_clicked()));
     connect(ui->storageRemoveButton,    SIGNAL(clicked()),              this,   SLOT(at_storageRemoveButton_clicked()));
@@ -186,7 +196,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     QScopedPointer<detail::CheckFreeSpaceReplyProcessor> processor(new detail::CheckFreeSpaceReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
 
-    QnVideoServerConnectionPtr serverConnection = m_server->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
     foreach (const QnAbstractStorageResourcePtr &storage, storages) {
         int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));

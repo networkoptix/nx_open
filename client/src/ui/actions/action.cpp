@@ -6,17 +6,19 @@
 
 #include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
+#include "action_factories.h"
 #include "action_parameter_types.h"
 
 QnAction::QnAction(Qn::ActionId id, QObject *parent): 
@@ -88,6 +90,10 @@ void QnAction::setCondition(QnActionCondition *condition) {
     m_condition = condition;
 }
 
+void QnAction::setChildFactory(QnActionFactory *childFactory) {
+    m_childFactory = childFactory;
+}
+
 void QnAction::addChild(QnAction *action) {
     m_children.push_back(action);
 }
@@ -118,6 +124,9 @@ void QnAction::setToolTipFormat(const QString &toolTipFormat) {
 }
 
 Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnActionParameters &parameters) const {
+    if(!isVisible())
+        return Qn::InvisibleAction; // TODO: cheat!
+
     if(!(this->scope() & scope) && scope != this->scope())
         return Qn::InvisibleAction;
 
@@ -149,8 +158,10 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
                 resources.push_back(context()->workbench()->currentLayout()->resource());
             } else if(key == Qn::CurrentUserParameter) {
                 resources.push_back(context()->user());
-            } else if(key == Qn::AllVideoServersParameter) {
-                resources = context()->resourcePool()->getResources().filtered<QnVideoServerResource>();
+            } else if(key == Qn::AllMediaServersParameter) {
+                resources = context()->resourcePool()->getResources().filtered<QnMediaServerResource>();
+            } else if(key == Qn::CurrentLayoutMediaItemsParameter) {
+                resources = QnActionParameterTypes::resources(context()->display()->widgets()).filtered<QnMediaResource>();
             }
 
             if((accessController()->permissions(resources) & required) != required)

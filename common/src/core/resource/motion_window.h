@@ -1,7 +1,9 @@
 #ifndef __MOTION_WINDOW_H__
 #define __MOTION_WINDOW_H__
 
-#include <QRegion>
+#include <QtCore/QMultiMap>
+#include <QtGui/QRegion>
+#include <QtGui/QPainterPath>
 
 /*
 struct QnMotionWindow
@@ -17,6 +19,7 @@ struct QnMotionWindow
 
 //typedef QnMotionWindow[QnMotionWindow::MAX_SENSITIVITY-QnMotionWindow::MIN_SENSITIVITY+1] QnMotionRegion;
 
+// TODO: rename header
 
 class QnMotionRegion
 {
@@ -46,6 +49,17 @@ public:
     QMultiMap<int, QRect> getAllMotionRects() const;
 
     /**
+     * Returns painter path for the motion mask region.
+     */
+    QPainterPath getMotionMaskPath() const;
+
+    /**
+     * Returns painter path for the given sensitivity region.
+     * \param value                 Target sensitivity level.
+     */
+    QPainterPath getRegionBySensPath(int value) const;
+
+    /**
      * Returns simplified version of region's rects
      */
     QVector<QRect> getRectsBySens(int value) const;
@@ -58,8 +72,13 @@ public:
 
     void removeDefaultMotion();
 private:
+    void updatePathCache();
+private:
     QRegion m_data[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
+    QPainterPath m_pathCache[MAX_SENSITIVITY - MIN_SENSITIVITY + 1];
 };
+
+Q_DECLARE_METATYPE(QnMotionRegion);
 
 
 #endif // __MOTION_WINDOW_H__

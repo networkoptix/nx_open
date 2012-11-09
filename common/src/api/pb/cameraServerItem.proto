@@ -1,6 +1,6 @@
 package pb;
 
-option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "CameraServerItemProtos";
 
 message CameraServerItem {

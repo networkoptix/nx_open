@@ -36,7 +36,7 @@
 #if defined(_MSC_VER)
 #  define noexcept throw()
 #elif defined(__GNUC__)
-#  if (GCC_VERSION >= 406000)
+#  if (GCC_VERSION >= 40600)
 #    define noexcept noexcept
 #  else
 #    define noexcept throw()
@@ -58,6 +58,31 @@
 #   undef __STDC_CONSTANT_MACROS
 #   define __STDC_CONSTANT_MACROS
 #endif
+
+
+// -------------------------------------------------------------------------- //
+// Useful utility definitions
+// -------------------------------------------------------------------------- //
+/* Macros to avoid using #ifdef _DEBUG. */
+#ifdef _DEBUG
+#   define DEBUG_CODE(...) __VA_ARGS__
+#   define RELEASE_CODE(...)
+#else
+#   define DEBUG_CODE(...)
+#   define RELEASE_CODE(...) __VA_ARGS__
+#endif
+
+
+/* Helper function that can be used to 'place' macros into Qn namespace. */
+#ifdef __cplusplus
+namespace Qn {
+    template<class T>
+    const T &_id(const T &value) { return value; }
+}
+#endif
+
+// TODO: move to client_globals?
+#define InvalidUtcOffset _id(INT64_MAX)
 
 
 #endif // QN_COMMON_CONFIG_H

@@ -3,7 +3,7 @@
 
 #include <QTime>
 #include <QMutex>
-#include <utils/common/longrunnable.h>
+#include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
 
 class QnAbstractRenderer;

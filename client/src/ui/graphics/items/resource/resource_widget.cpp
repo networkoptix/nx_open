@@ -14,7 +14,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/common/color_transformations.h>
 #include <ui/animation/opacity_animator.h>
@@ -69,6 +69,8 @@ namespace {
 
     const QColor frameColor = qnGlobals->frameColor();
 
+    const QColor activeFrameColor = frameColor.lighter();
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -81,7 +83,7 @@ namespace {
 
     Q_GLOBAL_STATIC(QnGlContextData<QnPausedPainter>, qn_resourceWidget_pausedPainterStorage);
 
-    Q_GLOBAL_STATIC(QnDefaultDeviceVideoLayout, qn_resourceWidget_defaultContentLayout);
+    Q_GLOBAL_STATIC(QnDefaultResourceVideoLayout, qn_resourceWidget_defaultContentLayout);
 
     void splitFormat(const QString &format, QString *left, QString *right) {
         int index = format.indexOf(QLatin1Char('\t'));
@@ -109,6 +111,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnWorkbenchContextAware(context),
     m_item(item),
     m_options(DisplaySelectionOverlay | DisplayButtons),
+    m_localActive(false),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
@@ -118,7 +121,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormat(QLatin1String("%1")),
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
-    m_aboutToBeDestroyedEmitted(false)
+    m_aboutToBeDestroyedEmitted(false),
+    m_mouseInWidget(false),
+    m_desiredRotation(0)
 {
     setAcceptHoverEvents(true);
 
@@ -138,6 +143,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         palette.setColor(QPalette::WindowText, overlayTextColor);
         setPalette(palette);
     }
+
 
     /* Header overlay. */
     m_headerLeftLabel = new GraphicsLabel();
@@ -170,7 +176,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     infoButton->setCheckable(true);
     infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
-    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(setInfoVisible(bool)));
+
+    connect(infoButton, SIGNAL(toggled(bool)), this, SLOT(at_infoButton_toggled(bool)));
     
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
@@ -185,16 +192,22 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
 
-    QGraphicsLinearLayout *headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
-    headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_headerLeftLabel);
-    headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-    headerLayout->addItem(m_headerRightLabel);
-    headerLayout->addItem(m_buttonBar);
+    m_iconButton = new QnImageButtonWidget();
+    m_iconButton->setParent(this);
+    m_iconButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setVisible(false);
+    connect(m_iconButton, SIGNAL(visibleChanged()), this, SLOT(at_iconButton_visibleChanged()));
+
+    m_headerLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    m_headerLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_headerLayout->setSpacing(2.0);
+    m_headerLayout->addItem(m_headerLeftLabel);
+    m_headerLayout->addStretch(0x1000); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    m_headerLayout->addItem(m_headerRightLabel);
+    m_headerLayout->addItem(m_buttonBar);
 
     m_headerWidget = new GraphicsWidget();
-    m_headerWidget->setLayout(headerLayout);
+    m_headerWidget->setLayout(m_headerLayout);
     m_headerWidget->setAcceptedMouseButtons(0);
     m_headerWidget->setAutoFillBackground(true);
     {
@@ -212,6 +225,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_headerOverlayWidget->setLayout(headerOverlayLayout);
     m_headerOverlayWidget->setAcceptedMouseButtons(0);
     m_headerOverlayWidget->setOpacity(0.0);
+
 
     /* Footer overlay. */
     m_footerLeftLabel = new GraphicsLabel();
@@ -265,6 +279,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_unauthorizedStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
     m_unauthorizedStaticText2.setText(tr("Please check authentication information in camera settings"));
     m_unauthorizedStaticText2.setPerformanceHint(QStaticText::AggressiveCaching);
+    m_loadingStaticText.setText(tr("Loading..."));
+    m_loadingStaticText.setPerformanceHint(QStaticText::AggressiveCaching);
 
 
     /* Run handlers. */
@@ -404,6 +420,35 @@ void QnResourceWidget::updateInfoText() {
     setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
 }
 
+void QnResourceWidget::updateOverlayRotation(qreal rotation) {
+    while (rotation < -180)
+        rotation += 360;
+    while (rotation > 180)
+        rotation -= 360;
+
+    Qn::FixedItemRotation fixed;
+    if (rotation >= -45 && rotation <= 45) {
+        fixed = Qn::Angle0;
+        m_desiredRotation = 0;
+    }
+    else if (rotation > 135 || rotation < -135) {
+        fixed = Qn::Angle180;
+        m_desiredRotation = 180;
+    }
+    else if (rotation > 0) {
+        fixed = Qn::Angle270;
+        m_desiredRotation = 270;
+    }
+    else {
+        fixed = Qn::Angle90;
+        m_desiredRotation = 90;
+    }
+
+    m_headerOverlayWidget->setDesiredRotation(fixed);
+    m_footerOverlayWidget->setDesiredRotation(fixed);
+}
+
+
 QSizeF QnResourceWidget::constrainedSize(const QSizeF constraint) const {
     if(!hasAspectRatio())
         return constraint;
@@ -460,10 +505,24 @@ void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
 }
 
 bool QnResourceWidget::isInfoVisible() const {
-    return !qFuzzyIsNull(m_footerWidget->opacity());
+    return (options() & DisplayInfo);
+}
+
+bool QnResourceWidget::isInfoButtonVisible() const {
+    return calculateButtonsVisibility() & InfoButton;
+}
+
+bool QnResourceWidget::isLocalActive() const {
+    return m_localActive;
+}
+
+void QnResourceWidget::setLocalActive(bool localActive) {
+    m_localActive = localActive;
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
+    setOption(DisplayInfo, visible);
+
     qreal opacity = visible ? 1.0 : 0.0;
 
     if(animate) {
@@ -474,6 +533,18 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
 
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
         infoButton->setChecked(visible);
+}
+
+QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
+    return (QnResourceWidget::Buttons)buttonBar()->checkedButtons();
+}
+
+void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
+    buttonBar()->setCheckedButtons(checkedButtons);
+}
+
+QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
+    return (QnResourceWidget::Buttons)buttonBar()->visibleButtons();
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
@@ -488,6 +559,11 @@ Qn::WindowFrameSections QnResourceWidget::windowFrameSectionsAt(const QRectF &re
         result = result & ~(Qn::LeftSection | Qn::RightSection | Qn::TopSection | Qn::BottomSection);
 
     return result;
+}
+
+int QnResourceWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
+    return -1;
 }
 
 void QnResourceWidget::ensureAboutToBeDestroyedEmitted() {
@@ -580,7 +656,7 @@ void QnResourceWidget::updateChannelOverlay(int channel) {
     setChannelOverlay(channel, calculateChannelOverlay(channel));
 }
 
-void QnResourceWidget::setChannelLayout(const QnVideoResourceLayout *channelLayout) {
+void QnResourceWidget::setChannelLayout(const QnResourceVideoLayout *channelLayout) {
     if(m_channelsLayout == channelLayout)
         return;
 
@@ -664,7 +740,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor : frameColor;
+    QColor color = isSelected() ? selectedFrameColor : isLocalActive() ? activeFrameColor : frameColor;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -680,13 +756,28 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     QFont font;
     font.setPointSizeF(textSize * unit);
     font.setStyleHint(QFont::SansSerif, QFont::ForceOutline);
+
     QnScopedPainterFontRollback fontRollback(painter, font);
     QnScopedPainterPenRollback penRollback(painter, QPen(QColor(255, 208, 208, 196)));
+    QnScopedPainterTransformRollback transformRollback(painter);
 
     qreal opacity = painter->opacity();
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
-    painter->drawStaticText(rect().center() - toPoint(text.size() / 2) + offset * unit, text);
+
+    painter->translate(rect().center());
+    painter->rotate(m_desiredRotation);
+    painter->translate(offset * unit);
+    if (m_desiredRotation % 180 != 0){
+        qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
+        painter->scale(ratio, ratio);
+    }
+
+    painter->drawStaticText(-toPoint(text.size() / 2), text);
     painter->setOpacity(opacity);
+
+    Q_UNUSED(transformRollback)
+    Q_UNUSED(penRollback)
+    Q_UNUSED(fontRollback)
 }
 
 void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect) {
@@ -705,25 +796,23 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
 
     painter->fillRect(rect, QColor(0, 0, 0, 128));
 
-    if(overlay == LoadingOverlay || overlay == PausedOverlay) {
+    if(overlay == LoadingOverlay || overlay == PausedOverlay || overlay == EmptyOverlay) {
         qint64 currentTimeMSec = QDateTime::currentMSecsSinceEpoch();
+        qreal unit = qnGlobals->workbenchUnitSize();
 
         painter->beginNativePainting();
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        QRectF overlayRect = expanded(
-            1.0,
-            QRectF(
-                rect.center() - toPoint(rect.size()) / 8,
-                rect.size() / 4
-            ),
-            Qt::KeepAspectRatio
+        QRectF overlayRect(
+            rect.center() - QPointF(unit / 10, unit / 10),
+            QSizeF(unit / 5, unit / 5)
         );
 
         glPushMatrix();
         glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
         glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
+        glRotatef(m_desiredRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
@@ -736,6 +825,9 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
 
         glDisable(GL_BLEND);
         painter->endNativePainting();
+
+        if(overlay == LoadingOverlay)
+            paintFlashingText(painter, m_loadingStaticText, 0.05, QPointF(0.0, 0.15));
     }
 
     if (overlay == NoDataOverlay) {
@@ -772,14 +864,15 @@ bool QnResourceWidget::windowFrameEvent(QEvent *event) {
 }
 
 void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
-    setDecorationsVisible(true);
+    setDecorationsVisible();
+    m_mouseInWidget = true;
 
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isDecorationsVisible())
-        setDecorationsVisible(true);
+        setDecorationsVisible();
 
     base_type::hoverMoveEvent(event);
 }
@@ -787,9 +880,35 @@ void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     if(!isInfoVisible())
         setDecorationsVisible(false);
+    m_mouseInWidget = false;
 
     base_type::hoverLeaveEvent(event);
 }
 
+QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
+    if (change == QGraphicsItem::ItemRotationHasChanged){
+        updateOverlayRotation(value.toReal());
+    }
+    return base_type::itemChange(change, value);
+}
 
+void QnResourceWidget::optionsChangedNotify(Options changedFlags){
+    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+        bool visible = isInfoVisible();
+        setInfoVisible(visible);
+        setDecorationsVisible(visible || m_mouseInWidget);
+    }
+}
+void QnResourceWidget::at_iconButton_visibleChanged() {
+    if(m_iconButton->isVisible()) {
+        m_headerLayout->insertItem(0, m_iconButton);
+    } else {
+        m_headerLayout->removeItem(m_iconButton);
+    }
+}
+
+void QnResourceWidget::at_infoButton_toggled(bool toggled){
+    setInfoVisible(toggled);
+    setDecorationsVisible(toggled || m_mouseInWidget);
+}
 

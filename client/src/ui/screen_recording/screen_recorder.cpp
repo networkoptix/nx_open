@@ -6,7 +6,6 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/warnings.h>
-#include "utils/client_util.h"
 
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"
@@ -119,11 +118,17 @@ void QnScreenRecorder::startRecording(QGLWidget *appWidget) {
     }
 
 #ifdef Q_OS_WIN
-    QString filePath = getTempRecordingDir() + QLatin1String("/video_recording.avi");
-
     QnVideoRecorderSettings recorderSettings;
-    QAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
-    QAudioDeviceInfo secondAudioDevice = recorderSettings.secondaryAudioDevice();
+
+    QString filePath = recorderSettings.recordingFolder() + QLatin1String("/video_recording.avi");
+    QnAudioDeviceInfo audioDevice = recorderSettings.primaryAudioDevice();
+    QnAudioDeviceInfo secondAudioDevice;
+    if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
+        secondAudioDevice = recorderSettings.secondaryAudioDevice();
+    if (QnAudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
+        audioDevice = QnAudioDeviceInfo(); // no audio devices
+        secondAudioDevice = QnAudioDeviceInfo();
+    }
     int screen = screenToAdapter(recorderSettings.screen());
     bool captureCursor = recorderSettings.captureCursor();
     QSize encodingSize = resolutionToSize(recorderSettings.resolution());

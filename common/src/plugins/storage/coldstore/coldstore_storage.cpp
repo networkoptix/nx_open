@@ -342,6 +342,12 @@ bool QnPlColdStoreStorage::isDirExists(const QString& url)
     return true;
 }
 
+bool QnPlColdStoreStorage::isCatalogAccessible()
+{
+    return false;
+}
+
+
 qint64 QnPlColdStoreStorage::getFreeSpace() 
 {
     return 10*1024*1024*1024ll;

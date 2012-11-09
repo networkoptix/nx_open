@@ -7,13 +7,15 @@
 #include "../filetypesupport.h"
 #include "../single_shot_file_reader.h"
 
-
 QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
     setUrl(file);
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
+	if (FileTypeSupport::isImageFileExt(file)) 
+		addFlags(QnResource::still_image);
+    m_timeZoneOffset = Qn::InvalidUtcOffset;
 }
 
 QnAviResource::~QnAviResource()
@@ -48,13 +50,13 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProviderInternal(Connecti
     if (m_storage)
         aviDelegate->setStorage(m_storage);
     result->setArchiveDelegate(aviDelegate);
-    if (hasFlags(still_image))
+    if (hasFlags(still_image) || hasFlags(utc))
         result->setCycleMode(false);
 
     return result;
 }
 
-const QnVideoResourceLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+const QnResourceVideoLayout* QnAviResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     const QnArchiveStreamReader* archiveReader = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
     if (archiveReader)
@@ -75,4 +77,29 @@ const QnResourceAudioLayout* QnAviResource::getAudioLayout(const QnAbstractMedia
 void QnAviResource::setStorage(QnStorageResourcePtr storage)
 {
     m_storage = storage;
+}
+
+QnStorageResourcePtr QnAviResource::getStorage() const
+{
+    return m_storage;
+}
+
+void QnAviResource::setMotionBuffer(const QnMetaDataLightVector& data, int channel)
+{
+    m_motionBuffer[channel] = data;
+}
+
+const QnMetaDataLightVector& QnAviResource::getMotionBuffer(int channel) const
+{
+    return m_motionBuffer[channel];
+}
+
+void QnAviResource::setTimeZoneOffset(qint64 value)
+{
+    m_timeZoneOffset = value;
+}
+
+qint64 QnAviResource::timeZoneOffset() const
+{
+    return m_timeZoneOffset;
 }

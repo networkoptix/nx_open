@@ -2,9 +2,9 @@
 #define client_pull_stream_reader_h1226
 
 
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "media_streamdataprovider.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 
 struct QnAbstractMediaData;
 
@@ -20,7 +20,7 @@ public:
     float getFps() const;
     bool isMaxFps() const;
 protected:
-
+    bool canChangeStatus() const;
 
 private:
     void run(); // in a loop: takes images from camera and put into queue

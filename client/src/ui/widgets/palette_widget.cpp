@@ -84,7 +84,7 @@ void QnPaletteWidget::setDisplayPalette(const QPalette &displayPalette) {
             pixmap.fill(color);
 
             QString rgb;
-            rgb.sprintf("%03d %03d %03d", color.red(), color.green(), color.blue());
+            rgb.sprintf("#%02x%02x%02x", color.red(), color.green(), color.blue());
             
             setItem(r, c, new QTableWidgetItem(QIcon(pixmap), rgb));
         }

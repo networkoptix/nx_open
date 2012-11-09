@@ -2,7 +2,7 @@
 #define abstract_archive_stream_reader_h1907
 
 #include "abstract_archive_delegate.h"
-#include "utils/common/adaptivesleep.h"
+#include "utils/common/adaptive_sleep.h"
 #include "core/dataprovider/cpull_media_stream_provider.h"
 #include "recording/time_period.h"
 
@@ -77,17 +77,20 @@ public:
     /**
      * \returns                         Time of the archive's start, in microseconds.
      */
-    qint64 startTime() const;
+    virtual qint64 startTime() const = 0;
 
     /**
      * \returns                         Time of the archive's end, in microseconds.
      */
-    qint64 endTime() const;
+    virtual qint64 endTime() const = 0;
 
     bool isRealTimeSource() const;
 
     virtual bool setSendMotion(bool value) = 0;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) = 0;
+    virtual void setPlaybackRange(const QnTimePeriod& playbackRange) = 0;
+    virtual QnTimePeriod getPlaybackRange() const = 0;
+
     virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
     virtual MediaQuality getQuality() const = 0;
     virtual void disableQualityChange() = 0;

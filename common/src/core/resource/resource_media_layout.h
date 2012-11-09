@@ -1,24 +1,25 @@
-#ifndef device_video_layout_h_2143
-#define device_video_layout_h_2143
+#ifndef QN_RESOURCE_LAYOUT_H
+#define QN_RESOURCE_LAYOUT_H
 
 #define CL_MAX_CHANNELS 4 // TODO: get rid of this definition
 #include <QVector>
 #include <QStringList>
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
-class QN_EXPORT QnDeviceLayout
+class QN_EXPORT QnResourceLayout
 {
 public:
     //returns number of audio or video channels device has
     virtual int numberOfChannels() const = 0; // TODO: rename to channelCount()
 };
 
-class QnResourceAudioLayout: public QnDeviceLayout
+class QnResourceAudioLayout: public QnResourceLayout
 {
 public:
     struct AudioTrack
     {
         AudioTrack() {} 
+        AudioTrack(QnMediaContextPtr ctx, const QString& descr): codecContext(ctx), description(descr) {}
 
         QnMediaContextPtr codecContext;
         QString description;
@@ -27,19 +28,38 @@ public:
     virtual AudioTrack getAudioTrackInfo(int index) const = 0;
 };
 
-class QnEmptyAudioLayout: public QnResourceAudioLayout
+class QnEmptyResourceAudioLayout: public QnResourceAudioLayout
 {
 public:
-    QnEmptyAudioLayout(): QnResourceAudioLayout() {}
+    QnEmptyResourceAudioLayout(): QnResourceAudioLayout() {}
     virtual int numberOfChannels() const override { return 0; }
-    virtual AudioTrack getAudioTrackInfo(int /*index*/) const override { return AudioTrack(); }
+    virtual AudioTrack getAudioTrackInfo(int index) const override { Q_UNUSED(index); return AudioTrack(); }
 };
 
-class QnVideoResourceLayout: public QnDeviceLayout
+class QnResourceCustomAudioLayout: public QnResourceAudioLayout
 {
 public:
-    QnVideoResourceLayout() {}
-    virtual ~QnVideoResourceLayout() {}
+    
+
+    QnResourceCustomAudioLayout(): QnResourceAudioLayout() {}
+
+    void addAudioTrack(const AudioTrack& audioTrack) {m_audioTracks << audioTrack; }
+    void setNumberOfChannels(int value) { m_audioTracks.resize(value); }
+    void setAudioTrackInfo(const AudioTrack& audioTrack, int index) {m_audioTracks[index] = audioTrack; }
+
+    virtual int numberOfChannels() const override { return m_audioTracks.size(); }
+    virtual AudioTrack getAudioTrackInfo(int index) const override { return m_audioTracks[index]; }
+private:
+    QVector<AudioTrack> m_audioTracks;
+    
+};
+
+
+class QnResourceVideoLayout: public QnResourceLayout
+{
+public:
+    QnResourceVideoLayout() {}
+    virtual ~QnResourceVideoLayout() {}
 
     // returns maximum width ( in terms of channels 4x1 2x2 1x1 ans so on  )
     virtual int width() const = 0;
@@ -53,11 +73,11 @@ public:
 };
 
 // this is default DeviceVideoLayout for any camera with only one sensor 
-class QnDefaultDeviceVideoLayout : public QnVideoResourceLayout
+class QnDefaultResourceVideoLayout : public QnResourceVideoLayout
 {
 public:
-    QnDefaultDeviceVideoLayout() {}
-    virtual ~QnDefaultDeviceVideoLayout() {}
+    QnDefaultResourceVideoLayout() {}
+    virtual ~QnDefaultResourceVideoLayout() {}
 
     virtual int numberOfChannels() const override
     {
@@ -90,9 +110,9 @@ public:
 
 };
 
-class QnCustomDeviceVideoLayout : public QnVideoResourceLayout {
+class QnCustomResourceVideoLayout : public QnResourceVideoLayout {
 public:
-    static QnCustomDeviceVideoLayout *fromString(const QString& value)
+    static QnCustomResourceVideoLayout *fromString(const QString& value)
     {
         QStringList params = value.split(QLatin1Char(';'));
         int width = 1;
@@ -113,20 +133,20 @@ public:
             }
         }
 
-        QnCustomDeviceVideoLayout* result = new QnCustomDeviceVideoLayout(width, height);
+        QnCustomResourceVideoLayout* result = new QnCustomResourceVideoLayout(width, height);
         for (int i = 0; i < sensors.size(); ++i)
             result->setChannel(i, sensors[i].toInt());
         return result;
     }
 
-    QnCustomDeviceVideoLayout(int width, int height):
+    QnCustomResourceVideoLayout(int width, int height):
         m_width(width),
         m_height(height)
     {
         m_channels.resize(width * height);
     }
 
-    virtual ~QnCustomDeviceVideoLayout() {}
+    virtual ~QnCustomResourceVideoLayout() {}
 
     virtual int numberOfChannels() const override
     {
@@ -199,4 +219,4 @@ protected:
     int m_height;
 };
 
-#endif //device_video_layout_h_2143
+#endif //QN_RESOURCE_LAYOUT_H

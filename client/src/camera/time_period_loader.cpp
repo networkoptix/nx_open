@@ -1,26 +1,23 @@
 #include "time_period_loader.h"
+
 #include <utils/common/warnings.h>
-#include <core/resourcemanagment/resource_pool.h>
-#include <core/resource/video_server_resource.h>
+#include <utils/common/synctime.h>
+#include <core/resource_managment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 
 namespace {
     QAtomicInt qn_fakeHandle(INT_MAX / 2);
 }
 
-QnTimePeriodLoader::QnTimePeriodLoader(const QnVideoServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
-    QObject(parent), 
-    m_connection(connection), 
-    m_resource(resource)
+QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connection, QnNetworkResourcePtr resource, QObject *parent):
+    QnAbstractTimePeriodLoader(resource, parent),
+    m_connection(connection)
 {
     if(!connection)
         qnNullWarning(connection);
 
     if(!resource)
         qnNullWarning(resource);
-
-    qRegisterMetaType<QnTimePeriodList>("QnTimePeriodList");
-
-    connect(this, SIGNAL(delayedReady(const QnTimePeriodList &, int)), this, SIGNAL(ready(const QnTimePeriodList &, int)), Qt::QueuedConnection);
 }
 
 QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent) {
@@ -28,22 +25,15 @@ QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObj
     if (!networkResource)
         return NULL;
 
-    QnVideoServerResourcePtr serverResource = qSharedPointerDynamicCast<QnVideoServerResource>(qnResPool->getResourceById(resource->getParentId()));
+    QnMediaServerResourcePtr serverResource = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(resource->getParentId()));
     if (!serverResource)
         return NULL;
 
-    QnVideoServerConnectionPtr serverConnection = serverResource->apiConnection();
+    QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();
     if (!serverConnection)
         return NULL;
 
     return new QnTimePeriodLoader(serverConnection, networkResource, parent);
-}
-
-QnNetworkResourcePtr QnTimePeriodLoader::resource() const 
-{
-    QMutexLocker lock(&m_mutex);
-
-    return m_resource;
 }
 
 int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions)
@@ -114,8 +104,30 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     return handle;
 }
 
+void QnTimePeriodLoader::discardCachedData() {
+    QMutexLocker lock(&m_mutex);
+    m_loading.clear();
+    m_loadedData.clear();
+    m_loadedPeriods.clear();
+}
+
+int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
+{
+    return m_connection->asyncRecordedTimePeriods(
+        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
+        periodToLoad.startTimeMs, 
+        periodToLoad.startTimeMs + periodToLoad.durationMs, 
+        1, 
+        m_motionRegions,
+        this, 
+        SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
+    );
+}
+
 void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
 {
+    // TODO: I don't see a mutex here.
+
     for (int i = 0; i < m_loading.size(); ++i)
     {
         if (m_loading[i].handle == requstHandle)
@@ -167,18 +179,5 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
             break;
         }
     }
-}
-
-int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
-{
-    return m_connection->asyncRecordedTimePeriods(
-        QnNetworkResourceList() << m_resource, 
-        periodToLoad.startTimeMs, 
-        periodToLoad.startTimeMs + periodToLoad.durationMs, 
-        1, 
-        m_motionRegions,
-        this, 
-        SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
-    );
 }
 

@@ -1,21 +1,21 @@
 #include "main_window.h"
 
-#include <QApplication>
-#include <QBoxLayout>
-#include <QFileDialog>
-#include <QToolButton>
-#include <QMenu>
-#include <QMessageBox>
-#include <QFile>
-#include <QNetworkReply>
-#include <QFileOpenEvent>
+#include <QtCore/QFile>
+#include <QtGui/QApplication>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QFileDialog>
+#include <QtGui/QToolButton>
+#include <QtGui/QMenu>
+#include <QtGui/QMessageBox>
+#include <QtGui/QFileOpenEvent>
+#include <QtNetwork/QNetworkReply>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/environment.h>
 
-#include <core/resourcemanagment/resource_discovery_manager.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_discovery_manager.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
@@ -24,6 +24,8 @@
 #include "ui/actions/action_manager.h"
 #include "ui/graphics/view/graphics_view.h"
 #include "ui/graphics/view/gradient_background_painter.h"
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include "ui/workbench/handlers/workbench_action_handler.h"
 #include "ui/workbench/handlers/workbench_panic_handler.h"
 #include "ui/workbench/workbench_controller.h"
@@ -37,19 +39,23 @@
 #include "ui/processors/drag_processor.h"
 #include "ui/style/skin.h"
 #include "ui/style/globals.h"
+#include "ui/style/noptix_style.h"
 #include "ui/style/proxy_style.h"
-#include "ui/events/system_menu_event.h"
+#include "ui/workaround/system_menu_event.h"
+#include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
 #include "utils/settings.h"
 
-#include "resource_tree_widget.h"
+#include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "openal/qtvaudiodevice.h"
+#include "ui/graphics/items/controls/volume_slider.h"
 
 namespace {
 
-    QToolButton *newActionButton(QAction *action, qreal sizeMultiplier = 1.0) {
+    QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
         QToolButton *button = new QToolButton();
         button->setDefaultAction(action);
 
@@ -57,6 +63,23 @@ namespace {
         int iconHeight = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, 0, button) * sizeMultiplier;
         int iconWidth = iconHeight * aspectRatio;
         button->setFixedSize(iconWidth, iconHeight);
+
+        button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
+
+        if(popup) {
+            /* We want the button to activate the corresponding action so that menu is updated. 
+             * However, menu buttons do not activate their corresponding actions as they do not receive release events. 
+             * We work this around by making some hacky connections. */
+            button->setPopupMode(QToolButton::InstantPopup);
+
+            QObject::disconnect(button, SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+            QObject::connect(button,    SIGNAL(pressed()),  button->defaultAction(),    SLOT(trigger()));
+            QObject::connect(button,    SIGNAL(pressed()),  button,                     SLOT(_q_buttonPressed()));
+        }
+
+        if(helpTopicId != -1)
+            setHelpTopic(button, helpTopicId);
+
 
         return button;
     }
@@ -79,12 +102,13 @@ namespace {
 
 
 QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
-    base_type(parent, flags | Qt::CustomizeWindowHint),
+    base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint),
     QnWorkbenchContextAware(context),
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false)
+    m_drawCustomFrame(false),
+    m_changeOpacity(false)
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
@@ -116,6 +140,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Set up scene & view. */
     QGraphicsScene *scene = new QGraphicsScene(this);
+    setHelpTopic(scene, Qn::MainWindow_Scene_Help);
+
     m_view = new QnGraphicsView(scene);
     m_view->setFrameStyle(QFrame::Box | QFrame::Plain);
     m_view->setLineWidth(1);
@@ -172,7 +198,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(Qn::IncrementDebugCounterAction));
     addAction(action(Qn::DecrementDebugCounterAction));
     addAction(action(Qn::TogglePanicModeAction));
+    addAction(action(Qn::ToggleTourModeHotkeyAction));
 
+    connect(action(Qn::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
     connect(action(Qn::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
     connect(action(Qn::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
 
@@ -193,37 +221,31 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->addStretch(0x1000);
     tabBarLayout->addWidget(m_tabBar);
 
-    /* We want the main menu button to activate the corresponding action so that
-     * main menu is updated. However, menu buttons do not activate their corresponding 
-     * actions as they do not receive release events. We work this around by making
-     * some hacky connections. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), 1.5);
-    m_mainMenuButton->setPopupMode(QToolButton::InstantPopup);
-
-    disconnect(m_mainMenuButton,            SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
-    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton->defaultAction(),      SLOT(trigger()));
-    connect(m_mainMenuButton,               SIGNAL(pressed()),                              m_mainMenuButton,                       SLOT(_q_buttonPressed()));
-
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
     m_windowButtonsLayout->setContentsMargins(0, 0, 0, 0);
     m_windowButtonsLayout->setSpacing(2);
     m_windowButtonsLayout->addSpacing(6);
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::WhatsThisAction)));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::MinimizeAction)));
-    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::FullscreenAction)));
+    m_windowButtonsLayout->addWidget(newActionButton(action(Qn::EffectiveMaximizeAction), false, 1.0, Qn::MainWindow_Fullscreen_Help));
     m_windowButtonsLayout->addWidget(newActionButton(action(Qn::ExitAction)));
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_MainMenu_Help);
+
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
     m_titleLayout->setSpacing(2);
     m_titleLayout->addWidget(m_mainMenuButton);
     m_titleLayout->addLayout(tabBarLayout);
     m_titleLayout->addWidget(newActionButton(action(Qn::OpenNewTabAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     m_titleLayout->addStretch(0x1000);
-    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction)));
-    m_titleLayout->addSpacing(6);
+    m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
+    if (QnScreenRecorder::isSupported())
+        m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
     m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
@@ -240,6 +262,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
+
+
+    /* Transparency. */
+    connect(QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()), this, SLOT(at_volumeSliderNotifier_manipulated()));
+    connect(QtvAudioDevice::instance(), SIGNAL(volumeChanged()), this, SLOT(at_audioDevice_volumeChanged()));
+    at_audioDevice_volumeChanged();
+
 
     /* Post-initialize. */
     updateDwmState();
@@ -285,19 +314,26 @@ void QnMainWindow::setWindowButtonsVisible(bool visible) {
     }
 }
 
+void QnMainWindow::setMaximized(bool maximized) {
+    if(maximized == isMaximized())
+        return;
+
+    if(maximized) {
+        showMaximized();
+    } else if(isMaximized()) {
+        showNormal();
+    }
+}
+
 void QnMainWindow::setFullScreen(bool fullScreen) {
     if(fullScreen == isFullScreen())
         return;
 
     if(fullScreen) {
         showFullScreen();
-    } else {
+    } else if(isFullScreen()) {
         showNormal();
     }
-}
-
-void QnMainWindow::toggleFullScreen() {
-    setFullScreen(!isFullScreen());
 }
 
 void QnMainWindow::minimize() {
@@ -328,33 +364,21 @@ void QnMainWindow::setOptions(Options options) {
     m_ui->setWindowButtonsUsed(m_options & WindowButtonsVisible);
 }
 
-void QnMainWindow::updateFullScreenState() {
+void QnMainWindow::updateDecorationsState() {
     bool fullScreen = isFullScreen();
+    bool maximized = isMaximized();
 
     action(Qn::FullscreenAction)->setChecked(fullScreen);
+    action(Qn::MaximizeAction)->setChecked(maximized);
 
-    setTitleVisible(!fullScreen);
-    m_ui->setTitleUsed(fullScreen);
-    m_view->setLineWidth(isFullScreen() ? 0 : 1);
+    setTitleVisible(!(fullScreen || maximized));
+    m_ui->setTitleUsed(fullScreen || maximized);
+    m_view->setLineWidth(fullScreen || maximized ? 0 : 1);
 
     updateDwmState();
 }
 
 void QnMainWindow::updateDwmState() {
-#if 0
-    if(!m_dwm->isSupported()) {
-        /* Non-windows systems where DWM is not supported. */
-
-        m_drawCustomFrame = false;
-
-        setAttribute(Qt::WA_NoSystemBackground, false);
-        setAttribute(Qt::WA_TranslucentBackground, false);
-
-        m_titleLayout->setContentsMargins(0, 0, 0, 0);
-        m_viewLayout->setContentsMargins(0, 0, 0, 0);
-    } else */
-#endif
-        
     if(isFullScreen()) {
         /* Full screen mode. */
         m_drawCustomFrame = false;
@@ -380,9 +404,9 @@ void QnMainWindow::updateDwmState() {
         m_titleLayout->setContentsMargins(0, 0, 0, 0);
         m_viewLayout->setContentsMargins(0, 0, 0, 0);
     } else if(m_dwm->isSupported() && m_dwm->isCompositionEnabled()) {
-        /* Windowed with aero glass. */
+        /* Windowed or maximized with aero glass. */
         m_drawCustomFrame = false;
-        m_frameMargins = m_dwm->themeFrameMargins();
+        m_frameMargins = !isMaximized() ? m_dwm->themeFrameMargins() : QMargins(0, 0, 0, 0);
 
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
@@ -401,9 +425,9 @@ void QnMainWindow::updateDwmState() {
             m_frameMargins.bottom()
         );
     } else {
-        /* Windowed without aero glass. */
+        /* Windowed or maximized without aero glass. */
         m_drawCustomFrame = true;
-        m_frameMargins = m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8);
+        m_frameMargins = !isMaximized() ? (m_dwm->isSupported() ? m_dwm->themeFrameMargins() : QMargins(8, 8, 8, 8)) : QMargins(0, 0, 0, 0);
 
         if(m_dwm->isSupported()) {
             setAttribute(Qt::WA_NoSystemBackground, false);
@@ -413,6 +437,8 @@ void QnMainWindow::updateDwmState() {
             m_dwm->setCurrentFrameMargins(QMargins(0, 0, 0, 0));
             m_dwm->disableBlurBehindWindow();
         }
+
+        setContentsMargins(0, 0, 0, 0);
 
         m_titleLayout->setContentsMargins(m_frameMargins.left(), 2, m_frameMargins.right(), 0);
         m_viewLayout->setContentsMargins(
@@ -445,7 +471,6 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
-
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
 
@@ -460,14 +485,14 @@ void QnMainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
     base_type::mouseDoubleClickEvent(event);
 
     if(event->button() == Qt::LeftButton && windowFrameSectionAt(event->pos()) == Qt::TitleBarArea) {
-        toggleFullScreen();
+        action(Qn::EffectiveMaximizeAction)->toggle();
         event->accept();
     }
 }
 
 void QnMainWindow::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange)
-        updateFullScreenState();
+        updateDecorationsState();
 
     base_type::changeEvent(event);
 }
@@ -542,27 +567,20 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
 }
 
-void QnMainWindow::at_sessionManager_error(int error) {
-    switch (error) {
-    case QNetworkReply::ConnectionRefusedError:
-    case QNetworkReply::HostNotFoundError:
-    case QNetworkReply::TimeoutError: // ### remove ?
-    case QNetworkReply::ContentAccessDenied:
-    case QNetworkReply::AuthenticationRequiredError:
-    case QNetworkReply::UnknownNetworkError:
-        // Do not show popup box! It's annoying!
-        // Show something like color label in the main window.
-        // showAuthenticationDialog();
-        break;
-
-    default:
-        break;
-    }
-}
-
 void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     QnWorkbenchLayoutList layouts;
     layouts.push_back(layout);
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
+void QnMainWindow::at_volumeSliderNotifier_manipulated() {
+    m_changeOpacity = true;
+}
+
+void QnMainWindow::at_audioDevice_volumeChanged() {
+    if(m_changeOpacity) {
+        qreal volume = QtvAudioDevice::instance()->volume();
+
+        setWindowOpacity(qMin(0.7 + 0.5 * volume, 1.0));
+    }
+}

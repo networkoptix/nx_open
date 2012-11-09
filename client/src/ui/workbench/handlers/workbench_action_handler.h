@@ -9,13 +9,13 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "../workbench_globals.h"
+#include <client/client_globals.h>
 #include <utils/settings.h>
 
 class QAction;
 class QMenu;
-class QProgressDialog;
 
+class QnProgressDialog;
 class QnMimeData;
 class QnResourcePool;
 class QnWorkbench;
@@ -36,7 +36,6 @@ struct QnThumbnailsSearchState {
     QnTimePeriod period;
     qint64 step;
 };
-
 Q_DECLARE_METATYPE(QnThumbnailsSearchState)
 
 
@@ -166,12 +165,21 @@ protected:
     void closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot);
     bool closeLayouts(const QnLayoutResourceList &resources, bool waitForReply = false);
     bool closeLayouts(const QnWorkbenchLayoutList &layouts, bool waitForReply = false);
+    bool closeAllLayouts(bool waitForReply = false);
 
     void setLayoutAspectRatio(const QnLayoutResourcePtr &resource, double aspectRatio);
 
+    void openResourcesInNewWindow(const QnResourceList &resources);
+
     void openNewWindow(const QStringList &args);
 
-    void saveCameraSettingsFromDialog();
+    /**
+     * Save modified camera settings to resources.
+     * \param checkControls - if set then additional check will occur.
+     * If user modified some of control elements but did not apply changes he will be asked to fix it.
+     * \see Feature #1195
+     */
+    void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
     
@@ -183,6 +191,7 @@ protected slots:
     void updateCameraSettingsFromSelection();
     void updateCameraSettingsEditibility();
     void submitDelayedDrops();
+    void submitInstantDrop(QnMimeData &data);
 
 protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
@@ -194,6 +203,7 @@ protected slots:
     void at_eventManager_connectionOpened();
 
     void at_mainMenuAction_triggered();
+    void at_openCurrentUserLayoutMenuAction_triggered();
 
     void at_incrementDebugCounterAction_triggered();
     void at_decrementDebugCounterAction_triggered();
@@ -221,6 +231,7 @@ protected slots:
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
     void at_delayedDropResourcesAction_triggered();
+    void at_instantDropResourcesAction_triggered();
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openLayoutAction_triggered();
@@ -230,9 +241,12 @@ protected slots:
     void at_getMoreLicensesAction_triggered();
     void at_connectToServerAction_triggered();
     void at_reconnectAction_triggered();
+    void at_disconnectAction_triggered();
     void at_userSettingsAction_triggered();
     void at_cameraSettingsAction_triggered();
+    void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
@@ -278,26 +292,38 @@ protected slots:
     void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
+    void at_updateWatcher_availableUpdateChanged();
+    void at_layoutCountWatcher_layoutCountChanged();
 
     void at_toggleTourAction_toggled(bool checked);
     void at_tourTimer_timeout();
     void at_workbench_itemChanged(Qn::ItemRole role);
 
     void at_layoutCamera_exportFinished(QString fileName);
-    void at_cameraCamera_exportFailed(QString errorMessage);
-
+    void at_layout_exportFinished();
+    void at_layoutCamera_exportFailed(QString errorMessage);
 
     void at_camera_settings_saved(int httpStatusCode, const QList<QPair<QString, bool> >& operationResult);
 
-private:
-    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
-   // void updateStoredConnections(QnConnectionData connectionData);
+    void at_cancelExport();
 
+    void at_whatsThisAction_triggered();
+
+private:
+    enum LayoutExportMode {LayoutExport_LocalSave, LayoutExport_LocalSaveAs, LayoutExport_Export};
+
+    void saveAdvancedCameraSettingsAsync(QnVirtualCameraResourceList cameras);
+    void saveLayoutToLocalFile(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, const QString& layoutFileName, LayoutExportMode mode, bool exportReadOnly);
+    bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
+    QString binaryFilterName(bool readOnly) const;
+    bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
+    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
     QWeakPointer<QWidget> m_widget;
     QWeakPointer<QMenu> m_mainMenu;
+    QWeakPointer<QMenu> m_currentUserLayoutsMenu;
     
     QWeakPointer<QnCameraSettingsDialog> m_cameraSettingsDialog;
 
@@ -313,11 +339,17 @@ private:
     QList<QnMimeData> m_delayedDrops;
 
     QnVideoCamera* m_layoutExportCamera;
+    QnVideoCamera* m_exportedCamera;
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
-    QWeakPointer<QProgressDialog> m_exportProgressDialog;
-    QnStorageResourcePtr m_exportStorage;
+    QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QnLayoutResourcePtr m_exportLayout;  
+    QnStorageResourcePtr m_exportStorage;  
+    QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
+    QnMediaResourcePtr m_exportedMediaRes;
+    //QString m_layoutExportMessage;
+    LayoutExportMode m_layoutExportMode;
 
 
     QTimer *m_tourTimer;

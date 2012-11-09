@@ -3,6 +3,15 @@
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
 
+/*
+*   Port list used for manual camera add
+*/
+static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
+{
+    80,
+    8032, // DW default port
+    9988 // Dahui default port
+};
 
 OnvifResourceSearcher::OnvifResourceSearcher():
     wsddSearcher(OnvifResourceSearcherWsdd::instance())
@@ -35,6 +44,25 @@ QString OnvifResourceSearcher::manufacture() const
 
 QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth)
 {
+    if (url.port() == -1)
+    {
+        for (int i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i) 
+        {
+            QUrl newUrl(url);
+            newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
+            QnResourcePtr result = checkHostAddrInternal(newUrl, auth);
+            if (result)
+                return result;
+        }
+        return QnResourcePtr();
+    }
+    else {
+        return checkHostAddrInternal(url, auth);
+    }
+}
+
+QnResourcePtr OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth)
+{
     QnResourceTypePtr typePtr = qnResTypePool->getResourceTypeByName(QLatin1String("ONVIF"));
     if (!typePtr)
         return QnResourcePtr();
@@ -54,7 +82,21 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthe
     if (resource->fetchAndSetDeviceInformation())
     {
         // Clarify resource type
-        QString manufacturer = resource->getName().split(QLatin1String("-"))[0];
+        QString fullName = resource->getName();
+        int manufacturerPos = fullName.indexOf(QLatin1String("-"));
+        QString manufacturer = fullName.mid(0,manufacturerPos).trimmed();
+        QString modelName = fullName.mid(manufacturerPos+1).trimmed().toLower();
+
+        if (NameHelper::instance().isSupported(modelName))
+            return QnResourcePtr();
+
+        int modelNamePos = modelName.indexOf(QLatin1String(" "));
+        if (modelNamePos >= 0)
+        {
+            modelName = modelName.mid(modelNamePos+1);
+            if (NameHelper::instance().isSupported(modelName))
+                return QnResourcePtr();
+        }
         QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer);
         if (rt)
             resource->setTypeId(rt);

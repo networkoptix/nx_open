@@ -66,6 +66,8 @@ public:
     bool isThreadSafe() const;
     void setThreadSafe(bool threadSafe);
 
+    // TODO: we need a 'dirty' flag and several submit modes. Default mode is to write out only those settings that were actually changed.
+
     void updateFromSettings(QSettings *settings);
     void submitToSettings(QSettings *settings) const;
 

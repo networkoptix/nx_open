@@ -10,7 +10,7 @@ CLNetState::CLNetState()
 
 void CLNetState::updateNetState()
 {
-    bool net_state_changed = false;
+    //bool net_state_changed = false;
 
     m_net_entries = getAllIPv4AddressEntries();
 
@@ -41,18 +41,18 @@ void CLNetState::updateNetState()
 
             if (state.minHostAddress == existing_state.minHostAddress && state.maxHostAddress == existing_state.maxHostAddress)// same subnet, nothing changed
                 state.currHostAddress = existing_state.currHostAddress;
-            else// subnet mask changed
-                net_state_changed = true;
+          //  else// subnet mask changed
+          //     net_state_changed = true;
 
         }
-        else
-            net_state_changed = true; // ip changed or new subnet
+        //else
+        //    net_state_changed = true; // ip changed or new subnet
 
         new_netstate[entry.ip().toString()] = state;
     }
 
-    if (new_netstate.size()!=m_netstate.size())
-        net_state_changed = true;
+    /*if (new_netstate.size()!=m_netstate.size())
+        net_state_changed = true;*/
 
     m_netstate = new_netstate;
 

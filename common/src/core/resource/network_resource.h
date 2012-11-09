@@ -91,7 +91,7 @@ public:
     virtual bool shoudResolveConflicts() const;
 
     // in some cases I just want to update couple of field from just discovered resource
-    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source) ;
+    virtual bool mergeResourcesIfNeeded(QnNetworkResourcePtr source);
 
 
 private:
@@ -109,7 +109,6 @@ private:
     unsigned int m_networkTimeout;
 
     bool m_probablyNeedToUpdateStatus;
-    
 };
 
 #endif // QN_NETWORK_RESOURCE_H

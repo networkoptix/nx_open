@@ -16,7 +16,7 @@
 #endif
 
 #include "nettools.h"
-#include "utils/common/bytearray.h"
+#include "utils/common/byte_array.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -138,16 +138,13 @@ public:
      * even if port is busy (in TIME_WAIT state).
      */
     bool setReuseAddrFlag(bool reuseAddr = true);
-
-protected:
-    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-
-    void createSocket(int type, int protocol);
-
-private:
-    // Prevent the user from trying to use value semantics on this object
-    Socket(const Socket &sock);
-    void operator=(const Socket &sock);
+    //!if, \a val is \a true, turns non-blocking mode on, else turns it off
+    /*!
+        \return true, if set successfully
+    */
+    bool setNonBlockingMode(bool val);
+    //!Returns true, if in non-blocking mode
+    bool isNonBlockingMode() const;
 
 protected:
     int sockDesc;              // Socket descriptor
@@ -155,6 +152,15 @@ protected:
 
     Socket(int type, int protocol) ;
     Socket(int sockDesc);
+    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
+    void createSocket(int type, int protocol);
+
+private:
+    bool m_nonBlockingMode;
+
+    // Prevent the user from trying to use value semantics on this object
+    Socket(const Socket &sock);
+    void operator=(const Socket &sock);
 };
 
 /**
@@ -212,8 +218,9 @@ public:
      */
     unsigned short getForeignPort() ;
 
-    bool isConnected() const;
+    bool isConnected() const { return mConnected; }
 
+    void setSendBufferSize(int buff_size);
 protected:
     CommunicatingSocket(int type, int protocol) ;
     CommunicatingSocket(int newConnSD);
@@ -300,6 +307,8 @@ private:
 class UDPSocket : public CommunicatingSocket {
     Q_DECLARE_TR_FUNCTIONS(UDPSocket)
 public:
+    static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
+
     /**
      *   Construct a UDP socket
      *   @exception SocketException thrown if unable to create UDP socket
@@ -357,7 +366,6 @@ public:
      *   @param sourceAddress address of datagram source
      *   @param sourcePort port of data source
      *   @return number of bytes received and -1 for error
-     *   @exception SocketException thrown if unable to receive datagram
      */
     int recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
                  unsigned short &sourcePort) ;

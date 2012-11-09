@@ -13,6 +13,7 @@
 
 #include <tchar.h>
 #include <atlstr.h>
+#include <atlpath.h>
 #include <strsafe.h>
 #include <msiquery.h>
 
@@ -22,6 +23,7 @@
 #include <comutil.h>
 #include <objbase.h>
 #include <shobjidl.h>
+#include <Shellapi.h>
 #include <shlobj.h>
 #include <msxml2.h>
 

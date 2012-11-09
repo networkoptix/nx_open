@@ -2,7 +2,7 @@
 #define abstract_audio_decoder_h_1532
 
 #include "audio_struct.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 
 class CLAbstractAudioDecoder;
 

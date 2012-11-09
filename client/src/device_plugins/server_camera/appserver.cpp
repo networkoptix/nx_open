@@ -1,7 +1,7 @@
 #include "appserver.h"
 
 #include "api/app_server_connection.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_discovery_manager.h"
 #include "device_plugins/server_camera/server_camera.h"
 #include "utils/settings.h"
 #include "version.h"

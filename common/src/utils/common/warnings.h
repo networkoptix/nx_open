@@ -5,11 +5,9 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 #include <QtCore/QVariant>
+#include <QtCore/QUrl>
 
-#ifndef QT_STRINGIFY
-#   define QT_STRINGIFY2(x) #x
-#   define QT_STRINGIFY(x) QT_STRINGIFY2(x)
-#endif
+#include "preprocessor.h"
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {
@@ -37,12 +35,24 @@ namespace detail {
             return s.arg(arg);
         }
 
+        inline QString operator<<(const QString &s, const QUrl &arg) {
+            return s.arg(arg.toString());
+        }
+
         inline QString operator<<(const QString &s, const char *arg) {
             return s.arg(QLatin1String(arg));
         }
 
+        inline QString operator<<(const QString &s, const wchar_t *arg) {
+            return s.arg(QString::fromWCharArray(arg));
+        }
+
         inline QString operator<<(const QString &s, char *arg) {
             return s.arg(QLatin1String(arg));
+        }
+
+        inline QString operator<<(const QString &s, wchar_t *arg) {
+            return s.arg(QString::fromWCharArray(arg));
         }
 
         inline QString operator<<(const QString &s, const QByteArray &arg) {
@@ -159,7 +169,7 @@ namespace detail {
 
 #define QN_NULL_PARAMETER_I(MACRO, PARAMETER) {                                 \
     (void) (PARAMETER); /* Show compilation error if parameter name is mistyped. */ \
-    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QT_STRINGIFY(PARAMETER)); \
+    MACRO("Unexpected %1 parameter '%2'.", ::detail::nullName(PARAMETER), QN_STRINGIZE(PARAMETER)); \
 }
 
 /**

@@ -1,5 +1,5 @@
-#ifndef ABOUTDIALOG_H
-#define ABOUTDIALOG_H
+#ifndef QN_ABOUT_DIALOG_H
+#define QN_ABOUT_DIALOG_H
 
 #include <QtCore/QScopedPointer>
 
@@ -30,4 +30,4 @@ private:
     QPushButton *m_copyButton;
 };
 
-#endif // ABOUTDIALOG_H
+#endif // QN_ABOUT_DIALOG_H

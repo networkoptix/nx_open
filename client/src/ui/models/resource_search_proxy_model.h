@@ -1,17 +1,19 @@
 #ifndef QN_RESOURCE_SEARCH_PROXY_MODEL_H
 #define QN_RESOURCE_SEARCH_PROXY_MODEL_H
 
+#include <QtCore/QMetaType>
 #include <QtGui/QSortFilterProxyModel>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 
 /**
  * A resource filtering model that uses resource criteria for filtering.
  */
 class QnResourceSearchProxyModel: public QSortFilterProxyModel {
-    Q_OBJECT;
+    Q_OBJECT
+    typedef QSortFilterProxyModel base_type;
 
 public:
     explicit QnResourceSearchProxyModel(QObject *parent = 0);
@@ -46,10 +48,15 @@ public slots:
 
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
-
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+private:
+    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state);
 private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;
 };
+
+Q_DECLARE_METATYPE(QnResourceSearchProxyModel *)
+
 
 #endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H

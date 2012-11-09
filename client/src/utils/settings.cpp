@@ -8,6 +8,8 @@
 
 #include <ui/style/globals.h>
 
+#include <client/client_meta_types.h>
+
 namespace {
     QnConnectionData readConnectionData(QSettings *settings)
     {
@@ -41,11 +43,32 @@ bool QnConnectionDataList::contains(const QString &name){
     return false;
 }
 
+QnConnectionData QnConnectionDataList::getByName(const QString &name){
+    foreach(QnConnectionData data, *this){
+        if (data.name == name)
+            return data;
+    }
+    return QnConnectionData();
+}
+
 bool QnConnectionDataList::removeOne(const QString &name){
     foreach(QnConnectionData data, *this){
         if (data.name != name)
             continue;
         QList::removeOne(data);
+        return true;
+    }
+    return false;
+}
+
+bool QnConnectionDataList::reorderByUrl(const QUrl &url){
+    QUrl clean_url(url);
+    clean_url.setPassword(QString());
+    foreach(QnConnectionData data, *this){
+        if (data.url != clean_url)
+            continue;
+        QList::removeOne(data);
+        QList::prepend(data);
         return true;
     }
     return false;
@@ -61,6 +84,9 @@ QString QnConnectionDataList::generateUniqueName(const QString &base){
     return uniqueName;
 }
 
+QString QnConnectionDataList::defaultLastUsedName(){
+    return QObject::tr("* Last used connection *");
+}
 
 
 Q_GLOBAL_STATIC(QnSettings, qn_settings)
@@ -69,11 +95,13 @@ QnSettings::QnSettings():
     m_settings(new QSettings(this)),
     m_loading(true)
 {
+    QnClientMetaTypes::initialize();
+
     init();
 
     /* Set default values. */
     setBackgroundColor(qnGlobals->backgroundGradientColor());
-    setMediaFolder(getMoviesDirectory() + QLatin1String("/HD Witness Media/"));
+    setMediaFolder(getMoviesDirectory() + QLatin1String("/HD Witness Media/")); // TODO: #Elric customize
 #ifdef Q_OS_DARWIN
     setAudioDownmixed(true); /* Mac version uses SPDIF by default for multichannel audio. */
 #endif
@@ -91,6 +119,13 @@ QnSettings::QnSettings():
     addArgumentName(SOFTWARE_YUV,          "--soft-yuv");
     addArgumentName(OPEN_LAYOUTS_ON_LOGIN, "--open-layouts-on-login");
     addArgumentName(MAX_VIDEO_ITEMS,       "--max-video-items");
+
+    /* Load from internal resource. */
+    QString path = QLatin1String(QN_SKIN_PATH) + QLatin1String("/globals.ini");
+    QScopedPointer<QSettings> settings(new QSettings(path, QSettings::IniFormat));
+    settings->beginGroup(QLatin1String("settings"));
+    updateFromSettings(settings.data());
+    settings->endGroup();
 
     /* Load from settings. */
     load();
@@ -198,6 +233,7 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
     }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
+    case UPDATE_FEED_URL:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);

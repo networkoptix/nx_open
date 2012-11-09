@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QWeakPointer>
 #include <QtCore/QSet>
+#include <QtCore/QMetaType>
 
 #include <core/resource/resource_fwd.h>
 
@@ -24,7 +25,7 @@ struct QnStreamSynchronizationState {
     qint64 time;
     float speed;
 };
-
+Q_DECLARE_METATYPE(QnStreamSynchronizationState);
 
 /**
  * This class manages the necessary machinery for synchronized playback of
@@ -77,6 +78,8 @@ protected slots:
     void at_display_widgetAboutToBeRemoved(QnResourceWidget *widget);
     void at_renderWatcher_displayingChanged(QnAbstractRenderer *renderer, bool displaying);
 
+    void at_workbench_currentLayoutChanged();
+
     void at_resource_flagsChanged();
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
@@ -93,7 +96,5 @@ private:
 
     QSet<QnMediaResourceWidget *> m_queuedWidgets;
 };
-
-Q_DECLARE_METATYPE(QnStreamSynchronizationState);
 
 #endif // QN_WORKBENCH_STREAM_SYNCHRONIZER_H

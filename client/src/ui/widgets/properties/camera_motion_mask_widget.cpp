@@ -64,7 +64,6 @@ void QnCameraMotionMaskWidget::init() {
     m_controller.reset(new QnWorkbenchController(display));
 
     /* Disable unused instruments. */
-    m_controller->motionSelectionInstrument()->disable();
     m_controller->itemRightClickInstrument()->disable();
     m_controller->moveInstrument()->disable();
     m_controller->resizingInstrument()->disable();
@@ -77,23 +76,21 @@ void QnCameraMotionMaskWidget::init() {
     connect(resizeSignalingInstrument, SIGNAL(activated(QWidget *, QEvent *)), this, SLOT(at_viewport_resized()));
 
     /* Create motion mask selection instrument. */
-    m_motionSelectionInstrument = new MotionSelectionInstrument(this);
+    m_motionSelectionInstrument = m_controller->motionSelectionInstrument();//new MotionSelectionInstrument(this);
     m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
     m_motionSelectionInstrument->setColor(MotionSelectionInstrument::MouseBorder, qnGlobals->motionMaskMouseFrameColor());
-    display->instrumentManager()->installInstrument(m_motionSelectionInstrument);
 
+    /* Create motion region floodfill instrument. */
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);
-    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     display->instrumentManager()->installInstrument(m_clickInstrument);
 
-    ForwardingInstrument *itemMouseForwardingInstrument = m_controller->itemMouseForwardingInstrument();
+    disconnect(m_motionSelectionInstrument, NULL,                                                                                   m_controller.data(),            NULL); // TODO: controller flags?
+    connect(m_clickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                               this,                           SLOT(at_itemClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),    this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument,  SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                    this,                           SLOT(at_motionRegionCleared()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                itemMouseForwardingInstrument,  SLOT(recursiveDisable()));
-    connect(m_motionSelectionInstrument,  SIGNAL(selectionProcessFinished(QGraphicsView *, QnMediaResourceWidget *)),               itemMouseForwardingInstrument,  SLOT(recursiveEnable()));
 
     /* Set up UI. */
     QVBoxLayout *layout = new QVBoxLayout();
@@ -149,7 +146,6 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
 
     if(!m_camera) {
         m_resourceWidget = 0;
-        m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
     } else {
         /* Add single item to the layout. */
         QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QUuid::createUuid(), this);
@@ -163,27 +159,8 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotionSensitivity, true);
         m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
         m_resourceWidget->setOption(QnResourceWidget::DisplayMotion, true);
-
-        /* Find best value for sensitivity. */
-        int counts[QnMotionRegion::MAX_SENSITIVITY - QnMotionRegion::MIN_SENSITIVITY + 1];
-        memset(counts, 0, sizeof(counts));
-
-        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++)
-            foreach(const QnMotionRegion &motionRegion, m_resourceWidget->motionSensitivity())
-                foreach(const QRect &rect, motionRegion.getRectsBySens(sensitivity))
-                    counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] += rect.width() * rect.height();
-
-        int bestCount = std::numeric_limits<int>::min();
-        int bestSensitivity = 0;
-        for(int sensitivity = QnMotionRegion::MIN_SENSITIVITY; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; sensitivity++) {
-            if(counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY] > bestCount) {
-                bestCount = counts[sensitivity - QnMotionRegion::MIN_SENSITIVITY];
-                bestSensitivity = sensitivity;
-            }
-        }
-
-        m_motionSensitivity = bestSensitivity;
     }
+    m_motionSensitivity = QnMotionRegion::MIN_SENSITIVITY;
 
     /* Consider motion mask list changed. */
     emit motionRegionListChanged();
@@ -246,7 +223,7 @@ void QnCameraMotionMaskWidget::clearMotion()
 
 bool QnCameraMotionMaskWidget::isValidMotionRegion() {
     if (m_resourceWidget && m_needControlMaxRects) {
-        const QnVideoResourceLayout *layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout *layout = m_camera->getVideoLayout();
         const QList<QnMotionRegion> &regions = m_resourceWidget->motionSensitivity();
         for (int i = 0; i < qMin(regions.size(), layout->numberOfChannels()); ++i) {
             QnMotionRegion::RegionValid kind = regions[i].isValid(m_camera->motionWindowCount(),

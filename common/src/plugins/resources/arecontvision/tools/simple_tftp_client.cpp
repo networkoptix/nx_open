@@ -1,7 +1,7 @@
 #include "simple_tftp_client.h"
 #include "utils/network/socket.h"
 #include "utils/common/log.h"
-#include "utils/common/bytearray.h"
+#include "utils/common/byte_array.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"
 
 static const int SERVER_TFTP_PORT = 69;

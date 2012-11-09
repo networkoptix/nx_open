@@ -1,12 +1,16 @@
 #ifndef QN_WORKBENCH_CONTROLLER_H
 #define QN_WORKBENCH_CONTROLLER_H
 
-#include <QObject>
-#include <QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+
+#include <core/resource/resource_fwd.h>
+
 #include <ui/common/geometry.h>
 #include <ui/actions/actions.h>
-#include <core/resource/resource_fwd.h>
-#include "workbench_globals.h"
+
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsScene;
@@ -103,6 +107,7 @@ protected:
 
     void updateGeometryDelta(QnResourceWidget *widget);
     void displayMotionGrid(const QList<QnResourceWidget *> &widgets, bool display);
+    void displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display);
 
     void moveCursor(const QPoint &direction);
     void showContextMenuAt(const QPoint &pos);
@@ -120,6 +125,7 @@ protected slots:
     void at_rotationFinished(QGraphicsView *view, QGraphicsWidget *widget);
 
     void at_motionSelectionProcessStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
+    void at_motionSelectionStarted(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
@@ -149,6 +155,9 @@ protected slots:
     void at_stopSmartSearchAction_triggered();
     void at_toggleSmartSearchAction_triggered();
     void at_clearMotionSelectionAction_triggered();
+    void at_showInfoAction_triggered();
+    void at_hideInfoAction_triggered();
+    void at_toggleInfoAction_triggered();
     void at_maximizeItemAction_triggered();
     void at_unmaximizeItemAction_triggered();
     void at_recordingAction_triggered(bool checked);
@@ -161,6 +170,9 @@ protected slots:
 
     void at_recordingAnimation_valueChanged(const QVariant &value);
     void at_recordingAnimation_finished();
+
+    void at_zoomedToggle_activated();
+    void at_zoomedToggle_deactivated();
 
 private:
     /* Global state. */

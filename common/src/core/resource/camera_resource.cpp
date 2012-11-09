@@ -1,20 +1,16 @@
 #include "camera_resource.h"
-#include "../dataprovider/live_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 #include "resource_consumer.h"
-
-Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr);
+#include "common/common_meta_types.h"
 
 QnVirtualCameraResource::QnVirtualCameraResource()
     : m_scheduleDisabled(true),
       m_audioEnabled(false),
       m_manuallyAdded(false),
-      m_advancedWorking(false)
+      m_advancedWorking(false),
+      m_dtsFactory(0)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnVirtualCameraResourcePtr>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 }
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): QnVirtualCameraResource()
@@ -183,6 +179,26 @@ void QnVirtualCameraResource::setAdvancedWorking(bool value)
     m_advancedWorking = value;
 }
 
+QnAbstractDTSFactory* QnVirtualCameraResource::getDTSFactory()
+{
+    return m_dtsFactory;
+}
+
+void QnVirtualCameraResource::setDTSFactory(QnAbstractDTSFactory* factory)
+{
+    m_dtsFactory = factory;
+}
+
+void QnVirtualCameraResource::lockDTSFactory()
+{
+    m_mutex.lock();
+}
+
+void QnVirtualCameraResource::unLockDTSFactory()
+{
+    m_mutex.unlock();
+}
+
 QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCapabilities()
 {
     QVariant mediaVariant;
@@ -195,4 +211,27 @@ void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
     value |= getCameraCapabilities();
     int valueInt = (int) value;
     setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+}
+
+QString QnVirtualCameraResource::getModel() const
+{
+    return m_model;
+}
+
+void QnVirtualCameraResource::setModel(QString model)
+{
+    QMutexLocker locker(&m_mutex);
+    m_model = model;
+}
+
+QString QnVirtualCameraResource::getFirmware() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_firmware;
+}
+
+void QnVirtualCameraResource::setFirmware(QString firmware)
+{
+    QMutexLocker locker(&m_mutex);
+    m_firmware = firmware;
 }

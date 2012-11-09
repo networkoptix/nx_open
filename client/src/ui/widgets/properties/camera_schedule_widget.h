@@ -3,7 +3,7 @@
 
 #include <QtGui/QWidget>
 
-#include <core/misc/scheduleTask.h>
+#include <core/misc/schedule_task.h>
 
 class QnWorkbenchContext;
 
@@ -45,15 +45,24 @@ public:
     int getGridMaxFps();
     bool isSecondaryStreamReserver() const;
 
+    /** Returns true if there is at least one "record-motion" square on the grid */
+    bool hasMotionOnGrid() const;
+
+    /** Returns true if there is at least one "record-motion-plus-LQ-always" square on the grid */
+    bool hasDualStreamingMotionOnGrid() const;
+
     // TODO
     QnWorkbenchContext *context() const { return m_context; }
     void setContext(QnWorkbenchContext *context);
 
+    void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void scheduleTasksChanged();
+    void recordingSettingsChanged();
     void scheduleEnabledChanged();
     void moreLicensesRequested();
     void gridParamsChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void updateGridParams(bool fromUserInput = false);
@@ -61,12 +70,16 @@ private slots:
     void updateLicensesLabelText();
     void updateMotionButtons();
     void updatePanicLabelText();
+    void updateLicensesButtonVisible();
+    void updateRecordSpinboxes();
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
     void at_displayQualiteCheckBox_stateChanged(int state);
     void at_displayFpsCheckBox_stateChanged(int state);
     void at_licensesButton_clicked();
+    void at_releaseSignalizer_activated(QObject *target);
+    void at_exportScheduleButton_clicked();
 
 private:
     int qualityTextToIndex(const QString &text);

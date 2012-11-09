@@ -1,4 +1,5 @@
 #!/bin/bash
+
 export buildlib=${buildLib}
 export QTDIR=`qmake -query QT_INSTALL_PREFIX`
 

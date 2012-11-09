@@ -5,7 +5,7 @@
 #include <QRegion>
 #include <QMap>
 #include "utils/media/sse_helper.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "recorder/device_file_catalog.h"
 #include "motion_archive.h"

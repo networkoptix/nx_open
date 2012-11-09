@@ -3,19 +3,16 @@
 #include "plugins/storage/file_storage/layout_storage_resource.h"
 #include "api/serializer/pb_serializer.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
+#include "common/common_meta_types.h"
 
 QnLayoutResource::QnLayoutResource(): 
     base_type(),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0, -1.0)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnLayoutItemData>();
-        metaTypesInitialized = true;
-    }
-    
+    QnCommonMetaTypes::initilize();
+
     setStatus(Online, true);
     addFlags(QnResource::layout);
 }
@@ -47,6 +44,28 @@ QnLayoutItemDataMap QnLayoutResource::getItems() const {
     QMutexLocker locker(&m_mutex);
 
     return m_itemByUuid;
+}
+
+static QString removeProtocolPrefix(const QString& url)
+{
+    int prefix = url.indexOf(QLatin1String("://"));
+    return prefix == -1 ? url : url.mid(prefix + 3);
+}
+
+void QnLayoutResource::setUrl(const QString& value)
+{
+    QString oldValue = removeProtocolPrefix(getUrl());
+    QnResource::setUrl(value);
+    QString newValue = removeProtocolPrefix(getUrl());
+    if (!oldValue.isEmpty() && oldValue != newValue)
+    {
+        // Local layout renamed
+        for(QnLayoutItemDataMap::iterator itr = m_itemByUuid.begin(); itr != m_itemByUuid.end(); ++itr) 
+        {
+            QnLayoutItemData& item = itr.value();
+            item.resource.path = updateNovParent(value, item.resource.path);
+        }
+    }
 }
 
 QnLayoutItemData QnLayoutResource::getItem(const QUuid &itemUuid) const {
@@ -177,58 +196,24 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     m_mutex.unlock();
 }
 
-QnLayoutResourcePtr QnLayoutResource::fromFile(const QString& xfile)
+QnTimePeriod QnLayoutResource::getLocalRange() const
 {
-    QnLayoutResourcePtr layout;
-    QnLayoutFileStorageResource layoutStorage;
-    layoutStorage.setUrl(xfile);
-    QIODevice* layoutFile = layoutStorage.open(QLatin1String("layout.pb"), QIODevice::ReadOnly);
-    if (layoutFile == 0)
-        return layout;
-    QByteArray layoutData = layoutFile->readAll();
-
-    QnApiPbSerializer serializer;
-    try {
-        serializer.deserializeLayout(layout, layoutData);
-        if (layout == 0)
-            return layout;
-    } catch(...) {
-        return layout;
-    }
-    layout->setGuid(QUuid::createUuid());
-    layout->setParentId(0);
-    layout->setId(QnId::generateSpecialId());
-    layout->setName(QFileInfo(xfile).fileName() + QLatin1String(" - ") + layout->getName());
-
-    layout->addFlags(QnResource::url);
-    layout->setUrl(xfile);
-
-    QnLayoutItemDataMap items = layout->getItems();
-    QnLayoutItemDataMap updatedItems;
-
-    // todo: here is bad place to add resources to pool. need rafactor
-    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-    {
-        QnLayoutItemData& item = itr.value();
-        item.uuid = QUuid::createUuid();
-        item.resource.id = QnId::generateSpecialId();
-        item.resource.path = QLatin1String("layout://") + xfile + QLatin1Char('?') + item.resource.path + QLatin1String(".mkv");
-        updatedItems.insert(item.uuid, item);
-
-        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
-        storage->setUrl(QLatin1String("layout://") + xfile);
-
-        QnAviResourcePtr aviResource(new QnAviResource(item.resource.path));
-        aviResource->setStorage(storage);
-        aviResource->setId(item.resource.id);
-        aviResource->removeFlags(QnResource::local); // do not display in tree root and disable 'open in container folder' menu item
-        qnResPool->addResource(aviResource);
-    }
-    layout->setItems(updatedItems);
-    layout->addFlags(QnResource::local_media);
-    return layout;
+    return m_localRange;
 }
 
+void QnLayoutResource::setLocalRange(const QnTimePeriod& value)
+{
+    m_localRange = value;
+}
+
+QString QnLayoutResource::updateNovParent(const QString& novName, const QString& itemName)
+{
+    QString normItemName = itemName.mid(itemName.lastIndexOf(L'?')+1);
+    QString normNovName = novName;
+    if (!normNovName.startsWith(QLatin1String("layout://")))
+        normNovName = QLatin1String("layout://") + normNovName;
+    return normNovName + QLatin1String("?") + normItemName;
+}
 
 void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole) {
     QMutexLocker locker(&m_mutex);

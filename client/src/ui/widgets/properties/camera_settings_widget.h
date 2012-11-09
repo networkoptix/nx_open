@@ -2,7 +2,7 @@
 #define QN_CAMERA_SETTINGS_WIDGET_H
 
 #include <QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "camera_settings_tab.h"
@@ -41,8 +41,11 @@ public:
     bool hasCameraChanges() const;
     bool hasAnyCameraChanges() const;
 
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const;
+
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const;
-    QnVideoServerConnectionPtr getServerConnection() const;
+    QnMediaServerConnectionPtr getServerConnection() const;
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly) const;
@@ -54,11 +57,14 @@ public:
 
     /** Check if motion region is valid */
     bool isValidMotionRegion();
+
+    void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
     void modeChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected slots:
     void at_moreLicensesRequested();

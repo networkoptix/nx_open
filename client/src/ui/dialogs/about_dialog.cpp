@@ -14,8 +14,21 @@
 
 #include <ui/graphics/opengl/gl_functions.h>
 
+#include "api/app_server_connection.h"
+#include "core/resource/resource_type.h"
+#include "core/resource_managment/resource_pool.h"
+
 #include "openal/qtvaudiodevice.h"
 #include "version.h"
+
+namespace {
+    QString versionString(const char *version) {
+        QString result = QString::fromLatin1(version);
+        result.replace(QLatin1String("-SNAPSHOT"), QString());
+        return result;
+    }
+
+} // anonymous namespace
 
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
     QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint),
@@ -50,47 +63,96 @@ void QnAboutDialog::retranslateUi()
 
     m_copyButton->setText(tr("Copy to Clipboard"));
 
-    setWindowTitle(tr("About %1").arg(QString::fromLatin1(APPLICATION_NAME)));
+    setWindowTitle(tr("About %1").arg(QString::fromLatin1(QN_APPLICATION_NAME)));
 
     QString version = 
-        tr("<b>%1</b> Version: %2 (%3)").
-        arg(QString::fromLatin1(APPLICATION_NAME)).
-        arg(QString::fromLatin1(APPLICATION_VERSION)).
-        arg(QString::fromLatin1(APPLICATION_REVISION));
+        tr(
+            "<b>%1</b> version %2 (%3).<br/>\n"
+            "Engine version %4.<br/>\n"
+            "Built for %5-%6 with %7.<br/>\n"
+        ).
+        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_ENGINE_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
+        arg(QLatin1String(QN_APPLICATION_ARCH)).
+        arg(QLatin1String(QN_APPLICATION_COMPILER));
+
+    QString ecsVersion = QnAppServerConnectionFactory::currentVersion();
+    QUrl ecsUrl = QnAppServerConnectionFactory::defaultUrl();
+    QString servers;
+
+    if (ecsVersion.isEmpty()) {
+        servers =         tr(
+            "<b>Enterprise controller</b>: not connected."
+            );
+    } else {
+        servers =         tr(
+            "<b>Enterprise controller: %1</b> version: %2.<br>\n"
+            ).
+            arg(ecsUrl.host() + QLatin1String(":") + QString::number(ecsUrl.port())).
+            arg(ecsVersion);
+    }
+
+    QnId serverTypeId = qnResTypePool->getResourceTypeByName(QLatin1String("Server"))->getId();
+    QnResourceList serverResources = qnResPool->getResourcesWithTypeId(serverTypeId);
+
+    QStringList serverVersions;
+    foreach (QnResourcePtr resource, serverResources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+
+        if (server->getStatus() != QnResource::Online)
+            continue;
+
+        QUrl serverUrl(server->getUrl());
+        QString serverString = QString(QLatin1String("%1 (%2)")).
+            arg(server->getName()).
+            arg(serverUrl.host());
+        serverVersions.append(tr("<b>Media Server: %1</b> version: %2.").arg(serverString).arg(server->getVersion()));
+    }
+    
+    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty()) {
+        servers += serverVersions.join(QLatin1String("<br>"));
+    }
 
     QString credits = 
         tr(
-            "<b>%1 %2</b> uses the following external libraries:<br />\n"
+            "<b>%1 %2</b> uses the following external libraries:<br/>\n"
             "<br />\n"
-            "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br />\n"
-            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 the FFmpeg developers.<br />\n"
-            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br />"
-            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 the LAME developers.<br />"
-            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6<br />"
+            "<b>Qt v.%3</b> - Copyright (c) 2012 Nokia Corporation.<br/>\n"
+            "<b>FFMpeg %4</b> - Copyright (c) 2000-2012 FFmpeg developers.<br/>\n"
+            "<b>Color Picker v2.6 Qt Solution</b> - Copyright (c) 2009 Nokia Corporation.<br/>\n"
+            "<b>LAME 3.99.0</b> - Copyright (c) 1998-2012 LAME developers.<br/>\n"
+            "<b>OpenAL %5</b> - Copyright (c) 2000-2006 %6.<br/>\n"
+            "<b>SIGAR %7</b> - Copyright (c) 2004-2011 VMware Inc.<br/>\n"
+            "<b>Boost %8</b> - Copyright (c) 2000-2012 Boost developers.<br/>\n"
         ).
-        arg(QString::fromLatin1(ORGANIZATION_NAME) + QLatin1String("(tm)")).
-        arg(QString::fromLatin1(APPLICATION_NAME)).
+        arg(QString::fromLatin1(QN_ORGANIZATION_NAME) + QLatin1String("(tm)")).
+        arg(QString::fromLatin1(QN_APPLICATION_NAME)).
         arg(QString::fromLatin1(QT_VERSION_STR)).
-        arg(QString::fromLatin1(FFMPEG_VERSION)).
+        arg(versionString(QN_FFMPEG_VERSION)).
         arg(QtvAudioDevice::instance()->versionString()).
-        arg(QtvAudioDevice::instance()->company());
+        arg(QtvAudioDevice::instance()->company()).
+        arg(versionString(QN_SIGAR_VERSION)).
+        arg(versionString(QN_BOOST_VERSION));
 
 #ifndef Q_OS_DARWIN
-    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br />");
+    credits += tr("<b>Bespin style</b> - Copyright (c) 2007-2010 Thomas Luebking.<br/>");
 #endif
 
     int maxTextureSize = 0;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize); // TODO: using opengl calls here is BAD. use estimate?
 
     QString gpu = 
         tr(
-            "<b>OpenGL version</b>: %1.<br />"
+            "<b>OpenGL version</b>: %1.<br/>"
             "<b>OpenGL renderer</b>: %2.<br/>"
-            "<b>OpenGL vendor</b>: %3.<br />"
-            "<b>OpenGL max texture size</b>: %4.<br />"
+            "<b>OpenGL vendor</b>: %3.<br/>"
+            "<b>OpenGL max texture size</b>: %4.<br/>"
         ).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
-        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))).
+        arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: same shit, OpenGL calls.
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VENDOR)))).
         arg(maxTextureSize);
 
@@ -98,6 +160,7 @@ void QnAboutDialog::retranslateUi()
     ui->versionLabel->setText(version);
     ui->creditsLabel->setText(credits);
     ui->gpuLabel->setText(gpu);
+    ui->serversLabel->setText(servers);
 }
 
 // -------------------------------------------------------------------------- //

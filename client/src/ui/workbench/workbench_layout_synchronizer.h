@@ -1,10 +1,13 @@
 #ifndef QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 #define QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H
 
-#include <QObject>
-#include <QSet>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+#include <QtCore/QMetaType>
+
 #include <core/resource/resource_fwd.h>
-#include <ui/workbench/workbench_globals.h>
+
+#include <client/client_globals.h>
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -121,5 +124,7 @@ private:
      * item are synchronized there-and-back many times until finally converging. */
     QSet<QUuid> m_pendingItems;
 };
+
+Q_DECLARE_METATYPE(QnWorkbenchLayoutSynchronizer *);
 
 #endif // QN_WORKBENCH_LAYOUT_SYNCHRONIZER_H

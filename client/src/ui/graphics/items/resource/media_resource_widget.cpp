@@ -1,11 +1,14 @@
 #include "media_resource_widget.h"
 
+#include <QtCore/QTimer>
 #include <QtGui/QPainter>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/synctime.h>
+#include <utils/settings.h>
 
 #include <core/resource/media_resource.h>
 #include <core/resource/user_resource.h>
@@ -17,20 +20,24 @@
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/help/help_topics.h>
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
+
 // TODO: remove
-#include <core/resource/video_server_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource_managment/resource_pool.h>
 #include "plugins/resources/camera_settings/camera_settings.h"
 
-#include "version.h" // TODO: remove
+#define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
 namespace {
     template<class T>
@@ -54,6 +61,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if(!m_resource) 
         qnCritical("Media resource widget was created with a non-media resource.");
     m_camera = m_resource.dynamicCast<QnVirtualCameraResource>();
+    updateServerResource();
 
     /* Set up video rendering. */
     m_display = new QnResourceDisplay(m_resource, this);
@@ -110,8 +118,22 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     buttonBar()->addButton(PtzButton, ptzButton);
     buttonBar()->addButton(ZoomInButton, zoomInButton);
     buttonBar()->addButton(ZoomOutButton, zoomOutButton);
+    
+    if(m_camera) {
+        QTimer *timer = new QTimer(this);
+        
+        connect(timer, SIGNAL(timeout()), this, SLOT(updateIconButton()));
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(scheduleTasksChanged()), this, SLOT(updateIconButton()));
+        connect(m_camera.data(), SIGNAL(parentIdChanged()), this, SLOT(updateServerResource()));
+
+        timer->start(1000 * 60); /* Update icon button every minute. */
+    }
+
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
+    updateIconButton();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -188,8 +210,10 @@ void QnMediaResourceWidget::addToMotionSelection(const QRect &gridRect) {
         }
     }
 
-    if(changed)
+    if(changed){
+        invalidateMotionSelectionCache();
         emit motionSelectionChanged();
+    }
 }
 
 void QnMediaResourceWidget::clearMotionSelection() {
@@ -199,6 +223,7 @@ void QnMediaResourceWidget::clearMotionSelection() {
     for (int i = 0; i < m_motionSelection.size(); ++i)
         m_motionSelection[i] = QRegion();
 
+    invalidateMotionSelectionCache();
     emit motionSelectionChanged();
 }
 
@@ -217,6 +242,9 @@ void QnMediaResourceWidget::ensureMotionSensitivity() const {
             qnWarning("Camera '%1' returned a motion sensitivity list of invalid size.", m_camera->getName());
             resizeList(m_motionSensitivity, channelCount());
         }
+    } else if(m_resource->flags() & QnResource::motion) {
+        for(int i = 0, count = channelCount(); i < count; i++)
+            m_motionSensitivity.push_back(QnMotionRegion());
     } else {
         m_motionSensitivity.clear();
     }
@@ -229,7 +257,7 @@ bool QnMediaResourceWidget::addToMotionSensitivity(const QRect &gridRect, int se
 
     bool changed = false;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(0, 0, MD_WIDTH, MD_HEIGHT);
@@ -255,7 +283,7 @@ bool QnMediaResourceWidget::setMotionSensitivityFilled(const QPoint &gridPos, in
     int channel =0;
     QPoint channelPos = gridPos;
     if (m_camera) {
-        const QnVideoResourceLayout* layout = m_camera->getVideoLayout();
+        const QnResourceVideoLayout* layout = m_camera->getVideoLayout();
 
         for (int i = 0; i < layout->numberOfChannels(); ++i) {
             QRect r(layout->h_position(i) * MD_WIDTH, layout->v_position(i) * MD_HEIGHT, MD_WIDTH, MD_HEIGHT);
@@ -296,6 +324,20 @@ void QnMediaResourceWidget::invalidateBinaryMotionMask() {
     m_binaryMotionMaskValid = false;
 }
 
+void QnMediaResourceWidget::ensureMotionSelectionCache() {
+    if (m_motionSelectionCacheValid)
+        return;
+
+    for (int i = 0; i < channelCount(); ++i){
+        QPainterPath path;
+        path.addRegion(m_motionSelection[i]);
+        m_motionSelectionPathCache[i] = path.simplified();
+    }
+}
+
+void QnMediaResourceWidget::invalidateMotionSelectionCache(){
+    m_motionSelectionCacheValid = false;
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -310,10 +352,17 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &rect) {
     painter->beginNativePainting();
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    qreal opacity = effectiveOpacity();
+    bool opaque = qFuzzyCompare(opacity, 1.0);
+    if(!opaque) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
     Qn::RenderStatus result = m_renderer->paint(channel, rect, effectiveOpacity());
-    glDisable(GL_BLEND);
+    
+    /* There is no need to restore blending state before invoking endNativePainting. */
     painter->endNativePainting();
 
     if(result != Qn::NewFrameRendered && result != Qn::OldFrameRendered)
@@ -324,25 +373,29 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
 
 void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channel, const QRectF &rect) {
     if (options() & DisplayMotion) {
+        ensureMotionSelectionCache();
+
         paintMotionGrid(painter, channel, rect, m_renderer->lastFrameMetadata(channel));
         paintMotionSensitivity(painter, channel, rect);
 
         /* Motion selection. */
         if(!m_motionSelection[channel].isEmpty()) {
             QColor color = toTransparent(qnGlobals->mrsColor(), 0.2);
-            paintFilledRegion(painter, rect, m_motionSelection[channel], color, color);
+            paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
 }
 
+// 5-7 fps
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion) {
     ensureMotionSensitivity();
 
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
 
-    QVector<QPointF> gridLines;
+    QVector<QPointF> gridLines[2];
 
+/* // saved for comparison
     for (int x = 0; x < MD_WIDTH; ++x) {
         if (m_motionSensitivity[channel].isEmpty()) {
             gridLines << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
@@ -350,7 +403,7 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
             QRegion lineRect(x, 0, 1, MD_HEIGHT + 1);
             QRegion drawRegion = lineRect - m_motionSensitivity[channel].getMotionMask().intersect(lineRect);
             foreach(const QRect& r, drawRegion.rects())
-                gridLines << QPointF(x * xStep, r.top() * yStep) << QPointF(x * xStep, qMin(rect.height(), (r.top() + r.height()) * yStep));
+            gridLines << QPointF(x * xStep, r.top() * yStep) << QPointF(x * xStep, qMin(rect.height(), (r.top() + r.height()) * yStep));
         }
     }
 
@@ -364,36 +417,77 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
                 gridLines << QPointF(r.left() * xStep, y * yStep) << QPointF(qMin(rect.width(), (r.left() + r.width()) * xStep), y * yStep);
         }
     }
+*/
+
+    if (motion && motion->channelNumber == (quint32)channel) {
+        ensureBinaryMotionMask();
+        motion->removeMotion(m_binaryMotionMask[channel]);
+        // 2-3 fps
+        { //horizontal lines
+
+            for (int y = 1; y < MD_HEIGHT; ++y) {
+                bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
+                gridLines[isMotion] << QPointF(0, y * yStep);
+                int x = 1;
+                while(x < MD_WIDTH){
+                    while (x < MD_WIDTH && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)) )
+                       x++;
+                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                    if (x < MD_WIDTH){
+                        isMotion = !isMotion;
+                        gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                    }
+                }
+            }
+
+        }
+
+        { //vertical lines
+
+            for (int x = 1; x < MD_WIDTH; ++x) {
+                bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
+                gridLines[isMotion] << QPointF(x * xStep, 0);
+                int y = 1;
+                while(y < MD_HEIGHT){
+                    while (y < MD_HEIGHT && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)) )
+                       y++;
+                    gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                    if (y < MD_HEIGHT){
+                        isMotion = !isMotion;
+                        gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                    }
+                }
+            }
+
+        }
+    } else {
+        for (int x = 1; x < MD_WIDTH; ++x) {
+            gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
+        }
+
+        for (int y = 1; y < MD_HEIGHT; ++y) {
+            gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
+        }
+    }
+
 
     QnScopedPainterTransformRollback transformRollback(painter);
     painter->translate(rect.topLeft());
 
     QnScopedPainterPenRollback penRollback(painter);
     painter->setPen(QPen(QColor(255, 255, 255, 16)));
-    painter->drawLines(gridLines);
+    painter->drawLines(gridLines[0]);
 
-    if (motion && motion->channelNumber == (quint32)channel) {
-        ensureBinaryMotionMask();
-
-        QPainterPath motionPath;
-        motion->removeMotion(m_binaryMotionMask[channel]);
-        for (int y = 0; y < MD_HEIGHT; ++y)
-            for (int x = 0; x < MD_WIDTH; ++x)
-                if(motion->isMotionAt(x, y))
-                    motionPath.addRect(QRectF(QPointF(x * xStep, y * yStep), QPointF((x + 1) * xStep, (y + 1) * yStep)));
-
-        painter->setPen(QPen(QColor(255, 0, 0, 128)));
-        painter->drawPath(motionPath);
-    }
+    painter->setPen(QPen(QColor(255, 0, 0, 128)));
+    painter->drawLines(gridLines[1]);
 }
 
-void QnMediaResourceWidget::paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor) {
-    QPainterPath path;
-    path.addRegion(selection);
-    path = path.simplified(); // TODO: this is slow.
+// 4-6 fps
+void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
+    QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
 
-    QnScopedPainterTransformRollback transformRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter, color);
+    QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
+
     painter->translate(rect.topLeft());
     painter->scale(rect.width() / MD_WIDTH, rect.height() / MD_HEIGHT);
     painter->setPen(QPen(penColor));
@@ -425,17 +519,15 @@ void QnMediaResourceWidget::paintMotionSensitivity(QPainter *painter, int channe
     ensureMotionSensitivity();
 
     if (options() & DisplayMotionSensitivity) {
-        for (int i = 0; i < 10; ++i) {
+        for (int i = QnMotionRegion::MIN_SENSITIVITY; i <= QnMotionRegion::MAX_SENSITIVITY; ++i) {
             QColor color = i > 0 ? QColor(100 +  i * 3, 16 * (10 - i), 0, 96 + i * 2) : qnGlobals->motionMaskColor();
-            QRegion region = m_motionSensitivity[channel].getRegionBySens(i);
-            if (i > 0)
-                region -= m_motionSensitivity[channel].getRegionBySens(0);
-            paintFilledRegion(painter, rect, region, color, Qt::black);
+            QPainterPath path = m_motionSensitivity[channel].getRegionBySensPath(i);
+            paintFilledRegionPath(painter, rect, path, color, Qt::black);
         }
 
         paintMotionSensitivityIndicators(painter, channel, rect, m_motionSensitivity[channel]);
     } else {
-        paintFilledRegion(painter, rect, m_motionSensitivity[channel].getMotionMask(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
+        paintFilledRegionPath(painter, rect, m_motionSensitivity[channel].getMotionMaskPath(), qnGlobals->motionMaskColor(), qnGlobals->motionMaskColor());
     }
 }
 
@@ -443,11 +535,9 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
     if(!m_camera)
         return;
 
-    if(!m_connection) {
-        QnVideoServerResourcePtr server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnVideoServerResource>();
-        if(server)
-            m_connection = server->apiConnection();
-    }
+    // TODO: server may change!
+    if(!m_connection && m_server)
+        m_connection = m_server->apiConnection();
     if(!m_connection)
         return;
 
@@ -487,6 +577,70 @@ void QnMediaResourceWidget::sendZoomAsync(qreal zoomSpeed) {
     }
 }
 
+void QnMediaResourceWidget::updateIconButton() {
+    if(!m_camera) {
+        iconButton()->setVisible(false);
+        return;
+    }
+
+    int recordingMode = QnScheduleTask::RecordingType_Never;
+    if(m_camera->getStatus() == QnResource::Recording)
+        recordingMode = currentRecordingMode();
+    
+    iconButton()->setVisible(true);
+    switch(recordingMode) {
+    case QnScheduleTask::RecordingType_Never:
+        iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
+        iconButton()->setToolTip(tr("Not recording."));
+        break;
+    case QnScheduleTask::RecordingType_Run:
+        iconButton()->setIcon(qnSkin->icon("item/recording.png"));
+        iconButton()->setToolTip(tr("Recording everything."));
+        break;
+    case QnScheduleTask::RecordingType_MotionOnly:
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
+        iconButton()->setToolTip(tr("Recording motion only."));
+        break;
+    case QnScheduleTask::RecordingType_MotionPlusLQ:
+        iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
+        iconButton()->setToolTip(tr("Recording motion and low quality."));
+        break;
+    default:
+        iconButton()->setVisible(false);
+        break;
+    }
+}
+
+void QnMediaResourceWidget::updateServerResource() {
+    QnMediaServerResourcePtr server;
+    if(m_camera)
+        server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    if(m_server == server)
+        return;
+
+    m_server = server;
+
+    updateIconButton();
+}
+
+int QnMediaResourceWidget::currentRecordingMode() {
+    if(!m_camera)
+        return QnScheduleTask::RecordingType_Never;
+
+    // TODO: this should be a resource parameter that is update from the server.
+
+    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
+    int dayOfWeek = dateTime.date().dayOfWeek();
+    int seconds = QTime().secsTo(dateTime.time());
+
+    foreach(const QnScheduleTask &task, m_camera->getScheduleTasks())
+        if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
+            return task.getRecordingType();
+
+    return QnScheduleTask::RecordingType_Never;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -499,10 +653,20 @@ Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRect
     }
 }
 
+int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
+    Q_UNUSED(pos)
+    if(options() & DisplayMotion) {
+        return Qn::MainWindow_MediaItem_SmartSearch_Help;
+    } else {
+        return Qn::MainWindow_MediaItem_Help;
+    }
+}
+
 void QnMediaResourceWidget::channelLayoutChangedNotify() {
     base_type::channelLayoutChangedNotify();
 
     resizeList(m_motionSelection, channelCount());
+    resizeList(m_motionSelectionPathCache, channelCount());
     resizeList(m_motionSensitivity, channelCount());
 
     while(m_binaryMotionMask.size() > channelCount()) {
@@ -534,6 +698,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
             setProperty(Qn::MotionSelectionModifiers, QVariant()); /* Use defaults. */
         }
     }
+    base_type::optionsChangedNotify(changedFlags);
 }
 
 QString QnMediaResourceWidget::calculateInfoText() const {
@@ -556,29 +721,40 @@ QString QnMediaResourceWidget::calculateInfoText() const {
             codecString = tr(" (%1)").arg(codecString);
     }
 
+    QString hqLqString;
+#ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
+    hqLqString = (m_renderer->isLowQualityImage(0)) ? tr(" Lo-Res") : tr(" Hi-Res");
+#endif
+
     QString timeString;
-    if (m_resource->flags() & QnResource::utc) /* Do not show time for regular media files. */
-        timeString = tr("\t%1").arg(QDateTime::fromMSecsSinceEpoch(m_renderer->lastDisplayedTime(0) / 1000).toString(tr("hh:mm:ss.zzz")));
+    if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
+        qint64 utcTime = m_renderer->lastDisplayedTime(0) / 1000;
+        if(qnSettings->timeMode() == Qn::ServerTimeMode)
+            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0);
+
+        timeString = tr("\t%1").arg(
+            m_display->camDisplay()->isRealTimeSource() ? 
+            tr("LIVE") :
+            QDateTime::fromMSecsSinceEpoch(utcTime).toString(tr("hh:mm:ss.zzz"))
+        );
+    }
     
-    return tr("%1x%2 %3fps @ %4Mbps%5%6").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(timeString);
+    return tr("%1x%2 %3fps @ %4Mbps%5%6%7").arg(size.width()).arg(size.height()).arg(fps, 0, 'f', 2).arg(mbps, 0, 'f', 2).arg(codecString).arg(hqLqString).arg(timeString);
 }
 
 QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() const {
-    struct {int major, minor, bugfix;} ver = {VER_PRODUCTVERSION};
-    int version = ver.major * 10000 + ver.minor * 100 + ver.bugfix;
-
     Buttons result = base_type::calculateButtonsVisibility() & ~InfoButton;
 
     if(!(resource()->flags() & QnResource::still_image))
         result |= InfoButton;
 
-    if(m_camera) {
+    if (resource()->flags() & QnResource::motion)
         result |= MotionSearchButton | InfoButton;
 
+    if(m_camera) {
         if(
-            /*version >= 103010 && */
             (m_camera->getCameraCapabilities() & (QnVirtualCameraResource::HasPtz | QnVirtualCameraResource::HasZoom)) && 
-            accessController()->hasPermissions(m_resource, Qn::WritePermission) 
+            accessController()->hasPermissions(m_resource, Qn::WritePtzPermission) 
         ) {
             result |= PtzButton;
 
@@ -593,7 +769,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int channel) const {
     if (m_display->camDisplay()->isStillImage()) {
         return EmptyOverlay;
-    } else if(m_display->isPaused() && (options() & DisplayActivityOverlay)) {
+    } else if (m_display->isPaused() && (options() & DisplayActivityOverlay)) {
         return PausedOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Offline) {
         return OfflineOverlay;
@@ -601,13 +777,8 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return UnauthorizedOverlay;
     } else if (m_display->camDisplay()->isNoData()) {
         return NoDataOverlay;
-    } if(m_display->isPaused()) {
-        Qn::RenderStatus status = channelRenderStatus(channel);
-        if(status == Qn::NothingRendered || status == Qn::CannotRender) {
-            return NoDataOverlay;
-        } else {
-            return EmptyOverlay;
-        }
+    } else if (m_display->isPaused()) {
+        return EmptyOverlay;
     } else {
         return base_type::calculateChannelOverlay(channel, QnResource::Online);
     }

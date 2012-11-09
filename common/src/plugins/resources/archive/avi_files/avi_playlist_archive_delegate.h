@@ -19,7 +19,7 @@ public:
     virtual void close();
     virtual qint64 seek(qint64 time);
     virtual qint64 endTime();
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
 
     static QString addDirPath(const QString sourceDir, const QString& postfix);
 protected:
@@ -60,7 +60,7 @@ private:
 private:
     QFile m_currentFile;
     qint64 m_totalContentLength;
-    QnDefaultDeviceVideoLayout m_defaultVideoLayout;
+    QnDefaultResourceVideoLayout m_defaultVideoLayout;
 };
 
 #endif // QN_AVI_PLAYLIST_ARCHIVE_DELEGATE_H

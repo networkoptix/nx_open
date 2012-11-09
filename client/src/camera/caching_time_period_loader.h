@@ -10,19 +10,19 @@
 
 
 class QnTimePeriodLoader;
-class QnMultiCameraTimePeriodLoader;
+class QnAbstractTimePeriodLoader;
 
 class QnCachingTimePeriodLoader: public QObject {
     Q_OBJECT;
     Q_PROPERTY(qreal loadingMargin READ loadingMargin WRITE setLoadingMargin);
 
 public:
-    QnCachingTimePeriodLoader(const QnNetworkResourcePtr &networkResource, QObject *parent = NULL);
+    QnCachingTimePeriodLoader(const QnResourcePtr &networkResource, QObject *parent = NULL);
     virtual ~QnCachingTimePeriodLoader();
 
     static QnCachingTimePeriodLoader *newInstance(const QnResourcePtr &resource, QObject *parent = NULL);
 
-    QnNetworkResourcePtr resource();
+    QnResourcePtr resource();
 
     qreal loadingMargin() const;
     void setLoadingMargin(qreal loadingMargin);
@@ -31,7 +31,7 @@ public:
     void setUpdateInterval(qint64 msecs);
 
     const QnTimePeriod &loadedPeriod() const;
-    void setTargetPeriod(const QnTimePeriod &targetPeriod);
+    void setTargetPeriods(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod);
     
     const QList<QRegion> &motionRegions() const;
     void setMotionRegions(const QList<QRegion> &motionRegions);
@@ -46,24 +46,26 @@ signals:
 private slots:
     void at_loader_ready(const QnTimePeriodList &timePeriods, int handle);
     void at_loader_failed(int status, int handle);
+    void at_syncTime_timeChanged();
 
 protected:
     void load(Qn::TimePeriodRole type);
     void trim(Qn::TimePeriodRole type, qint64 trimTime);
 
-    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod) const;
+    QnTimePeriod addLoadingMargins(const QnTimePeriod &targetPeriod, const QnTimePeriod &boundingPeriod) const;
 
 private:
-    QnCachingTimePeriodLoader(QnMultiCameraTimePeriodLoader **loaders, QObject *parent);
+    QnCachingTimePeriodLoader(QnAbstractTimePeriodLoader **loaders, QObject *parent);
 
     void init();
-    void initLoaders(QnMultiCameraTimePeriodLoader **loaders);
-    static bool createLoaders(const QnResourcePtr &resource, QnMultiCameraTimePeriodLoader **loaders);
+    void initLoaders(QnAbstractTimePeriodLoader **loaders);
+    static bool createLoaders(const QnResourcePtr &resource, QnAbstractTimePeriodLoader **loaders);
 
 private:
-    QnNetworkResourcePtr m_resource;
+    QnResourcePtr m_resource;
+    bool m_resourceIsLocal;
     QnTimePeriod m_loadedPeriod;
-    QnMultiCameraTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
+    QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
     int m_handles[Qn::TimePeriodRoleCount];
     QList<QRegion> m_motionRegions;
     QnTimePeriodList m_periods[Qn::TimePeriodRoleCount];

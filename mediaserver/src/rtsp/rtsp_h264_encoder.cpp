@@ -1,6 +1,7 @@
 #include "utils/network/socket.h"
 #include "rtsp_h264_encoder.h"
 #include "utils/media/nalUnits.h"
+#include "utils/network/rtp_stream_parser.h"
 
 QnRtspH264Encoder::QnRtspH264Encoder():
     m_currentData(0),
@@ -87,6 +88,8 @@ bool QnRtspH264Encoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_currentData == dataEnd)
         return false;
 
+    sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
+
     if (!m_isFragmented)
     {
         sendBuffer.write((const char*) m_currentData, m_nalEnd - m_currentData);
@@ -138,10 +141,7 @@ quint32 QnRtspH264Encoder::getSSRC()
 
 bool QnRtspH264Encoder::isLastPacket()
 {
-    if (m_isFragmented)
-        return m_nalEnd - m_currentData + 2 <= RTSP_H264_MAX_LEN;
-    else
-        return true;
+    return m_isFragmented || m_currentData == m_nalEnd;
 }
 
 bool QnRtspH264Encoder::getRtpMarker()

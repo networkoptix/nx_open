@@ -22,8 +22,8 @@ QImage QnMediaResource::getImage(int /*channel*/, QDateTime /*time*/, QnStreamQu
     return QImage();
 }
 
-static QnDefaultDeviceVideoLayout defaultVideoLayout;
-const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
+static QnDefaultResourceVideoLayout defaultVideoLayout;
+const QnResourceVideoLayout* QnMediaResource::getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
 {
     QVariant val;
     getParam(QLatin1String("VideoLayout"), val, QnDomainMemory);
@@ -38,12 +38,12 @@ const QnVideoResourceLayout* QnMediaResource::getVideoLayout(const QnAbstractMed
     }
     else {
         if (m_customVideoLayout == 0)
-            m_customVideoLayout = QnCustomDeviceVideoLayout::fromString(strVal);
+            m_customVideoLayout = QnCustomResourceVideoLayout::fromString(strVal);
         return m_customVideoLayout;
     }
 }
 
-static QnEmptyAudioLayout audioLayout;
+static QnEmptyResourceAudioLayout audioLayout;
 const QnResourceAudioLayout* QnMediaResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* /*dataProvider*/)
 {
     return &audioLayout;

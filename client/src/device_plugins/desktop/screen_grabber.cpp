@@ -7,7 +7,7 @@
 #include "utils/common/log.h"
 #include <emmintrin.h>
 #include "utils/media/sse_helper.h"
-#include "utils/yuvconvert.h"
+#include "utils/color_space/yuvconvert.h"
 
 extern "C" {
 #include <libavformat/avformat.h>

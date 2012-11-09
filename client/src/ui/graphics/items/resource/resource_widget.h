@@ -13,6 +13,7 @@
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
 #include <ui/common/frame_section_queryable.h>
+#include <ui/common/help_topic_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/graphics/instruments/instrumented.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
@@ -21,7 +22,7 @@
 class QGraphicsLinearLayout;
 
 class QnViewportBoundWidget;
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnWorkbenchItem;
 
 class QnLoadingProgressPainter;
@@ -31,14 +32,15 @@ class QnImageButtonBar;
 
 class GraphicsLabel;
 
-class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry {
-    Q_OBJECT;
-    Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity);
-    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth);
-    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement);
-    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry);
-    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio);
-    Q_FLAGS(Options Option);
+class QnResourceWidget: public Shaded<Instrumented<GraphicsWidget> >, public QnWorkbenchContextAware, public ConstrainedResizable, public FrameSectionQuearyable, protected QnGeometry, public HelpTopicQueryable {
+    Q_OBJECT
+    Q_PROPERTY(qreal frameOpacity READ frameOpacity WRITE setFrameOpacity)
+    Q_PROPERTY(qreal frameWidth READ frameWidth WRITE setFrameWidth)
+    Q_PROPERTY(QPointF shadowDisplacement READ shadowDisplacement WRITE setShadowDisplacement)
+    Q_PROPERTY(QRectF enclosingGeometry READ enclosingGeometry WRITE setEnclosingGeometry)
+    Q_PROPERTY(qreal enclosingAspectRatio READ enclosingAspectRatio WRITE setEnclosingAspectRatio)
+    Q_PROPERTY(bool localActive READ isLocalActive WRITE setLocalActive)
+    Q_FLAGS(Options Option)
 
     typedef Shaded<Instrumented<GraphicsWidget> > base_type;
 
@@ -51,15 +53,16 @@ public:
         DisplayMotionSensitivity    = 0x10, /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x20, // TODO
         ControlPtz                  = 0x40, // TODO
+        DisplayInfo                 = 0x80  /** Whether info panel is to be displayed. */
     };
     Q_DECLARE_FLAGS(Options, Option)
 
     enum Button {
         CloseButton                 = 0x1,
         InfoButton                  = 0x2,
-        RotateButton                = 0x4,
+        RotateButton                = 0x4
     };
-    Q_DECLARE_FLAGS(Buttons, Button);
+    Q_DECLARE_FLAGS(Buttons, Button)
 
     /**
      * Constructor.
@@ -87,7 +90,7 @@ public:
         return m_item.data();
     }
 
-    const QnVideoResourceLayout *channelLayout() const {
+    const QnResourceVideoLayout *channelLayout() const {
         return m_channelsLayout;
     }
     
@@ -228,12 +231,23 @@ public:
      * \see setTitleTextFormat(const QString &)
      */
     void setInfoTextFormat(const QString &infoTextFormat);
-    
+
     bool isDecorationsVisible() const;
-    Q_SLOT void setDecorationsVisible(bool visible, bool animate = true);
+    Q_SLOT void setDecorationsVisible(bool visible = true, bool animate = true);
 
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
+
+    Buttons checkedButtons() const;
+    void setCheckedButtons(Buttons checkedButtons);
+
+    Buttons visibleButtons() const;
+
+    // TODO: #gdm implement via visibleButtons() function, then remove this one.
+    bool isInfoButtonVisible() const;
+
+    bool isLocalActive() const;
+    void setLocalActive(bool localActive);
 
     using base_type::mapRectToScene;
 
@@ -256,11 +270,13 @@ protected:
 
     virtual Qt::WindowFrameSection windowFrameSectionAt(const QPointF &pos) const override;
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual bool windowFrameEvent(QEvent *event) override;
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverMoveEvent(QGraphicsSceneHoverEvent *event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    virtual QVariant itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value) override;
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
@@ -276,7 +292,7 @@ protected:
 
     const QSize &channelScreenSize() const;
     void setChannelScreenSize(const QSize &size);
-    virtual void channelScreenSizeChangedNotify() {};
+    virtual void channelScreenSizeChangedNotify() {}
 
     Overlay channelOverlay(int channel) const;
     void setChannelOverlay(int channel, Overlay overlay);
@@ -290,17 +306,28 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
+    /**
+     * Updates overlay widget's rotation.
+     *
+     * \param rotation                  Target rotation angle in degrees.
+     */
+    void updateOverlayRotation(qreal rotation);
+
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
+    }
+
+    QnImageButtonWidget *iconButton() const {
+        return m_iconButton;
     }
 
     virtual Buttons calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
-    void setChannelLayout(const QnVideoResourceLayout *channelLayout);
+    void setChannelLayout(const QnResourceVideoLayout *channelLayout);
     virtual void channelLayoutChangedNotify() {}
     
-    virtual void optionsChangedNotify(Options changedFlags) { Q_UNUSED(changedFlags); }
+    virtual void optionsChangedNotify(Options changedFlags);
 
     int channelCount() const;
     QRectF channelRect(int channel) const;
@@ -311,6 +338,9 @@ protected:
 private:
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
+
+    Q_SLOT void at_iconButton_visibleChanged();
+    Q_SLOT void at_infoButton_toggled(bool toggled);
 
     struct ChannelState {
         ChannelState(): overlay(EmptyOverlay), changeTimeMSec(0), fadeInNeeded(false), lastNewFrameTimeMSec(0), renderStatus(Qn::NothingRendered) {}
@@ -344,11 +374,14 @@ private:
     /** Resource associated with this widget. */
     QnResourcePtr m_resource;
 
-    /* Display flags. */
+    /** Options that control display & behavior. */
     Options m_options;
 
+    /** Whether this item is 'locally active'. This affects the color of item's border. */
+    bool m_localActive;
+
     /** Layout of this widget's channels. */
-    const QnVideoResourceLayout *m_channelsLayout;
+    const QnResourceVideoLayout *m_channelsLayout;
 
     /** Aspect ratio. Negative value means that aspect ratio is not enforced. */
     qreal m_aspectRatio;
@@ -370,10 +403,12 @@ private:
 
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
+    QGraphicsLinearLayout *m_headerLayout;
     GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLeftLabel;
     GraphicsLabel *m_headerRightLabel;
     QnImageButtonBar *m_buttonBar;
+    QnImageButtonWidget *m_iconButton;
 
     QnViewportBoundWidget *m_footerOverlayWidget;
     GraphicsWidget *m_footerWidget;
@@ -390,6 +425,14 @@ private:
     QStaticText m_offlineStaticText;
     QStaticText m_unauthorizedStaticText;
     QStaticText m_unauthorizedStaticText2;
+    QStaticText m_loadingStaticText;
+
+    /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
+    bool m_mouseInWidget;
+
+    // TODO: #gdm move Qn::FixedAngle out in common module and use here.
+    /** Rotation angle in degrees, shall be multiple of 90. Used to rotate static text and images. */
+    int m_desiredRotation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

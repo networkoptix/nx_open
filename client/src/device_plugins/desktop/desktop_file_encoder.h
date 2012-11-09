@@ -6,17 +6,17 @@
 #ifdef Q_OS_WIN
 
 #include <QtCore/QIODevice>
-#include <QtMultimedia/QAudioDeviceInfo>
 #include <QtMultimedia/QAudioInput>
 
 #include <windows.h>
 #include <mmsystem.h>
 
 #include <dsp_effects/speex/speex_preprocess.h>
-#include "core/datapacket/mediadatapacket.h"
-#include "utils/common/longrunnable.h"
+#include "core/datapacket/media_data_packet.h"
+#include "utils/common/long_runnable.h"
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"
+#include "ui/screen_recording/qnaudio_device_info.h"
 
 class CaptureAudioStream;
 
@@ -29,8 +29,8 @@ private:
 public:
     QnDesktopFileEncoder( const QString& fileName,
                         int desktopNum,           // = 0,
-                        const QAudioDeviceInfo* audioDevice,
-                        const QAudioDeviceInfo* audioDevice2,
+                        const QnAudioDeviceInfo* audioDevice,
+                        const QnAudioDeviceInfo* audioDevice2,
                         QnScreenGrabber::CaptureMode mode,
                         bool captureCursor,
                         const QSize& captureResolution,
@@ -71,7 +71,8 @@ private:
         EncodedAudioInfo(QnDesktopFileEncoder* owner);
         ~EncodedAudioInfo();
         // doubled audio objects
-        QAudioDeviceInfo m_audioDevice;
+        QnAudioDeviceInfo m_audioDevice;
+        //QString m_audioDeviceName;
         QnAudioFormat m_audioFormat;
         CLThreadQueue<QnAbstractMediaDataPtr>  m_audioQueue;
         QnAbstractMediaData m_tmpAudioBuffer;

@@ -6,14 +6,14 @@
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include "core/resource/media_resource.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "rtsp_encoder.h"
 
 class QnAbstractStreamDataProvider;
 
 struct RtspServerTrackInfo
 {
-    RtspServerTrackInfo(): clientPort(0), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
+    RtspServerTrackInfo(): clientPort(-1), clientRtcpPort(0), sequence(0), firstRtpTime(-1), mediaSocket(0), rtcpSocket(0) 
     {
 
     }
@@ -38,12 +38,11 @@ struct RtspServerTrackInfo
 
     int clientPort;
     int clientRtcpPort;
+    quint16 sequence;
+    qint64 firstRtpTime;
     UDPSocket* mediaSocket;
     UDPSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
-    quint16 sequence;
-    qint64 firstRtpTime;
-
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
@@ -62,12 +61,10 @@ public:
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
 
     void setQuality(MediaQuality quality);
-    bool isSecondaryLiveDP(QnAbstractStreamDataProvider* provider) const;
-    bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
     QString getRangeHeaderIfChanged();
-    int getMetadataTcpChannel() const;
+    int getMetadataChannelNum() const;
     int getAVTcpChannel(int trackNum) const;
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
@@ -104,7 +101,7 @@ private:
     void connectToLiveDataProviders();
     //QnAbstractMediaStreamDataProvider* getLiveDp();
     void setQualityInternal(MediaQuality quality);
-    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media);
+    QnRtspEncoderPtr createEncoderByMediaData(QnAbstractMediaDataPtr media, QSize resolution);
     QnAbstractMediaDataPtr getCameraData(QnAbstractMediaData::DataType dataType);
     static int isFullBinaryMessage(const QByteArray& data);
     void processBinaryRequest();

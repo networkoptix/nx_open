@@ -47,5 +47,9 @@ Description: Media Server port is invalid. Please try again.
 
 Template: ${deb.customization.company.name}-mediaserver/storage_cant_create
 Type: error
-Description: Can't create directory. Please check it's correct
- and you have appropriate permissions.
+Description: Can't create directory. Please check it's correct and you have appropriate permissions.
+
+Template: ${deb.customization.company.name}-mediaserver/transport
+Type: select
+Choices: auto, tcp, udp
+Description: Select preferred transport. If unsure leave default value.

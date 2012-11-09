@@ -60,13 +60,13 @@ class QnUserResource;
 typedef QnSharedResourcePointer<QnUserResource> QnUserResourcePtr;
 typedef QnSharedResourcePointerList<QnUserResource> QnUserResourceList;
 
-class QnVideoServerResource;
-typedef QnSharedResourcePointer<QnVideoServerResource> QnVideoServerResourcePtr;
-typedef QnSharedResourcePointerList<QnVideoServerResource> QnVideoServerResourceList;
+class QnMediaServerResource;
+typedef QnSharedResourcePointer<QnMediaServerResource> QnMediaServerResourcePtr;
+typedef QnSharedResourcePointerList<QnMediaServerResource> QnMediaServerResourceList;
 
-class QnLocalVideoServerResource;
-typedef QnSharedResourcePointer<QnLocalVideoServerResource> QnLocalVideoServerResourcePtr;
-typedef QnSharedResourcePointerList<QnLocalVideoServerResource> QnLocalVideoServerResourceList;
+class QnLocalMediaServerResource;
+typedef QnSharedResourcePointer<QnLocalMediaServerResource> QnLocalMediaServerResourcePtr;
+typedef QnSharedResourcePointerList<QnLocalMediaServerResource> QnLocalMediaServerResourceList;
 
 class QnPlColdStoreStorage;
 typedef QnSharedResourcePointer<QnPlColdStoreStorage> QnPlColdStoreStoragePtr;
@@ -83,5 +83,11 @@ typedef QnSharedResourcePointerList<QnPlOnvifResource> QnPlOnvifResourceList;
 class QnPlIsdResource;
 typedef QnSharedResourcePointer<QnPlIsdResource> QnPlIsdResourcePtr;
 typedef QnSharedResourcePointerList<QnPlIsdResource> QnPlIsdResourceList;
+
+class QnPlPulseResource;
+typedef QSharedPointer<QnPlPulseResource> QnPlPulseResourcePtr;
+
+class QnPlIqResource;
+typedef QSharedPointer<QnPlIqResource> QnPlIqResourcePtr;
 
 #endif // QN_RESOURCE_FWD_H

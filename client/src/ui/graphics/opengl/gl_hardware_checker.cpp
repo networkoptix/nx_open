@@ -71,11 +71,6 @@ namespace {
         bool softwareTrouble = false;
         bool hardwareTrouble = false;
 
-        if (functions.features() & QnGlFunctions::OpenGLBroken){
-            qnWarning("Intel HD 3000.");
-            hardwareTrouble = true;
-        }
-
         if (!(functions.features() & QnGlFunctions::OpenGL1_3)) {
             qnWarning("Multitexturing is not supported.");
             softwareTrouble = true;

@@ -1,7 +1,7 @@
 #ifndef isd_device_server_h_1936
 #define isd_device_server_h_1936
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 
@@ -17,7 +17,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth) override;
 
 protected:
     virtual QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress) override;

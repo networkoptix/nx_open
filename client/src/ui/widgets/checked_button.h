@@ -1,10 +1,13 @@
-#ifndef __QN_CHECKED_BUTTON_H__
-#define __QN_CHECKED_BUTTON_H__
+#ifndef QN_CHECKED_BUTTON_H
+#define QN_CHECKED_BUTTON_H
 
-#include <QToolButton>
+#include <QtGui/QToolButton>
 
-class QnCheckedButton: public QToolButton
-{
+class QnCheckedButton: public QToolButton {
+    Q_OBJECT
+
+    typedef QToolButton base_type;
+
 public:
     QnCheckedButton(QWidget* parent);
     
@@ -16,16 +19,17 @@ public:
     QColor checkedColor() const;
     void setCheckedColor(const QColor& color);
 
-    void setEnabled(bool value);
 protected:
+    virtual bool event(QEvent *event) override;
+
     void updateIcon();
     QPixmap generatePixmap(int size, const QColor &color, const QColor &insideColor, bool hovered, bool checked);
+
 private:
     QColor m_color;
     QColor m_insideColor;
     QColor m_checkedColor;
     bool m_insideColorDefined;
-    bool m_isEnabled;
 };
 
-#endif // __QN_CHECKED_BUTTON_H__
+#endif // QN_CHECKED_BUTTON_H

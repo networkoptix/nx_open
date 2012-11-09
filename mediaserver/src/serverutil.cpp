@@ -16,7 +16,7 @@ QString defaultStoragePath()
 #endif
 }
 
-void syncStoragesToSettings(QnVideoServerResourcePtr server)
+void syncStoragesToSettings(QnMediaServerResourcePtr server)
 {
     const QnAbstractStorageResourceList& storages = server->getStorages();
 
@@ -31,7 +31,7 @@ void syncStoragesToSettings(QnVideoServerResourcePtr server)
     qSettings.endArray();
 
     if (storages.size() == 1) {
-        qSettings.setValue("mediaDir", storages.at(0)->getUrl());
+        qSettings.setValue("mediaDir", QDir::toNativeSeparators(storages.at(0)->getUrl()));
     }
 }
 

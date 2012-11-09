@@ -98,7 +98,7 @@ private:
 
     QVector3D m_localSpeed, m_remoteSpeed;
     QnNetworkResourcePtr m_camera;
-    QnVideoServerConnectionPtr m_connection;
+    QnMediaServerConnectionPtr m_connection;
 };
 
 

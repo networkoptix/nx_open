@@ -29,7 +29,11 @@ protected:
     virtual void paintGL() override;
     virtual void resizeGL(int width, int height) override;
 
+    void invalidateDisplay();
+    void ensureDisplay();
+
 private:
+    QnMediaResourcePtr m_resource;
     QnResourceDisplay *m_display;
     QnResourceWidgetRenderer *m_renderer;
     QSize m_channelScreenSize;

@@ -1,6 +1,6 @@
 #include "media_streamdataprovider.h"
 #include "core/resource/resource_media_layout.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
@@ -12,8 +12,8 @@ m_numberOfchannels(0)
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame));
     m_mediaResource = qSharedPointerDynamicCast<QnMediaResource>(res);
     Q_ASSERT(m_mediaResource);
-    memset(m_lastVideoTime, 0, sizeof(m_lastVideoTime));
-
+    resetTimeCheck();
+    m_isCamera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (res) != 0;
     //QnMediaResourcePtr mr = getResource().dynamicCast<QnMediaResource>();
     //m_NumaberOfVideoChannels = mr->getMediaLayout()->numberOfVideoChannels();
 }
@@ -151,23 +151,30 @@ float QnAbstractMediaStreamDataProvider::getBitrate() const
     return rez;
 }
 
-void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr data)
+void QnAbstractMediaStreamDataProvider::resetTimeCheck()
 {
-    QnPhysicalCameraResourcePtr camera = qSharedPointerDynamicCast<QnPhysicalCameraResource> (getResource());
-    if (camera)
+    for (int i = 0; i < CL_MAX_CHANNELS+1; ++i)
+        m_lastMediaTime[i] = AV_NOPTS_VALUE;
+}
+
+void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr media)
+{
+    if (m_isCamera && media && (media->dataType == QnAbstractMediaData::VIDEO || media->dataType == QnAbstractMediaData::AUDIO))
     {
         // correct packets timestamp if we have got several packets very fast
-        QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-        if (video)
-        {
-            qint64 timeDiff = video->timestamp - m_lastVideoTime[video->channelNumber];
-            // if timeDiff < -N it may be time correction or dayling time change
-            if (timeDiff >= -1000ll*1000 && timeDiff < MIN_FRAME_DURATION)
-            {
-                video->timestamp = m_lastVideoTime[video->channelNumber] + MIN_FRAME_DURATION;
-            }
-            m_lastVideoTime[video->channelNumber] = video->timestamp;
+
+        if (media->flags & QnAbstractMediaData::MediaFlags_BOF) {
+            resetTimeCheck();
         }
+        else if (m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE) {
+            qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
+        	// if timeDiff < -N it may be time correction or dayling time change
+            if (timeDiff >=-1000ll*1000  && timeDiff < MIN_FRAME_DURATION)
+            {
+                media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
+            }
+        }
+        m_lastMediaTime[media->channelNumber] = media->timestamp;
     }
 }
 

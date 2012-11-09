@@ -1,8 +1,11 @@
 #include <QtGui>
 #include <QTcpServer>
 
+#include <utils/network/foundenterprisecontrollersmodel.h>
+
 #include "systraywindow.h"
 #include "ui_settings.h"
+#include "ui_findappserverdialog.h"
 #include "connectiontestingdialog.h"
 
 #include <shlobj.h>
@@ -14,7 +17,7 @@
 
 #define USE_SINGLE_STREAMING_PORT
 
-static const QString MEDIA_SERVER_NAME (QString(ORGANIZATION_NAME) + QString(" Media Server"));
+static const QString MEDIA_SERVER_NAME (QString(QN_ORGANIZATION_NAME) + QString(" Media Server"));
 static const QString APP_SERVER_NAME("Enterprise Controller");
 static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
@@ -49,12 +52,24 @@ bool MyIsUserAnAdmin()
    return isAdmin;
 }
 
-QnSystrayWindow::QnSystrayWindow():
+QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEnterpriseControllersModel )
+:
     ui(new Ui::SettingsDialog),
+    m_findAppServerDialog(new QDialog()),
+    m_findAppServerDialogUI( new Ui::FindAppServerDialog() ),
     m_mServerSettings(QSettings::SystemScope, qApp->organizationName(), MEDIA_SERVER_NAME),
-    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME)
+    m_appServerSettings(QSettings::SystemScope, qApp->organizationName(), APP_SERVER_NAME),
+    m_foundEnterpriseControllersModel( foundEnterpriseControllersModel )
 {
     ui->setupUi(this);
+    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
+    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( m_foundEnterpriseControllersModel );
+
+    connect(
+        m_findAppServerDialogUI->foundEnterpriseControllersView,
+        SIGNAL(doubleClicked(const QModelIndex&)),
+        m_findAppServerDialog.data(),
+        SLOT(accept()) );
 
 #ifdef USE_SINGLE_STREAMING_PORT
     ui->apiPortLineEdit->setVisible(false);
@@ -69,8 +84,8 @@ QnSystrayWindow::QnSystrayWindow():
     m_appServerHandle = 0;
     m_skipTicks = 0;
 
-    m_mediaServerServiceName = QString(VER_CUSTOMIZATION) + QString("MediaServer");
-    m_appServerServiceName = QString(VER_CUSTOMIZATION) + QString("AppServer");
+    m_mediaServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("MediaServer");
+    m_appServerServiceName = QString(QN_CUSTOMIZATION_NAME) + QString("AppServer");
 
     m_mediaServerStartAction = 0;
     m_mediaServerStopAction = 0;
@@ -101,26 +116,39 @@ QnSystrayWindow::QnSystrayWindow():
     trayIcon->show();
 
     setWindowTitle(tr("VMS settings"));
-    //resize(440, 300);
 
-    connect (&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
-    connect (&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
+    connect(&m_findServices, SIGNAL(timeout()), this, SLOT(findServiceInfo()));
+    connect(&m_updateServiceStatus, SIGNAL(timeout()), this, SLOT(updateServiceInfo()));
+
+    connect(ui->findAppServerButton, SIGNAL(clicked()), this, SLOT(onFindAppServerButtonClicked()));
+
+    connect(ui->appServerUrlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAppServerUrlHistoryComboBoxCurrentChanged(int)));
+    
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
 
-    ui->labelProductName->setText(APPLICATION_NAME);
-    ui->labelProductRevision->setText(APPLICATION_REVISION);
-    ui->labelProductVersion->setText(APPLICATION_VERSION);
-    ui->labelFfmpegRevision->setText(FFMPEG_VERSION);
+    ui->informationLabel->setText(
+        tr(
+            "<b>%1</b> version %2 (%3).<br/>\n"
+            "Engine version %4.<br/>\n"
+            "Built for %5-%6 with %7.<br/>\n"
+        ).
+        arg(QLatin1String(QN_APPLICATION_NAME)).
+        arg(QLatin1String(QN_APPLICATION_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_REVISION)).
+        arg(QLatin1String(QN_ENGINE_VERSION)).
+        arg(QLatin1String(QN_APPLICATION_PLATFORM)).
+        arg(QLatin1String(QN_APPLICATION_ARCH)).
+        arg(QLatin1String(QN_APPLICATION_COMPILER))
+    );
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
 {
-    if (message == "quit")
+    if (message == "quit") {
         qApp->quit();
-    else if (message == "activate")
-    {
-        ;
+    } else if (message == "activate") {
+        return;
     }
 }
 
@@ -183,7 +211,7 @@ void QnSystrayWindow::findServiceInfo()
         m_appServerHandle  = OpenService(m_scManager, (LPCWSTR) m_appServerServiceName.data(),   SERVICE_QUERY_STATUS);
 
     if (!m_mediaServerHandle && !m_appServerHandle)
-        showMessage(QString("No %1 services installed").arg(ORGANIZATION_NAME));
+        showMessage(QString("No %1 services installed").arg(QN_ORGANIZATION_NAME));
 }
 
 void QnSystrayWindow::setVisible(bool visible)
@@ -210,7 +238,7 @@ void QnSystrayWindow::closeEvent(QCloseEvent *event)
     }
 }
 
-void QnSystrayWindow::setIcon(int index)
+void QnSystrayWindow::setIcon(int /*index*/)
 {
     //QIcon icon = iconComboBox->itemIcon(index);
     //trayIcon->setIcon(icon);
@@ -222,20 +250,15 @@ void QnSystrayWindow::setIcon(int index)
 
 void QnSystrayWindow::iconActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    CURSORINFO  pci;
-    pci.cbSize = sizeof(CURSORINFO);
-
-    switch (reason) 
-    {
-       case QSystemTrayIcon::DoubleClick:
-       case QSystemTrayIcon::Trigger:
-           if (GetCursorInfo(&pci))
-               trayIcon->contextMenu()->popup(QPoint(pci.ptScreenPos.x, pci.ptScreenPos.y));
-           break;
-       case QSystemTrayIcon::MiddleClick:
-           break;
-       default:
-           ;
+    switch (reason) {
+        case QSystemTrayIcon::DoubleClick:
+        case QSystemTrayIcon::Trigger:
+            trayIcon->contextMenu()->popup(QCursor::pos());
+            break;
+        case QSystemTrayIcon::MiddleClick:
+            break;
+        default:
+            break;
     }
 }
 
@@ -609,12 +632,15 @@ void QnSystrayWindow::onSettingsAction()
     QStringList urlList = m_settings.value("appserverUrlHistory").toString().split(';');
     urlList.insert(0, appServerUrl.toString());
     urlList.removeDuplicates();
-    
+
     ui->appServerUrlComboBox->clear();
+    ui->appServerUrlComboBox->addItem( tr("* Last used connection *") );
     foreach(const QString& value, urlList) {
         ui->appServerUrlComboBox->addItem(value);
     }
 
+    ui->appIPEdit->setText(m_mServerSettings.value("appserverHost").toString());
+    ui->appPortSpinBox->setValue(m_mServerSettings.value("appserverPort").toInt());
     ui->appServerLogin->setText(m_mServerSettings.value("appserverLogin").toString());
     ui->appServerPassword->setText(m_mServerSettings.value("appserverPassword").toString());
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
@@ -648,10 +674,9 @@ bool QnSystrayWindow::isAppServerParamChanged() const
 bool QnSystrayWindow::isMediaServerParamChanged() const
 {
     QUrl savedURL = getAppServerURL();
-    QUrl currentURL(ui->appServerUrlComboBox->currentText());
+    QUrl currentURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
     if (savedURL.host() != currentURL.host() || savedURL.port(DEFAULT_APP_SERVER_PORT) != currentURL.port(DEFAULT_APP_SERVER_PORT))
         return true;
-
 
     if (ui->appServerLogin->text() != m_mServerSettings.value("appserverLogin").toString())
         return true;
@@ -681,6 +706,8 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
             saveData();
             if (appServerParamChanged || mediaServerParamChanged)
             {
+                // TODO: #VASILENKO Untranslatable strings.
+
                 QString requestStr = tr("The changes you made require ");
                 if (appServerParamChanged)
                     requestStr += APP_SERVER_NAME;
@@ -736,37 +763,43 @@ bool QnSystrayWindow::validateData()
 {
     struct PortInfo
     {
-        PortInfo(int _newPort, int _oldPort, const QString& _descriptor)
+        PortInfo(int _newPort, int _oldPort, const QString& _descriptor, int _tabIndex)
         {
             newPort = _newPort;
             descriptor = _descriptor;
             oldPort = _oldPort;
+            tabIndex = _tabIndex;
         }
 
         int newPort;
         int oldPort;
         QString descriptor;
+        int tabIndex;
     };
     QList<PortInfo> checkedPorts;
 
     if (m_appServerHandle)
     {
-        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME);
-        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy");
+        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME, 1);
+        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy", 1);
     }
 
     if (m_mediaServerHandle)
     {
-        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP");
+        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP", 0);
 #ifndef USE_SINGLE_STREAMING_PORT
-        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API");
+        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API", 0);
 #endif
     }
     
     for(int i = 0; i < checkedPorts.size(); ++i)
     {
         if (!checkPortNum(checkedPorts[i].newPort, checkedPorts[i].descriptor))
+        {
+            if( ui->tabWidget->currentIndex() != checkedPorts[i].tabIndex )
+                ui->tabWidget->setCurrentIndex( checkedPorts[i].tabIndex );
             return false;
+        }
         for (int j = i+1; j < checkedPorts.size(); ++j) {
             if (checkedPorts[i].newPort == checkedPorts[j].newPort)
             {
@@ -816,19 +849,13 @@ void QnSystrayWindow::saveData()
     }
     m_settings.setValue("appserverUrlHistory", rez);
 
-    QString text = ui->appServerUrlComboBox->currentText();
-    if (text.indexOf("://") == -1)
-        text = QString("https://") + text;
-    setAppServerURL(text);
+    setAppServerURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 }
 
 void QnSystrayWindow::onTestButtonClicked()
 {
-    QString text = ui->appServerUrlComboBox->currentText();
-    if (text.indexOf("://") == -1)
-        text = QString("https://") + text;
+    QUrl url( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
 
-    QUrl url(text);
     url.setUserName(ui->appServerLogin->text());
     url.setPassword(ui->appServerPassword->text());
 
@@ -841,4 +868,29 @@ void QnSystrayWindow::onTestButtonClicked()
     ConnectionTestingDialog dialog(this, url);
     dialog.setModal(true);
     dialog.exec();
+}
+
+void QnSystrayWindow::onFindAppServerButtonClicked()
+{
+    if( !m_findAppServerDialog->exec() )
+        return; //cancel pressed
+    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
+    if( !selectedSrvIndex.isValid() )
+        return;
+
+    ui->appIPEdit->setText( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
+    ui->appPortSpinBox->setValue( m_foundEnterpriseControllersModel->data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
+}
+
+void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
+{
+    if( index == 0 )
+        return; //selected "Last used connection" element
+
+    //filling in edits with values
+    const QUrl urlToSet( ui->appServerUrlComboBox->currentText() );
+    ui->appIPEdit->setText( urlToSet.host() );
+    ui->appPortSpinBox->setValue( urlToSet.port() );
+    //ui->appServerLogin->setText( urlToSet.userName() );
+    //ui->appServerPassword->setText( urlToSet.password() );
 }

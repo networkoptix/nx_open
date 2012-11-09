@@ -70,6 +70,7 @@ public:
     //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN};
+    enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     struct SDPTrackInfo
     {
@@ -106,13 +107,13 @@ public:
     static QString mediaTypeToStr(TrackType tt);
 
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
-    typedef QList<QSharedPointer<SDPTrackInfo> > TrackMap;
+    typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
     RTPSession();
     ~RTPSession();
 
     // returns true if stream was opened, false in case of some error
-    bool open(const QString& url);
+    bool open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
 
     /*
     * Start playing RTSP sessopn.
@@ -136,8 +137,9 @@ public:
 
     bool sendKeepAliveIfNeeded();
 
+    void setTransport(TransportType transport);
     void setTransport(const QString& transport);
-    QString getTransport() const;
+    TransportType getTransport() const { return m_transport; }
     QString getTrackFormatByRtpChannelNum(int channelNum);
     TrackType getTrackTypeByRtpChannelNum(int channelNum);
 
@@ -177,16 +179,35 @@ public:
 
     void setAudioEnabled(bool value);
 
+    /*
+    * Demuxe RTSP binary data
+    * @param data Buffer to write demuxed data. 4 byte RTSP header keep in buffer
+    * @param maxDataSize maximum buffer size
+    * @return amount of readed bytes
+    */
     int readBinaryResponce(quint8 *data, int maxDataSize);
+
+    /*
+    * Demuxe RTSP binary data.
+    * @param demuxedData vector of buffers where stored demuxed data. Buffer number determined by RTSP channel number. 4 byte RTSP header are not stored in buffer
+    * @param channelNumber buffer number
+    * @return amount of readed bytes
+    */
+    int readBinaryResponce(QVector<QnByteArray*>& demuxedData, int& channelNumber);
+
+
     void sendBynaryResponse(quint8* buffer, int size);
 
-    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize);
-    int buildClientRTCPReport(quint8 *dstBuffer);
+    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
+    int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
+
+    static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
 signals:
     void gotTextResponse(QByteArray text);
 private:
+    void addRangeHeader(QByteArray& request, qint64 startPos, qint64 endPos);
     QString getTrackFormat(int trackNum) const;
     TrackType getTrackType(int trackNum) const;
     //int readRAWData();
@@ -209,12 +230,13 @@ private:
     // in case of error return false
     bool checkIfDigestAuthIsneeded(const QByteArray& response);
     void usePredefinedTracks();
+    bool processTextResponseInsideBinData();
 private:
     enum { RTSP_BUFFER_LEN = 1024 * 65 };
 
     // 'initialization in order' block
     unsigned int m_csec;
-    QString m_transport;
+    TransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
     qint64 m_endTime;
@@ -250,10 +272,11 @@ private:
     QAuthenticator m_auth;
     QString m_proxyAddr;
     QString m_contentBase;
-    QString m_prefferedTransport;
+    TransportType m_prefferedTransport;
 
     QString m_realm;
     QString m_nonce;
+    qint64 m_openedTime;
 };
 
 #endif //rtp_session_h_1935_h

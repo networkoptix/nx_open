@@ -1,7 +1,7 @@
 #ifndef pulse_resource_searcher_h
 #define pulse_resource_searcher_h
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 
 class QnPlPulseSearcher : public QnAbstractNetworkResourceSearcher

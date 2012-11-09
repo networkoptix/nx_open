@@ -1,18 +1,35 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#ifndef ${artifactId}_VERSION_H_
-#define ${artifactId}_VERSION_H_
+#ifndef ${artifactId}_VERSION_H
+#define ${artifactId}_VERSION_H
 
-static const char *const ORGANIZATION_NAME="${company.name}";
-static const char *const APPLICATION_NAME="${product.title}";
-static const char *const APPLICATION_VERSION="${project.version}.${buildNumber}";
-static const char *const APPLICATION_REVISION="${changeSet}";
-static const char *const FFMPEG_VERSION="${ffmpeg.version}";
+/* 
+ * Some defines from the build system. Feel free to use these.
+ */
+#define QN_ORGANIZATION_NAME        "${company.name}"
+#define QN_APPLICATION_NAME         "${product.title}"
+#define QN_APPLICATION_VERSION      "${release.version}.${buildNumber}"
+#define QN_ENGINE_VERSION           "${project.version}.${buildNumber}"
+#define QN_APPLICATION_REVISION     "${changeSet}"
+#define QN_APPLICATION_PLATFORM     "${platform}"
+#define QN_APPLICATION_ARCH         "${arch}"
+#define QN_APPLICATION_COMPILER     "${compiler}"
+#define QN_FFMPEG_VERSION           "${ffmpeg.version}"
+#define QN_SIGAR_VERSION            "${sigar.version}"
+#define QN_BOOST_VERSION            "${boost.version}"
+#define QN_CUSTOMIZATION_NAME       "${installer.customization}"
+#define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
+#define QN_LICENSING_MAIL_ADDRESS   "${company.support.address}"
+#define QN_HAS_FREE_LICENSES        ${freeLicenses}
 
-// These constans are here for windows resouce file.
-#define VER_CUSTOMIZATION           "${installer.customization}"
-#define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}"
+/* 
+ * These constans are here for windows resouce file.
+ *
+ * DO NOT USE THEM IN YOUR CODE. 
+ * DO NOT ADD NEW CONSTANTS HERE.
+ */
+#define VER_LINUX_ORGANIZATION_NAME "${deb.customization.company.name}" // TODO: move up
 #define VER_FILEVERSION             ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion},${buildNumber}
 #define VER_FILEVERSION_STR         "${project.version}.${buildNumber}"
 #define VER_PRODUCTVERSION          ${parsedVersion.majorVersion},${parsedVersion.minorVersion},${parsedVersion.incrementalVersion}
@@ -20,11 +37,12 @@ static const char *const FFMPEG_VERSION="${ffmpeg.version}";
 #define VER_COMPANYNAME_STR         "${company.name}"
 #define VER_FILEDESCRIPTION_STR     "${product.title}"
 #define VER_INTERNALNAME_STR        "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR      "Copyright © 2011 Network Optix"
+#define VER_LEGALCOPYRIGHT_STR      "Copyright 2011 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR    "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR    VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR    "${artifactId}.exe"
 #define VER_PRODUCTNAME_STR         "${artifactId}"
 #define VER_COMPANYDOMAIN_STR       "${company.url}"
+/* BORIS, a note personally to you. If you continue adding defines to this block, I'll rip you a new asshole. */
 
-#endif // ${artifactId}_VERSION_H_
+#endif // ${artifactId}_VERSION_H

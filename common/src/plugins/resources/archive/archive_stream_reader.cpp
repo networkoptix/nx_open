@@ -39,6 +39,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_newDataMarker(0),
     m_currentTimeHint(AV_NOPTS_VALUE),
 //private section 2
+    m_jumpInSilenceMode(false),
     m_bofReached(false),
     m_canChangeQuality(true),
     m_externalLocked(false),
@@ -57,7 +58,9 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_oldQualityFastSwitch(true),
     m_isStillImage(false),
     m_speed(1.0),
-    m_pausedStart(false)
+    m_pausedStart(false),
+    m_sendMotion(false),
+    m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
 
@@ -109,7 +112,9 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
         return;
     }
     emit prevFrameOccured();
+    m_jumpInSilenceMode = true;
     jumpToPreviousFrame(mksec);
+    m_jumpInSilenceMode = false;
 }
 
 void QnArchiveStreamReader::resumeMedia()
@@ -174,7 +179,7 @@ AVIOContext* QnArchiveStreamReader::getIOContext()
     return 0;
 }
 
-QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layout)
+QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layout)
 {
     QString rez;
     QTextStream ost(&rez);
@@ -186,7 +191,7 @@ QString QnArchiveStreamReader::serializeLayout(const QnVideoResourceLayout* layo
     return rez;
 }
 
-const QnVideoResourceLayout* QnArchiveStreamReader::getDPVideoLayout() const
+const QnResourceVideoLayout* QnArchiveStreamReader::getDPVideoLayout() const
 {
     m_delegate->open(m_resource);
     return m_delegate->getVideoLayout();
@@ -209,15 +214,13 @@ bool QnArchiveStreamReader::init()
     {
         while (1)
         {
-            bool seekOk = m_delegate->seek(requiredJumpTime, false) > 0;
+            bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
+            Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
                 m_jumpMtx.unlock();
-                if (seekOk)
-                    emit jumpOccured(requiredJumpTime);
-                else
-                    emit jumpCanceled(requiredJumpTime);
+                emit jumpOccured(requiredJumpTime);
                 break;
             }
             requiredJumpTime = m_requiredJumpTime; // race condition. jump again
@@ -262,9 +265,9 @@ qint64 QnArchiveStreamReader::determineDisplayTime(bool reverseMode)
     if(rez == qint64(AV_NOPTS_VALUE)) 
     {
         if (reverseMode)
-            return m_delegate->endTime();
+            return endTime();
         else
-            return m_delegate->startTime();
+            return startTime();
     }
     return rez;
 }
@@ -383,6 +386,7 @@ begin_label:
                 beforeJumpInternal(displayTime);
                 if (!exactJumpToSpecifiedFrame && channelCount > 1)
                     setNeedKeyData();
+        		m_outOfPlaybackMask = false;
                 internalJumpTo(displayTime);
                 setSkipFramesToTime(displayTime, false);
 
@@ -396,6 +400,7 @@ begin_label:
     // jump command
     if (jumpTime != qint64(AV_NOPTS_VALUE) && reverseMode == m_prevReverseMode) // if reverse mode is changing, ignore seek, because of reverseMode generate seek operation
     {
+        m_outOfPlaybackMask = false;
         /*
         if (m_newDataMarker) {
             QString s;
@@ -419,9 +424,14 @@ begin_label:
     bool delegateForNegativeSpeed = m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanProcessNegativeSpeed;
     if (reverseMode != m_prevReverseMode)
     {
+        m_outOfPlaybackMask = false;
         m_bofReached = false;
         qint64 displayTime = currentTimeHint;
-        if (currentTimeHint == qint64(AV_NOPTS_VALUE)) 
+        if (currentTimeHint == DATETIME_NOW) {
+            if (reverseMode)
+                displayTime = endTime()-BACKWARD_SEEK_STEP;
+        }
+        else if (currentTimeHint == qint64(AV_NOPTS_VALUE))
         {
             if (jumpTime != qint64(AV_NOPTS_VALUE))
                 displayTime = jumpTime;
@@ -451,6 +461,16 @@ begin_label:
             emit jumpOccured(displayTime);
     }
     m_dataMarker = m_newDataMarker;
+
+    if (m_outOfPlaybackMask)
+        return createEmptyPacket(reverseMode); // EOF reached
+
+    if (m_afterMotionData)
+    {
+        QnAbstractMediaDataPtr result = m_afterMotionData;
+        m_afterMotionData.clear();
+        return result;
+    }
 
     /*
     if (reverseMode && m_topIFrameTime > 0 && m_topIFrameTime <= m_delegate->startTime() && !m_cycleMode)
@@ -616,7 +636,6 @@ begin_label:
                 //return getNextData();
                 goto begin_label;
             }
-            videoData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
         }
 
 
@@ -657,28 +676,12 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-
-    if (m_currentData && m_eof)
-    {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
-        m_eof = false;
-    }
-
-    if (m_BOF) {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        m_BOF = false;
-        //m_BOFTime = m_currentData->timestamp;
-        /*
-        QString msg;
-        QTextStream str(&msg);
-        str << "set BOF " << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << " for marker " << m_dataMarker;
-        str.flush();
-        cl_log.log(msg, cl_logWARNING);
-        */
-
-    }
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
+
+
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
     if (videoData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
@@ -691,6 +694,13 @@ begin_label:
     //    qDebug() << "timestamp=" << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << "flags=" << m_currentData->flags;
 
 
+    // Do not display archive in a future
+    if (videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) && videoData->timestamp > qnSyncTime->currentUSecsSinceEpoch() && !reverseMode)
+    {
+        m_outOfPlaybackMask = true;
+        return createEmptyPacket(reverseMode); // EOF reached
+    }
+
     // ensure Pos At playback mask
     if (!m_needStop && videoData && !(videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && !(videoData->flags & QnAbstractMediaData::MediaFlags_LIVE) 
         && m_nextData == 0) // check next data because of first current packet may be < required time (but next packet always > required time)
@@ -699,8 +709,11 @@ begin_label:
         qint64 newTime = m_playbackMaskHelper.findTimeAtPlaybackMask(m_currentData->timestamp, !reverseMode);
         m_playbackMaskSync.unlock();
 
-        if (newTime == DATETIME_NOW)
+        if (newTime == DATETIME_NOW || newTime == -1) {
+            //internalJumpTo(qMax(0ll, newTime)); // seek to end or BOF.
+            m_outOfPlaybackMask = true;
             return createEmptyPacket(reverseMode); // EOF reached
+        }
 
         if (newTime != m_currentData->timestamp)
         {
@@ -708,9 +721,21 @@ begin_label:
                 setNeedKeyData();
             internalJumpTo(newTime);
             setSkipFramesToTime(newTime, true);
+            m_eof = true;
             m_BOF = true;
             goto begin_label;
         }
+    }
+
+    if (m_currentData && m_eof)
+    {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+        m_eof = false;
+    }
+
+    if (m_BOF) {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        m_BOF = false;
     }
 
     if (m_isStillImage)
@@ -720,6 +745,24 @@ begin_label:
     if (jumpTime != DATETIME_NOW)
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
+    // process motion
+    if (m_currentData && m_sendMotion)
+    {
+        int channel = m_currentData->channelNumber;
+        if (!m_motionConnection[channel])
+            m_motionConnection[channel] = m_delegate->getMotionConnection(channel);
+        if (m_motionConnection[channel]) {
+            QnMetaDataV1Ptr motion = m_motionConnection[channel]->getMotionData(m_currentData->timestamp);
+            if (motion) 
+            {
+                motion->flags = m_currentData->flags;
+                motion->opaque = m_currentData->opaque;
+                m_afterMotionData = m_currentData;
+                return motion;
+            }
+        }
+    }
+
     return m_currentData;
 }
 
@@ -727,6 +770,7 @@ void QnArchiveStreamReader::internalJumpTo(qint64 mksec)
 {
     m_skippedMetadata.clear();
     m_nextData.clear();
+    m_afterMotionData.clear();
     qint64 seekRez = 0;
     if (mksec > 0) {
         seekRez = m_delegate->seek(mksec, !m_exactJumpToSpecifiedFrame);
@@ -754,6 +798,7 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextPacket()
     QnAbstractMediaDataPtr result;
     while (!m_needStop)
     {
+
         result = m_delegate->getNextData();
 
         if (result == 0 && !m_needStop)
@@ -941,19 +986,31 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
     if (m_requiredJumpTime != qint64(AV_NOPTS_VALUE))
         emit jumpCanceled(m_requiredJumpTime);
-    emit beforeJump(mksec);
+    if (!m_jumpInSilenceMode)
+        emit beforeJump(mksec);
     m_delegate->beforeSeek(mksec);
 }
 
 bool QnArchiveStreamReader::setSendMotion(bool value)
 {
     /*
-    if (m_navDelegate) {
+    if (m_navDelegate) 
         return m_navDelegate->setSendMotion(value);
-    }
     */
+
+    m_delegate->setSendMotion(value);
+    if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
+    {
+        m_sendMotion = value;
+        return true;
+    }
+    else {
+        return false;
+    }
+    /*
     QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
     if (maskedDelegate) {
+        m_sendMotion = value;
         maskedDelegate->setSendMotion(value);
         if (!mFirstTime && !m_delegate->isRealTimeSource())
             jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
@@ -962,11 +1019,26 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     else {
         return false;
     }
+    */
+}
+
+
+void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
+{
+    QMutexLocker lock(&m_playbackMaskSync);
+    m_outOfPlaybackMask = false;
+    m_playbackMaskHelper.setPlaybackRange(playbackRange);
+}
+
+QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const
+{
+    return m_playbackMaskHelper.getPlaybackRange();
 }
 
 void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask)
 {
     QMutexLocker lock(&m_playbackMaskSync);
+    m_outOfPlaybackMask = false;
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
@@ -986,6 +1058,20 @@ void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
     QMutexLocker lock(&m_jumpMtx);
     m_oldQuality = m_quality = quality;
     m_oldQualityFastSwitch = m_qualityFastSwitch = true;
+}
+
+void QnArchiveStreamReader::setQualityForced(MediaQuality quality)
+{
+    if (m_quality != quality || !m_qualityFastSwitch) 
+    {
+        bool useMutex = !m_externalLocked;
+        if (useMutex)
+            m_jumpMtx.lock();
+        m_quality = quality;
+        m_qualityFastSwitch = true;
+        if (useMutex)
+            m_jumpMtx.unlock();
+    }
 }
 
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
@@ -1053,4 +1139,24 @@ double QnArchiveStreamReader::getSpeed() const
 QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 {
     return m_codecContext;
+}
+
+qint64 QnArchiveStreamReader::startTime() const
+{
+    Q_ASSERT(m_delegate);
+    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    if (p.isEmpty())
+        return m_delegate->startTime();
+    else
+        return p.startTimeMs*1000;
+}
+
+qint64 QnArchiveStreamReader::endTime() const
+{
+    Q_ASSERT(m_delegate);
+    const QnTimePeriod p = m_playbackMaskHelper.getPlaybackRange();
+    if (p.isEmpty())
+        return m_delegate->endTime();
+    else
+        return p.endTimeMs()*1000;
 }

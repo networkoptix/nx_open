@@ -3,7 +3,7 @@
 
 #include "resource_widget.h"
 
-#include <core/datapacket/mediadatapacket.h> /* For QnMetaDataV1Ptr. */
+#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <core/resource/motion_window.h>
 #include <core/resource/media_resource.h>
 
@@ -93,23 +93,9 @@ public:
 signals:
     void motionSelectionChanged();
 
-private slots:
-    void at_renderer_sourceSizeChanged(const QSize &size);
-    void at_resource_resourceChanged();
-    void at_searchButton_toggled(bool checked);
-    void at_ptzButton_toggled(bool checked);
-    void at_zoomInButton_pressed();
-    void at_zoomInButton_released();
-    void at_zoomOutButton_pressed();
-    void at_zoomOutButton_released();
-
-    void at_replyReceived(int status, int handle);
-    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
-
-    void at_camDisplay_liveChanged();
-
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
+    virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void channelLayoutChangedNotify() override;
     virtual void channelScreenSizeChangedNotify() override;
@@ -125,13 +111,16 @@ protected:
     void paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region);
     void paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion);
     void paintMotionSensitivity(QPainter *painter, int channel, const QRectF &rect);
-    void paintFilledRegion(QPainter *painter, const QRectF &rect, const QRegion &selection, const QColor &color, const QColor &penColor);
+    void paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor);
 
     void ensureMotionSensitivity() const;
     void invalidateMotionSensitivity();
 
     void ensureBinaryMotionMask() const;
     void invalidateBinaryMotionMask();
+
+    void ensureMotionSelectionCache();
+    void invalidateMotionSelectionCache();
 
     int motionGridWidth() const;
     int motionGridHeight() const;
@@ -140,8 +129,27 @@ protected:
 
     Q_SIGNAL void updateInfoTextLater();
 
+private slots:
+    void at_renderer_sourceSizeChanged(const QSize &size);
+    void at_resource_resourceChanged();
+    void at_searchButton_toggled(bool checked);
+    void at_ptzButton_toggled(bool checked);
+    void at_zoomInButton_pressed();
+    void at_zoomInButton_released();
+    void at_zoomOutButton_pressed();
+    void at_zoomOutButton_released();
+
+    void at_replyReceived(int status, int handle);
+    void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
+
+    void at_camDisplay_liveChanged();
+
 private:
     void sendZoomAsync(qreal zoomSpeed);
+    int currentRecordingMode();
+
+    Q_SLOT void updateIconButton();
+    Q_SLOT void updateServerResource();
 
 private:
     /** Media resource. */
@@ -150,8 +158,11 @@ private:
     /** Camera resource. */
     QnVirtualCameraResourcePtr m_camera;
 
+    /** Camera's media server resource. */
+    QnMediaServerResourcePtr m_server;
+
     /** Connection for camera's server */
-    QnVideoServerConnectionPtr m_connection; // TODO: move out?
+    QnMediaServerConnectionPtr m_connection; // TODO: move out?
 
     /** Display. */
     QnResourceDisplay *m_display;
@@ -161,6 +172,9 @@ private:
 
     /** Selected region for search-by-motion, in parrots. */
     QList<QRegion> m_motionSelection;
+
+    /** Painter path cache for the list of selected regions. */
+    QList<QPainterPath> m_motionSelectionPathCache;
 
     /** Image region where motion is currently present, in parrots. */
     mutable QList<QnMotionRegion> m_motionSensitivity;
@@ -173,6 +187,9 @@ private:
 
     /** Whether motion mask binary data is valid. */
     mutable bool m_binaryMotionMaskValid;
+
+    /** Whether motion selection cached paths are valid. */
+    mutable bool m_motionSelectionCacheValid;
 
     QStaticText m_sensStaticText[10];
 

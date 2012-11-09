@@ -30,3 +30,8 @@ mac {
   #  QMAKE_CXXFLAGS += -DAPI_TEST_MAIN
   #  TARGET = consoleapp
 }
+
+unix {
+  LIBS += -lX11
+}
+

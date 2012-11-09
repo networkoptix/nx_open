@@ -1,7 +1,7 @@
 #ifndef __VIDEO_CAMERA_H__
 #define __VIDEO_CAMERA_H__
 
-#include <core/dataconsumer/dataconsumer.h>
+#include <core/dataconsumer/abstract_data_consumer.h>
 #include <core/resource/resource_consumer.h>
 #include "core/dataprovider/media_streamdataprovider.h"
 

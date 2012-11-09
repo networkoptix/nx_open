@@ -1,8 +1,8 @@
 #include "action_conditions.h"
 
 #include <utils/common/warnings.h>
-#include <core/resourcemanagment/resource_criterion.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_criterion.h>
+#include <core/resource_managment/resource_pool.h>
 #include <recording/time_period_list.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -73,6 +73,25 @@ Qn::ActionVisibility QnSmartSearchActionCondition::check(const QnResourceWidgetL
 
         if(m_hasRequiredGridDisplayValue) {
             if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayMotion) == m_requiredGridDisplayValue)
+                return Qn::EnabledAction;
+        } else {
+            return Qn::EnabledAction;
+        }
+    }
+
+    return Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetList &widgets) {
+    foreach(QnResourceWidget *widget, widgets) {
+        if(!widget)
+            continue;
+
+        if (!widget->isInfoButtonVisible())
+            continue;
+
+        if(m_hasRequiredDisplayInfoValue) {
+            if(static_cast<bool>(widget->options() & QnResourceWidget::DisplayInfo) == m_requiredDisplayInfoValue)
                 return Qn::EnabledAction;
         } else {
             return Qn::EnabledAction;
@@ -177,7 +196,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(!resource)
             continue; /* OK to remove. */
 
-        if(resource->hasFlags(QnResource::layout))
+        if(resource->hasFlags(QnResource::layout) && !resource->hasFlags(QnResource::local))
             continue; /* OK to remove. */
 
         if(resource->hasFlags(QnResource::user))
@@ -271,16 +290,17 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
-    if(!context()->workbench()->item(Qn::CentralRole))
+    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
-    QnResourcePtr resource = parameters.resource();
-    if(resource->flags() & QnResource::utc) {
-        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
-        if(!periods.intersects(period))
-            return Qn::DisabledAction;
-    }
-    
+    if (m_centralItemRequired) {
+        QnResourcePtr resource = parameters.resource();
+        if(resource->flags() & QnResource::sync) {
+            QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsParameter);
+            if(!periods.intersects(period))
+                return Qn::DisabledAction;
+        }
+    }    
     return Qn::EnabledAction;
 }
 
@@ -302,3 +322,23 @@ Qn::ActionVisibility QnArchiveActionCondition::check(const QnResourceList &resou
     // TODO: this will fail (?) if we have sync with some UTC resource on the scene.
 }
 
+Qn::ActionVisibility QnToggleTitleBarActionCondition::check(const QnActionParameters &) {
+    return action(Qn::EffectiveMaximizeAction)->isChecked() ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnNoArchiveActionCondition::check(const QnActionParameters &) {
+    return (accessController()->globalPermissions() & Qn::GlobalViewArchivePermission) ? Qn::InvisibleAction : Qn::EnabledAction;
+}
+
+
+Qn::ActionVisibility QnDisconnectActionCondition::check(const QnActionParameters &) {
+    return (context()->user()) ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &resources) {
+    if(resources.size() != 1)
+        return Qn::InvisibleAction;
+
+    QnResourcePtr resource = resources[0];
+    return resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:")) ? Qn::EnabledAction : Qn::InvisibleAction;
+}

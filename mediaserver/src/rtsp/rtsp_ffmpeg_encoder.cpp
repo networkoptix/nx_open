@@ -10,7 +10,8 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_curDataBuffer(0),
     m_liveMarker(0),
     m_additionFlags(0),
-    m_eofReached(false)
+    m_eofReached(false),
+    m_isLastDataContext(false)
 {
 
 }    
@@ -38,22 +39,19 @@ void QnRtspFfmpegEncoder::setDataPacket(QnAbstractMediaDataPtr media)
     m_media = media;
     m_curDataBuffer = media->data.data();
     m_codecCtxData.clear();
+    if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
+        m_ctxSended.clear();
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(m_media);
-    int subChannelNumber = m_media->subChannelNumber;
     if (!metadata && m_media->compressionType)
     {
-        QList<QnMediaContextPtr>& ctxData = m_ctxSended[m_media->channelNumber];
-        while (ctxData.size() <= subChannelNumber)
-            ctxData << QnMediaContextPtr(0);
-
         QnMediaContextPtr currentContext = m_media->context;
         if (currentContext == 0)
             currentContext = getGeneratedContext(m_media->compressionType);
         //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
-        if (ctxData[subChannelNumber] == 0 || !ctxData[subChannelNumber]->equalTo(currentContext.data()))
+        if (!m_ctxSended || !m_ctxSended->equalTo(currentContext.data()))
         {
-            ctxData[subChannelNumber] = currentContext;
+            m_ctxSended = currentContext;
             QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &m_codecCtxData);
         }
     }
@@ -62,13 +60,17 @@ void QnRtspFfmpegEncoder::setDataPacket(QnAbstractMediaDataPtr media)
 
 bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
+    sendBuffer.resize(sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE); // reserve space for RTP header
+
     if (!m_codecCtxData.isEmpty())
     {
         Q_ASSERT(!m_codecCtxData.isEmpty());
         sendBuffer.write(m_codecCtxData);
         m_codecCtxData.clear();
+        m_isLastDataContext = true;
         return true;
     }
+    m_isLastDataContext = false;
 
     quint16 flags = m_media->flags;
     flags |= m_additionFlags;
@@ -82,9 +84,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
             flags |= QnAbstractMediaData::MediaFlags_BOF;
         m_gotLivePacket = true;
     }
-    if (flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        m_ctxSended.clear();
-
 
     // one video channel may has several subchannels (video combined with frames from difference codecContext)
     // max amount of subchannels is MAX_CONTEXTS_AT_VIDEO. Each channel used 2 ssrc: for data and for CodecContext
@@ -140,20 +139,13 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
 
 quint32 QnRtspFfmpegEncoder::getSSRC()
 {
-    quint32 ssrc = BASIC_FFMPEG_SSRC + m_media->channelNumber * MAX_CONTEXTS_AT_VIDEO*2;
-    ssrc += m_media->subChannelNumber*2;
-    return ssrc + (m_codecCtxData.isEmpty() ? 0 : 1);
+    return BASIC_FFMPEG_SSRC + (m_isLastDataContext ? 1 : 0);
 }
 
 bool QnRtspFfmpegEncoder::getRtpMarker()
 {
-    if (!m_codecCtxData.isEmpty())
-        return true;
-
     int dataRest = m_media->data.data() + m_media->data.size() - m_curDataBuffer;
-    int sendLen = qMin(MAX_RTSP_DATA_LEN - RTSP_FFMPEG_MAX_HEADER_SIZE, dataRest);
-
-    return sendLen >= dataRest ? 1 : 0;
+    return m_isLastDataContext || dataRest == 0;
 }
 
 quint32 QnRtspFfmpegEncoder::getFrequency()
@@ -168,7 +160,13 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP()
 {
-    return QByteArray();
+    if (!m_codecCtxData.isEmpty()) {
+        QString result("a=fmtp:%1 config=%2\r\n");
+        return result.arg((int)getPayloadtype()).arg(QString(m_codecCtxData.toBase64())).toLocal8Bit();
+    }
+    else {
+        return QByteArray();
+    }
 }
 
 QString QnRtspFfmpegEncoder::getName()
@@ -184,4 +182,9 @@ void QnRtspFfmpegEncoder::setLiveMarker(int value)
 void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
 {
     m_additionFlags = value;
+}
+
+void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
+{
+    QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
 }

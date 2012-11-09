@@ -1,0 +1,178 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+   <title>Working with DW Spectrum &gt; Cameras Management &gt; Setting Up Cameras &gt; Setting up Motion Mask and Motion Sensitivity</title>
+   <meta name="generator" content="Help & Manual">
+   <meta name="keywords" content="">
+   <meta name="description" content="Setting up Motion Mask and Motion Sensitivity">
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+   <link type="text/css" href="default.css" rel="stylesheet">
+   <link type="text/css" href="custom.css" rel="stylesheet">
+   <script type="text/javascript" src="nsh.js"></script>
+
+<script type="text/javascript">   
+// Toggle Toggler 
+
+var toggleCount=false;
+var switchState;
+
+function toggleToggles() {
+
+    if (!toggleCount) {
+     toggleCount = true;
+     HMToggleExpandAll(true);
+     switchState = true;
+     }
+   
+     else if (switchState) {
+        HMToggleExpandAll(false);
+        switchState = false;
+        }
+        
+     else  {
+        HMToggleExpandAll(true);
+        switchState = true;
+        } 
+    }
+</script>
+   
+<!-- non-scrolling headers for CHM and browser-based help, local styles-->
+<style type="text/css" media="screen"> 
+html, body {    
+      margin:0; 
+      padding:0; 
+      overflow: hidden; 
+      background: #FFFFFF; 
+   }
+ 
+div#printheader { 
+   display: none;
+   }
+   #idheader { 
+      width:100%; 
+      height:auto; 
+      padding: 0; 
+      margin: 0; 
+} 
+    #idheaderbg  {
+    background: #6F6F6F; 
+}
+   #callout-table, #overview-table {display:block; position:relative; top:0; left:0;}
+   #callout-icon {display:block; position:absolute; top:-11px; left:-11px;}
+   #callout-icon-flag {display:block; position:absolute; top:-11px; left:-8px;}
+   #callout-table a {text-decoration: none; color: blue;}
+   #callout-table a:visited {text-decoration: none; color: blue;}
+   #overview-table a {text-decoration: none; color: black;}
+   #overview-table a:visited {text-decoration: none; color: black;}
+   #callout-table a:hover, #overview-table a:hover {text-decoration: underline;}
+   p.help-url { margin: 20px 0 5px 0; text-align: center; font-size: 80%; text-decoration: none }
+   </style>
+<!--[if lt IE 7]>
+<style type="text/css">
+  #idcontent {padding: 0px;} 
+  #innerdiv {padding: 10px 5px 5px 10px ;} 
+</style> 
+<![endif]-->
+   <noscript>
+   <style type="text/css">
+   html, body { overflow: auto; }
+   </style> 
+   </noscript>
+<style type="text/css" media="print">
+span.f_Heading1 { color: black; }
+#idheader, #printheader img { display:none; }
+#printheader { display: block; margin-top: 20px; }
+#idcontent { margin-top: 10px; }
+</style>   
+   <script type="text/javascript" src="jquery.js"></script>
+   <script type="text/javascript" src="helpman_settings.js"></script>
+   <script type="text/javascript" src="helpman_topicinit.js"></script>
+
+   <script type="text/javascript">
+     HMSyncTOC("index.html", "setting_up_motion_mask_and_motion_sensitivity_(adm.htm");
+   </script>
+   <script type="text/javascript" src="highlight.js"></script>
+   <script type="text/javascript">
+     $(document).ready(function(){highlight();});
+   </script>
+</head>
+<body>
+<!--ZOOMSTOP-->
+
+<div id="printheader"><h1 class="p_Heading1"><span class="f_Heading1">Setting up Motion Mask and Motion Sensitivity</span></h1>
+</div>
+<div id="idheader">
+<div id="idheaderbg">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" 
+       style="margin: 0px; background: url(header_bg.jpg);">
+
+  <tr valign="bottom">
+    <td align="left" valign="bottom" class="topichead">
+   <p class="crumbs" id="idnav"><b>Navigation:</b>&nbsp;
+   
+   Working with DW Spectrum &gt; <a href="configuring_cameras.htm">Cameras Management</a> &gt; <a href="opening_camera_settings_dialog.htm">Setting Up Cameras</a>&nbsp;&gt;</p>
+   <h1 class="p_Heading1"><span class="f_Heading1">Setting up Motion Mask and Motion Sensitivity</span></h1>
+
+    </td>
+    <td align="right" width="120" valign="middle" class="topichead" id="idnav">
+    
+     <a href="panic_recording.htm"
+        onmouseover="document.images.prev.src='btn_prev_h.gif'" 
+        onmouseout="document.images.prev.src='btn_prev_n.gif'"
+        ><img name=prev src="btn_prev_n.gif" border=0 alt="Previous page"
+        ></a><a href="opening_camera_settings_dialog.htm"
+        onmouseover="document.images.main.src='btn_home_h.gif'" 
+        onmouseout="document.images.main.src='btn_home_n.gif'"><img name=main src="btn_home_n.gif" border=0 alt="Return to chapter overview"
+        ></a><a href="setting_same_parameters_for_multiple_cameras_(admi.htm"
+        onmouseover="document.images.next.src='btn_next_h.gif'" 
+        onmouseout="document.images.next.src='btn_next_n.gif'"><img name=next src="btn_next_n.gif" border=0 alt="Next page"
+        ></a>
+    </td>
+  </tr>
+  <tr><td colspan="2" style="height: 3px; background: url(header_bg_shadow.gif)"></td></tr>
+</table>
+</div>
+
+<!-- The following code displays Expand All/Collapse All links  below the header in topics containing toggles -->
+  
+
+</div>  
+
+
+
+<div id="idcontent"><div id="innerdiv"> 
+<!--ZOOMRESTART-->
+<p class="p_BodyText"><span class="f_BodyText">In order to detect motion more properly and accurately, DW Spectrum provides a powerful and flexible </span><span class="f_BodyText" style="font-weight: bold;">Motion Detection </span><span class="f_BodyText">configuration. For example, if a camera is pointed at a parking lot, motion mask can be set on all the surrounding areas that are not targeted for recording. In this case, any motion appearing in the areas surrounding the main target area, will not trigger motion detection and recording.</span></p>
+<p class="p_BodyTextIndent"><img src="!_zoom50.png" width="16" height="16" alt="!" style="border:none" /><span class="f_ImageCaption" style="font-size: 11pt; font-family: Calibri;">  </span><span class="f_BodyText" style="font-weight: bold;">IMPORTANT</span><span class="f_BodyText">. This particular feature in DW Spectrum makes sense (REPHRASE) only if the selected camera supports Motion Detection.</span></p>
+<p class="p_BodyText"><span class="f_BodyText">The following </span><span class="f_BodyText" style="font-weight: bold;">Motion Detection</span><span class="f_BodyText"> types are supported:</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Hardware Motion Detection</span><span class="f_BodyTextIndent"> – implemented on </span><span class="f_BodyTextIndent" style="font-weight: bold;">Cameras</span><span class="f_BodyTextIndent"> directly. In this case only motion mask can be configured. To configure additional parameters it may be necessary to go to </span><span class="f_BodyTextIndent" style="font-weight: bold;">Camera Settings web page (</span><span class="f_BodyTextIndent">see &quot;<a href="configuring_proprietary_camera_parameters.htm" class="topiclink">Configuring Proprietary Camera Parameters</a>&quot;). </span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextIndent" style="font-weight: bold;">Software Motion Detection </span><span class="f_BodyTextIndent">is performed on </span><span class="f_BodyTextIndent" style="font-weight: bold;">Media Server</span><span class="f_BodyTextIndent">. It consumes more resources, though it provides better and more flexible motion detection. In this case, it is possible to set up unlimited number of motion regions and adjust its sensitivity. </span><span class="f_BodyTextIndent" style="font-weight: bold;">Software Motion Detection </span><span class="f_BodyTextIndent">requires </span><span class="f_BodyTextIndent" style="font-weight: bold;">Dual-Streaming</span><span class="f_BodyTextIndent"> supported by </span><span class="f_BodyTextIndent" style="font-weight: bold;">Camera</span><span class="f_BodyTextIndent">. If supported, </span><span class="f_BodyTextIndent" style="font-weight: bold;">Software Motion Detection </span><span class="f_BodyTextIndent">is set </span><span class="f_BodyTextIndent" style="font-weight: bold;">automatically</span><span class="f_BodyTextIndent"> (excluding </span><span class="f_BodyTextIndent" style="font-weight: bold;">Arecont Vision</span><span class="f_BodyTextIndent"> cameras).</span></p><p class="p_BodyText"><span class="f_BodyText">To set up </span><span class="f_BodyText" style="font-weight: bold;">Motion Detection:</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">1.</span><span class="f_BodyTextIndent">Open <a href="opening_camera_settings_dialog.htm" class="topiclink">Camera Settings</a> and go to </span><span class="f_BodyTextIndent" style="font-style: italic;">Motion</span><span class="f_BodyTextIndent">:</span></p><p class="p_BodyTextFirstIndent2"><img src="hmfile_hash_15764cd2.jpg" width="770" height="595" alt="Setting up Motion Mask and Motion Sensitivity - 1" style="border:none" /></p>
+<p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">If red zones appear on the grid during motion, </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Motion Detection</span><span class="f_BodyTextFirstIndent2"> is supported. Red cells indicate the level of motion (the higher the motion level, the brighter the cells).</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">1.</span><span class="f_BodyTextIndent">Select the type of motion detection (</span><span class="f_ListBullet2" style="font-weight: bold;">Hardware</span><span class="f_ListBullet2"> or</span><span class="f_ListBullet2" style="font-weight: bold;"> Software</span><span class="f_ListBullet2">). If none are active, the camera does not support Motion Detection at all.</span></p><p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">2.</span><span class="f_BodyTextIndent">Select </span><span class="f_BodyTextIndent" style="font-style: italic;">Sensitivity </span><span class="f_BodyTextIndent">on the slider. </span><span class="f_T_Value">0</span><span class="f_BodyTextIndent"> is motion mask (minimal sensitivity, motion will not be detected on the selected region); </span><span class="f_T_Value">9</span><span class="f_BodyTextIndent"> is the highest sensitivity</span></p><p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">3.</span><span class="f_BodyTextIndent">Select the desired regions the sensitivity will be applied to:</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Click</span><span class="f_BodyTextFirstIndent2"> </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">and</span><span class="f_BodyTextFirstIndent2"> </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Drag</span><span class="f_BodyTextFirstIndent2"> to select a single region</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Ctrl</span><span class="f_BodyTextFirstIndent2"> + </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Click</span><span class="f_BodyTextFirstIndent2"> </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">and</span><span class="f_BodyTextFirstIndent2"> </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Drag</span><span class="f_BodyTextFirstIndent2"> to add another region</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Click</span><span class="f_BodyTextFirstIndent2"> on a region to fill it with desired sensitivity</span></p><p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">To set </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Motion Mask</span><span class="f_BodyTextFirstIndent2"> just </span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Click and Drag</span><span class="f_BodyTextFirstIndent2">. There is no need to adjust </span><span class="f_T_Interface_Elements">Motion Sensitivity</span><span class="f_BodyTextFirstIndent2">.</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">4.</span><span class="f_BodyTextIndent">Repeat for each desired sensitivity. Use </span><span class="f_BodyTextIndent" style="font-style: italic;">Reset Motion Regions </span><span class="f_BodyTextIndent">to start over.</span></p><p class="p_BodyTextFirstIndent2"><img src="hmfile_hash_9a8aabbf.jpg" width="612" height="282" alt="Setting up Motion Mask and Motion Sensitivity - 3" style="border:none" /></p>
+<p class="p_BodyTextFirstIndent2"><span class="f_BodyTextFirstIndent2">The above picture illustrates the following:</span></p>
+<p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2">the area marked in grey will not capture motion (</span><span class="f_BodyTextFirstIndent2" style="font-weight: bold;">Motion Mask</span><span class="f_BodyTextFirstIndent2">)</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2">the green area will capture motion with very low sensitivity</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2">top right and bottom left corners will capture motion with standard sensitivity</span></p><p style="text-align: left; padding: 0px 0px 0px 13px; margin: 2px 0px 2px 36px;"><span style="font-size:11pt; font-family: 'Arial Unicode MS','Lucida Sans Unicode','Arial';color:#000000;display:inline-block;width:13px;margin-left:-13px">&#8226;</span><span class="f_BodyTextFirstIndent2">for other regions, the sensitivity will be high.</span></p><p style="text-align: left; padding: 0px 0px 0px 16px; margin: 2px 0px 2px 19px;"><span style="font-size:11pt; font-family: 'Calibri';color:#000000;display:inline-block;width:16px;margin-left:-16px">2.</span><span class="f_BodyTextIndent">Click </span><span class="f_BodyTextIndent" style="font-style: italic;">Apply </span><span class="f_BodyTextIndent">or </span><span class="f_BodyTextIndent" style="font-style: italic;">OK </span><span class="f_BodyTextIndent">when finished. To discard any changes, click </span><span class="f_BodyTextIndent" style="font-style: italic;">Cancel</span><span class="f_BodyTextIndent">.</span></p><p class="p_BodyText"><span class="f_BodyText">It is possible to set up motion directly from camera’s web page. For this purpose, use </span><span class="f_T_Interface_Elements">Camera Motion Web Page </span><span class="f_BodyText">link on the </span><span class="f_BodyText" style="font-style: italic;">Motion</span><span class="f_BodyText"> tab.</span></p>
+
+<!--ZOOMSTOP-->
+</div></div>
+<script type="text/javascript">
+
+var lastSlashPos = document.URL.lastIndexOf("/") > document.URL.lastIndexOf("\\") ? document.URL.lastIndexOf("/") : document.URL.lastIndexOf("\\");
+if( document.URL.substring(lastSlashPos + 1, lastSlashPos + 4).toLowerCase() != "~hh" )
+{
+ if (document.all) setTimeout(function() {nsrInit();},20); 
+    else nsrInit();
+ } 
+
+
+</script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -8,7 +8,7 @@ class QnNoptixStyleAnimator;
 class QnSkin;
 class QnGlobals;
 
-class QnNoptixStyle: public QProxyStyle, public GraphicsStyle { 
+class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
     Q_OBJECT;
 
     typedef QProxyStyle base_type;
@@ -57,7 +57,7 @@ private:
     void drawProgressBarLabel(const QStyleOptionProgressBarV2 *pb, QPainter *painter, const QWidget *widget) const;
 
 private:
-    QnNoptixStyleAnimator *m_animator;
+    QnNoptixStyleAnimator *m_hoverAnimator, *m_rotationAnimator;
     QnSkin *m_skin;
     QnGlobals *m_globals;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
@@ -65,28 +65,35 @@ private:
 };
 
 
-namespace Qn { namespace {
-    /**
-     * Name of a property to set on a <tt>QAction</tt> that is checkable, but for
-     * which checkbox must not be displayed in a menu. 
-     */
-    const char *HideCheckBoxInMenu              = "_qn_hideCheckBoxInMenu";
+/**
+ * Name of a property to set on a <tt>QAction</tt> that is checkable, but for
+ * which checkbox must not be displayed in a menu. 
+ */
+#define HideCheckBoxInMenu              _id("_qn_hideCheckBoxInMenu")
 
-    /**
-     * Name of a property to set on a <tt>QAbstractItemView</tt> to change
-     * default opacity if its items' background.
-     */
-    const char *ItemViewItemBackgroundOpacity   = "_qn_itemViewItemBackgroundOpacity";
+/**
+ * Name of a property to set on a <tt>QAbstractItemView</tt> to change
+ * default opacity if its items' background.
+ */
+#define ItemViewItemBackgroundOpacity   _id("_qn_itemViewItemBackgroundOpacity")
 
-    /**
-     * Name of a property to set on a <tt>QAbstractSlider</tt> or 
-     * <tt>AbstractGraphicsSlider</tt> to change default width of the slider handle.
-     */
-    const char *SliderLength                    = "_qn_sliderLength";
+/**
+ * Name of a property to set on a <tt>QAbstractSlider</tt> or 
+ * <tt>AbstractGraphicsSlider</tt> to change default width of the slider handle.
+ */
+#define SliderLength                    _id("_qn_sliderLength")
 
-#define HideCheckBoxInMenu HideCheckBoxInMenu
-#define ItemViewItemBackgroundOpacity ItemViewItemBackgroundOpacity
-#define SliderLength SliderLength
-}}
+/**
+ * Name of a property to set on a <tt>QToolButton</tt> to make it rotate
+ * when checked. Value defines rotation speed in degrees per second.
+ */
+#define ToolButtonCheckedRotationSpeed  _id("_qn_toolButtonCheckedRotationSpeed")
+
+/**
+ * Name of a property to set on a <tt>QTreeView</tt> to make it hide
+ * last row if there is not enough space for it.
+ */
+#define HideLastRowInTreeIfNotEnoughSpace _id("_qn_hideLastRowInTreeIfNotEnoughSpace")
+
 
 #endif // QN_NOPTIX_STYLE_H

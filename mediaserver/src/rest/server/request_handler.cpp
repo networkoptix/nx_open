@@ -1,5 +1,26 @@
 #include <QDebug>
+#include <QDateTime>
+#include <QStringList>
 #include "request_handler.h"
+#include "utils/common/util.h"
+
+qint64 QnRestRequestHandler::parseDateTime(const QString& dateTime)
+{
+    if (dateTime.toLower().trimmed() == "now")
+    {
+        return DATETIME_NOW;
+    }
+    else if (dateTime.contains('T') || dateTime.contains('-'))
+    {
+        QStringList dateTimeParts = dateTime.split('.');
+        QDateTime tmpDateTime = QDateTime::fromString(dateTimeParts[0], Qt::ISODate);
+        if (dateTimeParts.size() > 1)
+            tmpDateTime = tmpDateTime.addMSecs(dateTimeParts[1].toInt()/1000);
+        return tmpDateTime.toMSecsSinceEpoch() * 1000;
+    }
+    else
+        return dateTime.toLongLong();
+}
 
 class QnRestGUIRequestHandler::QnRestGUIRequestHandlerPrivate {
 public:

@@ -1,6 +1,6 @@
 package pb;
 
-option java_package = "com.networkoptix.hdwitness.protobuf";
+option java_package = "com.google.protobuf.implementation";
 option java_outer_classname = "ResourceProtos";
 
 message Resource {
@@ -17,8 +17,7 @@ message Resource {
         Offline      = 0;
         Unauthorized = 1;
         Online       = 2;
-        Disabled     = 3;
-        Recording    = 4;
+        Recording    = 3;
     }
 
     message Property {

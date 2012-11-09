@@ -141,7 +141,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     }
 
 
-    QnNetworkResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
@@ -156,6 +156,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
 
     resource->setTypeId(rt);
     resource->setName(name);
+    resource->setModel(name);
     resource->setMAC(smac);
 
     local_results.push_back(resource);
@@ -208,11 +209,12 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
         return;
     }
 
-    QnNetworkResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource ( new QnPlIqResource() );
     in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
     QHostAddress peerAddress(QLatin1String(inet_ntoa(*peer_addr)));
     resource->setTypeId(rt);
     resource->setName(nameStr);
+    resource->setModel(nameStr);
     resource->setMAC(macAddr);
     resource->setHostAddress(peerAddress, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryAddress);

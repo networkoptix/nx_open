@@ -5,6 +5,14 @@
 
 #include "Utils.h"
 
+UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyMediaServerProfile");
+}
+
+UINT __stdcall CopyAppServerProfile(MSIHANDLE hInstall) {
+    return CopyProfile(hInstall, "CopyAppServerProfile");
+}
+
 UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -14,16 +22,26 @@ UINT __stdcall FindConfiguredStorages(MSIHANDLE hInstall)
     CRegKey RegKey;
 
     CAtlString registryPath;
+    CAtlString arch;
 
     hr = WcaInitialize(hInstall, "FindConfiguredStorages");
     ExitOnFailure(hr, "Failed to initialize");
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
+    arch = GetProperty(hInstall, L"ARCHITECTURE");
+
     registryPath = GetProperty(hInstall, L"MEDIASERVER_REGISTRY_PATH");
     registryPath += L"\\storages";
 
-    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ|KEY_WOW64_32KEY) != ERROR_SUCCESS) {
+    int flags = KEY_READ;
+    if (arch == "x86") {
+        flags |= KEY_WOW64_32KEY;
+    } else {
+        flags |= KEY_WOW64_64KEY;
+    }
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, flags) != ERROR_SUCCESS) {
         WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
         goto LExit;
     }
@@ -106,6 +124,7 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
 /**
   * Check if drive which contains directory specified in SERVER_DIRECTORY installer property 
   * have space less than 10GB.
@@ -261,11 +280,6 @@ LExit:
     return WcaFinalize(er);
 }
 
-void fixPath(CString& path)
-{
-	path.Replace(L"/", L"\\");
-}
-
 UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -276,11 +290,41 @@ UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-	{
-		CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
-		fixPath(serverFolder);
-		MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
-	}
+    {
+        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
+        fixPath(serverFolder);
+        MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "AnalyzeServerDirectoryReg");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
+
+        if (CPath(serverFolder).IsDirectory())
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"");
+
+        if (serverFolder.Find(L"coldstore://") == 0)
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"");
+    }
 
 LExit:
     
@@ -298,11 +342,33 @@ UINT __stdcall FixClientFolder(MSIHANDLE hInstall)
 
     WcaLog(LOGMSG_STANDARD, "Initialized.");
 
-	{
-		CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
-		fixPath(clientFolder);
-		MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
-	}
+    {
+        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+        fixPath(clientFolder);
+        MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", clientFolder);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "IsClientFolderExists");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
+        if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
+            MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
+    }
 
 LExit:
     

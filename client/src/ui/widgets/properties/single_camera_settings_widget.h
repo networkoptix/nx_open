@@ -2,7 +2,7 @@
 #define CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "utils/camera_advanced_settings_xml_parser.h"
@@ -46,7 +46,13 @@ public:
         return m_hasDbChanges;
     }
 
-    QnVideoServerConnectionPtr getServerConnection() const;
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const {
+        return m_hasControlsChanges;
+    }
+
+
+    QnMediaServerConnectionPtr getServerConnection() const;
 
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
         return m_modifiedAdvancedParamsOutgoing;
@@ -61,6 +67,8 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    void setExportScheduleButtonEnabled(bool enabled);
+
 public slots:
     void setAdvancedParam(const CameraSetting& val);
     void refreshAdvancedSettings();
@@ -69,6 +77,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -79,10 +88,13 @@ private slots:
     void at_dbDataChanged();
     void at_cameraDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_recordingSettingsChanged();
+    void at_cameraScheduleWidget_gridParamsChanged();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
     void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
+    void at_pingButton_clicked();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();
@@ -116,7 +128,13 @@ private:
     bool m_hasCameraChanges;
     bool m_anyCameraChanges;
     bool m_hasDbChanges;
+
+    /** Indicates that schedule was changed */
     bool m_hasScheduleChanges;
+
+    /** Indicates that the user changed controls but not applied them to the schedule */
+    bool m_hasControlsChanges;
+
     bool m_readOnly;
 
     QnCameraMotionMaskWidget *m_motionWidget;
@@ -127,7 +145,7 @@ private:
     CameraSettingsWidgetsTreeCreator* m_widgetsRecreator;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParams;
     QList< QPair< QString, QVariant> > m_modifiedAdvancedParamsOutgoing;
-    mutable QnVideoServerConnectionPtr m_serverConnection;
+    mutable QnMediaServerConnectionPtr m_serverConnection;
 };
 
 #endif // CAMERA_SETTINGS_DIALOG_H

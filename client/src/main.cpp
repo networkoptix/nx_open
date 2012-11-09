@@ -28,13 +28,12 @@
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
 #include "decoders/video/abstractdecoder.h"
-#include "device_plugins/desktop/device/desktop_device_server.h"
+#include "device_plugins/desktop/device/desktop_resource_searcher.h"
 #include "libavformat/avio.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
-#include "core/resourcemanagment/resource_discovery_manager.h"
-#include "core/resourcemanagment/resource_pool.h"
-#include "utils/client_util.h"
+#include "core/resource_managment/resource_discovery_manager.h"
+#include "core/resource_managment/resource_pool.h"
 #include "plugins/resources/arecontvision/resource/av_resource_searcher.h"
 #include "api/app_server_connection.h"
 #include "device_plugins/server_camera/server_camera.h"
@@ -44,7 +43,7 @@
 #define TEST_RTSP_SERVER
 //#define STANDALONE_MODE
 
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
@@ -70,11 +69,21 @@
 #include "ui/workbench/workbench_translation_manager.h"
 
 #ifdef Q_WS_X11
-    #include "utils/app_focus_listener.h"
+    #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
 #include "ui/style/globals.h"
 #include "openal/qtvaudiodevice.h"
+#include "ui/workaround/fglrx_full_screen.h"
+
+#ifdef Q_OS_WIN
+    #include "ui/workaround/iexplore_url_handler.h"
+#endif
+
+#include "ui/help/help_handler.h"
+#include "client/client_module.h"
+#include "platform/platform_abstraction.h"
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -131,31 +140,17 @@ void addTestFile(const QString& fileName, const QString& resId)
 void addTestData()
 {
     /*
-    QnVideoServerPtr server(new QnVideoServer());
-    server->setUrl("rtsp://localhost:50000");
-    server->setApiUrl("rtsp://localhost:8080");
-    //server->startRTSPListener();
-    qnResPool->addResource(QnResourcePtr(server));
-
-    QnServerCameraPtr testCamera(new QnServerCamera());
-    testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00-1A-07-00-A5-76"));
-    testCamera->setName("testCamera");
-    qnResPool->addResource(QnResourcePtr(testCamera));
-    */
-
-    /*
     QnAviResourcePtr resource(new QnAviResource("E:/Users/roman76r/video/ROCKNROLLA/BDMV/STREAM/00000.m2ts"));
     resource->removeFlag(QnResource::local); // to initialize access to resource throught RTSP server
     resource->addFlag(QnResource::remote); // to initialize access to resource throught RTSP server
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
-
+ 
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
+    testCamera->setMAC(QnMacAddress("00000"));    
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -197,7 +192,7 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // TODO: #Ivan. Enable it when removing all places on receiving messages.
     // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
@@ -223,7 +218,7 @@ static void myMsgHandler(QtMsgType type, const char *msg)
 
 int qnMain(int argc, char *argv[])
 {
-    QN_INIT_MODULE_RESOURCES(common);
+    QnClientModule client(argc, argv);
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -233,9 +228,12 @@ int qnMain(int argc, char *argv[])
 #endif
 
     /* Set up application parameters so that QSettings know where to look for settings. */
-    QApplication::setOrganizationName(QLatin1String(ORGANIZATION_NAME));
-    QApplication::setApplicationName(QLatin1String(APPLICATION_NAME));
-    QApplication::setApplicationVersion(QLatin1String(APPLICATION_VERSION));
+    QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
+    QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
+    QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+
+    /* We don't want changes in desktop color settings to mess up our custom style. */
+    QApplication::setDesktopSettingsAware(false);
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
@@ -245,19 +243,22 @@ int qnMain(int argc, char *argv[])
     QString devModeKey;
     bool noSingleApplication = false;
     int screen = -1;
-    QString authenticationString, delayedDrop, logLevel;
+    QString authenticationString, delayedDrop, instantDrop, logLevel;
     QString translationPath = qnSettings->translationPath();
     bool devBackgroundEditable = false;
+    bool skipMediaFolderScan = false;
     
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&noSingleApplication,    "--no-single-application",      NULL,   QString());
     commandLineParser.addParameter(&authenticationString,   "--auth",                       NULL,   QString());
     commandLineParser.addParameter(&screen,                 "--screen",                     NULL,   QString());
     commandLineParser.addParameter(&delayedDrop,            "--delayed-drop",               NULL,   QString());
+    commandLineParser.addParameter(&instantDrop,            "--instant-drop",               NULL,   QString());
     commandLineParser.addParameter(&logLevel,               "--log-level",                  NULL,   QString());
     commandLineParser.addParameter(&translationPath,        "--translation",                NULL,   QString());
     commandLineParser.addParameter(&devModeKey,             "--dev-mode-key",               NULL,   QString());
     commandLineParser.addParameter(&devBackgroundEditable,  "--dev-background-editable",    NULL,   QString());
+    commandLineParser.addParameter(&skipMediaFolderScan,    "--skip-media-folder-scan",     NULL,   QString());
     commandLineParser.parse(argc, argv, stderr);
 
     /* Dev mode. */
@@ -287,9 +288,17 @@ int qnMain(int argc, char *argv[])
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
 
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
+
 #ifdef Q_WS_X11
-    QnAppFocusListener appFocusListener;
-    application->installEventFilter(&appFocusListener);
+ //   QnX11LauncherWorkaround x11LauncherWorkaround;
+ //   application->installEventFilter(&x11LauncherWorkaround);
+#endif
+
+#ifdef Q_OS_WIN
+    QnIexploreUrlHandler iexploreUrlHanderWorkaround;
+    // all effects are placed in the constructor
+    Q_UNUSED(iexploreUrlHanderWorkaround)
 #endif
 
     if(singleApplication) {
@@ -327,9 +336,13 @@ int qnMain(int argc, char *argv[])
         return 0;
 
 
+    QnHelpHandler helpHandler;
+    qApp->installEventFilter(&helpHandler);
+
+
     QnLog::initLog(logLevel);
-    cl_log.log(APPLICATION_NAME, " started", cl_logALWAYS);
-    cl_log.log("Software version: ", APPLICATION_VERSION, cl_logALWAYS);
+    cl_log.log(QN_APPLICATION_NAME, " started", cl_logALWAYS);
+    cl_log.log("Software version: ", QN_APPLICATION_VERSION, cl_logALWAYS);
     cl_log.log("binary path: ", QFile::decodeName(argv[0]), cl_logALWAYS);
 
     defaultMsgHandler = qInstallMsgHandler(myMsgHandler);
@@ -356,12 +369,14 @@ int qnMain(int argc, char *argv[])
 
     //============================
     //QnResourceDirectoryBrowser
-    QnResourceDirectoryBrowser::instance().setLocal(true);
-    QStringList dirs;
-    dirs << qnSettings->mediaFolder();
-    dirs << qnSettings->extraMediaFolders();
-    QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    if(!skipMediaFolderScan) {
+        QnResourceDirectoryBrowser::instance().setLocal(true);
+        QStringList dirs;
+        dirs << qnSettings->mediaFolder();
+        dirs << qnSettings->extraMediaFolders();
+        QnResourceDirectoryBrowser::instance().setPathCheckList(dirs);
+        QnResourceDiscoveryManager::instance().addDeviceServer(&QnResourceDirectoryBrowser::instance());
+    }
 
 #ifdef STANDALONE_MODE
     QnPlArecontResourceSearcher::instance().setLocal(true);
@@ -400,19 +415,11 @@ int qnMain(int argc, char *argv[])
 
     qApp->setStyle(qnSkin->style());
 
-#if 0
-    // todo: remove me! debug only
-    QnCameraHistoryPtr history1(new QnCameraHistory());
-    qint64 dt = QDateTime::fromString("2012-04-12T19:19:00", Qt::ISODate).toMSecsSinceEpoch();
-    QnCameraTimePeriod period1(dt-1000*60*30, 1000*60*30, 2);
-    QnCameraTimePeriod period2(dt, 3600*24*1000ll, 43);
-    history1->setMacAddress("00-40-8C-BF-92-CE");
-    history1->addTimePeriod(period1);
-    history1->addTimePeriod(period2);
-    QnCameraHistoryPool::instance()->addCameraHistory(history1);
-#endif
-
+    /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
+    context->instance<QnFglrxFullScreen>(); /* Init fglrx workaround. */
+
+    /* Create main window. */
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data()));
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
 
@@ -425,8 +432,8 @@ int qnMain(int argc, char *argv[])
         }
     }
 
-    mainWindow->showFullScreen();
     mainWindow->show();
+    context->action(Qn::EffectiveMaximizeAction)->trigger();
         
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
@@ -461,6 +468,13 @@ int qnMain(int argc, char *argv[])
 
         QByteArray data = QByteArray::fromBase64(delayedDrop.toLatin1());
         context->menu()->trigger(Qn::DelayedDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
+    }
+
+    if (!instantDrop.isEmpty()){
+        qnSettings->setLayoutsOpenedOnLogin(false);
+
+        QByteArray data = QByteArray::fromBase64(instantDrop.toLatin1());
+        context->menu()->trigger(Qn::InstantDropResourcesAction, QnActionParameters().withArgument(Qn::SerializedResourcesParameter, data));
     }
 
 #ifdef _DEBUG

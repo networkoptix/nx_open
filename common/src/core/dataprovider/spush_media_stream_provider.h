@@ -3,7 +3,7 @@
 
 
 #include "media_streamdataprovider.h"
-#include "../datapacket/mediadatapacket.h"
+#include "../datapacket/media_data_packet.h"
 
 
 struct QnAbstractMediaData;

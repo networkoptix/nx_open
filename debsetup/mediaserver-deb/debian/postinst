@@ -20,14 +20,15 @@ fi
 function read_config {
     [ -f $CONFIG_FILE ] || { true; return; }
 
-    SERVER_GUID=$(cat $CONFIG_FILE | grep serverGuid | head -1 | sed 's/serverGuid=\(.*\)/\1/g')
-    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')
-    ECS_HOST=$(cat $CONFIG_FILE | grep appserverHost | head -1 | sed 's/appserverHost=\(.*\)/\1/g')
-    ECS_PORT=$(cat $CONFIG_FILE | grep appserverPort | head -1 | sed 's/appserverPort=\(.*\)/\1/g')
-    ECS_LOGIN=$(cat $CONFIG_FILE | grep appserverLogin | head -1 | sed 's/appserverLogin=\(.*\)/\1/g')
-    ECS_PASSWORD=$(cat $CONFIG_FILE | grep appserverPassword | head -1 | sed 's/appserverPassword=\(.*\)/\1/g')
-    STORAGE=$(cat $CONFIG_FILE | grep mediaDir | head -1 | sed 's/mediaDir=\(.*\)/\1/g')
-    PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port=\(.*\)/\1/g')
+    SERVER_GUID=$(cat $CONFIG_FILE | grep "^serverGuid=" | head -1 | sed 's/serverGuid=\(.*\)/\1/g')
+    LOG_FILE=$(cat $CONFIG_FILE | grep "^logFile=" | head -1 | sed 's/logFile=\(.*\)/\1/g')
+    ECS_HOST=$(cat $CONFIG_FILE | grep "^appserverHost=" | head -1 | sed 's/appserverHost=\(.*\)/\1/g')
+    ECS_PORT=$(cat $CONFIG_FILE | grep "^appserverPort=" | head -1 | sed 's/appserverPort=\(.*\)/\1/g')
+    ECS_LOGIN=$(cat $CONFIG_FILE | grep "^appserverLogin=" | head -1 | sed 's/appserverLogin=\(.*\)/\1/g')
+    ECS_PASSWORD=$(cat $CONFIG_FILE | grep "^appserverPassword=" | head -1 | sed 's/appserverPassword=\(.*\)/\1/g')
+    STORAGE=$(cat $CONFIG_FILE | grep "^mediaDir=" | head -1 | sed 's/mediaDir=\(.*\)/\1/g')
+    PORT=$(cat $CONFIG_FILE | grep "^port=" | head -1 | sed 's/port=\(.*\)/\1/g')
+    TRANSPORT=$(cat $CONFIG_FILE | grep "^rtspTransport=" | head -1 | sed 's/rtspTransport=\(.*\)/\1/g')
 
     # Compatibility option
     if [ -z "$PORT" ]
@@ -46,6 +47,7 @@ function write_config {
     [ -z "$ECS_PASSWORD" ] || echo "appserverPassword=$ECS_PASSWORD" >> $CONFIG_FILE
     [ -z "$STORAGE" ] || echo "mediaDir=$STORAGE" >> $CONFIG_FILE
     [ -z "$PORT" ] || echo "rtspPort=$PORT" >> $CONFIG_FILE
+    [ -z "$TRANSPORT" ] || echo "rtspTransport=$TRANSPORT" >> $CONFIG_FILE
 }
 
 function to_int {
@@ -133,6 +135,7 @@ case "$1" in
       done
 
       PORT=$(ask_for_value port "$PORT")
+      TRANSPORT=$(ask_for_value transport "$TRANSPORT")
 
       write_config
   ;;

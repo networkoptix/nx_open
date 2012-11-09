@@ -7,8 +7,10 @@
 
 #include <ui/common/geometry.h>
 #include <ui/actions/action_target_provider.h>
+#include <ui/animation/animation_timer_listener.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
+
 #include "workbench_context_aware.h"
 
 class QGraphicsProxyWidget;
@@ -26,7 +28,7 @@ class AnimatorGroup;
 class HoverFocusProcessor;
 
 class QnNavigationItem;
-class QnResourceTreeWidget;
+class QnResourceBrowserWidget;
 class GraphicsLabel;
 
 class QnWorkbenchDisplay;
@@ -43,7 +45,7 @@ class QnActionManager;
 class QnLayoutTabBar;
 class QnWorkbenchMotionDisplayWatcher;
 
-class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, protected QnGeometry {
+class QnWorkbenchUi: public QObject, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT;
     Q_ENUMS(Flags Flag);
 
@@ -60,7 +62,16 @@ public:
         /** Whether controls affect viewport margins. */
         AdjustMargins = 0x4,
     };
-    Q_DECLARE_FLAGS(Flags, Flag)
+    Q_DECLARE_FLAGS(Flags, Flag);
+
+    enum Panel {
+        NoPanel = 0x0,
+        TreePanel = 0x1,
+        TitlePanel = 0x2,
+        SliderPanel = 0x4,
+        HelpPanel = 0x8
+    };
+    Q_DECLARE_FLAGS(Panels, Panel);
 
     QnWorkbenchUi(QObject *parent = NULL);
 
@@ -86,17 +97,17 @@ public:
 
     bool isFpsVisible() const;
 
-    bool isTreeOpened() const {
-        return m_treeOpened;
-    }
+    /** Whether the tree is opened */
+    bool isTreeOpened() const;
 
-    bool isSliderOpened() const {
-        return m_sliderOpened;
-    }
+    /** Whether the tree is pinned */
+    bool isTreePinned() const;
 
-    bool isTitleOpened() const {
-        return m_titleUsed && m_titleOpened;
-    }
+    /** Whether navigation slider is opened. */
+    bool isSliderOpened() const;
+
+    /** Whether title bar is opened. */
+    bool isTitleOpened() const;
 
     bool isHelpOpened() const {
         return m_helpOpened;
@@ -167,6 +178,8 @@ public slots:
 protected:
     virtual bool event(QEvent *event) override;
 
+    virtual void tick(int deltaMSecs) override;
+
     QMargins calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal helpY);
     void updateViewportMargins();
 
@@ -175,7 +188,7 @@ protected:
     void updateFpsGeometry();
     void updateCalendarGeometry();
     Q_SLOT void updateSliderResizerGeometry();
-    void updatePanicButtonGeometry();
+    void updateSliderZoomButtonsGeometry();
 
     QRectF updatedTreeGeometry(const QRectF &treeGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry);
     QRectF updatedHelpGeometry(const QRectF &helpGeometry, const QRectF &titleGeometry, const QRectF &sliderGeometry, const QRectF &calendarGeometry);
@@ -187,11 +200,16 @@ protected:
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setHelpOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
+    void setZoomButtonsOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
-protected slots:
+private:
+    Panels openedPanels() const;
+    void setOpenedPanels(Panels panels);
+
+private slots:
     void updateHelpContext();
     
     void updateTreeOpacity(bool animate = true);
@@ -218,21 +236,22 @@ protected slots:
 
     void at_sliderItem_geometryChanged();
     void at_sliderResizerItem_geometryChanged();
-    void at_sliderShowButton_toggled(bool checked);
     void at_toggleThumbnailsAction_toggled(bool checked);
     void at_toggleCalendarAction_toggled(bool checked);
-
+    void at_toggleSliderAction_toggled(bool checked);
+    
     void at_treeWidget_activated(const QnResourcePtr &resource);
     void at_treeItem_paintGeometryChanged();
     void at_treeHidingProcessor_hoverFocusLeft();
     void at_treeShowingProcessor_hoverEntered();
     void at_treeShowButton_toggled(bool checked);
-    void at_treePinButton_toggled(bool checked);
+    void at_toggleTreeAction_toggled(bool checked);
+    void at_pinTreeAction_toggled(bool checked);
 
     void at_tabBar_closeRequested(QnWorkbenchLayout *layout);
     void at_titleItem_geometryChanged();
     void at_titleItem_contextMenuRequested(QObject *target, QEvent *event);
-    void at_titleShowButton_toggled(bool checked);
+    void at_toggleTitleBarAction_toggled(bool checked);
 
     void at_helpPinButton_toggled(bool checked);
     void at_helpShowButton_toggled(bool checked);
@@ -244,8 +263,15 @@ protected slots:
 
     void at_calendarShowButton_toggled(bool checked);
     void at_calendarItem_paintGeometryChanged();
+    void at_calendarHidingProcessor_hoverFocusLeft();
 
     void at_fpsItem_geometryChanged();
+
+    void at_sliderZoomInButton_pressed();
+    void at_sliderZoomInButton_released();
+    void at_sliderZoomOutButton_pressed();
+    void at_sliderZoomOutButton_released();
+
 
 private:
     /* Global state. */
@@ -274,23 +300,11 @@ private:
     /** Stored size of ui controls widget. */
     QRectF m_controlsWidgetRect;
 
-    /** Whether the tree is pinned. */
-    bool m_treePinned;
-
-    /** Whether the tree is opened. */
-    bool m_treeOpened;
-
     bool m_treeVisible;
 
     bool m_titleUsed;
 
-    /** Whether title bar is opened. */
-    bool m_titleOpened;
-
     bool m_titleVisible;
-
-    /** Whether navigation slider is opened. */
-    bool m_sliderOpened;
 
     bool m_sliderVisible;
 
@@ -315,6 +329,7 @@ private:
     /* In freespace mode? */
     bool m_inFreespace;
 
+    Panels m_unzoomedOpenedPanels;
 
 
     /* Slider-related state. */
@@ -324,10 +339,12 @@ private:
 
     QGraphicsWidget *m_sliderResizerItem;
 
-    QGraphicsWidget *m_sliderEaterItem;
-
     bool m_ignoreSliderResizerGeometryChanges;
     bool m_ignoreSliderResizerGeometryChanges2;
+
+    bool m_sliderZoomingIn, m_sliderZoomingOut;
+
+    QGraphicsWidget *m_sliderZoomButtonsWidget;
 
     /** Hover processor that is used to change slider opacity when mouse is hovered over it. */
     HoverFocusProcessor *m_sliderOpacityProcessor;
@@ -345,7 +362,7 @@ private:
     /* Tree-related state. */
 
     /** Navigation tree widget. */
-    QnResourceTreeWidget *m_treeWidget;
+    QnResourceBrowserWidget *m_treeWidget;
 
     /** Proxy widget for navigation tree widget. */
     QnMaskedProxyWidget *m_treeItem;
@@ -441,9 +458,12 @@ private:
 
     HoverFocusProcessor *m_calendarOpacityProcessor;
 
+    HoverFocusProcessor *m_calendarHidingProcessor;
+
     bool m_inCalendarGeometryUpdate;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Flags);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchUi::Panels);
 
 #endif // QN_WORKBENCH_UI_H

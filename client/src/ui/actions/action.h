@@ -1,12 +1,13 @@
 #ifndef QN_ACTION_H
 #define QN_ACTION_H
 
-#include <QAction>
-#include <QWeakPointer>
-#include <core/resource/resource_fwd.h>
+#include <QtCore/QWeakPointer>
+#include <QtCore/QMetaType>
+#include <QtGui/QAction>
+
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
-#include <core/resource/user_resource.h>
+#include <client/client_globals.h>
+
 #include "action_fwd.h"
 #include "actions.h"
 
@@ -14,6 +15,7 @@ class QGraphicsItem;
 
 class QnWorkbenchContext;
 class QnActionCondition;
+class QnActionFactory;
 class QnActionManager;
 class QnActionParameters;
 
@@ -144,6 +146,12 @@ public:
      */
     void setCondition(QnActionCondition *condition);
 
+    QnActionFactory *childFactory() const {
+        return m_childFactory.data();
+    }
+
+    void setChildFactory(QnActionFactory *childFactory);
+
     /**
      * \returns                         Child actions. These action will appear
      *                                  in a submenu for this action.
@@ -158,6 +166,7 @@ public:
 
     QString toolTipFormat() const;
     void setToolTipFormat(const QString &toolTipFormat);
+
 
     /**
      * \param scope                     Scope in which action is to be executed.
@@ -206,10 +215,13 @@ private:
     QString m_normalText, m_toggledText, m_pulledText;
     QString m_toolTipFormat, m_toolTipMarker;
     QWeakPointer<QnActionCondition> m_condition;
+    QWeakPointer<QnActionFactory> m_childFactory;
 
     QList<QnAction *> m_children;
     QHash<QnActionCondition *, QString> m_textConditions;
 };
+
+Q_DECLARE_METATYPE(QnAction *)
 
 #endif // QN_ACTION_H
 

@@ -1,7 +1,7 @@
 #ifndef axis_device_server_h_2219
 #define axis_device_server_h_2219
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 #include "../mdns/mdns_device_searcher.h"
 
 
@@ -17,7 +17,7 @@ public:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
-    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth);
+    virtual QnResourcePtr checkHostAddr(const QUrl& url, const QAuthenticator& auth) override;
 
 protected:
     QList<QnNetworkResourcePtr> processPacket(QnResourceList& result, QByteArray& responseData, const QHostAddress& discoveryAddress);

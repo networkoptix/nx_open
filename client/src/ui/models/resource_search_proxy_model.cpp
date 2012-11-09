@@ -2,10 +2,10 @@
 #include "resource_pool_model.h"
 
 #include <utils/common/delete_later.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <core/resource/resource.h>
 
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 
 QnResourceSearchProxyModel::QnResourceSearchProxyModel(QObject *parent): 
     QSortFilterProxyModel(parent),
@@ -74,5 +74,22 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
         return false;
 
     return true;
+}
+
+bool QnResourceSearchProxyModel::setData(const QModelIndex &index, const QVariant &value, int role) {
+    //TODO: #gdm move enum
+    if (index.column() == 1 /*CheckColumn*/ && role == Qt::CheckStateRole){
+        Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+        setCheckStateRecursive(index, checkState);
+        return true;
+    } else
+        return base_type::setData(index, value, role);
+}
+
+void QnResourceSearchProxyModel::setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state) {
+    for (int i = 0; i < rowCount(index); ++i){
+        setCheckStateRecursive(this->index(i, 1, index), state);
+    }
+    base_type::setData(index, state, Qt::CheckStateRole);
 }
 

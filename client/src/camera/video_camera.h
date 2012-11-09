@@ -15,12 +15,8 @@ class QnAbstractArchiveReader;
 class QnVideoCamera : public QObject {
     Q_OBJECT
 public:
-    QnVideoCamera(QnMediaResourcePtr resource, bool generateEndOfStreamSignal = false, QnAbstractMediaStreamDataProvider* reader = 0);
+    QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader = 0);
     virtual ~QnVideoCamera();
-
-    void startRecording();
-    void stopRecording();
-    bool isRecording();
 
     QnMediaResourcePtr resource();
 
@@ -45,14 +41,19 @@ public:
     bool isVisible() const { return m_isVisible; }
     void setVisible(bool value) { m_isVisible = value; }
 
-    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage = QnStorageResourcePtr());
+    /*
+    * Export motion stream to separate file
+    */
+    void setMotionIODevice(QSharedPointer<QBuffer>, int channel);
+
+    void exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, 
+                                 QnStorageResourcePtr storage = QnStorageResourcePtr(), QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport, int timeOffsetMs = 0);
 
     void setResource(QnMediaResourcePtr resource);
     void setExportProgressOffset(int value);
     int getExportProgressOffset() const;
-
+    QString exportedFileName() const;
 signals:
-    void reachedTheEnd();
     void recordingFailed(QString errMessage);
     void exportProgress(int progress);
     void exportFailed(const QString &errMessage);
@@ -68,22 +69,20 @@ public slots:
     void onExportFailed(QString fileName);
 
 protected slots:
-    void onReachedTheEnd();
     void at_exportProgress(int value);
 
 private:
+    mutable QMutex m_exportMutex;
     QnMediaResourcePtr m_resource;
     QnCamDisplay m_camdispay;
-    QnStreamRecorder* m_recorder;
     QnAbstractMediaStreamDataProvider* m_reader;
 
-    bool m_generateEndOfStreamSignal;
-    
     QnlTimeSource* m_extTimeSrc;
     bool m_isVisible;
     QnStreamRecorder* m_exportRecorder;
     QnAbstractArchiveReader* m_exportReader;
     int m_progressOffset;
+    QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
 };
 
 #endif //QN_VIDEO_CAMERA_H

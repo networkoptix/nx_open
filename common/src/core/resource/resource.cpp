@@ -7,7 +7,7 @@
 #include "utils/common/warnings.h"
 
 #include "core/dataprovider/abstract_streamdataprovider.h"
-#include "core/resourcemanagment/resource_pool.h"
+#include "core/resource_managment/resource_pool.h"
 
 #include "resource_command_processor.h"
 #include "resource_consumer.h"
@@ -16,6 +16,7 @@
 #include <typeinfo>
 #include <limits.h>
 #include "utils/common/synctime.h"
+#include "common/common_meta_types.h"
 
 QnResource::QnResource(): 
     QObject(),
@@ -27,14 +28,7 @@ QnResource::QnResource():
     m_initialized(false),
     m_initMutex(QMutex::Recursive)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnParam>();
-        qRegisterMetaType<QnId>();
-        metaTypesInitialized = true;
-
-        QnResourceProperty::test();
-    }
+    QnCommonMetaTypes::initilize();
 }
 
 QnResource::~QnResource()
@@ -74,7 +68,7 @@ void QnResource::updateInner(QnResourcePtr other)
 {
     Q_ASSERT(getUniqueId() == other->getUniqueId()); // unique id MUST be the same
 
-    m_id = other->m_id;
+    m_id = other->m_id; // TODO: this is WRONG!!!!!!!!!11111111
     m_typeId = other->m_typeId;
     m_lastDiscoveredTime = other->m_lastDiscoveredTime;
     m_tags = other->m_tags;
@@ -620,6 +614,8 @@ void QnResource::setId(QnId id) {
     QnId oldId = m_id;
     m_id = id;
 
+    mutexLocker.unlock();
+
     emit idChanged(oldId, id);
 }
 
@@ -629,10 +625,19 @@ QString QnResource::getUrl() const
     return m_url;
 }
 
-void QnResource::setUrl(const QString& value)
+void QnResource::setUrl(const QString &url)
 {
     QMutexLocker mutexLocker(&m_mutex);
-    m_url = value;
+
+    if(m_url == url)
+        return;
+
+    QString oldUrl = m_url;
+    m_url = url;
+
+    mutexLocker.unlock();
+
+    emit urlChanged();
 }
 
 void QnResource::addTag(const QString& tag)
@@ -826,4 +831,10 @@ bool QnResource::isInitialized() const
 QnAbstractPtzController* QnResource::getPtzController()
 {
     return 0;
+}
+
+void QnResource::setUniqId(const QString& value)
+{
+    Q_UNUSED(value)
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented");
 }

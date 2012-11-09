@@ -8,20 +8,24 @@ QnColorShaderProgram::QnColorShaderProgram(const QGLContext *context, QObject *p
     QGLShaderProgram(context, parent)
 {
     addShaderFromSourceCode(QGLShader::Vertex, "                                \
+        attribute vec4 color;                                                   \
+        varying vec4 fragColor;                                                 \
         void main() {                                                           \
-            gl_FrontColor = gl_Color;                                           \
+            fragColor = color;                                                  \
             gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;             \
         }                                                                       \
     ");
     addShaderFromSourceCode(QGLShader::Fragment, "                              \
         uniform vec4 colorMultiplier;                                           \
+        varying vec4 fragColor;                                                 \
         void main() {                                                           \
-            gl_FragColor = gl_Color * colorMultiplier;                          \
+            gl_FragColor = fragColor * colorMultiplier;                         \
         }                                                                       \
     ");
     link();
 
     m_colorMultiplierLocation = uniformLocation("colorMultiplier");
+    m_colorLocation = attributeLocation("color");
 }
 
 QSharedPointer<QnColorShaderProgram> QnColorShaderProgram::instance(const QGLContext *context) {

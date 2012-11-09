@@ -4,6 +4,7 @@
 #include "core/resource/camera_resource.h"
 
 
+
 QnLiveStreamProvider::QnLiveStreamProvider(QnResourcePtr res):
 m_livemutex(QMutex::Recursive),
 m_quality(QnQualityNormal),
@@ -17,11 +18,12 @@ m_softMotionLastChannel(0)
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_layout = m_cameraRes->getVideoLayout();
+    m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
-
+    //if (cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS)
 }
 
 void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
@@ -42,7 +44,7 @@ void QnLiveStreamProvider::setRole(QnResource::ConnectionRole role)
             }
 
             int oldFps = m_fps;
-            int newFps = qMin(5, m_cameraRes->getMaxFps());
+            int newFps = qMin(DESIRED_SECOND_STREAM_FPS, m_cameraRes->getMaxFps()); //ss; target for secind stream fps is 5 
             newFps = qMax(1, newFps);
 
             if (newFps != oldFps)
@@ -139,7 +141,7 @@ float QnLiveStreamProvider::getFps() const
     QMutexLocker mtx(&m_livemutex);
 
     if (m_fps < 0) // setfps never been called
-        m_fps = m_cameraRes->getMaxFps() - 4;
+        m_fps = m_cameraRes->getMaxFps() - 4; // 4 here is out of the blue; just somthing not maximum
 
     m_fps = qMin((int)m_fps, m_cameraRes->getMaxFps());
     m_fps = qMax((int)m_fps, 1);
@@ -206,7 +208,23 @@ void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
 
     int maxFps = res->getMaxFps();
 
-    int newSecFps = qMin(5, maxFps - newFps);
+    StreamFpsSharingMethod sharingMethod = res->streamFpsSharingMethod();
+    int newSecFps;
+
+    if (sharingMethod == sharePixels)
+    {
+        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
+        if (maxFps - newFps < 2 )
+            newSecFps = qMin(DESIRED_SECOND_STREAM_FPS/2,MIN_SECOND_STREAM_FPS);
+
+    }
+    else if (sharingMethod == shareFps)
+        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps - newFps); //ss; minimum between 5 and what is left;
+    else// noSharing
+        newSecFps = qMin(DESIRED_SECOND_STREAM_FPS, maxFps);
+
+
+
 
     //Q_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and assert is appear
 

@@ -19,12 +19,13 @@
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
-#include "plugins/resources/archive/filetypes.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
+#include "ui_findappserverdialog.h"
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
+#include "version.h"
 
 namespace {
     void setEnabled(const QObjectList &objects, QObject *exclude, bool enabled) {
@@ -40,9 +41,12 @@ namespace {
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
+    m_findAppServerDialog(new QDialog),
+    m_findAppServerDialogUI( new Ui::FindAppServerDialog ),
     m_context(context),
     m_requestHandle(-1),
-    m_renderingWidget(NULL)
+    m_renderingWidget(NULL),
+    m_foundEntCtrlModel( &m_entCtrlFinder )
 {
     if(!context)
         qnNullWarning(context);
@@ -94,6 +98,18 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
 
     resetConnectionsModel();
     updateFocus();
+
+    m_entCtrlFinder.start();
+    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
+    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( &m_foundEntCtrlModel );
+
+    connect(
+        m_findAppServerDialogUI->foundEnterpriseControllersView,
+        SIGNAL(doubleClicked(const QModelIndex&)),
+        m_findAppServerDialog.data(),
+        SLOT(accept()) );
+
+    connect( ui->selectEntCtrlButton, SIGNAL(clicked()), this, SLOT(onSelectEntCtrlButtonClicked()) );
 }
 
 LoginDialog::~LoginDialog() {
@@ -115,14 +131,15 @@ QUrl LoginDialog::currentUrl() const {
     return url;
 }
 
+QString LoginDialog::currentName() const {
+    return ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+}
+
 QnConnectInfoPtr LoginDialog::currentInfo() const {
     return m_connectInfo;
 }
 
 void LoginDialog::accept() {
-    /* Widget data may not be written out to the model yet. Force it. */
- //   m_dataWidgetMapper->submit();
-
     QUrl url = currentUrl();
     if (!url.isValid()) {
         QMessageBox::warning(this, tr("Invalid Login Information"), tr("The Login Information you have entered is not valid."));
@@ -131,19 +148,6 @@ void LoginDialog::accept() {
 
     QnAppServerConnectionPtr connection = QnAppServerConnectionFactory::createConnection(url);
     m_requestHandle = connection->connectAsync(this, SLOT(at_connectFinished(int, const QByteArray &, QnConnectInfoPtr, int)));
-
-    {
-        // TODO: #gdm ask Elrik about it a bit later
-        // Temporary 1.0/1.1 version check.
-        // Let's remove it 1.3/1.4.
-        QUrl httpUrl;
-        httpUrl.setHost(url.host());
-        httpUrl.setPort(url.port());
-        httpUrl.setScheme(QLatin1String("http"));
-        httpUrl.setUserName(QString());
-        httpUrl.setPassword(QString());
-        QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(at_oldHttpConnectFinished(int,QByteArray,QByteArray,int)));
-    }
 
     updateUsability();
 }
@@ -221,19 +225,6 @@ void LoginDialog::updateUsability() {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void LoginDialog::at_oldHttpConnectFinished(int status, QByteArray /*errorString*/, QByteArray /*data*/, int /*handle*/) {
-    if (status == 204) {
-        m_requestHandle = -1;
-
-        updateUsability();
-
-        QMessageBox::warning(
-            this,
-            tr("Could not connect to Enterprise Controller"),
-            tr("Connection could not be established.\nThe Enterprise Controller is incompatible. Please upgrade your enterprise controller or contact VMS administrator.")
-        );
-    }
-}
 
 void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString*/, QnConnectInfoPtr connectInfo, int requestHandle) {
     if(m_requestHandle != requestHandle) 
@@ -262,7 +253,7 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
         compatibilityChecker = &localChecker;
     }
 
-    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), qApp->applicationVersion(), QLatin1String("ECS"), connectInfo->version)) {
+    if (!compatibilityChecker->isCompatible(QLatin1String("Client"), QLatin1String(QN_ENGINE_VERSION), QLatin1String("ECS"), connectInfo->version)) {
         QMessageBox::warning(
             this,
             tr("Could not connect to Enterprise Controller"),
@@ -308,13 +299,13 @@ void LoginDialog::at_saveButton_clicked() {
     QnConnectionDataList connections = qnSettings->customConnections();
 
     bool ok = false;
-    QString defaultName = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
-    if (connections.contains(defaultName))
-        defaultName = connections.generateUniqueName(defaultName);
-    QString name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, defaultName, &ok);
+
+    QString name = tr("%1 at %2").arg(ui->loginLineEdit->text()).arg(ui->hostnameLineEdit->text());
+    name = QInputDialog::getText(this, tr("Save connection as..."), tr("Enter name:"), QLineEdit::Normal, name, &ok);
     if (!ok)
         return;
 
+    // save here because of the 'connections' field modifying
     QString password = ui->passwordLineEdit->text();
 
     if (connections.contains(name)){
@@ -327,6 +318,7 @@ void LoginDialog::at_saveButton_clicked() {
     }
 
     QnConnectionData connectionData(name, currentUrl());
+    connectionData.url.setPassword(QString());
     connections.prepend(connectionData);
     qnSettings->setCustomConnections(connections);
 
@@ -337,15 +329,27 @@ void LoginDialog::at_saveButton_clicked() {
 }
 
 void LoginDialog::at_deleteButton_clicked() {
-    QnConnectionDataList connections = qnSettings->customConnections();
-    QString name = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    QString name = currentName();
 
     if (QMessageBox::warning(this, tr("Delete connections"),
                                    tr("Are you sure you want to delete the connection\n%1?").arg(name),
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
+    QnConnectionDataList connections = qnSettings->customConnections();
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();
+}
+
+void LoginDialog::onSelectEntCtrlButtonClicked()
+{
+    if( !m_findAppServerDialog->exec() )
+        return; //cancel pressed
+    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
+    if( !selectedSrvIndex.isValid() )
+        return;
+
+    ui->hostnameLineEdit->setText( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
+    ui->portSpinBox->setValue( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
 }

@@ -10,6 +10,7 @@
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
+#include <client/client_meta_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -59,11 +60,7 @@ QnThumbnailsLoader::QnThumbnailsLoader(QnResourcePtr resource, bool decode):
     m_generation(0),
     m_cachedAspectRatio(0.0)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnThumbnail>();
-        metaTypesInitialized = true;
-    }
+    QnClientMetaTypes::initialize();
 
     connect(this, SIGNAL(updateProcessingLater()), this, SLOT(updateProcessing()), Qt::QueuedConnection);
 
@@ -366,7 +363,7 @@ void QnThumbnailsLoader::process() {
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
     qDebug() << "QnThumbnailsLoader::process START [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
-    qint64 startRealTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 startRealTime = QDateTime::currentMSecsSinceEpoch();
     qint64 startCpuTime = QnPerformance::currentThreadTimeMSecs();
 #endif
 
@@ -470,7 +467,7 @@ void QnThumbnailsLoader::process() {
     }
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
-    qint64 totalRealTime = qnSyncTime->currentMSecsSinceEpoch() - startRealTime;
+    qint64 totalRealTime = QDateTime::currentMSecsSinceEpoch() - startRealTime;
     qint64 totalCpuTime = QnPerformance::currentThreadTimeMSecs() - startCpuTime;
     qDebug() << "QnThumbnailsLoader::process END [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ") IN " << totalCpuTime << "/" << totalRealTime << "ms cpu/real time";
 #endif

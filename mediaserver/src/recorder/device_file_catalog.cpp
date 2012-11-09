@@ -61,7 +61,8 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     m_macAddress(macAddress),
     m_mutex(QMutex::Recursive),
     m_duplicateName(false),
-    m_role(role)
+    m_role(role),
+    m_lastAddIndex(-1)
 {
 #ifdef _TEST_TWO_SERVERS
     QString devTitleFile = closeDirPath(getDataDirectory()) + QString("test/record_catalog/media/");
@@ -83,7 +84,7 @@ DeviceFileCatalog::DeviceFileCatalog(const QString& macAddress, QnResource::Conn
     if (m_file.size() == 0) 
     {
         QTextStream str(&m_file);
-        str << "start; storage; index; duration\n"; // write CSV header
+        str << "timezone; start; storage; index; duration\n"; // write CSV header
         str.flush();
     }
     else {
@@ -101,11 +102,18 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return false;
+
+    if (!storage->isCatalogAccessible())
+        return true; // Can't check if file really exists
+
     QString prefix = closeDirPath(storage->getUrl()) + prefixForRole(m_role) + QString('/') + m_macAddress + QString('/');
 
    
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
+	if (chunk.timeZone != -1)
+		fileDate = fileDate.toUTC().addSecs(chunk.timeZone*60);
+
     int currentParts[4];
     currentParts[0] = fileDate.date().year();
     currentParts[1] = fileDate.date().month();
@@ -224,13 +232,13 @@ QList<QDate> DeviceFileCatalog::recordedMonthList()
     return rez;
 }
 
-void DeviceFileCatalog::addChunk(const Chunk& chunk, qint64 lastStartTime)
+void DeviceFileCatalog::addChunk(const Chunk& chunk)
 {
-    if (chunk.startTimeMs > lastStartTime) {
+    if (!m_chunks.isEmpty() && chunk.startTimeMs > m_chunks.last().startTimeMs) {
         m_chunks << chunk;
     }
     else {
-        ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
         m_chunks.insert(itr, chunk);
     }
 };
@@ -241,25 +249,28 @@ void DeviceFileCatalog::deserializeTitleFile()
     bool needRewriteCatalog = false;
     QFile newFile(m_file.fileName() + QString(".tmp"));
 
-    m_file.readLine(); // read header
+    int timeZoneExist = 0;
+    QByteArray headerLine = m_file.readLine();
+    if (headerLine.contains("timezone"))
+        timeZoneExist = 1;
     QByteArray line;
-    qint64 lastStartTime = 0;
     do {
         line = m_file.readLine();
         QList<QByteArray> fields = line.split(';');
-        if (fields.size() < 4) {
+        if (fields.size() < 4 + timeZoneExist) {
             continue;
         }
         int coeff = 1; // compabiliy with previous version (convert usec to ms)
-        if (fields[0].length() >= 16)
+        if (fields[0+timeZoneExist].length() >= 16)
             coeff = 1000;
-        qint64 startTime = fields[0].toLongLong()/coeff;
-        QString durationStr = fields[3].trimmed();
-        int duration = fields[3].trimmed().toInt()/coeff;
-        Chunk chunk(startTime, fields[1].toInt(), fields[2].toInt(), duration);
+        qint16 timeZone = timeZoneExist ? fields[0].toInt() : -1;
+        qint64 startTime = fields[0+timeZoneExist].toLongLong()/coeff;
+        QString durationStr = fields[3+timeZoneExist].trimmed();
+        int duration = fields[3+timeZoneExist].trimmed().toInt()/coeff;
+        Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
         QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
-        if (fields[3].trimmed().isEmpty()) 
+        if (fields[3+timeZoneExist].trimmed().isEmpty()) 
         {
             // duration unknown. server restart occured. Duration for chunk is unknown
             if (qnStorageMan->isStorageAvailable(chunk.storageIndex))
@@ -299,23 +310,26 @@ void DeviceFileCatalog::deserializeTitleFile()
             }       
             else 
             {
-                addChunk(chunk, lastStartTime);
+                addChunk(chunk);
             }
         }
         else {
             needRewriteCatalog = true;
         }
-        lastStartTime = startTime;
 
     } while (!line.isEmpty());
     newFile.close();
+    
+    if (!timeZoneExist)
+        needRewriteCatalog = true; // update catalog to new version
+
     if (needRewriteCatalog && newFile.open(QFile::WriteOnly))
     {
         QTextStream str(&newFile);
-        str << "start; storage; index; duration\n"; // write CSV header
+        str << "timezone; start; storage; index; duration\n"; // write CSV header
 
         foreach(Chunk chunk, m_chunks)
-            str << chunk.startTimeMs  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.durationMs << '\n';
+            str << chunk.timeZone << ';' << chunk.startTimeMs  << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';' << chunk.durationMs << '\n';
         str.flush();
 
         m_file.close();
@@ -335,11 +349,14 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
 
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin(), m_chunks.end(), chunk.startTimeMs);
-    m_chunks.insert(itr, chunk);
+    ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+    itr = m_chunks.insert(itr, chunk);
+    m_lastAddIndex = itr - m_chunks.begin();
+    //if (m_lastAddIndex < m_chunks.size()-1)
+    //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
     QTextStream str(&m_file);
 
-    str << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
+    str << chunk.timeZone << ';' << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
     if (chunk.durationMs >= 0)
         str << chunk.durationMs  << '\n';
     str.flush();
@@ -349,7 +366,9 @@ void DeviceFileCatalog::updateDuration(int durationMs)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
     QMutexLocker lock(&m_mutex);
-    m_chunks.last().durationMs = durationMs;
+    //m_chunks.last().durationMs = durationMs;
+    if (m_lastAddIndex >= 0)
+        m_chunks[m_lastAddIndex].durationMs = durationMs;
     QTextStream str(&m_file);
     str << durationMs << '\n';
     str.flush();
@@ -384,6 +403,7 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
         emit firstDataRemoved(m_firstDeleteCount);
         m_chunks.erase(m_chunks.begin(), m_chunks.begin() + m_firstDeleteCount);
         m_firstDeleteCount = 0;
+        m_lastAddIndex -= m_firstDeleteCount;
     }
     for (int i = 0; i < m_chunks.size();)
     {
@@ -435,10 +455,12 @@ bool DeviceFileCatalog::deleteFirstRecord()
         m_firstDeleteCount = 0;
         emit firstDataRemoved(m_chunks.size());
         m_chunks.clear();
+        m_lastAddIndex = -1;
     }
     if (m_firstDeleteCount == DELETE_COEFF) {
         emit firstDataRemoved(DELETE_COEFF);
         m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
+        m_lastAddIndex -= DELETE_COEFF;
         m_firstDeleteCount = 0;
     }
     return true;
@@ -488,7 +510,7 @@ QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
     return closeDirPath(storage->getUrl()) + 
                 prefixForRole(m_role) + QString('/') +
                 m_macAddress + QString('/') +
-                QnStorageManager::dateTimeStr(chunk.startTimeMs) + 
+                QnStorageManager::dateTimeStr(chunk.startTimeMs, chunk.timeZone) + 
                 strPadLeft(QString::number(chunk.fileIndex), 3, '0') + 
                 QString(".mkv");
 }
@@ -507,6 +529,10 @@ qint64 DeviceFileCatalog::maxTime() const
     QMutexLocker lock(&m_mutex);
     if (m_chunks.isEmpty())
         return AV_NOPTS_VALUE;
+    else if (m_lastAddIndex >= 0 && m_chunks[m_lastAddIndex].durationMs == -1)
+        return DATETIME_NOW;
+    else if (m_chunks.last().durationMs == -1)
+        return DATETIME_NOW;
     else
         return m_chunks.last().startTimeMs + qMax(0, m_chunks.last().durationMs);
 }

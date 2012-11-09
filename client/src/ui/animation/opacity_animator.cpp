@@ -25,8 +25,6 @@ namespace {
 
 } // anonymous namespace
 
-Q_DECLARE_METATYPE(VariantAnimator *);
-
 Q_GLOBAL_STATIC(VariantAnimator, staticVariantAnimator);
 
 VariantAnimator *opacityAnimator(QGraphicsObject *item, qreal speed) {

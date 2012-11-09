@@ -4,9 +4,13 @@
 #include <QtCore/QSharedPointer>
 #include <QtGui/QColor>
 
+#include <ui/graphics/opengl/gl_functions.h>
+
+class QGLContext;
+
 class QnColorShaderProgram;
 
-class QnLoadingProgressPainter {
+class QnLoadingProgressPainter: public QnGlFunctions {
 public:
     /**
      * \param innerRadius           Number in [0, 1] defining the inner radius of the progress sign.
@@ -25,9 +29,10 @@ public:
     void paint(qreal progress, qreal opacity);
 
 private:
+    GLuint m_buffer;
+    int m_vertexOffset, m_colorOffset, m_vertexCount;
     int m_sectorCount;
-    unsigned m_list;
-    QSharedPointer<QnColorShaderProgram> m_program;
+    QSharedPointer<QnColorShaderProgram> m_shader;
 };
 
 #endif // QN_LOADING_PROGRESS_PAINTER_H

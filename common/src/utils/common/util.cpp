@@ -184,3 +184,22 @@ quint64 getUsecTimer()
     return tv.tv_sec * 1000000ull + tv.tv_usec;
 #endif
 } 
+
+QString getValueFromString(const QString& line)
+{
+
+    int index = line.indexOf(QLatin1Char('='));
+
+    if (index < 1)
+        return QString();
+
+    return line.mid(index+1);
+}
+
+int currentTimeZone()
+{
+    QDateTime dt1(QDateTime::currentDateTime());
+    QDateTime dt2 = dt1.toUTC();
+    dt1.setTimeSpec(Qt::UTC);
+    return dt2.secsTo(dt1);
+}

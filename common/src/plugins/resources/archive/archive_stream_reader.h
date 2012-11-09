@@ -29,10 +29,10 @@ public:
     virtual bool isSingleShotMode() const;
 
 
-    virtual const QnVideoResourceLayout* getDPVideoLayout() const;
+    virtual const QnResourceVideoLayout* getDPVideoLayout() const;
     virtual const QnResourceAudioLayout* getDPAudioLayout() const;
-    static bool deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr);
-    static QString serializeLayout(const QnVideoResourceLayout* layout);
+    static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
+    static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);
@@ -51,8 +51,14 @@ public:
 
     bool setSendMotion(bool value);
 
-    void setPlaybackMask(const QnTimePeriodList& playbackMask);
+    virtual void setPlaybackRange(const QnTimePeriod& playbackRange) override;
+    virtual QnTimePeriod getPlaybackRange() const override;
+    virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
+    /*
+    *   setQualityForced same as setQuality but ignore 'disableQualityChange' mode
+    */
+    void setQualityForced(MediaQuality quality);
     virtual MediaQuality getQuality() const override;
     virtual void disableQualityChange() override;
     virtual void enableQualityChange() override;
@@ -70,6 +76,9 @@ public:
     virtual QnMediaContextPtr getCodecContext() const override;
 
     virtual void startPaused() override;
+
+    virtual qint64 startTime() const override;
+    virtual qint64 endTime() const override;
 protected:
     virtual bool init();
 
@@ -123,6 +132,7 @@ private:
     qint64 m_currentTimeHint;
 
 private:
+    bool m_jumpInSilenceMode;
     bool m_bofReached;
     bool m_canChangeQuality;
     bool m_externalLocked;
@@ -137,6 +147,7 @@ private:
     mutable QMutex m_jumpMtx;
     QWaitCondition m_singleShowWaitCond;
     QnAbstractMediaDataPtr m_currentData;
+    QnAbstractMediaDataPtr m_afterMotionData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
     QnMediaContextPtr m_codecContext;
@@ -150,7 +161,10 @@ private:
     bool m_isStillImage;
     double m_speed;
     bool m_rewSecondaryStarted[CL_MAX_CHANNELS];
+    QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
+    bool m_sendMotion;
+    bool m_outOfPlaybackMask;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

@@ -14,6 +14,9 @@ public:
     HandScrollInstrument(QObject *parent);
     virtual ~HandScrollInstrument();
 
+    Qt::MouseButtons mouseButtons() const;
+    void setMouseButtons(Qt::MouseButtons mouseButtons);
+
     void emulate(QPoint viewportDelta);
 
 signals:
@@ -37,20 +40,17 @@ protected:
     virtual void finishKinetic() override;
 
 private:
+    Qt::MouseButtons m_mouseButtons;
     QCursor m_originalCursor;
     QWeakPointer<QGraphicsView> m_currentView;
 };
 
-namespace Qn { namespace {
-    /**
-     * Name of the property to set on a graphics object to forbid hand scrolling
-     * on top of it. By default, this property is not set, and hand scrolling is
-     * thus enabled.
-     */
-    const char *NoHandScrollOver = "_qn_noHandScrollOver";
-
-#define NoHandScrollOver NoHandScrollOver
-}}
+/**
+ * Name of the property to set on a graphics object to forbid hand scrolling
+ * on top of it. By default, this property is not set, and hand scrolling is
+ * thus enabled.
+ */
+#define NoHandScrollOver _id("_qn_noHandScrollOver")
 
 
 #endif // QN_HAND_SCROLL_INSTRUMENT_H

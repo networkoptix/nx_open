@@ -1,7 +1,7 @@
 #ifndef COMMON_APPSERVER_H
 #define COMMON_APPSERVER_H
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 class QnAppServerResourceSearcher : virtual public QnAbstractResourceSearcher
 {

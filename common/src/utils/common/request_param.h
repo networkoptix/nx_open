@@ -4,6 +4,7 @@
 #include <QtCore/QList>
 #include <QtCore/QPair>
 #include <QtCore/QString>
+#include <QtCore/QMetaType>
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -15,5 +16,7 @@ public:
 };
 
 typedef QList<QPair<QString, QString> > QnRequestParamList;
+
+Q_DECLARE_METATYPE(QnRequestParamList);
 
 #endif // QN_REQUEST_PARAM_H

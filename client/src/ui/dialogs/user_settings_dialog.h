@@ -68,6 +68,8 @@ protected slots:
     void updateAccessRights() { updateElement(AccessRights); }
     void loadAccessRightsToUi(quint64 rights);
 
+    void updateDependantPermissions();
+
     void updateAll();
     void setHasChanges(bool hasChanges = true);
 
@@ -82,6 +84,15 @@ private:
     void fillAccessRightsAdvanced(quint64 rights);
     quint64 readAccessRightsAdvanced();
 
+    /** Utility function to access checkboxes. */
+    bool isCheckboxChecked(quint64 right);
+
+    /** Utility function to access checkboxes. */
+    void setCheckboxChecked(quint64 right, bool checked = true);
+
+    /** Utility function to access checkboxes. */
+    void setCheckboxEnabled(quint64 right, bool enabled = true);
+
     QScopedPointer<Ui::UserSettingsDialog> ui;
     QString m_currentPassword;
     QHash<QString, QnResourcePtr> m_userByLogin;
@@ -92,6 +103,9 @@ private:
     bool m_hasChanges;
     QHash<quint64, QCheckBox*> m_advancedRights;
     quint64 m_editorRights;
+
+    /** Status variable to avoid unneeded checks. */
+    bool m_inUpdateDependensies;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnUserSettingsDialog::ElementFlags)

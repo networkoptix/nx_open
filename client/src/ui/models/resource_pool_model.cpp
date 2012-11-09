@@ -6,26 +6,29 @@
 #include <QtCore/QCoreApplication>
 
 #include <utils/common/checked_cast.h>
+#include <common/common_meta_types.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_globals.h>
 
 #include "file_processor.h"
 
 namespace {
     enum Columns {
         NameColumn,
+        CheckColumn,
         ColumnCount
     };
 
@@ -38,6 +41,16 @@ namespace {
         return false;
     }
 
+    QString extractHost(const QString &url) {
+        /* Try it as a host address first. */
+        QHostAddress hostAddress(url);
+        if(!hostAddress.isNull())
+            return hostAddress.toString();
+
+        /* Then go default QUrl route. */
+        return QUrl(url).host();
+    }
+
 } // namespace
 
 
@@ -45,7 +58,7 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourcePoolModel::Node {
-    Q_DECLARE_TR_FUNCTIONS(Node);
+    Q_DECLARE_TR_FUNCTIONS(Node)
 public:
     enum State {
         Normal,     /**< Normal node. */
@@ -64,25 +77,29 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Online),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
-        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode);
+        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
 
         switch(type) {
         case Qn::RootNode:
-            m_name = tr("Root");
+            m_displayName = m_name = tr("Root");
             break;
         case Qn::LocalNode:
-            m_name = tr("Local");
+            m_displayName = m_name = tr("Local");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Local);
             break;
         case Qn::ServersNode:
-            m_name = tr("Servers");
+            m_displayName = m_name = tr("Servers");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Servers);
             break;
         case Qn::UsersNode:
-            m_name = tr("Users");
+            m_displayName = m_name = tr("Users");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+            break;
+        case Qn::BastardNode:
+            m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
             break;
         default:
             break;
@@ -99,7 +116,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
 
@@ -117,7 +135,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
     }
@@ -157,17 +176,25 @@ public:
         /* Update stored fields. */
         if(m_type == Qn::ResourceNode || m_type == Qn::ItemNode) {
             if(m_resource.isNull()) {
-                m_name = QString();
+                m_displayName = m_name = QString();
                 m_flags = 0;
                 m_status = QnResource::Online;
                 m_searchString = QString();
                 m_icon = QIcon();
             } else {
-                m_name = m_resource->getName();
+                m_displayName = m_name = m_resource->getName();
                 m_flags = m_resource->flags();
                 m_status = m_resource->getStatus();
                 m_searchString = m_resource->toSearchString();
                 m_icon = qnResIconCache->icon(m_flags, m_status);
+
+                if(m_model->m_urlsShown) {
+                    if((m_flags & QnResource::network) || (m_flags & QnResource::server && m_flags & QnResource::remote)) {
+                        QString host = extractHost(m_resource->getUrl());
+                        if(!host.isEmpty())
+                            m_displayName = tr("%1 (%2)").arg(m_name).arg(host);
+                    }
+                }
             }
         }
 
@@ -175,27 +202,26 @@ public:
         bool bastard = false;
         switch(m_type) {
         case Qn::ItemNode:
-            /* Well, this is an ugly hack, as this case must be handled at different level, 
-             * but we want to feel safe even when it gets fixed. */
-            bastard = m_resource.isNull(); 
+            bastard = m_resource.isNull();
             break;
         case Qn::ResourceNode: 
             bastard = !(m_model->accessController()->permissions(m_resource) & Qn::ReadPermission); /* Hide non-readable resources. */
-            if(!bastard) {
-                QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>();
-                if(layout) {
-                    /* Hide local layouts that are not file-based. */
-                    bastard = m_model->snapshotManager()->isLocal(layout) && (m_flags & QnResource::local_media) != QnResource::local_media; 
-                }
-                if(!bastard)
-                    bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
-            }
+            if(!bastard)
+                if(QnLayoutResourcePtr layout = m_resource.dynamicCast<QnLayoutResource>()) /* Hide local layouts that are not file-based. */
+                    bastard = m_model->snapshotManager()->isLocal(layout) && !m_model->snapshotManager()->isFile(layout); 
+            if(!bastard)
+                bastard = (m_flags & QnResource::local_server) == QnResource::local_server; /* Hide local server resource. */
+            if(!bastard)
+                bastard = (m_flags & QnResource::local_media) == QnResource::local_media && m_resource->getUrl().startsWith(QLatin1String("layout://")); // TODO: hack hack hack
             break;
         case Qn::UsersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission);
             break;
         case Qn::ServersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+            break;
+        case Qn::BastardNode:
+            bastard = true;
             break;
         default:
             break;
@@ -204,6 +230,13 @@ public:
 
         /* Notify views. */
         changeInternal();
+    }
+
+    void updateRecursive() {
+        update();
+
+        foreach(Node *child, m_children)
+            child->updateRecursive();
     }
 
     Qn::NodeType type() const {
@@ -311,8 +344,10 @@ public:
         return m_model->createIndex(row, col, this);
     }
 
-    Qt::ItemFlags flags() const {
+    Qt::ItemFlags flags(int column) const {
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
+        if (column== CheckColumn)
+            result |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -338,13 +373,21 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_name + (m_modified ? QLatin1String("*") : QString());
+            if (column == NameColumn)
+                return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            break;
         case Qt::DecorationRole:
-            if (column == 0)
+            if (column == NameColumn)
                 return m_icon;
             break;
         case Qt::EditRole:
-            return m_name;
+            if (column == NameColumn)
+                return m_name;
+            break;
+        case Qt::CheckStateRole:
+            if (column == CheckColumn)
+                return m_checked;
+            break;
         case Qn::ResourceRole:
             if(m_resource)
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
@@ -363,6 +406,18 @@ public:
             return static_cast<int>(m_status);
         case Qn::NodeTypeRole:
             return static_cast<int>(m_type);
+        case Qn::HelpTopicIdRole:
+            if(m_flags & QnResource::layout) {
+                return Qn::MainWindow_Tree_Layouts_Help;
+            } else if(m_flags & QnResource::user) {
+                return Qn::MainWindow_Tree_Users_Help;
+            } else if(m_flags & QnResource::local) {
+                return Qn::MainWindow_Tree_Local_Help;
+            } else if(m_flags & QnResource::server) {
+                return Qn::MainWindow_Tree_Servers_Help;
+            } else {
+                return -1;
+            }
         default:
             break;
         }
@@ -371,7 +426,11 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        Q_UNUSED(column);
+        if (column == CheckColumn && role == Qt::CheckStateRole){
+            m_checked = (Qt::CheckState)value.toInt();
+            changeInternal();
+            return true;
+        }
 
         if(role != Qt::EditRole)
             return false;
@@ -398,7 +457,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(NameColumn);
             int row = m_children.indexOf(child);
 
             m_model->beginRemoveRows(index, row, row);
@@ -413,7 +472,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(NameColumn);
             int row = m_children.size();
 
             m_model->beginInsertRows(index, row, row);
@@ -428,7 +487,7 @@ protected:
         if(!isValid() || isBastard())
             return;
         
-        QModelIndex index = this->index(0);
+        QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
     }
 
@@ -466,6 +525,9 @@ private:
     /** Resource flags. */
     QnResource::Flags m_flags;
 
+    /** Display name of this node */
+    QString m_displayName;
+
     /** Name of this node. */
     QString m_name;
 
@@ -480,38 +542,64 @@ private:
 
     /** Whether this resource is modified. */
     bool m_modified;
+
+    /** Whether this resource is checked. */
+    Qt::CheckState m_checked;
 };
 
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
+QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType):
     QAbstractItemModel(parent), 
-    QnWorkbenchContextAware(parent)
+    QnWorkbenchContextAware(parent),
+    m_urlsShown(true),
+    m_rootNodeType(rootNodeType)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qn::ResourceRole,      "resource");
-    roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::ItemUuidRole,          "uuid");
+    roles.insert(Qn::ResourceRole,              "resource");
+    roles.insert(Qn::ResourceFlagsRole,         "flags");
+    roles.insert(Qn::ItemUuidRole,              "uuid");
     roles.insert(Qn::ResourceSearchStringRole,  "searchString");
     roles.insert(Qn::ResourceStatusRole,        "status");
-    roles.insert(Qn::NodeTypeRole,      "nodeType");
+    roles.insert(Qn::NodeTypeRole,              "nodeType");
     setRoleNames(roles);
 
-    /* Create root. */
-    m_rootNode = new Node(this, Qn::RootNode);
+    // TODO: #gdm looks like we need an array indexed by Qn::NodeType here,
+    // it will make the code shorter.
 
     /* Create top-level nodes. */
     m_localNode = new Node(this, Qn::LocalNode);
-    m_localNode->setParent(m_rootNode);
-
     m_usersNode = new Node(this, Qn::UsersNode);
-    m_usersNode->setParent(m_rootNode);
-
     m_serversNode = new Node(this, Qn::ServersNode);
-    m_serversNode->setParent(m_rootNode);
+    m_bastardNode = new Node(this, Qn::BastardNode);
+
+    /* Create root. */
+    switch (rootNodeType) {
+    case Qn::LocalNode:
+        m_rootNode = m_localNode;
+        break;
+    case Qn::UsersNode:
+        m_rootNode = m_usersNode;
+        break;
+    case Qn::ServersNode:
+        m_rootNode = m_serversNode;
+        break;
+    default:
+        Q_ASSERT(rootNodeType == Qn::RootNode);
+        m_rootNode = new Node(this, Qn::RootNode);
+        break;
+    }
+
+    if (rootNodeType != Qn::LocalNode)
+        m_localNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+    if (rootNodeType != Qn::UsersNode)
+        m_usersNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+    if (rootNodeType != Qn::ServersNode)
+        m_serversNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
+
 
     /* Connect to context. */
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
@@ -542,10 +630,12 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
 
-    delete m_rootNode;
+    if (m_rootNodeType == Qn::RootNode)
+        delete m_rootNode;
     delete m_localNode;
     delete m_serversNode;
     delete m_usersNode;
+    delete m_bastardNode;
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
@@ -594,15 +684,29 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     if(node->resourceFlags() & QnResource::server)
         return m_serversNode;
 
-    if((node->resourceFlags() & QnResource::local_media) == QnResource::local_media)
-        return m_localNode;
-
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
-    if(!parentResource) {
-        return NULL;
+    if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
+        if(node->resourceFlags() & QnResource::local) {
+            return m_localNode;
+        } else {
+            return NULL;
+        }
     } else {
         return this->node(parentResource);
     }
+}
+
+bool QnResourcePoolModel::isUrlsShown() {
+    return m_urlsShown;
+}
+
+void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
+    if(urlsShown == m_urlsShown)
+        return;
+
+    m_urlsShown = urlsShown;
+
+    m_rootNode->updateRecursive();
 }
 
 
@@ -617,14 +721,14 @@ QModelIndex QnResourcePoolModel::index(int row, int column, const QModelIndex &p
 }
 
 QModelIndex QnResourcePoolModel::buddy(const QModelIndex &index) const {
-    return index.sibling(index.row(), 0);
+    return index;
 }
 
 QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
     if(!index.isValid())
         return QModelIndex();
 
-    return node(index)->parent()->index(0);
+    return node(index)->parent()->index(NameColumn);
 }
 
 bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
@@ -645,8 +749,7 @@ int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
-
-    return node(index)->flags();
+    return node(index)->flags(index.column());
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
@@ -748,7 +851,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                     withArgument(Qn::NameParameter, layout->getName())
             );
         }
-    } else if(QnVideoServerResourcePtr server = node->resource().dynamicCast<QnVideoServerResource>()) {
+    } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
             /* Allow drop of non-layout item data, from tree only. */
 
@@ -776,6 +879,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     connect(resource.data(), SIGNAL(nameChanged()),                                         this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(disabledChanged(bool, bool)),                           this, SLOT(at_resource_resourceChanged()));
+    connect(resource.data(), SIGNAL(urlChanged()),                                          this, SLOT(at_resource_resourceChanged()));
     connect(resource.data(), SIGNAL(resourceChanged()),                                     this, SLOT(at_resource_resourceChanged()));
 
     QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();

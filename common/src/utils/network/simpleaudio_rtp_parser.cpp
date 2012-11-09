@@ -2,7 +2,7 @@
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
-#include "core/datapacket/mediadatapacket.h"
+#include "core/datapacket/media_data_packet.h"
 #include "../common/math.h"
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
@@ -63,8 +63,9 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_audioLayout.setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBuffer, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, QList<QnAbstractMediaDataPtr>& result)
 {
+    quint8* rtpBuffer = rtpBufferBase + bufferOffset;
     result.clear();
 
     RtpHeader* rtpHeader = (RtpHeader*) rtpBuffer;

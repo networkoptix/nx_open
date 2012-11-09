@@ -77,6 +77,11 @@ bool QnFileStorageResource::isDirExists(const QString& url)
     return d.exists(removeProtocolPrefix(url));
 }
 
+bool QnFileStorageResource::isCatalogAccessible()
+{
+    return true;
+}
+
 bool QnFileStorageResource::isFileExists(const QString& url)
 {
     return QFile::exists(removeProtocolPrefix(url));

@@ -7,7 +7,7 @@
 
 #include <QtGui/QWidget>
 #include "screen_grabber.h"
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 #include "utils/common/threadqueue.h"
 
 class QnBufferedScreenGrabber: public QnLongRunnable

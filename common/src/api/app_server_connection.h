@@ -9,12 +9,12 @@
 #include "core/resource/resource_type.h"
 #include "core/resource/resource.h"
 #include "core/resource/network_resource.h"
-#include "core/resource/video_server_resource.h"
+#include "core/resource/media_server_resource.h"
 #include "core/resource/storage_resource.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/layout_resource.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "core/resource/user_resource.h"
 #include "licensing/license.h"
 #include "connectinfo.h"
@@ -87,24 +87,24 @@ public:
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int registerServer(const QnVideoServerResourcePtr&, QnVideoServerResourceList& servers, QByteArray& errorString);
+    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getServers(QnVideoServerResourceList& servers, QByteArray& errorString);
+    int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);
     int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
 
-    int saveSync(const QnVideoServerResourcePtr&, QByteArray& errorString);
+    int saveSync(const QnMediaServerResourcePtr&, QByteArray& errorString);
     int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
 
     // Returns request id
-    int saveAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
@@ -115,7 +115,7 @@ public:
     int saveAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
     int addLicenseAsync(const QnLicensePtr& resource, QObject* target, const char* slot);
 
-    int deleteAsync(const QnVideoServerResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
@@ -147,7 +147,7 @@ private:
     QnRequestParamList m_requestParams;
 
     QnResourceFactory& m_resourceFactory;
-    QnVideoServerResourceFactory m_serverFactory;
+    QnMediaServerResourceFactory m_serverFactory;
 
     QnApiSerializer& m_serializer;
 
@@ -160,12 +160,14 @@ public:
     static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
+    static QString currentVersion();
 	static QnResourceFactory* defaultFactory();
 
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
     static void setDefaultMediaProxyPort(int port);
+    static void setCurrentVersion(const QString& version);
 
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl& url);
@@ -175,6 +177,7 @@ private:
     QString m_clientGuid;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
+    QString m_currentVersion;
     QnResourceFactory* m_resourceFactory;
     QnApiPbSerializer m_serializer;
 };

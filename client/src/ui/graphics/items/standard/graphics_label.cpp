@@ -71,6 +71,7 @@ void GraphicsLabel::setText(const QString &text) {
 
     d->text = text;
     d->updateCachedData();
+    update();
 }
 
 void GraphicsLabel::clear() {

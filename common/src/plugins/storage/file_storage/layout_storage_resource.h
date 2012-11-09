@@ -16,6 +16,7 @@ class QnLayoutFileStorageResource: public QnStorageResource
 {
 public:
     QnLayoutFileStorageResource();
+    virtual ~QnLayoutFileStorageResource();
 
     static QnStorageResource* instance();
 
@@ -33,19 +34,13 @@ public:
     virtual bool renameFile(const QString& oldName, const QString& newName) override;
     virtual bool isFileExists(const QString& url) override;
     virtual bool isDirExists(const QString& url) override;
+    virtual bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
+    virtual void setUrl(const QString& value) override;
 
-protected:
-
-private:
-    static QString removeProtocolPrefix(const QString& url);
-
-    bool addFileEntry(const QString& fileName);
-    qint64 getFileOffset(const QString& fileName, qint64* fileSize);
-    void readIndexHeader();
-private:
+    bool switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile);
+public:
     static const int MAX_FILES_AT_LAYOUT = 256;
-    static const quint64 MAGIC_STATIC = 0xfed8260da9eebc04ll;
 
 #pragma pack(push, 4)
     struct QnLayoutFileIndexEntry
@@ -69,8 +64,32 @@ private:
     };
 #pragma pack(pop)
 
+    static QString removeProtocolPrefix(const QString& url);
+private:
+    bool addFileEntry(const QString& fileName);
+    qint64 getFileOffset(const QString& fileName, qint64* fileSize);
+    void readIndexHeader();
+    void registerFile(QnLayoutFile* file);
+    void unregisterFile(QnLayoutFile* file);
+
+    void closeOpenedFiles();
+    void restoreOpenedFiles();
+    void addBinaryPostfix(QFile& file);
+    int getPostfixSize() const;
+
+    static const quint64 MAGIC_STATIC = 0xfed8260da9eebc04ll;
+
+private:
     friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
+    QSet<QnLayoutFile*> m_openedFiles;
+    QMutex m_fileSync;
+    static QMutex m_storageSync;
+    static QSet<QnLayoutFileStorageResource*> m_allStorages;
+    qint64 m_novFileOffset;
+    //qint64 m_novFileLen;
 };
+
+typedef QSharedPointer<QnLayoutFileStorageResource> QnLayoutFileStorageResourcePtr;
 
 #endif // _LAYOUT_STORAGE_PROTOCOL_H__

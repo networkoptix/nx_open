@@ -17,6 +17,12 @@ extern "C" {
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
+char SIGN_TEXT_DELIMITER('\\');
+char SIGN_TEXT_DELIMITER_REPLACED('/');
+
+QByteArray INITIAL_SIGNATURE_MAGIC("BCDC833CB81C47bc83B37ECD87FD5217"); // initial MD5 hash
+QByteArray SIGNATURE_XOR_MAGIC = QByteArray::fromHex("B80466320F15448096F7CEE3379EEF78");
+
 
 int getSquareSize(int width, int height, int signBits)
 {
@@ -47,6 +53,19 @@ QnSignHelper::QnSignHelper():
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
+
+    m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
+    m_hwIdStr = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    if (m_hwIdStr.isEmpty())
+        m_hwIdStr = tr("Unknown");
+
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    m_licensedToStr = QString(tr("FREE license"));
+    foreach (QnLicensePtr license, list)
+    {
+        if (license->name() != QLatin1String("FREE"))
+            m_licensedToStr = license->name();
+    }
 }
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
@@ -92,7 +111,7 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &c
 
 QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
 {
-    static const int COLOR_THRESHOLD = 32;
+    static const int COLOR_THRESHOLD = 38;
 
     int signBits = signLen*8;
     int rowCnt = signBits / 16;
@@ -139,9 +158,24 @@ QByteArray QnSignHelper::getSign(const AVFrame* frame, int signLen)
     return QByteArray((const char*)signArray, signLen);
 }
 
+QByteArray QnSignHelper::getSignFromDigest(const QByteArray& digest)
+{
+    QByteArray result = digest;
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= SIGNATURE_XOR_MAGIC[i % SIGNATURE_XOR_MAGIC.size()];
+    return result.toHex();
+}
+
+QByteArray QnSignHelper::getDigestFromSign(const QByteArray& sign)
+{
+    QByteArray result = QByteArray::fromHex(sign);
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= SIGNATURE_XOR_MAGIC[i % SIGNATURE_XOR_MAGIC.size()];
+    return result;
+}
+
 QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintSize)
 {
-    QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
     if (m_lastPaintSize == paintSize)
     {
         painter.setFont(m_cachedFont);
@@ -149,15 +183,16 @@ QFontMetrics QnSignHelper::updateFontSize(QPainter& painter, const QSize& paintS
     }
 
     QFont font;
+    font.setPointSize(1);
     QFontMetrics metric(font);
     for (int i = 0; i < 100; ++i)
     {
-        font.setPointSize(font.pointSize() + 1);
         metric = QFontMetrics(font);
-        int width = metric.width(versionStr);
+        int width = metric.width(m_versionStr);
         int height = metric.height();
         if (width >= paintSize.width()/2 || height >= (paintSize.height()/2-text_y_offs) / 4)
             break;
+        font.setPointSize(font.pointSize() + 1);
     }
     painter.setFont(font);
 
@@ -213,24 +248,12 @@ void QnSignHelper::draw(QPainter& painter, const QSize& paintSize, bool drawText
 
     if (drawText)
     {
-        QString versionStr = qApp->applicationName().append(QLatin1String(" v")).append(qApp->applicationVersion());
         QFontMetrics metric = updateFontSize(painter, paintSize);
 
-        //painter.drawText(QPoint(text_x_offs, text_y_offs), qApp->organizationName());
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), versionStr);
-        QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
-        if (hid.isEmpty())
-            hid = tr("Unknown");
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(hid));
-        QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
-        QString licenseName(tr("FREE license"));
-        foreach (QnLicensePtr license, list)
-        {
-            if (license->name() != QLatin1String("FREE"))
-                licenseName = license->name();
-        }
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()), m_versionStr);
 
-        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(licenseName));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*2), tr("Hardware ID: ").append(m_hwIdStr));
+        painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*3), tr("Licensed to: ").append(m_licensedToStr));
         painter.drawText(QPoint(text_x_offs, text_y_offs + metric.height()*4), tr("Watermark: ").append(QLatin1String(m_sign.toHex())));
     }
 
@@ -307,14 +330,14 @@ void QnSignHelper::drawOnSignFrame(AVFrame* frame)
 
 }
 
-void QnSignHelper::extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady)
+void QnSignHelper::extractSpsPpsFromPrivData(const quint8* buffer, int bufferSize, SPSUnit& sps, PPSUnit& pps, bool& spsReady, bool& ppsReady)
 {
     spsReady = false;
     ppsReady = false;
 
-    const quint8* spsPpsData = (quint8*) data.data();
-    const quint8* spsPpsEnd = spsPpsData + data.size();
-    if (data.size() >= 7)
+    const quint8* spsPpsData = buffer;
+    const quint8* spsPpsEnd = buffer + bufferSize;
+    if (bufferSize >= 7)
     {
         if (spsPpsData[0] == 1)
         {
@@ -364,7 +387,7 @@ void QnSignHelper::extractSpsPpsFromPrivData(const QByteArray& data, SPSUnit& sp
     }
 }
 
-QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, AVCodecContext* /*avctx*/)
+QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* /*avctx*/)
 {
     QString result;
     SPSUnit sps;
@@ -372,7 +395,9 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     bool spsReady;
     bool ppsReady;
     QString profile;
-    extractSpsPpsFromPrivData(srcCodecExtraData, sps, pps, spsReady, ppsReady);
+    extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), sps, pps, spsReady, ppsReady);
+    if ((!spsReady || !ppsReady) && iFrame)
+        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), sps, pps, spsReady, ppsReady);
     if (spsReady && ppsReady)
     {
         if (sps.profile_idc >= 100)
@@ -399,17 +424,21 @@ QString QnSignHelper::fillH264EncoderParams(const QByteArray& srcCodecExtraData,
     return result;
 }
 
-int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCodecContext* /*videoCodecCtx*/, quint8* videoBuf, int out_size, int videoBufSize)
+int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, QnCompressedVideoDataPtr iFrame, AVCodecContext* /*videoCodecCtx*/, quint8* videoBuf, int out_size, int videoBufSize)
 {
     SPSUnit oldSps, newSps;
     PPSUnit oldPps, newPps;
     bool spsReady;
     bool ppsReady;
-    extractSpsPpsFromPrivData(srcCodecExtraData, oldSps, oldPps, spsReady, ppsReady);
+
+    extractSpsPpsFromPrivData((quint8*)srcCodecExtraData.data(), srcCodecExtraData.size(), oldSps, oldPps, spsReady, ppsReady);
+    if ((!spsReady || !ppsReady) && iFrame)
+        extractSpsPpsFromPrivData((quint8*)iFrame->data.data(), iFrame->data.size(), oldSps, oldPps, spsReady, ppsReady);
+
     if (!spsReady || !ppsReady)
         return out_size;
     int oldLen = oldSps.log2_max_pic_order_cnt_lsb;
-    extractSpsPpsFromPrivData(QByteArray((const char*)videoBuf,out_size), newSps, newPps, spsReady, ppsReady);
+    extractSpsPpsFromPrivData(videoBuf,out_size, newSps, newPps, spsReady, ppsReady);
     if (!spsReady || !ppsReady)
         return -1;
 
@@ -461,19 +490,34 @@ int QnSignHelper::correctX264Bitstream(const QByteArray& srcCodecExtraData, AVCo
 int QnSignHelper::correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int /*videoBufSize*/)
 {
     int x264PrefixLen = NALUnit::findNextNAL(videoBuf, videoBuf+out_size) - videoBuf;
+    int reqUnitSize = 4;
+    bool nalPrefixMode = true;
 
     const quint8* spsPpsData = (quint8*) srcCodecExtraData.data();
-    if (srcCodecExtraData.size() < 7)
-        return out_size;
-
-    if (spsPpsData[0] == 0)
+    if (srcCodecExtraData.size() > 0)
     {
+        if (srcCodecExtraData.size() < 7)
+            return out_size;
 
+        if (spsPpsData[0] == 0)
+        {
+            reqUnitSize = spsPpsData[2] == 1 ? 3 : 4;
+        }
+        else {
+            reqUnitSize = (spsPpsData[4] & 0x03) + 1;
+            nalPrefixMode = false;
+        }
+    }
+
+    memmove(videoBuf+reqUnitSize, videoBuf+x264PrefixLen, out_size - x264PrefixLen);
+    out_size += reqUnitSize - x264PrefixLen;
+    if (nalPrefixMode)
+    {
+        for (int i = 0; i < reqUnitSize-1; ++i)
+            videoBuf[i] = 0;
+        videoBuf[reqUnitSize-1] = 1;
     }
     else {
-        int reqUnitSize = (spsPpsData[4] & 0x03) + 1;
-        memmove(videoBuf+x264PrefixLen, videoBuf+reqUnitSize, out_size - x264PrefixLen);
-        out_size += reqUnitSize - x264PrefixLen;
         int tmp = out_size - reqUnitSize;
         for (int i = 0; i < reqUnitSize; ++i) 
         {
@@ -539,7 +583,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
     return size;
 }
 
-QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec)
+QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
 {
     QnCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
@@ -578,7 +622,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     if (videoCodecCtx->codec_id == CODEC_ID_H264)
     {
         // To avoid X.264 GPL restriction run x264 as separate process
-        QString optionStr = fillH264EncoderParams(srcCodecExtraData, videoCodecCtx); // make X264 frame compatible with existing stream
+        QString optionStr = fillH264EncoderParams(srcCodecExtraData, iFrame, videoCodecCtx); // make X264 frame compatible with existing stream
         out_size = runX264Process(frame, optionStr, videoBuf);
         if (out_size == -1)
             goto error_label;
@@ -602,7 +646,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
         out_size = removeH264SeiMessage(videoBuf, out_size);
 
         // make X264 frame compatible with existing stream
-        out_size = correctX264Bitstream(srcCodecExtraData, videoCodecCtx, videoBuf, out_size, videoBufSize); 
+        out_size = correctX264Bitstream(srcCodecExtraData, iFrame, videoCodecCtx, videoBuf, out_size, videoBufSize); 
         if (out_size == -1)
             goto error_label;
             // change nal prefix if need
@@ -631,4 +675,59 @@ void QnSignHelper::setLogo(QPixmap logo)
 void QnSignHelper::setSign(const QByteArray& sign)
 {
     m_sign = sign;
+}
+
+QByteArray QnSignHelper::getSignMagic()
+{
+    return INITIAL_SIGNATURE_MAGIC;
+}
+
+char QnSignHelper::getSignPatternDelim()
+{
+    return SIGN_TEXT_DELIMITER;
+}
+
+int QnSignHelper::getMaxSignSize()
+{
+    return 512;
+}
+
+QByteArray QnSignHelper::getSignPattern()
+{
+    QByteArray result;
+    result.append(INITIAL_SIGNATURE_MAGIC);
+    result.append(SIGN_TEXT_DELIMITER);
+
+    result.append(qApp->applicationName().toUtf8()).append(" v").append(qApp->applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
+
+    QString hid = QLatin1String(qnLicensePool->getLicenses().hardwareId());
+    if (hid.isEmpty())
+        hid = tr("Unknown");
+    result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
+
+    QList<QnLicensePtr> list = qnLicensePool->getLicenses().licenses();
+    QString licenseName(tr("FREE license"));
+    foreach (QnLicensePtr license, list)
+    {
+        if (license->name() != QLatin1String("FREE"))
+            licenseName = license->name();
+    }
+    QByteArray bLicName = licenseName.toUtf8().replace(SIGN_TEXT_DELIMITER, SIGN_TEXT_DELIMITER_REPLACED);
+    result.append(bLicName);
+    return result;
+}
+
+void QnSignHelper::setVersionStr(const QString& value)
+{
+    m_versionStr = value;
+}
+
+void QnSignHelper::setHwIdStr(const QString& value)
+{
+    m_hwIdStr = value;
+}
+
+void QnSignHelper::setLicensedToStr(const QString& value)
+{
+    m_licensedToStr = value;
 }

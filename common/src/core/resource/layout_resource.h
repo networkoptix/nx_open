@@ -8,6 +8,7 @@
 
 #include "resource.h"
 #include "layout_item_data.h"
+#include "recording/time_period.h"
 
 class QnLayoutResource: public QnResource {
     Q_OBJECT;
@@ -45,11 +46,6 @@ public:
 
     void setCellSpacing(qreal horizontalSpacing, qreal verticalSpacing);
 
-    /**
-     * Deserialize layout resource from file
-     */
-    static QnLayoutResourcePtr fromFile(const QString& xfile);
-
     void setData(const QHash<int, QVariant> &dataByRole);
 
     void setData(int role, const QVariant &value);
@@ -57,6 +53,13 @@ public:
     QHash<int, QVariant> data() const;
 
     void requestStore() { emit storeRequested(); } // TODO: hack
+
+    QnTimePeriod getLocalRange() const;
+    void setLocalRange(const QnTimePeriod& value);
+
+    static QString updateNovParent(const QString& novName, const QString& itemName);
+
+    virtual void setUrl(const QString& value) override;
 
 signals:
     void itemAdded(const QnLayoutItemData &item);
@@ -79,6 +82,7 @@ private:
     qreal m_cellAspectRatio;
     QSizeF m_cellSpacing;
     QHash<int, QVariant> m_dataByRole;
+    QnTimePeriod m_localRange;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);

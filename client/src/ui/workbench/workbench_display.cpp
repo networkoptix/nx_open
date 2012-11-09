@@ -15,9 +15,11 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/math.h>
 #include <utils/common/toggle.h>
+#include <client/client_meta_types.h>
+#include <common/common_meta_types.h>
 
 #include <core/resource/layout_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include <camera/resource_display.h>
 #include <camera/video_camera.h>
 
@@ -66,8 +68,6 @@
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
 
-
-Q_DECLARE_METATYPE(QUuid) // TODO: move out
 
 namespace {
     struct GraphicsItemZLess: public std::binary_function<QGraphicsItem *, QGraphicsItem *, bool> {
@@ -152,6 +152,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_frameWidthsDirty(false),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
+    m_inChangeLayout(false),
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
@@ -505,6 +506,10 @@ QnResourceWidget *QnWorkbenchDisplay::widget(Qn::ItemRole role) const {
     return m_widgetByRole[role];
 }
 
+QnResourceWidget *QnWorkbenchDisplay::widget(const QUuid &uuid) const {
+    return widget(workbench()->currentLayout()->item(uuid));
+}
+
 void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) {
     if(role < 0 || role >= Qn::ItemRoleCount) {
         qnWarning("Invalid item role '%1'.", static_cast<int>(role));
@@ -563,10 +568,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
             if (newMediaWidget->display()->archiveReader()) {
-                if (newMediaWidget->display()->camDisplay()->isRealTimeSource())
-                    newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
-                else
-                    newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
+                newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_AlwaysHigh, true);
                 newMediaWidget->display()->archiveReader()->disableQualityChange();
             }
         }
@@ -586,6 +588,14 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         if(m_curtainAnimator->isCurtained())
             updateCurtainedCursor();
 
+        break;
+    }
+    case Qn::ActiveRole: {
+        if(oldWidget)
+            oldWidget->setLocalActive(false);
+        if(newWidget)
+            newWidget->setLocalActive(true);
+        m_frameWidthsDirty = true;
         break;
     }
     case Qn::CentralRole: {
@@ -698,7 +708,9 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item) {
 }
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay) {
-    if (m_widgets.size() >= 24) { // TODO: item limit must be changeable.
+    const int maxItemCount = sizeof(void *) == sizeof(qint32) ? 24 : 64;
+
+    if (m_widgets.size() >= maxItemCount) { // TODO: item limit must be changeable.
         qnDeleteLater(item);
         return false;
     }
@@ -709,7 +721,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         return false;
     }
 
-    if (!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) { // TODO: unsupported for now
+    if ((!resource->hasFlags(QnResource::media) && !resource->hasFlags(QnResource::server)) || resource->hasFlags(QnResource::layout)) { // TODO: unsupported for now
         qnDeleteLater(item);
         return false;
     }
@@ -770,9 +782,18 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
         if(item == workbench()->item(static_cast<Qn::ItemRole>(i)))
             setWidget(static_cast<Qn::ItemRole>(i), widget);
 
-    if(startDisplay)
-        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+    if(startDisplay) {
+        if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
             mediaWidget->display()->start();
+            if(mediaWidget->display()->archiveReader()) {
+                if(item->layout()->resource() && !item->layout()->resource()->getLocalRange().isEmpty())
+                    mediaWidget->display()->archiveReader()->setPlaybackRange(item->layout()->resource()->getLocalRange());
+
+                if(m_widgets.size() == 1 && !mediaWidget->resource()->hasFlags(QnResource::live)) 
+                    mediaWidget->display()->archiveReader()->jumpTo(0, 0);
+            }
+        }
+    }
 
     return true;
 }
@@ -1099,14 +1120,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     /* Move! */
     WidgetAnimator *animator = this->animator(widget);
     if(animate) {
-        QEasingCurve easingCurve;
-
-        /*
-        QSizeF currentSize = widget->enclosingGeometry().size();
-        QSizeF targetSize = enclosingGeometry.size();
-        */
-
-        animator->moveTo(enclosingGeometry, item->rotation(), easingCurve);
+        animator->moveTo(enclosingGeometry, item->rotation());
     } else {
         animator->stop();
         widget->setEnclosingGeometry(enclosingGeometry);
@@ -1224,7 +1238,7 @@ void QnWorkbenchDisplay::adjustGeometry(QnWorkbenchItem *item, bool animate) {
     }
 
     /* Assume 4:3 AR of a single channel. In most cases, it will work fine. */
-    const QnVideoResourceLayout *videoLayout = widget->channelLayout();
+    const QnResourceVideoLayout *videoLayout = widget->channelLayout();
     const qreal estimatedAspectRatio = (4.0 * videoLayout->width()) / (3.0 * videoLayout->height());
     const Qt::Orientation orientation = estimatedAspectRatio > 1.0 ? Qt::Vertical : Qt::Horizontal;
     const QSize size = bestSingleBoundedSize(workbench()->mapper(), 1, orientation, estimatedAspectRatio);
@@ -1252,7 +1266,7 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() ? selectedFrameWidth : defaultFrameWidth);
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() ? selectedFrameWidth : defaultFrameWidth);
 }
 
 void QnWorkbenchDisplay::updateCurtainedCursor() {
@@ -1274,6 +1288,8 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item) {
     if(addItemInternal(item, true)) {
         synchronizeSceneBounds();
         fitInView();
+
+        workbench()->setItem(Qn::ZoomedRole, NULL); /* Unzoom & fit in view on item addition. */
     }
 }
 
@@ -1293,6 +1309,10 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
+    if (m_inChangeLayout)
+        qWarning() << "Changing layout while changing layout. Error! #GDM";
+
+    m_inChangeLayout = true;
     QnWorkbenchLayout *layout = workbench()->currentLayout();
 
     disconnect(layout, NULL, this, NULL);
@@ -1300,17 +1320,27 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(streamSynchronizer->state()));
 
+    QVector<QUuid> selectedUuids;
+    foreach(QnResourceWidget *widget, widgets())
+        if(widget->isSelected())
+            selectedUuids.push_back(widget->item()->uuid());
+    layout->setData(Qn::LayoutSelectionRole, QVariant::fromValue<QVector<QUuid> >(selectedUuids));
+
     foreach(QnResourceWidget *widget, widgets()) {
         if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget)) {
-            qint64 time = mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : mediaWidget->display()->currentTimeUSec() / 1000;
+            qint64 timeUSec = mediaWidget->display()->currentTimeUSec();
+            if((quint64)timeUSec != AV_NOPTS_VALUE)
+                mediaWidget->item()->setData(Qn::ItemTimeRole, mediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : timeUSec / 1000);
 
-            mediaWidget->item()->setData(Qn::ItemTimeRole, time);
             mediaWidget->item()->setData(Qn::ItemPausedRole, mediaWidget->display()->isPaused());
         }
+
+        widget->item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(widget->checkedButtons()));
     }
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
+    m_inChangeLayout = false;
 }
 
 
@@ -1363,15 +1393,25 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
         }
 
-        if(!thumbnailed && time != -1) {
-            qreal timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
-            widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+        if(!thumbnailed) {
+            QnResourcePtr resource = widget->resource();
+            if(time != -1) {
+                qint64 timeUSec = time == DATETIME_NOW ? DATETIME_NOW : time * 1000;
+                if(widget->display()->archiveReader())
+                    widget->display()->archiveReader()->jumpTo(timeUSec, timeUSec);
+            } else if (!resource->hasFlags(QnResource::live)) {
+                // default position in SyncPlay is LIVE. If current resource is synchronized and it is not camera (does not has live) seek to 0 (default position)
+                if(widget->display()->archiveReader())
+                    widget->display()->archiveReader()->jumpTo(0, 0);
+            }
         }
 
         bool paused = widget->item()->data<bool>(Qn::ItemPausedRole);
         if(paused) {
-            widget->display()->archiveReader()->pauseMedia();
-            widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+            if(widget->display()->archiveReader()) {
+                widget->display()->archiveReader()->pauseMedia();
+                widget->display()->archiveReader()->setSpeed(0.0); // TODO: #VASILENKO check that this call doesn't break anything
+            }
         }
 
         if(hasTimeLabels) {
@@ -1381,7 +1421,15 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(time).toString(tr("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
+
+        int checkedButtons = widget->item()->data(Qn::ItemCheckedButtonsRole).toInt();
+        widget->setCheckedButtons(static_cast<QnResourceWidget::Buttons>(checkedButtons));
     }
+
+    QVector<QUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QUuid> >();
+    foreach(const QUuid &selectedUuid, selectedUuids)
+        if(QnResourceWidget *widget = this->widget(selectedUuid))
+            widget->setSelected(true);
 
     connect(layout,             SIGNAL(itemAdded(QnWorkbenchItem *)),           this,                   SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(layout,             SIGNAL(itemRemoved(QnWorkbenchItem *)),         this,                   SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));

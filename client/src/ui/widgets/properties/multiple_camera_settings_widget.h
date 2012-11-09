@@ -2,7 +2,7 @@
 #define QN_MULTIPLE_CAMERA_SETTINGS_DIALOG_H
 
 #include <QtGui/QWidget>
-#include "api/video_server_connection.h"
+#include "api/media_server_connection.h"
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "ui/workbench/workbench_context_aware.h"
@@ -35,29 +35,38 @@ public:
         return m_hasDbChanges;
     }
 
+    /** Checks if user changed controls but not applied them to the schedule */
+    bool hasControlsChanges() const {
+        return m_hasControlsChanges;
+    }
+
     const QList< QPair< QString, QVariant> >& getModifiedAdvancedParams() const {
         //Currently this ability avaible only for single camera settings
         Q_ASSERT(false);
         return *(new QList< QPair< QString, QVariant> >);
     }
 
-    QnVideoServerConnectionPtr getServerConnection() const {
+    QnMediaServerConnectionPtr getServerConnection() const {
         //This ability avaible only for single camera settings
         Q_ASSERT(false);
-        return QnVideoServerConnectionPtr(0);
+        return QnMediaServerConnectionPtr(0);
     }
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void at_dbDataChanged();
     void at_cameraScheduleWidget_scheduleTasksChanged();
+    void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
+    void at_cameraScheduleWidget_gridParamsChanged();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
 private:
@@ -71,6 +80,10 @@ private:
     bool m_hasDbChanges;
     bool m_hasScheduleChanges;
     bool m_hasScheduleEnabledChanges;
+
+    /** Indicates that the user changed controls but not applied them to the schedule */
+    bool m_hasControlsChanges;
+
     bool m_readOnly;
     bool m_inUpdateMaxFps;
 };

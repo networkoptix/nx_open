@@ -152,6 +152,7 @@ public:
 
     AnimationTimer *animationTimer() const;
 
+    // TODO: #Elric ONE manager per scene
     /**
      * \param scene                    Scene.
      * \returns                        List of all instrument managers managing
@@ -174,10 +175,6 @@ private:
     Q_DECLARE_PRIVATE(InstrumentManager);
 };
 
-
-namespace detail {
-
-} // namespace detail
 
 
 #endif // QN_INSTRUMENT_MANAGER_H

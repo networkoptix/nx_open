@@ -11,4 +11,11 @@ bool IsPortRangeAvailable(int firstPort, int count);
 void InitWinsock();
 void FinishWinsock();
 
+int CopyDirectory(const CAtlString &refcstrSourceDirectory,
+                  const CAtlString &refcstrDestinationDirectory);
+
+
+UINT CopyProfile(MSIHANDLE hInstall, const char* actionName);
+void fixPath(CString& path);
+
 #endif // _CUSTOM_ACTIONS_UTILS_H_

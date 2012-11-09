@@ -1,7 +1,8 @@
 #include "security_cam_resource.h"
 
+#include "common/common_meta_types.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
-#include "../dataprovider/live_stream_provider.h"
+#include "core/dataprovider/live_stream_provider.h"
 
 
 QnSecurityCamResource::QnSecurityCamResource()
@@ -9,17 +10,10 @@ QnSecurityCamResource::QnSecurityCamResource()
       m_dpFactory(0),
       m_motionType(MT_Default)
 {
-    static volatile bool metaTypesInitialized = false;
-    if (!metaTypesInitialized) {
-        qRegisterMetaType<QnMotionRegion>();
-        qRegisterMetaType<QnScheduleTask>();
-        qRegisterMetaType<QnScheduleTaskList>();
-        metaTypesInitialized = true;
-    }
+    QnCommonMetaTypes::initilize();
 
-    for (int i = 0; i < CL_MAX_CHANNELS; ++i) {
+    for (int i = 0; i < CL_MAX_CHANNELS; ++i)
         m_motionMaskList << QnMotionRegion();
-    }
 
     addFlags(live_cam);
 }
@@ -36,7 +30,7 @@ void QnSecurityCamResource::updateInner(QnResourcePtr other)
     if (other_casted)
     {
 
-        const QnVideoResourceLayout* layout = getVideoLayout();
+        const QnResourceVideoLayout* layout = getVideoLayout();
         int numChannels = layout->numberOfChannels();
 
         m_motionType = other_casted->m_motionType;
@@ -200,11 +194,17 @@ void QnSecurityCamResource::setMotionRegionList(const QList<QnMotionRegion>& mas
 
 void QnSecurityCamResource::setScheduleTasks(const QnScheduleTaskList &scheduleTasks)
 {
+    // TODO: #VASILENKO needs synchronization. Currently it is not used from multiple threads, but things may change.
+
     m_scheduleTasks = scheduleTasks;
+
+    emit scheduleTasksChanged();
 }
 
 const QnScheduleTaskList &QnSecurityCamResource::getScheduleTasks() const
 {
+    // TODO: #VASILENKO needs synchronization
+
     return m_scheduleTasks;
 }
 
@@ -220,6 +220,29 @@ bool QnSecurityCamResource::hasDualStreaming() const
     QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
     this_casted->getParam(QLatin1String("hasDualStreaming"), val, QnDomainMemory);
     return val.toInt();
+}
+
+StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
+{
+    if (!hasParam(QLatin1String("streamFpsSharing")))
+    {
+        //Q_ASSERT(false);
+        return sharePixels;
+    }
+
+    QVariant val;
+    QnSecurityCamResource* this_casted = const_cast<QnSecurityCamResource*>(this);
+    this_casted->getParam(QLatin1String("streamFpsSharing"), val, QnDomainMemory);
+
+    QString sval = val.toString();
+
+    if (sval == QLatin1String("shareFps"))
+        return shareFps;
+
+    if (sval == QLatin1String("noSharing"))
+        return noSharing;
+
+    return sharePixels;
 }
 
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const

@@ -7,6 +7,8 @@
 #  include <iphlpapi.h>
 #endif
 
+#include "../common/systemerror.h"
+
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
@@ -110,7 +112,10 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
 
 // Socket Code
 
-Socket::Socket(int type, int protocol)  {
+Socket::Socket(int type, int protocol)
+:
+    m_nonBlockingMode( false )
+{
     createSocket(type, protocol);
 }
 
@@ -135,7 +140,10 @@ void Socket::createSocket(int type, int protocol)
     }
 }
 
-Socket::Socket(int sockDesc) {
+Socket::Socket(int sockDesc)
+:
+    m_nonBlockingMode( false )
+{
     this->sockDesc = sockDesc;
 }
 
@@ -240,7 +248,8 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        m_lastError = tr("Set of local address and port failed (bind()).");
+        SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(errorCode));
         return false;
     }
 
@@ -279,11 +288,6 @@ CommunicatingSocket::CommunicatingSocket(int newConnSD) : Socket(newConnSD),
 {
 }
 
-bool CommunicatingSocket::isConnected() const
-{
-    return mConnected;
-}
-
 void CommunicatingSocket::close()
 {
     Socket::close();
@@ -303,12 +307,9 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
-#ifdef _WIN32
-    u_long iMode = 1;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
-#endif
+    const bool isNonBlockingModeBak = isNonBlockingMode();
+    if( !setNonBlockingMode( true ) )
+        return false;
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
@@ -341,12 +342,8 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
         return false;
 #endif // _WIN32
 
-#ifdef _WIN32
-    iMode = 0;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, 0);
-#endif
+    //restoring original mode
+    setNonBlockingMode( isNonBlockingModeBak );
 
     mConnected = true;
 
@@ -556,6 +553,14 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
+void CommunicatingSocket::setSendBufferSize(int buff_size)
+{
+    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size))<0)
+    {
+        //error
+    }
+}
+
 UDPSocket::UDPSocket(unsigned short localPort)   :
     CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP) {
     setLocalPort(localPort);
@@ -570,12 +575,13 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
+    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP),
+      m_destAddr( NULL )
 {
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
         qnWarning("Can't create socket: %1.", m_lastError);
-        return;
+        throw SocketException( QString::fromAscii("Failed to bind socket to address %1:%2. %3").arg(localAddress).arg(localPort).arg(m_lastError) );
     }
 
     setBroadcast();
@@ -785,4 +791,47 @@ bool Socket::setReuseAddrFlag(bool reuseAddr)
         return false;
     }
     return true;
+}
+
+//!if, \a val is \a true, turns non-blocking mode on, else turns it off
+bool Socket::setNonBlockingMode(bool val)
+{
+    if( val == m_nonBlockingMode )
+        return true;
+
+#ifdef _WIN32
+    u_long _val = val ? 1 : 0;
+    if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    long currentFlags = fcntl( sockDesc, F_GETFL, 0 );
+    if( currentFlags == -1 )
+        return false;
+    if( val )
+        currentFlags |= O_NONBLOCK;
+    else
+        currentFlags &= ~O_NONBLOCK;
+    if( fcntl( sockDesc, F_SETFL, currentFlags ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#endif
+}
+
+//!Returns true, if in non-blocking mode
+bool Socket::isNonBlockingMode() const
+{
+    return m_nonBlockingMode;
 }

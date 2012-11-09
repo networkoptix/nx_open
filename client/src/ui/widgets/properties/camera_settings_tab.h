@@ -5,7 +5,6 @@ namespace Qn {
 
     enum CameraSettingsTab {
         GeneralSettingsTab,
-        NetworkSettingsTab,
         RecordingSettingsTab,
         MotionSettingsTab,
         AdvancedSettingsTab

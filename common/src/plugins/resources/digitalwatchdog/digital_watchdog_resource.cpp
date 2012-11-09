@@ -2,6 +2,7 @@
 #include "onvif/soapDeviceBindingProxy.h"
 
 const QString CAMERA_SETTINGS_ID_PARAM = QString::fromLatin1("cameraSettingsId");
+static const int HTTP_PORT = 80;
 
 QString getIdSuffixByModel(const QString& cameraModel)
 {
@@ -30,7 +31,7 @@ QnPlWatchDogResource::~QnPlWatchDogResource()
 
 bool QnPlWatchDogResource::isDualStreamingEnabled(bool& unauth)
 {
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("/cgi-bin/getconfig.cgi?action=onvif"));
     if (status == CL_HTTP_SUCCESS) 
     {
@@ -80,7 +81,7 @@ bool QnPlWatchDogResource::initInternal()
 void QnPlWatchDogResource::enableOnvifSecondStream()
 {
     // The camera most likely is going to reset after enabling dual streaming
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), HTTP_PORT, getNetworkTimeout(), getAuth());
     QByteArray request;
     request.append("onvif_stream_number=2&onvif_use_service=true&onvif_service_port=8032&");
     request.append("onvif_use_discovery=true&onvif_use_security=true&onvif_security_opts=63&onvif_use_sa=true&reboot=true");
@@ -108,7 +109,7 @@ int QnPlWatchDogResource::suggestBitrateKbps(QnStreamQuality q, QSize resolution
     int result = lowEnd + (hiEnd - lowEnd) * (q - QnQualityLowest) / (QnQualityHighest - QnQualityLowest);
     result *= (resolutionFactor * frameRateFactor);
 
-    return qMax(512,result);
+    return qMax(1024,result);
 }
 
 void QnPlWatchDogResource::fetchAndSetCameraSettings()

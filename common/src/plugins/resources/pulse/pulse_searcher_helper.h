@@ -1,7 +1,7 @@
 #ifndef pulse_searcher_helper_h1338
 #define pulse_searcher_helper_h1338
 
-#include "core/resourcemanagment/resource_searcher.h"
+#include "core/resource_managment/resource_searcher.h"
 
 
 

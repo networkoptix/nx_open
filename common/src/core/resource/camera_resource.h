@@ -1,8 +1,12 @@
 #ifndef QN_CAMERA_RESOURCE_H
 #define QN_CAMERA_RESOURCE_H
 
+#include <QtCore/QMetaType>
+
 #include "network_resource.h"
 #include "security_cam_resource.h"
+
+class QnAbstractDTSFactory;
 
 class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virtual public QnSecurityCamResource
 {
@@ -11,7 +15,7 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
 public:
     // TODO: move to QnSecurityCamResource
     enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag)
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
 
 
     QnVirtualCameraResource();
@@ -33,18 +37,37 @@ public:
     bool isAdvancedWorking() const;
     void setAdvancedWorking(bool value);
 
+    QnAbstractDTSFactory* getDTSFactory();
+    void setDTSFactory(QnAbstractDTSFactory* factory);
+    void lockDTSFactory();
+    void unLockDTSFactory();
+
     // TODO: move to QnSecurityCamResource
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
 
+    // TODO: move to QnSecurityCamResource
+    QString getModel() const;
+    void setModel(QString model);
+
+    // TODO: move to QnSecurityCamResource
+    QString getFirmware() const;
+    void setFirmware(QString firmware);
+
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
+    virtual void scheduleTasksChanged() override;
 
 private:
     bool m_scheduleDisabled;
     bool m_audioEnabled;
     bool m_manuallyAdded;
     bool m_advancedWorking;
+
+    QString m_model;
+    QString m_firmware;
+
+    QnAbstractDTSFactory* m_dtsFactory;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnVirtualCameraResource::CameraCapabilities)
 
@@ -70,5 +93,6 @@ public:
 #endif
 };
 
+Q_DECLARE_METATYPE(QnVirtualCameraResourcePtr)
 
 #endif // QN_CAMERA_RESOURCE_H

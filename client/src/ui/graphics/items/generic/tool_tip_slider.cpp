@@ -68,11 +68,12 @@ QnToolTipSlider::QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *paren
 void QnToolTipSlider::init() {
     setOrientation(Qt::Horizontal);
 
-    m_toolTipItem = NULL;
     m_toolTipItemVisibility = 0.0;
     m_autoHideToolTip = true;
     m_sliderUnderMouse = false;
     m_toolTipUnderMouse = false;
+    m_pendingPositionUpdate = false;
+    m_instantPositionUpdate = false;
 
     m_toolTipItemVisibilityAnimator = new VariantAnimator(this);
     m_toolTipItemVisibilityAnimator->setSpeed(2.0);
@@ -85,6 +86,8 @@ void QnToolTipSlider::init() {
 
     setToolTipItem(new QnSliderToolTipItem(this));
     setAcceptHoverEvents(true);
+
+    setFlag(ItemSendsScenePositionChanges, true);
 }
 
 QnToolTipSlider::~QnToolTipSlider() {
@@ -92,25 +95,25 @@ QnToolTipSlider::~QnToolTipSlider() {
 }
 
 QnToolTipItem *QnToolTipSlider::toolTipItem() const {
-    return m_toolTipItem;
+    return m_toolTipItem.data();
 }
 
-void QnToolTipSlider::setToolTipItem(QnToolTipItem *toolTipItem) {
+void QnToolTipSlider::setToolTipItem(QnToolTipItem *newToolTipItem) {
     qreal opacity = 0.0;
-    if(m_toolTipItem) {
-        opacity = m_toolTipItem->opacity();
-        delete m_toolTipItem;
+    if(toolTipItem()) {
+        opacity = toolTipItem()->opacity();
+        delete toolTipItem();
     }
 
-    m_toolTipItem = toolTipItem;
+    m_toolTipItem = newToolTipItem;
 
-    if(m_toolTipItem) {
-        m_toolTipItem->setParent(this); /* Claim ownership, but not in graphics item sense. */
-        m_toolTipItem->setFocusProxy(this);
-        m_toolTipItem->setOpacity(opacity);
-        m_toolTipItem->setAcceptHoverEvents(true);
-        m_toolTipItem->installEventFilter(this);
-        m_toolTipItem->setFlag(ItemIgnoresParentOpacity, true);
+    if(toolTipItem()) {
+        toolTipItem()->setParent(this); /* Claim ownership, but not in graphics item sense. */
+        toolTipItem()->setFocusProxy(this);
+        toolTipItem()->setOpacity(opacity);
+        toolTipItem()->setAcceptHoverEvents(true);
+        toolTipItem()->installEventFilter(this);
+        toolTipItem()->setFlag(ItemIgnoresParentOpacity, true);
 
         updateToolTipText();
         updateToolTipOpacity();
@@ -138,7 +141,7 @@ void QnToolTipSlider::showToolTip() {
 }
 
 void QnToolTipSlider::updateToolTipVisibility() {
-    if(!m_toolTipItem)
+    if(!toolTipItem())
         return;
 
     if(m_autoHideToolTip) {
@@ -153,21 +156,28 @@ void QnToolTipSlider::updateToolTipVisibility() {
 }
 
 void QnToolTipSlider::updateToolTipOpacity() {
-    if(!m_toolTipItem)
+    if(!toolTipItem())
         return;
 
-    m_toolTipItem->setOpacity(effectiveOpacity() * m_toolTipItemVisibility);
+    toolTipItem()->setOpacity(effectiveOpacity() * m_toolTipItemVisibility);
 }
 
 void QnToolTipSlider::updateToolTipText() {
-    if(!m_toolTipItem)
+    if(!toolTipItem())
         return;
 
-    m_toolTipItem->setText(toolTip());
+    toolTipItem()->setText(toolTip());
 }
 
 void QnToolTipSlider::updateToolTipPosition() {
-    if(!m_toolTipItem)
+    if(!m_instantPositionUpdate) {
+        m_pendingPositionUpdate = true;
+        return;
+    }
+
+    m_pendingPositionUpdate = false;
+
+    if(!toolTipItem())
         return;
 
     QStyleOptionSlider opt;
@@ -177,7 +187,7 @@ void QnToolTipSlider::updateToolTipPosition() {
     qreal x = positionFromValue(sliderPosition()).x() + handleRect.width() / 2.0;
     qreal y = handleRect.top();
     
-    m_toolTipItem->setPos(m_toolTipItem->mapToParent(m_toolTipItem->mapFromItem(this, x, y)));
+    toolTipItem()->setPos(toolTipItem()->mapToParent(toolTipItem()->mapFromItem(this, x, y)));
 }
 
 
@@ -189,6 +199,18 @@ void QnToolTipSliderAnimationListener::tick(int) {
      * so we have to track it in animation handler (which gets invoked before the
      * paint event). */
     m_slider->updateToolTipOpacity();
+
+    /* All position updates in [tick, paint] time period are instant. */
+    m_slider->m_instantPositionUpdate = true;
+
+    if(m_slider->m_pendingPositionUpdate)
+        m_slider->updateToolTipPosition();
+}
+
+void QnToolTipSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+    m_instantPositionUpdate = false;
+
+    base_type::paint(painter, option, widget);
 }
 
 QString QnToolTipSlider::toolTipAt(const QPointF &) const {
@@ -198,21 +220,21 @@ QString QnToolTipSlider::toolTipAt(const QPointF &) const {
 }
 
 bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
-    if(target == m_toolTipItem) {
+    if(target == toolTipItem()) {
         QGraphicsSceneMouseEvent *e = static_cast<QGraphicsSceneMouseEvent *>(event);
 
         switch(event->type()) {
         case QEvent::GraphicsSceneMousePress:
             if(e->button() == Qt::LeftButton) {
                 setSliderDown(true);
-                m_dragOffset = positionFromValue(sliderPosition()) - m_toolTipItem->mapToItem(this, e->pos());
+                m_dragOffset = positionFromValue(sliderPosition()) - toolTipItem()->mapToItem(this, e->pos());
                 e->accept();
                 return true;
             }
             break;
         case QEvent::GraphicsSceneMouseMove:
             if(isSliderDown()) {
-                qint64 pos = valueFromPosition(m_toolTipItem->mapToItem(this, e->pos()) + m_dragOffset);
+                qint64 pos = valueFromPosition(toolTipItem()->mapToItem(this, e->pos()) + m_dragOffset);
                 setSliderPosition(pos);
 
                 e->accept();
@@ -248,7 +270,7 @@ bool QnToolTipSlider::eventFilter(QObject *target, QEvent *event) {
 void QnToolTipSlider::sliderChange(SliderChange change) {
     base_type::sliderChange(change);
 
-    if(m_toolTipItem) {
+    if(toolTipItem()) {
         if(change == SliderValueChange) {
             if(m_autoHideToolTip)
                 m_hideTimer.start(toolTipHideDelay, this);
@@ -269,6 +291,9 @@ QVariant QnToolTipSlider::itemChange(GraphicsItemChange change, const QVariant &
         break;
     case ItemOpacityHasChanged:
         updateToolTipOpacity();
+        break;
+    case ItemScenePositionHasChanged:
+        updateToolTipPosition();
         break;
     default:
         break;

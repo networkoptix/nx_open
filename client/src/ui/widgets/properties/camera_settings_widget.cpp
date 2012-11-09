@@ -5,7 +5,7 @@
 #include <QtGui/QVBoxLayout>
 
 #include <core/resource/camera_resource.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -34,6 +34,8 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
+    connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+    connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);
@@ -162,6 +164,14 @@ bool QnCameraSettingsWidget::hasAnyCameraChanges() const {
     }
 }
 
+bool QnCameraSettingsWidget::hasControlsChanges() const {
+    switch(mode()) {
+    case SingleMode: return m_singleWidget->hasControlsChanges();
+    case MultiMode: return m_multiWidget->hasControlsChanges();
+    default: return false;
+    }
+}
+
 const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdvancedParams() const
 {
     switch(mode()) {
@@ -171,12 +181,12 @@ const QList< QPair< QString, QVariant> >& QnCameraSettingsWidget::getModifiedAdv
     }
 }
 
-QnVideoServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
+QnMediaServerConnectionPtr QnCameraSettingsWidget::getServerConnection() const
 {
     switch(mode()) {
     case SingleMode: return m_singleWidget->getServerConnection();
     case MultiMode: return m_multiWidget->getServerConnection();
-    default: return QnVideoServerConnectionPtr(0);
+    default: return QnMediaServerConnectionPtr(0);
     }
 }
 
@@ -263,4 +273,17 @@ bool QnCameraSettingsWidget::isValidMotionRegion(){
     if (mode() == SingleMode)
         return m_singleWidget->isValidMotionRegion();
     return true;
+}
+
+void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    case MultiMode:
+        m_multiWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    default:
+        break;
+    }
 }

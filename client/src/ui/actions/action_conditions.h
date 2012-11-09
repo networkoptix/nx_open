@@ -5,7 +5,7 @@
 #include <QtCore/QWeakPointer>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 
 #include <recording/time_period.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -113,6 +113,27 @@ public:
 private:
     bool m_hasRequiredGridDisplayValue;
     bool m_requiredGridDisplayValue;
+};
+
+class QnDisplayInfoActionCondition: public QnActionCondition {
+public:
+    QnDisplayInfoActionCondition(bool requiredDisplayInfoValue, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_hasRequiredDisplayInfoValue(true),
+        m_requiredDisplayInfoValue(requiredDisplayInfoValue)
+    {}
+
+    QnDisplayInfoActionCondition(QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_hasRequiredDisplayInfoValue(false),
+        m_requiredDisplayInfoValue(false)
+    {}
+
+    virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
+
+private:
+    bool m_hasRequiredDisplayInfoValue;
+    bool m_requiredDisplayInfoValue;
 };
 
 class QnClearMotionSelectionActionCondition: public QnActionCondition {
@@ -240,11 +261,15 @@ private:
 
 class QnExportActionCondition: public QnActionCondition {
 public:
-    QnExportActionCondition(QObject *parent = NULL):
-        QnActionCondition(parent)
+    QnExportActionCondition(bool centralItemRequired, QObject *parent = NULL):
+        QnActionCondition(parent),
+        m_centralItemRequired(centralItemRequired)
     {}
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+
+private:
+    bool m_centralItemRequired;
 };
 
 class QnPanicActionCondition: public QnActionCondition {
@@ -266,6 +291,34 @@ public:
 class QnArchiveActionCondition: public QnActionCondition {
 public:
     QnArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
+class QnToggleTitleBarActionCondition: public QnActionCondition {
+public:
+    QnToggleTitleBarActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnNoArchiveActionCondition: public QnActionCondition {
+public:
+    QnNoArchiveActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnDisconnectActionCondition: public QnActionCondition {
+public:
+    QnDisconnectActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
+class QnOpenInFolderActionCondition: public QnActionCondition {
+public:
+    QnOpenInFolderActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };

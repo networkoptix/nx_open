@@ -685,8 +685,8 @@ EXPORT void speex_echo_playback(SpeexEchoState *st, const spx_int16_t *play)
 /** Performs echo cancellation on a frame (deprecated, last arg now ignored) */
 EXPORT void speex_echo_cancel(SpeexEchoState *st, const spx_int16_t *in, const spx_int16_t *far_end, spx_int16_t *out, spx_int32_t *Yout)
 {
-    (void)Yout;
    speex_echo_cancellation(st, in, far_end, out);
+   (void)Yout;
 }
 
 /** Performs echo cancellation on a frame */
@@ -1199,7 +1199,8 @@ void speex_echo_get_residual(SpeexEchoState *st, spx_word32_t *residual_echo, in
    int i;
    spx_word16_t leak2;
    int N;
-   
+
+   (void)len;
    N = st->window_size;
 
    /* Apply hanning window (should pre-compute it)*/

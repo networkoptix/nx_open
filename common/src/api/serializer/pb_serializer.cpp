@@ -83,6 +83,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_physicalid())
         camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
+    camera->setModel(QString::fromStdString(pb_camera.model()));
+    camera->setFirmware(QString::fromStdString(pb_camera.firmware()));
+
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
 
@@ -139,11 +142,11 @@ void parseCameras(QnVirtualCameraResourceList& cameras, const PbResourceList& pb
     }
 }
 
-void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_serverResource, QnResourceFactory &resourceFactory)
+void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_serverResource, QnResourceFactory &resourceFactory)
 {
     const pb::Server& pb_server = pb_serverResource.GetExtension(pb::Server::resource);
 
-    server = QnVideoServerResourcePtr(new QnVideoServerResource());
+    server = QnMediaServerResourcePtr(new QnMediaServerResource());
     server->setId(pb_serverResource.id());
     server->setName(QString::fromUtf8(pb_serverResource.name().c_str()));
     server->setUrl(QString::fromUtf8(pb_serverResource.url().c_str()));
@@ -151,6 +154,9 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
     if (pb_server.has_streamingurl())
         server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
+
+    if (pb_server.has_version())
+        server->setVersion(QString::fromUtf8(pb_server.version().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -191,7 +197,7 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
             parameters["url"] = QString::fromUtf8(pb_storage.url().c_str());
             parameters["spaceLimit"] = QString::number(pb_storage.spacelimit());
 
-            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters);
+            QnResourcePtr st = resourceFactory.createResource(qnResTypePool->getResourceTypeByName(QLatin1String("Storage"))->getId(), parameters); // TODO: no types in pool => crash
             storage = qSharedPointerDynamicCast<QnAbstractStorageResource> (st);
 
             storages.append(storage);
@@ -201,13 +207,13 @@ void parseServer(QnVideoServerResourcePtr &server, const pb::Resource &pb_server
     }
 }
 
-void parseServers(QnVideoServerResourceList &servers, const PbResourceList &pb_servers, QnResourceFactory &resourceFactory)
+void parseServers(QnMediaServerResourceList &servers, const PbResourceList &pb_servers, QnResourceFactory &resourceFactory)
 {
     for (PbResourceList::const_iterator ci = pb_servers.begin(); ci != pb_servers.end(); ++ci)
     {
         const pb::Resource& pb_serverResource = *ci;
 
-        QnVideoServerResourcePtr server;
+        QnMediaServerResourcePtr server;
         parseServer(server, pb_serverResource, resourceFactory);
         if (server)
             servers.append(server);
@@ -476,6 +482,8 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());
+    pb_camera.set_model(cameraPtr->getModel().toUtf8().constData());
+    pb_camera.set_firmware(cameraPtr->getFirmware().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_cameraResource.set_disabled(cameraPtr->isDisabled());
@@ -521,7 +529,7 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
 {
     pb_cameraServerItem.set_physicalid(cameraServerItem.physicalId.toStdString());
     pb_cameraServerItem.set_timestamp(cameraServerItem.timestamp);
-    pb_cameraServerItem.set_serverguid(cameraServerItem.videoServerGuid.toStdString());
+    pb_cameraServerItem.set_serverguid(cameraServerItem.mediaServerGuid.toStdString());
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -570,7 +578,7 @@ void QnApiPbSerializer::deserializeCameras(QnVirtualCameraResourceList& cameras,
     parseCameras(cameras, pb_cameras.resource(), resourceFactory);
 }
 
-void QnApiPbSerializer::deserializeServers(QnVideoServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
+void QnApiPbSerializer::deserializeServers(QnMediaServerResourceList& servers, const QByteArray& data, QnResourceFactory& resourceFactory)
 {
     pb::Resources pb_servers;
     if (!pb_servers.ParseFromArray(data.data(), data.size())) {
@@ -722,7 +730,7 @@ void QnApiPbSerializer::serializeLicense(const QnLicensePtr& license, QByteArray
     data = QByteArray(str.data(), str.length());
 }
 
-void QnApiPbSerializer::serializeServer(const QnVideoServerResourcePtr& serverPtr, QByteArray& data)
+void QnApiPbSerializer::serializeServer(const QnMediaServerResourcePtr& serverPtr, QByteArray& data)
 {
     pb::Resources pb_servers;
 
@@ -837,7 +845,7 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
         }
         case pb::Resource_Type_Server:
         {
-            QnVideoServerResourcePtr server;
+            QnMediaServerResourcePtr server;
             parseServer(server, pb_resource, resourceFactory);
             resource = server;
             break;

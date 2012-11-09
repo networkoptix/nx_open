@@ -1,7 +1,6 @@
 #include "sign_info.h"
 #include "ui/style/skin.h"
 #include "sign_dialog.h"
-#include "utils/common/synctime.h"
 
 QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
 {
@@ -12,6 +11,7 @@ QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
     m_signHelper.setLogo(qnSkin->pixmap("logo_1920_1080.png"));
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(update()));
     m_timer.start(16);
+    m_DrawDetailText = false;
 }
 
 void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromFrame)
@@ -22,6 +22,13 @@ void QnSignInfo::at_gotSignature(QByteArray calculatedSign, QByteArray signFromF
     m_sign = calculatedSign;
     m_signFromFrame = signFromFrame;
     update();
+}
+
+void QnSignInfo::at_gotSignatureDescription(QString version, QString hwId, QString licensedTo)
+{
+    m_signHelper.setVersionStr(version);
+    m_signHelper.setHwIdStr(hwId);
+    m_signHelper.setLicensedToStr(licensedTo);
 }
 
 void QnSignInfo::at_calcSignInProgress(QByteArray sign, int progress)
@@ -44,7 +51,7 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     //t.restart();
 
     static const int TEXT_FLASHING_PERIOD = 1000;
-    float opacity = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
+    float opacity = qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
 
     {
         QMutexLocker lock(&m_mutex);
@@ -57,7 +64,7 @@ void QnSignInfo::paintEvent(QPaintEvent *)
 
     if (m_finished)
         m_signHelper.setSignOpacity(opacity, m_sign == m_signFromFrame ? QColor(0,128,0) : QColor(128,0,0));
-    m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), false);
+    m_signHelper.draw(p, QSize(m_textureWidth, m_textureHeight), m_DrawDetailText);
     QString text;
     text = tr("Analyzing: %1%").arg(m_progress);
     p.end();
@@ -89,7 +96,8 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     QFontMetrics metric = m_signHelper.updateFontSize(p2, QSize(width()*2, height()*2));
     if (m_finished)
         p2.setOpacity(opacity);
-    p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
+    if (!m_DrawDetailText)
+        p2.drawText(m_videoRect.left() + 16, m_videoRect.top() + metric.height() + 16, text);
 
     //qDebug() << "t2=" << t.elapsed();
 }
@@ -100,4 +108,9 @@ void QnSignInfo::setImageSize(int textureWidth, int textureHeight)
     m_textureHeight = textureHeight;
     m_videoRect = SignDialog::calcVideoRect(width(), height(), m_textureWidth, m_textureHeight);
     update();
+}
+
+void QnSignInfo::setDrawDetailTextMode(bool value)
+{
+    m_DrawDetailText = value;
 }

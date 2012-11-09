@@ -46,6 +46,31 @@ public:
 
     inline QnTimePeriodListTimeIterator timeBegin() const;
     inline QnTimePeriodListTimeIterator timeEnd() const;
+
+    /** 
+     * Encode (compress) data to a byte array. 
+     * TimePeriods must be arranged by time and must not intersected. If this condition is not met, the function returns false. 
+     * Average compressed QnTimePeriod size is close to 6 bytes.
+     * 
+     * \param stream                    Byte array to compress time periods to. 
+     */
+    bool encode(QByteArray &stream);
+    
+    /** 
+     * Decode (decompress) data from a byte array. 
+     * 
+     * \param[in] stream                Byte array to decompress time periods from.
+     */
+    bool decode(QByteArray &stream);
+
+    /**
+     * Decode (decompress) data from a byte array. 
+     * 
+     * \param[in] data                  Compressed data pointer.
+     * \param[in] dataSize              Size of the compressed data.
+     */
+    bool decode(const quint8 *data, int dataSize);
+
 };
 
 

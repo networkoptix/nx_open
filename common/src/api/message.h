@@ -1,10 +1,14 @@
 #ifndef QN_MESSAGE_H
 #define QN_MESSAGE_H
 
-#include "utils/common/qnid.h"
-#include "core/resource/resource.h"
-#include "licensing/license.h"
-#include "core/resource/camera_history.h"
+#include <QtCore/QMetaType>
+
+#include <utils/common/qnid.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/camera_history.h>
+
+#include <licensing/license.h>
 
 namespace pb {
     class Message;
@@ -22,7 +26,6 @@ namespace Qn {
         Message_Type_CameraServerItem = 7
     };
 }
-
 
 struct QnMessage
 {
@@ -45,6 +48,7 @@ struct QnMessage
 
     static quint32 nextSeqNumber(quint32 seqNumber);
 };
+
 Q_DECLARE_METATYPE(QnMessage);
 
 #endif // QN_MESSAGE_H

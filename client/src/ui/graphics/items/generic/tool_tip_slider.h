@@ -33,6 +33,8 @@ public:
 
     virtual bool eventFilter(QObject *target, QEvent *event) override;
 
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+
 protected:
     QnToolTipSlider(GraphicsSliderPrivate &dd, QGraphicsItem *parent);
 
@@ -61,13 +63,15 @@ private:
     friend class QnToolTipSliderVisibilityAccessor;
 
     QScopedPointer<QnToolTipSliderAnimationListener> m_animationListener;
-    QnToolTipItem *m_toolTipItem;
+    QWeakPointer<QnToolTipItem> m_toolTipItem;
     VariantAnimator *m_toolTipItemVisibilityAnimator;
     qreal m_toolTipItemVisibility;
     QBasicTimer m_hideTimer;
     bool m_autoHideToolTip;
     bool m_sliderUnderMouse;
     bool m_toolTipUnderMouse;
+    bool m_pendingPositionUpdate;
+    bool m_instantPositionUpdate;
     QPointF m_dragOffset;
 };
 

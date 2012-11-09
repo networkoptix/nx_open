@@ -11,15 +11,15 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Camera schedule editor</string>
+   <string>Camera Schedule Editor</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout_8">
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QCheckBox" name="enableRecordingCheckBox">
        <property name="text">
-        <string>Enable recording</string>
+        <string>Enable Recording</string>
        </property>
        <property name="tristate">
         <bool>true</bool>
@@ -58,7 +58,7 @@
    <item>
     <widget class="QGroupBox" name="scheduleGridGroupBox">
      <property name="title">
-      <string>Schedule grid</string>
+      <string>Schedule Grid</string>
      </property>
      <property name="flat">
       <bool>true</bool>
@@ -75,7 +75,7 @@
         <item>
          <widget class="QCheckBox" name="displayQualityCheckBox">
           <property name="text">
-           <string>Display quality on grid</string>
+           <string>Display Quality on Grid</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -101,7 +101,7 @@
         <item>
          <widget class="QCheckBox" name="displayFpsCheckBox">
           <property name="text">
-           <string>Display fps on grid</string>
+           <string>Display FPS on Grid</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -124,7 +124,7 @@
         <item>
          <widget class="QLabel" name="label_3">
           <property name="text">
-           <string>Panic mode: </string>
+           <string>Panic Mode: </string>
           </property>
          </widget>
         </item>
@@ -150,6 +150,16 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Note: Recording Schedule is based on Server Time</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -170,7 +180,7 @@
         </size>
        </property>
        <property name="title">
-        <string>Schedule settings</string>
+        <string>Schedule Settings</string>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
@@ -178,7 +188,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>fps</string>
+             <string>FPS</string>
             </property>
            </widget>
           </item>
@@ -201,7 +211,7 @@
           <item row="1" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>quality</string>
+             <string>Quality</string>
             </property>
            </widget>
           </item>
@@ -287,7 +297,7 @@
                </size>
               </property>
               <property name="text">
-               <string>Record always</string>
+               <string>Record Always</string>
               </property>
               <property name="textFormat">
                <enum>Qt::AutoText</enum>
@@ -341,7 +351,7 @@
             <item>
              <widget class="QLabel" name="labelMotionOnly">
               <property name="text">
-               <string>Motion only</string>
+               <string>Motion Only</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -392,7 +402,7 @@
             <item>
              <widget class="QLabel" name="labelMotionPlusLQ">
               <property name="text">
-               <string>Motion+ low quality always</string>
+               <string>Motion+ Lo-Res Always</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -443,7 +453,7 @@
             <item>
              <widget class="QLabel" name="label_8">
               <property name="text">
-               <string>Do not record</string>
+               <string>Do not Record</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -463,7 +473,7 @@
      <item>
       <widget class="QGroupBox" name="motionGroupBox">
        <property name="title">
-        <string>Motion recording</string>
+        <string>Motion Recording</string>
        </property>
        <property name="flat">
         <bool>false</bool>
@@ -483,7 +493,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Record before motion</string>
+             <string>Pre-Recording</string>
             </property>
            </widget>
           </item>
@@ -512,7 +522,7 @@
              </sizepolicy>
             </property>
             <property name="text">
-             <string>Record after motion</string>
+             <string>Post-Recording</string>
             </property>
            </widget>
           </item>
@@ -549,6 +559,52 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QPushButton" name="exportScheduleButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Copy Schedule...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="exportWarningLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>Apply changes before copy schedule</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>

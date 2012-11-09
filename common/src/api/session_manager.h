@@ -11,7 +11,7 @@
 #include <QtNetwork/QNetworkReply>
 
 #include "utils/common/request_param.h"
-#include "utils/common/longrunnable.h"
+#include "utils/common/long_runnable.h"
 
 
 class QNetworkReply;

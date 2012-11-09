@@ -3,7 +3,7 @@
 
 #include <QRegion>
 #include "media_resource.h"
-#include "core/misc/scheduleTask.h"
+#include "core/misc/schedule_task.h"
 #include "motion_window.h"
 
 class QnDataProviderFactory
@@ -15,6 +15,14 @@ public:
 };
 
 enum MotionType {MT_Default = 0, MT_HardwareGrid = 1, MT_SoftwareGrid = 2, MT_MotionWindow = 4, MT_NoMotion = 8};
+
+enum StreamFpsSharingMethod 
+{
+    shareFps, // if second stream is running whatever fps it has => first stream can get maximumFps - secondstreamFps
+    sharePixels, //if second stream is running whatever megapixel it has => first stream can get maxMegapixels - secondstreamPixels
+    noSharing // second stream does not subtract first stream fps 
+};
+
 Q_DECLARE_FLAGS(MotionTypeFlags, MotionType);
 
 class QnSecurityCamResource : virtual public QnMediaResource
@@ -22,7 +30,6 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
-
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;
@@ -68,6 +75,15 @@ public:
 
     virtual bool hasDualStreaming() const;
 
+    virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+
+signals:
+    /** 
+     * This signal is virtual to work around a problem with inheritance from
+     * two <tt>QObject</tt>s. 
+     */
+    virtual void scheduleTasksChanged();
+
 protected:
     void updateInner(QnResourcePtr other) override;
 
@@ -79,13 +95,12 @@ protected:
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
+
 private:
     QnDataProviderFactory* m_dpFactory;
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
 };
-
-Q_DECLARE_METATYPE(QnMotionRegion)
 
 #endif //sequrity_cam_resource_h_1239

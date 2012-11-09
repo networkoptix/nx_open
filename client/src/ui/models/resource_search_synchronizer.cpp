@@ -4,7 +4,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/checked_cast.h>
 #include <core/resource/resource.h>
-#include <core/resourcemanagment/resource_criterion.h>
+#include <core/resource_managment/resource_criterion.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include "resource_search_proxy_model.h"

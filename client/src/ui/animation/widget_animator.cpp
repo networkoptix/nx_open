@@ -22,12 +22,10 @@ WidgetAnimator::WidgetAnimator(QGraphicsWidget *widget, const QByteArray &geomet
     m_geometryAnimator = new RectAnimator(this);
     m_geometryAnimator->setTargetObject(widget);
     m_geometryAnimator->setAccessor(new PropertyAccessor(geometryPropertyName));
-    m_geometryAnimator->setEasingCurve(QEasingCurve::InOutBack);
 
     m_rotationAnimator = new VariantAnimator(this);
     m_rotationAnimator->setTargetObject(widget);
     m_rotationAnimator->setAccessor(new PropertyAccessor(rotationPropertyName));
-    m_rotationAnimator->setEasingCurve(QEasingCurve::InOutBack);
 
     addAnimator(m_geometryAnimator);
     addAnimator(m_rotationAnimator);
@@ -55,7 +53,7 @@ void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation, const QEasin
 }
 
 void WidgetAnimator::moveTo(const QRectF &geometry, qreal rotation) {
-    moveTo(geometry, rotation, QEasingCurve::InOutBack);
+    moveTo(geometry, rotation, QEasingCurve::Linear);
 }
 
 QGraphicsWidget *WidgetAnimator::widget() const {

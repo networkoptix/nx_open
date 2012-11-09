@@ -7,7 +7,7 @@
 #include "resource_media_layout.h"
 
 class QnAbstractMediaStreamDataProvider;
-class QnVideoResourceLayout;
+class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
 enum QnStreamQuality {QnQualityLowest, QnQualityLow, QnQualityNormal, QnQualityHigh, QnQualityHighest, QnQualityPreSet};
@@ -28,10 +28,10 @@ public:
     virtual QImage getImage(int channel, QDateTime time, QnStreamQuality quality) const;
 
     // resource can use DataProvider for addition info (optional)
-    virtual const QnVideoResourceLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
+    virtual const QnResourceVideoLayout* getVideoLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider = 0);
 protected:
-    QnCustomDeviceVideoLayout* m_customVideoLayout;
+    QnCustomResourceVideoLayout* m_customVideoLayout;
 };
 
 #endif // QN_MEDIA_RESOURCE_H

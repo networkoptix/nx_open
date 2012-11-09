@@ -12,11 +12,14 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameter_types.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/style/skin.h>
+
 
 QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     QTabBar(parent),
@@ -39,6 +42,8 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     /* Connect to context. */
     at_workbench_layoutsChanged();
     at_workbench_currentLayoutChanged();
+
+    setHelpTopic(this, Qn::MainWindow_TabNavigator_Help);
 
     connect(workbench(),        SIGNAL(layoutsChanged()),                           this, SLOT(at_workbench_layoutsChanged()));
     connect(workbench(),        SIGNAL(currentLayoutChanged()),                     this, SLOT(at_workbench_currentLayoutChanged()));
@@ -66,11 +71,11 @@ void QnLayoutTabBar::checkInvariants() const {
 }
 
 Qn::ActionScope QnLayoutTabBar::currentScope() const {
-    return Qn::TabBarScope;
+    return Qn::TitleBarScope;
 }
 
 QVariant QnLayoutTabBar::currentTarget(Qn::ActionScope scope) const {
-    if(scope != Qn::TabBarScope)
+    if(scope != Qn::TitleBarScope)
         return QVariant();
 
     QnWorkbenchLayoutList result;
@@ -138,12 +143,15 @@ void QnLayoutTabBar::contextMenuEvent(QContextMenuEvent *event) {
     if(index >= 0 && index < m_layouts.size())
         target.push_back(m_layouts[index]);
     
-    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TabBarScope, target));
+    QScopedPointer<QMenu> menu(context()->menu()->newMenu(Qn::TitleBarScope, target));
     if(menu->isEmpty())
         return;
 
-    /* Run menu. */
-    menu->exec(event->globalPos());
+    /** 
+     * Note that we cannot use event->globalPos() here as it doesn't work when
+     * the widget is embedded into graphics scene.
+     */
+    menu->exec(QCursor::pos());
 }
 
 void QnLayoutTabBar::mousePressEvent(QMouseEvent *event){

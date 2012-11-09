@@ -1,8 +1,8 @@
 #ifndef QN_MAC_ADDRESS_H
 #define QN_MAC_ADDRESS_H
 
-#include <QString>
-#include <QMetaType>
+#include <QtCore/QString>
+#include <QtCore/QMetaType>
 
 class QnMacAddress
 {

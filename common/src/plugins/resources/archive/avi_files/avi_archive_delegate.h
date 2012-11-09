@@ -5,7 +5,7 @@
 #include "../abstract_archive_delegate.h"
 
 struct AVFormatContext;
-class QnCustomDeviceVideoLayout;
+class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;
 
 class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
@@ -13,12 +13,13 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software};
+    enum Tag {Tag_startTime, Tag_endTime, Tag_LayoutInfo, Tag_Software, Tag_Signature};
 
     /*
     * Some containers supports only predefined tag names. So, I've introduce this function
     */
     static const char* getTagName(Tag tag, const QString& formatName);
+    const char* getTagValue(Tag tag);
 
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
@@ -29,7 +30,7 @@ public:
     virtual qint64 endTime();
     virtual QnAbstractMediaDataPtr getNextData();
     virtual qint64 seek (qint64 time, bool findIFrame);
-    virtual QnVideoResourceLayout* getVideoLayout();
+    virtual QnResourceVideoLayout* getVideoLayout();
     virtual QnResourceAudioLayout* getAudioLayout();
 
     virtual AVCodecContext* setAudioChannel(int num);
@@ -40,14 +41,17 @@ public:
     bool isStreamsFound() const;
     void setUseAbsolutePos(bool value);
     void setStorage(const QnStorageResourcePtr &storage);
-
+    virtual QnAbstractMotionArchiveConnectionPtr getMotionConnection(int channel) override;
+    
+    //void setMotionConnection(QnAbstractMotionArchiveConnectionPtr connection, int channel);
 protected:
-    virtual qint64 packetTimestamp(const AVPacket& packet);
+    void packetTimestamp(QnCompressedAudioData* audio, const AVPacket& packet);
+    void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     virtual bool findStreams();
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:
-    bool deserializeLayout(QnCustomDeviceVideoLayout* layout, const QString& layoutStr);
+    bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     QnMediaContextPtr getCodecContext(AVStream* stream);
 protected:
     AVFormatContext* m_formatContext;
@@ -59,7 +63,7 @@ private:
     int m_audioStreamIndex;
     int m_firstVideoIndex;
     bool m_streamsFound;
-    QnCustomDeviceVideoLayout* m_videoLayout;
+    QnCustomResourceVideoLayout* m_videoLayout;
     QnResourceAudioLayout* m_audioLayout;
     QVector<int> m_indexToChannel;
     QList<QnMediaContextPtr> m_contexts;
@@ -75,6 +79,8 @@ private:
     QMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
     bool m_fastStreamFind;
+
+    //QVector<QnAbstractMotionArchiveConnectionPtr> m_motionConnections;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

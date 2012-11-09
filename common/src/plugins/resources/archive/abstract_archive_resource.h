@@ -12,6 +12,7 @@ public:
     ~QnAbstractArchiveResource();
 
     virtual QString getUniqueId() const;
+    virtual void setUniqId(const QString& value) override;
 
     virtual void setStatus(Status newStatus, bool silenceMode = false) override;
 };

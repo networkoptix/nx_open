@@ -3,7 +3,7 @@
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
 #include <core/resource/user_resource.h>
-#include <core/resourcemanagment/resource_pool.h>
+#include <core/resource_managment/resource_pool.h>
 #include "workbench.h"
 #include "workbench_layout.h"
 #include "workbench_layout_synchronizer.h"

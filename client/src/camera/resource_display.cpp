@@ -3,7 +3,7 @@
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
-#include <core/resource/video_server_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
@@ -36,7 +36,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
         if(m_mediaProvider != NULL) {
             /* Camera will free media provider in its destructor. */
-            m_camera = new QnVideoCamera(m_mediaResource, false, m_mediaProvider);
+            m_camera = new QnVideoCamera(m_mediaResource, m_mediaProvider);
 
             connect(this,                           SIGNAL(destroyed()),    m_camera,   SLOT(beforeStopDisplay()));
 
@@ -117,7 +117,7 @@ void QnResourceDisplay::disconnectFromResource() {
     QnResourceConsumer::disconnectFromResource();
 }
 
-const QnVideoResourceLayout *QnResourceDisplay::videoLayout() const {
+const QnResourceVideoLayout *QnResourceDisplay::videoLayout() const {
     if(m_mediaProvider == NULL)
         return NULL;
 
