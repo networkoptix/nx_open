@@ -174,8 +174,10 @@ public:
 // ------ Sort model class ------
 
 class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+    typedef QSortFilterProxyModel base_type;
+
 public:
-    QnResourceTreeSortProxyModel(QObject *parent = NULL): QSortFilterProxyModel(parent) {}
+    QnResourceTreeSortProxyModel(QObject *parent = NULL): base_type(parent) {}
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
@@ -197,6 +199,26 @@ protected:
         QnResourcePtr leftResource = left.data(Qn::ResourceRole).value<QnResourcePtr>();
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
         return leftResource < rightResource;
+    }
+
+    /*!
+      \reimp
+    */
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
+        //TODO: #gdm move enum
+        //TODO: #gdm fucking code-doubling
+        if (index.column() == 1 /*CheckColumn*/ && role == Qt::CheckStateRole){
+            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+            setCheckStateRecursive(index, checkState);
+            return true;
+        } else
+            return base_type::setData(index, value, role);
+    }
+
+    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state) {
+        base_type::setData(index, state, Qt::CheckStateRole);
+        for (int i = 0; i < rowCount(index); ++i)
+            setCheckStateRecursive(this->index(i, 1, index), state);
     }
 };
 
@@ -271,7 +293,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
-    m_searchModel->setSourceModel(model);
+    //TODO: #gdm hell!
+    //m_searchModel->setSourceModel(m_resourceProxyModel);
+     m_searchModel->setSourceModel(model);
     emit viewportSizeChanged();
 }
 

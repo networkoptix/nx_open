@@ -70,6 +70,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->enableGraphicsTweaks();
 //    ui->resourceTreeWidget->setFilterVisible();
+
     ui->searchTreeWidget->setCheckboxesVisible(false);
     ui->searchTreeWidget->enableGraphicsTweaks();
 
