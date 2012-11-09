@@ -174,8 +174,10 @@ public:
 // ------ Sort model class ------
 
 class QnResourceTreeSortProxyModel: public QSortFilterProxyModel {
+    typedef QSortFilterProxyModel base_type;
+
 public:
-    QnResourceTreeSortProxyModel(QObject *parent = NULL): QSortFilterProxyModel(parent) {}
+    QnResourceTreeSortProxyModel(QObject *parent = NULL): base_type(parent) {}
 
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const {
@@ -198,6 +200,26 @@ protected:
         QnResourcePtr rightResource = right.data(Qn::ResourceRole).value<QnResourcePtr>();
         return leftResource < rightResource;
     }
+
+    /*!
+      \reimp
+    */
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override {
+        //TODO: #gdm move enum
+        //TODO: #gdm fucking code-doubling
+        if (index.column() == 1 /*CheckColumn*/ && role == Qt::CheckStateRole){
+            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
+            setCheckStateRecursive(index, checkState);
+            return true;
+        } else
+            return base_type::setData(index, value, role);
+    }
+
+    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state) {
+        base_type::setData(index, state, Qt::CheckStateRole);
+        for (int i = 0; i < rowCount(index); ++i)
+            setCheckStateRecursive(this->index(i, 1, index), state);
+    }
 };
 
 
@@ -207,7 +229,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0),
-    m_checkboxesHidden(false)
+    m_checkboxesVisible(true)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -271,7 +293,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
-    m_searchModel->setSourceModel(model);
+    //TODO: #gdm hell!
+    //m_searchModel->setSourceModel(m_resourceProxyModel);
+     m_searchModel->setSourceModel(model);
     emit viewportSizeChanged();
 }
 
@@ -303,20 +327,19 @@ QPoint QnResourceTreeWidget::selectionPos() const {
 
     QModelIndex selected = selectedRows.back();
     QPoint pos = ui->resourcesTreeView->visualRect(selected).bottomRight();
-
-    // TODO: #gdm looks like this comment was written by me, but I don't see
-    // the two-step transformation here %). Did you change anything?
-
-    // mapToGlobal works incorrectly here, using two-step transformation
     pos = ui->resourcesTreeView->mapToGlobal(pos);
     return pos;
 }
 
-void QnResourceTreeWidget::setCheckboxesHidden(bool hidden) {
-    if (m_checkboxesHidden == hidden)
+void QnResourceTreeWidget::setCheckboxesVisible(bool visible) {
+    if (m_checkboxesVisible == visible)
         return;
-    m_checkboxesHidden = hidden;
+    m_checkboxesVisible = visible;
     updateCheckboxesVisibility();
+}
+
+bool QnResourceTreeWidget::isCheckboxesVisible() const {
+    return m_checkboxesVisible;
 }
 
 void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks) {
@@ -352,7 +375,7 @@ void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
 }
 
 void QnResourceTreeWidget::updateCheckboxesVisibility(){
-    ui->resourcesTreeView->setColumnHidden(1, m_checkboxesHidden);
+    ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
 }
 
 void QnResourceTreeWidget::updateColumnsSize(){
