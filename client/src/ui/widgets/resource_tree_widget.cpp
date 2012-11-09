@@ -10,6 +10,8 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
+#include <ui/models/resource_search_proxy_model.h>
+
 #include <ui/style/noptix_style.h>
 #include <ui/style/proxy_style.h>
 #include <ui/style/skin.h>
@@ -208,7 +210,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     m_checkboxesHidden(false)
 {
     ui->setupUi(this);
-    ui->filterFrame->setVisible(false); //TODO: set visible from property
+    ui->filterFrame->setVisible(false);
+    ui->selectFilterButton->setVisible(false);
 
     m_itemDelegate = new QnResourceTreeItemDelegate(this);
     ui->resourcesTreeView->setItemDelegate(m_itemDelegate);
@@ -221,11 +224,23 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
 
     connect(this,                       SIGNAL(viewportSizeChanged()),      this,               SLOT(updateColumnsSize()), Qt::QueuedConnection);
 
+    connect(ui->filterLineEdit,         SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));
+    connect(ui->filterLineEdit,         SIGNAL(editingFinished()),          this,               SLOT(updateFilter()));
+    connect(ui->clearFilterButton,      SIGNAL(clicked()),                  ui->filterLineEdit, SLOT(clear()));
+
     ui->resourcesTreeView->verticalScrollBar()->installEventFilter(this);
+
+    m_searchModel = new QnResourceSearchProxyModel(this);
+    m_searchModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_searchModel->setFilterKeyColumn(0);
+    m_searchModel->setFilterRole(Qn::ResourceSearchStringRole);
+    m_searchModel->setSortCaseSensitivity(Qt::CaseInsensitive);
+    m_searchModel->setDynamicSortFilter(true);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
     setWorkbench(NULL);
+    delete m_searchModel;
 }
 
 
@@ -256,6 +271,7 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
     } else {
         ui->resourcesTreeView->setModel(NULL);
     }
+    m_searchModel->setSourceModel(model);
     emit viewportSizeChanged();
 }
 
@@ -312,6 +328,16 @@ void QnResourceTreeWidget::enableGraphicsTweaks(bool enableTweaks) {
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
 }
 
+void QnResourceTreeWidget::setFilterVisible(bool visible) {
+    ui->filterFrame->setVisible(visible);
+}
+
+bool QnResourceTreeWidget::isFilterVisible() const {
+    return ui->filterFrame->isVisible();
+}
+
+// ----------- Handlers -------------
+
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
     if (obj == ui->resourcesTreeView->verticalScrollBar() &&
             (event->type() == QEvent::Show || event->type() == QEvent::Hide)){
@@ -334,6 +360,32 @@ void QnResourceTreeWidget::updateColumnsSize(){
     const int offset = checkBoxSize * 1.5;
     ui->resourcesTreeView->setColumnWidth(1, checkBoxSize);
     ui->resourcesTreeView->setColumnWidth(0, ui->resourcesTreeView->viewport()->width() - offset);
+}
+
+void QnResourceTreeWidget::updateFilter() {
+    QString filter = ui->filterLineEdit->text();
+
+    /* Don't allow empty filters. */
+    if (!filter.isEmpty() && filter.trimmed().isEmpty()) {
+        ui->filterLineEdit->clear(); /* Will call into this slot again, so it is safe to return. */
+    //    ui->resourcesTreeView->setModel(m_resourceProxyModel);
+        return;
+    }
+
+    ui->clearFilterButton->setVisible(!filter.isEmpty());
+//    QnResource::Flags flags = static_cast<QnResource::Flags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
+
+    m_searchModel->clearCriteria();
+    m_searchModel->addCriterion(QnResourceCriterionGroup(filter));
+  //  if(flags != 0)
+  //      model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+    m_searchModel->addCriterion(QnResourceCriterion(QnResource::server));
+
+    if (filter.isEmpty())
+        ui->resourcesTreeView->setModel(m_resourceProxyModel);
+    else
+        ui->resourcesTreeView->setModel(m_searchModel);
+    ui->resourcesTreeView->expandAll();
 }
 
 // -------------------------------------------------------------------------- //

@@ -26,6 +26,7 @@ QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWo
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
+    ui->resourcesWidget->setFilterVisible(true);
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
@@ -60,18 +61,20 @@ QnVirtualCameraResourceList QnExportCameraSettingsDialog::getSelectedCameras() c
     return cameras;
 }
 
-void QnExportCameraSettingsDialog::setRecordingEnabled(bool enabled){
+void QnExportCameraSettingsDialog::setRecordingEnabled(bool enabled) {
     if (m_recordingEnabled == enabled)
         return;
     m_recordingEnabled = enabled;
     updateLicensesStatus();
 }
 
-void QnExportCameraSettingsDialog::setMotionParams(bool motionUsed, bool dualStreamingUsed){
+void QnExportCameraSettingsDialog::setMotionParams(bool motionUsed, bool dualStreamingUsed) {
     m_motionUsed = motionUsed;
     m_dualStreamingUsed = dualStreamingUsed;
     updateMotionStatus();
 }
+
+// ------------ Handlers ---------------------
 
 void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
     updateLicensesStatus();
