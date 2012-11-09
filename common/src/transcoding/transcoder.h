@@ -93,6 +93,8 @@ typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 */
 class QnTranscoder: public QObject
 {
+    Q_OBJECT;
+
 public:
     QnTranscoder();
     virtual ~QnTranscoder();

@@ -81,6 +81,7 @@ namespace Qn {
 }
 #endif
 
+// TODO: move to client_globals?
 #define InvalidUtcOffset _id(INT64_MAX)
 
 

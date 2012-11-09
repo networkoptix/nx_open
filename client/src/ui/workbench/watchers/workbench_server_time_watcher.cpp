@@ -4,6 +4,7 @@
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
+#include "plugins/resources/archive/avi_files/avi_resource.h"
 
 #include <api/media_server_connection.h>
 
@@ -36,8 +37,32 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaServerResourcePtr &s
     return m_utcOffsetByResource.value(server, defaultValue);
 }
 
+qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resource, qint64 defaultValue) const {
+    if(QnAviResourcePtr fileResource = resource.dynamicCast<QnAviResource>()) {
+        qint64 result = fileResource->timeZoneOffset();
+        return result == Qn::InvalidUtcOffset ? defaultValue : result;
+    } else if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(resource->getParentId()).dynamicCast<QnMediaServerResource>()) {
+        return utcOffset(server, defaultValue);
+    } else {
+        return defaultValue;
+    }
+}
+
 qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue) const {
+    // TODO: duplicate code.
     qint64 utcOffset = this->utcOffset(server, Qn::InvalidUtcOffset);
+    if(utcOffset == Qn::InvalidUtcOffset)
+        return defaultValue;
+
+    QDateTime localDateTime = QDateTime::currentDateTime();
+    QDateTime utcDateTime = localDateTime.toUTC();
+    localDateTime.setTimeSpec(Qt::UTC);
+
+    return utcOffset - utcDateTime.msecsTo(localDateTime);
+}
+
+qint64 QnWorkbenchServerTimeWatcher::localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue) const {
+    qint64 utcOffset = this->utcOffset(resource, Qn::InvalidUtcOffset);
     if(utcOffset == Qn::InvalidUtcOffset)
         return defaultValue;
 

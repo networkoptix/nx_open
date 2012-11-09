@@ -630,7 +630,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
 
     // TODO: this should be a resource parameter that is update from the server.
 
-    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_server, 0));
+    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
     int dayOfWeek = dateTime.date().dayOfWeek();
     int seconds = QTime().secsTo(dateTime.time());
 
@@ -730,7 +730,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         qint64 utcTime = m_renderer->lastDisplayedTime(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_server, 0);
+            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0);
 
         timeString = tr("\t%1").arg(
             m_display->camDisplay()->isRealTimeSource() ? 

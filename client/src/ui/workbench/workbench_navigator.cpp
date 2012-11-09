@@ -667,8 +667,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 void QnWorkbenchNavigator::updateLocalOffset() {
     qint64 localOffset = 0;
     if(qnSettings->timeMode() == Qn::ServerTimeMode && m_currentMediaWidget && (m_currentWidgetFlags & WidgetUsesUTC))
-        if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_currentMediaWidget->resource()->getParentId()).dynamicCast<QnMediaServerResource>())
-            localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(server, 0);
+        localOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_currentMediaWidget->resource(), 0);
     m_timeSlider->setLocalOffset(localOffset);
 }
 
