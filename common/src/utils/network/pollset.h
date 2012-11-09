@@ -84,6 +84,10 @@ public:
         \note Ivalidates all iterators
     */
     void remove( Socket* const sock, EventType eventType );
+    //!Returns number of sockets, monitored for \a eventType
+    /*!
+        Returned value should only be used for compare with \a maxPollSetSize(). Returned absolute value may be unexpected sometimes
+    */
     size_t size( EventType eventType ) const;
 
     /*!
