@@ -344,6 +344,7 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QnLayoutResourcePtr m_exportLayout;  
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;

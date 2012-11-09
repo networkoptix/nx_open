@@ -2325,16 +2325,18 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         }
     }
 
-	// TODO: exoprt progres dialog can be already deleted?
+	// TODO: export progress dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     m_exportPeriod = exportPeriod;
+    m_exportLayout = layout;
     at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layout_exportFinished()
 {
-    disconnect(sender(), NULL, this, NULL);
+    disconnect(sender(), NULL, this, NULL); // TODO: not needed here.
+
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
     if (!m_exportStorage)
@@ -2343,17 +2345,15 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     if (fileName.endsWith(QLatin1String(".tmp")))
     {
         fileName.chop(4);
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
     else if (m_layoutExportMode == LayoutExport_LocalSaveAs) 
     {
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-        QString oldUrl = layout->getUrl();
+        QString oldUrl = m_exportLayout->getUrl();
         QString newUrl = m_exportStorage->getUrl();
 
-        QnLayoutItemDataMap items = layout->getItems();
+        QnLayoutItemDataMap items = m_exportLayout->getItems();
         for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
@@ -2361,21 +2361,20 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
             if (aviRes)
                 qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
         }
-        layout->setUrl(newUrl);
+        m_exportLayout->setUrl(newUrl);
 
 
-        layout->setName(QFileInfo(newUrl).fileName());
+        m_exportLayout->setName(QFileInfo(newUrl).fileName());
 
         QnLayoutFileStorageResourcePtr novStorage = m_exportStorage.dynamicCast<QnLayoutFileStorageResource>();
         if (novStorage)
             novStorage->switchToFile(oldUrl, newUrl, false);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
     else {
-        QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
-        if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
-            layout->setStatus(QnResource::Online);
-            resourcePool()->addResource(layout);
+        if (m_exportLayout && !resourcePool()->getResourceByGuid(m_exportLayout->getUniqueId())) {
+            m_exportLayout->setStatus(QnResource::Online);
+            resourcePool()->addResource(m_exportLayout);
         }
     }
     m_exportStorage.clear();
