@@ -8,7 +8,7 @@
 #include <smmintrin.h>
 #endif
 
-static const char version = 1;
+static const char version = 2;
 static const quint16 DETAILED_AGGREGATE_INTERVAL = 3; // at seconds
 static const quint16 COARSE_AGGREGATE_INTERVAL = 3600; // at seconds
 
@@ -263,7 +263,7 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
 {
     QFile indexFile;
     fillFileNames(msTime, 0, &indexFile);
-    if (!indexFile.open(QFile::ReadOnly)) 
+    if (!indexFile.open(QFile::ReadWrite)) 
         return false;
     return loadIndexFile(index, indexHeader, indexFile);
 }
@@ -285,13 +285,29 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
         index.resize(oldVectorSize + records);
         memcpy(&index[oldVectorSize], tmpBuffer, records * MOTION_INDEX_RECORD_SIZE);
     }
+    if (indexHeader.version == 1)
+    {
+        // update index to version 2: move month start from local time to UTC time
+        indexHeader.version = 2;
+        int offset = currentTimeZone()*1000;
+        indexHeader.startTime -= offset;
+
+        //rewrite index
+        indexFile.seek(0);
+        indexFile.write((const char*) &indexHeader, sizeof(IndexHeader));
+        for (int i = 0; i < index.size(); ++i) {
+            index[i].start += offset;
+            indexFile.write((const char*) &index[i].start, 4);
+            indexFile.write((const char*) &index[i].duration, 4);
+        }
+    }
 
     return true;
 }
 
 void QnMotionArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate)
 {
-    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
+    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs).toUTC();
     QDateTime monthStart(datetime.date().addDays(1-datetime.date().day()));
     minDate = monthStart.toMSecsSinceEpoch();
 
