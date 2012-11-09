@@ -432,10 +432,8 @@ public:
 
     bool setData(const QVariant &value, int role, int column) {
         if (column == CheckColumn && role == Qt::CheckStateRole){
-            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
-            setCheckStateRecursive(checkState);
-            if (m_parent)
-                m_parent->updateParentCheckStateRecursive(checkState);
+            m_checked = (Qt::CheckState)value.toInt();
+            changeInternal();
             return true;
         }
 
@@ -496,27 +494,6 @@ protected:
         
         QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
-    }
-
-    void setCheckStateRecursive(Qt::CheckState state){
-        m_checked = state;
-      /*  foreach(Node* child, m_children)
-            child->setCheckStateRecursive(state);*/
-        changeInternal();
-    }
-
-    void updateParentCheckStateRecursive(Qt::CheckState state){
-      /*  foreach(Node* child, m_children)
-            if (child->m_checked != state) {
-                m_checked = Qt::Unchecked;
-                if (m_parent)
-                    m_parent->updateParentCheckStateRecursive(Qt::Unchecked);
-                return;
-            }
-        m_checked = state;
-        if (m_parent)
-            m_parent->updateParentCheckStateRecursive(state);
-        changeInternal();*/
     }
 
 private:

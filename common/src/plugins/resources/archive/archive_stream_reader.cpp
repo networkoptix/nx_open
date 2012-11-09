@@ -39,6 +39,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_newDataMarker(0),
     m_currentTimeHint(AV_NOPTS_VALUE),
 //private section 2
+    m_jumpInSilenceMode(false),
     m_bofReached(false),
     m_canChangeQuality(true),
     m_externalLocked(false),
@@ -59,7 +60,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_speed(1.0),
     m_pausedStart(false),
     m_sendMotion(false),
-    m_jumpInSilenceMode(false),
     m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
@@ -215,6 +215,7 @@ bool QnArchiveStreamReader::init()
         while (1)
         {
             bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
+            Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;

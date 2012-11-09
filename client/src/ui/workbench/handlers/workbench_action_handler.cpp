@@ -2628,7 +2628,7 @@ Do you want to continue?"),
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
         if (selectedFilter.contains(tr("with Timestamps")))
             role = QnStreamRecorder::Role_FileExportWithTime;
-        int timeOffset = timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_exportedCamera->getDevice().dynamicCast<QnMediaResource>(), 0);
+        int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_exportedCamera->getDevice().dynamicCast<QnMediaResource>(), 0);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
                                                   QnStorageResourcePtr(), role, timeOffset);
         exportProgressDialog->exec();

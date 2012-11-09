@@ -99,6 +99,7 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
+    m_startMksec(0),
     m_selectedAudioChannel(0),
     m_audioStreamIndex(-1),
     m_firstVideoIndex(0),
@@ -108,8 +109,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
-    m_fastStreamFind(false),
-    m_startMksec(0)
+    m_fastStreamFind(false)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -466,7 +466,7 @@ void QnAviArchiveDelegate::initLayoutStreams()
         switch(codecContext->codec_type)
         {
         case AVMEDIA_TYPE_AUDIO:
-            while (m_indexToChannel.size() <= i)
+            while ((uint)m_indexToChannel.size() <= i)
                 m_indexToChannel << -1;
             m_indexToChannel[i] = videoNum + audioNum++;
             break;
@@ -504,7 +504,7 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
         video->timestamp = AV_NOPTS_VALUE;
     else
         video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
-    if (packet.pts != AV_NOPTS_VALUE) {
+    if ((quint64)packet.pts != AV_NOPTS_VALUE) {
         video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTime;
     }
 }
