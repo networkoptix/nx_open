@@ -1,32 +1,52 @@
+
 ----------------------------------------------- 1.4-Release-Candidate -----------------------------------------------
+New Features: 
+ - Traytool is able to perform search for Enterprise Controllers available in the network. Try this on Media Server setup page
+ - Ability to export with timestamps rendered on video. Requires transcoding on client, so may take a long, slightly decrease quality and increase 
+   processor load up to 100% during export
+ - DST is working correctly in most cases
+ - Time change is correctly supported
+ - Time Zone changing and handling is correctly supported even if components are in different time zones
+ - Time Line can display Local or Server time (specified in System Settings). Export and Thumbnail Search features will depend on this settings as well. 
+   However this setting does not affect Recording Schedule (it is always based on Media Server Time)
+
 Improvements:
  - Item's info panel is not hidden if go to fullscreen
  - Playback control is not hidden if go to fullscreen
  - CAL is replaced to CLND
+ - When a camera is discovered its Model is stored in properties. Contrary to Name, Model cannot be changed
  - Items' buttons states are saved when switching between layouts
  - Tooltips to Pin/Unpin and Show/Hide buttons are added
  - Items' Panels and Text (NO DATA etc.) are rotated correctly if rotate them
- - Time Line is never hidden if at least one video is on Scene. Lastly selected video remains selected even if click on empty space (grey frame is drawn around it).
+ - Time Line is never hidden if at least one video is on Scene. Lastly selected video remains selected even if click on empty space (grey frame is drawn around it)
+ - Motion Detection warning on Recording Settings form is displayed correctly depending on MD support
+ - In "About" screen new information is diaplayed (EC and each Media Server versions, Architectire, compiler etc)
+ - Some renamings
 
 Bugs Fixed.
  - Fixed incorrect support email if click on link on the Licenses page (2 slashes before address).
  - Fixed misclicks on Time Line (clicks were sent underneath)
  - Fixed incorrect displaying of Multi-Videos in Tree: if the file had been overwritten it was displayed twice
- - If add a camera in exported layout and play it at the end, added camera started playing live video. If add a camera with no archive it started playing live. Fixed.
- - Fixed an error with Axis1031W: it was played back incorrectly in Multi-Video if it had been changed.
+ - Fixed errors in Multi-Videos exported from local files: if the file had been overwritten videos could display incorrectly
+ - If add a camera in Multi-Video exported file and play it at the end, added camera started playing live video. If add a camera with no archive it started playing live. Fixed.
+ - Fixed an error with Axis1031W: it was played back incorrectly in Multi-Video if Multi-Video had been changed.
+ - SOme local files could be exported without audio. Fixed
  - If double click on the bottom of Time Line zoom out occured but Time Line started shifting left. Fixed
  - Sometimes Menu color is changed from grey to white (especially if remote log in to the computer Client is opened on). Fixed
  - Logout didn't clear workspace. Fixed
  - License could not be reused if deinstall database and reinstall the software again. Fixed
  - Expand tree icon is drawn near the bottom element of the tree, even though the element itself is not drawn
- - Fixed the problem when sometimes screen recording could not be saved. Screen recording TEMP folder was equal to Root Media Folder
- - Fixed Screen Recording if several microphone devices with identical names were registered (usually happens in laptops)
+ - Fixed the problem when sometimes screen recording could not be saved. The cause was that the screen recording TEMP folder was equal to Root Media Folder.
    If it was inaccessible Screen Recording could not be saved even if it had been performed. Now new setting for Temp Folder is introduced. 
    By default it's User's Temp Folder
+ - Fixed Screen Recording microphone issue if several microphone devices with identical names were registered (usually happens in laptops)
  - Multi-Video Export fix: if one exported camera contained no data Time Line displayed time in incorrect format  
- - Installer bugs:
-   - Option "Run Client after installation" was not shown if Client was added via "change" method. Fixed
-   - If install software for the first time EC Port in Tray Tool was not displayed. Fixed.
+ - Installer bugs fixed:
+   - Option "Run Client after installation" was not shown if Client was added via "change" method
+   - If install software for the first time EC Port in Tray Tool was not displayed
+   - Windows XP issue solved
+   - If reinstall/upgrade EC on Linux the installer suggested default values instead of ones entered earlier.
+   
 ----------------------------------------------- 1.4-Beta -----------------------------------------------
 
 New Features: 
