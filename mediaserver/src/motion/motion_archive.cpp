@@ -307,11 +307,16 @@ bool QnMotionArchive::loadIndexFile(QVector<IndexRecord>& index, IndexHeader& in
 
 void QnMotionArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& maxDate)
 {
-    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs).toUTC();
+    QDateTime datetime = QDateTime::fromMSecsSinceEpoch(datetimeMs);
+    datetime.setTimeSpec(Qt::UTC);
+
+
     QDateTime monthStart(datetime.date().addDays(1-datetime.date().day()));
+    monthStart.setTimeSpec(Qt::UTC);
     minDate = monthStart.toMSecsSinceEpoch();
 
     QDateTime nextMonth(monthStart.addMonths(1));
+    nextMonth.setTimeSpec(Qt::UTC);
     maxDate = nextMonth.toMSecsSinceEpoch()-1;
 }
 
