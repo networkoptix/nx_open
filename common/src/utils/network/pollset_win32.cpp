@@ -202,6 +202,7 @@ PollSet::PollSet()
 {
     m_impl->readSockets.push_back( &m_impl->dummySocket );
     m_impl->dummySocket.setNonBlockingMode( true );
+    m_impl->dummySocket.setLocalAddressAndPort( QString::fromAscii("127.0.0.1") );
 }
 
 PollSet::~PollSet()

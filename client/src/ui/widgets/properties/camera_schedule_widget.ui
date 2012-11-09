@@ -564,15 +564,30 @@
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
         <widget class="QPushButton" name="exportScheduleButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
-          <string>Export Schedule...</string>
+          <string>Copy Schedule...</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="exportWarningLabel">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="text">
-          <string>Apply settings before export</string>
+          <string>Apply changes before copy schedule</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

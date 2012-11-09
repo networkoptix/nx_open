@@ -57,6 +57,8 @@ public:
 
     /** Check if motion region is valid */
     bool isValidMotionRegion();
+
+    void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
     void modeChanged();
