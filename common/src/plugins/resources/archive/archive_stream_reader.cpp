@@ -675,31 +675,12 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-
-    if (m_currentData && m_eof)
-    {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
-        m_eof = false;
-    }
-
-    if (m_BOF) {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        m_BOF = false;
-        //m_BOFTime = m_currentData->timestamp;
-        /*
-        QString msg;
-        QTextStream str(&msg);
-        str << "set BOF " << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << " for marker " << m_dataMarker;
-        str.flush();
-        cl_log.log(msg, cl_logWARNING);
-        */
-
-    }
-    if (reverseMode && !delegateForNegativeSpeed)
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
+
+
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
     if (videoData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
@@ -743,6 +724,17 @@ begin_label:
             m_BOF = true;
             goto begin_label;
         }
+    }
+
+    if (m_currentData && m_eof)
+    {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+        m_eof = false;
+    }
+
+    if (m_BOF) {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        m_BOF = false;
     }
 
     if (m_isStillImage)
