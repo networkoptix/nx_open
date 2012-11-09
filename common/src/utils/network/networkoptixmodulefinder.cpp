@@ -55,6 +55,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
             sock->getLocalAddress();    //requesting local address. During this call local port is assigned to socket
             sock->setDestAddr( multicastGroupAddress.toString(), multicastGroupPort );
             m_sockets.push_back( sock.release() );
+            m_localNetworkAdresses.insert( addressToUse.toString() );
         }
         catch( const std::exception& e )
         {
@@ -212,6 +213,7 @@ void NetworkOptixModuleFinder::run()
                     response.typeSpecificParameters,
                     localAddress.toString(),
                     remoteAddress.toString(),
+                    m_localNetworkAdresses.find(remoteAddressStr) != m_localNetworkAdresses.end(),
                     response.seed );
             }
 
@@ -239,6 +241,7 @@ void NetworkOptixModuleFinder::run()
                     it->second.response.type,
                     it->second.response.typeSpecificParameters,
                     *addrIter,
+                    m_localNetworkAdresses.find(*addrIter) != m_localNetworkAdresses.end(),
                     it->second.response.seed );
             }
             m_knownEnterpriseControllers.erase( it++ );

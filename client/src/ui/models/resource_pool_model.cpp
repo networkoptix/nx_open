@@ -344,10 +344,13 @@ public:
         return m_model->createIndex(row, col, this);
     }
 
-    Qt::ItemFlags flags(const QModelIndex &index) const {
-        if (index.column() == CheckColumn)
-            return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable | Qt::ItemIsTristate;
+    Qt::ItemFlags flags(int column) const {
+        if (column== CheckColumn)
+            return Qt::ItemIsEnabled
+                    | Qt::ItemIsSelectable
+                    | Qt::ItemIsUserCheckable
+                    | Qt::ItemIsEditable
+                    | Qt::ItemIsTristate;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
@@ -429,10 +432,8 @@ public:
 
     bool setData(const QVariant &value, int role, int column) {
         if (column == CheckColumn && role == Qt::CheckStateRole){
-            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
-            setCheckStateRecursive(checkState);
-            if (m_parent)
-                m_parent->updateParentCheckStateRecursive(checkState);
+            m_checked = (Qt::CheckState)value.toInt();
+            changeInternal();
             return true;
         }
 
@@ -493,27 +494,6 @@ protected:
         
         QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
-    }
-
-    void setCheckStateRecursive(Qt::CheckState state){
-        m_checked = state;
-        foreach(Node* child, m_children)
-            child->setCheckStateRecursive(state);
-        changeInternal();
-    }
-
-    void updateParentCheckStateRecursive(Qt::CheckState state){
-        foreach(Node* child, m_children)
-            if (child->m_checked != state) {
-                m_checked = Qt::Unchecked;
-                if (m_parent)
-                    m_parent->updateParentCheckStateRecursive(Qt::Unchecked);
-                return;
-            }
-        m_checked = state;
-        if (m_parent)
-            m_parent->updateParentCheckStateRecursive(state);
-        changeInternal();
     }
 
 private:
@@ -779,11 +759,7 @@ int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
-
-    // TODO: #gdm this looks strange. 
-    // Node::flags doesn't need index, only column, so this is what you should pass.
-    // i.e. node(index)->flags(index.column())
-    return node(index)->flags(index);
+    return node(index)->flags(index.column());
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {

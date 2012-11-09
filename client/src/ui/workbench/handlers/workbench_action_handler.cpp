@@ -2257,11 +2257,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
                 }
-                QnMediaServerResourcePtr videoServer = qnResPool->getResourceById(mediaRes->getParentId()).dynamicCast<QnMediaServerResource>();
-                if (videoServer)
-                    itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(videoServer, Qn::InvalidUtcOffset);
-                else 
-                    itemTimeZones << Qn::InvalidUtcOffset;
+                itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
             }
             else 
                 itemTimeZones << Qn::InvalidUtcOffset;
@@ -2633,10 +2629,8 @@ Do you want to continue?"),
         if (selectedFilter.contains(tr("with Timestamps")))
             role = QnStreamRecorder::Role_FileExportWithTime;
         int timeOffset = 0;
-        if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-            if(QnMediaServerResourcePtr server = resourcePool()->getResourceById(m_exportedCamera->getDevice()->getParentId()).dynamicCast<QnMediaServerResource>())
-                timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(server, 0);
-        }
+        if(qnSettings->timeMode() == Qn::ServerTimeMode)
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_exportedCamera->getDevice().dynamicCast<QnMediaResource>(), 0);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
                                                   QnStorageResourcePtr(), role, timeOffset);
         exportProgressDialog->exec();

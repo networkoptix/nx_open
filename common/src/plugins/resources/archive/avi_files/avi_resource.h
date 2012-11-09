@@ -34,6 +34,7 @@ public:
 
     /* Return item time zone offset in ms */
     qint64 timeZoneOffset() const;
+
 protected:
 
 private:

@@ -16,15 +16,15 @@ FoundEnterpriseControllersModel::FoundEnterpriseControllersModel( NetworkOptixMo
 {
     QObject::connect(
         finder,
-        SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, const QString&)),
+        SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
         this,
-        SLOT(remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, const QString&)),
+        SLOT(remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
     QObject::connect(
         finder,
-        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, const QString&)),
+        SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         this,
-        SLOT(remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, const QString&)),
+        SLOT(remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
         Qt::DirectConnection );
 }
 
@@ -106,7 +106,7 @@ QVariant FoundEnterpriseControllersModel::headerData( int section, Qt::Orientati
         return QVariant();
     }
 
-    return tr("Enterprise controller address");
+    return tr("Enterprise Controller addresses");
 }
 
 //!Implementation of QAbstractItemModel::index
@@ -157,7 +157,8 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     const QString& /*moduleVersion*/,
     const TypeSpecificParamMap& moduleParameters,
     const QString& /*localInterfaceAddress*/,
-    const QString& remoteHostAddress,
+    const QString& remoteHostAddressVal,
+    bool isLocal,
     const QString& seed )
 {
     QMutexLocker lk( &m_mutex );
@@ -167,6 +168,8 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     if( !moduleParameters.contains(QString::fromAscii("port")) )
         return;
 
+    const QString& remoteHostAddress = isLocal ? QString::fromAscii("127.0.0.1") : remoteHostAddressVal;
+
     const QString& url = QString::fromAscii("https://%1:%2").arg(remoteHostAddress).arg(moduleParameters[QString::fromAscii("port")]);
     bool isNewElement = false;
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
@@ -175,7 +178,6 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
         FoundModuleData newModuleData;
         newModuleData.url = url;
         newModuleData.seed = seed;
-        beginResetModel();
         //searching place to insert new element in order of increase of url
         it = std::lower_bound( m_foundModules.begin(), m_foundModules.end(), newModuleData );
         if( it == m_foundModules.end() || it->url != newModuleData.url )
@@ -184,8 +186,8 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
     }
 
     //if such already exists, updating it's data
-    it->url = url;
-    it->ipAddresses.push_back( remoteHostAddress );
+    if( std::find( it->ipAddresses.begin(), it->ipAddresses.end(), remoteHostAddress ) == it->ipAddresses.end() )
+        it->ipAddresses.push_back( remoteHostAddress );
     it->params = moduleParameters;
     const QModelIndex& updatedElemIndex = indexNonSafe( it - m_foundModules.begin(), 0 );
 
@@ -193,6 +195,7 @@ void FoundEnterpriseControllersModel::remoteModuleFound(
 
     if( isNewElement )
     {
+        beginResetModel();
         endResetModel();
     }
     else
@@ -205,6 +208,7 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     const QString& moduleID,
     const TypeSpecificParamMap& /*moduleParameters*/,
     const QString& /*remoteHostAddress*/,
+    bool isLocal,
     const QString& seed )
 {
     QMutexLocker lk( &m_mutex );
@@ -215,8 +219,11 @@ void FoundEnterpriseControllersModel::remoteModuleLost(
     vector<FoundModuleData>::iterator it = std::find_if( m_foundModules.begin(), m_foundModules.end(), IsSeedEqualPred(seed) );
     if( it == m_foundModules.end() )
         return;
-    beginResetModel();
     m_foundModules.erase( it );
+
+    lk.unlock();
+
+    beginResetModel();
     endResetModel();
 }
 

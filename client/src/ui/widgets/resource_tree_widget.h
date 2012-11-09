@@ -40,22 +40,31 @@ public:
 
     QPoint selectionPos() const;
 
-    // TODO: #gdm Better use setCheckboxesVisible. And add a getter (bool isCheckboxesVisible() const).
-    void setCheckboxesHidden(bool hidden = true);
+    /**
+     * @brief setCheckboxesVisible      Show/hide checkboxes against each row.
+     * @param visible                   Target state of checkboxes.
+     */
+    void setCheckboxesVisible(bool visible = true);
+
+    /**
+     * @brief isCheckboxesVisible       This property holds whether checkboxes against each row are visible.
+     * @return                          True if checkboxes are visible.
+     */
+    bool isCheckboxesVisible() const;
 
     //TODO: #gdm flags?
     // TODO: #gdm setter starts with set, e.g. setGraphicsTweaksEnabled. And add a getter.
     void enableGraphicsTweaks(bool enableTweaks = true);
 
     /**
-     * @brief setFilterVisible  Show/hide resource tree filter widget.
-     * @param visible           Target state of filter.
+     * @brief setFilterVisible          Show/hide resource tree filter widget.
+     * @param visible                   Target state of filter.
      */
     void setFilterVisible(bool visible = true);
 
     /**
-     * @brief isFilterVisible   This property holds whether filter widget is visible.
-     * @return                  True if filter is visible.
+     * @brief isFilterVisible           This property holds whether filter widget is visible.
+     * @return                          True if filter is visible.
      */
     bool isFilterVisible() const;
 protected:
@@ -84,7 +93,10 @@ private:
     QSortFilterProxyModel *m_resourceProxyModel;
     QnResourceSearchProxyModel *m_searchModel;
 
-    bool m_checkboxesHidden;
+    /**
+     * @brief m_checkboxesVisible   This property holds whether checkboxes against each row are visible.
+     */
+    bool m_checkboxesVisible;
 };
 
 #endif // RESOURCE_TREE_WIDGET_H
