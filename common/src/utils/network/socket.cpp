@@ -800,7 +800,7 @@ bool Socket::setNonBlockingMode(bool val)
         return true;
 
 #ifdef _WIN32
-    u_long _val = m_nonBlockingMode ? 1 : 0;
+    u_long _val = val ? 1 : 0;
     if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
     {
         m_nonBlockingMode = val;
