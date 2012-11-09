@@ -25,7 +25,7 @@ QnScheduleGridWidget::QnScheduleGridWidget(QWidget *parent)
     m_enabled = true;
     m_readOnly = false;
     m_defaultParams[FirstParam] = 10;
-    m_defaultParams[SecondParam] = QLatin1String("Md");
+    m_defaultParams[SecondParam] = QLatin1String("Me");
     m_defaultParams[ColorInsideParam] = m_defaultParams[ColorParam] = qnGlobals->recordAlwaysColor().rgba();
     resetCellValues();
 
@@ -88,7 +88,7 @@ void QnScheduleGridWidget::initMetrics()
     while (1)
     {
         QFontMetrics metrics(m_gridFont);
-        if (metrics.width(QLatin1String("Md")) > cellSize/2.2)
+        if (metrics.width(QLatin1String("Me")) > cellSize/2.2)
             break;
         m_gridFont.setPointSizeF(m_gridFont.pointSizeF()+0.5);
     }

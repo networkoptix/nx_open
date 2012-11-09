@@ -5,6 +5,9 @@
 
 #include <utils/common/event_processors.h>
 
+//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+#include <core/dataprovider/live_stream_provider.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -226,7 +229,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                 QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: Oh crap. This string-switching is totally evil.
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
-                else if (shortQuality == QLatin1String("Md"))
+                else if (shortQuality == QLatin1String("Me"))
                     streamQuality = QnQualityNormal;
                 else if (shortQuality == QLatin1String("Hi"))
                     streamQuality = QnQualityHigh;
@@ -318,7 +321,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             switch (task.m_streamQuality) 
             {
                 case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
-                case QnQualityNormal: shortQuality = QLatin1String("Md"); break;
+                case QnQualityNormal: shortQuality = QLatin1String("Me"); break;
                 case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
                 case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
                 default:
@@ -352,7 +355,7 @@ static inline QString getShortText(const QString &text)
     if (text == QLatin1String("Low"))
         return QLatin1String("Lo");
     if (text == QLatin1String("Medium"))
-        return QLatin1String("Md");
+        return QLatin1String("Me");
     if (text == QLatin1String("High"))
         return QLatin1String("Hi");
     if (text == QLatin1String("Best"))
@@ -364,7 +367,7 @@ static inline QString getLongText(const QString &text)
 {
     if (text == QLatin1String("Lo"))
         return QLatin1String("Low");
-    if (text == QLatin1String("Md"))
+    if (text == QLatin1String("Me"))
         return QLatin1String("Medium");
     if (text == QLatin1String("Hi"))
         return QLatin1String("High");
@@ -709,8 +712,11 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){
             int maxFps = camera->getMaxFps();
+
+            //TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of the live_stream_provider module
             if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
-                maxFps = maxFps - camera->reservedSecondStreamFps();
+                //maxFps = maxFps - camera->reservedSecondStreamFps(); // maybe this way better?
+                maxFps = maxFps - MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;
             foreach(const QnScheduleTask::Data &data, scheduleTasks()){
