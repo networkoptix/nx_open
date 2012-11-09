@@ -112,7 +112,7 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel):
     m_channel(channel),
     m_lastDetailedData(new QnMetaDataV1()),
     m_lastTimestamp(AV_NOPTS_VALUE),
-    m_inMiddle(false)
+    m_middleRecordNum(-1)
 {
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
@@ -299,13 +299,12 @@ void QnMotionArchive::dateBounds(qint64 datetimeMs, qint64& minDate, qint64& max
     maxDate = nextMonth.toMSecsSinceEpoch()-1;
 }
 
-int QnMotionArchive::getSizeForTime(qint64 timeMs)
+int QnMotionArchive::getSizeForTime(qint64 timeMs, bool reloadIndex)
 {
-    QVector<IndexRecord> index;
-    IndexHeader indexHeader;
-    loadIndexFile(index, indexHeader, m_detailedIndexFile);
-    QVector<IndexRecord>::iterator indexIterator = qLowerBound(index.begin(), index.end(), timeMs - indexHeader.startTime);
-    return indexIterator - index.begin();
+    if (reloadIndex)
+        loadIndexFile(m_index, m_indexHeader, m_detailedIndexFile);
+    QVector<IndexRecord>::iterator indexIterator = qLowerBound(m_index.begin(), m_index.end(), timeMs - m_indexHeader.startTime);
+    return indexIterator - m_index.begin();
 }
 
 bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
@@ -315,7 +314,8 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     {
         // go to new file
 
-        m_inMiddle = false;
+        m_middleRecordNum = -1;
+        m_index.clear();
         dateBounds(timestamp, m_firstTime, m_lastDateForCurrentFile);
 
         //QString fileName = getFilePrefix(datetime);
@@ -351,12 +351,10 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
             m_detailedIndexFile.write((const char*) &header, sizeof(IndexHeader));
         }
         else {
-            QVector<IndexRecord> index;
-            IndexHeader indexHeader;
-            loadIndexFile(index, indexHeader, m_detailedIndexFile);
-            if (index.size() > 0) {
-                m_minMotionTime = index.first().start + indexHeader.startTime;
-                m_lastRecordedTime = m_maxMotionTime = index.last().start + indexHeader.startTime;
+            loadIndexFile(m_index, m_indexHeader, m_detailedIndexFile);
+            if (m_index.size() > 0) {
+                m_minMotionTime = m_index.first().start + m_indexHeader.startTime;
+                m_lastRecordedTime = m_maxMotionTime = m_index.last().start + m_indexHeader.startTime;
             }
         }
         m_detailedMotionFile.seek(m_detailedMotionFile.size());
@@ -366,17 +364,19 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     if (timestamp < m_lastRecordedTime)
     {
         // go to the file middle
-        int dataRecords = getSizeForTime(timestamp);
-        m_detailedIndexFile.seek(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE);
-        m_detailedMotionFile.seek(dataRecords*MOTION_DATA_RECORD_SIZE);
+        m_middleRecordNum = getSizeForTime(timestamp, true);
+        m_detailedIndexFile.seek(m_middleRecordNum*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE);
+        m_detailedMotionFile.seek(m_middleRecordNum*MOTION_DATA_RECORD_SIZE);
         m_minMotionTime = qMin(m_minMotionTime, timestamp);
-        m_inMiddle = true;
     }
-    else if (timestamp > m_maxMotionTime && m_inMiddle) {
-        // return to the end of a file
-        m_detailedIndexFile.seek(m_detailedIndexFile.size());
-        m_detailedMotionFile.seek(m_detailedMotionFile.size());
-        m_inMiddle = false;
+    else if (m_middleRecordNum >= 0 && m_middleRecordNum < m_index.size()) 
+    {
+        qint64 timeInIndex = m_index[m_middleRecordNum].start + m_indexHeader.startTime;
+        if (timestamp > timeInIndex) {
+            m_middleRecordNum = getSizeForTime(timestamp, false);
+            m_detailedIndexFile.seek(m_middleRecordNum*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE);
+            m_detailedMotionFile.seek(m_middleRecordNum*MOTION_DATA_RECORD_SIZE);
+        }
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
@@ -402,6 +402,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     m_maxMotionTime = qMax(m_maxMotionTime, timestamp);
     if (m_minMotionTime == AV_NOPTS_VALUE)
         m_minMotionTime = m_maxMotionTime;
+    m_middleRecordNum++;
     return true;
 }
 

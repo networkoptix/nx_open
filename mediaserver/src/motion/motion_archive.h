@@ -88,7 +88,7 @@ private:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile);
 
     void loadRecordedRange();
-    int getSizeForTime(qint64 timeMs);
+    int getSizeForTime(qint64 timeMs, bool reloadIndex);
 
     friend class QnMotionArchiveConnection;
 private:
@@ -108,7 +108,9 @@ private:
     qint64 m_maxMotionTime;
     qint64 m_lastRecordedTime;
     qint64 m_lastTimestamp;
-    bool m_inMiddle;
+    int m_middleRecordNum;
+    QVector<IndexRecord> m_index;
+    IndexHeader m_indexHeader;
 };
 
 #endif // __MOTION_WRITER_H__
