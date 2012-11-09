@@ -233,6 +233,7 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
     }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
+    case UPDATE_FEED_URL:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
