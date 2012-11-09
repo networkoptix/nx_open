@@ -302,6 +302,12 @@ void PollSet::remove( Socket* const sock, EventType eventType )
     }
 }
 
+size_t PollSet::size( EventType /*eventType*/ ) const
+{
+    //TODO/IMPL return only for events eventType
+    return m_impl->monitoredEvents.size();
+}
+
 static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
 
 /*!
