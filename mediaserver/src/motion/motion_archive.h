@@ -106,7 +106,9 @@ private:
 
     qint64 m_minMotionTime;
     qint64 m_maxMotionTime;
+    qint64 m_lastRecordedTime;
     qint64 m_lastTimestamp;
+    bool m_inMiddle;
 };
 
 #endif // __MOTION_WRITER_H__

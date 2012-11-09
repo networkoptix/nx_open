@@ -111,7 +111,8 @@ QnMotionArchive::QnMotionArchive(QnNetworkResourcePtr resource, int channel):
     m_resource(resource),
     m_channel(channel),
     m_lastDetailedData(new QnMetaDataV1()),
-    m_lastTimestamp(AV_NOPTS_VALUE)
+    m_lastTimestamp(AV_NOPTS_VALUE),
+    m_inMiddle(false)
 {
     m_camResource = qSharedPointerDynamicCast<QnSecurityCamResource>(m_resource);
     m_lastDateForCurrentFile = 0;
@@ -127,6 +128,7 @@ void QnMotionArchive::loadRecordedRange()
 {
     m_minMotionTime = AV_NOPTS_VALUE;
     m_maxMotionTime = AV_NOPTS_VALUE;
+    m_lastRecordedTime = AV_NOPTS_VALUE;
     QList<QDate> existsRecords = QnMotionHelper::instance()->recordedMonth(m_resource->getPhysicalId());
     if (existsRecords.isEmpty())
         return;
@@ -139,7 +141,7 @@ void QnMotionArchive::loadRecordedRange()
     if (existsRecords.size() > 1)
         loadIndexFile(index, indexHeader, existsRecords.last());
     if (!index.isEmpty())
-        m_maxMotionTime = index.last().start + indexHeader.startTime;
+        m_lastRecordedTime = m_maxMotionTime = index.last().start + indexHeader.startTime;
 }
 
 QString QnMotionArchive::getFilePrefix(const QDate& datetime)
@@ -313,6 +315,7 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     {
         // go to new file
 
+        m_inMiddle = false;
         dateBounds(timestamp, m_firstTime, m_lastDateForCurrentFile);
 
         //QString fileName = getFilePrefix(datetime);
@@ -353,19 +356,27 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
             loadIndexFile(index, indexHeader, m_detailedIndexFile);
             if (index.size() > 0) {
                 m_minMotionTime = index.first().start + indexHeader.startTime;
-                m_maxMotionTime = index.last().start + indexHeader.startTime;
+                m_lastRecordedTime = m_maxMotionTime = index.last().start + indexHeader.startTime;
             }
         }
         m_detailedMotionFile.seek(m_detailedMotionFile.size());
         m_detailedIndexFile.seek(m_detailedIndexFile.size());
     }
     
-    if (timestamp < m_maxMotionTime)
+    if (timestamp < m_lastRecordedTime)
     {
+        // go to the file middle
         int dataRecords = getSizeForTime(timestamp);
         m_detailedIndexFile.seek(dataRecords*MOTION_INDEX_RECORD_SIZE + MOTION_INDEX_HEADER_SIZE);
         m_detailedMotionFile.seek(dataRecords*MOTION_DATA_RECORD_SIZE);
         m_minMotionTime = qMin(m_minMotionTime, timestamp);
+        m_inMiddle = true;
+    }
+    else if (timestamp > m_maxMotionTime && m_inMiddle) {
+        // return to the end of a file
+        m_detailedIndexFile.seek(m_detailedIndexFile.size());
+        m_detailedMotionFile.seek(m_detailedMotionFile.size());
+        m_inMiddle = false;
     }
 
     quint32 relTime = quint32(timestamp - m_firstTime);
@@ -387,7 +398,8 @@ bool QnMotionArchive::saveToArchiveInternal(QnMetaDataV1Ptr data)
     m_detailedIndexFile.flush();
     m_detailedMotionFile.flush();
 
-    m_maxMotionTime = timestamp;
+    m_lastRecordedTime = timestamp;
+    m_maxMotionTime = qMax(m_maxMotionTime, timestamp);
     if (m_minMotionTime == AV_NOPTS_VALUE)
         m_minMotionTime = m_maxMotionTime;
     return true;
