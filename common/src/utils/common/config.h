@@ -81,5 +81,7 @@ namespace Qn {
 }
 #endif
 
+#define InvalidUtcOffset _id(INT64_MAX)
+
 
 #endif // QN_COMMON_CONFIG_H

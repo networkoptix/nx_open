@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <QAbstractListModel>
+#include <QMutex>
 
 #include <utils/network/networkoptixmodulefinder.h>
 
@@ -16,7 +17,7 @@
 //!Connects to NetworkOptixModuleFinder and holds found enterprise controllers list
 class FoundEnterpriseControllersModel
 :
-    public QAbstractListModel
+    public QAbstractItemModel
 {
     Q_OBJECT
 
@@ -34,8 +35,16 @@ public:
 
     //!Implementation of QAbstractItemModel::data
     virtual QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const;
+    //!Implementation of QAbstractItemModel::hasChildren
+    virtual bool hasChildren( const QModelIndex& parent = QModelIndex() ) const;
+    //!Implementation of QAbstractItemModel::headerData
+    virtual QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
     //!Implementation of QAbstractItemModel::index
     virtual QModelIndex	index( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
+    //!Implementation of QAbstractItemModel::parent
+    virtual QModelIndex	parent( const QModelIndex& index ) const;
+    //!Implementation of QAbstractItemModel::columnCount
+    virtual int columnCount( const QModelIndex& index ) const;
     //!Implementation of QAbstractItemModel::rowCount
     virtual int	rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
@@ -53,13 +62,13 @@ public slots:
         const QString& remoteHostAddress,
         const QString& seed );
 
-private:
+protected:
     class FoundModuleData
     {
     public:
         QString seed;
         QString url;
-        QString ipAddress;
+        std::vector<QString> ipAddresses;
         TypeSpecificParamMap params;
 
         bool operator<( const FoundModuleData& right ) const
@@ -68,6 +77,10 @@ private:
         }
     };
 
+    virtual QString getDisplayStringForEnterpriseControllerRootNode( const FoundModuleData& moduleData ) const;
+    virtual QString getDisplayStringForEnterpriseControllerAddressNode( const FoundModuleData& moduleData, const QString& address ) const;
+
+private:
     class IsSeedEqualPred
     {
     public:
@@ -87,6 +100,9 @@ private:
     };
 
     std::vector<FoundModuleData> m_foundModules;
+    mutable QMutex m_mutex;
+
+    QModelIndex	indexNonSafe( int row, int column, const QModelIndex& parent = QModelIndex() ) const;
 };
 
 #endif  //FOUNDENTERPRISECONTROLLERSMODEL_H

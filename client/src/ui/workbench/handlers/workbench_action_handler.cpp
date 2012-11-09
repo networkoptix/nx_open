@@ -1300,6 +1300,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
     QnSessionManager::instance()->stop();
 
+    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
     QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
@@ -1353,6 +1354,7 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
 
     qnLicensePool->reset();
 
+    QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
     // TODO: save workbench state on logout.
 }
 
@@ -1518,6 +1520,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
     }
@@ -1566,6 +1569,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
     default:
         break;
     }
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
+    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
@@ -2229,6 +2236,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
     QTextStream itemNames(itemNamesIO);
+    QList<qint64> itemTimeZones;
 
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
@@ -2249,11 +2257,25 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
                 }
+                QnMediaServerResourcePtr videoServer = qnResPool->getResourceById(mediaRes->getParentId()).dynamicCast<QnMediaServerResource>();
+                if (videoServer)
+                    itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(videoServer, Qn::InvalidUtcOffset);
+                else 
+                    itemTimeZones << Qn::InvalidUtcOffset;
             }
+            else 
+                itemTimeZones << Qn::InvalidUtcOffset;
         }
     }
     itemNames.flush();
     delete itemNamesIO;
+
+    QIODevice* itemTimezonesIO = m_exportStorage->open(QLatin1String("item_timezones.txt"), QIODevice::WriteOnly);
+    QTextStream itemTimeZonesStream(itemTimezonesIO);
+    foreach(qint64 timeZone, itemTimeZones)
+        itemTimeZonesStream << timeZone << QLatin1String("\n");
+    itemTimeZonesStream.flush();
+    delete itemTimezonesIO;
 
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
@@ -2303,16 +2325,18 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         }
     }
 
-	// TODO: exoprt progres dialog can be already deleted?
+	// TODO: export progress dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     m_exportPeriod = exportPeriod;
+    m_exportLayout = layout;
     at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layout_exportFinished()
 {
-    disconnect(sender(), NULL, this, NULL);
+    disconnect(sender(), NULL, this, NULL); // TODO: not needed here.
+
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
     if (!m_exportStorage)
@@ -2321,17 +2345,15 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     if (fileName.endsWith(QLatin1String(".tmp")))
     {
         fileName.chop(4);
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
     else if (m_layoutExportMode == LayoutExport_LocalSaveAs) 
     {
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-        QString oldUrl = layout->getUrl();
+        QString oldUrl = m_exportLayout->getUrl();
         QString newUrl = m_exportStorage->getUrl();
 
-        QnLayoutItemDataMap items = layout->getItems();
+        QnLayoutItemDataMap items = m_exportLayout->getItems();
         for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
@@ -2339,21 +2361,20 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
             if (aviRes)
                 qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
         }
-        layout->setUrl(newUrl);
+        m_exportLayout->setUrl(newUrl);
 
 
-        layout->setName(QFileInfo(newUrl).fileName());
+        m_exportLayout->setName(QFileInfo(newUrl).fileName());
 
         QnLayoutFileStorageResourcePtr novStorage = m_exportStorage.dynamicCast<QnLayoutFileStorageResource>();
         if (novStorage)
             novStorage->switchToFile(oldUrl, newUrl, false);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
     else {
-        QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
-        if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
-            layout->setStatus(QnResource::Online);
-            resourcePool()->addResource(layout);
+        if (m_exportLayout && !resourcePool()->getResourceByGuid(m_exportLayout->getUniqueId())) {
+            m_exportLayout->setStatus(QnResource::Online);
+            resourcePool()->addResource(m_exportLayout);
         }
     }
     m_exportStorage.clear();

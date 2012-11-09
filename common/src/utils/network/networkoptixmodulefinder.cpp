@@ -46,7 +46,7 @@ NetworkOptixModuleFinder::NetworkOptixModuleFinder(
         if( addrIter->protocol() != QAbstractSocket::IPv4Protocol )
             continue;
 
-        const QHostAddress& addressToUse = *addrIter; //using any address of inteface
+        const QHostAddress& addressToUse = *addrIter; //using any address of interface
         try
         {
             //if( addressToUse == QHostAddress(QString::fromAscii("127.0.0.1")) )
@@ -194,13 +194,18 @@ void NetworkOptixModuleFinder::run()
             QHostAddress remoteAddress(remoteAddressStr);
             std::pair<std::map<QString, ModuleContext>::iterator, bool>
                 p = m_knownEnterpriseControllers.insert( std::make_pair( response.seed, ModuleContext() ) );
-            if( p.second )
-            {
+            if( p.second )  //new module
                 p.first->second.response = response;
+            if( p.first->second.signalledAddresses.insert( remoteAddress.toString() ).second )
+            {
                 //new enterprise controller found
                 const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress());
-                cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local address %4").
-                    arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
+                if( p.second )  //new module found
+                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local address %4").
+                        arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
+                else    //new address of existing module
+                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local address %4").
+                        arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 emit moduleFound(
                     response.type,
                     response.version,
@@ -211,7 +216,6 @@ void NetworkOptixModuleFinder::run()
             }
 
             p.first->second.prevResponseReceiveClock = currentClock;
-            p.first->second.address = remoteAddress;
         }
 
         //checking for expired known hosts...
@@ -225,11 +229,18 @@ void NetworkOptixModuleFinder::run()
                 ++it;
                 continue;
             }
-            emit moduleLost(
-                it->second.response.type,
-                it->second.response.typeSpecificParameters,
-                it->second.address.toString(),
-                it->second.response.seed );
+            const std::set<QString>::const_iterator& addrIterEnd = it->second.signalledAddresses.end();
+            for( std::set<QString>::const_iterator
+                addrIter = it->second.signalledAddresses.begin();
+                addrIter != addrIterEnd;
+                ++addrIter )
+            {
+                emit moduleLost(
+                    it->second.response.type,
+                    it->second.response.typeSpecificParameters,
+                    *addrIter,
+                    it->second.response.seed );
+            }
             m_knownEnterpriseControllers.erase( it++ );
         }
     }

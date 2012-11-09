@@ -11,8 +11,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#define InvalidUtcOffset _id(INT64_MAX)
-
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 

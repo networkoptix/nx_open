@@ -84,6 +84,7 @@
 #include "client/client_module.h"
 #include "platform/platform_abstraction.h"
 
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;

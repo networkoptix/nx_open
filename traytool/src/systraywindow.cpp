@@ -1,11 +1,12 @@
 #include <QtGui>
 #include <QTcpServer>
 
+#include <utils/network/foundenterprisecontrollersmodel.h>
+
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
 #include "connectiontestingdialog.h"
-#include "foundenterprisecontrollersmodel.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -62,10 +63,10 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 {
     ui->setupUi(this);
     m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
-    m_findAppServerDialogUI->foundEnterpriseControllersListView->setModel( m_foundEnterpriseControllersModel );
+    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( m_foundEnterpriseControllersModel );
 
     connect(
-        m_findAppServerDialogUI->foundEnterpriseControllersListView,
+        m_findAppServerDialogUI->foundEnterpriseControllersView,
         SIGNAL(doubleClicked(const QModelIndex&)),
         m_findAppServerDialog.data(),
         SLOT(accept()) );
@@ -762,37 +763,43 @@ bool QnSystrayWindow::validateData()
 {
     struct PortInfo
     {
-        PortInfo(int _newPort, int _oldPort, const QString& _descriptor)
+        PortInfo(int _newPort, int _oldPort, const QString& _descriptor, int _tabIndex)
         {
             newPort = _newPort;
             descriptor = _descriptor;
             oldPort = _oldPort;
+            tabIndex = _tabIndex;
         }
 
         int newPort;
         int oldPort;
         QString descriptor;
+        int tabIndex;
     };
     QList<PortInfo> checkedPorts;
 
     if (m_appServerHandle)
     {
-        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME);
-        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy");
+        checkedPorts << PortInfo(ui->appServerPortLineEdit->text().toInt(), m_appServerSettings.value("port").toInt(), APP_SERVER_NAME, 1);
+        checkedPorts << PortInfo(ui->proxyPortLineEdit->text().toInt(), m_appServerSettings.value("proxyPort", DEFAUT_PROXY_PORT).toInt(), "media proxy", 1);
     }
 
     if (m_mediaServerHandle)
     {
-        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP");
+        checkedPorts << PortInfo(ui->rtspPortLineEdit->text().toInt(), m_mServerSettings.value("rtspPort").toInt(), "media server RTSP", 0);
 #ifndef USE_SINGLE_STREAMING_PORT
-        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API");
+        checkedPorts << PortInfo(ui->apiPortLineEdit->text().toInt(), m_mServerSettings.value("apiPort").toInt(), "media server API", 0);
 #endif
     }
     
     for(int i = 0; i < checkedPorts.size(); ++i)
     {
         if (!checkPortNum(checkedPorts[i].newPort, checkedPorts[i].descriptor))
+        {
+            if( ui->tabWidget->currentIndex() != checkedPorts[i].tabIndex )
+                ui->tabWidget->setCurrentIndex( checkedPorts[i].tabIndex );
             return false;
+        }
         for (int j = i+1; j < checkedPorts.size(); ++j) {
             if (checkedPorts[i].newPort == checkedPorts[j].newPort)
             {
@@ -867,7 +874,7 @@ void QnSystrayWindow::onFindAppServerButtonClicked()
 {
     if( !m_findAppServerDialog->exec() )
         return; //cancel pressed
-    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersListView->currentIndex();
+    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
     if( !selectedSrvIndex.isValid() )
         return;
 
