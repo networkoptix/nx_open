@@ -67,6 +67,7 @@ signals:
         \param moduleParameters
         \param localInterfaceIP IP address of local interface, response from enterprise controller has been received on
         \param remoteHostAddress Address of found enterprise controller
+        \param isLocal true, if \a remoteHostAddress is a local address
         \param moduleSeed unique string, reported by module
     */
     void moduleFound(
@@ -75,12 +76,17 @@ signals:
         const TypeSpecificParamMap& moduleParameters,
         const QString& localInterfaceAddress,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& moduleSeed );
     //!Emmited when previously found module did not respond to request in predefined timeout
+    /*!
+        \param isLocal true, if \a remoteHostAddress is a local address
+    */
     void moduleLost(
         const QString& moduleType,
         const TypeSpecificParamMap& moduleParameters,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& moduleSeed );
 
 protected:
@@ -109,6 +115,7 @@ private:
     quint64 m_prevPingClock;
     //!map<seed, module data>
     std::map<QString, ModuleContext> m_knownEnterpriseControllers;
+    std::set<QString> m_localNetworkAdresses;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

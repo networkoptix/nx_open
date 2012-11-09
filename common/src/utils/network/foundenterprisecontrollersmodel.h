@@ -55,11 +55,13 @@ public slots:
         const TypeSpecificParamMap& moduleParameters,
         const QString& localInterfaceAddress,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& seed );
     void remoteModuleLost(
         const QString& moduleID,
         const TypeSpecificParamMap& moduleParameters,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& seed );
 
 protected:

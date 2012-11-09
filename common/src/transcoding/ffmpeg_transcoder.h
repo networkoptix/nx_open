@@ -8,10 +8,10 @@
 
 class QnFfmpegTranscoder: public QnTranscoder
 {
+    Q_OBJECT;
+
 public:
     static const int MTU_SIZE = 1412;
-
-    typedef QMap<QString, QVariant> Params;
 
     QnFfmpegTranscoder();
     ~QnFfmpegTranscoder();
@@ -23,12 +23,15 @@ public:
     AVFormatContext* getFormatContext() const { return m_formatCtx; }
 
     virtual int open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio) override;
+
 protected:
     virtual int transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result) override;
+
 private:
     //friend qint32 ffmpegWritePacket(void *opaque, quint8* buf, int size);
     AVIOContext* createFfmpegIOContext();
     void closeFfmpegContext();
+
 private:
     AVCodecContext* m_videoEncoderCodecCtx;
     AVCodecContext* m_audioEncoderCodecCtx;
