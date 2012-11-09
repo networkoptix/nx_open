@@ -329,6 +329,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QFont font(this->font());
 
+        // TODO: #gdm it's not trivial to change text size now because of a lot
+        // of hardcoded constants. This needs to be fixed.
+
+
+        // TODO: #gdm I think we should use zoom-based approach on all OSes.
+        // Less code == less bugs.
 #ifdef Q_OS_LINUX
         qreal zoom(offset * 0.02);
         font.setPixelSize(20);
@@ -357,11 +363,25 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                painter->scale(unzoom, unzoom);
         }
 
+        // TODO: #gdm Please clean up this copypasta I've introduced.
+#ifdef Q_OS_LINUX
+        zoom = (offset * 0.04);
+        font.setPixelSize(20);
+        scaleRequired = true;
+#else
+        zoom = (1.0);
+        font.setPointSizeF(offset * 0.6);
+        scaleRequired = false;
+#endif
+        unzoom = 1/zoom;
+
+        painter->setFont(font);
+
         /* Draw legend */
         {
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
-            painter->translate(width * 0.5, oh + offset * 1.5);
+            painter->translate(width * 0.5, oh + offset * 1.65);
             if (scaleRequired)
                 painter->scale(zoom, zoom);
             qreal legendOffset = 0.0;
