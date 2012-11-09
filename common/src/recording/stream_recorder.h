@@ -98,7 +98,7 @@ protected:
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
-        Q_UNUSED(startTimeMs) Q_UNUSED(fileName) Q_UNUSED(provider)
+        Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 

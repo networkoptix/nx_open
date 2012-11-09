@@ -5,6 +5,9 @@
 
 #include <utils/common/event_processors.h>
 
+//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+#include <core/dataprovider/live_stream_provider.h>
+
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -14,7 +17,7 @@
 #include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
 
-#include <ui/dialogs/resource_tree_dialog.h>
+#include <ui/dialogs/export_camera_settings_dialog.h>
 
 #include <ui/style/globals.h>
 
@@ -175,7 +178,6 @@ void QnCameraScheduleWidget::setHasChanges(bool hasChanges){
     if (m_hasChanges == hasChanges)
         return;
 
-    qDebug() << "set has changes " << hasChanges;
     m_hasChanges = hasChanges;
     ui->exportScheduleButton->setEnabled(!hasChanges
                                          && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
@@ -227,7 +229,7 @@ QList<QnScheduleTask::Data> QnCameraScheduleWidget::scheduleTasks() const
                 QString shortQuality(ui->gridWidget->cellValue(cell, QnScheduleGridWidget::SecondParam).toString()); // TODO: Oh crap. This string-switching is totally evil.
                 if (shortQuality == QLatin1String("Lo"))
                     streamQuality = QnQualityLow;
-                else if (shortQuality == QLatin1String("Md"))
+                else if (shortQuality == QLatin1String("Me"))
                     streamQuality = QnQualityNormal;
                 else if (shortQuality == QLatin1String("Hi"))
                     streamQuality = QnQualityHigh;
@@ -319,7 +321,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
             switch (task.m_streamQuality) 
             {
                 case QnQualityLow: shortQuality = QLatin1String("Lo"); break;
-                case QnQualityNormal: shortQuality = QLatin1String("Md"); break;
+                case QnQualityNormal: shortQuality = QLatin1String("Me"); break;
                 case QnQualityHigh: shortQuality = QLatin1String("Hi"); break;
                 case QnQualityHighest: shortQuality = QLatin1String("Bst"); break;
                 default:
@@ -353,7 +355,7 @@ static inline QString getShortText(const QString &text)
     if (text == QLatin1String("Low"))
         return QLatin1String("Lo");
     if (text == QLatin1String("Medium"))
-        return QLatin1String("Md");
+        return QLatin1String("Me");
     if (text == QLatin1String("High"))
         return QLatin1String("Hi");
     if (text == QLatin1String("Best"))
@@ -365,7 +367,7 @@ static inline QString getLongText(const QString &text)
 {
     if (text == QLatin1String("Lo"))
         return QLatin1String("Low");
-    if (text == QLatin1String("Md"))
+    if (text == QLatin1String("Me"))
         return QLatin1String("Medium");
     if (text == QLatin1String("Hi"))
         return QLatin1String("High");
@@ -694,7 +696,7 @@ void QnCameraScheduleWidget::at_releaseSignalizer_activated(QObject *target) {
 
 void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
     bool recordingEnabled = ui->enableRecordingCheckBox->checkState() == Qt::Checked;
-    QnResourceTreeDialog dialog(NULL, context());
+    QnExportCameraSettingsDialog dialog(NULL, context());
     dialog.setRecordingEnabled(recordingEnabled);
 
     bool motionUsed = recordingEnabled && hasMotionOnGrid();
@@ -706,16 +708,25 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         return;
 
     QnVirtualCameraResourceList cameras = dialog.getSelectedCameras();
-    QnScheduleTaskList tasks;
-    if (recordingEnabled && cameras.size() > 0) {
-        foreach(const QnScheduleTask::Data &data, scheduleTasks())
-            tasks.append(QnScheduleTask(data));
-    }
-
     foreach(QnVirtualCameraResourcePtr camera, cameras) {
         camera->setScheduleDisabled(!recordingEnabled);
-        if (recordingEnabled)
-            camera->setScheduleTasks(tasks); // TODO: #gdm there is a problem with FPS-2 for arecont resources. Ask medved.
+        if (recordingEnabled){
+            int maxFps = camera->getMaxFps();
+
+            //TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of the live_stream_provider module
+            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+                //maxFps = maxFps - camera->reservedSecondStreamFps(); // maybe this way better?
+                maxFps = maxFps - MIN_SECOND_STREAM_FPS;
+
+            QnScheduleTaskList tasks;
+            foreach(const QnScheduleTask::Data &data, scheduleTasks()){
+                QnScheduleTask task(data);
+                task.setFps(qMin(task.getFps(), maxFps));
+                tasks.append(task);
+            }
+
+            camera->setScheduleTasks(tasks);
+        }
     }
     updateLicensesLabelText();
     emit scheduleExported(cameras);

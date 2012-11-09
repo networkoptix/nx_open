@@ -11,6 +11,7 @@
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
+class QnResourceSearchProxyModel;
 
 namespace Ui {
     class QnResourceTreeWidget;
@@ -46,6 +47,17 @@ public:
     // TODO: #gdm setter starts with set, e.g. setGraphicsTweaksEnabled. And add a getter.
     void enableGraphicsTweaks(bool enableTweaks = true);
 
+    /**
+     * @brief setFilterVisible  Show/hide resource tree filter widget.
+     * @param visible           Target state of filter.
+     */
+    void setFilterVisible(bool visible = true);
+
+    /**
+     * @brief isFilterVisible   This property holds whether filter widget is visible.
+     * @return                  True if filter is visible.
+     */
+    bool isFilterVisible() const;
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
@@ -63,12 +75,14 @@ private slots:
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
 
     void updateColumnsSize();
+    void updateFilter();
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
     QnResourceTreeItemDelegate *m_itemDelegate;
 
     QSortFilterProxyModel *m_resourceProxyModel;
+    QnResourceSearchProxyModel *m_searchModel;
 
     bool m_checkboxesHidden;
 };

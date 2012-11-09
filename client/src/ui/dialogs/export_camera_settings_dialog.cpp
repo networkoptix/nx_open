@@ -1,5 +1,5 @@
-#include "resource_tree_dialog.h"
-#include "ui_resource_tree_dialog.h"
+#include "export_camera_settings_dialog.h"
+#include "ui_export_camera_settings_dialog.h"
 
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -11,10 +11,10 @@
 #include <ui/workbench/workbench_context.h>
 
 
-QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *context) :
+QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
     QDialog(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
-    ui(new Ui::QnResourceTreeDialog()),
+    ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
     m_motionUsed(false),
     m_dualStreamingUsed(false),
@@ -26,6 +26,7 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
     m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
     connect(m_resourceModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(at_resourceModel_dataChanged()));
     ui->resourcesWidget->setModel(m_resourceModel);
+    ui->resourcesWidget->setFilterVisible(true);
 
     QPalette palette = this->palette();
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
@@ -35,11 +36,11 @@ QnResourceTreeDialog::QnResourceTreeDialog(QWidget *parent, QnWorkbenchContext *
     at_resourceModel_dataChanged();
 }
 
-QnResourceTreeDialog::~QnResourceTreeDialog() {
+QnExportCameraSettingsDialog::~QnExportCameraSettingsDialog() {
 
 }
 
-QnVirtualCameraResourceList QnResourceTreeDialog::getSelectedCameras() const {
+QnVirtualCameraResourceList QnExportCameraSettingsDialog::getSelectedCameras() const {
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //servers
@@ -60,25 +61,27 @@ QnVirtualCameraResourceList QnResourceTreeDialog::getSelectedCameras() const {
     return cameras;
 }
 
-void QnResourceTreeDialog::setRecordingEnabled(bool enabled){
+void QnExportCameraSettingsDialog::setRecordingEnabled(bool enabled) {
     if (m_recordingEnabled == enabled)
         return;
     m_recordingEnabled = enabled;
     updateLicensesStatus();
 }
 
-void QnResourceTreeDialog::setMotionParams(bool motionUsed, bool dualStreamingUsed){
+void QnExportCameraSettingsDialog::setMotionParams(bool motionUsed, bool dualStreamingUsed) {
     m_motionUsed = motionUsed;
     m_dualStreamingUsed = dualStreamingUsed;
     updateMotionStatus();
 }
 
-void QnResourceTreeDialog::at_resourceModel_dataChanged(){
+// ------------ Handlers ---------------------
+
+void QnExportCameraSettingsDialog::at_resourceModel_dataChanged(){
     updateLicensesStatus();
     updateMotionStatus();
 }
 
-void QnResourceTreeDialog::updateLicensesStatus(){
+void QnExportCameraSettingsDialog::updateLicensesStatus(){
     int alreadyActive = 0;
 
     QnVirtualCameraResourceList cameras = getSelectedCameras();
@@ -106,7 +109,7 @@ void QnResourceTreeDialog::updateLicensesStatus(){
     updateOkStatus();
 }
 
-void QnResourceTreeDialog::updateMotionStatus(){
+void QnExportCameraSettingsDialog::updateMotionStatus(){
     m_motionOk = true;
 
     if (m_motionUsed){
@@ -127,6 +130,6 @@ void QnResourceTreeDialog::updateMotionStatus(){
     updateOkStatus();
 }
 
-void QnResourceTreeDialog::updateOkStatus(){
+void QnExportCameraSettingsDialog::updateOkStatus(){
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(m_licensesOk && m_motionOk);
 }

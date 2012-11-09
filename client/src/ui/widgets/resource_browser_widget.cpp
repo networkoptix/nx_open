@@ -69,6 +69,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesHidden();
     ui->resourceTreeWidget->enableGraphicsTweaks();
+//    ui->resourceTreeWidget->setFilterVisible();
     ui->searchTreeWidget->setCheckboxesHidden();
     ui->searchTreeWidget->enableGraphicsTweaks();
 
