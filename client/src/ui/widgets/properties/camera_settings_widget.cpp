@@ -274,3 +274,16 @@ bool QnCameraSettingsWidget::isValidMotionRegion(){
         return m_singleWidget->isValidMotionRegion();
     return true;
 }
+
+void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    case MultiMode:
+        m_multiWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    default:
+        break;
+    }
+}

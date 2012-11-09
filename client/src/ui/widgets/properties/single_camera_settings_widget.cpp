@@ -303,7 +303,6 @@ void QnSingleCameraSettingsWidget::submitToResource() {
     } else {
         setAnyCameraChanges(false);
     }
-    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 void QnSingleCameraSettingsWidget::updateFromResource() {
@@ -456,7 +455,6 @@ void QnSingleCameraSettingsWidget::setHasCameraChanges(bool hasChanges) {
     if(!m_hasCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
-    ui->cameraScheduleWidget->setHasChanges(hasChanges);
     emit hasChangesChanged();
 }
 
@@ -468,7 +466,6 @@ void QnSingleCameraSettingsWidget::setAnyCameraChanges(bool hasChanges) {
     if(!m_anyCameraChanges && !hasDbChanges())
         m_hasScheduleChanges = false;
 
-    ui->cameraScheduleWidget->setHasChanges(hasChanges);
     emit hasChangesChanged();
 }
 
@@ -508,6 +505,10 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     if (!m_motionWidget) 
         return true;
     return m_motionWidget->isValidMotionRegion();
+}
+
+void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
+    ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }
 
 // -------------------------------------------------------------------------- //

@@ -67,6 +67,8 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    void setExportScheduleButtonEnabled(bool enabled);
+
 public slots:
     void setAdvancedParam(const CameraSetting& val);
     void refreshAdvancedSettings();

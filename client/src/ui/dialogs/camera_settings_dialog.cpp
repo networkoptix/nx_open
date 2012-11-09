@@ -45,7 +45,9 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
-    m_applyButton->setEnabled(m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges());
+    bool hasChanges = m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges();
+    m_applyButton->setEnabled(hasChanges);
+    m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {

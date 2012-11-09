@@ -345,14 +345,9 @@ public:
     }
 
     Qt::ItemFlags flags(int column) const {
-        if (column== CheckColumn)
-            return Qt::ItemIsEnabled
-                    | Qt::ItemIsSelectable
-                    | Qt::ItemIsUserCheckable
-                    | Qt::ItemIsEditable
-                    | Qt::ItemIsTristate;
-
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
+        if (column== CheckColumn)
+            result |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -432,10 +427,8 @@ public:
 
     bool setData(const QVariant &value, int role, int column) {
         if (column == CheckColumn && role == Qt::CheckStateRole){
-            Qt::CheckState checkState = (Qt::CheckState)value.toInt();
-            setCheckStateRecursive(checkState);
-            if (m_parent)
-                m_parent->updateParentCheckStateRecursive(checkState);
+            m_checked = (Qt::CheckState)value.toInt();
+            changeInternal();
             return true;
         }
 
@@ -496,27 +489,6 @@ protected:
         
         QModelIndex index = this->index(NameColumn);
         emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
-    }
-
-    void setCheckStateRecursive(Qt::CheckState state){
-        m_checked = state;
-      /*  foreach(Node* child, m_children)
-            child->setCheckStateRecursive(state);*/
-        changeInternal();
-    }
-
-    void updateParentCheckStateRecursive(Qt::CheckState state){
-      /*  foreach(Node* child, m_children)
-            if (child->m_checked != state) {
-                m_checked = Qt::Unchecked;
-                if (m_parent)
-                    m_parent->updateParentCheckStateRecursive(Qt::Unchecked);
-                return;
-            }
-        m_checked = state;
-        if (m_parent)
-            m_parent->updateParentCheckStateRecursive(state);
-        changeInternal();*/
     }
 
 private:
@@ -764,12 +736,7 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    // TODO: #gdm 
-    // Only children of the first column are considered when TreeView is
-    // building a tree.
-    // You should always return zero for other columns,
-    // so the condition should be (parent.column() >= 0).
-    if (parent.column() >= ColumnCount)
+    if (parent.column() > 0)
         return 0;
 
     return node(parent)->children().size();

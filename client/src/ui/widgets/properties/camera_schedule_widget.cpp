@@ -31,8 +31,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
     m_changesDisabled(false),
-    m_readOnly(false),
-    m_hasChanges(false)
+    m_readOnly(false)
 {
     ui->setupUi(this);
 
@@ -174,15 +173,9 @@ void QnCameraScheduleWidget::setContext(QnWorkbenchContext *context) {
     }
 }
 
-void QnCameraScheduleWidget::setHasChanges(bool hasChanges){
-    if (m_hasChanges == hasChanges)
-        return;
-
-    m_hasChanges = hasChanges;
-    ui->exportScheduleButton->setEnabled(!hasChanges
-                                         && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
-    ui->exportWarningLabel->setVisible(hasChanges
-                                       && ui->enableRecordingCheckBox->checkState() != Qt::PartiallyChecked);
+void QnCameraScheduleWidget::setExportScheduleButtonEnabled(bool enabled) {
+    ui->exportScheduleButton->setEnabled(enabled);
+    ui->exportWarningLabel->setVisible(!enabled);
 }
 
 void QnCameraScheduleWidget::updatePanicLabelText() {
@@ -425,7 +418,6 @@ void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
         }
     }
 
-    setHasChanges(true);
     emit gridParamsChanged();
 }
 
@@ -498,8 +490,6 @@ void QnCameraScheduleWidget::updateGridEnabledState()
     ui->settingsGroupBox->setEnabled(enabled);
     ui->motionGroupBox->setEnabled(enabled);
     ui->gridWidget->setEnabled(enabled && !m_changesDisabled);
-
-    setHasChanges(true);
 }
 
 void QnCameraScheduleWidget::updateLicensesLabelText() 

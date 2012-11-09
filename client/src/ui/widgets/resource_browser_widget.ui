@@ -23,12 +23,18 @@
       <number>0</number>
      </property>
      <widget class="QWidget" name="resourcesTab">
+      <property name="acceptDrops">
+       <bool>true</bool>
+      </property>
       <attribute name="title">
        <string>Resources</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QnResourceTreeWidget" name="resourceTreeWidget" native="true">
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_3"/>
         </widget>
        </item>

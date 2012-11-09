@@ -128,7 +128,6 @@ void QnMultipleCameraSettingsWidget::submitToResources() {
     }
 
     setHasDbChanges(false);
-    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 void QnMultipleCameraSettingsWidget::updateFromResources() {
@@ -223,7 +222,6 @@ void QnMultipleCameraSettingsWidget::updateFromResources() {
 
     setHasDbChanges(false);
     m_hasControlsChanges = false;
-    ui->cameraScheduleWidget->setHasChanges(false);
 }
 
 bool QnMultipleCameraSettingsWidget::isReadOnly() const {
@@ -240,6 +238,10 @@ void QnMultipleCameraSettingsWidget::setReadOnly(bool readOnly) {
     setReadOnly(ui->passwordEdit, readOnly);
     setReadOnly(ui->cameraScheduleWidget, readOnly);
     m_readOnly = readOnly;
+}
+
+void QnMultipleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled){
+    ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
 }
 
 void QnMultipleCameraSettingsWidget::setHasDbChanges(bool hasChanges) {
