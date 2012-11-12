@@ -78,6 +78,9 @@ private:
     /** Root nodes array */
     Node *m_rootNodes[Qn::NodeTypeCount];
 
+    /** Set of top-level node types */
+    QList<Qn::NodeType> m_rootNodeTypes;
+
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;
 
