@@ -73,7 +73,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
         m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
     }
-    else if (m_resolution.width() == 0 && m_resolution.height() == 0 || m_resolution.isEmpty())
+    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
         m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
 
     return true;
@@ -82,11 +82,11 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 // ---------------------- QnTranscoder -------------------------
 
 QnTranscoder::QnTranscoder():
-    m_initialized(false),
     m_videoCodec(CODEC_ID_NONE),
     m_audioCodec(CODEC_ID_NONE),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
+    m_initialized(false),
     m_eofCounter(0),
     m_packetizedMode(false)
 {
@@ -150,10 +150,14 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
             /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
-            */
             break;
+            */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            return -1;
+        default:
+            //TODO: #vasilenko Check 'Value not handled in switch' case.
+            m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
     if (m_vTranscoder)
@@ -179,10 +183,14 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
-            */
             break;
+            */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            return -1;
+        default:
+            //TODO: #vasilenko Check 'Value not handled in switch' case.
+            m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
     return m_lastErrMessage.isEmpty();
