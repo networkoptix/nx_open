@@ -307,9 +307,11 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
+#ifdef _WIN32
     const bool isNonBlockingModeBak = isNonBlockingMode();
     if( !setNonBlockingMode( true ) )
         return false;
+#endif
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
@@ -342,8 +344,10 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
         return false;
 #endif // _WIN32
 
+#ifdef _WIN32
     //restoring original mode
     setNonBlockingMode( isNonBlockingModeBak );
+#endif
 
     mConnected = true;
 
