@@ -60,7 +60,6 @@ QnTcpListener::QnTcpListener(const QHostAddress& address, int port, int maxConne
         d->serverSocket = new TCPServerSocket(address.toString(), port, 5 ,true);
         d->maxConnections = maxConnections;
         d->ddosWarned = false;
-        start();
         cl_log.log("Server started at ", address.toString() + QLatin1String(":") + QString::number(port), cl_logINFO);
     }
     catch(const SocketException &e) {
@@ -187,6 +186,7 @@ void QnTcpListener::run()
         }
         removeDisconnectedConnections();
     }
+    removeAllConnections();
 }
 
 void* QnTcpListener::getOpenSSLContext()
