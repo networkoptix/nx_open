@@ -92,7 +92,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         // for high speed mode change same item to LQ (do not try to find least item)
         reader->setQuality(MEDIA_Quality_Low, true);
         m_redAssInfo[display].toLQSpeed = display->getSpeed();
-        m_redAssInfo[display].lqReason == Reason_CPU;
+        m_redAssInfo[display].lqReason = Reason_CPU;
         return;
     }
     
@@ -111,7 +111,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         reader->setQuality(MEDIA_Quality_Low, true);
         m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
         m_redAssInfo[display].toLQSpeed = display->getSpeed();
-        m_redAssInfo[display].lqReason == display->queueSize() < 3 ? Reason_Network : Reason_CPU;
+        m_redAssInfo[display].lqReason = display->queueSize() < 3 ? Reason_Network : Reason_CPU;
         m_lastSwitchTimer.restart();
     }
 }
