@@ -15,7 +15,8 @@ namespace Qn {
         UsersNode,
         ResourceNode,   /**< Node that represents a resource. */
         ItemNode,       /**< Node that represents a layout item. */
-        BastardNode     /**< Node that contains hidden resources. */
+        BastardNode,    /**< Node that contains hidden resources. */
+        NodeTypeCount
     };
 
 

@@ -18,7 +18,7 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
     explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode);
@@ -75,13 +75,8 @@ private slots:
     void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Root node. */
-    Node *m_rootNode;
-
-    /** Bastard node for hidden resources. */
-    Node *m_bastardNode;
-
-    Node *m_serversNode, *m_localNode, *m_usersNode;
+    /** Root nodes array */
+    Node *m_rootNodes[Qn::NodeTypeCount];
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;

@@ -566,39 +566,25 @@ QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeT
     roles.insert(Qn::NodeTypeRole,              "nodeType");
     setRoleNames(roles);
 
-    // TODO: #gdm looks like we need an array indexed by Qn::NodeType here,
-    // it will make the code shorter.
+    QList<Qn::NodeType> topNodes;
+    topNodes.append(Qn::LocalNode);
+    topNodes.append(Qn::UsersNode);
+    topNodes.append(Qn::ServersNode);
 
     /* Create top-level nodes. */
-    m_localNode = new Node(this, Qn::LocalNode);
-    m_usersNode = new Node(this, Qn::UsersNode);
-    m_serversNode = new Node(this, Qn::ServersNode);
-    m_bastardNode = new Node(this, Qn::BastardNode);
+    foreach(Qn::NodeType t, topNodes)
+        m_rootNodes[t] = new Node(this, t);
+    m_rootNodes[Qn::BastardNode] = new Node(this, Qn::BastardNode);
 
-    /* Create root. */
-    switch (rootNodeType) {
-    case Qn::LocalNode:
-        m_rootNode = m_localNode;
-        break;
-    case Qn::UsersNode:
-        m_rootNode = m_usersNode;
-        break;
-    case Qn::ServersNode:
-        m_rootNode = m_serversNode;
-        break;
-    default:
-        Q_ASSERT(rootNodeType == Qn::RootNode);
-        m_rootNode = new Node(this, Qn::RootNode);
-        break;
-    }
+    if (topNodes.contains(rootNodeType))
+        m_rootNodes[Qn::RootNode] = m_rootNodes[rootNodeType];
+    else
+        m_rootNodes[Qn::RootNode] = new Node(this, Qn::RootNode);
 
-    if (rootNodeType != Qn::LocalNode)
-        m_localNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
-    if (rootNodeType != Qn::UsersNode)
-        m_usersNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
-    if (rootNodeType != Qn::ServersNode)
-        m_serversNode->setParent(rootNodeType == Qn::RootNode ? m_rootNode : m_bastardNode);
-
+    Qn::NodeType parentNode = rootNodeType == Qn::RootNode ? Qn::RootNode : Qn::BastardNode;
+    foreach(Qn::NodeType t, topNodes)
+        if (rootNodeType != t)
+            m_rootNodes[t]->setParent(m_rootNodes[parentNode]);
 
     /* Connect to context. */
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
@@ -630,11 +616,11 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     qDeleteAll(m_itemNodeByUuid);
 
     if (m_rootNodeType == Qn::RootNode)
-        delete m_rootNode;
-    delete m_localNode;
-    delete m_serversNode;
-    delete m_usersNode;
-    delete m_bastardNode;
+        delete m_rootNodes[Qn::RootNode];
+    delete m_rootNodes[Qn::LocalNode];
+    delete m_rootNodes[Qn::ServersNode];
+    delete m_rootNodes[Qn::UsersNode];
+    delete m_rootNodes[Qn::BastardNode];
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
@@ -644,7 +630,7 @@ QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QnResourcePtr &resource) {
     QnResource *index = resource.data();
     if(!index)
-        return m_rootNode;
+        return m_rootNodes[Qn::RootNode];
 
     QHash<QnResource *, Node *>::iterator pos = m_resourceNodeByResource.find(index);
     if(pos == m_resourceNodeByResource.end())
@@ -661,7 +647,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::node(const QUuid &uuid) {
 
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QModelIndex &index) const {
     if(!index.isValid())
-        return m_rootNode;
+        return m_rootNodes[Qn::RootNode];
 
     return static_cast<Node *>(index.internalPointer());
 }
@@ -670,23 +656,23 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     assert(node->type() == Qn::ResourceNode);
 
     if(!node->resource())
-        return m_rootNode;
+        return m_rootNodes[Qn::RootNode];
 
     if(node->resourceFlags() & QnResource::user) {
         if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
-            return m_rootNode;
+            return m_rootNodes[Qn::RootNode];
         } else {
-            return m_usersNode;
+            return m_rootNodes[Qn::UsersNode];
         }
     }
 
     if(node->resourceFlags() & QnResource::server)
-        return m_serversNode;
+        return m_rootNodes[Qn::ServersNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
         if(node->resourceFlags() & QnResource::local) {
-            return m_localNode;
+            return m_rootNodes[Qn::LocalNode];
         } else {
             return NULL;
         }
@@ -705,7 +691,7 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
 
     m_urlsShown = urlsShown;
 
-    m_rootNode->updateRecursive();
+    m_rootNodes[Qn::RootNode]->updateRecursive();
 }
 
 
@@ -908,9 +894,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 }
 
 void QnResourcePoolModel::at_context_userChanged() {
-    m_localNode->update();
-    m_serversNode->update();
-    m_usersNode->update();
+    m_rootNodes[Qn::LocalNode]->update();
+    m_rootNodes[Qn::ServersNode]->update();
+    m_rootNodes[Qn::UsersNode]->update();
 
     foreach(Node *node, m_resourceNodeByResource)
         node->setParent(expectedParent(node));
