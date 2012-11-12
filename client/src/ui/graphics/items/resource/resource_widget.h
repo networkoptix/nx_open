@@ -243,9 +243,6 @@ public:
 
     Buttons visibleButtons() const;
 
-    // TODO: #gdm implement via visibleButtons() function, then remove this one.
-    bool isInfoButtonVisible() const;
-
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 

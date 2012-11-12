@@ -508,10 +508,6 @@ bool QnResourceWidget::isInfoVisible() const {
     return (options() & DisplayInfo);
 }
 
-bool QnResourceWidget::isInfoButtonVisible() const {
-    return calculateButtonsVisibility() & InfoButton;
-}
-
 bool QnResourceWidget::isLocalActive() const {
     return m_localActive;
 }
@@ -893,7 +889,7 @@ QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, 
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
         bool visible = isInfoVisible();
         setInfoVisible(visible);
         setDecorationsVisible(visible || m_mouseInWidget);
