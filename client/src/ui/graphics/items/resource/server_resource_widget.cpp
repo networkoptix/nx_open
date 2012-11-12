@@ -327,15 +327,18 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
         QFont font(this->font());
+
 #ifdef Q_OS_LINUX
+        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
         int fontSize = 20;
 #else
+        // DO NOT MODIFY THIS. To change font size, modify 'zoomCoef' variable below.
         int fontSize = 80;
 #endif
         font.setPixelSize(fontSize);
         painter->setFont(font);
 
-        /* Draw text values */
+        /* Draw text values on the right side */
         {
             // modify this if you want to change font size
             qreal zoomCoef = 0.4 * offset;
