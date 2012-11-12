@@ -330,7 +330,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 #ifdef Q_OS_LINUX
         int fontSize = 20;
 #else
-        int fontsize = 80;
+        int fontSize = 80;
 #endif
         font.setPixelSize(fontSize);
         painter->setFont(font);
