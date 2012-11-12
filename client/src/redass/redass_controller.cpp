@@ -9,6 +9,9 @@ static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quali
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
 static const int TO_LOWQ_SCREEN_SIZE = 320*240;
 
+static const int TIMER_TICK_INTERVAL = 500; // at ms
+static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
+
 QnRedAssController* QnRedAssController::instance()
 {
     return inst();
@@ -17,9 +20,9 @@ QnRedAssController* QnRedAssController::instance()
 QnRedAssController::QnRedAssController()
 {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
-    m_timer.start(500);
+    m_timer.start(TIMER_TICK_INTERVAL);
     m_hiQualityRetryCounter = 0;
-    //m_someStreamIsSlow = false;
+    m_timerTicks = 0;
 }
 
 /*
@@ -166,6 +169,9 @@ bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 
 void QnRedAssController::onTimer()
 {
+    if (++m_timerTicks % TOHQ_ADDITIONAL_TRY == 0)
+        addHQTry(); // sometimes allow addition LQ->HQ switch
+
     if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
         return;
 

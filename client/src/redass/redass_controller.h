@@ -54,7 +54,7 @@ private:
     QTimer m_timer;
     QTime m_lastSwitchTimer;
     int m_hiQualityRetryCounter;
-    //bool m_someStreamIsSlow;
+    int m_timerTicks;
 private:
     QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0);
 };
