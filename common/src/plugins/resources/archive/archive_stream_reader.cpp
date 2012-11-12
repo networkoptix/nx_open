@@ -210,8 +210,9 @@ bool QnArchiveStreamReader::init()
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) 
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) && m_reverseMode == m_prevReverseMode) 
     {
+        // It is optimization: open and jump at same time
         while (1)
         {
             bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
