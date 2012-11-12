@@ -736,7 +736,7 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    if (parent.column() > 0)
+    if (parent.column() > ColumnCount)
         return 0;
 
     return node(parent)->children().size();
