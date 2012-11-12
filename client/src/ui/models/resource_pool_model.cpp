@@ -345,9 +345,14 @@ public:
     }
 
     Qt::ItemFlags flags(int column) const {
-        Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         if (column== CheckColumn)
-            result |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+            return Qt::ItemIsEnabled
+                    | Qt::ItemIsSelectable
+                    | Qt::ItemIsUserCheckable
+                    | Qt::ItemIsEditable
+                    | Qt::ItemIsTristate;
+
+        Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
         switch(m_type) {
         case Qn::ResourceNode:
@@ -736,7 +741,16 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    if (parent.column() > 0)
+    // TODO: #gdm
+    // Only children of the first column are considered when TreeView is
+    // building a tree.
+    // You should always return zero for other columns,
+    // so the condition should be (parent.column() >= 0).
+
+    //TODO: #elrik
+    // That's not true. If (parent.column() >= 0) then checkboxes setup in tree is not working.
+
+    if (parent.column() > ColumnCount)
         return 0;
 
     return node(parent)->children().size();

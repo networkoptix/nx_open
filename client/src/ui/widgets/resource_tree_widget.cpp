@@ -258,8 +258,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     m_searchModel->setFilterRole(Qn::ResourceSearchStringRole);
     m_searchModel->setSortCaseSensitivity(Qt::CaseInsensitive);
     m_searchModel->setDynamicSortFilter(true);
-
-    ui->resourcesTreeView->setAcceptDrops(true);
 }
 
 QnResourceTreeWidget::~QnResourceTreeWidget() {
@@ -378,6 +376,7 @@ void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
 
 void QnResourceTreeWidget::updateCheckboxesVisibility(){
     ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
+    ui->resourcesTreeView->setAcceptDrops(!m_checkboxesVisible);
 }
 
 void QnResourceTreeWidget::updateColumnsSize(){
