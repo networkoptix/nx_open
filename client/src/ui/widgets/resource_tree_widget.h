@@ -11,7 +11,7 @@
 class QnResourceTreeItemDelegate;
 class QnWorkbench;
 class QSortFilterProxyModel;
-class QnResourceSearchProxyModel;
+class QnResourceTreeSortProxyModel;
 
 namespace Ui {
     class QnResourceTreeWidget;
@@ -90,8 +90,7 @@ private:
 
     QnResourceTreeItemDelegate *m_itemDelegate;
 
-    QSortFilterProxyModel *m_resourceProxyModel;
-    QnResourceSearchProxyModel *m_searchModel;
+    QnResourceTreeSortProxyModel *m_resourceProxyModel;
 
     /**
      * @brief m_checkboxesVisible   This property holds whether checkboxes against each row are visible.

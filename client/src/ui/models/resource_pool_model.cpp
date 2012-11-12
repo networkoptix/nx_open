@@ -26,12 +26,6 @@
 #include "file_processor.h"
 
 namespace {
-    enum Columns {
-        NameColumn,
-        CheckColumn,
-        ColumnCount
-    };
-
     const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
 
     bool intersects(const QStringList &l, const QStringList &r) {
@@ -345,7 +339,7 @@ public:
     }
 
     Qt::ItemFlags flags(int column) const {
-        if (column== CheckColumn)
+        if (column == Qn::CheckColumn)
             return Qt::ItemIsEnabled
                     | Qt::ItemIsSelectable
                     | Qt::ItemIsUserCheckable
@@ -378,19 +372,19 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            if (column == NameColumn)
+            if (column == Qn::NameColumn)
                 return m_displayName + (m_modified ? QLatin1String("*") : QString());
             break;
         case Qt::DecorationRole:
-            if (column == NameColumn)
+            if (column == Qn::NameColumn)
                 return m_icon;
             break;
         case Qt::EditRole:
-            if (column == NameColumn)
+            if (column == Qn::NameColumn)
                 return m_name;
             break;
         case Qt::CheckStateRole:
-            if (column == CheckColumn)
+            if (column == Qn::CheckColumn)
                 return m_checked;
             break;
         case Qn::ResourceRole:
@@ -431,7 +425,7 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        if (column == CheckColumn && role == Qt::CheckStateRole){
+        if (column == Qn::CheckColumn && role == Qt::CheckStateRole){
             m_checked = (Qt::CheckState)value.toInt();
             changeInternal();
             return true;
@@ -462,7 +456,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(NameColumn);
+            QModelIndex index = this->index(Qn::NameColumn);
             int row = m_children.indexOf(child);
 
             m_model->beginRemoveRows(index, row, row);
@@ -477,7 +471,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(NameColumn);
+            QModelIndex index = this->index(Qn::NameColumn);
             int row = m_children.size();
 
             m_model->beginInsertRows(index, row, row);
@@ -492,8 +486,8 @@ protected:
         if(!isValid() || isBastard())
             return;
         
-        QModelIndex index = this->index(NameColumn);
-        emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
+        QModelIndex index = this->index(Qn::NameColumn);
+        emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
     }
 
 private:
@@ -733,7 +727,7 @@ QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
     if(!index.isValid())
         return QModelIndex();
 
-    return node(index)->parent()->index(NameColumn);
+    return node(index)->parent()->index(Qn::NameColumn);
 }
 
 bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
@@ -741,23 +735,14 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    // TODO: #gdm
-    // Only children of the first column are considered when TreeView is
-    // building a tree.
-    // You should always return zero for other columns,
-    // so the condition should be (parent.column() >= 0).
-
-    //TODO: #elrik
-    // That's not true. If (parent.column() >= 0) then checkboxes setup in tree is not working.
-
-    if (parent.column() > ColumnCount)
+    if (parent.column() > Qn::NameColumn)
         return 0;
 
     return node(parent)->children().size();
 }
 
 int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
-    return ColumnCount;
+    return Qn::ColumnCount;
 }
 
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
