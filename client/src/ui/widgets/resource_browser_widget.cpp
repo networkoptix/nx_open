@@ -68,11 +68,11 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     m_resourceModel = new QnResourcePoolModel(this);
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
-    ui->resourceTreeWidget->enableGraphicsTweaks();
-//    ui->resourceTreeWidget->setFilterVisible();
+    ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
+//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elrik whether try to enable this =)
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
-    ui->searchTreeWidget->enableGraphicsTweaks();
+    ui->searchTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
 
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
