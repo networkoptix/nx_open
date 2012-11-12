@@ -1310,7 +1310,7 @@ void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role) {
 
 void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged() {
     if (m_inChangeLayout)
-        qWarning() << "Changing layout while changing layout. Error! #GDM";
+        return;
 
     m_inChangeLayout = true;
     QnWorkbenchLayout *layout = workbench()->currentLayout();

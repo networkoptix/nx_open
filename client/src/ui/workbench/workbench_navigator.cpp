@@ -625,7 +625,10 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_sliderWindowInvalid = true;
     }
 
-    if (display() && display()->isChangingLayout()) { // TODO: #gdm isChangingLayout is your code? WTF? Where are the comments that would prevent the WTFs?
+    if (display() && display()->isChangingLayout()) {
+        // clear current widget state to avoid incorrect behavior when closing the layout
+        // see: Bug #1341: Selection on timline aren't displayed after thumbnails searching
+        // see: Bug #1344: If make a THMB search from a layout with a result of THMB searc, Timeline are not marked properly
         m_currentWidget = NULL;
         m_currentMediaWidget = NULL;
     } else {

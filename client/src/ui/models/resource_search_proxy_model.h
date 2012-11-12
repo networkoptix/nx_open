@@ -48,9 +48,6 @@ public slots:
 
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
-private:
-    void setCheckStateRecursive(const QModelIndex &index, Qt::CheckState state);
 private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;

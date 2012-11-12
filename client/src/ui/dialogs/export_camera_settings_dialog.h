@@ -18,6 +18,8 @@ class QnExportCameraSettingsDialog : public QDialog, public QnWorkbenchContextAw
 {
     Q_OBJECT
     
+    typedef QDialog base_type;
+
 public:
     explicit QnExportCameraSettingsDialog(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
     ~QnExportCameraSettingsDialog();
@@ -27,6 +29,8 @@ public:
     void setRecordingEnabled(bool enabled = true);
 
     void setMotionParams(bool motionUsed, bool dualStreamingUsed);
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
 private slots:
     void at_resourceModel_dataChanged();
 

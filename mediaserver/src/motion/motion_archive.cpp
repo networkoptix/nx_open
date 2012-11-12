@@ -226,7 +226,7 @@ QnTimePeriodList QnMotionArchive::mathPeriod(const QRegion& region, qint64 msSta
                 if (QnMetaDataV1::mathImage((__m128i*) curData, mask, maskStart, maskEnd))
                 {
                     qint64 fullStartTime = i->start + indexHeader.startTime;
-                    if (fullStartTime >= msEndTime) {
+                    if (fullStartTime > msEndTime) {
                         totalSteps = 0;
                         break;
                     }

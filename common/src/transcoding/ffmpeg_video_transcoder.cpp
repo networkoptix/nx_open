@@ -9,15 +9,15 @@ static const int MIN_TEXT_HEIGHT = 14;
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnVideoTranscoder(codecId),
 m_videoDecoder(0),
-scaleContext(0),
 m_encoderCtx(0),
+scaleContext(0),
 m_firstEncodedPts(AV_NOPTS_VALUE),
 m_lastSrcWidth(-1),
 m_lastSrcHeight(-1),
 m_mtMode(false),
 m_dateTextPos(Date_None),
-m_timeImg(0),
 m_imageBuffer(0),
+m_timeImg(0),
 m_dateTimeXOffs(0),
 m_dateTimeYOffs(0),
 m_quality(QnQualityNormal),
@@ -217,9 +217,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
-        if (m_firstEncodedPts == AV_NOPTS_VALUE)
+        if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 
+        //TODO: #vasilenko avoid using deprecated methods
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
 
         if (encoded < 0)
