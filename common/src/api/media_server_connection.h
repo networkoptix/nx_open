@@ -209,15 +209,15 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    // TODO: #gdm why 'Get'? This is not a get request.
+    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
     // TODO: #gdm (QObject *target, const char *slot) are normally the last parameter pair.
-    int asyncGetManualCameraSearch(QObject *target, const char *slot,
-                                   const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port);
+    int asyncGetManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+                                   QObject *target, const char *slot);
 
-    // TODO: #gdm why 'Get'? This is not a get request.
+    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
     // TODO: #gdm (QObject *target, const char *slot) are normally the last parameter pair.
-    int asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password);
+    int asyncGetManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+                                QObject *target, const char *slot);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
