@@ -32,15 +32,17 @@ private:
     /** try LQ->HQ once more */
     void addHQTry(); 
 
-    MediaQuality getPrefferedQuality(QnCamDisplay* display);
+    void updateStreamQuality(QnCamDisplay* display);
 private:
     enum FindMethod {Find_Biggest, Find_Least};
+    enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), hiQualityRetryCounter(0), toLQSpeed(0.0) {}
+        RedAssInfo(): lqTime(0), hiQualityRetryCounter(0), toLQSpeed(0.0), lqReason(Reason_None) {}
         qint64 lqTime;
         int hiQualityRetryCounter;
         float toLQSpeed;
+        LQReason lqReason;
     };
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);

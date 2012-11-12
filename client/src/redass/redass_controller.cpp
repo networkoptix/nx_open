@@ -89,6 +89,7 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         // for high speed mode change same item to LQ (do not try to find least item)
         reader->setQuality(MEDIA_Quality_Low, true);
         m_redAssInfo[display].toLQSpeed = display->getSpeed();
+        m_redAssInfo[display].lqReason == Reason_CPU;
         return;
     }
     
@@ -107,28 +108,40 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         reader->setQuality(MEDIA_Quality_Low, true);
         m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
         m_redAssInfo[display].toLQSpeed = display->getSpeed();
-        //m_someStreamIsSlow = true;
+        m_redAssInfo[display].lqReason == display->queueSize() < 3 ? Reason_Network : Reason_CPU;
         m_lastSwitchTimer.restart();
     }
 }
 
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return;
     if (reader->getQuality() == MEDIA_Quality_High)
         return; // reader already at HQ
     
     QnCamDisplay* display = getDisplayByReader(reader);
     if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
-        // for leave high speed mode change same item to HQ (do not try to find biggest item)
+        // If item leave high speed mode change same item to HQ (do not try to find biggest item)
         reader->setQuality(MEDIA_Quality_High, true);
         return;
     }
-    
+
     if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return; // no more tries left for lQ->HQ swithc
+        return; // Some item stuck after HQ switching. Do not switch to HQ any more
+
+    if (isSmallItem(display))
+        return; // do not try HQ for small items
+
+    if (m_redAssInfo[display].lqReason == Reason_Small)
+    {
+        reader->setQuality(MEDIA_Quality_High, true);
+        return; // if item go to LQ because of small, return to HQ without delay
+    }
+
+    //try one more LQ->HQ switch
+
+    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
+        return;
 
     display = findDisplay(Find_Biggest, false, &QnRedAssController::isNotSmallItem);
     if (display) {
@@ -165,6 +178,9 @@ void QnRedAssController::onTimer()
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             reader->setQuality(MEDIA_Quality_Low, true); // put small display to LQ
+            m_redAssInfo[display].toLQSpeed = display->getSpeed();
+            m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
+            m_redAssInfo[display].lqReason = Reason_Small;
             addHQTry();
         }
 
@@ -184,22 +200,21 @@ void QnRedAssController::registerConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
     if (display->getArchiveReader()) {
-        display->getArchiveReader()->setQuality(getPrefferedQuality(display), true);
+        updateStreamQuality(display);
         m_redAssInfo.insert(display, RedAssInfo());
     }
 }
 
-MediaQuality QnRedAssController::getPrefferedQuality(QnCamDisplay* display)
+void QnRedAssController::updateStreamQuality(QnCamDisplay* display)
 {
-    //if (isSmallItem(display))
-    //    return MEDIA_Quality_Low;
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
-        if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && !isSmallItem(itr.key()))
-            return MEDIA_Quality_Low;
+        if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+        {
+            display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
+            m_redAssInfo[display].lqReason = itr.value().lqReason;
+        }
     }
-
-    return MEDIA_Quality_High;
 }
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
