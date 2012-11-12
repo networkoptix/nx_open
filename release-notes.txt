@@ -1,3 +1,11 @@
+----------------------------------------------- 1.4 -----------------------------------------------
+Bugs Fixed:
+ - Web-Client acquired the default resolution instead of specified-one. As the default resolution is the biggest possible this could result in CPU overloading if trying to view
+   cameras on Web-Client. Fixed
+ - If trying to copy recording settings to other camera(s) the dialog could work incorrectly in sime cases. Fixed
+ - Media Server service now stops correctly
+ - Installer bugs fixed
+  
 ----------------------------------------------- 1.4-Release-Candidate -----------------------------------------------
 
 New Features: 
@@ -27,7 +35,7 @@ Improvements:
  - Some renamings
  - Internet Explorer is supported by web-client. Minimal version required is 9.x.
 
-Bugs Fixed.
+Bugs Fixed:
  - Fixed incorrect support email if click on link on the Licenses page (2 slashes before address).
  - Fixed misclicks on Time Line (clicks were sent underneath)
  - Multi-Videos Fixes:
