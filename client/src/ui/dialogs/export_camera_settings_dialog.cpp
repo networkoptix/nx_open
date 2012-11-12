@@ -12,7 +12,7 @@
 
 
 QnExportCameraSettingsDialog::QnExportCameraSettingsDialog(QWidget *parent, QnWorkbenchContext *context) :
-    QDialog(parent),
+    base_type(parent),
     QnWorkbenchContextAware(context ? static_cast<QObject *>(context) : parent),
     ui(new Ui::QnExportCameraSettingsDialog()),
     m_recordingEnabled(true),
@@ -44,11 +44,11 @@ QnVirtualCameraResourceList QnExportCameraSettingsDialog::getSelectedCameras() c
     QnResourceList result;
     for (int i = 0; i < m_resourceModel->rowCount(); ++i){
         //servers
-        QModelIndex idx = m_resourceModel->index(i, 0);
+        QModelIndex idx = m_resourceModel->index(i, Qn::NameColumn);
         for (int j = 0; j < m_resourceModel->rowCount(idx); ++j){
             //cameras
-            QModelIndex camIdx = m_resourceModel->index(j, 0, idx);//TODO: #gdm move out enum values
-            QModelIndex checkedIdx = camIdx.sibling(camIdx.row(), 1); //TODO: #gdm move out enum values
+            QModelIndex camIdx = m_resourceModel->index(j, Qn::NameColumn, idx);
+            QModelIndex checkedIdx = camIdx.sibling(camIdx.row(), Qn::CheckColumn);
             bool checked = checkedIdx.data(Qt::CheckStateRole) == Qt::Checked;
             if (!checked)
                 continue;
@@ -72,6 +72,14 @@ void QnExportCameraSettingsDialog::setMotionParams(bool motionUsed, bool dualStr
     m_motionUsed = motionUsed;
     m_dualStreamingUsed = dualStreamingUsed;
     updateMotionStatus();
+}
+
+void QnExportCameraSettingsDialog::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return) {
+        event->ignore();
+        return;
+    }
+    base_type::keyPressEvent(event);
 }
 
 // ------------ Handlers ---------------------
