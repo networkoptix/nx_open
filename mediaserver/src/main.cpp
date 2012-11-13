@@ -816,6 +816,8 @@ protected:
 
     void stop()
     {
+        m_main.exit();
+        m_main.wait();
         stopServer(0);
     }
 
