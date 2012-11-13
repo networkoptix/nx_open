@@ -46,7 +46,7 @@
                             <files>
                                 <file>../build-${customization}.properties</file>
                                 <file>../build-environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver.properties</file>
+                                <file>../appserver/setup/build/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
                     </execution>
