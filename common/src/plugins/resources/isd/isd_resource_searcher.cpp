@@ -99,7 +99,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
     mac = getValueFromString(mac).trimmed();
 
-    int n = mac.length();
+    //int n = mac.length();
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);

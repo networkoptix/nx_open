@@ -797,6 +797,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
 void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const
 {
+    Q_UNUSED(isPrimary)
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
     QnPlOnvifResource::AUDIO_CODECS codec = m_onvifRes->getAudioCodec();
