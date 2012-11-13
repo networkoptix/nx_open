@@ -21,9 +21,9 @@ m_timeImg(0),
 m_dateTimeXOffs(0),
 m_dateTimeYOffs(0),
 m_quality(QnQualityNormal),
-m_bufferYOffs(0),
-m_bufferUVOffs(0),
-m_onscreenDateOffset(0)
+m_onscreenDateOffset(0),
+m_bufXOffs(0),
+m_bufYOffs(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -121,33 +121,31 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
-    int bufYOffs = 0;
+    m_bufYOffs;
 
     switch(m_dateTextPos)
     {
     case Date_LeftTop:
-        bufYOffs = 0;
+        m_bufYOffs = 0;
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
     case Date_RightTop:
-        bufYOffs = 0;
+        m_bufYOffs = 0;
         m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
         break;
     case Date_RightBottom:
-        bufYOffs = frame->height - metric.height();
+        m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
         break;
     case Date_LeftBottom:
     default:
-        bufYOffs = frame->height - metric.height();
+        m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
     }
 
-    bufYOffs = qPower2Floor(bufYOffs, 2);
-    int srcBufOffset = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
-    m_bufferYOffs  = srcBufOffset + bufYOffs * frame->linesize[0];
-    m_bufferUVOffs = srcBufOffset/2 + bufYOffs * frame->linesize[1] / 2;
+    m_bufYOffs = qPower2Floor(m_bufYOffs, 2);
+    m_bufXOffs = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
 
     m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
     m_dateTimeYOffs = metric.ascent();
@@ -171,9 +169,12 @@ void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);
 
+    int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
+    int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
+
     // copy and convert frame buffer to image
     yuv420_argb32_sse2_intr(m_imageBuffer,
-        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
         m_timeImg->bytesPerLine(), 
         frame->linesize[0], frame->linesize[1], 255);
@@ -188,7 +189,7 @@ void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 
     // copy and convert RGBA32 image back to frame buffer
     bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
-        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
 }
