@@ -49,9 +49,10 @@ private:
     int m_dateTimeXOffs;
     int m_dateTimeYOffs;
     QnStreamQuality m_quality;
-    int m_bufferYOffs;
-    int m_bufferUVOffs;
     int m_onscreenDateOffset;
+
+    int m_bufXOffs;
+    int m_bufYOffs;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;
