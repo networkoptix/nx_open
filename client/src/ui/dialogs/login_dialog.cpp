@@ -7,8 +7,10 @@
 #include <QtGui/QInputDialog>
 #include <QtGui/QStandardItemModel>
 
-#include <utils/settings.h>
+#include <client/client_connection_data.h>
+
 #include <core/resource/resource.h>
+
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 
@@ -20,6 +22,8 @@
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "plugins/resources/archive/filetypesupport.h"
+
+#include <utils/settings.h>
 
 #include "ui_findappserverdialog.h"
 #include "connection_testing_dialog.h"

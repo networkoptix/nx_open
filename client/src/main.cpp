@@ -68,7 +68,7 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_translation_manager.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
@@ -82,6 +82,7 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
+#include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
 
 

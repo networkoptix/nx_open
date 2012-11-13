@@ -32,6 +32,8 @@
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
 
+#include <client/client_connection_data.h>
+
 #include <recording/time_period_list.h>
 
 #include <ui/style/skin.h>
