@@ -2,6 +2,7 @@
 #define __QN_REDASS_CONTROLLER_H__
 
 #include "core/datapacket/media_data_packet.h"
+#include "utils/common/synctime.h"
 
 class QnCamDisplay;
 class QnArchiveStreamReader;
@@ -35,20 +36,20 @@ private:
     void updateStreamQuality(QnCamDisplay* display);
 private:
     enum FindMethod {Find_Biggest, Find_Least};
-    enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU};
+    enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), hiQualityRetryCounter(0), toLQSpeed(0.0), lqReason(Reason_None) {}
+        RedAssInfo(): lqTime(0), /* hiQualityRetryCounter(0), */ toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()) {}
         qint64 lqTime;
-        int hiQualityRetryCounter;
+        //int hiQualityRetryCounter;
         float toLQSpeed;
         LQReason lqReason;
+        qint64 initialTime;
     };
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
 
     QMutex m_mutex;
-    //QSet<QnCamDisplay*> m_consumers;
     typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
     ConsumersMap m_redAssInfo;
     QTimer m_timer;
@@ -57,6 +58,7 @@ private:
     int m_timerTicks;
 private:
     QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0);
+    void gotoLowQuality(QnCamDisplay* display, LQReason reason);
 };
 
 #define qnRedAssController QnRedAssController::instance()
