@@ -91,6 +91,18 @@ public:
      * @return                          True if filter is visible.
      */
     bool isFilterVisible() const;
+
+    /**
+     * @brief setEditingEnabled         Enable or disable item editing: renaming by F2 and moving by drag'n'drop.
+     * @param enabled                   Whether editing should be allowed.
+     */
+    void setEditingEnabled(bool enabled = true);
+
+    /**
+     * @brief isEditingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
+     * @return                          True if editing is allowed.
+     */
+    bool isEditingEnabled() const;
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
     void resizeEvent(QResizeEvent *event) override;
@@ -117,14 +129,19 @@ private:
     QnResourceTreeSortProxyModel *m_resourceProxyModel;
 
     /**
-     * @brief m_checkboxesVisible   This property holds whether checkboxes against each row are visible.
+     * @brief m_checkboxesVisible       This property holds whether checkboxes against each row are visible.
      */
     bool m_checkboxesVisible;
 
     /**
-     * @brief m_graphicsTweaksFlags This property holds which graphics tweaks are used for widget displaying.
+     * @brief m_graphicsTweaksFlags     This property holds which graphics tweaks are used for widget displaying.
      */
     Qn::GraphicsTweaksFlags m_graphicsTweaksFlags;
+
+    /**
+     * @brief m_editingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
+     */
+    bool m_editingEnabled;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)
