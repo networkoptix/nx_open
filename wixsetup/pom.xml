@@ -132,7 +132,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python</executable>
+                                    <executable>${python.executable}</executable>
                                     <arguments>
                                         <argument>generate-ec-wxs.py</argument>
                                     </arguments>
@@ -147,7 +147,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python</executable>
+                                    <executable>${python.executable}</executable>
                                     <arguments>
                                         <argument>generate-help-wxs.py</argument>
                                     </arguments>
