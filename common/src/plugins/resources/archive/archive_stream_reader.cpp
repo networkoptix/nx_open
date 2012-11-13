@@ -60,6 +60,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_speed(1.0),
     m_pausedStart(false),
     m_sendMotion(false),
+    m_prevSendMotion(false),
     m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
@@ -351,6 +352,12 @@ begin_label:
             // If media data can't be opened report 'no data'
             return createEmptyPacket(m_reverseMode);
         }
+    }
+
+    bool sendMotion = m_sendMotion;
+    if (sendMotion != m_prevSendMotion) {
+        m_delegate->setSendMotion(sendMotion);
+        m_prevSendMotion = sendMotion;
     }
 
     int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
@@ -747,7 +754,7 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && m_sendMotion)
+    if (m_currentData && sendMotion)
     {
         int channel = m_currentData->channelNumber;
         if (!m_motionConnection[channel])
@@ -994,12 +1001,6 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 
 bool QnArchiveStreamReader::setSendMotion(bool value)
 {
-    /*
-    if (m_navDelegate) 
-        return m_navDelegate->setSendMotion(value);
-    */
-
-    m_delegate->setSendMotion(value);
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
     {
         m_sendMotion = value;
@@ -1008,19 +1009,6 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     else {
         return false;
     }
-    /*
-    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
-    if (maskedDelegate) {
-        m_sendMotion = value;
-        maskedDelegate->setSendMotion(value);
-        if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
-        return true;
-    }
-    else {
-        return false;
-    }
-    */
 }
 
 

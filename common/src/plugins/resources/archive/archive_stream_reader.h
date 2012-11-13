@@ -164,6 +164,7 @@ private:
     QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
     bool m_sendMotion;
+    bool m_prevSendMotion;
     bool m_outOfPlaybackMask;
 
     qint64 determineDisplayTime(bool reverseMode);
