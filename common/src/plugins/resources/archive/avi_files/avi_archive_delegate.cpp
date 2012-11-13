@@ -392,6 +392,7 @@ bool QnAviArchiveDelegate::findStreams()
         global_ffmpeg_mutex.lock();
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
+            // TODO: #vasilenko avoid using deprecated methods
             av_find_stream_info(m_formatContext);
             m_formatContext->interrupt_callback.callback = 0;
             m_streamsFound = m_formatContext->nb_streams > 0;
@@ -399,6 +400,7 @@ bool QnAviArchiveDelegate::findStreams()
                 m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
         }
         else {
+            // TODO: #vasilenko avoid using deprecated methods
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         }
 

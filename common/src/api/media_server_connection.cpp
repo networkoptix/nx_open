@@ -376,8 +376,8 @@ int QnMediaServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-int QnMediaServerConnection::asyncGetManualCameraSearch(QObject *target, const char *slot,
-                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port){
+int QnMediaServerConnection::asyncGetManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+                                                        QObject *target, const char *slot){
 
     QnRequestParamList params;
     params << QnRequestParam("start_ip", startAddr);
@@ -391,8 +391,8 @@ int QnMediaServerConnection::asyncGetManualCameraSearch(QObject *target, const c
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), params, processor, SLOT(at_searchReplyReceived(int, QByteArray, QByteArray, int)));
 }
 
-int QnMediaServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                                     const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password){
+int QnMediaServerConnection::asyncGetManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+                                                     QObject *target, const char *slot){
     QnRequestParamList params;
 
     for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){

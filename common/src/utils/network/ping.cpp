@@ -158,7 +158,7 @@ bool CLPing::ping(const QString& ip, int retry, int timeoutPerRetry, int packetS
         return false;
     } else
     {
-        cl_log.log(cl_logWARNING, "CLPing::ping(): SUCCESS");
+        //cl_log.log(cl_logWARNING, "CLPing::ping(): SUCCESS");
     }
 
     struct

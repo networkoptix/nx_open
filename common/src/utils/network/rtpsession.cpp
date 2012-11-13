@@ -387,7 +387,7 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
 
 bool RTPSession::open(const QString& url, qint64 startTime)
 {
-    if (startTime != AV_NOPTS_VALUE)
+    if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
@@ -556,7 +556,7 @@ bool RTPSession::sendDescribe()
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
-    if (m_openedTime != AV_NOPTS_VALUE)
+    if ((quint64)m_openedTime != AV_NOPTS_VALUE)
         addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
@@ -982,6 +982,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
         {
             int messageCode = reader.getBits(8);
             int messageLen = reader.getBits(16);
+            Q_UNUSED(messageLen)
             if (messageCode == RTCP_SENDER_REPORT)
             {
                 reader.skipBits(32); // sender ssrc

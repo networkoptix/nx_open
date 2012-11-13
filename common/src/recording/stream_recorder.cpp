@@ -27,6 +27,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_endDateTime(AV_NOPTS_VALUE),
     m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
+    m_currentTimeZone(-1),
     m_waitEOF(false),
     m_forceDefaultCtx(true),
     m_formatCtx(0),
@@ -37,6 +38,7 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
+    m_role(Role_ServerRecording),
     m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
     m_videoChannels(0),
@@ -47,8 +49,6 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
-    m_role(Role_ServerRecording),
-    m_currentTimeZone(-1),
     m_onscreenDateOffset(0)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -328,7 +328,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
     av_init_packet(&avPkt);
     avPkt.dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
     QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
-    if (video && video->pts != AV_NOPTS_VALUE)
+    if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base);
     else
         avPkt.pts = avPkt.dts;
@@ -423,6 +423,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         for (int i = 0; i < m_videoChannels; ++i) 
         {
+            // TODO: #vasilenko avoid using deprecated methods
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0)
             {
@@ -443,7 +444,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
             // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
             
-            if (m_role == Role_FileExportWithTime || m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id)
+            if (m_role == Role_FileExportWithTime || (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id))
             {
                 // transcode video
                 if (m_dstVideoCodec == CODEC_ID_NONE)
@@ -498,6 +499,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             m_isAudioPresent = true;
+            // TODO: #vasilenko avoid using deprecated methods
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
