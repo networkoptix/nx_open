@@ -712,7 +712,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
 
             int decreaseIfMotionPlusLQ = 0;
             if (camera->streamFpsSharingMethod() == shareFps)
-                decreaseIfMotionPlusLQ = 2;
+                decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;
             foreach(const QnScheduleTask::Data &data, scheduleTasks()){
