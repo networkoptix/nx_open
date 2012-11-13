@@ -251,7 +251,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0),
     m_checkboxesVisible(true),
-    m_graphicsTweaksFlags(0)
+    m_graphicsTweaksFlags(0),
+    m_editingEnabled(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -391,6 +392,22 @@ bool QnResourceTreeWidget::isFilterVisible() const {
     return ui->filterFrame->isVisible();
 }
 
+void QnResourceTreeWidget::setEditingEnabled(bool enabled) {
+    if (m_editingEnabled == enabled)
+        return;
+
+    m_editingEnabled = enabled;
+    ui->resourcesTreeView->setAcceptDrops(m_editingEnabled);
+    if (enabled)
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
+    else
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+bool QnResourceTreeWidget::isEditingEnabled() const {
+    return m_editingEnabled;
+}
+
 // ----------- Handlers -------------
 
 bool QnResourceTreeWidget::eventFilter(QObject *obj, QEvent *event){
@@ -408,7 +425,6 @@ void QnResourceTreeWidget::resizeEvent(QResizeEvent *event) {
 
 void QnResourceTreeWidget::updateCheckboxesVisibility(){
     ui->resourcesTreeView->setColumnHidden(1, !m_checkboxesVisible);
-    ui->resourcesTreeView->setAcceptDrops(!m_checkboxesVisible);
 }
 
 void QnResourceTreeWidget::updateColumnsSize(){
