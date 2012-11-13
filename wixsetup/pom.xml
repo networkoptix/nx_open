@@ -30,7 +30,7 @@
     <build>
         <directory>${arch}</directory>
         <sourceDirectory>${basedir}</sourceDirectory>
-        <finalName>${project.parent.artifactId}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}-${customization}</finalName>
+        <finalName>${namespace.additional}-${release.version}.${buildNumber}-${platform}-${arch}-${build.configuration}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
