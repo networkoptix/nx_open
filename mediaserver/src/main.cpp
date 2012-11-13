@@ -65,6 +65,7 @@
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/gettime_handler.h"
 #include "platform/platform_abstraction.h"
+#include "rest/handlers/version_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -565,6 +566,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/version", new QnGetVersionHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
