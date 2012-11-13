@@ -519,6 +519,18 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
+QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl)
+{
+    QUrl url(QString::fromStdString(onvifUrl));
+    QUrl mediaUrl(getUrl());
+    QString gg4 = mediaUrl.toString();
+    url.setHost(getHostAddress().toString());
+    if (mediaUrl.port(-1) != -1)
+        url.setPort(mediaUrl.port());
+    QString gg = url.toString();
+    return url.toString();
+}
+
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
     bool result = true;
@@ -575,19 +587,19 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             //TODO:UTF unuse std::string
             if (response.Capabilities->Media) 
             {
-                setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
+                setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
             }
             if (response.Capabilities->Imaging)
             {
-                setImagingUrl(QString::fromStdString(response.Capabilities->Imaging->XAddr));
+                setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
             }
             if (response.Capabilities->Device) 
             {
-                setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
+                setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
             }
             if (response.Capabilities->PTZ) 
             {
-                setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
+                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
             }
         }
     }

@@ -194,6 +194,7 @@ private:
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     void readPtzInfo();
+    QString fromOnvifDiscoveredUrl(const std::string& onvifUrl);
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
