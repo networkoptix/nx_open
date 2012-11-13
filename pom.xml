@@ -139,7 +139,7 @@
 			</modules>
 			<properties>
 				<environment.dir>${env.ENVIRONMENT}</environment.dir>
-				<python.executable>${env.ENVIRONMENT}/python/${arch}/python</python.executable>				
+				<python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
@@ -181,7 +181,7 @@
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
-				<python.executable>python</python.executable>				
+				<python.dir>/usr/bin/</python.dir>				
 				<qt.dir>${env.QTDIR}</qt.dir>				
 				<platform>linux</platform>
 				<compiler>gcc</compiler>

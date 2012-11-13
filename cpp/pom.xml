@@ -144,7 +144,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${python.executable}</executable>
+							<executable>${python.dir}/python</executable>
 							<arguments>
 								<argument>gen-resources.py</argument>
 							</arguments>
@@ -158,7 +158,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>${python.executable}</executable>
+							<executable>${python.dir}/python</executable>
 							<arguments>
 								<argument>build-prepare.py</argument>
 							</arguments>
