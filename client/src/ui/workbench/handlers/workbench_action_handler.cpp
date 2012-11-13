@@ -2369,10 +2369,11 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
             novStorage->switchToFile(oldUrl, newUrl, false);
         snapshotManager()->store(m_exportLayout);
     }
-    else {
-        if (m_exportLayout && !resourcePool()->getResourceByGuid(m_exportLayout->getUniqueId())) {
-            m_exportLayout->setStatus(QnResource::Online);
-            resourcePool()->addResource(m_exportLayout);
+    else if (m_exportLayout && m_exportStorage) {
+        QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
+        if (!resourcePool()->getResourceByGuid(layout->getUniqueId())) {
+            layout->setStatus(QnResource::Online);
+            resourcePool()->addResource(layout);
         }
     }
     m_exportStorage.clear();
