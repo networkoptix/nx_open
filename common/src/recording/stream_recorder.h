@@ -76,7 +76,15 @@ public:
     */
     void setAudioCodec(CodecID codec);
 
+    /*
+    * Time difference between client and server time zone. Used for onScreen timestamp drawing
+    */
     void setOnScreenDateOffset(int timeOffsetMs);
+
+    /*
+    * Server time zone. Used for export to avi/mkv files
+    */
+    void setServerTimeZoneMs(int value);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -156,6 +164,7 @@ private:
     CodecID m_dstAudioCodec;
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
+    qint64 m_serverTimeZoneMs;
 };
 
 #endif // _STREAM_RECORDER_H__

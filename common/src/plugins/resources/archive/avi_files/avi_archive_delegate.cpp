@@ -13,6 +13,7 @@
 #include "avi_resource.h"
 #include "motion/light_motion_archive_connection.h"
 #include "core/resource/media_resource.h"
+#include "export/sign_helper.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -341,8 +342,21 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
     {
         m_videoLayout = new QnCustomResourceVideoLayout(1, 1);
 
+
         // prevent standart tag name parsing in 'avi' format
         QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
+
+        // check time zone in the 4-th column
+        AVDictionaryEntry* sign = av_dict_get(m_formatContext->metadata, getTagName(Tag_Signature, format), 0, 0);
+        if (sign && sign->value) {
+            QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
+            if (tmp.size() > 4) {
+                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong();
+                QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
+                if (timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
+                    aviRes->setTimeZoneOffset(timeZoneOffset);
+            }
+        }
 
         AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
         bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));

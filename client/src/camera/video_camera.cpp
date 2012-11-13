@@ -131,7 +131,7 @@ void QnVideoCamera::setQuality(QnStreamQuality q, bool increase)
 }
 
 void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
-                                            QnStreamRecorder::Role role, int timeOffsetMs)
+                                            QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -178,6 +178,7 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(role);
     m_exportRecorder->setOnScreenDateOffset(timeOffsetMs);
+    m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
 
 #ifndef _DEBUG

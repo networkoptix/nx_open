@@ -713,7 +713,7 @@ QByteArray QnSignHelper::getSignPattern()
             licenseName = license->name();
     }
     QByteArray bLicName = licenseName.toUtf8().replace(SIGN_TEXT_DELIMITER, SIGN_TEXT_DELIMITER_REPLACED);
-    result.append(bLicName);
+    result.append(bLicName).append(SIGN_TEXT_DELIMITER);
     return result;
 }
 

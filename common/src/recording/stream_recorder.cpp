@@ -49,7 +49,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
-    m_onscreenDateOffset(0)
+    m_onscreenDateOffset(0),
+    m_serverTimeZoneMs(Qn::InvalidUtcOffset)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -410,6 +411,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();
+            if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
+                signPattern.append(QByteArray::number(m_serverTimeZoneMs)); // add server timeZone as one more column to sign pattern
             while (signPattern.size() < QnSignHelper::getMaxSignSize())
                 signPattern.append(" ");
             signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
@@ -636,6 +639,8 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 {
 #ifndef SIGN_FRAME_ENABLED
     QByteArray signText = QnSignHelper::getSignPattern();
+    if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
+        signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
     QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) signText.data(), signText.size());
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
@@ -706,4 +711,9 @@ void QnStreamRecorder::setAudioCodec(CodecID codec)
 void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
 {
     m_onscreenDateOffset = timeOffsetMs;
+}
+
+void QnStreamRecorder::setServerTimeZoneMs(int value)
+{
+    m_serverTimeZoneMs = value;
 }
