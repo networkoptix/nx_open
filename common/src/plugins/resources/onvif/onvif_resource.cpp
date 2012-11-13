@@ -523,11 +523,9 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl)
 {
     QUrl url(QString::fromStdString(onvifUrl));
     QUrl mediaUrl(getUrl());
-    QString gg4 = mediaUrl.toString();
     url.setHost(getHostAddress().toString());
     if (mediaUrl.port(-1) != -1)
         url.setPort(mediaUrl.port());
-    QString gg = url.toString();
     return url.toString();
 }
 
