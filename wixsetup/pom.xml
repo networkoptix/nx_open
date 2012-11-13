@@ -46,7 +46,7 @@
                             <files>
                                 <file>../build-${customization}.properties</file>
                                 <file>../build-environment/${arch}/libdir.properties</file>
-                                <file>../appserver/setup/build/appserver.properties</file>
+                                <file>../appserver/setup/build/appserver-${arch}.properties</file>
                             </files>
                         </configuration>
                     </execution>
@@ -132,7 +132,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python</executable>
+                                    <executable>${python.dir}/python</executable>
                                     <arguments>
                                         <argument>generate-ec-wxs.py</argument>
                                     </arguments>
@@ -147,7 +147,7 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>python</executable>
+                                    <executable>${python.dir}/python</executable>
                                     <arguments>
                                         <argument>generate-help-wxs.py</argument>
                                     </arguments>
