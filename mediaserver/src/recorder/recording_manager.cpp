@@ -67,6 +67,9 @@ void QnRecordingManager::deleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::stop()
 {
+    exit();
+    wait(); // stop QT event loop
+
     QMutexLocker lock(&m_mutex);
 
     foreach(const Recorders& recorders, m_recordMap.values())
