@@ -95,8 +95,12 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         else if (action == "getCalibrate") {
             QnAbstractPtzController::getCalibrate(res, xSpeed, ySpeed, zoomSpeed);
             result.append("<root>\n");
+            result.append("<velocity>\n");
             QString velocity("<velocity xSpeed=\"%1\" ySpeed=\"%2\" zoomSpeed=\"%3\" />\n");
-            result.append(velocity.arg(xSpeed).arg(ySpeed).arg(zoomSpeed).toUtf8());
+            result.append(QString("<xSpeed>%1</xSpeed>").arg(xSpeed).toUtf8());
+            result.append(QString("<ySpeed>%1</ySpeed>").arg(ySpeed).toUtf8());
+            result.append(QString("<zoomSpeed>%1</zoomSpeed>").arg(zoomSpeed).toUtf8());
+            result.append("</velocity>\n");
             result.append("</root>\n");
             return CODE_OK;
         }
@@ -130,8 +134,11 @@ int QnPtzHandler::executeGet(const QString& path, const QnRequestParamList& para
         }
         else {
             result.append("<root>\n");
-            QString posStr("<position xPos=\"\%1\" yPos=\"\%2\" zoomPos=\"\%3\"/>\n");
-            result.append(posStr.arg(xPos).arg(yPos).arg(zoomPos).toUtf8());
+            result.append("<position>\n");
+            result.append(QString("<xPos>%1</xPos>").arg(xPos).toUtf8());
+            result.append(QString("<yPos>%1</yPos>").arg(yPos).toUtf8());
+            result.append(QString("<zoomPos>%1</zoomPos>").arg(zoomPos).toUtf8());
+            result.append("</position>\n");
             result.append("</root>\n");
             return CODE_OK;
         }

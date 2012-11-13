@@ -147,6 +147,20 @@ namespace detail {
          QList<QPair<QString, bool> > m_operationResult;
     };
 
+
+    class QnMediaServerPtzGetPosReplyProcessor: public QObject {
+        Q_OBJECT
+    public:
+        QnMediaServerPtzGetPosReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+
+    signals:
+        void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+    };
+
+
 } // namespace detail
 
 
@@ -221,6 +235,8 @@ public:
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+    int asyncPtzMoveTo(const QnNetworkResourcePtr &camera, qreal xPos, qreal yPos, qreal zoomPos, QObject *target, const char *slot);
+    int asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
 
     int asyncGetTime(QObject *target, const char *slot);
 
