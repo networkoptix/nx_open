@@ -1,7 +1,7 @@
 #include "motion_business_event.h"
 
 QnMotionBusinessEvent::QnMotionBusinessEvent():
-    QnToggleBusinessEvent()
+    QnAbstractBusinessEvent()
 {
     setEventType(BE_Camera_Motion);
 }
