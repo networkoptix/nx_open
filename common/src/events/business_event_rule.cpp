@@ -1,6 +1,5 @@
 #include "business_event_rule.h"
 #include "recording_business_action.h"
-#include "toggle_business_event.h"
 
 QnBusinessEventRule::QnBusinessEventRule()
 {

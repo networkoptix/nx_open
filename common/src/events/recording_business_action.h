@@ -1,8 +1,8 @@
 #ifndef __RECORDING_BUSINESS_ACTION_H__
 #define __RECORDING_BUSINESS_ACTION_H__
 
-#include "toggle_business_action.h"
 #include "core/resource/media_resource.h"
+#include "abstract_business_action.h"
 
 class QnRecordingBusinessAction: public QnAbstractBusinessAction
 {

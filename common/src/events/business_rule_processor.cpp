@@ -1,7 +1,6 @@
 #include <QList>
 #include "business_rule_processor.h"
 #include "core/resource/media_server_resource.h"
-#include "toggle_business_event.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -94,11 +93,10 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
             bool condOK = bEvent->checkCondition(rule->getEventCondition());
             if (rule->isActionInProgress())
             {
-                QnToggleBusinessEventPtr toggleEvent = bEvent.dynamicCast<QnToggleBusinessEvent>();
                 // Toggle event repeated with some interval with state 'on'.
                 if (!condOK)
                     result << rule->getAction(bEvent, ToggleState_Off); // if toggled action is used and condition is no longer valid - stop action
-                else if (toggleEvent->getToggleState() == ToggleState_Off)
+                else if (bEvent->getToggleState() == ToggleState_Off)
                     result << rule->getAction(bEvent); // Toggle event goes to 'off'. stop action
             }
             else if (condOK)
