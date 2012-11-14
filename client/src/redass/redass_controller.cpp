@@ -24,22 +24,6 @@ QnRedAssController::QnRedAssController()
     m_timerTicks = 0;
 }
 
-/*
-void QnRedAssController::setQuality(QnCamDisplay* display, MediaQuality quality)
-{
-    if (quality == MEDIA_Quality_Low)
-    {
-        m_lowQualityRequests.insert(display, qnSyncTime->currentMSecsSinceEpoch());
-    }
-    else if (quality == MEDIA_Quality_High || quality == MEDIA_Quality_AlwaysHigh) 
-    {
-        m_lowQualityRequests.remove(display);
-        if (display->getArchiveReader())
-            display->getArchiveReader()->setQualityForced(quality);
-    }   
-}
-*/
-
 QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* reader)
 {
     for(QMap<QnCamDisplay*, RedAssInfo>::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
@@ -51,8 +35,10 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
     return 0;
 }
 
-QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, bool findHQ, SearchCondition cond)
+QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, bool findHQ, SearchCondition cond, int* displaySize)
 {
+    if (displaySize)
+        *displaySize = 0;
     QMultiMap<int, QnCamDisplay*> camDisplayByScreenSize;
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
@@ -74,8 +60,11 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, bool findHQ, Se
         QnCamDisplay* display = itr.value();
         QnArchiveStreamReader* reader = display->getArchiveReader();
         bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High;
-        if (isReaderHQ == findHQ && (!cond || (this->*cond)(display)))
+        if (isReaderHQ == findHQ && (!cond || (this->*cond)(display))) {
+            if (displaySize)
+                *displaySize = itr.key();
             return display;
+        }
     }
     return 0;
 }
@@ -144,8 +133,6 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (display) {
         display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
-        //if (m_redAssInfo[display].lqTime > 0)
-            //m_hiQualityRetryCounter++; // if was switch HQ > LQ (because of slow CPU or network), increase LQ->HQ try counter to prevent infinite HQ->LQ->HQ loop
     }
 }
 
@@ -192,15 +179,48 @@ void QnRedAssController::onTimer()
         {
             streamBackToNormal(display->getArchiveReader());
         }
+    }
 
+    optimizeItemsQualityBySize();
+}
+
+void QnRedAssController::optimizeItemsQualityBySize()
+{
+    // rearrange items quality: put small items to LQ state, large to HQ
+ 
+    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
+        return; // do not optimize quality if recently switch occured
+
+    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    {
+        QnCamDisplay* display = itr.key();
+        if (display->getSpeed() > 1 || display->getSpeed() < 0)
+            return; // do not rearrange items if FF/REW mode
+    }
+
+    int largeSize = 0;
+    int smallSize = 0;
+    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, false, &QnRedAssController::isNotSmallItem, &largeSize);
+    QnCamDisplay* smallDisplay = findDisplay(Find_Least, true, &QnRedAssController::isNotSmallItem, &smallSize);
+    if (largeDisplay && smallDisplay && largeSize > smallSize*2)
+    {
+        // swap items quality
+        gotoLowQuality(smallDisplay, m_redAssInfo[largeDisplay].lqReason);
+        largeDisplay->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
+        m_lastSwitchTimer.restart();
     }
 }
 
 void QnRedAssController::registerConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
-    if (display->getArchiveReader()) {
-        updateStreamQuality(display);
+    if (display->getArchiveReader()) 
+    {
+        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        {
+            if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
+                gotoLowQuality(display, itr.value().lqReason);
+        }
         m_redAssInfo.insert(display, RedAssInfo());
     }
 }
@@ -214,16 +234,8 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
     m_redAssInfo[display].lqReason = reason;
     m_redAssInfo[display].toLQSpeed = display->getSpeed();
-    m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
-}
-
-void QnRedAssController::updateStreamQuality(QnCamDisplay* display)
-{
-    for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
-    {
-        if (itr.key()->getArchiveReader()->getQuality() == MEDIA_Quality_Low && itr.value().lqReason != Reason_Small)
-            gotoLowQuality(display, itr.value().lqReason);
-    }
+    if (reason != Reason_Small)
+        m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)

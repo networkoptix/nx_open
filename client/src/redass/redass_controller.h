@@ -33,7 +33,6 @@ private:
     /** try LQ->HQ once more */
     void addHQTry(); 
 
-    void updateStreamQuality(QnCamDisplay* display);
 private:
     enum FindMethod {Find_Biggest, Find_Least};
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
@@ -57,8 +56,9 @@ private:
     int m_hiQualityRetryCounter;
     int m_timerTicks;
 private:
-    QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0);
+    QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason);
+    void optimizeItemsQualityBySize();
 };
 
 #define qnRedAssController QnRedAssController::instance()
