@@ -247,5 +247,6 @@ void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
 
 void QnRedAssController::addHQTry()
 {
+    m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
