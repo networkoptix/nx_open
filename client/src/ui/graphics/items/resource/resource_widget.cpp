@@ -110,7 +110,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_options(DisplaySelectionOverlay | DisplayButtons | DisplayCrosshair),
+    m_options(DisplaySelectionOverlay | DisplayButtons),
     m_localActive(false),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),

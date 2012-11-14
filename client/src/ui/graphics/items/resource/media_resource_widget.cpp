@@ -397,7 +397,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
 
         QPointF center = rect.center();
         qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
-        qreal d1 = d0 / 5.0;
+        qreal d1 = d0 / 8.0;
 
         qreal dx = d1 * 3.0;
         while(dx < rect.width() / 2.0) {
@@ -415,7 +415,18 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             dy += d1;
         }
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(0, 0, 0, 196)));
+        for(int i = 0; i < 4; i++) {
+            qreal a = M_PI * (0.25 + 0.5 * i);
+            qreal sin = std::sin(a);
+            qreal cos = std::cos(a);
+            QPointF v0(cos, sin), v1(-sin, cos);
+
+            crosshairLines
+                << center + v0 * d1 << center + v0 * d0
+                << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
+        }
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(128, 0, 0, 196)));
         painter->drawLines(crosshairLines);
     }
 }
@@ -823,7 +834,10 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    setOption(ControlPtz, checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::HasPtz));
+    bool ptzEnabled = checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::HasPtz);
+
+    setOption(ControlPtz, ptzEnabled);
+    setOption(DisplayCrosshair, ptzEnabled);
 
     if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton, false);
