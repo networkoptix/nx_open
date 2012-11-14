@@ -391,10 +391,38 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             paintFilledRegionPath(painter, rect, m_motionSelectionPathCache[channel], color, color);
         }
     }
+
+    if(options() & DisplayCrosshair) {
+        QVector<QPointF> crosshairLines; // TODO: cache these?
+
+        QPointF center = rect.center();
+        qreal d0 = qMin(rect.width(), rect.height()) / 4.0;
+        qreal d1 = d0 / 5.0;
+
+        qreal dx = d1 * 3.0;
+        while(dx < rect.width() / 2.0) {
+            crosshairLines 
+                << center + QPointF( dx, d1 / 2.0) << center + QPointF( dx, -d1 / 2.0)
+                << center + QPointF(-dx, d1 / 2.0) << center + QPointF(-dx, -d1 / 2.0);
+            dx += d1;
+        }
+
+        qreal dy = d1 * 3.0;
+        while(dy < rect.height() / 2.0) {
+            crosshairLines 
+                << center + QPointF(d1 / 2.0,  dy) << center + QPointF(-d1 / 2.0,  dy)
+                << center + QPointF(d1 / 2.0, -dy) << center + QPointF(-d1 / 2.0, -dy);
+            dy += d1;
+        }
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(0, 0, 0, 196)));
+        painter->drawLines(crosshairLines);
+    }
 }
 
-// 5-7 fps
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion) {
+    // 5-7 fps
+
     ensureMotionSensitivity();
 
     qreal xStep = rect.width() / MD_WIDTH;
@@ -402,79 +430,48 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
 
     QVector<QPointF> gridLines[2];
 
-/* // saved for comparison
-    for (int x = 0; x < MD_WIDTH; ++x) {
-        if (m_motionSensitivity[channel].isEmpty()) {
-            gridLines << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
-        } else {
-            QRegion lineRect(x, 0, 1, MD_HEIGHT + 1);
-            QRegion drawRegion = lineRect - m_motionSensitivity[channel].getMotionMask().intersect(lineRect);
-            foreach(const QRect& r, drawRegion.rects())
-            gridLines << QPointF(x * xStep, r.top() * yStep) << QPointF(x * xStep, qMin(rect.height(), (r.top() + r.height()) * yStep));
-        }
-    }
-
-    for (int y = 0; y < MD_HEIGHT; ++y) {
-        if (m_motionSensitivity[channel].isEmpty()) {
-            gridLines << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
-        } else {
-            QRegion lineRect(0, y, MD_WIDTH + 1, 1);
-            QRegion drawRegion = lineRect - m_motionSensitivity[channel].getMotionMask().intersect(lineRect);
-            foreach(const QRect& r, drawRegion.rects())
-                gridLines << QPointF(r.left() * xStep, y * yStep) << QPointF(qMin(rect.width(), (r.left() + r.width()) * xStep), y * yStep);
-        }
-    }
-*/
-
     if (motion && motion->channelNumber == (quint32)channel) {
+        // 2-3 fps
+
         ensureBinaryMotionMask();
         motion->removeMotion(m_binaryMotionMask[channel]);
-        // 2-3 fps
-        { //horizontal lines
 
-            for (int y = 1; y < MD_HEIGHT; ++y) {
-                bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
-                gridLines[isMotion] << QPointF(0, y * yStep);
-                int x = 1;
-                while(x < MD_WIDTH){
-                    while (x < MD_WIDTH && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)) )
-                       x++;
+        /* Horizontal lines. */
+        for (int y = 1; y < MD_HEIGHT; ++y) {
+            bool isMotion = motion->isMotionAt(0, y - 1) || motion->isMotionAt(0, y);
+            gridLines[isMotion] << QPointF(0, y * yStep);
+            int x = 1;
+            while(x < MD_WIDTH){
+                while (x < MD_WIDTH && isMotion == (motion->isMotionAt(x, y - 1) || motion->isMotionAt(x, y)) )
+                    x++;
+                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                if (x < MD_WIDTH){
+                    isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                    if (x < MD_WIDTH){
-                        isMotion = !isMotion;
-                        gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                    }
                 }
             }
-
         }
 
-        { //vertical lines
-
-            for (int x = 1; x < MD_WIDTH; ++x) {
-                bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
-                gridLines[isMotion] << QPointF(x * xStep, 0);
-                int y = 1;
-                while(y < MD_HEIGHT){
-                    while (y < MD_HEIGHT && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)) )
-                       y++;
+        /* Vertical lines. */
+        for (int x = 1; x < MD_WIDTH; ++x) {
+            bool isMotion = motion->isMotionAt(x - 1, 0) || motion->isMotionAt(x, 0);
+            gridLines[isMotion] << QPointF(x * xStep, 0);
+            int y = 1;
+            while(y < MD_HEIGHT){
+                while (y < MD_HEIGHT && isMotion == (motion->isMotionAt(x - 1, y) || motion->isMotionAt(x, y)) )
+                    y++;
+                gridLines[isMotion] << QPointF(x * xStep, y * yStep);
+                if (y < MD_HEIGHT){
+                    isMotion = !isMotion;
                     gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                    if (y < MD_HEIGHT){
-                        isMotion = !isMotion;
-                        gridLines[isMotion] << QPointF(x * xStep, y * yStep);
-                    }
                 }
             }
-
         }
     } else {
-        for (int x = 1; x < MD_WIDTH; ++x) {
+        for (int x = 1; x < MD_WIDTH; ++x)
             gridLines[0] << QPointF(x * xStep, 0.0) << QPointF(x * xStep, rect.height());
-        }
-
-        for (int y = 1; y < MD_HEIGHT; ++y) {
+        for (int y = 1; y < MD_HEIGHT; ++y)
             gridLines[0] << QPointF(0.0, y * yStep) << QPointF(rect.width(), y * yStep);
-        }
     }
 
 
@@ -489,8 +486,9 @@ void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, cons
     painter->drawLines(gridLines[1]);
 }
 
-// 4-6 fps
 void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRectF &rect, const QPainterPath &path, const QColor &color, const QColor &penColor) {
+    // 4-6 fps
+
     QnScopedPainterTransformRollback transformRollback(painter); Q_UNUSED(transformRollback)
 
     QnScopedPainterBrushRollback brushRollback(painter, color); Q_UNUSED(brushRollback)
