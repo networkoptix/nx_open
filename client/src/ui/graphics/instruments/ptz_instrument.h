@@ -39,10 +39,8 @@ protected:
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
-    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool animationEvent(AnimationEvent *event) override;
-
-    virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
+    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
 
     virtual bool hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
     virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
@@ -69,9 +67,9 @@ private:
     PtzSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
 private:
-    QBasicTimer m_timer;
-
     qreal m_ptzItemZValue;
+    qreal m_expansionSpeed;
+
 
     QWeakPointer<QnMediaResourceWidget> m_target;
 

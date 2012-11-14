@@ -18,6 +18,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/animation/animation_event.h>
+#include <ui/style/globals.h>
 
 namespace {
     const QColor ptzColor(128, 128, 255, 255);
@@ -60,18 +61,13 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         painter->fillRect(m_rect, m_brush);
+        //painter->fillRect(m_rect, Qt::green);
     }
         
 private:
     QBrush m_brush;
     QRectF m_rect;
 };
-
-
-// -------------------------------------------------------------------------- //
-// PtzSelectionItem
-// -------------------------------------------------------------------------- //
-
 
 
 // -------------------------------------------------------------------------- //
@@ -85,7 +81,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneHoverEnter, QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), 
         parent
     ),
-    m_ptzItemZValue(0.0)
+    m_ptzItemZValue(0.0),
+    m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
     // TODO: check validity of isWaiting / isRunning calls in this class.
     //dragProcessor()->setStartDragTime(150); /* Almost instant drag. */
@@ -116,7 +113,9 @@ PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
         result = new PtzSplashItem(parentItem);
     }
 
+    result->setBoundingRect(QRectF(0.0, 0.0, 0.0, 0.0));
     result->setOpacity(1.0);
+    result->show();
     m_activeSplashItems.push_back(result);
     return result;
 }
@@ -161,15 +160,28 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
 }
 
 bool PtzInstrument::animationEvent(AnimationEvent *event) {
+    qreal dt = event->deltaTime() / 1000.0;
+    
+    for(int i = m_activeSplashItems.size() - 1; i >= 0; i--) {
+        PtzSplashItem *item = m_activeSplashItems[i];
+
+        qreal opacity = item->opacity();
+        qreal radius = item->boundingRect().width() / 2.0;
+
+        opacity -= dt * 1.0;
+        if(opacity <= 0.0) {
+            item->hide();
+            m_activeSplashItems.removeAt(i);
+            m_freeSplashItems.push_back(item);
+            continue;
+        }
+        radius += dt * m_expansionSpeed;
+
+        item->setOpacity(opacity);
+        item->setBoundingRect(QRectF(QPointF(-radius, -radius), QPointF(radius, radius)));
+    }
+    
     return false;
-}
-
-bool PtzInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) {
-    Q_UNUSED(scene)
-    bool accepted = !dragProcessor()->isWaiting();
-
-    event->setAccepted(accepted);
-    return accepted;
 }
 
 bool PtzInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *) {
@@ -199,7 +211,6 @@ bool PtzInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEven
 }
 
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
-#if 0
     if(event->button() != Qt::LeftButton)
         return false;
 
@@ -210,7 +221,10 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     if(!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
-    if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
+    PtzSplashItem *splashItem = newSplashItem(item);
+    splashItem->setPos(event->pos());
+
+    /*if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
         if(QnMediaServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>()) {
             setServerSpeed(QVector3D(), true);
 
@@ -221,9 +235,7 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
         }
     }
 
-    event->accept();
-    return false;
-#endif
+    event->accept();*/
     return false;
 }
 
