@@ -19,6 +19,7 @@ class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
 class onvifXsd__VideoEncoderConfiguration;
+class onvifXsd__EventCapabilities;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
@@ -51,6 +52,23 @@ struct CameraPhysicalWindowSize
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
 public:
+    class RelayOutputInfo
+    {
+    public:
+        std::string token;
+        bool isBistable;
+        //!Valid only if \a isBistable is \a false
+        std::string delayTime;
+        bool activeByDefault;
+
+        RelayOutputInfo();
+        RelayOutputInfo(
+            const std::string& _token,
+            bool _isBistable,
+            const std::string& _delayTime,
+            bool _activeByDefault );
+    };
+
     enum CODECS
     {
         H264,
@@ -103,6 +121,14 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; };
 
+    //!Implementation of QnSecurityCamResource::getRelayOutputList
+    virtual QStringList getRelayOutputList() const;
+    //!Implementation of QnSecurityCamResource::setRelayOutputState
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeout );
+
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
 
@@ -130,9 +156,10 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
-    void setPtzfUrl(const QString& src);
     QString getPtzfUrl() const;
+    void setPtzfUrl(const QString& src);
 
+    QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec(bool isPrimary) const;
@@ -145,6 +172,10 @@ public:
 
     virtual QnOnvifPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
+
+    //!Relay input with token \a relayToken has changed its state to \a active
+    void notificationReceived( const std::string& relayToken, bool active );
+
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -161,7 +192,6 @@ protected:
 
     virtual void fetchAndSetCameraSettings();
 
-    QString getDeviceOnvifUrl() const;
 private:
     void setMaxFps(int f);
 
@@ -194,6 +224,7 @@ private:
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     void readPtzInfo();
+
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
@@ -237,6 +268,21 @@ private:
     QString m_imagingUrl;
     QString m_ptzUrl;
     int m_timeDrift;
+    int m_prevSoapCallResult;
+    onvifXsd__EventCapabilities* m_eventCapabilities;
+    std::vector<RelayOutputInfo> m_relayOutputInfo;
+    std::vector<std::string> m_relayInputs;
+    std::string m_deviceIOUrl;
+
+    bool registerNotificationConsumer();
+    bool createPullPointSubscription();
+    //!Registeres local NotificationConsumer in resource's NotificationProducer
+    bool registerNotificationHandler();
+    //!Reads relay output list from resource
+    bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
+    bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
+    bool fetchRelayInputInfo();
+    bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
 };
 
 #endif //onvif_resource_h

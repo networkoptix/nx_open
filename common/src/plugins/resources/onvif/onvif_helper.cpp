@@ -350,6 +350,7 @@ bool NameHelper::isManufacturerSupported(const QString& manufacturer) const
     QString tmp = manufacturer.toLower().replace(UNNEEDED_CHARACTERS, QString());
     if (tmp == QLatin1String("sony") ||
         tmp == QLatin1String("brickcom") ||
+        tmp == QLatin1String("axis") ||
         tmp == QLatin1String("digitalwatchdog"))
     {
         return false;

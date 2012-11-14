@@ -1,16 +1,25 @@
+
 #include <climits>
+#include <cmath>
+#include <sstream>
+
 #include <QDebug>
 #include <QHash>
-#include <cmath>
+
+#include <onvif/soapDeviceBindingProxy.h>
+#include <onvif/soapMediaBindingProxy.h>
+#include <onvif/soapNotificationProducerBindingProxy.h>
+#include <onvif/soapEventBindingProxy.h>
 
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
 #include "utils/common/synctime.h"
 #include "utils/common/math.h"
-#include "onvif/soapDeviceBindingProxy.h"
-#include "onvif/soapMediaBindingProxy.h"
 #include "api/app_server_connection.h"
+#include "../../../events/business_event_connector.h"
+#include "../../../soap/soapserver.h"
+
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
 static const float MAX_EPS = 0.01f;
@@ -85,7 +94,28 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 // QnPlOnvifResource
 //
 
-QnPlOnvifResource::QnPlOnvifResource() :
+QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo()
+:
+    isBistable( false ),
+    activeByDefault( false )
+{
+}
+
+QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
+    const std::string& _token,
+    bool _isBistable,
+    const std::string& _delayTime,
+    bool _activeByDefault )
+:
+    token( _token ),
+    isBistable( _isBistable ),
+    delayTime( _delayTime ),
+    activeByDefault( _activeByDefault )
+{
+}
+
+QnPlOnvifResource::QnPlOnvifResource()
+:
     m_onvifAdditionalSettings(0),
     m_physicalParamsMutex(QMutex::Recursive),
     m_advSettingsLastUpdated(QDateTime::currentDateTime()),
@@ -104,11 +134,16 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_needUpdateOnvifUrl(false),
     m_forceCodecFromPrimaryEncoder(false),
     m_ptzController(0),
-    m_timeDrift(0)
+    m_timeDrift(0),
+    m_prevSoapCallResult( 0 ),
+    m_eventCapabilities( NULL )
 {
 }
 
-QnPlOnvifResource::~QnPlOnvifResource() {
+QnPlOnvifResource::~QnPlOnvifResource()
+{
+    QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+
     delete m_onvifAdditionalSettings;
     delete m_ptzController;
 }
@@ -316,6 +351,15 @@ bool QnPlOnvifResource::initInternal()
 
     if (m_ptzController)
         addCameraCapabilities(HasPtz);
+
+    //registering onvif event handler
+    std::vector<QnPlOnvifResource::RelayOutputInfo> relayOutputs;
+    fetchRelayOutputs( &relayOutputs );
+    if( relayOutputs.size() > 0 )
+        setRelayOutputState( QString::fromStdString(relayOutputs.front().token), true, 12 );
+    fetchRelayInputInfo();
+    //if( !m_relayInputs.empty() )
+        registerNotificationHandler();
 
     save();
 
@@ -573,6 +617,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         if (response.Capabilities) 
         {
             //TODO:UTF unuse std::string
+            if (response.Capabilities->Events)
+                m_eventCapabilities = new onvifXsd__EventCapabilities( *response.Capabilities->Events );
+
             if (response.Capabilities->Media) 
             {
                 setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
@@ -589,6 +636,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             {
                 setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
             }
+            m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
+                ? response.Capabilities->Extension->DeviceIO->XAddr
+                : getDeviceOnvifUrl().toStdString();
         }
     }
 
@@ -605,7 +655,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             result = false;
         }
 
-        QString mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
+        const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
 
         if (!mac.isEmpty()) 
             setMAC(mac);
@@ -614,7 +664,6 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         {
             setPhysicalId(hardwareId);
         }
-            
     }
 
     return result;
@@ -997,7 +1046,103 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
     return result;
 }
 
-int  QnPlOnvifResource::getH264StreamProfile(const VideoOptionsResp& response)
+static QString getRelayOutpuToken( const QnPlOnvifResource::RelayOutputInfo& relayInfo )
+{
+    return QString::fromStdString( relayInfo.token );
+}
+
+//!Implementation of QnSecurityCamResource::getRelayOutputList
+QStringList QnPlOnvifResource::getRelayOutputList() const
+{
+    QStringList idList;
+    std::transform(
+        m_relayOutputInfo.begin(),
+        m_relayOutputInfo.end(),
+        std::back_inserter(idList),
+        getRelayOutpuToken );
+    return idList;
+}
+
+//!Implementation of QnSecurityCamResource::setRelayOutputState
+bool QnPlOnvifResource::setRelayOutputState(
+    const QString& outputID,
+    bool active,
+    unsigned int autoResetTimeout )
+{
+    //{
+    //    const QAuthenticator& auth = getAuth();
+    //    DeviceIOWrapper soapWrapper(
+    //        m_deviceIOUrl,
+    //        auth.user().toStdString(),
+    //        auth.password().toStdString(),
+    //        m_timeDrift );
+
+    //    std::string relayOutputToken = outputID.toStdString();
+    //    _onvifDeviceIO__GetRelayOutputOptions request;
+    //    request.RelayOutputToken = &relayOutputToken;
+    //    _onvifDeviceIO__GetRelayOutputOptionsResponse response;
+    //    m_prevSoapCallResult = soapWrapper.getRelayOutputOptions( request, response );
+    //}
+
+    //retrieving output info to check mode
+    RelayOutputInfo relayOutputInfo;
+    if( !fetchRelayOutputInfo( outputID.toStdString(), &relayOutputInfo ) )
+    {
+        cl_log.log( QString::fromAscii("Failed to get relay output %1 info").arg(outputID), cl_logWARNING );
+        return false;
+    }
+
+    const bool isBistableModeRequired = autoResetTimeout == 0;
+    std::string requiredDelayTime;
+    if( autoResetTimeout > 0 )
+    {
+        std::ostringstream ss;
+        ss<<"PT"<<autoResetTimeout<<"S";
+        requiredDelayTime = ss.str();
+    }
+    if( (relayOutputInfo.isBistable != isBistableModeRequired) || (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) )
+    {
+        //switching output to required mode
+        relayOutputInfo.isBistable = isBistableModeRequired;
+        relayOutputInfo.delayTime = requiredDelayTime;
+        if( !setRelayOutputSettings( relayOutputInfo ) )
+        {
+            cl_log.log( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 sec. Cannot set mode to %5. %6").
+                arg(QString()).arg(outputID).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeout).
+                arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")).arg(m_prevSoapCallResult), cl_logWARNING );
+            return false;
+        }
+
+        cl_log.log( QString::fromAscii("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
+            arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
+    }
+
+    //modifing output
+    const QAuthenticator& auth = getAuth();
+    DeviceSoapWrapper soapWrapper(
+        getDeviceOnvifUrl().toStdString(),
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    _onvifDevice__SetRelayOutputState request;
+    request.RelayOutputToken = outputID.toStdString();
+    request.LogicalState = active ? onvifXsd__RelayLogicalState__active : onvifXsd__RelayLogicalState__inactive;
+    _onvifDevice__SetRelayOutputStateResponse response;
+    m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        cl_log.log( QString::fromAscii("Failed to set relay %1 output state to %2. endpoint %3").
+            arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return false;
+    }
+
+    cl_log.log( QString::fromAscii("Successfully set relay %1 output state to %2. endpoint %3").
+        arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+    return true;
+}
+
+int QnPlOnvifResource::getH264StreamProfile(const VideoOptionsResp& response)
 {
     if (!response.Options || !response.Options->H264)
         return -1; // inform do not change profile
@@ -1748,4 +1893,224 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
 QnOnvifPtzController* QnPlOnvifResource::getPtzController()
 {
     return m_ptzController;
+}
+
+bool QnPlOnvifResource::registerNotificationHandler()
+{
+    if( !m_eventCapabilities )
+        return false;
+
+    if( QnSoapServer::instance()->initialized() )
+        return registerNotificationConsumer();
+    else if( m_eventCapabilities->WSPullPointSupport )
+        return createPullPointSubscription();
+    else
+        return false;
+}
+
+bool QnPlOnvifResource::registerNotificationConsumer()
+{
+    const QAuthenticator& auth = getAuth();
+    NotificationProducerSoapWrapper soapWrapper(
+        m_eventCapabilities->XAddr,
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    //providing local gsoap server url
+    _oasisWsnB2__Subscribe request;
+    ns1__EndpointReferenceType notificationConsumerEndPoint;
+    ns1__AttributedURIType notificationConsumerEndPointAddress;
+    std::ostringstream ss;
+    ss<<"http://";
+    ss<<"10.0.2.120";   //TODO/IMPL get local address reachable by device
+    ss<<":"<<QnSoapServer::instance()->port()<<QnSoapServer::instance()->path().toStdString();
+    notificationConsumerEndPointAddress.__item = ss.str();
+    notificationConsumerEndPoint.Address = &notificationConsumerEndPointAddress;
+    request.ConsumerReference = &notificationConsumerEndPoint;
+    //_oasisWsnB2__Subscribe_SubscriptionPolicy subscriptionPolicy;
+    //subscriptionPolicy.__any.push_back( "<wsnt:UseRaw/>" );   //TODO
+    //oasisWsnB2__FilterType filter;
+    //filter.__item = "HUY";
+    //filter.__any.push_back( "PIZDA1" );
+    //filter.__any.push_back( "PIZDA-DA-DA" );
+    //request.Filter = &filter;
+    //request.SubscriptionPolicy = &subscriptionPolicy;
+    //TODO/IMPL setting InitialTerminationTime (if supported)
+    std::string initialTerminationTime = "PT600S";
+    request.InitialTerminationTime = &initialTerminationTime;
+
+    _oasisWsnB2__SubscribeResponse response;
+    m_prevSoapCallResult = soapWrapper.Subscribe( &request, &response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
+    {
+        cl_log.log( QString::fromAscii("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return false;
+    }
+
+    std::string subscriptionID;
+    if( response.SubscriptionReference &&
+        response.SubscriptionReference->ns1__ReferenceParameters &&
+        response.SubscriptionReference->ns1__ReferenceParameters->__item )
+    {
+        //TODO/IMPL parsing to retrieve subscriptionId. Example: "<dom0:SubscriptionId xmlns:dom0=\"(null)\">0</dom0:SubscriptionId>"
+    }
+
+    //TODO/IMPL launch renew-subscription timer
+
+    QnSoapServer::instance()->getService()->registerResource(
+        this,
+        QUrl(QString::fromStdString(m_eventCapabilities->XAddr)).host() );
+
+    cl_log.log( QString::fromAscii("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logDEBUG1 );
+    return true;
+}
+
+bool QnPlOnvifResource::createPullPointSubscription()
+{
+    return false;   //not implemented yet
+
+    const QAuthenticator& auth = getAuth();
+    EventSoapWrapper soapWrapper(
+        m_eventCapabilities->XAddr,
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    _onvifEvents__CreatePullPointSubscription request;
+    std::string initialTerminationTime = "PT600S";
+    request.InitialTerminationTime = &initialTerminationTime;
+    _onvifEvents__CreatePullPointSubscriptionResponse response;
+    m_prevSoapCallResult = soapWrapper.createPullPointSubscription( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )    //TODO/IMPL find out which is error and which is not
+    {
+        cl_log.log( QString::fromAscii("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return false;
+    }
+
+    //TODO/IMPL initialize "pull-event" timer
+
+    return true;
+}
+
+bool QnPlOnvifResource::fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs )
+{
+    const QAuthenticator& auth = getAuth();
+    DeviceSoapWrapper soapWrapper(
+        getDeviceOnvifUrl().toStdString(),
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    _onvifDevice__GetRelayOutputs request;
+    _onvifDevice__GetRelayOutputsResponse response;
+    m_prevSoapCallResult = soapWrapper.getRelayOutputs( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        cl_log.log( QString::fromAscii("Failed to get relay input/output info. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return false;
+    }
+
+    m_relayOutputInfo.clear();
+    for( size_t i = 0; i < response.RelayOutputs.size(); ++i )
+    {
+        m_relayOutputInfo.push_back( RelayOutputInfo( 
+            response.RelayOutputs[i]->token,
+            response.RelayOutputs[i]->Properties->Mode == onvifXsd__RelayMode__Bistable,
+            response.RelayOutputs[i]->Properties->DelayTime,
+            response.RelayOutputs[i]->Properties->IdleState == onvifXsd__RelayIdleState__open ) );
+    }
+
+    if( relayOutputs )
+        *relayOutputs = m_relayOutputInfo;
+
+    cl_log.log( QString::fromAscii("Successfully got device (%1) IO ports info. Found %2 digital input and %3 relay output").
+        arg(QString::fromAscii(soapWrapper.endpoint())).arg(0).arg(m_relayOutputInfo.size()), cl_logDEBUG1 );
+
+    return true;
+}
+
+bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo )
+{
+    fetchRelayOutputs( NULL );
+    for( std::vector<RelayOutputInfo>::size_type
+         i = 0;
+         i < m_relayOutputInfo.size();
+        ++i )
+    {
+        if( m_relayOutputInfo[i].token == outputID )
+        {
+            *relayOutputInfo = m_relayOutputInfo[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool QnPlOnvifResource::fetchRelayInputInfo()
+{
+    if( m_deviceIOUrl.empty() )
+        return false;
+
+    const QAuthenticator& auth = getAuth();
+    DeviceIOWrapper soapWrapper(
+        m_deviceIOUrl,
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    _onvifDeviceIO__GetDigitalInputs request;
+    _onvifDeviceIO__GetDigitalInputsResponse response;
+    m_prevSoapCallResult = soapWrapper.getDigitalInputs( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        cl_log.log( QString::fromAscii("Failed to get relay digital input list. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return true;
+    }
+
+    return true;
+}
+
+void QnPlOnvifResource::notificationReceived( const std::string& relayToken, bool active )
+{
+    int x = 0;
+    //firing signal
+    //QnBusinessEventConnector::instance()->at_cameraInput(
+    //    this, //TODO/IMPL get shared pointer
+    //    relayToken,
+    //    active,
+    //    QDateTime::currentMSecsSinceEpoch() );
+}
+
+bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )
+{
+    const QAuthenticator& auth = getAuth();
+    DeviceSoapWrapper soapWrapper(
+        getDeviceOnvifUrl().toStdString(),
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    cl_log.log( QString::fromLatin1("Swiching camera %1 relay output %2 to monostable mode").
+        arg(QString::fromAscii(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)), cl_logDEBUG1 );
+
+    //switching to monostable mode
+    _onvifDevice__SetRelayOutputSettings setOutputSettingsRequest;
+    setOutputSettingsRequest.RelayOutputToken = relayOutputInfo.token;
+    onvifXsd__RelayOutputSettings relayOutputSettings;
+    relayOutputSettings.Mode = relayOutputInfo.isBistable ? onvifXsd__RelayMode__Bistable : onvifXsd__RelayMode__Monostable;
+    relayOutputSettings.DelayTime = relayOutputInfo.delayTime;
+    relayOutputSettings.IdleState = onvifXsd__RelayIdleState__closed;
+    setOutputSettingsRequest.Properties = &relayOutputSettings;
+    _onvifDevice__SetRelayOutputSettingsResponse setOutputSettingsResponse;
+    m_prevSoapCallResult = soapWrapper.setRelayOutputSettings( setOutputSettingsRequest, setOutputSettingsResponse );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        cl_log.log( QString::fromAscii("Failed to switch camera %1 relay output %2 to monostable mode. %3").
+            arg(QString::fromAscii(soapWrapper.endpoint())).arg(QString::fromStdString(relayOutputInfo.token)).arg(m_prevSoapCallResult), cl_logWARNING );
+        return false;
+    }
+
+    return true;
 }

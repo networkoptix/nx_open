@@ -36,6 +36,7 @@
 #include "settings.h"
 
 #include <fstream>
+#include "soap/soapserver.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
@@ -585,6 +586,7 @@ void QnMain::initTcpListener()
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->start();
     m_progressiveDownloadingServer->enableSSLMode();
     m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
     m_restServer->start();
@@ -734,7 +736,9 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
     //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+#ifndef _DEBUG
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
+#endif
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
     //Onvif searcher should be the last:
@@ -781,6 +785,10 @@ void QnMain::run()
 
 
     connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
+
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
 
     exec();
 }
@@ -849,8 +857,13 @@ void stopServer(int signal)
 
 #include "api/session_manager.h"
 
+//#include <onvif/soapH.h>
+
 int main(int argc, char* argv[])
 {
+    //soap_serve( soap_new() );
+
+
     QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);

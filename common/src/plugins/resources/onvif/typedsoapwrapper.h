@@ -1,22 +1,19 @@
-#ifndef onvif_soap_wrapper_h
-#define onvif_soap_wrapper_h
 
-#include "onvif_helper.h"
+#if 0
 
-struct soap;
+#ifndef TYPEDSOAPWRAPPER_H
+#define TYPEDSOAPWRAPPER_H
+
+#include "soap_wrapper.h"
+
+
 class DeviceBindingProxy;
-class DeviceIOBindingProxy;
 class MediaBindingProxy;
 class PTZBindingProxy;
 class ImagingBindingProxy;
-class NotificationProducerBindingProxy;
-class CreatePullPointBindingProxy;
-class EventBindingProxy;
 
 class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
-class _onvifDevice__GetServiceCapabilities;
-class _onvifDevice__GetServiceCapabilitiesResponse;
 class _onvifDevice__GetCapabilities;
 class _onvifDevice__GetCapabilitiesResponse;
 class _onvifDevice__GetSystemDateAndTime;
@@ -27,24 +24,10 @@ class _onvifDevice__GetNetworkInterfaces;
 class _onvifDevice__GetNetworkInterfacesResponse;
 class _onvifDevice__SetSystemFactoryDefault;
 class _onvifDevice__SetSystemFactoryDefaultResponse;
-class _onvifDevice__GetRelayOutputs;
-class _onvifDevice__GetRelayOutputsResponse;
-class _onvifDevice__SetRelayOutputState;
-class _onvifDevice__SetRelayOutputStateResponse;
-class _onvifDevice__SetRelayOutputSettings;
-class _onvifDevice__SetRelayOutputSettingsResponse;
 class _onvifDevice__SystemReboot;
 class _onvifDevice__SystemRebootResponse;
 class _onvifMedia__GetCompatibleMetadataConfigurations;
 class _onvifMedia__GetCompatibleMetadataConfigurationsResponse;
-
-
-class _onvifDeviceIO__GetDigitalInputs;
-class _onvifDeviceIO__GetDigitalInputsResponse;
-class _onvifDeviceIO__GetRelayOutputOptions;
-class _onvifDeviceIO__GetRelayOutputOptionsResponse;
-class _onvifDeviceIO__SetRelayOutputSettings;
-class _onvifDeviceIO__SetRelayOutputSettingsResponse;
 
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
@@ -197,68 +180,6 @@ class _onvifPtz__StopResponse;
 class _onvifPtz__Stop;
 class onvifPtz__StopResponse;
 
-class _oasisWsnB2__Subscribe;
-class _oasisWsnB2__SubscribeResponse;
-
-class _oasisWsnB2__CreatePullPoint;
-class _oasisWsnB2__CreatePullPointResponse;
-
-class _onvifEvents__CreatePullPointSubscription;
-class _onvifEvents__CreatePullPointSubscriptionResponse;
-
-
-//
-// SoapWrapper
-//
-
-template <class T>
-class SoapWrapper
-{
-public:
-    SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
-    virtual ~SoapWrapper();
-
-    soap* getSoap();
-    const T* getProxy() const { return m_soapProxy; }
-    T* getProxy() { return m_soapProxy; }
-    const char* endpoint() const { return m_endpoint; }
-    const char* getLogin();
-    const char* getPassword();
-    int getTimeDrift();
-    const QString getLastError();
-    const QString getEndpointUrl();
-    bool isNotAuthenticated();
-    bool isConflictError();
-    void setLoginPassword(const std::string& login, const std::string& passwd);
-
-    //!Invokes method \a methodToInvoke, which is member of \a T, with pre-supplied endpoint, username and password
-    template<class RequestType, class ResponseType>
-        int invokeMethod(
-            int (T::*methodToInvoke)( const char*, const char*, RequestType*, ResponseType* ),
-            RequestType* const request,
-            ResponseType* const response )
-    {
-        beforeMethodInvocation();
-        return (m_soapProxy->*methodToInvoke)( m_endpoint, NULL, request, response );
-    }
-
-protected:
-    T* m_soapProxy;
-    char* m_endpoint;
-
-    void beforeMethodInvocation();
-
-private:
-    char* m_login;
-    char* m_passwd;
-    bool invoked;
-    int m_timeDrift;
-
-    SoapWrapper();
-    SoapWrapper(const SoapWrapper<T>&);
-
-    void cleanLoginPassword();
-};
 
 //
 // DeviceSoapWrapper
@@ -277,11 +198,6 @@ public:
     //Input: normalized manufacturer
     bool fetchLoginPassword(const QString& manufacturer);
 
-    int getServiceCapabilities( _onvifDevice__GetServiceCapabilities& request, _onvifDevice__GetServiceCapabilitiesResponse& response );
-    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
-    int setRelayOutputState( _onvifDevice__SetRelayOutputState& request, _onvifDevice__SetRelayOutputStateResponse& response );
-    int setRelayOutputSettings( _onvifDevice__SetRelayOutputSettings& request, _onvifDevice__SetRelayOutputSettingsResponse& response );
-
     int getCapabilities(CapabilitiesReq& request, CapabilitiesResp& response);
     int getDeviceInformation(DeviceInfoReq& request, DeviceInfoResp& response);
     int getNetworkInterfaces(NetIfacesReq& request, NetIfacesResp& response);
@@ -296,30 +212,6 @@ public:
 private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
-};
-
-class DeviceIOWrapper
-:
-    public SoapWrapper<DeviceIOBindingProxy>
-{
-public:
-    DeviceIOWrapper(
-        const std::string& endpoint,
-        const std::string& login,
-        const std::string& passwd,
-        int _timeDrift );
-    virtual ~DeviceIOWrapper();
-
-    int getDigitalInputs(
-        _onvifDeviceIO__GetDigitalInputs& request,
-        _onvifDeviceIO__GetDigitalInputsResponse& response );
-    int getRelayOutputs( _onvifDevice__GetRelayOutputs& request, _onvifDevice__GetRelayOutputsResponse& response );
-    int getRelayOutputOptions( _onvifDeviceIO__GetRelayOutputOptions& request, _onvifDeviceIO__GetRelayOutputOptionsResponse& response );
-    int setRelayOutputSettings( _onvifDeviceIO__SetRelayOutputSettings& request, _onvifDeviceIO__SetRelayOutputSettingsResponse& response );
-
-private:
-    DeviceIOWrapper();
-    DeviceIOWrapper( const DeviceIOWrapper& );
 };
 
 //
@@ -422,51 +314,6 @@ private:
 
 typedef QSharedPointer<ImagingSoapWrapper> ImagingSoapWrapperPtr;
 
+#endif  //TYPEDSOAPWRAPPER_H
 
-class NotificationProducerSoapWrapper
-:
-    public SoapWrapper<NotificationProducerBindingProxy>
-{
-public:
-    NotificationProducerSoapWrapper(
-        const std::string& endpoint,
-        const std::string& login,
-        const std::string& passwd,
-        int _timeDrift );
-
-    int Subscribe(
-        _oasisWsnB2__Subscribe* const request,
-        _oasisWsnB2__SubscribeResponse* const response );
-};
-
-class CreatePullPointSoapWrapper
-:
-    public SoapWrapper<CreatePullPointBindingProxy>
-{
-public:
-    CreatePullPointSoapWrapper(
-        const std::string& endpoint,
-        const std::string& login,
-        const std::string& passwd,
-        int _timeDrift );
-
-	int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
-};
-
-class EventSoapWrapper
-:
-    public SoapWrapper<EventBindingProxy>
-{
-public:
-    EventSoapWrapper(
-        const std::string& endpoint,
-        const std::string& login,
-        const std::string& passwd,
-        int _timeDrift );
-
-	int createPullPointSubscription(
-        _onvifEvents__CreatePullPointSubscription& request,
-        _onvifEvents__CreatePullPointSubscriptionResponse& response );
-};
-
-#endif //onvif_soap_wrapper_h
+#endif
