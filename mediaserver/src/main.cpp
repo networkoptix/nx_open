@@ -63,7 +63,7 @@
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
-#include "rest/handlers/gettime_handler.h"
+#include "rest/handlers/time_handler.h"
 #include "platform/platform_abstraction.h"
 #include "rest/handlers/version_handler.h"
 
@@ -565,8 +565,8 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
-    QnRestConnectionProcessor::registerHandler("api/version", new QnGetVersionHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/version", new QnVersionHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

@@ -1,14 +1,14 @@
-#include "gettime_handler.h"
+#include "time_handler.h"
 #include "utils/network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 
-QnGetTimeHandler::QnGetTimeHandler()
+QnTimeHandler::QnTimeHandler()
 {
 
 }
 
-int QnGetTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+int QnTimeHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
 {
     int offset = currentTimeZone();
     QString offsetStr = QString::number(offset);
@@ -20,13 +20,13 @@ int QnGetTimeHandler::executeGet(const QString& path, const QnRequestParamList& 
     return CODE_OK;
 }
 
-int QnGetTimeHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
+int QnTimeHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
     Q_UNUSED(body)
     return executeGet(path, params, result, contentType);
 }
 
-QString QnGetTimeHandler::description(TCPSocket* tcpSocket) const
+QString QnTimeHandler::description(TCPSocket* tcpSocket) const
 {
     Q_UNUSED(tcpSocket)
     QString rez;
