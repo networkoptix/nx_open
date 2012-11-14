@@ -120,10 +120,10 @@ void MotionSelectionInstrument::ensureSelectionItem() {
     m_selectionItem = new SelectionItem();
     selectionItem()->setVisible(false);
     
-    if(m_colors[SelectionItem::Base].isValid())
-        selectionItem()->setColor(SelectionItem::Base, m_colors[SelectionItem::Base]);
     if(m_colors[SelectionItem::Border].isValid())
         selectionItem()->setColor(SelectionItem::Border, m_colors[SelectionItem::Border]);
+    if(m_colors[SelectionItem::Base].isValid())
+        selectionItem()->setColor(SelectionItem::Base, m_colors[SelectionItem::Base]);
 
     if(scene() != NULL)
         scene()->addItem(selectionItem());

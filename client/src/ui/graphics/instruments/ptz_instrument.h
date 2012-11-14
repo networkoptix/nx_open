@@ -11,6 +11,7 @@
 
 class QnMediaResourceWidget;
 
+class SelectionItem;
 class PtzSplashItem;
 
 class PtzInstrument: public DragProcessingInstrument {
@@ -40,11 +41,8 @@ protected:
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
     virtual bool animationEvent(AnimationEvent *event) override;
-    virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
 
-    virtual bool hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
-    virtual bool hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
-    virtual bool hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) override;
+    virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
@@ -66,12 +64,22 @@ private:
     
     PtzSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
+    SelectionItem *selectionItem() const {
+        return m_selectionItem.data();
+    }
+
+    void ensureSelectionItem();
+
 private:
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
-
+    QWeakPointer<SelectionItem> m_selectionItem;
+    QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
+
+    bool m_isClick;
+    bool m_ptzStartedEmitted;
 
     QList<PtzSplashItem *> m_freeSplashItems, m_activeSplashItems;
 

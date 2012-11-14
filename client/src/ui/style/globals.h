@@ -37,6 +37,9 @@ public:
         NO_RECORD_COLOR,
         MRS_COLOR,
         RECORD_ALWAYS_COLOR,
+        
+        PTZ_COLOR,
+
         OPACITY_CHANGE_PERIOD,
 
         SELECTION_OPACITY_DELTA,
@@ -82,6 +85,8 @@ private:
         QN_DECLARE_R_PROPERTY(QColor,   motionMaskColor,                MOTION_MASK_COLOR,                      QColor(180, 180, 180, 96))
         QN_DECLARE_R_PROPERTY(QColor,   frameColor,                     FRAME_COLOR,                            QColor(128, 128, 128, 196))
         QN_DECLARE_R_PROPERTY(QColor,   selectedFrameColor,             SELECTED_FRAME_COLOR,                   QColor(64, 130, 180, 128))
+        QN_DECLARE_R_PROPERTY(QColor,   ptzColor,                       PTZ_COLOR,                              QColor(128, 196, 255, 255))
+
         QN_DECLARE_R_PROPERTY(int,      opacityChangePeriod,            OPACITY_CHANGE_PERIOD,                  250)
         QN_DECLARE_R_PROPERTY(QColor,   errorTextColor,                 ERROR_TEXT_COLOR,                       QColor(255, 64, 64))
         QN_DECLARE_R_PROPERTY(qreal,    workbenchUnitSize,              WORKBENCH_UNIT_SIZE,                    10000.0) /* Graphics scene has problems with handling mouse events on small scales, so the larger this number, the better. */

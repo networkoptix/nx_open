@@ -20,8 +20,10 @@
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 
+#include "selection_item.h"
+
 namespace {
-    const QColor ptzColor(128, 128, 255, 255);
+    const QColor ptzColor = qnGlobals->ptzColor();
 
 } // anonymous namespace
 
@@ -33,6 +35,11 @@ class PtzSplashItem: public QGraphicsObject {
     typedef QGraphicsObject base_type;
 
 public:
+    enum Type {
+        Circular,
+        Rectangular
+    };
+
     PtzSplashItem(QGraphicsItem *parent = NULL):
         base_type(parent)
     {
@@ -61,7 +68,6 @@ public:
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
         painter->fillRect(m_rect, m_brush);
-        //painter->fillRect(m_rect, Qt::green);
     }
         
 private:
@@ -75,10 +81,10 @@ private:
 // -------------------------------------------------------------------------- //
 PtzInstrument::PtzInstrument(QObject *parent): 
     base_type(
-        makeSet(QEvent::MouseMove, AnimationEvent::Animation),
+        makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneWheel),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneHoverEnter, QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), 
+        makeSet(),
+        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
         parent
     ),
     m_ptzItemZValue(0.0),
@@ -120,14 +126,25 @@ PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     return result;
 }
 
+void PtzInstrument::ensureSelectionItem() {
+    if(selectionItem() != NULL)
+        return;
 
+    m_selectionItem = new SelectionItem();
+    selectionItem()->setVisible(false);
+    selectionItem()->setColor(SelectionItem::Border, toTransparent(ptzColor, 0.75));
+    selectionItem()->setColor(SelectionItem::Base, toTransparent(ptzColor.lighter(120), 0.5));
+
+    if(scene() != NULL)
+        scene()->addItem(selectionItem());
+}
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
 void PtzInstrument::installedNotify() {
-    //assert(ptzItem() == NULL);
+    assert(selectionItem() == NULL);
 
     base_type::installedNotify();
 }
@@ -135,8 +152,8 @@ void PtzInstrument::installedNotify() {
 void PtzInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
-    /*if(ptzItem())
-        delete ptzItem();*/
+    if(selectionItem())
+        delete selectionItem();
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
@@ -184,29 +201,9 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
     return false;
 }
 
-bool PtzInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *) {
-    /* Make sure ptz item is displayed on the viewport where the mouse is. */
-    //ptzItem()->setViewport(viewport);
+bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
+    m_viewport = viewport;
 
-    return false;
-}
-
-bool PtzInstrument::hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
-    Q_UNUSED(event)
-    QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
-    setTarget(target);
-
-    return false;
-}
-
-bool PtzInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
-    return hoverEnterEvent(item, event);
-}
-
-bool PtzInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
-    Q_UNUSED(item)
-    Q_UNUSED(event)
-    
     return false;
 }
 
@@ -221,8 +218,11 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     if(!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
-    PtzSplashItem *splashItem = newSplashItem(item);
-    splashItem->setPos(event->pos());
+    m_target = target;
+    dragProcessor()->mousePressEvent(item, event);
+    
+    event->accept();
+    return false;
 
     /*if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
         if(QnMediaServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>()) {
@@ -234,39 +234,59 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
             dragProcessor()->mousePressEvent(item, event);
         }
     }
-
-    event->accept();*/
-    return false;
+    */
 }
 
 void PtzInstrument::startDragProcess(DragInfo *) {
+    m_isClick = true;
     emit ptzProcessStarted(target());
-
-    //updatePtzItemOpacity();
 }
 
 void PtzInstrument::startDrag(DragInfo *info) {
-    Q_UNUSED(info)
+    m_isClick = false;
+    m_ptzStartedEmitted = false;
+
+    if(target() == NULL) {
+        /* Whoops, already destroyed. */
+        dragProcessor()->reset();
+        return;
+    }
+
+    ensureSelectionItem();
+    selectionItem()->setParentItem(target());
+    selectionItem()->setViewport(m_viewport.data());
+    selectionItem()->setVisible(true);
+    selectionItem()->setOrigin(info->mousePressItemPos());
+    /* Everything else will be initialized in the first call to drag(). */
+
     emit ptzStarted(target());
+    m_ptzStartedEmitted = true;
 }
 
 void PtzInstrument::dragMove(DragInfo *info) {
-    Q_UNUSED(info)
-    ///QVector3D localSpeed = ptzItem()->speed();
+    if(target() == NULL) {
+        dragProcessor()->reset();
+        return;
+    }
+    ensureSelectionItem();
 
-    //setServerSpeed(localSpeed);
+    selectionItem()->setCorner(info->mouseItemPos());
 }
 
 void PtzInstrument::finishDrag(DragInfo *) {
-    emit ptzFinished(target());
+    ensureSelectionItem();
+    selectionItem()->setVisible(false);
+    selectionItem()->setParentItem(NULL);
+
+    if(m_ptzStartedEmitted)
+        emit ptzFinished(target());
 }
 
-void PtzInstrument::finishDragProcess(DragInfo *) {
-    //setServerSpeed(QVector3D(), true);
-    m_camera = QnNetworkResourcePtr();
-    m_connection = QnMediaServerConnectionPtr();
-
-    ///updatePtzItemOpacity();
+void PtzInstrument::finishDragProcess(DragInfo *info) {
+    if(target() && m_isClick) {
+        PtzSplashItem *splash = newSplashItem(target());
+        splash->setPos(info->mousePressItemPos());
+    }
 
     emit ptzProcessFinished(target());
 }

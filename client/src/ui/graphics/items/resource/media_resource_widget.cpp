@@ -426,7 +426,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
                 << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
         }
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(QColor(128, 0, 0, 196)));
+        QnScopedPainterPenRollback penRollback(painter, QPen(toTransparent(qnGlobals->ptzColor(), 0.75)));
         painter->drawLines(crosshairLines);
     }
 }
