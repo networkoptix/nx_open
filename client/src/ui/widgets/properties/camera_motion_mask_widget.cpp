@@ -79,9 +79,8 @@ void QnCameraMotionMaskWidget::init() {
     m_motionSelectionInstrument = m_controller->motionSelectionInstrument();//new MotionSelectionInstrument(this);
     m_motionSelectionInstrument->setSelectionModifiers(Qt::NoModifier);
     m_motionSelectionInstrument->setMultiSelectionModifiers(Qt::NoModifier);
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, qnGlobals->motionMaskRubberBandColor());
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, qnGlobals->motionMaskRubberBandBorderColor());
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::MouseBorder, qnGlobals->motionMaskMouseFrameColor());
+    m_motionSelectionInstrument->setColor(SelectionItem::Base, qnGlobals->motionMaskRubberBandColor());
+    m_motionSelectionInstrument->setColor(SelectionItem::Border, qnGlobals->motionMaskRubberBandBorderColor());
 
     /* Create motion region floodfill instrument. */
     m_clickInstrument = new ClickInstrument(Qt::LeftButton, 0, Instrument::Item, this);

@@ -219,8 +219,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     gridAdjustmentInstrument->setSpeed(QSizeF(0.25 / 360.0, 0.25 / 360.0));
     gridAdjustmentInstrument->setMaxSpacing(QSizeF(0.5, 0.5));
 
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Base, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
-    m_motionSelectionInstrument->setColor(MotionSelectionInstrument::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
+    m_motionSelectionInstrument->setColor(SelectionItem::Base, subColor(qnGlobals->mrsColor(), qnGlobals->selectionOpacityDelta()));
+    m_motionSelectionInstrument->setColor(SelectionItem::Border, subColor(qnGlobals->mrsColor(), qnGlobals->selectionBorderDelta()));
     m_motionSelectionInstrument->setSelectionModifiers(Qt::ShiftModifier);
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));

@@ -7,6 +7,7 @@
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/fuzzy.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -16,195 +17,61 @@
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include "ui/animation/animated.h"
+#include <ui/animation/animation_event.h>
 
 namespace {
-    // TODO: merge with rotation instrument
-
-    const QColor arrowColor(255, 0, 0, 112);
-
-    const QColor arrowOutlineColor(0, 0, 0, 128);
-
-    const qreal arrowWidth = 5;
-
-    const QSizeF headSize = QSizeF(12.5, 17.5); /* (Side, Front) */
-
-    const qreal headOverlap = 2.5;
-
-    const qreal maximalScale = 6.0;
-
-    inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &frontUnit, const QPointF &sideUnit) {
-        shape->lineTo(base - headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
-        shape->lineTo(base + headSize.height() * frontUnit);
-        shape->lineTo(base + headSize.width() / 2 * sideUnit - headOverlap * frontUnit);
-    }
-
-
-    const qreal instantUpdateSpeedThreshold = 0.1;
-    const qreal updateSpeedThreshold = 0.001;
-    const int updateSpeedInterval = 1000;
-
-    const qreal ptzItemBackgroundOpacity = 0.25;
-    const qreal ptzItemOperationalOpacity = 1.0;
-    const qreal ptzItemOpacityAnimationSpeed = 2.0;
-
+    const QColor ptzColor(128, 128, 255, 255);
 
 } // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
-// PtzItem
+// PtzSplashItem
 // -------------------------------------------------------------------------- //
-class PtzItem: public Animated<QGraphicsObject>, protected QnGeometry {
-    typedef Animated<QGraphicsObject> base_type;
+class PtzSplashItem: public QGraphicsObject {
+    typedef QGraphicsObject base_type;
 
 public:
-    PtzItem(PtzInstrument *instrument, QGraphicsItem *parent = NULL): 
-        base_type(parent),
-        m_instrument(instrument),
-        m_opacityAnimator(::opacityAnimator(this, ptzItemOpacityAnimationSpeed))
+    PtzSplashItem(QGraphicsItem *parent = NULL):
+        base_type(parent)
     {
-        /* We cheat with the bounding rect, but properly calculating it is not worth it. */
-        qreal d = std::numeric_limits<qreal>::max() / 4;
-        m_boundingRect = QRectF(QPointF(-d, -d), QPointF(d, d));
+        QRadialGradient gradient(0.5, 0.5, 0.5);
+        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+
+        gradient.setColorAt(0.8, toTransparent(ptzColor));
+        gradient.setColorAt(0.9, toTransparent(ptzColor, 0.5));
+        gradient.setColorAt(1.0, toTransparent(ptzColor));
+
+        m_brush = QBrush(gradient);
     }
 
     virtual QRectF boundingRect() const override {
-        if (m_viewport == NULL)
-            return QRectF();
-
-        return m_boundingRect;
+        return m_rect;
     }
 
-    /* We can also implement shape(), but most probably there is no point. */
-
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override {
-        if(!viewport() || !view() || widget != viewport())
-            return; /* Draw it on source viewport only. */
-
-        if(m_instrument->target() == NULL)
-            return; /* Target may get suddenly deleted. */
-
-        updateParameters();
-
-        /* Precalculate shape parameters. */
-        qreal scale = 1.0 + m_magnitude * (maximalScale - 1.0);
-        qreal width = arrowWidth;
-        qreal halfWidth = arrowWidth / 2;
-        qreal headDistance = qMax(width, this->length(m_viewportOrigin - m_viewportHead) / scale - headSize.height());
-        qreal baseDistance = headDistance - qMin(headDistance / 4, headSize.height());
-
-        /* Prepare shape. */
-        QPainterPath shape;
-        shape.moveTo(baseDistance, halfWidth);
-        shape.arcTo(QRectF(baseDistance - halfWidth, -halfWidth, width, width), -90.0, -180.0);
-        shape.lineTo(headDistance, -halfWidth);
-        addArrowHead(&shape, QPointF(headDistance, 0), QPointF(1, 0), QPointF(0, 1));
-        shape.lineTo(headDistance, halfWidth);
-        shape.closeSubpath();
-
-        /* Draw! */
-        QnScopedPainterTransformRollback transformRollback(painter, QTransform());
-        QnScopedPainterPenRollback penRollback(painter, arrowOutlineColor);
-        QnScopedPainterBrushRollback brushRollback(painter, arrowColor);
-        painter->translate(m_viewportOrigin);
-        painter->scale(scale, scale);
-        painter->rotate(atan2(m_viewportHead - m_viewportOrigin) / M_PI * 180.0);
-        painter->drawPath(shape);
-    }
-
-    /**
-     * This item will be drawn only on the given view. 
-     * 
-     * \param viewport                  Viewport to draw this item on.
-     */
-    void setViewport(QWidget *viewport) {
-        if(m_viewport.data() == viewport)
+    void setBoundingRect(const QRectF &rect) {
+        if(qFuzzyCompare(m_rect, rect))
             return;
 
-        m_viewport = viewport;
-        m_view = viewport ? checked_cast<QGraphicsView *>(viewport->parent()) : NULL;
         prepareGeometryChange();
 
-        updateParameters();
+        m_rect = rect;
     }
 
-    /**
-     * \returns                         This item's viewport.
-     */
-    QWidget *viewport() const {
-        return m_viewport.data();
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
+        painter->fillRect(m_rect, m_brush);
     }
-
-    /**
-     * \returns                         This item's graphics view.
-     */
-    QGraphicsView *view() const {
-        return m_view.data();
-    }
-
-    /**
-     * \returns                         This item's opacity animator.
-     */
-    VariantAnimator *opacityAnimator() const {
-        return m_opacityAnimator;
-    }
-
-    const QVector2D &speed() const {
-        return m_speed;
-    }
-
-private:
-    void updateParameters() {
-        if(!viewport() || !m_instrument->target())
-            return;
-
-        m_viewportHead = viewport()->mapFromGlobal(QCursor::pos());
         
-        QPointF head = m_instrument->target()->mapFromScene(view()->mapToScene(m_viewportHead));
-        QPointF origin = m_instrument->target()->rect().center();
-        QPointF delta = head - origin;
-
-        m_viewportOrigin = view()->mapFromScene(m_instrument->target()->mapToScene(origin));
-
-        QSizeF size = m_instrument->target()->size();
-        qreal side = qMax(size.width(), size.height());
-        QPointF speed = cwiseDiv(delta, QSizeF(side, side) / 2.0);
-        m_speed = QVector2D(
-            qBound(-1.0, speed.x(), 1.0),
-            qBound(-1.0, speed.y(), 1.0)
-        );
-
-        m_magnitude = qMax(qAbs(m_speed.x()), qAbs(m_speed.y()));
-    }
-
 private:
-    PtzInstrument *m_instrument;
-
-    /** Viewport that this rotation item will be drawn at. */
-    QWeakPointer<QWidget> m_viewport;
-
-    /** View that this rotation item will be drawn at. */
-    QWeakPointer<QGraphicsView> m_view;
-
-    /** Bounding rect of this item. */
-    QRectF m_boundingRect;
-
-    /** Item's head, in viewport coordinates. */
-    QPoint m_viewportHead;
-
-    /** Item's origin, in viewport coordinates. */
-    QPoint m_viewportOrigin;
-
-    /** Speed. */
-    QVector2D m_speed;
-
-    /** Speed magnitude to be reflected in item's size. */
-    qreal m_magnitude;
-
-    /** Opacity animator of this item. */
-    VariantAnimator *m_opacityAnimator;
+    QBrush m_brush;
+    QRectF m_rect;
 };
+
+
+// -------------------------------------------------------------------------- //
+// PtzSelectionItem
+// -------------------------------------------------------------------------- //
+
 
 
 // -------------------------------------------------------------------------- //
@@ -212,17 +79,16 @@ private:
 // -------------------------------------------------------------------------- //
 PtzInstrument::PtzInstrument(QObject *parent): 
     base_type(
-        makeSet(QEvent::MouseMove),
+        makeSet(QEvent::MouseMove, AnimationEvent::Animation),
         makeSet(),
         makeSet(QEvent::GraphicsSceneWheel),
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease, QEvent::GraphicsSceneHoverEnter, QEvent::GraphicsSceneHoverMove, QEvent::GraphicsSceneHoverLeave), 
         parent
     ),
-    m_ptzItemZValue(0.0),
-    m_targetUnderMouse(false)
+    m_ptzItemZValue(0.0)
 {
     // TODO: check validity of isWaiting / isRunning calls in this class.
-    dragProcessor()->setStartDragTime(150); /* Almost instant drag. */
+    //dragProcessor()->setStartDragTime(150); /* Almost instant drag. */
 }
 
 PtzInstrument::~PtzInstrument() {
@@ -231,9 +97,6 @@ PtzInstrument::~PtzInstrument() {
 
 void PtzInstrument::setPtzItemZValue(qreal ptzItemZValue) {
     m_ptzItemZValue = ptzItemZValue;
-
-    if(ptzItem())
-        ptzItem()->setZValue(m_ptzItemZValue);
 }
 
 void PtzInstrument::setTarget(QnMediaResourceWidget *target) {
@@ -241,83 +104,31 @@ void PtzInstrument::setTarget(QnMediaResourceWidget *target) {
         return;
 
     m_target = target;
-    ptzItem()->opacityAnimator()->stop();
-    ptzItem()->setOpacity(0.0);
-
-    setTargetUnderMouse(false);
 }
 
-void PtzInstrument::setTargetUnderMouse(bool underMouse) {
-    if(m_targetUnderMouse == underMouse)
-        return;
-    
-    m_targetUnderMouse = underMouse;
-
-    updatePtzItemOpacity();
-}
-
-void PtzInstrument::updatePtzItemOpacity() {
-    if(target() && isTargetUnderMouse() && (target()->options() & QnResourceWidget::ControlPtz)) {
-        ptzItem()->opacityAnimator()->animateTo(dragProcessor()->isWaiting() ? ptzItemBackgroundOpacity : ptzItemOperationalOpacity);
+PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
+    PtzSplashItem *result;
+    if(!m_freeSplashItems.empty()) {
+        result = m_freeSplashItems.back();
+        m_freeSplashItems.pop_back();
+        result->setParentItem(parentItem);
     } else {
-        ptzItem()->opacityAnimator()->animateTo(0.0);
+        result = new PtzSplashItem(parentItem);
     }
+
+    result->setOpacity(1.0);
+    m_activeSplashItems.push_back(result);
+    return result;
 }
 
-void PtzInstrument::setServerSpeed(const QVector3D &speed, bool force) {
-    m_localSpeed = speed;
 
-    bool instant = false;
-    bool delayed = false;
-    qreal delta = (m_remoteSpeed - m_localSpeed).lengthSquared();
-    if(delta > instantUpdateSpeedThreshold * instantUpdateSpeedThreshold) {
-        instant = true;
-    } else if(delta > updateSpeedThreshold * updateSpeedThreshold || (!qFuzzyIsNull(delta) && m_localSpeed.isNull())) {
-        instant = force;
-        delayed = true;
-    }
-
-    if(instant) {
-        if(m_connection) {
-            if(m_localSpeed.isNull()) {
-                m_connection->asyncPtzStop(m_camera, this, SLOT(at_replyReceived(int, int)));
-
-                qDebug() << "PTZ STOP";
-            } else {
-                m_connection->asyncPtzMove(m_camera, m_localSpeed.x(), -m_localSpeed.y(), m_localSpeed.z(), this, SLOT(at_replyReceived(int, int)));
-
-                qDebug() << "PTZ MOVE" << m_localSpeed;
-            }
-        }
-
-        m_remoteSpeed = m_localSpeed;
-        m_timer.stop();
-    } else if(delayed) {
-        if(!m_timer.isActive())
-            m_timer.start(updateSpeedInterval, this);
-    }
-}
 
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void PtzInstrument::timerEvent(QTimerEvent *event) {
-    if(event->timerId() == m_timer.timerId()) {
-        setServerSpeed(m_localSpeed, true);
-    } else {
-        base_type::timerEvent(event);
-    }
-}
-
 void PtzInstrument::installedNotify() {
-    assert(ptzItem() == NULL);
-
-    m_ptzItem = new PtzItem(this);
-    ptzItem()->setParent(this); /* Just to feel totally safe. Note that this is a parent in QObject sense. */
-    ptzItem()->setZValue(m_ptzItemZValue);
-    ptzItem()->setOpacity(0.0);
-    scene()->addItem(ptzItem());
+    //assert(ptzItem() == NULL);
 
     base_type::installedNotify();
 }
@@ -325,8 +136,8 @@ void PtzInstrument::installedNotify() {
 void PtzInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
-    if(ptzItem())
-        delete ptzItem();
+    /*if(ptzItem())
+        delete ptzItem();*/
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
@@ -349,6 +160,10 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     disconnect(object, NULL, this, NULL);
 }
 
+bool PtzInstrument::animationEvent(AnimationEvent *event) {
+    return false;
+}
+
 bool PtzInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) {
     Q_UNUSED(scene)
     bool accepted = !dragProcessor()->isWaiting();
@@ -359,7 +174,7 @@ bool PtzInstrument::wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *
 
 bool PtzInstrument::mouseMoveEvent(QWidget *viewport, QMouseEvent *) {
     /* Make sure ptz item is displayed on the viewport where the mouse is. */
-    ptzItem()->setViewport(viewport);
+    //ptzItem()->setViewport(viewport);
 
     return false;
 }
@@ -368,7 +183,6 @@ bool PtzInstrument::hoverEnterEvent(QGraphicsItem *item, QGraphicsSceneHoverEven
     Q_UNUSED(event)
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
     setTarget(target);
-    setTargetUnderMouse(true);
 
     return false;
 }
@@ -380,12 +194,12 @@ bool PtzInstrument::hoverMoveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent
 bool PtzInstrument::hoverLeaveEvent(QGraphicsItem *item, QGraphicsSceneHoverEvent *event) {
     Q_UNUSED(item)
     Q_UNUSED(event)
-    setTargetUnderMouse(false);
     
     return false;
 }
 
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+#if 0
     if(event->button() != Qt::LeftButton)
         return false;
 
@@ -409,12 +223,14 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
 
     event->accept();
     return false;
+#endif
+    return false;
 }
 
 void PtzInstrument::startDragProcess(DragInfo *) {
     emit ptzProcessStarted(target());
 
-    updatePtzItemOpacity();
+    //updatePtzItemOpacity();
 }
 
 void PtzInstrument::startDrag(DragInfo *info) {
@@ -424,9 +240,9 @@ void PtzInstrument::startDrag(DragInfo *info) {
 
 void PtzInstrument::dragMove(DragInfo *info) {
     Q_UNUSED(info)
-    QVector3D localSpeed = ptzItem()->speed();
+    ///QVector3D localSpeed = ptzItem()->speed();
 
-    setServerSpeed(localSpeed);
+    //setServerSpeed(localSpeed);
 }
 
 void PtzInstrument::finishDrag(DragInfo *) {
@@ -434,11 +250,11 @@ void PtzInstrument::finishDrag(DragInfo *) {
 }
 
 void PtzInstrument::finishDragProcess(DragInfo *) {
-    setServerSpeed(QVector3D(), true);
+    //setServerSpeed(QVector3D(), true);
     m_camera = QnNetworkResourcePtr();
     m_connection = QnMediaServerConnectionPtr();
 
-    updatePtzItemOpacity();
+    ///updatePtzItemOpacity();
 
     emit ptzProcessFinished(target());
 }
@@ -449,8 +265,8 @@ void PtzInstrument::at_replyReceived(int status, int handle) {
 }
 
 void PtzInstrument::at_target_optionsChanged() {
-    if(sender() == target())
-        updatePtzItemOpacity();
+    //if(sender() == target())
+        //updatePtzItemOpacity();
 }
 
 

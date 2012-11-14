@@ -11,7 +11,7 @@
 
 class QnMediaResourceWidget;
 
-class PtzItem;
+class PtzSplashItem;
 
 class PtzInstrument: public DragProcessingInstrument {
     Q_OBJECT;
@@ -34,14 +34,13 @@ signals:
     void ptzProcessFinished(QnMediaResourceWidget *widget);
 
 protected:
-    virtual void timerEvent(QTimerEvent *event) override;
-
     virtual void installedNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
     virtual bool mouseMoveEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool animationEvent(AnimationEvent *event) override;
 
     virtual bool wheelEvent(QGraphicsScene *scene, QGraphicsSceneWheelEvent *event) override;
 
@@ -61,42 +60,23 @@ private slots:
     void at_target_optionsChanged();
 
 private:
-    friend class PtzItem;
-
-    PtzItem *ptzItem() const {
-        return m_ptzItem.data();
-    }
-
     QnMediaResourceWidget *target() const {
         return m_target.data();
     }
 
     void setTarget(QnMediaResourceWidget *target);
     
-    bool isTargetUnderMouse() const {
-        return m_targetUnderMouse;
-    }
-    
-    void setTargetUnderMouse(bool underMouse);
-    
-    void updatePtzItemOpacity();
-
-    const QVector3D &serverSpeed() const {
-        return m_localSpeed;
-    }
-
-    void setServerSpeed(const QVector3D &speed, bool force = false);
+    PtzSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
 private:
     QBasicTimer m_timer;
 
-    QWeakPointer<PtzItem> m_ptzItem;
     qreal m_ptzItemZValue;
 
     QWeakPointer<QnMediaResourceWidget> m_target;
-    bool m_targetUnderMouse;
 
-    QVector3D m_localSpeed, m_remoteSpeed;
+    QList<PtzSplashItem *> m_freeSplashItems, m_activeSplashItems;
+
     QnNetworkResourcePtr m_camera;
     QnMediaServerConnectionPtr m_connection;
 };
