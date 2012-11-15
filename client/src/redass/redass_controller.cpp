@@ -16,7 +16,7 @@ QnRedAssController* QnRedAssController::instance()
     return inst();
 }
 
-QnRedAssController::QnRedAssController()
+QnRedAssController::QnRedAssController(): m_mutex(QMutex::Recursive)
 {
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimer()));
     m_timer.start(TIMER_TICK_INTERVAL);
@@ -103,6 +103,8 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
 
 void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 {
+    QMutexLocker lock(&m_mutex);
+
     if (reader->getQuality() == MEDIA_Quality_High)
         return; // reader already at HQ
     
@@ -153,6 +155,8 @@ bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 
 void QnRedAssController::onTimer()
 {
+    QMutexLocker lock(&m_mutex);
+
     if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
     {
         // sometimes allow addition LQ->HQ switch
