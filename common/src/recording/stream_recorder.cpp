@@ -20,14 +20,12 @@ extern QMutex global_ffmpeg_mutex;
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
     m_endDateTime(AV_NOPTS_VALUE),
     m_startDateTime(AV_NOPTS_VALUE),
     m_stopOnWriteError(true),
-    m_currentTimeZone(-1),
     m_waitEOF(false),
     m_forceDefaultCtx(true),
     m_formatCtx(0),
@@ -38,7 +36,6 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
-    m_role(Role_ServerRecording),
     m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
     m_videoChannels(0),
@@ -50,6 +47,8 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
     m_onscreenDateOffset(0),
+    m_role(Role_ServerRecording),
+    m_currentTimeZone(-1),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
@@ -515,6 +514,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
             {
                 avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+
+                // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
+                if (srcAudioCodec == CODEC_ID_MP3 && audioStream->codec->channels == 1)
+                    audioStream->codec->block_align = 0; 
             }
             else {
                 // transcode audio
