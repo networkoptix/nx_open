@@ -149,8 +149,20 @@ bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
 
 void QnRedAssController::onTimer()
 {
-    if (++m_timerTicks % TOHQ_ADDITIONAL_TRY == 0)
-        addHQTry(); // sometimes allow addition LQ->HQ switch
+    if (++m_timerTicks >= TOHQ_ADDITIONAL_TRY)
+    {
+        // sometimes allow addition LQ->HQ switch
+        bool slowStreamExists = false;
+        for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+        {
+            if (qnSyncTime->currentMSecsSinceEpoch() < itr.value().lqTime  + QUALITY_SWITCH_INTERVAL)
+                slowStreamExists = true;
+        }
+        if (!slowStreamExists) {
+            addHQTry(); 
+            m_timerTicks = 0;
+        }
+    }
 
     if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
         return;
@@ -234,8 +246,6 @@ void QnRedAssController::gotoLowQuality(QnCamDisplay* display, LQReason reason)
     display->getArchiveReader()->setQuality(MEDIA_Quality_Low, true);
     m_redAssInfo[display].lqReason = reason;
     m_redAssInfo[display].toLQSpeed = display->getSpeed();
-    if (reason != Reason_Small)
-        m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
 }
 
 void QnRedAssController::unregisterConsumer(QnCamDisplay* display)
