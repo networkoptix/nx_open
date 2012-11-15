@@ -519,12 +519,12 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
-QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl)
+QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
 {
     QUrl url(QString::fromStdString(onvifUrl));
     QUrl mediaUrl(getUrl());
     url.setHost(getHostAddress().toString());
-    if (mediaUrl.port(-1) != -1)
+    if (updatePort && mediaUrl.port(-1) != -1)
         url.setPort(mediaUrl.port());
     return url.toString();
 }
