@@ -145,6 +145,7 @@ public:
 
     virtual QnOnvifPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
+    QString fromOnvifDiscoveredUrl(const std::string& onvifUrl);
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);

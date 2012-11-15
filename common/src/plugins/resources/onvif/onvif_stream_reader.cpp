@@ -322,7 +322,7 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
         << ") successfully fetched: " << response.MediaUri->Uri.c_str();
 
     
-    QUrl relutUrl(QString::fromStdString(response.MediaUri->Uri));
+    QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri));
     
 
     if (relutUrl.host().size()==0)
