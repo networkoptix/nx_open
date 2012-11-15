@@ -50,6 +50,8 @@ public:
 
         QRectF rect = base_type::rect();
         QPointF center = rect.center();
+        if(rect.isEmpty())
+            return;
 
         QPainterPath path;
         qreal elementHalfSize = qMin(m_elementSize, qMin(rect.width(), rect.height()) / 2.0) / 2.0;
