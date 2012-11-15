@@ -21,6 +21,7 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
+static const int LIVE_MEDIA_LEN_THRESHOLD = 100*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
@@ -353,7 +354,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
-        if (m_dataQueue.size() > 0) {
+        if (m_dataQueue.size() > 0 && m_dataQueue.mediaLength() > LIVE_MEDIA_LEN_THRESHOLD) {
             sleep = false;
             m_realTimeHurryUp = 5;
             if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 1000000ll / 15) 
@@ -783,7 +784,7 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
 {
     QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (media && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0) 
+    if (media && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && m_dataQueue.mediaLength() > LIVE_MEDIA_LEN_THRESHOLD)
     {
         m_delay.breakSleep();
     }
@@ -798,7 +799,6 @@ bool QnCamDisplay::canAcceptData() const
         return m_dataQueue.size() <= m_processedPackets;
     else 
         return QnAbstractDataConsumer::canAcceptData();
-        //return m_dataQueue.mediaLength() < MAX_QUEUE_LENGTH;
 }
 
 bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)

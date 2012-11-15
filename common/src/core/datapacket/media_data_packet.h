@@ -357,6 +357,17 @@ private:
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
 
-//typedef CLThreadQueue<QnAbstractDataPacketPtr> CLDataQueue;
+
+class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
+{
+public:
+    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
+
+
+    qint64 mediaLength() const;
+private:
+    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
+};
+
 
 #endif //abstract_media_data_h_112

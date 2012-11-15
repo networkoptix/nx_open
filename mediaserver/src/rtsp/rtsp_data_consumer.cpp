@@ -195,44 +195,9 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     return rez;
 }
 
-void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ)
-{
-    for (int i = 0; i < m_dataQueue.size(); ++i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video && video->isLQ() == checkLQ) {
-            firstVTime = video->timestamp;
-            break;
-        }
-    }
-
-    for (int i = m_dataQueue.size()-1; i >=0; --i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video && video->isLQ() == checkLQ) {
-            lastVTime = video->timestamp;
-            break;
-        }
-    }
-}
-
 qint64 QnRtspDataConsumer::dataQueueDuration()
 {
-    qint64 firstVTime = AV_NOPTS_VALUE;
-    qint64 lastVTime = AV_NOPTS_VALUE;
-
-    m_dataQueue.lock();
-
-    getEdgePackets(firstVTime, lastVTime, false);
-    if (firstVTime == AV_NOPTS_VALUE || lastVTime == AV_NOPTS_VALUE)
-        getEdgePackets(firstVTime, lastVTime, true);
-
-    m_dataQueue.unlock();
-
-    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
-        return lastVTime - firstVTime;
-    else
-        return 0;
+    return m_dataQueue.mediaLength();
 }
 
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
