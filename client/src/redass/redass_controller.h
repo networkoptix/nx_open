@@ -55,6 +55,7 @@ private:
     QTime m_lastSwitchTimer;
     int m_hiQualityRetryCounter;
     int m_timerTicks;
+    qint64 m_lastLqTime;
 private:
     QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason);

@@ -22,6 +22,7 @@ QnRedAssController::QnRedAssController()
     m_timer.start(TIMER_TICK_INTERVAL);
     m_hiQualityRetryCounter = 0;
     m_timerTicks = 0;
+    m_lastLqTime = 0;
 }
 
 QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* reader)
@@ -74,7 +75,8 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     QMutexLocker lock(&m_mutex);
 
     QnCamDisplay* display = getDisplayByReader(reader);
-    m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
+    
     if (display->getSpeed() > 1.0 || display->getSpeed() < 0)
     {
         // for high speed mode change same item to LQ (do not try to find least item)
@@ -127,7 +129,9 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     //try one more LQ->HQ switch
 
     if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return;
+        return; // recently LQ->HQ or HQ->LQ
+    if (m_lastLqTime + QUALITY_SWITCH_INTERVAL > qnSyncTime->currentMSecsSinceEpoch())
+        return; // recently slow report received (not all reports affect m_lastSwitchTimer)
 
     display = findDisplay(Find_Biggest, false, &QnRedAssController::isNotSmallItem);
     if (display) {
