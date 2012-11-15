@@ -399,7 +399,7 @@ void QnResourceTreeWidget::setEditingEnabled(bool enabled) {
     m_editingEnabled = enabled;
     ui->resourcesTreeView->setAcceptDrops(m_editingEnabled);
     if (enabled)
-        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
     else
         ui->resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
