@@ -45,6 +45,7 @@ Bugs Fixed:
    - If add a camera in Multi-Video exported file and play it at the end, added camera started playing live video. If add a camera with no archive it started playing live. Fixed.
    - Fixed an error with Axis1031W: it was played back incorrectly in Multi-Video if Multi-Video had been changed.
  - Some local files could be exported without audio. Fixed
+ - If pause or ff/rew local files they was resynchronized for a long time. This resulted in high-speed playback without sound for 3-5 seconds before playback starts. Fixed.
  - If double click on the bottom of Time Line zoom out occured but Time Line started shifting left. Fixed
  - Sometimes Menu color is changed from grey to white (especially if login remotely to the computer Client is opened on). Fixed
  - Logout didn't clear workspace. Fixed
