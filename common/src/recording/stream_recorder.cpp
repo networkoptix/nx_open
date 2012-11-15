@@ -510,6 +510,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
             {
                 avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+
+                // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
+                if (srcAudioCodec == CODEC_ID_MP3 && audioStream->codec->channels == 1)
+                    audioStream->codec->block_align = 0; 
             }
             else {
                 // transcode audio
