@@ -298,7 +298,7 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
     }
     */
 
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
+    if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
         m_dataQueue.lock();
         bool clearHiQ = m_liveQuality != MEDIA_Quality_Low; // remove LQ packets, keep HQ
@@ -310,8 +310,8 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
             QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
-                bool isLQ = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-                if (isLQ && clearHiQ || !isLQ && !clearHiQ)
+                bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
+                if (isHiQ == clearHiQ)
                 {
                     m_dataQueue.removeFirst(i);
                     somethingDeleted = true;
@@ -329,12 +329,14 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);
+                    somethingDeleted = true;
                     break;
                 }
             }
         }
         m_dataQueue.unlock();
-        m_someDataIsDropped = true;
+        if (somethingDeleted)
+            m_someDataIsDropped = true;
     }
 
     while(m_dataQueue.size() > 120) // queue to large
