@@ -192,6 +192,13 @@ qreal QnGeometry::scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mo
     }
 }
 
+QPointF QnGeometry::bounded(const QPointF &pos, const QRectF &bounds) {
+    return QPointF(
+        qBound(bounds.left(), pos.x(), bounds.right()),
+        qBound(bounds.top(), pos.y(), bounds.bottom())
+    );
+}
+
 QPoint QnGeometry::bounded(const QPoint &pos, const QRect &bounds) {
     return QPoint(
         qBound(bounds.left(), pos.x(), bounds.right()),

@@ -1,5 +1,6 @@
 #include "ptz_instrument.h"
 
+#include <cassert>
 #include <limits>
 
 #include <QtGui/QGraphicsSceneMouseEvent>
@@ -35,22 +36,45 @@ class PtzSplashItem: public QGraphicsObject {
     typedef QGraphicsObject base_type;
 
 public:
-    enum Type {
+    enum SplashType {
         Circular,
-        Rectangular
+        Rectangular,
+        Invalid = -1
     };
 
     PtzSplashItem(QGraphicsItem *parent = NULL):
-        base_type(parent)
+        base_type(parent),
+        m_splashType(Invalid)
     {
-        QRadialGradient gradient(0.5, 0.5, 0.5);
-        gradient.setCoordinateMode(QGradient::ObjectBoundingMode);
+        QGradient gradients[5];
 
-        gradient.setColorAt(0.8, toTransparent(ptzColor));
-        gradient.setColorAt(0.9, toTransparent(ptzColor, 0.5));
-        gradient.setColorAt(1.0, toTransparent(ptzColor));
+        /* Sector numbering for rectangular splash:
+         *       1
+         *      0 2
+         *       3                                                              */
+        gradients[0] = QLinearGradient(1.0, 0.0, 0.0, 0.0);
+        gradients[1] = QLinearGradient(0.0, 1.0, 0.0, 0.0);
+        gradients[2] = QLinearGradient(0.0, 0.0, 1.0, 0.0);
+        gradients[3] = QLinearGradient(0.0, 0.0, 0.0, 1.0);
+        gradients[4] = QRadialGradient(0.5, 0.5, 0.5);
 
-        m_brush = QBrush(gradient);
+        for(int i = 0; i < 5; i++) {
+            gradients[i].setCoordinateMode(QGradient::ObjectBoundingMode);
+            gradients[i].setColorAt(0.8, toTransparent(ptzColor));
+            gradients[i].setColorAt(0.9, toTransparent(ptzColor, 0.5));
+            gradients[i].setColorAt(1.0, toTransparent(ptzColor));
+            m_brushes[i] = QBrush(gradients[i]);
+        }
+    }
+
+    SplashType splashType() const {
+        return m_splashType;
+    }
+    
+    void setSplashType(SplashType splashType) {
+        assert(splashType == Circular || splashType == Rectangular || splashType == Invalid);
+
+        m_splashType = splashType;
     }
 
     virtual QRectF boundingRect() const override {
@@ -67,11 +91,39 @@ public:
     }
 
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override {
-        painter->fillRect(m_rect, m_brush);
+        if(m_splashType == Circular) {
+            painter->fillRect(m_rect, m_brushes[4]);
+        } else if(splashType() == Rectangular) {
+            QPointF points[5] = {
+                m_rect.bottomLeft(),
+                m_rect.topLeft(),
+                m_rect.topRight(),
+                m_rect.bottomRight(),
+                m_rect.bottomLeft()
+            };
+            QPointF center = m_rect.center();
+
+            for(int i = 0; i < 4; i++) {
+                QPainterPath path;
+
+                path = QPainterPath();
+                path.moveTo(center);
+                path.lineTo(points[i]);
+                path.lineTo(points[i + 1]);
+                path.closeSubpath();
+                painter->fillPath(path, m_brushes[i]);
+            }
+        }
     }
         
 private:
-    QBrush m_brush;
+    /** Splash type. */
+    SplashType m_splashType;
+
+    /** Brushes that are used for painting. 0 for circular, 1-4 for rectangular splash. */
+    QBrush m_brushes[5];
+
+    /** Bounding rectangle of the splash. */
     QRectF m_rect;
 };
 
@@ -89,10 +141,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     ),
     m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{
-    // TODO: check validity of isWaiting / isRunning calls in this class.
-    //dragProcessor()->setStartDragTime(150); /* Almost instant drag. */
-}
+{}
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
@@ -119,7 +168,6 @@ PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
         result = new PtzSplashItem(parentItem);
     }
 
-    result->setBoundingRect(QRectF(0.0, 0.0, 0.0, 0.0));
     result->setOpacity(1.0);
     result->show();
     m_activeSplashItems.push_back(result);
@@ -183,7 +231,7 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
         PtzSplashItem *item = m_activeSplashItems[i];
 
         qreal opacity = item->opacity();
-        qreal radius = item->boundingRect().width() / 2.0;
+        QRectF rect = item->boundingRect();
 
         opacity -= dt * 1.0;
         if(opacity <= 0.0) {
@@ -192,10 +240,11 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
             m_freeSplashItems.push_back(item);
             continue;
         }
-        radius += dt * m_expansionSpeed;
+        qreal ds = dt * m_expansionSpeed;
+        rect = rect.adjusted(-ds, -ds, ds, ds);
 
         item->setOpacity(opacity);
-        item->setBoundingRect(QRectF(QPointF(-radius, -radius), QPointF(radius, radius)));
+        item->setBoundingRect(rect);
     }
     
     return false;
@@ -270,13 +319,23 @@ void PtzInstrument::dragMove(DragInfo *info) {
     }
     ensureSelectionItem();
 
-    selectionItem()->setCorner(info->mouseItemPos());
+    selectionItem()->setCorner(bounded(info->mouseItemPos(), target()->rect()));
 }
 
 void PtzInstrument::finishDrag(DragInfo *) {
-    ensureSelectionItem();
-    selectionItem()->setVisible(false);
-    selectionItem()->setParentItem(NULL);
+    if(target()) {
+        ensureSelectionItem();
+        selectionItem()->setVisible(false);
+        selectionItem()->setParentItem(NULL);
+
+        QRectF selectionRect = selectionItem()->boundingRect();
+
+        PtzSplashItem *splash = newSplashItem(target());
+        splash->setSplashType(PtzSplashItem::Rectangular);
+        splash->setPos(selectionRect.center());
+        selectionRect.moveCenter(QPointF(0.0, 0.0));
+        splash->setBoundingRect(selectionRect);
+    }
 
     if(m_ptzStartedEmitted)
         emit ptzFinished(target());
@@ -285,6 +344,8 @@ void PtzInstrument::finishDrag(DragInfo *) {
 void PtzInstrument::finishDragProcess(DragInfo *info) {
     if(target() && m_isClick) {
         PtzSplashItem *splash = newSplashItem(target());
+        splash->setSplashType(PtzSplashItem::Circular);
+        splash->setBoundingRect(QRectF(0.0, 0.0, 0.0, 0.0));
         splash->setPos(info->mousePressItemPos());
     }
 

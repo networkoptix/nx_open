@@ -160,6 +160,7 @@ public:
      */
     static qreal scaleFactor(QSizeF size, QSizeF bounds, Qt::AspectRatioMode mode);
 
+    static QPointF bounded(const QPointF &pos, const QRectF &bounds);
     static QPoint bounded(const QPoint &pos, const QRect &bounds);
 
     /**
