@@ -13,6 +13,7 @@ class QnMediaResourceWidget;
 
 class SelectionItem;
 class PtzSplashItem;
+class PtzSelectionItem;
 
 class PtzInstrument: public DragProcessingInstrument {
     Q_OBJECT;
@@ -54,6 +55,7 @@ protected:
 private slots:
     void at_replyReceived(int status, int handle);
     void at_target_optionsChanged();
+    void at_splashItem_destroyed();
 
 private:
     QnMediaResourceWidget *target() const {
@@ -64,7 +66,7 @@ private:
     
     PtzSplashItem *newSplashItem(QGraphicsItem *parentItem);
 
-    SelectionItem *selectionItem() const {
+    PtzSelectionItem *selectionItem() const {
         return m_selectionItem.data();
     }
 
@@ -74,7 +76,7 @@ private:
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
-    QWeakPointer<SelectionItem> m_selectionItem;
+    QWeakPointer<PtzSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
 

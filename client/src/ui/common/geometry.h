@@ -302,6 +302,8 @@ public:
      */
     static bool contains(const QSize &size, const QSize &otherSize);
 
+    static QRectF movedInto(const QRectF &rect, const QRectF &target);
+
 };
 
 #endif // QN_GEOMETRY_H

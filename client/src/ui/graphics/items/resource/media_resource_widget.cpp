@@ -415,7 +415,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             dy += d1;
         }
 
-        for(int i = 0; i < 4; i++) {
+        /*for(int i = 0; i < 4; i++) {
             qreal a = M_PI * (0.25 + 0.5 * i);
             qreal sin = std::sin(a);
             qreal cos = std::cos(a);
@@ -424,7 +424,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
             crosshairLines
                 << center + v0 * d1 << center + v0 * d0
                 << center + v0 * d0 + v1 * d1 / 2.0 << center + v0 * d0 - v1 * d1 / 2.0;
-        }
+        }*/
 
         QnScopedPainterPenRollback penRollback(painter, QPen(toTransparent(qnGlobals->ptzColor(), 0.75)));
         painter->drawLines(crosshairLines);

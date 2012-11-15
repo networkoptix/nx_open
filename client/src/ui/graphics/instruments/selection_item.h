@@ -19,8 +19,9 @@ public:
     virtual ~SelectionItem();
 
     virtual QRectF boundingRect() const override;
-    void setBoundingRect(const QRectF &boundingRect);
-    void setBoundingRect(const QPointF &origin, const QPointF &corner);
+    QRectF rect() const;
+    void setRect(const QRectF &rect);
+    void setRect(const QPointF &origin, const QPointF &corner);
 
     const QPointF &origin() const;
     void setOrigin(const QPointF &origin);
@@ -47,7 +48,7 @@ public:
      */
     QWidget *viewport() const;
 
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) override;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
     /** Colors for drawing the selection rect. */
@@ -61,7 +62,6 @@ private:
 
     /** Viewport that this selection item will be drawn at. */
     QWidget *m_viewport;
-
 };
 
 #endif // QN_SELECTION_ITEM_H

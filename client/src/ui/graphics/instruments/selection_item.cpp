@@ -32,17 +32,21 @@ SelectionItem::~SelectionItem() {
 }
 
 QRectF SelectionItem::boundingRect() const {
+    return rect();
+}
+
+QRectF SelectionItem::rect() const {
     return QRectF(m_origin, m_corner).normalized();
 }
 
-void SelectionItem::setBoundingRect(const QRectF &boundingRect) {
+void SelectionItem::setRect(const QRectF &rect) {
     prepareGeometryChange();
 
-    m_origin = boundingRect.topLeft();
-    m_corner = boundingRect.bottomRight();
+    m_origin = rect.topLeft();
+    m_corner = rect.bottomRight();
 }
 
-void SelectionItem::setBoundingRect(const QPointF &origin, const QPointF &corner) {
+void SelectionItem::setRect(const QPointF &origin, const QPointF &corner) {
     prepareGeometryChange();
 
     m_origin = origin;

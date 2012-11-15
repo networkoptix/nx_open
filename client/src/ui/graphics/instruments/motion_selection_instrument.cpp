@@ -208,7 +208,7 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
     QPointF gridStep = target()->mapFromMotionGrid(QPoint(1, 1)) - target()->mapFromMotionGrid(QPoint(0, 0));
     QPointF mouseDelta = mouseOrigin - mouseCorner;
     if(qAbs(mouseDelta.x()) < qAbs(gridStep.x()) / 2 && qAbs(mouseDelta.y()) < qAbs(gridStep.y()) / 2) {
-        selectionItem()->setBoundingRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
+        selectionItem()->setRect(QPointF(0, 0), QPointF(0, 0)); /* Ignore small deltas. */
         m_gridRect = QRect();
     } else {
         QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
@@ -226,7 +226,7 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
 
         QPointF origin = target()->mapFromMotionGrid(gridOrigin);
         QPointF corner = target()->mapFromMotionGrid(gridCorner);
-        selectionItem()->setBoundingRect(origin, corner);
+        selectionItem()->setRect(origin, corner);
 
         m_gridRect = QRect(gridOrigin, gridCorner).normalized().adjusted(0, 0, -1, -1);
     }
