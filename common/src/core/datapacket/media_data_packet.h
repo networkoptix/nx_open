@@ -100,6 +100,9 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     {
     }
 
+    bool isLQ() const { return flags & MediaFlags_LowQuality; }
+    bool isLive() const { return flags & MediaFlags_LIVE; }
+
     QnByteArray data;
     DataType dataType;
     CodecID compressionType;

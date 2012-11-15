@@ -13,7 +13,7 @@
 #include "core/resource/security_cam_resource.h"
 
 static const int MAX_QUEUE_SIZE = 12;
-static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 1000ll * 1000ll; // 1 second
+static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
@@ -195,6 +195,27 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
     return rez;
 }
 
+void QnRtspDataConsumer::getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ)
+{
+    for (int i = 0; i < m_dataQueue.size(); ++i)
+    {
+        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            firstVTime = video->timestamp;
+            break;
+        }
+    }
+
+    for (int i = m_dataQueue.size()-1; i >=0; --i)
+    {
+        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            lastVTime = video->timestamp;
+            break;
+        }
+    }
+}
+
 qint64 QnRtspDataConsumer::dataQueueDuration()
 {
     qint64 firstVTime = AV_NOPTS_VALUE;
@@ -202,23 +223,9 @@ qint64 QnRtspDataConsumer::dataQueueDuration()
 
     m_dataQueue.lock();
 
-    for (int i = 0; i < m_dataQueue.size(); ++i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video) {
-           firstVTime = video->timestamp;
-           break;
-        }
-    }
-
-    for (int i = m_dataQueue.size()-1; i >=0; --i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video) {
-            lastVTime = video->timestamp;
-            break;
-        }
-    }
+    getEdgePackets(firstVTime, lastVTime, false);
+    if (firstVTime == AV_NOPTS_VALUE || lastVTime == AV_NOPTS_VALUE)
+        getEdgePackets(firstVTime, lastVTime, true);
 
     m_dataQueue.unlock();
 
