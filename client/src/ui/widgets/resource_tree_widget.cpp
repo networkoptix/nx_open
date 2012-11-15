@@ -250,7 +250,8 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
     m_resourceProxyModel(0),
-    m_checkboxesVisible(true)
+    m_checkboxesVisible(true),
+    m_editingEnabled(false)
 {
     ui->setupUi(this);
     ui->filterFrame->setVisible(false);
@@ -373,6 +374,22 @@ void QnResourceTreeWidget::setFilterVisible(bool visible) {
 
 bool QnResourceTreeWidget::isFilterVisible() const {
     return ui->filterFrame->isVisible();
+}
+
+void QnResourceTreeWidget::setEditingEnabled(bool enabled) {
+    if (m_editingEnabled == enabled)
+        return;
+
+    m_editingEnabled = enabled;
+    ui->resourcesTreeView->setAcceptDrops(m_editingEnabled);
+    if (enabled)
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked);
+    else
+        ui->resourcesTreeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+}
+
+bool QnResourceTreeWidget::isEditingEnabled() const {
+    return m_editingEnabled;
 }
 
 // ----------- Handlers -------------

@@ -69,7 +69,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setModel(m_resourceModel);
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->enableGraphicsTweaks();
-//    ui->resourceTreeWidget->setFilterVisible();
+    ui->resourceTreeWidget->setEditingEnabled();
+//    ui->resourceTreeWidget->setFilterVisible(); //TODO: #gdm ask #Elrik whether try to enable this =)
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
     ui->searchTreeWidget->enableGraphicsTweaks();
