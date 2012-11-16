@@ -20,7 +20,7 @@ class QnGlRendererTexture1;
 class GLContext;
 
 /*!
-    \note All region-arithmetic is thread-safe, but syunchronization of memory operations is out of this class
+    \note All region-arithmetic is thread-safe, but synchronization of memory operations is out of this class
 */
 class AggregationSurface
 {

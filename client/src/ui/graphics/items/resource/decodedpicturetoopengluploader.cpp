@@ -16,7 +16,7 @@
 #define GL_GLEXT_PROTOTYPES 1
 #include <GL/glext.h>
 
-#include <utils/yuvconvert.h>
+#include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_functions.h>
 #include <ui/graphics/opengl/gl_context_data.h>
