@@ -108,15 +108,22 @@ void QnCameraAdditionDialog::updateSubnetMode(){
     ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
     if (m_subnetMode){
-        QHostAddress startAddr(ui->startIPLineEdit->text());
-        quint32 addr = startAddr.toIPv4Address();
-        addr = addr >> 8;
-        addr = (addr << 8) + 255;
-        QString endAddrStr = QHostAddress(addr).toString();
-        ui->endIPLineEdit->setText(endAddrStr);
-        ui->endIPLineEdit->setFocus(); //TODO: #gdm rethink behaviour
-        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
-    }
+        QHostAddress startAddr(ui->cameraIpLineEdit->text());
+        if (startAddr.toIPv4Address()) {
+            ui->startIPLineEdit->setText(startAddr.toString());
+
+            quint32 addr = startAddr.toIPv4Address();
+            addr = addr >> 8;
+            addr = (addr << 8) + 255;
+            QString endAddrStr = QHostAddress(addr).toString();
+            ui->endIPLineEdit->setText(endAddrStr);
+            ui->endIPLineEdit->setFocus();
+            ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+        } else {
+            ui->startIPLineEdit->setFocus();
+        }
+    } else
+        ui->cameraIpLineEdit->setFocus();
 }
 
 // -------------------------------------------------------------------------- //
