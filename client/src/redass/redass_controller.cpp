@@ -6,7 +6,7 @@ Q_GLOBAL_STATIC(QnRedAssController, inst);
 
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const int TO_LOWQ_SCREEN_SIZE = 320*240;      // put item to LQ if visual size is small
+static const QSize TO_LOWQ_SCREEN_SIZE(320,240);      // put item to LQ if visual size is small
 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
@@ -146,7 +146,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
 bool QnRedAssController::isSmallItem(QnCamDisplay* display)
 {
     QSize sz = display->getScreenSize();
-    return sz.width()*sz.height() <= TO_LOWQ_SCREEN_SIZE;
+    return sz.height() <= TO_LOWQ_SCREEN_SIZE.height();
 }
 
 bool QnRedAssController::isNotSmallItem(QnCamDisplay* display)
