@@ -123,6 +123,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         QTimer *timer = new QTimer(this);
         
         connect(timer, SIGNAL(timeout()), this, SLOT(updateIconButton()));
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), SIGNAL(offsetsChanged()), this, SLOT(updateIconButton()));
         connect(m_camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(updateIconButton()));
         connect(m_camera.data(), SIGNAL(scheduleTasksChanged()), this, SLOT(updateIconButton()));
         connect(m_camera.data(), SIGNAL(parentIdChanged()), this, SLOT(updateServerResource()));
@@ -611,18 +612,25 @@ void QnMediaResourceWidget::updateIconButton() {
 }
 
 void QnMediaResourceWidget::updateServerResource() {
-    if(m_camera) {
-        m_server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    } else {
-        m_server.clear();
-    }
+    QnMediaServerResourcePtr server;
+    if(m_camera)
+        server = m_camera->resourcePool()->getResourceById(m_camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    if(m_server == server)
+        return;
+
+    m_server = server;
+
+    updateIconButton();
 }
 
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
         return QnScheduleTask::RecordingType_Never;
 
-    QDateTime dateTime = qnSyncTime->currentDateTime();
+    // TODO: this should be a resource parameter that is update from the server.
+
+    QDateTime dateTime = qnSyncTime->currentDateTime().addMSecs(context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0));
     int dayOfWeek = dateTime.date().dayOfWeek();
     int seconds = QTime().secsTo(dateTime.time());
 
@@ -722,7 +730,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         qint64 utcTime = m_renderer->lastDisplayedTime(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_server, 0);
+            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0);
 
         timeString = tr("\t%1").arg(
             m_display->camDisplay()->isRealTimeSource() ? 

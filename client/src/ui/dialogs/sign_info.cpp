@@ -1,7 +1,6 @@
 #include "sign_info.h"
 #include "ui/style/skin.h"
 #include "sign_dialog.h"
-#include "utils/common/synctime.h"
 
 QnSignInfo::QnSignInfo(QWidget* parent): QLabel(parent)
 {
@@ -52,7 +51,7 @@ void QnSignInfo::paintEvent(QPaintEvent *)
     //t.restart();
 
     static const int TEXT_FLASHING_PERIOD = 1000;
-    float opacity = qAbs(sin(qnSyncTime->currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
+    float opacity = qAbs(sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI))*0.5 + 0.5;
 
     {
         QMutexLocker lock(&m_mutex);

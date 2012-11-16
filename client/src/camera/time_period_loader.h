@@ -37,6 +37,8 @@ public:
     
     virtual int load(const QnTimePeriod &timePeriod, const QList<QRegion> &motionRegions = QList<QRegion>()) override;
 
+    virtual void discardCachedData() override;
+
 private slots:
     void at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle);
 

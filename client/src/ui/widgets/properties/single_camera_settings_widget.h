@@ -67,6 +67,8 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    void setExportScheduleButtonEnabled(bool enabled);
+
 public slots:
     void setAdvancedParam(const CameraSetting& val);
     void refreshAdvancedSettings();
@@ -75,6 +77,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -91,7 +94,7 @@ private slots:
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
     void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
-    void at_pingButtonClicked();
+    void at_pingButton_clicked();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();

@@ -9,6 +9,7 @@
 
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
+#include <ui/animation/animation_timer.h>
 
 namespace {
     struct NonHandScrollable {

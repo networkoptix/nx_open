@@ -5,6 +5,8 @@
 #include "connectinfo.h"
 #include <utils/settings.h>
 #include "plugins/resources/archive/avi_files/avi_resource.h"
+#include <utils/network/networkoptixmodulefinder.h>
+#include <utils/network/foundenterprisecontrollersmodel.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -18,6 +20,7 @@ class QnRenderingWidget;
 
 namespace Ui {
     class LoginDialog;
+    class FindAppServerDialog;
 }
 
 class LoginDialog : public QDialog {
@@ -52,11 +55,14 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
+    void onSelectEntCtrlButtonClicked();
 
 private:
     Q_DISABLE_COPY(LoginDialog)
 
     QScopedPointer<Ui::LoginDialog> ui;
+    QScopedPointer<QDialog> m_findAppServerDialog;
+    QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
     QWeakPointer<QnWorkbenchContext> m_context;
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
@@ -64,6 +70,8 @@ private:
     QnConnectInfoPtr m_connectInfo;
 
     QnRenderingWidget* m_renderingWidget;
+    NetworkOptixModuleFinder m_entCtrlFinder;
+    FoundEnterpriseControllersModel m_foundEntCtrlModel;
 };
 
 #endif // LOGINDIALOG_H

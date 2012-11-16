@@ -112,7 +112,10 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
 
 // Socket Code
 
-Socket::Socket(int type, int protocol)  {
+Socket::Socket(int type, int protocol)
+:
+    m_nonBlockingMode( false )
+{
     createSocket(type, protocol);
 }
 
@@ -137,7 +140,10 @@ void Socket::createSocket(int type, int protocol)
     }
 }
 
-Socket::Socket(int sockDesc) {
+Socket::Socket(int sockDesc)
+:
+    m_nonBlockingMode( false )
+{
     this->sockDesc = sockDesc;
 }
 
@@ -302,10 +308,9 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
         return false;
 
 #ifdef _WIN32
-    u_long iMode = 1;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
+    const bool isNonBlockingModeBak = isNonBlockingMode();
+    if( !setNonBlockingMode( true ) )
+        return false;
 #endif
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
@@ -340,10 +345,8 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 #endif // _WIN32
 
 #ifdef _WIN32
-    iMode = 0;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, 0);
+    //restoring original mode
+    setNonBlockingMode( isNonBlockingModeBak );
 #endif
 
     mConnected = true;
@@ -792,4 +795,47 @@ bool Socket::setReuseAddrFlag(bool reuseAddr)
         return false;
     }
     return true;
+}
+
+//!if, \a val is \a true, turns non-blocking mode on, else turns it off
+bool Socket::setNonBlockingMode(bool val)
+{
+    if( val == m_nonBlockingMode )
+        return true;
+
+#ifdef _WIN32
+    u_long _val = val ? 1 : 0;
+    if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    long currentFlags = fcntl( sockDesc, F_GETFL, 0 );
+    if( currentFlags == -1 )
+        return false;
+    if( val )
+        currentFlags |= O_NONBLOCK;
+    else
+        currentFlags &= ~O_NONBLOCK;
+    if( fcntl( sockDesc, F_SETFL, currentFlags ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#endif
+}
+
+//!Returns true, if in non-blocking mode
+bool Socket::isNonBlockingMode() const
+{
+    return m_nonBlockingMode;
 }

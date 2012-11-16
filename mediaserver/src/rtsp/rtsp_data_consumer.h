@@ -76,7 +76,6 @@ protected:
     bool isMediaTimingsSlow() const;
     void setLiveQualityInternal(MediaQuality quality);
     qint64 dataQueueDuration();
-    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ);
     void sendMetadata(const QByteArray& metadata);
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
@@ -122,6 +121,5 @@ private:
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
-    bool m_someDataIsDropped;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

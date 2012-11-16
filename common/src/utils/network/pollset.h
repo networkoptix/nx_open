@@ -61,9 +61,13 @@ public:
     PollSet();
     virtual ~PollSet();
 
+    //!Returns true, if all internal data has been initialized successfully
+    bool isValid() const;
+
     //!Interrupts \a poll method, blocked in other thread
     /*!
-        This is the only method which is allowed to be called from different thread
+        This is the only method which is allowed to be called from different thread.
+        poll, called after interrupt, will return immediately. But, it is unspecified whether it will return multiple times if interrupt has been called multiple times
     */
     void interrupt();
 
@@ -80,6 +84,10 @@ public:
         \note Ivalidates all iterators
     */
     void remove( Socket* const sock, EventType eventType );
+    //!Returns number of sockets, monitored for \a eventType
+    /*!
+        Returned value should only be used for compare with \a maxPollSetSize(). Returned absolute value may be unexpected sometimes
+    */
     size_t size( EventType eventType ) const;
 
     /*!

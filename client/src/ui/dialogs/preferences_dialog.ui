@@ -275,7 +275,7 @@
             <item>
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>seconds</string>
+               <string> seconds</string>
               </property>
              </widget>
             </item>
@@ -301,7 +301,7 @@
           <item row="5" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Time Mode:</string>
+             <string>Timeline Mode:</string>
             </property>
            </widget>
           </item>

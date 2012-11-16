@@ -114,7 +114,9 @@ public:
         if(query == INVALID_HANDLE_VALUE)
             return;
 
-        ULONGLONG timeMSec = GetTickCount64();
+        /* Note that we can't use GetTickCount64 since it doesn't exist under XP.
+         * GetTickCount wraps every ~50 days, but for this check the wrap is irrelevant. */
+        ULONGLONG timeMSec = GetTickCount(); 
         if(timeMSec - lastCollectTimeMSec < UpdateIntervalMSec)
             return; /* Don't update too often. */
 

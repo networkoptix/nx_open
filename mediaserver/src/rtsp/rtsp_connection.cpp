@@ -277,8 +277,8 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
         return QString();
 
     qint64 endTime = d->archiveDP->endTime();
-    bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture)
+    //bool endTimeInFuture = endTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+    if (QnRecordingManager::instance()->isCameraRecoring(d->mediaRes))
         endTime = DATETIME_NOW;
 
     if (d->archiveDP->startTime() != d->prevStartTime || endTime != d->prevEndTime)
@@ -366,8 +366,8 @@ QString QnRtspConnectionProcessor::getRangeStr()
         d->archiveDP->open();
         d->prevStartTime = d->archiveDP->startTime();
         qint64 archiveEndTime = d->archiveDP->endTime();
-        bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
-        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes) && !endTimeInFuture;
+        //bool endTimeInFuture = archiveEndTime > qnSyncTime->currentMSecsSinceEpoch()*1000;
+        bool endTimeIsNow = QnRecordingManager::instance()->isCameraRecoring(d->mediaRes); // && !endTimeInFuture;
         if (endTimeIsNow)
             d->prevEndTime = DATETIME_NOW;
         else
@@ -973,6 +973,21 @@ int QnRtspConnectionProcessor::composePlay()
         int copySize = 0;
         if (!getResource()->isDisabled() && (status == QnResource::Online || status == QnResource::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0);
+        }
+
+        if (copySize == 0) {
+            // no data from the camera. Insert several empty packets to inform client about it
+            for (int i = 0; i < 3; ++i)
+            {
+                QnEmptyMediaDataPtr emptyData(new QnEmptyMediaData());
+                emptyData->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+                if (i == 0)
+                    emptyData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+                emptyData->timestamp = DATETIME_NOW;
+                emptyData->opaque = d->lastPlayCSeq;
+
+                d->dataProcessor->addData(emptyData);
+            }
         }
 
         d->dataProcessor->unlockDataQueue();

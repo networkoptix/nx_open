@@ -67,6 +67,9 @@ void QnRecordingManager::deleteRecorder(const Recorders& recorders)
 
 void QnRecordingManager::stop()
 {
+    exit();
+    wait(); // stop QT event loop
+
     QMutexLocker lock(&m_mutex);
 
     foreach(const Recorders& recorders, m_recordMap.values())
@@ -263,6 +266,13 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
     }
 }
 
+void QnRecordingManager::at_initAsyncFinished(QnResourcePtr res, bool state)
+{
+    QnVirtualCameraResourcePtr camera = res.dynamicCast<QnVirtualCameraResource>();
+    if (camera && state)
+        updateCamera(camera);
+}
+
 void QnRecordingManager::at_cameraUpdated()
 {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource> (dynamic_cast<QnVirtualCameraResource*>(sender())->toSharedPointer());
@@ -300,6 +310,7 @@ void QnRecordingManager::onNewResource(QnResourcePtr res)
     if (camera) {
         connect(camera.data(), SIGNAL(statusChanged(QnResource::Status, QnResource::Status)), this, SLOT(at_cameraStatusChanged(QnResource::Status, QnResource::Status)));
         connect(camera.data(), SIGNAL(resourceChanged()), this, SLOT(at_cameraUpdated()));
+        connect(camera.data(), SIGNAL(initAsyncFinished(QnResourcePtr, bool)),                this, SLOT(at_initAsyncFinished(QnResourcePtr, bool)));
         updateCamera(camera);
         return;
     }

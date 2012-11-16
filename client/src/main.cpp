@@ -84,6 +84,7 @@
 #include "client/client_module.h"
 #include "platform/platform_abstraction.h"
 
+
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
     //USES_CONVERSION;
@@ -213,18 +214,10 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
-#include <utils/network/networkoptixmodulefinder.h>
-
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
-    NetworkOptixModuleFinder networkOptixModuleFinder;
-    networkOptixModuleFinder.start();
-    //::Sleep( 2000 );
-    ////enterpriseControllerSearcher->pleaseStop();
-    //delete enterpriseControllerSearcher;
-
     QnClientModule client(argc, argv);
 
     QTextStream out(stdout);

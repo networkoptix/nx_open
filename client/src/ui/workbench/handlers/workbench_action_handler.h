@@ -246,6 +246,7 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
@@ -343,6 +344,7 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QnLayoutResourcePtr m_exportLayout;  
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;

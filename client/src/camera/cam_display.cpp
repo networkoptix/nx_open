@@ -16,18 +16,16 @@
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
-#include "redass/redass_controller.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
-static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int LIVE_MEDIA_LEN_THRESHOLD = 100*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
     QMutexLocker locker(activityMutex());
 
-    if (qnSyncTime->currentMSecsSinceEpoch() >= activityTime)
+    if (QDateTime::currentMSecsSinceEpoch() >= activityTime)
     {
 #ifdef Q_OS_MAC
         UpdateSystemActivity(UsrActivity);
@@ -43,7 +41,7 @@ static void updateActivity()
             SetThreadExecutionState(ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
 #endif
         // Update system activity timer once per 20 seconds
-        activityTime = qnSyncTime->currentMSecsSinceEpoch() + 20000;
+        activityTime = QDateTime::currentMSecsSinceEpoch() + 20000;
     }
 }
 
@@ -114,9 +112,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
-	m_receivedInterval(0),
+	m_receivedInterval(0)
     m_fullScreen(false),
-    m_archiveReader(reader)
+    m_archiveReader(0)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -136,9 +134,17 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     qnRedAssController->registerConsumer(this);
 }
 
+void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
+{
+    m_audioBufferSize = bufferSize;
+    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
+    QMutexLocker lock(&m_audioChangeMutex);
+    delete m_audioDisplay;
+    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
+}
+
 QnCamDisplay::~QnCamDisplay()
 {
-    qnRedAssController->unregisterConsumer(this);
 
     Q_ASSERT(!isRunning());
     stop();
@@ -147,16 +153,6 @@ QnCamDisplay::~QnCamDisplay()
 
     clearVideoQueue();
     delete m_audioDisplay;
-}
-
-void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
-{
-    m_audioBufferSize = bufferSize;
-    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
-    QMutexLocker lock(&m_audioChangeMutex);
-    delete m_audioDisplay;
-    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
-
 }
 
 void QnCamDisplay::pause()
@@ -237,11 +233,6 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 		}
 	}
 };
-
-QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
-{
-    return m_archiveReader;
-}
 
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
@@ -677,11 +668,15 @@ void QnCamDisplay::onPrevFrameOccured()
 {
     m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::onNextFrameOccured()
 {
     m_singleShotQuantProcessed = false;
+    QMutexLocker lock(&m_audioChangeMutex);
+    m_audioDisplay->clearDeviceBuffer();
 }
 
 void QnCamDisplay::setSingleShotMode(bool single)
@@ -690,7 +685,7 @@ void QnCamDisplay::setSingleShotMode(bool single)
     if (m_singleShotMode) {
         m_isRealTimeSource = false;
         emit liveMode(false);
-        playAudio(false);
+        pauseAudio();
     }
 }
 
@@ -1181,6 +1176,16 @@ void QnCamDisplay::playAudio(bool play)
         setMTDecoding(play);
 }
 
+void QnCamDisplay::pauseAudio()
+{
+    m_playAudio = false;
+    {
+        QMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->suspend();
+    }
+    setMTDecoding(false);
+}
+
 //==========================================================================
 
 bool QnCamDisplay::haveAudio(float speed) const
@@ -1422,8 +1427,5 @@ bool QnCamDisplay::isFullScreen() const
 {
     return m_fullScreen;
 }
-
-void QnCamDisplay::setFullScreen(bool fullScreen)
-{
-    m_fullScreen = fullScreen;
-}
+QSize QnCamDisplay::getScreenSize() const
+    return m_display[0]->getScreenSize();

@@ -56,7 +56,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
-#include <ui/widgets/resource_tree_widget.h>
+#include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/help_widget.h>
 #include <ui/style/skin.h>
@@ -261,7 +261,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
 
     /* Tree widget. */
-    m_treeWidget = new QnResourceTreeWidget(NULL, context());
+    m_treeWidget = new QnResourceBrowserWidget(NULL, context());
     m_treeWidget->setAttribute(Qt::WA_TranslucentBackground);
     {
         QPalette palette = m_treeWidget->palette();
@@ -610,11 +610,11 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_sliderShowButton->setFocusProxy(m_sliderItem);
 
     QnImageButtonWidget *sliderZoomOutButton = new QnImageButtonWidget();
-    sliderZoomOutButton->setIcon(qnSkin->pixmap("item/zoom_out.png"));
+    sliderZoomOutButton->setIcon(qnSkin->icon("slider/buttons/zoom_out.png"));
     sliderZoomOutButton->setPreferredSize(16, 16);
 
     QnImageButtonWidget *sliderZoomInButton = new QnImageButtonWidget();
-    sliderZoomInButton->setIcon(qnSkin->pixmap("item/zoom_in.png"));
+    sliderZoomInButton->setIcon(qnSkin->icon("slider/buttons/zoom_in.png"));
     sliderZoomInButton->setPreferredSize(16, 16);
 
     QGraphicsLinearLayout *sliderZoomButtonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
@@ -1339,7 +1339,7 @@ void QnWorkbenchUi::updateSliderResizerGeometry() {
 }
 
 void QnWorkbenchUi::updateSliderZoomButtonsGeometry() {
-    QPointF pos = m_sliderItem->timeScrollBar()->mapToItem(m_controlsWidget, m_sliderItem->timeScrollBar()->rect().bottomLeft() - toPoint(m_sliderZoomButtonsWidget->size()));
+    QPointF pos = m_sliderItem->timeSlider()->mapToItem(m_controlsWidget, m_sliderItem->timeSlider()->rect().topLeft());
 
     m_sliderZoomButtonsWidget->setPos(pos);
 }

@@ -14,13 +14,14 @@
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
+class QnFfmpegVideoTranscoder;
 
 class QnStreamRecorder : public QnAbstractDataConsumer
 {
     Q_OBJECT
 
 public:
-    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
+    enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithTime, Role_FileExportWithEmptyContext};
 
     QnStreamRecorder(QnResourcePtr dev);
     virtual ~QnStreamRecorder();
@@ -74,6 +75,16 @@ public:
     * Transcode to specified audio codec is source codec is different
     */
     void setAudioCodec(CodecID codec);
+
+    /*
+    * Time difference between client and server time zone. Used for onScreen timestamp drawing
+    */
+    void setOnScreenDateOffset(int timeOffsetMs);
+
+    /*
+    * Server time zone. Used for export to avi/mkv files
+    */
+    void setServerTimeZoneMs(int value);
 signals:
     void recordingFailed(QString errMessage);
     void recordingStarted();
@@ -95,7 +106,7 @@ protected:
         Q_UNUSED(durationMs) Q_UNUSED(fileName) Q_UNUSED(provider) Q_UNUSED(fileSize)
     }
     virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider *provider) {
-        Q_UNUSED(startTimeMs) Q_UNUSED(fileName) Q_UNUSED(provider)
+        Q_UNUSED(startTimeMs) Q_UNUSED(timeZone) Q_UNUSED(fileName) Q_UNUSED(provider)
     }
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
@@ -149,7 +160,11 @@ private:
     QnCompressedVideoDataPtr m_lastIFrame;
     QSharedPointer<QIODevice> m_motionFileList[CL_MAX_CHANNELS];
     QnFfmpegAudioTranscoder* m_audioTranscoder;
+    QnFfmpegVideoTranscoder* m_videoTranscoder;
     CodecID m_dstAudioCodec;
+    CodecID m_dstVideoCodec;
+    int m_onscreenDateOffset;
+    qint64 m_serverTimeZoneMs;
 };
 
 #endif // _STREAM_RECORDER_H__

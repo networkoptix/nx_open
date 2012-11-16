@@ -5,8 +5,15 @@
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
 
-static const int SYNC_TIME_INTERVAL = 1000 * 60 * 5;
+enum {
+    EcTimeUpdatePeriod = 1000 * 60 * 5, /* 5 minutes. */
+    TimeChangeThreshold = 1000 * 30,    /* 30 seconds. */
+};
 
+
+// -------------------------------------------------------------------------- //
+// QnSyncTimeTask
+// -------------------------------------------------------------------------- //
 class QnSyncTimeTask: public QRunnable {
 public:
     QnSyncTimeTask(QnSyncTime* owner): m_owner(owner) {}
@@ -24,8 +31,9 @@ private:
 };
 
 
-// ------------------------------ QnSyncTime ------------------------------
-
+// -------------------------------------------------------------------------- //
+// QnSyncTime
+// -------------------------------------------------------------------------- //
 QnSyncTime::QnSyncTime()
 {
     reset();
@@ -34,9 +42,14 @@ QnSyncTime::QnSyncTime()
 void QnSyncTime::updateTime(qint64 newTime)
 {
     QMutexLocker lock(&m_mutex);
+    qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
+    
     m_lastReceivedTime = newTime;
     m_timer.restart();
     m_gotTimeTask = 0;
+
+    if(qAbs(oldTime - newTime) > TimeChangeThreshold)
+        emit timeChanged();
 }
 
 QDateTime QnSyncTime::currentDateTime()
@@ -61,7 +74,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
     QMutexLocker lock(&m_mutex);
     qint64 localTime = QDateTime::currentMSecsSinceEpoch();
-    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > SYNC_TIME_INTERVAL || qAbs(localTime-m_lastLocalTime) > SYNC_TIME_INTERVAL) && 
+    if ((m_lastReceivedTime == 0 || m_timer.elapsed() > EcTimeUpdatePeriod || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod) && 
         m_gotTimeTask == 0 && QnSessionManager::instance()->isReady() && !QnAppServerConnectionFactory::defaultUrl().isEmpty())
     {
         m_gotTimeTask = new QnSyncTimeTask(this);
@@ -71,7 +84,7 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 
     if (m_lastReceivedTime) {
         qint64 time = m_lastReceivedTime + m_timer.elapsed();
-        if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000*10)
+        if (qAbs(time - localTime) > 1000 * 10 && localTime - m_lastWarnTime > 1000 * 10)
         {
             m_lastWarnTime = localTime;
             if (m_lastWarnTime == 0)
@@ -84,9 +97,10 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
         return QDateTime::currentMSecsSinceEpoch();
 }
 
-Q_GLOBAL_STATIC(QnSyncTime, getInstance);
+Q_GLOBAL_STATIC(QnSyncTime, qn_syncTime_instance);
 
 QnSyncTime* QnSyncTime::instance()
 {
-    return getInstance();
+    return qn_syncTime_instance();
 }
+

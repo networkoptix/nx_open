@@ -1,5 +1,7 @@
 #include "time_period_loader.h"
+
 #include <utils/common/warnings.h>
+#include <utils/common/synctime.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
@@ -16,7 +18,6 @@ QnTimePeriodLoader::QnTimePeriodLoader(const QnMediaServerConnectionPtr &connect
 
     if(!resource)
         qnNullWarning(resource);
-
 }
 
 QnTimePeriodLoader *QnTimePeriodLoader::newInstance(QnResourcePtr resource, QObject *parent) {
@@ -103,8 +104,30 @@ int QnTimePeriodLoader::load(const QnTimePeriod &timePeriod, const QList<QRegion
     return handle;
 }
 
+void QnTimePeriodLoader::discardCachedData() {
+    QMutexLocker lock(&m_mutex);
+    m_loading.clear();
+    m_loadedData.clear();
+    m_loadedPeriods.clear();
+}
+
+int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
+{
+    return m_connection->asyncRecordedTimePeriods(
+        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
+        periodToLoad.startTimeMs, 
+        periodToLoad.startTimeMs + periodToLoad.durationMs, 
+        1, 
+        m_motionRegions,
+        this, 
+        SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
+    );
+}
+
 void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &timePeriods, int requstHandle)
 {
+    // TODO: I don't see a mutex here.
+
     for (int i = 0; i < m_loading.size(); ++i)
     {
         if (m_loading[i].handle == requstHandle)
@@ -156,18 +179,5 @@ void QnTimePeriodLoader::at_replyReceived(int status, const QnTimePeriodList &ti
             break;
         }
     }
-}
-
-int QnTimePeriodLoader::sendRequest(const QnTimePeriod &periodToLoad)
-{
-    return m_connection->asyncRecordedTimePeriods(
-        QnNetworkResourceList() << m_resource.dynamicCast<QnNetworkResource>(),
-        periodToLoad.startTimeMs, 
-        periodToLoad.startTimeMs + periodToLoad.durationMs, 
-        1, 
-        m_motionRegions,
-        this, 
-        SLOT(at_replyReceived(int, const QnTimePeriodList &, int))
-    );
 }
 
