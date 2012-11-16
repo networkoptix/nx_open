@@ -32,6 +32,8 @@
 #include <camera/cam_display.h>
 #include <camera/video_camera.h>
 
+#include <client/client_connection_data.h>
+
 #include <recording/time_period_list.h>
 
 #include <ui/style/skin.h>
@@ -90,6 +92,7 @@
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/resource_directory_browser.h"
+#include "../watchers/workbench_server_time_watcher.h"
 
 
 
@@ -475,8 +478,43 @@ bool QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resource
 }
 
 void QnWorkbenchActionHandler::closeLayouts(const QnLayoutResourceList &resources, const QnLayoutResourceList &rollbackResources, const QnLayoutResourceList &saveResources, QObject *object, const char *slot) {
-    if(!saveResources.empty())
-        snapshotManager()->save(saveResources, object, slot);
+    if(!saveResources.empty()) {
+        QnLayoutResourceList fileResources, normalResources;
+        foreach(const QnLayoutResourcePtr &resource, saveResources) {
+            if(snapshotManager()->isFile(resource)) {
+                fileResources.push_back(resource);
+            } else {
+                normalResources.push_back(resource);
+            }
+        }
+        
+        if(!normalResources.isEmpty())
+            snapshotManager()->save(normalResources, object, slot);
+
+        foreach(const QnLayoutResourcePtr &fileResource, fileResources) {
+            if (validateItemTypes(fileResource)) { // TODO: and if not?
+                bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
+                saveLayoutToLocalFile(fileResource->getLocalRange(), fileResource, fileResource->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+            }
+        }
+
+        if(normalResources.isEmpty()) {
+            QByteArray method(slot && *slot ? slot + 1 : slot);
+            int index = method.indexOf('(');
+            if(index != -1)
+                method.truncate(index);
+
+            QMetaObject::invokeMethod(
+                object, 
+                method.constData(), 
+                Qt::QueuedConnection, 
+                Q_ARG(int, 0),
+                Q_ARG(QByteArray, QByteArray()),
+                Q_ARG(QnResourceList, QnResourceList()),
+                Q_ARG(int, 0)
+            );
+        }
+    }
 
     foreach(const QnLayoutResourcePtr &resource, rollbackResources)
         snapshotManager()->restore(resource);
@@ -895,13 +933,12 @@ void QnWorkbenchActionHandler::at_saveLayoutAction_triggered(const QnLayoutResou
     if(!(accessController()->permissions(layout) & Qn::SavePermission))
         return;
 
-    if (layout->flags() & QnResource::local) {
+    if (snapshotManager()->isFile(layout)) {
         if (!validateItemTypes(layout))
             return;
-        bool isReadOnly = !(accessController()->permissions(layout) & Qn::ReadWriteSavePermission);
-        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // override layout
-    }
-    else {
+        bool isReadOnly = !(accessController()->permissions(layout) & Qn::WritePermission);
+        saveLayoutToLocalFile(layout->getLocalRange(), layout, layout->getUrl(), LayoutExport_LocalSave, isReadOnly); // overwrite layout file
+    } else {
         snapshotManager()->save(layout, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
     }
 }
@@ -1265,6 +1302,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
     QnSessionManager::instance()->stop();
 
+    QnAppServerConnectionFactory::setCurrentVersion(connectionInfo->version);
     QnAppServerConnectionFactory::setDefaultUrl(connectionData.url);
 
     // repopulate the resource pool
@@ -1278,9 +1316,6 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
         QnResourceDiscoveryManager::instance().setProperty(appserverAddedPropertyName, true);
     }
 #endif
-
-    //if(context()->user()) /* If we were connected... */
-        //workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1302,14 +1337,16 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     at_eventManager_connectionOpened();
 }
 
-void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
+void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
+    if(context()->user() && !closeAllLayouts(true))
+        return;
+
+    // TODO: Factor out common code from reconnect/disconnect/login actions.
+
     QnClientMessageProcessor::instance()->stop(); // TODO: blocks gui thread.
 //    QnSessionManager::instance()->stop(); // omfg... logic sucks
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
-
-    //if(context()->user()) /* If we were connected... */
-        //workbench()->clear(); // TODO: ask to save?
 
     // don't remove local resources
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
@@ -1318,6 +1355,9 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered(){
     resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
+
+    QnAppServerConnectionFactory::setCurrentVersion(QLatin1String(""));
+    // TODO: save workbench state on logout.
 }
 
 void QnWorkbenchActionHandler::at_editTagsAction_triggered() {
@@ -1482,6 +1522,7 @@ void QnWorkbenchActionHandler::at_cameraSettingsAction_triggered() {
         newlyCreated = true;
 
         connect(cameraSettingsDialog(), SIGNAL(buttonClicked(QDialogButtonBox::StandardButton)),    this, SLOT(at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton)));
+        connect(cameraSettingsDialog(), SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SLOT(at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &)));
         connect(cameraSettingsDialog(), SIGNAL(rejected()),                                         this, SLOT(at_cameraSettingsDialog_rejected()));
         connect(cameraSettingsDialog(), SIGNAL(advancedSettingChanged()),                            this, SLOT(at_cameraSettingsAdvanced_changed()));
     }
@@ -1530,6 +1571,10 @@ void QnWorkbenchActionHandler::at_cameraSettingsDialog_buttonClicked(QDialogButt
     default:
         break;
     }
+}
+
+void QnWorkbenchActionHandler::at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras){
+    connection()->saveAsync(cameras, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
 void QnWorkbenchActionHandler::at_cameraSettingsDialog_rejected() {
@@ -2031,6 +2076,19 @@ QString QnWorkbenchActionHandler::binaryFilterName(bool readOnly) const
     }
 }
 
+void QnWorkbenchActionHandler::removeLayoutFromPool(QnLayoutResourcePtr existingLayout)
+{
+    QnLayoutItemDataMap items = existingLayout->getItems();
+    for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
+    {
+        QnLayoutItemData& item = itr.value();
+        QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
+        if (layoutRes)
+            qnResPool->removeResource(layoutRes);
+    }
+    qnResPool->removeResource(existingLayout);
+}
+
 bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode)
 {
     if (!validateItemTypes(layout))
@@ -2116,18 +2174,8 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
     if (!existingLayout)
         existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
-    if (existingLayout) {
-        QnLayoutItemDataMap items = existingLayout->getItems();
-        for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
-        {
-            QnLayoutItemData& item = itr.value();
-            QnResourcePtr layoutRes = qnResPool->getResourceByUniqId(item.resource.path);
-            if (layoutRes)
-                qnResPool->removeResource(layoutRes);
-        }
-        qnResPool->removeResource(existingLayout);
-    }
-
+    if (existingLayout) 
+        removeLayoutFromPool(existingLayout);
 
     saveLayoutToLocalFile(exportPeriod, layout, fileName, mode, exportReadOnly);
 
@@ -2190,6 +2238,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     QIODevice* itemNamesIO = m_exportStorage->open(QLatin1String("item_names.txt"), QIODevice::WriteOnly);
     QTextStream itemNames(itemNamesIO);
+    QList<qint64> itemTimeZones;
 
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
@@ -2210,11 +2259,21 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
                     m_layoutExportResources << mediaRes;
                     uniqIdList << mediaRes->getUniqueId();
                 }
+                itemTimeZones << context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
             }
+            else 
+                itemTimeZones << Qn::InvalidUtcOffset;
         }
     }
     itemNames.flush();
     delete itemNamesIO;
+
+    QIODevice* itemTimezonesIO = m_exportStorage->open(QLatin1String("item_timezones.txt"), QIODevice::WriteOnly);
+    QTextStream itemTimeZonesStream(itemTimezonesIO);
+    foreach(qint64 timeZone, itemTimeZones)
+        itemTimeZonesStream << timeZone << QLatin1String("\n");
+    itemTimeZonesStream.flush();
+    delete itemTimezonesIO;
 
     QIODevice* device = m_exportStorage->open(QLatin1String("layout.pb"), QIODevice::WriteOnly);
     if (!device)
@@ -2264,16 +2323,18 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
         }
     }
 
-	// TODO: exoprt progres dialog can be already deleted?
+	// TODO: export progress dialog can be already deleted?
     exportProgressDialog->setRange(0, m_layoutExportResources.size() * 100);
     m_layoutExportCamera->setExportProgressOffset(-100);
     m_exportPeriod = exportPeriod;
+    m_exportLayout = layout;
     at_layoutCamera_exportFinished(fileName);
 }
 
 void QnWorkbenchActionHandler::at_layout_exportFinished()
 {
-    disconnect(sender(), NULL, this, NULL);
+    disconnect(sender(), NULL, this, NULL); // TODO: not needed here.
+
     if(m_exportProgressDialog)
         m_exportProgressDialog.data()->deleteLater();
     if (!m_exportStorage)
@@ -2282,17 +2343,15 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
     if (fileName.endsWith(QLatin1String(".tmp")))
     {
         fileName.chop(4);
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
         m_exportStorage->renameFile(m_exportStorage->getUrl(), fileName);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
     else if (m_layoutExportMode == LayoutExport_LocalSaveAs) 
     {
-        QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-        QString oldUrl = layout->getUrl();
+        QString oldUrl = m_exportLayout->getUrl();
         QString newUrl = m_exportStorage->getUrl();
 
-        QnLayoutItemDataMap items = layout->getItems();
+        QnLayoutItemDataMap items = m_exportLayout->getItems();
         for(QnLayoutItemDataMap::iterator itr = items.begin(); itr != items.end(); ++itr)
         {
             QnLayoutItemData& item = itr.value();
@@ -2300,19 +2359,19 @@ void QnWorkbenchActionHandler::at_layout_exportFinished()
             if (aviRes)
                 qnResPool->updateUniqId(aviRes, QnLayoutResource::updateNovParent(newUrl, item.resource.path));
         }
-        layout->setUrl(newUrl);
+        m_exportLayout->setUrl(newUrl);
 
 
-        layout->setName(QFileInfo(newUrl).fileName());
+        m_exportLayout->setName(QFileInfo(newUrl).fileName());
 
         QnLayoutFileStorageResourcePtr novStorage = m_exportStorage.dynamicCast<QnLayoutFileStorageResource>();
         if (novStorage)
             novStorage->switchToFile(oldUrl, newUrl, false);
-        snapshotManager()->store(layout);
+        snapshotManager()->store(m_exportLayout);
     }
-    else {
+    else if (m_exportLayout && m_exportStorage) {
         QnLayoutResourcePtr layout =  QnResourceDirectoryBrowser::layoutFromFile(m_exportStorage->getUrl());
-        if (layout && !resourcePool()->getResourceByGuid(layout->getUniqueId())) {
+        if (!resourcePool()->getResourceByGuid(layout->getUniqueId())) {
             layout->setStatus(QnResource::Online);
             resourcePool()->addResource(layout);
         }
@@ -2366,7 +2425,7 @@ void QnWorkbenchActionHandler::at_layoutCamera_exportFinished(QString fileName)
         uniqId = uniqId.mid(uniqId.indexOf(L'?')+1); // simplify name if export from existing layout
         //QnStreamRecorder::Role role = m_exportStorage ? QnStreamRecorder::Role_FileExportWithEmptyContext : QnStreamRecorder::Role_FileExport;
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
-        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::sync)))
+        if (m_exportStorage && (m_exportedMediaRes->hasFlags(QnResource::utc)))
             role = QnStreamRecorder::Role_FileExportWithEmptyContext;
         m_layoutExportCamera->exportMediaPeriodToFile(m_exportPeriod.startTimeMs * 1000ll, (m_exportPeriod.startTimeMs + m_exportPeriod.durationMs) * 1000ll, uniqId, QLatin1String("mkv"), m_exportStorage, role);
 
@@ -2468,9 +2527,11 @@ Do you want to continue?"),
 
     QString fileName;
     QString selectedExtension;
-    QString allowedFormatFilter = tr("AVI (Audio/Video Interleaved)(*.avi);;Matroska (*.mkv);;") + binaryFilterName(false);
+    QString selectedFilter;
+    QString allowedFormatFilter = tr("AVI (*.avi);;Matroska (*.mkv);;");
+    allowedFormatFilter += tr("AVI with Timestamps (Requires Transcoding)(*.avi);;Matroska  with Timestamps (Requires Transcoding)(*.mkv);;");
+    allowedFormatFilter += binaryFilterName(false);
     while (true) {
-        QString selectedFilter;
         fileName = QFileDialog::getSaveFileName(
             this->widget(), 
             tr("Export Video As..."),
@@ -2537,6 +2598,12 @@ Do you want to continue?"),
 
     if (selectedExtension.toLower() == QLatin1String(".exe")) 
     {
+        QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QLatin1String("layout://") + fileName).dynamicCast<QnLayoutResource>();
+        if (!existingLayout)
+            existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
+        if (existingLayout)
+            removeLayoutFromPool(existingLayout);
+
         QnLayoutResourcePtr newLayout(new QnLayoutResource());
 
         QnLayoutItemData itemData = widget->item()->layout()->resource()->getItem(widget->item()->uuid());
@@ -2561,7 +2628,18 @@ Do you want to continue?"),
         connect(m_exportedCamera,       SIGNAL(exportFailed(QString)),      this,                   SLOT(at_camera_exportFailed(QString)));
         connect(m_exportedCamera,       SIGNAL(exportFinished(QString)),    this,                   SLOT(at_camera_exportFinished(QString)));
 
-        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1));
+        QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
+        if (selectedFilter.contains(tr("with Timestamps")))
+            role = QnStreamRecorder::Role_FileExportWithTime;
+        QnMediaResourcePtr mediaRes = m_exportedCamera->getDevice().dynamicCast<QnMediaResource>();
+        int timeOffset = 0;
+        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+            // time difference between client and server
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0);
+        }
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
+        m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
+                                                  QnStorageResourcePtr(), role, timeOffset, serverTimeZone);
         exportProgressDialog->exec();
     }
 }

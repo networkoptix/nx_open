@@ -85,8 +85,10 @@ private:
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDateTime& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, const QDate& time);
     bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, qint64 msTime);
+    bool loadIndexFile(QVector<IndexRecord>& index, IndexHeader& indexHeader, QFile& indexFile);
 
     void loadRecordedRange();
+    int getSizeForTime(qint64 timeMs, bool reloadIndex);
 
     friend class QnMotionArchiveConnection;
 private:
@@ -104,7 +106,11 @@ private:
 
     qint64 m_minMotionTime;
     qint64 m_maxMotionTime;
+    qint64 m_lastRecordedTime;
     qint64 m_lastTimestamp;
+    int m_middleRecordNum;
+    QVector<IndexRecord> m_index;
+    IndexHeader m_indexHeader;
 };
 
 #endif // __MOTION_WRITER_H__

@@ -63,7 +63,9 @@
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
-#include "rest/handlers/gettime_handler.h"
+#include "rest/handlers/time_handler.h"
+#include "platform/platform_abstraction.h"
+#include "rest/handlers/version_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -405,6 +407,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrl.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
@@ -562,7 +565,8 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/version", new QnVersionHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -724,7 +728,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
@@ -792,6 +796,8 @@ protected:
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
 
+        new QnPlatformAbstraction(app);
+
         if (guid.isEmpty())
         {
             cl_log.log("Can't save guid. Run once as administrator.", cl_logERROR);
@@ -812,6 +818,8 @@ protected:
 
     void stop()
     {
+        m_main.exit();
+        m_main.wait();
         stopServer(0);
     }
 

@@ -62,8 +62,10 @@ namespace detail {
         Q_OBJECT
     public:
         QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
     public slots:
         void at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString */ , int /*handle*/);
+
     signals:
         void finished(const QnStatisticsDataList &/* usage data */);
     };
@@ -73,12 +75,28 @@ namespace detail {
         Q_OBJECT
     public:
         QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
     public slots:
         void at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
         void at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
+
     signals:
         void finishedSearch(const QnCamerasFoundInfoList &);
+        void searchError(int, const QString &);
         void finishedAdd(int);
+    };
+
+    class QnMediaServerGetTimeReplyProcessor: public QObject
+    {
+        Q_OBJECT
+    public:
+        QnMediaServerGetTimeReplyProcessor(QObject *parent = NULL): QObject(parent) {}
+
+    public slots:
+        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+
+    signals:
+        void finished(int status, const QDateTime &dateTime, int utcOffset, int handle);
     };
 
     //!Handles response on GetParam request
@@ -129,7 +147,8 @@ namespace detail {
     private:
          QList<QPair<QString, bool> > m_operationResult;
     };
-}
+
+} // namespace detail
 
 
 class QN_EXPORT QnMediaServerConnection: public QObject
@@ -161,6 +180,7 @@ public:
 
 	/** 
 	 * Set \a camera params.
+	 * 
 	 * Returns immediately. On request completion \a slot of object \a target is 
 	 * called with signature <tt>(int httpStatusCode, const QList<QPair<QString, bool> > &operationResult)</tt>
 	 * \a status is 0 in case of success, in other cases it holds error code
@@ -190,22 +210,26 @@ public:
      */
     int syncGetStatistics(QObject *target, const char *slot);
 
-    int asyncGetManualCameraSearch(QObject *target, const char *slot,
-                                   const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port);
+    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
+    int asyncGetManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+                                   QObject *target, const char *slotSuccess, const char *slotError);
 
-    int asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password);
+    // TODO: #gdm why 'Get'? This is not a get request. To #Elric: really that's an http GET request.
+    int asyncGetManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+                                QObject *target, const char *slot);
 
     int asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot);
     int asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot);
+
+    int asyncGetTime(QObject *target, const char *slot);
+
+protected:
+    QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
 
 private:
     int recordedTimePeriods(const QnRequestParamList &params, QnTimePeriodList &timePeriodList, QByteArray &errorString);
 
     int asyncRecordedTimePeriods(const QnRequestParamList &params, QObject *target, const char *slot);
-
-protected:
-    QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
 
 private:
     QUrl m_url;

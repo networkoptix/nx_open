@@ -20,7 +20,7 @@
 
 struct AVCodecContext;
 
-enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_AlwaysHigh, MEDIA_Quality_None};
+enum MediaQuality { MEDIA_Quality_High, MEDIA_Quality_Low, MEDIA_Quality_None};
 
 class QnMediaContext {
 public:
@@ -99,6 +99,9 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     virtual ~QnAbstractMediaData()
     {
     }
+
+    bool isLQ() const { return flags & MediaFlags_LowQuality; }
+    bool isLive() const { return flags & MediaFlags_LIVE; }
 
     QnByteArray data;
     DataType dataType;
@@ -354,6 +357,17 @@ private:
 };
 typedef QSharedPointer<QnCompressedAudioData> QnCompressedAudioDataPtr;
 
-//typedef CLThreadQueue<QnAbstractDataPacketPtr> CLDataQueue;
+
+class CLDataQueue: public CLThreadQueue<QnAbstractDataPacketPtr> 
+{
+public:
+    CLDataQueue(int size): CLThreadQueue<QnAbstractDataPacketPtr> (size) {}
+
+
+    qint64 mediaLength() const;
+private:
+    void getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const;
+};
+
 
 #endif //abstract_media_data_h_112

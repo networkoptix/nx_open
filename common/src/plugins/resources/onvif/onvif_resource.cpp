@@ -397,6 +397,9 @@ void QnPlOnvifResource::fetchAndSetPrimarySecondaryResolution()
     if (m_secondaryResolution == EMPTY_RESOLUTION_PAIR)
         m_secondaryResolution = getNearestResolutionForSecondary(SECONDARY_STREAM_DEFAULT_RESOLUTION, 0.0); // try to get resolution ignoring aspect ration
 
+    qDebug() << "ONVIF debug: got secondary resolution" << m_secondaryResolution << "encoders for camera " << getHostAddress();
+
+
     if (m_secondaryResolution != EMPTY_RESOLUTION_PAIR) {
         Q_ASSERT(m_secondaryResolution.first <= SECONDARY_STREAM_MAX_RESOLUTION.first &&
             m_secondaryResolution.second <= SECONDARY_STREAM_MAX_RESOLUTION.second);
@@ -516,6 +519,16 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
+QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
+{
+    QUrl url(QString::fromStdString(onvifUrl));
+    QUrl mediaUrl(getUrl());
+    url.setHost(getHostAddress().toString());
+    if (updatePort && mediaUrl.port(-1) != -1)
+        url.setPort(mediaUrl.port());
+    return url.toString();
+}
+
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
     bool result = true;
@@ -528,7 +541,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     QString hardwareId;
     
     //Trying to get name
-    if (getName().isEmpty())
+    if (getName().isEmpty() || getModel().isEmpty())
     {
         DeviceInfoReq request;
         DeviceInfoResp response;
@@ -544,7 +557,10 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         } 
         else
         {
-            setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            if (getName().isEmpty())
+                setName(QString::fromStdString(response.Manufacturer) + QLatin1String(" - ") + QString::fromStdString(response.Model));
+            setModel(QLatin1String(response.Model.c_str()));
+            setFirmware(QLatin1String(response.FirmwareVersion.c_str()));
             hardwareId = QString::fromStdString(response.HardwareId);
         }
     }
@@ -569,19 +585,19 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             //TODO:UTF unuse std::string
             if (response.Capabilities->Media) 
             {
-                setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
+                setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
             }
             if (response.Capabilities->Imaging)
             {
-                setImagingUrl(QString::fromStdString(response.Capabilities->Imaging->XAddr));
+                setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
             }
             if (response.Capabilities->Device) 
             {
-                setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
+                setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
             }
             if (response.Capabilities->PTZ) 
             {
-                setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
+                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
             }
         }
     }
@@ -1105,6 +1121,8 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     setVideoEncoderOptions(optionsList[0].optionsResp);
     checkMaxFps(confResponse, optionsList[0].id);
 
+    qDebug() << "ONVIF debug: got" << optionsList.size() << "encoders for camera " << getHostAddress();
+
     {
         QMutexLocker lock(&m_mutex);
         m_secondaryResolutionList = m_resolutionList;
@@ -1116,9 +1134,11 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
             if (optionsList[1].optionsResp.Options->H264) {
                 m_secondaryH264Profile = getH264StreamProfile(optionsList[1].optionsResp);
                 setCodec(H264, false);
+                qDebug() << "use H264 codec for secondary stream. camera=" << getHostAddress();
             }
             else {
                 setCodec(JPEG, false);
+                qDebug() << "use JPEG codec for secondary stream. camera=" << getHostAddress();
             }
             updateSecondaryResolutionList(optionsList[1].optionsResp);
         }
@@ -1132,6 +1152,13 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
     QMutexLocker lock(&m_mutex);
 
     bool dualStreaming = m_secondaryResolution != EMPTY_RESOLUTION_PAIR && !m_secondaryVideoEncoderId.isEmpty();
+    if (dualStreaming)
+        qDebug() << "ONVIF debug: enable dualstreaming for camera" << getHostAddress();
+    else {
+        QString reason = m_secondaryResolution == EMPTY_RESOLUTION_PAIR ? QLatin1String("no secondary resolution") : QLatin1String("no secondary encoder");
+        qDebug() << "ONVIF debug: disable dualstreaming for camera" << getHostAddress() << "reason:" << reason;
+    }
+
     setParam(DUAL_STREAMING_PARAM_NAME, dualStreaming ? 1 : 0, QnDomainDatabase);
     return true;
 }

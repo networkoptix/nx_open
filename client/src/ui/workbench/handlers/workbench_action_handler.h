@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 #include <ui/actions/actions.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 #include <utils/settings.h>
 
 class QAction;
@@ -246,6 +246,7 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
@@ -316,7 +317,7 @@ private:
     bool doAskNameAndExportLocalLayout(const QnTimePeriod& exportPeriod, QnLayoutResourcePtr layout, LayoutExportMode mode);
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
-
+    void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -343,6 +344,7 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QnLayoutResourcePtr m_exportLayout;  
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;

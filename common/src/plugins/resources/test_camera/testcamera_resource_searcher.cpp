@@ -56,6 +56,7 @@ QnResourceList QnTestCameraResourceSearcher::findResources(void)
 
                 resource->setTypeId(rt);
                 resource->setName(resName);
+                resource->setModel(resName);
                 QString mac(s);
                 resource->setMAC(mac);
                 resource->setDiscoveryAddr(ipaddrs.at(i).address);

@@ -34,6 +34,8 @@ QnCameraSettingsWidget::QnCameraSettingsWidget(QWidget *parent, QnWorkbenchConte
     connect(m_multiWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(moreLicensesRequested()), this, SLOT(at_moreLicensesRequested()));
     connect(m_singleWidget, SIGNAL(advancedSettingChanged()), this, SLOT(at_advancedSettingChanged()));
+    connect(m_singleWidget, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
+    connect(m_multiWidget,  SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
     /* Stack per-mode widgets. */
     m_stackedWidget = new QStackedWidget(this);
@@ -271,4 +273,17 @@ bool QnCameraSettingsWidget::isValidMotionRegion(){
     if (mode() == SingleMode)
         return m_singleWidget->isValidMotionRegion();
     return true;
+}
+
+void QnCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
+    switch(mode()) {
+    case SingleMode:
+        m_singleWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    case MultiMode:
+        m_multiWidget->setExportScheduleButtonEnabled(enabled);
+        break;
+    default:
+        break;
+    }
 }

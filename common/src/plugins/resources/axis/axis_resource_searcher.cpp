@@ -104,6 +104,7 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
 
     resource->setTypeId(rt);
     resource->setName(name);
+    (resource.dynamicCast<QnPlAxisResource>())->setModel(name);
     resource->setMAC(mac);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
     resource->setAuth(auth);
@@ -180,7 +181,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
     }
 
 
-    QnNetworkResourcePtr resource ( new QnPlAxisResource() );
+    QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
@@ -188,6 +189,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
     resource->setTypeId(rt);
     resource->setName(name);
+    resource->setModel(name);
     resource->setMAC(smac);
 
     local_results.push_back(resource);
@@ -211,7 +213,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
         for (int i = 2; i <= channesl; ++i)
         {
-            QnNetworkResourcePtr resource ( new QnPlAxisResource() );
+            QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
             QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
             if (!rt.isValid())
@@ -219,6 +221,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
 
             resource->setTypeId(rt);
             resource->setName(name);
+            resource->setModel(name);
             resource->setMAC(smac);
 
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));

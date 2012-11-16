@@ -195,3 +195,12 @@ QString getValueFromString(const QString& line)
 
     return line.mid(index+1);
 }
+
+int currentTimeZone()
+{
+    QDateTime dt1(QDateTime::currentDateTime());
+    QDateTime dt2 = dt1.toUTC();
+    dt1.setTimeSpec(Qt::UTC);
+    int res = dt2.secsTo(dt1);
+    return res;
+}

@@ -34,6 +34,7 @@ private:
     QnCompressedVideoDataPtr m_lastKeyFrame;
     int m_gotIFramesMask;
     int m_allChannelsMask;
+    bool m_isSecondaryStream;
 };
 
 QnVideoCameraGopKeeper::QnVideoCameraGopKeeper(QnResourcePtr resource): 
@@ -145,7 +146,7 @@ int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue)
     {
         QnAbstractDataPacketPtr data = m_dataQueue.at(i);
         QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
-        if (skipTime && video && video->timestamp <= skipTime)
+        if (video && skipTime && video->timestamp <= skipTime)
         {
             QnCompressedVideoData* newData = video->clone();
             newData->flags |= QnAbstractMediaData::MediaFlags_Ignore;
@@ -188,11 +189,25 @@ void QnVideoCamera::beforeStop()
     if (m_secondaryGopKeeper)
         m_secondaryGopKeeper->beforeDisconnectFromResource();
 
-    if (m_primaryReader)
-        m_primaryReader->pleaseStop();
+    if (m_primaryGopKeeper)
+        m_primaryGopKeeper->disconnectFromResource();
+    if (m_secondaryGopKeeper)
+        m_secondaryGopKeeper->disconnectFromResource();
 
-    if (m_secondaryReader)
+    if (m_primaryReader) {
+        m_primaryReader->removeDataProcessor(m_primaryGopKeeper);
+        m_primaryReader->pleaseStop();
+    }
+
+    if (m_secondaryReader) {
+        m_secondaryReader->removeDataProcessor(m_primaryGopKeeper);
         m_secondaryReader->pleaseStop();
+    }
+
+    if (m_primaryReader)
+        m_primaryReader->stop();
+    if (m_secondaryReader)
+        m_secondaryReader->stop();
 }
 
 QnVideoCamera::~QnVideoCamera()

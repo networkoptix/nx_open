@@ -23,11 +23,10 @@ fi
 function read_config {
     [ -f $CONFIG_FILE ] || { true; return; }
 
-    ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid=\(.*\)/\1/g')
-    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile=\(.*\)/\1/g')
-    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port=\(.*\)/\1/g')
-    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort=\(.*\)/\1/g')
-    ECS_PASSWORD=$(cat $CONFIG_FILE | grep password | head -1 | sed 's/password=\(.*\)/\1/g')
+    ECS_GUID=$(cat $CONFIG_FILE | grep ecsGuid | head -1 | sed 's/ecsGuid\s*=\s*\(.*\)/\1/g')
+    LOG_FILE=$(cat $CONFIG_FILE | grep logFile | head -1 | sed 's/logFile\s*=\s*\(.*\)/\1/g')
+    ECS_PORT=$(cat $CONFIG_FILE | grep port | head -1 | sed 's/port\s*=\s*\(.*\)/\1/g')
+    ECS_PROXY_PORT=$(cat $CONFIG_FILE | grep proxyPort | head -1 | sed 's/proxyPort\s*=\s*\(.*\)/\1/g')
 }
 
 function write_config {
@@ -108,7 +107,7 @@ case "$1" in
 
       ECS_PORT=$(ask_for_value ecsPort "$ECS_PORT")
       ECS_PROXY_PORT=$(ask_for_value ecsProxyPort "$ECS_PROXY_PORT")
-      ECS_PASSWORD=$(ask_for_value ecsPassword "$ECS_PASSWORD")
+      ECS_PASSWORD=$(ask_for_value ecsPassword "")
 
       write_config
 

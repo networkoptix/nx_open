@@ -9,6 +9,18 @@
 
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/animation/animation_event.h>
+#include <ui/animation/animation_timer.h>
+
+namespace {
+    struct NonHandScrollable {
+        bool operator()(QGraphicsItem *item) const {
+            QGraphicsObject *object = item ? item->toGraphicsObject() : NULL;
+            return object && object->property(Qn::NoHandScrollOver).toBool();
+        }
+    };
+
+} // anonymous namespace
+
 
 HandScrollInstrument::HandScrollInstrument(QObject *parent):
     base_type(Viewport, makeSet(QEvent::MouseButtonPress, QEvent::MouseMove, QEvent::MouseButtonRelease, AnimationEvent::Animation), parent),
@@ -60,9 +72,7 @@ bool HandScrollInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event
     if (!(event->button() & m_mouseButtons))
         return false;
 
-    QGraphicsItem *item = this->item(view(viewport), event->pos()); 
-    QGraphicsObject *object = item ? item->toGraphicsObject() : NULL;
-    if(object && object->property(Qn::NoHandScrollOver).toBool())
+    if(item(view(viewport), event->pos(), NonHandScrollable()))
         return false;
 
     kineticProcessor()->reset();

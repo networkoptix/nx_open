@@ -56,7 +56,10 @@ void QnPlaybackMaskHelper::setPlaybackMask(const QnTimePeriodList& playbackMask)
 
     if (m_playbackRange.isEmpty())
         m_playbackMask = playbackMask;
-    else
+    else {
         m_playbackMask = playbackMask.intersected(m_playbackRange);
+        if (m_playbackMask.isEmpty() && !m_playbackRange.isEmpty())
+            m_playbackMask << m_playbackRange;
+    }
     m_curPlaybackPeriod.clear();
 }

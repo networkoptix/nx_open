@@ -83,6 +83,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_physicalid())
         camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
+    camera->setModel(QString::fromStdString(pb_camera.model()));
+    camera->setFirmware(QString::fromStdString(pb_camera.firmware()));
+
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
 
@@ -151,6 +154,9 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
     if (pb_server.has_streamingurl())
         server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
+
+    if (pb_server.has_version())
+        server->setVersion(QString::fromUtf8(pb_server.version().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -476,6 +482,8 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());
+    pb_camera.set_model(cameraPtr->getModel().toUtf8().constData());
+    pb_camera.set_firmware(cameraPtr->getFirmware().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_cameraResource.set_disabled(cameraPtr->isDisabled());

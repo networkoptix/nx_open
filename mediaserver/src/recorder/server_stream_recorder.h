@@ -21,8 +21,6 @@ public:
     void updateScheduleInfo(qint64 timeMs);
 
     void setDualStreamingHelper(QnDualStreamingHelperPtr helper);
-signals:
-    void fpsChanged(QnServerStreamRecorder* recorder, float value);
 protected:
     virtual bool processData(QnAbstractDataPacketPtr data);
 
@@ -30,7 +28,7 @@ protected:
     void beforeProcessData(QnAbstractMediaDataPtr media);
     virtual bool saveMotion(QnMetaDataV1Ptr motion) override;
 
-    virtual void fileStarted(qint64 startTimeMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
+    virtual void fileStarted(qint64 startTimeMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider) override;
     virtual void fileFinished(qint64 durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize) override;
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider* provider) override;
     virtual bool canAcceptData() const;

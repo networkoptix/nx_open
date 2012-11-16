@@ -24,13 +24,13 @@
 #include <ui/style/globals.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_item.h>
-#include <ui/graphics/instruments/hand_scroll_instrument.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 
 #include "time_slider_pixmap_cache.h"
 
 namespace {
+
     QTime msecsToTime(qint64 msecs) {
         return QTime(0, 0, 0, 0).addMSecs(msecs); 
     }
@@ -305,7 +305,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_thumbnailsVisible(false),
     m_rulerHeight(0.0),
     m_prefferedHeight(0.0),
-    m_pixmapCache(QnTimeSliderPixmapCache::instance())
+    m_pixmapCache(QnTimeSliderPixmapCache::instance()),
+    m_localOffset(0)
 {
     m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS\nAVAILABLE"), 16, QColor(255, 255, 255, 255));
 
@@ -340,7 +341,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     /* Set default property values. */
     setAcceptHoverEvents(true);
     setProperty(Qn::SliderLength, 0);
-    setProperty(Qn::NoHandScrollOver, true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred, QSizePolicy::Slider);
 
     setWindowStart(minimum());
@@ -571,8 +571,8 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
         if(animate) {
             kineticProcessor()->reset(); /* Stop kinetic zoom. */
             m_animating = true;
-            m_animationStart = start;
-            m_animationEnd = end;
+            setAnimationStart(start);
+            setAnimationEnd(end);
         } else {
             m_windowStart = start;
             m_windowEnd = end;
@@ -739,11 +739,27 @@ void QnTimeSlider::finishAnimations() {
     animateThumbnails(10 * 1000);
 
     if(m_animating) {
-        setWindow(m_animationStart, m_animationEnd);
+        setWindow(animationStart(), animationEnd());
         m_animating = false;
     }
 
     kineticProcessor()->reset();
+}
+
+void QnTimeSlider::setAnimationStart(qint64 start) {
+    m_animationStart = start == minimum() ? std::numeric_limits<qint64>::min() : start;
+}
+
+void QnTimeSlider::setAnimationEnd(qint64 end) {
+    m_animationEnd = end == maximum() ? std::numeric_limits<qint64>::max() : end;
+}
+
+qint64 QnTimeSlider::animationStart() {
+    return m_animationStart == std::numeric_limits<qint64>::min() ? minimum() : m_animationStart;
+}
+
+qint64 QnTimeSlider::animationEnd() {
+    return m_animationEnd == std::numeric_limits<qint64>::max() ? maximum() : m_animationEnd;
 }
 
 bool QnTimeSlider::isAnimatingWindow() const {
@@ -900,6 +916,14 @@ void QnTimeSlider::setIndicators(const QVector<qint64> &indicators) {
     m_indicators = indicators;
 }
 
+qint64 QnTimeSlider::localOffset() const {
+    return m_localOffset;
+}
+
+void QnTimeSlider::setLocalOffset(qint64 localOffset) {
+    m_localOffset = localOffset;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Updating
@@ -918,7 +942,7 @@ void QnTimeSlider::updateToolTipText() {
 
     QString toolTip;
     if(m_options & UseUTC) {
-        toolTip = QDateTime::fromMSecsSinceEpoch(pos).toString(m_toolTipFormat);
+        toolTip = QDateTime::fromMSecsSinceEpoch(pos + m_localOffset).toString(m_toolTipFormat);
     } else {
         toolTip = msecsToTime(pos).toString(m_toolTipFormat);
     }
@@ -1483,8 +1507,8 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
 
     /* Find initial and maximal positions. */
     QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
-    qint64 startPos = valueFromPosition(positionFromValue(m_windowStart) - overlap, false);
-    qint64 endPos = valueFromPosition(positionFromValue(m_windowEnd) + overlap, false);
+    qint64 startPos = valueFromPosition(positionFromValue(m_windowStart) - overlap, false) + m_localOffset;
+    qint64 endPos = valueFromPosition(positionFromValue(m_windowEnd) + overlap, false) + m_localOffset;
 
     /* Initialize next positions for tickmark steps. */
     for(int i = minStepIndex; i < stepCount; i++)
@@ -1510,7 +1534,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         }
         index--;
 
-        qreal x = quickPositionFromValue(pos, false);
+        qreal x = quickPositionFromValue(pos - m_localOffset, false);
 
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
@@ -1523,7 +1547,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         }
 
         /* Calculate line ends. */
-        if(pos >= m_windowStart && pos <= m_windowEnd) {
+        if(pos - m_localOffset >= m_windowStart && pos - m_localOffset <= m_windowEnd) {
             m_tickmarkLines[index] << 
                 QPointF(x, rect.top() + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
                 QPointF(x, rect.top() + lineHeight);
@@ -1560,12 +1584,12 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     QnScopedPainterBrushRollback brushRollback(painter);
 
     /* Draw highlight. */
-    qint64 pos1 = roundUp(m_windowStart, highlightStep);
+    qint64 pos1 = roundUp(m_windowStart + m_localOffset, highlightStep);
     qint64 pos0 = sub(pos1, highlightStep);
     qreal x0 = quickPositionFromValue(m_windowStart);
     qint64 number = absoluteNumber(pos1, highlightStep);
     while(true) {
-        qreal x1 = quickPositionFromValue(pos1);
+        qreal x1 = quickPositionFromValue(pos1 - m_localOffset);
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
@@ -1741,14 +1765,17 @@ void QnTimeSlider::tick(int deltaMSecs) {
     if(!m_animating) {
         animateStepValues(deltaMSecs);
     } else {
-        qreal distance = qAbs(m_animationStart - m_windowStart) + qAbs(m_animationEnd - m_windowEnd);
+        qint64 animationStart = this->animationStart();
+        qint64 animationEnd = this->animationEnd();
+
+        qreal distance = qAbs(animationStart - m_windowStart) + qAbs(animationEnd - m_windowEnd);
         qreal delta = 8.0 * deltaMSecs / 1000.0 * qMax(distance, 2.0 * static_cast<qreal>(m_windowEnd - m_windowStart));
 
         if(delta > distance) {
-            setWindow(m_animationStart, m_animationEnd);
+            setWindow(animationStart, animationEnd);
         } else {
-            qreal startFraction = (m_animationStart - m_windowStart) / distance;
-            qreal endFraction  = (m_animationEnd - m_windowEnd) / distance;
+            qreal startFraction = (animationStart - m_windowStart) / distance;
+            qreal endFraction  = (animationEnd - m_windowEnd) / distance;
 
             setWindow(
                 m_windowStart + static_cast<qint64>(delta * startFraction),
@@ -1756,7 +1783,7 @@ void QnTimeSlider::tick(int deltaMSecs) {
             );
         }
 
-        if(m_animationStart == m_windowStart && m_animationEnd == m_windowEnd)
+        if(animationStart == m_windowStart && animationEnd == m_windowEnd)
             m_animating = false;
 
         animateStepValues(8.0 * deltaMSecs);

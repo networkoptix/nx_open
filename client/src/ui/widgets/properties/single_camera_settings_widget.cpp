@@ -65,6 +65,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
     connect(ui->webPageLabel,           SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
     connect(ui->motionWebPageLabel,     SIGNAL(linkActivated(const QString &)), this,   SLOT(at_linkActivated(const QString &)));
 
@@ -72,7 +73,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->softwareMotionButton,   SIGNAL(clicked(bool)),                  this,   SLOT(at_motionTypeChanged()));
     connect(ui->sensitivitySlider,      SIGNAL(valueChanged(int)),              this,   SLOT(updateMotionWidgetSensitivity()));
     connect(ui->resetMotionRegionsButton, SIGNAL(clicked()),                    this,   SLOT(at_motionSelectionCleared()));
-    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButtonClicked()));
+    connect(ui->pingButton,             SIGNAL(clicked()),                      this,   SLOT(at_pingButton_clicked()));
 
     updateFromResource();
 }
@@ -309,6 +310,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
     if(!m_camera) {
         ui->nameEdit->setText(QString());
+        ui->modelEdit->setText(QString());
         ui->enableAudioCheckBox->setChecked(false);
         ui->macAddressEdit->setText(QString());
         ui->ipAddressEdit->setText(QString());
@@ -334,6 +336,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
 
         ui->nameEdit->setText(m_camera->getName());
+        ui->modelEdit->setText(m_camera->getModel());
         ui->enableAudioCheckBox->setChecked(m_camera->isAudioEnabled());
         ui->enableAudioCheckBox->setEnabled(m_camera->isAudioSupported());
         ui->macAddressEdit->setText(m_camera->getMAC().toString());
@@ -504,6 +507,10 @@ bool QnSingleCameraSettingsWidget::isValidMotionRegion(){
     return m_motionWidget->isValidMotionRegion();
 }
 
+void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
+    ui->cameraScheduleWidget->setExportScheduleButtonEnabled(enabled);
+}
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
@@ -599,14 +606,15 @@ void QnSingleCameraSettingsWidget::at_advancedSettingsLoaded(int httpStatusCode,
     //}
 }
 
-void QnSingleCameraSettingsWidget::at_pingButtonClicked() {
+void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 #ifdef Q_OS_WIN
     QString cmd = QLatin1String("cmd /C ping %1 -t");
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
 #endif
-    QString ipAddress = m_camera->getUrl();
-    QProcess::startDetached(cmd.arg(ipAddress));
+    QUrl url = QUrl::fromUserInput(m_camera->getUrl());
+    QString host = url.host();
+    QProcess::startDetached(cmd.arg(host));
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

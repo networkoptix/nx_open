@@ -9,6 +9,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+#include <client/client_globals.h>
 
 class QnResourceModelPrivate;
 class QnResourcePool;
@@ -17,10 +18,10 @@ class QnWorkbenchContext;
 class QnWorkbenchLayoutSnapshotManager;
 
 class QnResourcePoolModel : public QAbstractItemModel, public QnWorkbenchContextAware {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    explicit QnResourcePoolModel(QObject *parent = 0);
+    explicit QnResourcePoolModel(QObject *parent = 0, Qn::NodeType rootNodeType = Qn::RootNode);
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -74,10 +75,11 @@ private slots:
     void at_resource_itemRemoved(const QnLayoutItemData &item);
 
 private:
-    /** Root node. */
-    Node *m_rootNode;
+    /** Root nodes array */
+    Node *m_rootNodes[Qn::NodeTypeCount];
 
-    Node *m_serversNode, *m_localNode, *m_usersNode;
+    /** Set of top-level node types */
+    QList<Qn::NodeType> m_rootNodeTypes;
 
     /** Mapping for resource nodes, by resource. */
     QHash<QnResource *, Node *> m_resourceNodeByResource;
@@ -90,6 +92,9 @@ private:
 
     /** Whether item urls should be shown. */
     bool m_urlsShown;
+
+    /** Type of root node - for the models with narrowed scopes */
+    Qn::NodeType m_rootNodeType;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H

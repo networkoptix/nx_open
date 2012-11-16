@@ -28,6 +28,13 @@ public:
     const QPixmap &positionLongPixmap(qint64 position, int height, const QnTimeStep &step);
     const QPixmap &textPixmap(const QString &text, int height, const QColor &color);
 
+    /**
+     * Clears positional part of this cache.
+     * 
+     * Note that underlying <tt>QString->QPixmap</tt> cache is not cleared.
+     */
+    Q_SLOT void clear();
+
 private:
     QFont m_font;
     QnTextPixmapCache *m_cache;

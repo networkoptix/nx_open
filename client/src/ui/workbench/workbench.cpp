@@ -2,7 +2,8 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
-#include <utils/client_meta_types.h>
+#include <utils/common/util.h>
+#include <client/client_meta_types.h>
 
 #include <core/resource_managment/resource_pool.h>
 
@@ -11,6 +12,17 @@
 #include "workbench_layout.h"
 #include "workbench_grid_mapper.h"
 #include "workbench_item.h"
+
+namespace {
+    QnWorkbenchItem *bestItemForRole(QnWorkbenchItem **itemByRole, Qn::ItemRole role) {
+        for(int i = 0; i != role ; i++)
+            if(itemByRole[i])
+                return itemByRole[i];
+        return NULL;
+    }
+
+} // anonymous namespace
+
 
 QnWorkbench::QnWorkbench(QObject *parent):
     QObject(parent),
@@ -165,8 +177,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
-        foreach(QnWorkbenchItem *item, m_currentLayout->items())
-            at_layout_itemRemoved(item);
+        for(int i = 0; i < Qn::ItemRoleCount; i++)
+            setItem(static_cast<Qn::ItemRole>(i), NULL);
 
         disconnect(m_currentLayout, SIGNAL(itemAdded(QnWorkbenchItem *)),           this, NULL);
         disconnect(m_currentLayout, SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, NULL);
@@ -202,8 +214,7 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         if(!qFuzzyCompare(newCellSpacing, oldCellSpacing))
             at_layout_cellSpacingChanged();
 
-        foreach(QnWorkbenchItem *item, m_currentLayout->items())
-            at_layout_itemAdded(item);
+        updateActiveRoleItem();
     }
 }
 
@@ -228,20 +239,11 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item) {
 
     emit itemChanged(role);
 
-    /* Update central item. */
-    if(role != Qn::CentralRole) {
-        if(m_itemByRole[Qn::ZoomedRole]) {
-            setItem(Qn::CentralRole, m_itemByRole[Qn::ZoomedRole]);
-        } else if(m_itemByRole[Qn::RaisedRole]) {
-            setItem(Qn::CentralRole, m_itemByRole[Qn::RaisedRole]);
-        } else if(m_itemByRole[Qn::SingleSelectedRole]) {
-            setItem(Qn::CentralRole, m_itemByRole[Qn::SingleSelectedRole]);
-        } else if(m_itemByRole[Qn::SingleRole]) {
-            setItem(Qn::CentralRole, m_itemByRole[Qn::SingleRole]);
-        } else {
-            setItem(Qn::CentralRole, NULL);
-        }
-    }
+    /* Update items for derived roles. */
+    if(role < Qn::ActiveRole)
+        updateActiveRoleItem();
+    if(role < Qn::CentralRole)
+        updateCentralRoleItem();
 }
 
 void QnWorkbench::updateSingleRoleItem() {
@@ -250,6 +252,23 @@ void QnWorkbench::updateSingleRoleItem() {
     } else {
         setItem(Qn::SingleRole, NULL);
     }
+}
+
+void QnWorkbench::updateActiveRoleItem() {
+    QnWorkbenchItem *activeItem = bestItemForRole(m_itemByRole, Qn::ActiveRole);
+    if(activeItem) {
+        setItem(Qn::ActiveRole, activeItem);
+        return;
+    }
+
+    if(m_itemByRole[Qn::ActiveRole])
+        return;
+
+    setItem(Qn::ActiveRole, m_currentLayout->items().isEmpty() ? NULL : *m_currentLayout->items().begin());
+}
+
+void QnWorkbench::updateCentralRoleItem() {
+    setItem(Qn::CentralRole, bestItemForRole(m_itemByRole, Qn::CentralRole));
 }
 
 void QnWorkbench::update(const QnWorkbenchState &state) {
@@ -294,6 +313,7 @@ void QnWorkbench::at_layout_itemRemoved(QnWorkbenchItem *item) {
             setItem(static_cast<Qn::ItemRole>(i), NULL);
 
     updateSingleRoleItem();
+    updateActiveRoleItem();
 }
 
 void QnWorkbench::at_layout_aboutToBeDestroyed() {

@@ -146,8 +146,10 @@ private slots:
 
 private:
     void sendZoomAsync(qreal zoomSpeed);
-    Q_SLOT void updateIconButton();
     int currentRecordingMode();
+
+    Q_SLOT void updateIconButton();
+    Q_SLOT void updateServerResource();
 
 private:
     /** Media resource. */
@@ -155,6 +157,9 @@ private:
 
     /** Camera resource. */
     QnVirtualCameraResourcePtr m_camera;
+
+    /** Camera's media server resource. */
+    QnMediaServerResourcePtr m_server;
 
     /** Connection for camera's server */
     QnMediaServerConnectionPtr m_connection; // TODO: move out?

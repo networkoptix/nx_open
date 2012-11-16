@@ -6,7 +6,7 @@
 #include <utils/common/warnings.h>
 #include <utils/common/mpl.h>
 
-#include <ui/events/invocation_event.h>
+#include <utils/common/invocation_event.h>
 
 #ifdef Q_OS_WIN
 #include <QtGui/private/qwidget_p.h>
@@ -72,7 +72,7 @@ typedef HRESULT (WINAPI *PtrDwmSetWindowAttribute)(HWND hwnd, DWORD dwAttribute,
 #endif // Q_OS_WIN
 
 enum QnDwmInvocation {
-    AdjustPositionInvocation
+    AdjustPositionInvocation = 0x7591
 };
 
 class QnDwmPrivate {

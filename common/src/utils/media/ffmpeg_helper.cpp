@@ -605,6 +605,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
     QMutexLocker mutex(&global_ffmpeg_mutex);
 
     AVCodec* codec = 0;
+    // TODO: #vasilenko avoid using deprecated methods
     AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
 
     QByteArray tmpArray(data, dataLen);
@@ -676,6 +677,7 @@ AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int da
         }
     }
 
+    // TODO: #vasilenko avoid using deprecated methods
     if (avcodec_open(ctx, codec) < 0)
         goto error_label;
 

@@ -128,12 +128,18 @@ void QnMessageSource::httpFinished()
 
     QVariant redirectionTarget = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
     if (QNetworkReply::NetworkError err = m_reply->error()) {
+        emit connectionClosed(m_reply->errorString());
 
         /** Operation was cancelled intentionally */
-        if (err != QNetworkReply::OperationCanceledError || m_timeoutFlag)
+        if (m_timeoutFlag) {
+            m_reply->deleteLater();
+            startRequest();
+            return;
+        }
+        else if (err != QNetworkReply::OperationCanceledError) {
             QTimer::singleShot(m_retryTimeout, this, SLOT(startRequest()));
+        }
 
-        emit connectionClosed(m_reply->errorString());
     } else if (!redirectionTarget.isNull()) {
         m_url = m_url.resolved(redirectionTarget.toUrl());
         m_reply->deleteLater();

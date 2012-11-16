@@ -99,7 +99,7 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
 
     mac = getValueFromString(mac).trimmed();
 
-    int n = mac.length();
+    //int n = mac.length();
 
     if (mac.length() > 17 && mac.endsWith(QLatin1Char('0')))
         mac.chop(mac.length() - 17);
@@ -112,10 +112,11 @@ QnResourcePtr QnPlISDResourceSearcher::checkHostAddr(const QUrl& url, const QAut
     if (!rt.isValid())
         return QnResourcePtr(0);
 
-    QnNetworkResourcePtr resource ( new QnPlIsdResource() );
+    QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     resource->setTypeId(rt);
     resource->setName(name);
+    resource->setModel(name);
     resource->setMAC(mac);
     resource->setHostAddress(QHostAddress(host), QnDomainMemory);
     resource->setAuth(auth);
@@ -198,7 +199,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
     }
 
 
-    QnNetworkResourcePtr resource ( new QnPlIsdResource() );
+    QnPlIsdResourcePtr resource ( new QnPlIsdResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
@@ -208,6 +209,7 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(QnResourceLis
 
     resource->setTypeId(rt);
     resource->setName(name);
+    resource->setModel(name);
     resource->setMAC(smac);
 
     local_result.push_back(resource);

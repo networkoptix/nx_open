@@ -634,7 +634,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
             goto error_label;
         }
 
-        // TODO: use avcodec_encode_video2 instead
+        // TODO: #vasilenko avoid using deprecated methods
         out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, frame);
         if (out_size == 0)
             out_size = avcodec_encode_video(videoCodecCtx, videoBuf, videoBufSize, 0); // flush encoder buffer
@@ -713,7 +713,7 @@ QByteArray QnSignHelper::getSignPattern()
             licenseName = license->name();
     }
     QByteArray bLicName = licenseName.toUtf8().replace(SIGN_TEXT_DELIMITER, SIGN_TEXT_DELIMITER_REPLACED);
-    result.append(bLicName);
+    result.append(bLicName).append(SIGN_TEXT_DELIMITER);
     return result;
 }
 

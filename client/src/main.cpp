@@ -69,7 +69,7 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_translation_manager.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
@@ -82,7 +82,10 @@
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client_module.h"
+#include "client/client_module.h"
+#include <client/client_connection_data.h>
+#include "platform/platform_abstraction.h"
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -145,11 +148,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
-
+ 
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
+    testCamera->setMAC(QnMacAddress("00000"));    
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -191,7 +194,7 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // TODO: #Ivan. Enable it when removing all places on receiving messages.
     // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
@@ -238,6 +241,9 @@ int qnMain(int argc, char *argv[])
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+
+    /* We don't want changes in desktop color settings to mess up our custom style. */
+    QApplication::setDesktopSettingsAware(false);
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
@@ -291,6 +297,8 @@ int qnMain(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
 
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;

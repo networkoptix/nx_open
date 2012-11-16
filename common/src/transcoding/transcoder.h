@@ -5,6 +5,7 @@
 #include <QSharedPointer>
 #include "libavcodec/avcodec.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/resource/media_resource.h"
 
 
 //!Base class for all raw media stream transcoders
@@ -82,7 +83,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(QnCompressedAudioDataPtr video) { return true; }
+    virtual bool open(QnCompressedAudioDataPtr video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -92,6 +93,8 @@ typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 */
 class QnTranscoder: public QObject
 {
+    Q_OBJECT
+
 public:
     QnTranscoder();
     virtual ~QnTranscoder();
@@ -142,6 +145,7 @@ public:
     int writeBuffer(const char* data, int size);
     void setPacketizedMode(bool value);
     const QVector<int>& getPacketsSize();
+    static int suggestBitrate(QSize resolution, QnStreamQuality quality = QnQualityNormal);
 protected:
     /*
     *  Prepare to transcode. If 'direct stream copy' is used, function got not empty video and audio data
@@ -161,8 +165,6 @@ protected:
     QnByteArray m_internalBuffer;
     QVector<int> m_outputPacketSize;
     qint64 m_firstTime;
-private:
-    int suggestBitrate(QSize resolution) const;
 protected:
     bool m_initialized;
 private:

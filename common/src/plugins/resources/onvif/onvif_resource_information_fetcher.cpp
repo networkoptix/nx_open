@@ -145,7 +145,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     if (!resource)
         return;
 
-    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer); // try to find child resource type, use real manufacturer name as camera model in onvif XML
+    QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false); // try to find child resource type, use real manufacturer name as camera model in onvif XML
     if (rt.isValid())
         resource->setTypeId(rt);
     else
@@ -154,6 +154,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     resource->setHostAddress(sender, QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
     //resource->setName(manufacturer + QLatin1String(" - ") + name);
+    resource->setModel(name);
     resource->setName(name); 
     resource->setMAC(mac);
 

@@ -5,6 +5,7 @@
 #include <QtGui/QFont>
 
 #include <ui/common/text_pixmap_cache.h>
+#include <platform/platform_abstraction.h>
 
 QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
     QObject(parent),
@@ -12,7 +13,9 @@ QnTimeSliderPixmapCache::QnTimeSliderPixmapCache(QObject *parent):
     m_cache(QnTextPixmapCache::instance()),
     m_pixmapByShortPositionKey(64 * 1024 * 1024), /* These are frequently reused, so we want the cache to be big. */
     m_pixmapByLongPositionKey(2 * 1024 * 1024) /* These are rarely reused once out of scope, so we don't want the cache to be large. */
-{}
+{
+    connect(qnPlatform->notifier(), SIGNAL(timeZoneChanged()), this, SLOT(clear()));
+}
 
 QnTimeSliderPixmapCache::~QnTimeSliderPixmapCache() {
     m_pixmapByShortPositionKey.clear();
@@ -54,5 +57,10 @@ const QPixmap &QnTimeSliderPixmapCache::textPixmap(const QString &text, int heig
     localFont.setPixelSize(height);
     
     return m_cache->pixmap(text, localFont, color);
+}
+
+void QnTimeSliderPixmapCache::clear() {
+    m_pixmapByLongPositionKey.clear();
+    m_pixmapByShortPositionKey.clear();
 }
 

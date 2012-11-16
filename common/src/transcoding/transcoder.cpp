@@ -63,33 +63,34 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
-    if (m_resolution.width() == 0 && m_resolution.height() == 0)
-        m_resolution = QSize(decodedVideoFrame->width, decodedVideoFrame->height);
-    else if (m_resolution.width() == 0)
+    if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
-        m_resolution.setHeight(qMin(decodedVideoFrame->height, m_resolution.height())); // strict to source frame height
+        m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
 
-        float ar = decodedVideoFrame->width / (float) decodedVideoFrame->height;
+        float ar = decoder.getContext()->width / (float) decoder.getContext()->height;
         m_resolution.setWidth(m_resolution.height() * ar);
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
-        m_resolution.setWidth(qMin(decodedVideoFrame->width, m_resolution.width())); // strict to source frame width
+        m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
     }
+    else if ((m_resolution.width() == 0 && m_resolution.height() == 0) || m_resolution.isEmpty())
+        m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
+
     return true;
 }
 
 // ---------------------- QnTranscoder -------------------------
 
 QnTranscoder::QnTranscoder():
-    m_initialized(false),
     m_videoCodec(CODEC_ID_NONE),
     m_audioCodec(CODEC_ID_NONE),
     m_internalBuffer(CL_MEDIA_ALIGNMENT, 1024*1024),
     m_firstTime(AV_NOPTS_VALUE),
+    m_initialized(false),
     m_eofCounter(0),
     m_packetizedMode(false)
 {
-
+    QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
 
 QnTranscoder::~QnTranscoder()
@@ -97,7 +98,7 @@ QnTranscoder::~QnTranscoder()
 
 }
 
-int QnTranscoder::suggestBitrate(QSize resolution) const
+int QnTranscoder::suggestBitrate(QSize resolution, QnStreamQuality quality)
 {
     // I assume for a QnQualityHighest quality 30 fps for 1080 we need 10 mbps
     // I assume for a QnQualityLowest quality 30 fps for 1080 we need 1 mbps
@@ -105,10 +106,24 @@ int QnTranscoder::suggestBitrate(QSize resolution) const
     if (resolution.width() == 0)
         resolution.setWidth(resolution.height()*4/3);
 
-    int hiEnd = 1024*2;
+    int hiEnd;
+    switch(quality)
+    {
+        case QnQualityLowest:
+            hiEnd = 1024;
+        case QnQualityLow:
+            hiEnd = 1024 + 512;
+        case QnQualityNormal:
+            hiEnd = 1024*2;
+        case QnQualityHigh:
+            hiEnd = 1024*3;
+        case QnQualityHighest:
+        default:
+            hiEnd = 1024*5;
+    }
 
     float resolutionFactor = resolution.width()*resolution.height()/1920.0/1080;
-    resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240
+    resolutionFactor = pow(resolutionFactor, (float)0.63); // 256kbps for 320x240 for Mq quality
 
     int result = hiEnd * resolutionFactor;
 
@@ -135,10 +150,14 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
             /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
-            */
             break;
+            */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            return -1;
+        default:
+            //TODO: #vasilenko Check 'Value not handled in switch' case.
+            m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
     if (m_vTranscoder)
@@ -164,10 +183,14 @@ bool QnTranscoder::setAudioCodec(CodecID codec, TranscodeMethod method)
             /*
         case TM_QuickSyncTranscode:
             m_vTranscoder = QnVideoTranscoderPtr(new QnQuickSyncTranscoder(codec));
-            */
             break;
+            */
         case TM_OpenCLTranscode:
             m_lastErrMessage = tr("OpenCLTranscode is not implemented");
+            return -1;
+        default:
+            //TODO: #vasilenko Check 'Value not handled in switch' case.
+            m_lastErrMessage = tr("Unknown Transcode Method");
             return -1;
     }
     return m_lastErrMessage.isEmpty();

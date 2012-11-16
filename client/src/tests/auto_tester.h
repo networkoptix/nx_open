@@ -1,7 +1,7 @@
 #ifndef QN_AUTO_TESTER_H
 #define QN_AUTO_TESTER_H
 
-#include <QObject>
+#include <QtCore/QObject>
 
 class QTimer;
 

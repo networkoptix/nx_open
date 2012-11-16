@@ -34,7 +34,7 @@ void QnViewportBoundWidget::setDesiredSize(const QSizeF &desiredSize) {
     updateScale();
 }
 
-void QnViewportBoundWidget::setDesiredRotation(Qn::FixedItemRotation fixedRotation){
+void QnViewportBoundWidget::setDesiredRotation(Qn::FixedRotation fixedRotation){
     if (m_fixedRotation == fixedRotation)
         return;
 
@@ -84,10 +84,10 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     qreal rotation;
     switch (m_fixedRotation){
         case Qn::Angle90:
-            rotationCenter.setX(rotationCenter.y());
+            rotationCenter.setY(rotationCenter.x());
             break;
         case Qn::Angle270:
-            rotationCenter.setY(rotationCenter.x());
+            rotationCenter.setX(rotationCenter.y());
             break;
         default:
             break;
@@ -95,7 +95,8 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     rotation = m_fixedRotation;
 
     setTransformOriginPoint(rotationCenter);
-    setRotation(rotation);
+    // Rotating counterclockwise to match with item rotation
+    setRotation( -1 * rotation);
 
     setTransform(QTransform::fromScale(scale, scale));
 }

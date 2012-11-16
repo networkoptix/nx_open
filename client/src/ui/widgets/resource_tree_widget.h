@@ -1,125 +1,149 @@
-#ifndef QN_RESOURCE_TREE_WIDGET_H
-#define QN_RESOURCE_TREE_WIDGET_H
+#ifndef RESOURCE_TREE_WIDGET_H
+#define RESOURCE_TREE_WIDGET_H
 
-#include <QWidget>
+#include <QtCore/QAbstractItemModel>
+
+#include <QtGui/QWidget>
+#include <QtGui/QItemSelectionModel>
+
 #include <core/resource/resource_fwd.h>
-#include <core/resource/layout_item_index.h>
-#include <ui/actions/action_target_provider.h>
-#include <ui/workbench/workbench_context_aware.h>
-#include <ui/workbench/workbench_globals.h>
 
-class QLineEdit;
-class QTabWidget;
-class QToolButton;
-class QTreeView;
-class QModelIndex;
-class QItemSelectionModel;
-class QSortFilterProxyModel;
-
-class QnWorkbench;
-class QnWorkbenchItem;
-class QnWorkbenchLayout;
-class QnWorkbenchContext;
-
-class QnResourceCriterion;
-class QnResourcePoolModel;
-class QnResourceSearchProxyModel;
-class QnResourceSearchSynchronizer;
 class QnResourceTreeItemDelegate;
+class QnWorkbench;
+class QSortFilterProxyModel;
+class QnResourceTreeSortProxyModel;
 
 namespace Ui {
-    class ResourceTreeWidget;
+    class QnResourceTreeWidget;
 }
 
-class QnResourceTreeWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider {
-    Q_OBJECT;
+namespace Qn {
+    /**
+     * Flags describing graphics tweaks usable in resource tree wigdet.
+     */
+    enum GraphicsTweaksFlag {
+        /** Last row is hidden if there is not enough space to fully show it. */
+        HideLastRow = 0x1,
 
-public:
-    enum Tab {
-        ResourcesTab,
-        SearchTab,
-        TabCount
+        /** Set background opacity to items. */
+        BackgroundOpacity = 0x2,
+
+        /** Set Qt::BypassGraphicsProxyWidget flag to items. */
+        BypassGraphicsProxy = 0x4
     };
+    Q_DECLARE_FLAGS(GraphicsTweaksFlags, GraphicsTweaksFlag)
+}
 
-    QnResourceTreeWidget(QWidget *parent = NULL, QnWorkbenchContext *context = NULL);
+class QnResourceTreeWidget : public QWidget {
+    Q_OBJECT
+    
+    typedef QWidget base_type;
+public:
+    explicit QnResourceTreeWidget(QWidget *parent = 0);
+    ~QnResourceTreeWidget();
+    
+    void setModel(QAbstractItemModel *model);
 
-    virtual ~QnResourceTreeWidget();
+    QItemSelectionModel *selectionModel();
 
-    Tab currentTab() const;
+    void setWorkbench(QnWorkbench *workbench);
 
-    void setCurrentTab(Tab tab);
+    void edit();
 
-    QnResourceList selectedResources() const;
+    void expand(const QModelIndex &index);
 
-    QnLayoutItemIndexList selectedLayoutItems() const;
-
-    virtual Qn::ActionScope currentScope() const override;
-
-    virtual QVariant currentTarget(Qn::ActionScope scope) const override;
-
-    QPalette comboBoxPalette() const;
-
-    void setComboBoxPalette(const QPalette &palette);
-
-signals:
-    void activated(const QnResourcePtr &resource);
-    void currentTabChanged();
-    void selectionChanged();
-
-protected:
-    virtual void contextMenuEvent(QContextMenuEvent *) override;
-    virtual void wheelEvent(QWheelEvent *event) override;
-    virtual void mousePressEvent(QMouseEvent *event) override;
-    virtual void mouseReleaseEvent(QMouseEvent *event) override;
-    virtual void keyPressEvent(QKeyEvent *event) override;
-    virtual void keyReleaseEvent(QKeyEvent *event) override;
-    virtual void timerEvent(QTimerEvent *event) override;
-
-    QTreeView *currentItemView() const;
-    QItemSelectionModel *currentSelectionModel() const;
-
-    bool isLayoutSearchable(QnWorkbenchLayout *layout) const;
-    QnResourceSearchProxyModel *layoutModel(QnWorkbenchLayout *layout, bool create) const;
-    QnResourceSearchSynchronizer *layoutSynchronizer(QnWorkbenchLayout *layout, bool create) const;
-    QString layoutFilter(QnWorkbenchLayout *layout) const;
-    void setLayoutFilter(QnWorkbenchLayout *layout, const QString &filter) const;
-
-    void killSearchTimer();
-    void showContextMenuAt(const QPoint &pos, bool ignoreSelection = false);
-
-private slots:
     void expandAll();
 
-    void updateFilter(bool force = false);
-    void forceUpdateFilter() { updateFilter(true); }
-    
+    QPoint selectionPos() const;
+
+    /**
+     * @brief setCheckboxesVisible      Show/hide checkboxes against each row.
+     * @param visible                   Target state of checkboxes.
+     */
+    void setCheckboxesVisible(bool visible = true);
+
+    /**
+     * @brief isCheckboxesVisible       This property holds whether checkboxes against each row are visible.
+     * @return                          True if checkboxes are visible.
+     */
+    bool isCheckboxesVisible() const;
+
+    /**
+     * @brief setGraphicsTweaks         Set various graphics tweaks for widget displaying.
+     * @param flags                     Set of flags describing tweaks.
+     */
+    void setGraphicsTweaks(Qn::GraphicsTweaksFlags flags);
+
+    /**
+     * @brief getGraphicsTweaks         Which graphics tweaks are enabled for this widget.
+     * @return                          Set of flags describing used tweaks.
+     */
+    Qn::GraphicsTweaksFlags getGraphicsTweaks();
+
+    /**
+     * @brief setFilterVisible          Show/hide resource tree filter widget.
+     * @param visible                   Target state of filter.
+     */
+    void setFilterVisible(bool visible = true);
+
+    /**
+     * @brief isFilterVisible           This property holds whether filter widget is visible.
+     * @return                          True if filter is visible.
+     */
+    bool isFilterVisible() const;
+
+    /**
+     * @brief setEditingEnabled         Enable or disable item editing: renaming by F2 and moving by drag'n'drop.
+     * @param enabled                   Whether editing should be allowed.
+     */
+    void setEditingEnabled(bool enabled = true);
+
+    /**
+     * @brief isEditingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
+     * @return                          True if editing is allowed.
+     */
+    bool isEditingEnabled() const;
+protected:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void resizeEvent(QResizeEvent *event) override;
+
+    void updateCheckboxesVisibility();
+signals:
+    void activated(const QnResourcePtr &resource);
+    void viewportSizeChanged();
+
+private slots:
     void at_treeView_enterPressed(const QModelIndex &index);
     void at_treeView_doubleClicked(const QModelIndex &index);
-    void at_tabWidget_currentChanged(int index);
+
     void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
 
-    void at_workbench_currentLayoutAboutToBeChanged();
-    void at_workbench_currentLayoutChanged();
-    
-    void at_workbench_itemChanged(Qn::ItemRole role);
-    void at_layout_itemAdded(QnWorkbenchItem *item);
-    void at_layout_itemRemoved(QnWorkbenchItem *item);
-
-    void at_showUrlsInTree_changed();
-
+    void updateColumnsSize();
+    void updateFilter();
 private:
-    QScopedPointer<Ui::ResourceTreeWidget> ui;
+    QScopedPointer<Ui::QnResourceTreeWidget> ui;
 
-    bool m_ignoreFilterChanges;
-    int m_filterTimerId;
+    QnResourceTreeItemDelegate *m_itemDelegate;
 
-    QnResourcePoolModel *m_resourceModel;
-    QSortFilterProxyModel *m_resourceProxyModel;
-    QnResourceTreeItemDelegate *m_resourceDelegate;
-    QnResourceTreeItemDelegate *m_searchDelegate;
+    QnResourceTreeSortProxyModel *m_resourceProxyModel;
 
-    QAction *m_renameAction;
+    /**
+     * @brief m_checkboxesVisible       This property holds whether checkboxes against each row are visible.
+     */
+    bool m_checkboxesVisible;
+
+    /**
+     * @brief m_graphicsTweaksFlags     This property holds which graphics tweaks are used for widget displaying.
+     */
+    Qn::GraphicsTweaksFlags m_graphicsTweaksFlags;
+
+    /**
+     * @brief m_editingEnabled          This property holds whether renaming by F2 and moving by drag'n'drop are enabled.
+     */
+    bool m_editingEnabled;
 };
 
-#endif // QN_RESOURCE_TREE_WIDGET_H
+Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)
+
+#endif // RESOURCE_TREE_WIDGET_H

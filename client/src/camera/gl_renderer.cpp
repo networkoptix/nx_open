@@ -11,7 +11,7 @@
 #include <utils/common/util.h>
 #include <utils/media/sse_helper.h>
 
-#include <utils/yuvconvert.h>
+#include <utils/color_space/yuvconvert.h>
 
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>

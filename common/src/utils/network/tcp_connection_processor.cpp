@@ -264,6 +264,8 @@ QString QnTCPConnectionProcessor::codeToMessage(int code)
         return tr("Not Found");
     case CODE_NOT_IMPLEMETED:
         return tr("Not Implemented");
+    case CODE_UNSPOORTED_TRANSPORT:
+        return tr("Unsupported Transport");
     case CODE_INTERNAL_ERROR:
         return tr("Internal Server Error");
     case CODE_INVALID_PARAMETER:

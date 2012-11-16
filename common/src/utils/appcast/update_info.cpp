@@ -58,9 +58,15 @@ QString QnVersion::toString() const {
 
 
 bool QnUpdateInfoItem::isNull() const {
-    return productVersion.isNull();
+    return engineVersion.isNull();
 }
 
 bool QnUpdateInfoItem::operator==(const QnUpdateInfoItem &other) const {
-    return productVersion == other.productVersion && title == other.title && description == other.description && pubDate == other.pubDate && url == other.url;
+    return 
+        productVersion == other.productVersion && 
+        engineVersion == other.engineVersion &&
+        title == other.title && 
+        description == other.description && 
+        pubDate == other.pubDate && 
+        url == other.url;
 }
