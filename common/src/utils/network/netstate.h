@@ -26,6 +26,8 @@ public:
     // check if addr is in the same subnet as one of our IPV4 interface 
     bool isAddrInMachineSubnet(const QHostAddress& addr) const;
 
+    bool isResourceInMachineSubnet(const QString& addr, const QHostAddress& discAddr) const;
+
     // checks if resource with such hostaddr and discover addr
     bool isResourceInMachineSubnet(const QHostAddress& addr, const QHostAddress& discAddr) const;
 

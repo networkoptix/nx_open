@@ -1,3 +1,4 @@
+#include <QHostInfo>
 #include "nettools.h"
 #include "ping.h"
 #include "netstate.h"
@@ -391,6 +392,11 @@ void removeARPrecord(const QHostAddress& ip)
     delete [] mtb;
 }
 
+QString getMacByIP(const QString& host, bool net)
+{
+    return getMacByIP(resolveAddress(host), net);
+}
+
 // this is only works in local networks
 //if net == true it returns the mac of the first device responded on ARP request; in case if net = true it might take time...
 // if net = false it returns last device responded on ARP request
@@ -535,3 +541,21 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 
 #endif
 
+bool isIpv4Address(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    return ip4Addr != 0 && ip4Addr != -1;
+}
+
+QHostAddress resolveAddress(const QString& addr)
+{
+    int ip4Addr = inet_addr(addr.toAscii().data());
+    if (ip4Addr != 0 && ip4Addr != -1)
+        return QHostAddress(ntohl(ip4Addr));
+
+    QHostInfo hi = QHostInfo::fromName(addr);
+    if (!hi.addresses().isEmpty())
+        return hi.addresses()[0];
+    else
+        return QHostAddress();
+}

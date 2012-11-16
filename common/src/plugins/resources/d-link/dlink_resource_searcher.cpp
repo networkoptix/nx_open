@@ -144,7 +144,7 @@ QnResourceList QnPlDlinkResourceSearcher::findResources()
             resource->setName(name);
             resource->setModel(name);
             resource->setMAC(smac);
-            resource->setHostAddress(sender, QnDomainMemory);
+            resource->setHostAddress(sender.toString(), QnDomainMemory);
 
             resource->setDiscoveryAddr(iface.address);
 
@@ -177,7 +177,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
         port = 80;
 
     CLHttpStatus status;
-    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), QHostAddress(host), port, timeout, auth)));
+    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("common/info.cgi"), host, port, timeout, auth)));
 
     if (response.length()==0)
         return QnResourcePtr(0);
@@ -216,7 +216,7 @@ QnResourcePtr QnPlDlinkResourceSearcher::checkHostAddr(const QUrl& url, const QA
     resource->setName(name);
     resource->setMAC(mac);
     (resource.dynamicCast<QnPlDlinkResource>())->setModel(name);
-    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);

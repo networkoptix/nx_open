@@ -328,7 +328,7 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
     if (relutUrl.host().size()==0)
     {
         QString temp = relutUrl.toString();
-        relutUrl.setHost(m_onvifRes->getHostAddress().toString());
+        relutUrl.setHost(m_onvifRes->getHostAddress());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << relutUrl.toString();
     }
 

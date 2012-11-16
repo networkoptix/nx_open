@@ -10,6 +10,18 @@ static const int MAX_LINE_LENGTH = 1024*16;
 
 using namespace std;
 
+CLSimpleHTTPClient::CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+    m_port(port),
+    m_connected(false),
+    m_timeout(timeout),
+    m_auth(auth),
+    m_dataRestPtr(0),
+    m_dataRestLen(0)
+{
+    m_host = resolveAddress(host);
+    initSocket();
+}
+
 CLSimpleHTTPClient::CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_host(host),
     m_port(port),
@@ -407,7 +419,7 @@ QString CLSimpleHTTPClient::digestAccess(const QString& request) const
 }
 
 
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity)
 {
     CLSimpleHTTPClient http (host, port, timeout, auth);
     status = http.doGET(fileName);

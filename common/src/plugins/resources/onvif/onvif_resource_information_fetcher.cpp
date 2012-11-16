@@ -151,7 +151,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     else
         resource->setTypeId(onvifTypeId); // no child resourceType found. Use root ONVIF resource type
 
-    resource->setHostAddress(sender, QnDomainMemory);
+    resource->setHostAddress(QHostAddress(sender).toString(), QnDomainMemory);
     resource->setDiscoveryAddr(discoveryIp);
     //resource->setName(manufacturer + QLatin1String(" - ") + name);
     resource->setModel(name);

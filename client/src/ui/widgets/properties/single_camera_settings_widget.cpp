@@ -333,7 +333,7 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         ui->motionSettingsGroupBox->setEnabled(false);
         ui->motionAvailableLabel->setVisible(true);
     } else {
-        QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress().toString());
+        QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
 
         ui->nameEdit->setText(m_camera->getName());
         ui->modelEdit->setText(m_camera->getModel());

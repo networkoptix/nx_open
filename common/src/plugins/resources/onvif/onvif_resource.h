@@ -87,7 +87,7 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
 
 
     virtual bool isResourceAccessible() override;
@@ -104,7 +104,7 @@ public:
     virtual int getMaxOnvifRequestTries() const { return 1; };
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
-    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
+    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
     int getGovLength() const;
     int getAudioBitrate() const;

@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #endif
 
+#include <QHostInfo>
+
 bool removeDir(const QString &dirName)
 {
     bool result = true;

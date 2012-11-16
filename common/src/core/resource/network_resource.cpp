@@ -49,22 +49,22 @@ QString QnNetworkResource::getUniqueId() const
 }
 
 
-QHostAddress QnNetworkResource::getHostAddress() const
+QString QnNetworkResource::getHostAddress() const
 {
     //QMutexLocker mutex(&m_mutex);
     //return m_hostAddr;
     QString url = getUrl();
     if (url.indexOf(QLatin1String("://")) == -1)
-        return QHostAddress(url);
+        return url;
     else
-        return QHostAddress(QUrl(url).host());
+        return QUrl(url).host();
 }
 
-bool QnNetworkResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+bool QnNetworkResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QMutexLocker mutex(&m_mutex);
     //m_hostAddr = ip;
-    setUrl(ip.toString());
+    setUrl(ip);
     return (domain == QnDomainMemory);
 }
 
@@ -138,7 +138,7 @@ int QnNetworkResource::httpPort() const
 QString QnNetworkResource::toString() const
 {
     QString result;
-    QTextStream(&result) << getName() << "(" << getHostAddress().toString() << ") live";
+    QTextStream(&result) << getName() << "(" << getHostAddress() << ") live";
     return result;
 }
 
@@ -258,7 +258,7 @@ bool QnNetworkResource::conflicting()
     QnSleep::msleep(10);
 
     CLPing ping;
-    if (!ping.ping(getHostAddress().toString(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
+    if (!ping.ping(getHostAddress(), 2, ping_timeout)) // I do not know how else to solve this problem. but getMacByIP do not creates any ARP record
     {
         //addNetworkStatus(QnNetworkResource::BadHostAddr);
         //return true;
