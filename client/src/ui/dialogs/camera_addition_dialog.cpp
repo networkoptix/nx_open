@@ -21,9 +21,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
 
     ui->camerasTable->horizontalHeader()->setVisible(true);
-    ui->camerasTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->camerasTable->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
     ui->camerasTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    ui->camerasTable->resizeColumnsToContents();
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
@@ -108,15 +107,22 @@ void QnCameraAdditionDialog::updateSubnetMode(){
     ui->cameraIpLineEdit->setVisible(!m_subnetMode);
 
     if (m_subnetMode){
-        QHostAddress startAddr(ui->startIPLineEdit->text());
-        quint32 addr = startAddr.toIPv4Address();
-        addr = addr >> 8;
-        addr = (addr << 8) + 255;
-        QString endAddrStr = QHostAddress(addr).toString();
-        ui->endIPLineEdit->setText(endAddrStr);
-        ui->endIPLineEdit->setFocus();
-        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
-    }
+        QHostAddress startAddr(ui->cameraIpLineEdit->text());
+        if (startAddr.toIPv4Address()) {
+            ui->startIPLineEdit->setText(startAddr.toString());
+
+            quint32 addr = startAddr.toIPv4Address();
+            addr = addr >> 8;
+            addr = (addr << 8) + 255;
+            QString endAddrStr = QHostAddress(addr).toString();
+            ui->endIPLineEdit->setText(endAddrStr);
+            ui->endIPLineEdit->setFocus();
+            ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+        } else {
+            ui->startIPLineEdit->setFocus();
+        }
+    } else
+        ui->cameraIpLineEdit->setFocus();
 }
 
 // -------------------------------------------------------------------------- //
@@ -230,7 +236,8 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             ui->validateLabelSearch->setVisible(true);
             return;
         }
-        startAddrStr = endAddrStr = url.host();
+        startAddrStr = url.host();
+        endAddrStr = QString();
     }
 
     ui->scanButton->setEnabled(false);
@@ -262,7 +269,9 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
     serverConnection->asyncGetManualCameraSearch(startAddrStr, endAddrStr, username, password, port,
-                                                 processor.data(), SLOT(processSearchReply(const QnCamerasFoundInfoList &)));
+                                                 processor.data(),
+                                                 SLOT(processSearchReply(const QnCamerasFoundInfoList &)),
+                                                 SLOT(processSearchError(int, const QString &)));
 
     eventLoop->exec();
 
@@ -279,17 +288,26 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
     ui->stopScanButton->setVisible(false);
     ui->scanProgressBar->setVisible(false);
 
-    if (!processor->isCancelled()){
-        if (processor->camerasFound().count() > 0){
+    if (!processor->isCancelled()) {
+        if (!processor->isSuccess()) {
+            QMessageBox::critical(this, tr("Error"), processor->getLastError(), QMessageBox::Ok);
+        } else if (processor->camerasFound().count() > 0) {
             fillTable(processor->camerasFound());
             ui->camerasTable->setEnabled(true);
             ui->addButton->setFocus();
+            ui->camerasTable->resizeColumnsToContents();
         } else {
             QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
-            ui->startIPLineEdit->setFocus();
+            if (m_subnetMode)
+                ui->startIPLineEdit->setFocus();
+            else
+                ui->cameraIpLineEdit->setFocus();
         }
-    }else
-        ui->startIPLineEdit->setFocus();
+    } else
+        if (m_subnetMode)
+            ui->startIPLineEdit->setFocus();
+        else
+            ui->cameraIpLineEdit->setFocus();
 }
 
 void QnCameraAdditionDialog::at_addButton_clicked(){
@@ -332,8 +350,8 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
     ui->scanButton->setEnabled(true);
     ui->camerasTable->setEnabled(true);
 
-    if (!processor->isCancelled()){
-        if (processor->addSuccess()){
+    if (!processor->isCancelled()) {
+        if (processor->isSuccess()) {
             removeAddedCameras();
             QMessageBox::information(this, tr("Success"), tr("Camera(s) added successfully"), QMessageBox::Ok);
         }

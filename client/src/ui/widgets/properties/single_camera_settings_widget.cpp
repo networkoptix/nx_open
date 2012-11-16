@@ -612,8 +612,9 @@ void QnSingleCameraSettingsWidget::at_pingButton_clicked() {
 #else
     QString cmd = QLatin1String("xterm -e ping %1");
 #endif
-    QString ipAddress = m_camera->getUrl();
-    QProcess::startDetached(cmd.arg(ipAddress));
+    QUrl url = QUrl::fromUserInput(m_camera->getUrl());
+    QString host = url.host();
+    QProcess::startDetached(cmd.arg(host));
 }
 
 void QnSingleCameraSettingsWidget::updateMaxFPS() {

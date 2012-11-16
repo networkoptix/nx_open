@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>528</width>
-    <height>306</height>
+    <width>679</width>
+    <height>300</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -42,12 +42,12 @@
           <widget class="QLabel" name="cameraIpLabel">
            <property name="minimumSize">
             <size>
-             <width>72</width>
+             <width>112</width>
              <height>0</height>
             </size>
            </property>
            <property name="text">
-            <string>Camera &amp;IP:</string>
+            <string>&amp;Camera Address:</string>
            </property>
            <property name="buddy">
             <cstring>cameraIpLineEdit</cstring>
@@ -55,7 +55,11 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="cameraIpLineEdit"/>
+          <widget class="QLineEdit" name="cameraIpLineEdit">
+           <property name="text">
+            <string notr="true">127.0.0.1</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -74,7 +78,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>72</width>
+             <width>112</width>
              <height>0</height>
             </size>
            </property>
@@ -103,7 +107,7 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>72</width>
+             <width>112</width>
              <height>0</height>
             </size>
            </property>
@@ -502,7 +506,7 @@
         </size>
        </property>
        <property name="text">
-        <string>&amp;Close</string>
+        <string>Cl&amp;ose</string>
        </property>
       </widget>
      </item>
