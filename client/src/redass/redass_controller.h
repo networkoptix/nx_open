@@ -17,11 +17,11 @@ public:
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
-
-    /** Inform that not enought CPU or badnwidth */
-    //void setQuality(QnCamDisplay* display, MediaQuality quality);
 public slots:
+    /* Inform controller that not enough data or CPU for stream */
     void onSlowStream(QnArchiveStreamReader* reader);
+
+    /* Inform controller that no more problem with stream */
     void streamBackToNormal(QnArchiveStreamReader* reader);
 private slots:
     void onTimer();
@@ -38,9 +38,8 @@ private:
     enum LQReason {Reason_None, Reason_Small, Reason_Network, Reason_CPU, Reson_FF};
     struct RedAssInfo
     {
-        RedAssInfo(): lqTime(0), /* hiQualityRetryCounter(0), */ toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()) {}
+        RedAssInfo(): lqTime(0), toLQSpeed(0.0), lqReason(Reason_None), initialTime(qnSyncTime->currentMSecsSinceEpoch()) {}
         qint64 lqTime;
-        //int hiQualityRetryCounter;
         float toLQSpeed;
         LQReason lqReason;
         qint64 initialTime;
@@ -52,12 +51,12 @@ private:
     typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
     ConsumersMap m_redAssInfo;
     QTimer m_timer;
-    QTime m_lastSwitchTimer;
+    QTime m_lastSwitchTimer; // latest HQ->LQ or LQ->HQ switch
     int m_hiQualityRetryCounter;
-    int m_timerTicks;
-    qint64 m_lastLqTime;
+    int m_timerTicks;    // onTimer ticks count
+    qint64 m_lastLqTime; // latest HQ->LQ switch time
 private:
-    QnCamDisplay* findDisplay(FindMethod method, bool findHQ, SearchCondition cond = 0, int* displaySize = 0);
+    QnCamDisplay* findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond = 0, int* displaySize = 0);
     void gotoLowQuality(QnCamDisplay* display, LQReason reason);
     void optimizeItemsQualityBySize();
 };

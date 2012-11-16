@@ -4,9 +4,9 @@
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);
 
-static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
+static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const int TO_LOWQ_SCREEN_SIZE = 320*240;
+static const int TO_LOWQ_SCREEN_SIZE = 320*240;      // put item to LQ if visual size is small
 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
@@ -36,8 +36,9 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
     return 0;
 }
 
-QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, bool findHQ, SearchCondition cond, int* displaySize)
+QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)
 {
+    bool findHQ = findQuality == MEDIA_Quality_High;
     if (displaySize)
         *displaySize = 0;
     QMultiMap<int, QnCamDisplay*> camDisplayByScreenSize;
@@ -88,12 +89,12 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
         return; // do not go to LQ for full screen items (except of FF/REW play)
 
     if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return;
+        return; // do not go to LQ if recently switch occurred
     if (reader->getQuality() == MEDIA_Quality_Low)
         return; // reader already at LQ
 
     // switch to LQ min item
-    display = findDisplay(Find_Least, true);
+    display = findDisplay(Find_Least, MEDIA_Quality_High);
     if (display) {
         QnArchiveStreamReader* reader = display->getArchiveReader();
         gotoLowQuality(display, display->queueSize() < 3 ? Reason_Network : Reason_CPU);
@@ -135,7 +136,7 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
     if (m_lastLqTime + QUALITY_SWITCH_INTERVAL > qnSyncTime->currentMSecsSinceEpoch())
         return; // recently slow report received (not all reports affect m_lastSwitchTimer)
 
-    display = findDisplay(Find_Biggest, false, &QnRedAssController::isNotSmallItem);
+    display = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem);
     if (display) {
         display->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
@@ -187,7 +188,6 @@ void QnRedAssController::onTimer()
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             gotoLowQuality(display, Reason_Small);
-
             addHQTry();
         }
 
@@ -220,8 +220,8 @@ void QnRedAssController::optimizeItemsQualityBySize()
 
     int largeSize = 0;
     int smallSize = 0;
-    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, false, &QnRedAssController::isNotSmallItem, &largeSize);
-    QnCamDisplay* smallDisplay = findDisplay(Find_Least, true, &QnRedAssController::isNotSmallItem, &smallSize);
+    QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem, &largeSize);
+    QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::isNotSmallItem, &smallSize);
     if (largeDisplay && smallDisplay && largeSize > smallSize*2)
     {
         // swap items quality
