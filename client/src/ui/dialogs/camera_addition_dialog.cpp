@@ -21,9 +21,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     ui->setupUi(this);
 
     ui->camerasTable->horizontalHeader()->setVisible(true);
-    ui->camerasTable->horizontalHeader()->setResizeMode(1, QHeaderView::ResizeToContents);
-    ui->camerasTable->horizontalHeader()->setResizeMode(2, QHeaderView::ResizeToContents);
     ui->camerasTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+    ui->camerasTable->resizeColumnsToContents();
 
     connect(ui->startIPLineEdit,    SIGNAL(textChanged(QString)), this, SLOT(at_startIPLineEdit_textChanged(QString)));
     connect(ui->startIPLineEdit,    SIGNAL(editingFinished()),    this, SLOT(at_startIPLineEdit_editingFinished()));
@@ -296,6 +295,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             fillTable(processor->camerasFound());
             ui->camerasTable->setEnabled(true);
             ui->addButton->setFocus();
+            ui->camerasTable->resizeColumnsToContents();
         } else {
             QMessageBox::information(this, tr("Finished"), tr("No cameras found"), QMessageBox::Ok);
             if (m_subnetMode)
