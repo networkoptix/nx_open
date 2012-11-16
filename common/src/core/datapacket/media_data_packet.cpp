@@ -409,3 +409,40 @@ QnCompressedAudioData* QnCompressedAudioData::clone()
     rez->assign(this);
     return rez;
 }
+
+void CLDataQueue::getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        QnCompressedVideoDataPtr video = at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            firstVTime = video->timestamp;
+            break;
+        }
+    }
+
+    for (int i = size()-1; i >=0; --i)
+    {
+        QnCompressedVideoDataPtr video = at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            lastVTime = video->timestamp;
+            break;
+        }
+    }
+}
+
+qint64 CLDataQueue::mediaLength() const
+{
+    QMutexLocker mutex(&m_cs);
+
+    qint64 firstVTime = AV_NOPTS_VALUE;
+    qint64 lastVTime = AV_NOPTS_VALUE;
+    getEdgePackets(firstVTime, lastVTime, false);
+    if (firstVTime == AV_NOPTS_VALUE || lastVTime == AV_NOPTS_VALUE)
+        getEdgePackets(firstVTime, lastVTime, true);
+
+    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
+        return lastVTime - firstVTime;
+    else
+        return 0;
+}

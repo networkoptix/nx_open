@@ -41,7 +41,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
 //private section 2
     m_jumpInSilenceMode(false),
     m_bofReached(false),
-    m_canChangeQuality(true),
     m_externalLocked(false),
     m_exactJumpToSpecifiedFrame(false),
     m_ignoreSkippingFrame(false),
@@ -1031,17 +1030,6 @@ void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
-void QnArchiveStreamReader::disableQualityChange()
-{
-    m_canChangeQuality = false;
-}
-
-void QnArchiveStreamReader::enableQualityChange()
-{
-    m_canChangeQuality = true;
-}
-
-
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
     QMutexLocker lock(&m_jumpMtx);
@@ -1049,23 +1037,9 @@ void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
     m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
 
-void QnArchiveStreamReader::setQualityForced(MediaQuality quality)
-{
-    if (m_quality != quality || !m_qualityFastSwitch) 
-    {
-        bool useMutex = !m_externalLocked;
-        if (useMutex)
-            m_jumpMtx.lock();
-        m_quality = quality;
-        m_qualityFastSwitch = true;
-        if (useMutex)
-            m_jumpMtx.unlock();
-    }
-}
-
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
-    if (m_canChangeQuality && (m_quality != quality || fastSwitch > m_qualityFastSwitch)) 
+    if (m_quality != quality || fastSwitch > m_qualityFastSwitch)
     {
         bool useMutex = !m_externalLocked;
         if (useMutex)

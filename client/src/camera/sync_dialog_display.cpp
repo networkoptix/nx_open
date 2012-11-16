@@ -5,7 +5,7 @@
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
-    QnCamDisplay(resource),
+    QnCamDisplay(resource, 0),
     m_mdctx(EXPORT_SIGN_METHOD)
 {
     m_firstFrameDisplayed = false;

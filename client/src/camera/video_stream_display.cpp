@@ -791,3 +791,8 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, CLV
     outFrame->format = dec->GetPixelFormat();
     return true;
 }
+
+QSize QnVideoStreamDisplay::getScreenSize() const
+{
+    return m_drawer->sizeOnScreen(0);
+}
