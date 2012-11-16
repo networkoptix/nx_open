@@ -104,7 +104,7 @@ protected:
     void processNewSpeed(float speed);
     bool useSync(QnCompressedVideoDataPtr vd);
     int getBufferingMask();
-
+    void pauseAudio();
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);
     void hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);

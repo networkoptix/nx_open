@@ -53,7 +53,7 @@ public:
       * Return last decoded frame
       */
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
-
+    QSize getScreenSize() const;
 private:
     mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;
