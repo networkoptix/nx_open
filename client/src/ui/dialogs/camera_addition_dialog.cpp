@@ -231,7 +231,6 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             return;
         }
         startAddrStr = endAddrStr = url.host();
-        qDebug() << startAddrStr;
     }
 
     ui->scanButton->setEnabled(false);
