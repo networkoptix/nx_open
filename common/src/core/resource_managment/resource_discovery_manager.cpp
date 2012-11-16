@@ -331,10 +331,12 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
                 if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
                     quint32 ips = newNetRes->getHostAddress().toIPv4Address();
-                    if (ipsList.contains(ips))
-                        ipsList[ips]++;
-                    else
-                        ipsList[ips] = 1;
+                    if (ips) {
+                        if (ipsList.contains(ips))
+                            ipsList[ips]++;
+                        else
+                            ipsList[ips] = 1;
+                    }
                 }
 
 
@@ -640,14 +642,14 @@ struct ManualSearcherHelper
 };
 
 
-QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port)
+QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port)
 {
     
     {
         QString str;
         QTextStream stream(&str);
 
-        stream << "Looking for cameras... StartAddr = " << startAddr.toString() << "  EndAddr = " << endAddr.toString() << "   login/pass = " << auth.user() << "/" << auth.password();
+        stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
         cl_log.log(str, cl_logINFO);
     }
     
@@ -656,14 +658,18 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
 
     cl_log.log("Checking for online addresses....", cl_logINFO);
 
-    QList<QHostAddress> online = ip_cheker.onlineHosts(startAddr, endAddr);
+    QList<QString> online;
+    if (endAddr.isNull())
+        online << startAddr;
+    else
+        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr));
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
 
-    foreach(QHostAddress addr, online)
+    foreach(const QString& addr, online)
     {
-        cl_log.log(addr.toString(), cl_logINFO);
+        cl_log.log(addr, cl_logINFO);
     }
 
     //=======================================
@@ -671,10 +677,10 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     //now lets check each one of online machines...
 
     QList<ManualSearcherHelper> testList;
-    foreach(QHostAddress addr, online)
+    foreach(const QString& addr, online)
     {
         ManualSearcherHelper t;
-        t.url.setHost(addr.toString());
+        t.url.setHost(addr);
         if (port)
             t.url.setPort(port);
         t.auth = auth;

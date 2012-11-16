@@ -55,7 +55,7 @@ public:
 
     void setReady(bool ready);
 
-    QnResourceList findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port);
+    QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
     QnResourceList processManualAddedResources();
 protected:

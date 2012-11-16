@@ -531,7 +531,6 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
-    bool result = true;
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -553,7 +552,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
 
-            result = false;
+            return false;
         } 
         else
         {
@@ -577,7 +576,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             if (soapWrapper.isNotAuthenticated())
                 setStatus(QnResource::Unauthorized);
-            result = false;
+            return false;
         }
 
         if (response.Capabilities) 
@@ -612,7 +611,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            result = false;
+            return false;
         }
 
         QString mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
@@ -627,7 +626,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             
     }
 
-    return result;
+    return true;
 }
 
 bool QnPlOnvifResource::fetchAndSetResourceOptions()
