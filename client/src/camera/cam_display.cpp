@@ -16,9 +16,11 @@
 #include "utils/common/util.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
+#include "redass/redass_controller.h"
 
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
+static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
 static const int LIVE_MEDIA_LEN_THRESHOLD = 100*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
@@ -112,9 +114,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     m_timeMutex(QMutex::Recursive),
     m_resource(resource),
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
-	m_receivedInterval(0)
+	m_receivedInterval(0),
     m_fullScreen(false),
-    m_archiveReader(0)
+    m_archiveReader(reader)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -134,17 +136,9 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
     qnRedAssController->registerConsumer(this);
 }
 
-void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
-{
-    m_audioBufferSize = bufferSize;
-    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
-    QMutexLocker lock(&m_audioChangeMutex);
-    delete m_audioDisplay;
-    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
-}
-
 QnCamDisplay::~QnCamDisplay()
 {
+    qnRedAssController->unregisterConsumer(this);
 
     Q_ASSERT(!isRunning());
     stop();
@@ -153,6 +147,16 @@ QnCamDisplay::~QnCamDisplay()
 
     clearVideoQueue();
     delete m_audioDisplay;
+}
+
+void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
+{
+    m_audioBufferSize = bufferSize;
+    m_minAudioDetectJumpInterval = MIN_VIDEO_DETECT_JUMP_INTERVAL + m_audioBufferSize*1000;
+    QMutexLocker lock(&m_audioChangeMutex);
+    delete m_audioDisplay;
+    m_audioDisplay = new QnAudioStreamDisplay(m_audioBufferSize, prebufferSize);
+
 }
 
 void QnCamDisplay::pause()
@@ -233,6 +237,11 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 		}
 	}
 };
+
+QnArchiveStreamReader* QnCamDisplay::getArchiveReader()
+{
+    return m_archiveReader;
+}
 
 void QnCamDisplay::hurryUpCheckForCamera(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime)
 {
@@ -1427,5 +1436,8 @@ bool QnCamDisplay::isFullScreen() const
 {
     return m_fullScreen;
 }
-QSize QnCamDisplay::getScreenSize() const
-    return m_display[0]->getScreenSize();
+
+void QnCamDisplay::setFullScreen(bool fullScreen)
+{
+    m_fullScreen = fullScreen;
+}
