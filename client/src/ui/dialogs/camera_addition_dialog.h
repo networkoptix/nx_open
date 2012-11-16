@@ -73,6 +73,7 @@ public:
 private:
     void fillTable(const QnCamerasFoundInfoList &cameras);
     void removeAddedCameras();
+    void updateSubnetMode();
 
 private slots: 
     void at_startIPLineEdit_textChanged(QString value);
@@ -92,7 +93,7 @@ private:
     QnMediaServerResourcePtr m_server;
 
     bool m_inIpRangeEdit;
-    QString m_startLabelTexts[2];
+    bool m_subnetMode;
 };
 
 #endif // CAMERA_ADDITION_DIALOG_H

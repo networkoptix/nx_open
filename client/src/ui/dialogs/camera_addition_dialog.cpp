@@ -15,7 +15,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     QDialog(parent),
     ui(new Ui::CameraAdditionDialog),
     m_server(server),
-    m_inIpRangeEdit(false)
+    m_inIpRangeEdit(false),
+    m_subnetMode(false)
 {
     ui->setupUi(this);
 
@@ -32,17 +33,13 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        this, SLOT(at_subnetCheckbox_toggled(bool)));
     connect(ui->closeButton,        SIGNAL(clicked()),            this, SLOT(accept()));
 
-    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLineEdit, SLOT(setVisible(bool)));
-    connect(ui->subnetCheckbox,     SIGNAL(toggled(bool)),        ui->endIPLabel, SLOT(setVisible(bool)));
-
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),        ui->portSpinBox, SLOT(setDisabled(bool)));
 
     ui->scanProgressBar->setVisible(false);
     ui->stopScanButton->setVisible(false);
     ui->validateLabelSearch->setVisible(false);
 
-    ui->endIPLineEdit->setVisible(false);
-    ui->endIPLabel->setVisible(false);
+    ui->cameraIpLineEdit->setMinimumSize(ui->startIPLineEdit->minimumSizeHint());
 
     ui->addButton->setEnabled(false);
     ui->camerasTable->setEnabled(false);
@@ -54,10 +51,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
     ui->validateLabelSearch->setPalette(palette);
 
-    m_startLabelTexts[0] = tr("Camera &IP:");
-    m_startLabelTexts[1] = ui->startIPLabel->text();
-
-    at_subnetCheckbox_toggled(false);
+    updateSubnetMode();
 }
 
 QnCameraAdditionDialog::~QnCameraAdditionDialog(){}
@@ -102,6 +96,27 @@ void QnCameraAdditionDialog::removeAddedCameras(){
 		row--;
     }
     ui->camerasTable->setEnabled(ui->camerasTable->rowCount() > 0);
+}
+
+void QnCameraAdditionDialog::updateSubnetMode(){
+    ui->startIPLabel->setVisible(m_subnetMode);
+    ui->startIPLineEdit->setVisible(m_subnetMode);
+    ui->endIPLabel->setVisible(m_subnetMode);
+    ui->endIPLineEdit->setVisible(m_subnetMode);
+
+    ui->cameraIpLabel->setVisible(!m_subnetMode);
+    ui->cameraIpLineEdit->setVisible(!m_subnetMode);
+
+    if (m_subnetMode){
+        QHostAddress startAddr(ui->startIPLineEdit->text());
+        quint32 addr = startAddr.toIPv4Address();
+        addr = addr >> 8;
+        addr = (addr << 8) + 255;
+        QString endAddrStr = QHostAddress(addr).toString();
+        ui->endIPLineEdit->setText(endAddrStr);
+        ui->endIPLineEdit->setFocus();
+        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
+    }
 }
 
 // -------------------------------------------------------------------------- //
@@ -188,28 +203,41 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
             ? PORT_AUTO
             : ui->portSpinBox->value();
 
-    QString startAddrStr = ui->startIPLineEdit->text();
-    QString endAddrStr = ui->endIPLineEdit->text();
+    QString startAddrStr;
+    QString endAddrStr;
+    if (m_subnetMode) {
+        startAddrStr = ui->startIPLineEdit->text();
+        endAddrStr = ui->endIPLineEdit->text();
 
-    QHostAddress startAddr(startAddrStr);
-    QHostAddress endAddr(endAddrStr);
+        QHostAddress startAddr(startAddrStr);
+        QHostAddress endAddr(endAddrStr);
 
-    if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
-        ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
-        ui->validateLabelSearch->setVisible(true);
-        return;
+        if (startAddr.toIPv4Address() > endAddr.toIPv4Address()){
+            ui->validateLabelSearch->setText(tr("First address in range is greater than last one"));
+            ui->validateLabelSearch->setVisible(true);
+            return;
+        }
+
+        if (!endAddr.isInSubnet(startAddr, 8)){
+            ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
+            ui->validateLabelSearch->setVisible(true);
+            return;
+        }
+    } else {
+        QUrl url = QUrl::fromUserInput(ui->cameraIpLineEdit->text());
+        if (url == QUrl()){
+            ui->validateLabelSearch->setText(tr("Camera address filed must contain valid url or ip address"));
+            ui->validateLabelSearch->setVisible(true);
+            return;
+        }
+        startAddrStr = endAddrStr = url.host();
+        qDebug() << startAddrStr;
     }
-
-    if (!endAddr.isInSubnet(startAddr, 8)){
-        ui->validateLabelSearch->setText(tr("Ip address range is too big, maximum of 255 addresses is allowed"));
-        ui->validateLabelSearch->setVisible(true);
-        return;
-    }
-
 
     ui->scanButton->setEnabled(false);
 
     ui->startIPLineEdit->setEnabled(false);
+    ui->cameraIpLineEdit->setEnabled(false);
     ui->endIPLineEdit->setEnabled(false);
     ui->portAutoCheckBox->setEnabled(false);
     ui->portSpinBox->setEnabled(false);
@@ -241,6 +269,7 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     ui->scanButton->setEnabled(true);
     ui->startIPLineEdit->setEnabled(true);
+    ui->cameraIpLineEdit->setEnabled(true);
     ui->endIPLineEdit->setEnabled(true);
     ui->portAutoCheckBox->setEnabled(true);
     ui->portSpinBox->setEnabled(!ui->portAutoCheckBox->isChecked());
@@ -315,15 +344,9 @@ void QnCameraAdditionDialog::at_addButton_clicked(){
 }
 
 void QnCameraAdditionDialog::at_subnetCheckbox_toggled(bool toggled){
-    ui->startIPLabel->setText(m_startLabelTexts[toggled ? 1 : 0]);
-    if (toggled){
-        QHostAddress startAddr(ui->startIPLineEdit->text());
-        quint32 addr = startAddr.toIPv4Address();
-        addr = addr >> 8;
-        addr = (addr << 8) + 255;
-        QString endAddrStr = QHostAddress(addr).toString();
-        ui->endIPLineEdit->setText(endAddrStr);
-        ui->endIPLineEdit->setFocus();
-        ui->endIPLineEdit->setSelection(endAddrStr.size() - 3, 3);
-    }
+    if (m_subnetMode == toggled)
+        return;
+
+    m_subnetMode = toggled;
+    updateSubnetMode();
 }
