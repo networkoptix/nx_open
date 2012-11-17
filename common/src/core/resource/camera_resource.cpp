@@ -206,11 +206,15 @@ QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCa
     return (CameraCapabilities) mediaVariant.toInt();
 }
 
-void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
-{
-    value |= getCameraCapabilities();
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+void QnVirtualCameraResource::setCameraCapabilities(CameraCapabilities capabilities) {
+    setParam(QLatin1String("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
+
+    // TODO: we don't check whether they have actually changed. This better be fixed.
+    emit cameraCapabilitiesChanged();
+}
+
+void QnVirtualCameraResource::setCameraCapability(CameraCapability capability, bool value) {
+    setCameraCapabilities(value ? (getCameraCapabilities() | capability) : (getCameraCapabilities() & ~capability));
 }
 
 QString QnVirtualCameraResource::getModel() const

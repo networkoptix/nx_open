@@ -20,6 +20,8 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
 
 #include "selection_item.h"
 
@@ -212,9 +214,16 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
         parent
     ),
+    QnWorkbenchContextAware(parent),
     m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{}
+{
+    QnWorkbenchPtzCamerasWatcher *watcher = context()->instance<QnWorkbenchPtzCamerasWatcher>();
+    connect(watcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
+    connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
+    foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
+        at_ptzCameraWatcher_ptzCameraAdded(camera);
+}
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
@@ -458,3 +467,29 @@ void PtzInstrument::at_splashItem_destroyed() {
     m_freeSplashItems.removeAll(item);
     m_activeSplashItems.removeAll(item);
 }
+
+void PtzInstrument::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera) {
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
+    m_cameraByHandle[handle] = camera;
+}
+
+void PtzInstrument::at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera) {
+    // TODO
+
+    m_ptzPositionByCamera.remove(camera);
+}
+
+void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
+    if(status != 0) {
+        qnWarning("Could not get PTZ position from camera.");
+        return;
+    }
+
+    QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
+    m_cameraByHandle.remove(handle);
+
+    m_ptzPositionByCamera[camera] = QVector3D(xPos, yPox, zoomPos);
+}
+

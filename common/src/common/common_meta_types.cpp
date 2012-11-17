@@ -45,6 +45,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<QnResource::Status>();
+    
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnUserResourcePtr>();
 

@@ -7,6 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <api/api_fwd.h>
 
+#include <ui/workbench/workbench_context_aware.h>
+
 #include "drag_processing_instrument.h"
 
 class QnMediaResourceWidget;
@@ -15,7 +17,7 @@ class SelectionItem;
 class PtzSplashItem;
 class PtzSelectionItem;
 
-class PtzInstrument: public DragProcessingInstrument {
+class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef DragProcessingInstrument base_type;
@@ -53,9 +55,13 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private slots:
-    void at_replyReceived(int status, int handle);
     void at_target_optionsChanged();
     void at_splashItem_destroyed();
+    void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
+    void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
+    void at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+
+    void at_replyReceived(int status, int handle);
 
 private:
     QnMediaResourceWidget *target() const {
@@ -76,6 +82,9 @@ private:
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
+    QHash<QnVirtualCameraResourcePtr, QVector3D> m_ptzPositionByCamera;
+    QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
+
     QWeakPointer<PtzSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
@@ -85,8 +94,8 @@ private:
 
     QList<PtzSplashItem *> m_freeSplashItems, m_activeSplashItems;
 
-    QnNetworkResourcePtr m_camera;
-    QnMediaServerConnectionPtr m_connection;
+    //QnNetworkResourcePtr m_camera;
+    //QnMediaServerConnectionPtr m_connection;
 };
 
 

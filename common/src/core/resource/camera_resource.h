@@ -14,8 +14,12 @@ class QN_EXPORT QnVirtualCameraResource : virtual public QnNetworkResource, virt
 
 public:
     // TODO: move to QnSecurityCamResource
-    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2};
-    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+    enum CameraCapability { 
+        NoCapabilities = 0, 
+        PtzCapability = 1, 
+        ZoomCapability = 2
+    };
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraCapability)
 
 
     QnVirtualCameraResource();
@@ -44,7 +48,8 @@ public:
 
     // TODO: move to QnSecurityCamResource
     CameraCapabilities getCameraCapabilities();
-    void addCameraCapabilities(CameraCapabilities value);
+    void setCameraCapabilities(CameraCapabilities capabilities);
+    void setCameraCapability(CameraCapability capability, bool value = true);
 
     // TODO: move to QnSecurityCamResource
     QString getModel() const;
@@ -56,6 +61,7 @@ public:
 
 signals:
     void scheduleDisabledChanged(const QnVirtualCameraResourcePtr &resource);
+    void cameraCapabilitiesChanged();
     virtual void scheduleTasksChanged() override;
 
 private:
