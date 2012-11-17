@@ -41,15 +41,19 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     bool findHQ = findQuality == MEDIA_Quality_High;
     if (displaySize)
         *displaySize = 0;
-    QMultiMap<int, QnCamDisplay*> camDisplayByScreenSize;
+    QMultiMap<qint64, QnCamDisplay*> camDisplayByScreenSize;
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
         QSize size = display->getScreenSize();
-        camDisplayByScreenSize.insert(size.width() * size.height(), display);
+        QSize res = display->getVideoSize();
+        qint64 screenSquare = size.width() * size.height();
+        int pps = res.width()*res.height()*display->getAvarageFps(); // pps - pixels per second
+        pps = INT_MAX - pps; // put display with max pps to the begin, so if slow stream do HQ->LQ for max pps disply (between displays with same size)
+        camDisplayByScreenSize.insert((screenSquare << 32) + pps, display);
     }
 
-    QMapIterator<int, QnCamDisplay*> itr(camDisplayByScreenSize);
+    QMapIterator<qint64, QnCamDisplay*> itr(camDisplayByScreenSize);
     if (method == Find_Biggest)
         itr.toBack();
 
@@ -64,7 +68,7 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
         bool isReaderHQ = reader->getQuality() == MEDIA_Quality_High;
         if (isReaderHQ == findHQ && (!cond || (this->*cond)(display))) {
             if (displaySize)
-                *displaySize = itr.key();
+                *displaySize = itr.key() >> 32;
             return display;
         }
     }
@@ -222,7 +226,7 @@ void QnRedAssController::optimizeItemsQualityBySize()
     int smallSize = 0;
     QnCamDisplay* largeDisplay = findDisplay(Find_Biggest, MEDIA_Quality_Low, &QnRedAssController::isNotSmallItem, &largeSize);
     QnCamDisplay* smallDisplay = findDisplay(Find_Least, MEDIA_Quality_High, &QnRedAssController::isNotSmallItem, &smallSize);
-    if (largeDisplay && smallDisplay && largeSize > smallSize*2)
+    if (largeDisplay && smallDisplay && largeSize >= smallSize*2)
     {
         // swap items quality
         gotoLowQuality(smallDisplay, m_redAssInfo[largeDisplay].lqReason);

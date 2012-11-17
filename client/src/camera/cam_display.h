@@ -15,6 +15,24 @@ class QnAudioStreamDisplay;
 struct QnCompressedVideoData;
 class QnArchiveStreamReader;
 
+/* 
+* This class is not duplicate statistics from Reader. If not enough CPU/network this class still show full (correct) stream fps
+*/
+class QnFpsStatistics
+{
+public:
+    static const int MAX_QUEUE_SIZE = 30;
+
+    QnFpsStatistics(): m_lastTime(AV_NOPTS_VALUE), m_queue(MAX_QUEUE_SIZE), m_queueSum(0) {}
+    void updateFpsStatistics(QnCompressedVideoDataPtr vd);
+    int getFps() const;
+private:
+    mutable QMutex m_mutex;
+    qint64 m_lastTime;
+    QnUnsafeQueue<qint64> m_queue;
+    qint64 m_queueSum;
+};
+
 /**
   * Stores QnVideoStreamDisplay for each channel/sensor
   */
@@ -55,6 +73,7 @@ public:
 
     QSize getFrameSize(int channel) const;
     QImage getScreenshot(int channel);
+    QSize getVideoSize() const;
     bool isRealTimeSource() const;
 
     void setExternalTimeSource(QnlTimeSource* value);
@@ -67,7 +86,7 @@ public:
     QnArchiveStreamReader* getArchiveReader();
     bool isFullScreen() const;
     void setFullScreen(bool fullScreen);
-
+    int getAvarageFps() const;
 public slots:
     void onBeforeJump(qint64 time);
     void onJumpOccured(qint64 time);
@@ -186,6 +205,7 @@ protected:
     QnArchiveStreamReader* m_archiveReader;
 
     bool m_fullScreen;
+    QnFpsStatistics m_fpsStat;
 };
 
 #endif //QN_CAM_DISPLAY_H

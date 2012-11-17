@@ -334,13 +334,6 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     // adaptive delay will not solve all problems => need to minus little appendix based on queue size
     qint32 needToSleep;
 
-    /*
-    if (vd->flags & QnAbstractMediaData::MediaFlags_LIVE)
-    {
-        needToSleep = vd->timestamp - qnSyncTime->currentMSecsSinceEpoch()*1000;
-    }
-    else 
-    */
     if (vd->flags & QnAbstractMediaData::MediaFlags_BOF)
         m_lastSleepInterval = needToSleep = 0;
     
@@ -902,6 +895,8 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
             return true; // ignore audio packet to prevent after jump detection
         }
     }
+    if (vd)
+        m_fpsStat.updateFpsStatistics(vd);
 
 
     QnEmptyMediaDataPtr emptyData = qSharedPointerDynamicCast<QnEmptyMediaData>(data);
@@ -1432,6 +1427,14 @@ QSize QnCamDisplay::getScreenSize() const
         return QSize();
 }
 
+QSize QnCamDisplay::getVideoSize() const
+{
+    if (m_display[0])
+        return m_display[0]->getImageSize();
+    else
+        return QSize();
+}
+
 bool QnCamDisplay::isFullScreen() const
 {
     return m_fullScreen;
@@ -1440,4 +1443,45 @@ bool QnCamDisplay::isFullScreen() const
 void QnCamDisplay::setFullScreen(bool fullScreen)
 {
     m_fullScreen = fullScreen;
+}
+
+int QnCamDisplay::getAvarageFps() const
+{
+    return m_fpsStat.getFps();
+}
+
+// -------------------------------- QnFpsStatistics -----------------------
+
+void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
+{
+    QMutexLocker lock(&m_mutex);
+    if (vd->flags & QnAbstractMediaData::MediaFlags_AfterDrop)
+    {
+        int gg = 4;
+    }
+    if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || (vd->flags & QnAbstractMediaData::MediaFlags_AfterDrop)) {
+        m_lastTime = AV_NOPTS_VALUE;
+        return;
+    }
+    if (m_lastTime != AV_NOPTS_VALUE)
+    {
+        qint64 diff = qAbs(vd->timestamp - m_lastTime);
+        if (m_queue.size() >= MAX_QUEUE_SIZE) {
+            qint64 oldVal;
+            m_queue.pop(oldVal);
+            m_queueSum -= oldVal;
+        }
+        m_queue.push(diff);
+        m_queueSum += diff;
+    }
+    m_lastTime = vd->timestamp;
+}
+
+int QnFpsStatistics::getFps() const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_queue.size() > 0)
+        return 1000000.0 / (m_queueSum / (qreal) m_queue.size()) + 0.5;
+    else
+        return 0;
 }
