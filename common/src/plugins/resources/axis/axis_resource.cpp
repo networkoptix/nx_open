@@ -8,6 +8,9 @@ static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
 
 QnPlAxisResource::QnPlAxisResource()
+:
+    m_inputPortCount( 0 ),
+    m_outputPortCount( 0 )
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
@@ -250,14 +253,25 @@ bool QnPlAxisResource::initInternal()
             m_resolutionList[i] = "720x576";
             m_palntscRes = true;
         }
-
     }
 
-    
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
+
+    status = readAxisParameter( &http, QLatin1String("Input.NbrOfInputs"), &m_inputPortCount );
+    if( status != CL_HTTP_SUCCESS )
+        cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
+            arg(getHostAddress().toString()).arg(::toString(status)), cl_logWARNING );
+    status = readAxisParameter( &http, QLatin1String("Output.NbrOfOutputs"), &m_outputPortCount );
+    if( status != CL_HTTP_SUCCESS )
+        cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
+            arg(getHostAddress().toString()).arg(::toString(status)), cl_logWARNING );
+
+    if( m_inputPortCount > 0 )
+        registerInputPortEventHandler();
 
     return true;
 }
@@ -470,4 +484,67 @@ int QnPlAxisResource::getChannelNum() const
     int result = phId.mid(index).toInt();
 
     return result;
+}
+
+//!Implementation of QnSecurityCamResource::getRelayOutputList
+QStringList QnPlAxisResource::getRelayOutputList() const
+{
+    //TODO/IMPL
+    return QStringList();
+}
+
+//!Implementation of QnSecurityCamResource::setRelayOutputState
+bool QnPlAxisResource::setRelayOutputState(
+    const QString& ouputID,
+    bool activate,
+    unsigned int autoResetTimeout )
+{
+    //TODO/IMPL
+    return false;
+}
+
+CLHttpStatus QnPlAxisResource::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QString& paramName,
+    unsigned int* paramValue )
+{
+    CLHttpStatus status = httpClient->doGET( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(paramName).toLatin1() );
+    if( status == CL_HTTP_SUCCESS )
+    {
+        QByteArray body;
+        httpClient->readAll( body );
+        const QStringList& paramItems = QString::fromLatin1(body.data()).split(QLatin1Char('='));
+        if( paramItems.size() == 2 && paramItems[0] == paramName )
+        {
+            *paramValue = paramItems[1].toUInt();
+            return CL_HTTP_SUCCESS;
+        }
+        else
+        {
+            cl_log.log( QString::fromLatin1("Failed to read param %1 of camera %2. Unexpected response: %3").
+                arg(paramName).arg(getHostAddress().toString()).arg(QLatin1String(body)), cl_logWARNING );
+            return CL_HTTP_BAD_REQUEST;
+        }
+    }
+    else
+    {
+        cl_log.log( QString::fromLatin1("Failed to param %1 of camera %2. Result: %3").
+            arg(paramName).arg(getHostAddress().toString()).arg(::toString(status)), cl_logWARNING );
+        return status;
+    }
+}
+
+bool QnPlAxisResource::registerInputPortEventHandler()
+{
+    //TODO/IMPL registering tcp server
+    //http://myserver/axis-cgi/param.cgi?action=add 
+    //    &group=EventServers.TCP&template=tcp_config 
+    //    &EventServers.TCP.T.Address=10.13.24.10 
+    //    &EventServers.TCP.T.Port=4444 
+
+    //TODO/IMPL creating event
+
+    //TODO/IMPL adding action to upload event
+
+    return false;
 }

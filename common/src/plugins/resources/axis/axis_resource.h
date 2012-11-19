@@ -37,8 +37,15 @@ public:
     virtual void setMotionMaskPhysical(int channel) override;
     virtual const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider) override;
 
-
     int getChannelNum() const;
+
+    //!Implementation of QnSecurityCamResource::getRelayOutputList
+    virtual QStringList getRelayOutputList() const;
+    //!Implementation of QnSecurityCamResource::setRelayOutputState
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeout );
 
 protected:
     bool initInternal() override;
@@ -62,6 +69,15 @@ private:
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;
     qint64 m_lastMotionReadTime;
+    unsigned int m_inputPortCount;
+    unsigned int m_outputPortCount;
+
+    //!reads axis parameter, triggering url like http://ip/axis-cgi/param.cgi?action=list&group=Input.NbrOfInputs
+    CLHttpStatus readAxisParameter(
+        CLSimpleHTTPClient* const httpClient,
+        const QString& paramName,
+        unsigned int* paramValue );
+    bool registerInputPortEventHandler();
 };
 
 #endif //axis_resource_h_2215
