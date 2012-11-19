@@ -392,11 +392,6 @@ void removeARPrecord(const QHostAddress& ip)
     delete [] mtb;
 }
 
-QString getMacByIP(const QString& host, bool net)
-{
-    return getMacByIP(resolveAddress(host), net);
-}
-
 // this is only works in local networks
 //if net == true it returns the mac of the first device responded on ARP request; in case if net = true it might take time...
 // if net = false it returns last device responded on ARP request
@@ -540,6 +535,11 @@ QString getMacByIP(const QHostAddress& ip, bool net)
 }
 
 #endif
+
+QString getMacByIP(const QString& host, bool net)
+{
+    return getMacByIP(resolveAddress(host), net);
+}
 
 bool isIpv4Address(const QString& addr)
 {
