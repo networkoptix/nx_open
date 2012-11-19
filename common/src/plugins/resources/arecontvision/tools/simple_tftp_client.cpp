@@ -8,16 +8,15 @@ static const int SERVER_TFTP_PORT = 69;
 
 using namespace std;
 
-CLSimpleTFTPClient::CLSimpleTFTPClient(const QHostAddress& hostAddress, unsigned int timeout, unsigned int retry):
+CLSimpleTFTPClient::CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry):
 m_retry(retry),
-m_hostAddress(hostAddress),
-m_ip(hostAddress.toString()),
+m_hostAddress(host),
 m_timeout(timeout)
 {
     //m_wish_blk_size = double_blk_size;
     m_wish_blk_size  = blk_size;
     m_sock.setReadTimeOut(max(m_timeout,1000)); // minimum timeout is 1000 ms
-    if (!m_sock.setDestAddr(m_ip, SERVER_TFTP_PORT))
+    if (!m_sock.setDestAddr(resolveAddress(host).toString(), SERVER_TFTP_PORT))
     {
         qWarning() << "CLSimpleTFTPClient::CLSimpleTFTPClient: setDestAddr() failed: " << m_sock.lastError();
     }

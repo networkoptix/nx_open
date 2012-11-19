@@ -44,21 +44,21 @@ void QnTestCameraResource::setCropingPhysical(QRect /*croping*/)
 }
 
 
-QHostAddress QnTestCameraResource::getHostAddress() const
+QString QnTestCameraResource::getHostAddress() const
 {
     QString url = getUrl();
     int start = QString(QLatin1String("tcp://")).length();
     int end = url.indexOf(QLatin1Char(':'), start);
     if (start >= 0 && end > start)
-        return QHostAddress(url.mid(start, end-start));
+        return url.mid(start, end-start);
     else
-        return QHostAddress();
+        return QString();
 }
 
-bool QnTestCameraResource::setHostAddress(const QHostAddress &ip, QnDomain /*domain*/)
+bool QnTestCameraResource::setHostAddress(const QString &ip, QnDomain /*domain*/)
 {
     QUrl url(getUrl());
-    url.setHost(ip.toString());
+    url.setHost(ip);
     setUrl(url.toString());
     return true;
 }

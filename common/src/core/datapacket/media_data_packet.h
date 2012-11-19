@@ -60,7 +60,8 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
 
         MediaFlags_NewServer = 1024, // swith archive to a new media server
         MediaFlags_DecodeTwice = 2048,
-        MediaFlags_FCZ = 4096 // fast channel zapping flag
+        MediaFlags_FCZ = 4096, // fast channel zapping flag
+        MediaFlags_AfterDrop = 1024*8 // some data were dropped before current data
     };
 
     enum DataType {

@@ -299,9 +299,15 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
                 }
             }
         }
-        m_dataQueue.unlock();
-        if (somethingDeleted)
+        if (somethingDeleted) 
+        {
+            // clone packet. Put to queue new copy because data is modified
+            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(m_dataQueue.front().dynamicCast<QnAbstractMediaData>()->clone());
+            media->flags |= QnAbstractMediaData::MediaFlags_AfterDrop;
+            m_dataQueue.setAt(media, 0);
             m_someDataIsDropped = true;
+        }
+        m_dataQueue.unlock();
     }
 
     while(m_dataQueue.size() > 120) // queue to large

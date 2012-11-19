@@ -349,14 +349,14 @@ void QnMulticodecRtpReader::openStream()
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
             url += m_request;;
         }
     }
     else
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress();
 
     m_RtpSession.setAuth(nres->getAuth());
 

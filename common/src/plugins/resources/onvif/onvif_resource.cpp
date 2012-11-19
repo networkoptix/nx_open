@@ -161,7 +161,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
-bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QnPhysicalCameraResource::se
     {
@@ -171,7 +171,7 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
         if (!mediaUrl.isEmpty())
         {
             QUrl url(mediaUrl);
-            url.setHost(ip.toString());
+            url.setHost(ip);
             setMediaUrl(url.toString());
         }
 
@@ -179,7 +179,7 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
         if (!onvifUrl.isEmpty())
         {
             QUrl url(onvifUrl);
-            url.setHost(ip.toString());
+            url.setHost(ip);
             setDeviceOnvifUrl(url.toString());
         }
     }
@@ -523,7 +523,7 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 {
     QUrl url(QString::fromStdString(onvifUrl));
     QUrl mediaUrl(getUrl());
-    url.setHost(getHostAddress().toString());
+    url.setHost(getHostAddress());
     if (updatePort && mediaUrl.port(-1) != -1)
         url.setPort(mediaUrl.port());
     return url.toString();
@@ -531,7 +531,6 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
-    bool result = true;
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -553,7 +552,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
 
-            result = false;
+            return false;
         } 
         else
         {
@@ -577,7 +576,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             if (soapWrapper.isNotAuthenticated())
                 setStatus(QnResource::Unauthorized);
-            result = false;
+            return false;
         }
 
         if (response.Capabilities) 
@@ -612,7 +611,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            result = false;
+            return false;
         }
 
         QString mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
@@ -627,7 +626,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             
     }
 
-    return result;
+    return true;
 }
 
 bool QnPlOnvifResource::fetchAndSetResourceOptions()
@@ -986,7 +985,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         QString temp = getDeviceOnvifUrl();
 
         QUrl newUrl(getDeviceOnvifUrl());
-        newUrl.setHost(getHostAddress().toString());
+        newUrl.setHost(getHostAddress());
         setDeviceOnvifUrl(newUrl.toString());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getDeviceOnvifUrl();
         result = true;
@@ -997,7 +996,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         // trying to introduce fix for dw cam 
         QString temp = getMediaUrl();
         QUrl newUrl(getMediaUrl());
-        newUrl.setHost(getHostAddress().toString());
+        newUrl.setHost(getHostAddress());
         setMediaUrl(newUrl.toString());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getMediaUrl();
         result = true;
