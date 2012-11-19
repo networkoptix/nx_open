@@ -90,6 +90,8 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     QMutexLocker lock(&m_mutex);
 
     QnCamDisplay* display = getDisplayByReader(reader);
+    if (!isSupportedDisplay(display))
+        return;
     m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
     
     if (display->getSpeed() > 1.0 || display->getSpeed() < 0)
@@ -124,6 +126,9 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
         return; // reader already at HQ
     
     QnCamDisplay* display = getDisplayByReader(reader);
+    if (!isSupportedDisplay(display))
+        return;
+
     if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
         // If item leave high speed mode change same item to HQ (do not try to find biggest item)
