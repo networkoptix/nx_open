@@ -1,6 +1,7 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);
 
@@ -36,6 +37,12 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
     return 0;
 }
 
+bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
+{
+    QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
+    return cam && cam->hasDualStreaming() && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
+}
+
 QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)
 {
     bool findHQ = findQuality == MEDIA_Quality_High;
@@ -45,6 +52,9 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
+        if (!isSupportedDisplay(display))
+            continue; // ommit cameras without dual streaming, offline and non-authorized cameras
+
         QSize size = display->getScreenSize();
         QSize res = display->getVideoSize();
         qint64 screenSquare = size.width() * size.height();
@@ -186,6 +196,9 @@ void QnRedAssController::onTimer()
             continue; // do not hanlde recently added items, some start animation can be in progress
 
         QnCamDisplay* display = itr.key();
+
+        if (!isSupportedDisplay(display))
+            continue; // ommit cameras without dual streaming, offline and non-authorized cameras
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
