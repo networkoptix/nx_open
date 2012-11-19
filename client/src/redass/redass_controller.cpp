@@ -187,8 +187,8 @@ void QnRedAssController::onTimer()
         }
     }
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return;
+    //if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
+    //    return;
 
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
@@ -212,6 +212,7 @@ void QnRedAssController::onTimer()
         if (display->isRealTimeSource() && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low &&   // LQ live stream
             qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
             display->queueSize() < 2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
+            m_lastSwitchTimer.elapsed() >= QUALITY_SWITCH_INTERVAL && // no recently slow report by any camera
             !isSmallItem(display))  // is big enough item for HQ
         {
             streamBackToNormal(display->getArchiveReader());
