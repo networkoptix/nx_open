@@ -2,9 +2,14 @@
 
 #include <QApplication>
 #include <QDir>
+#include <QSettings>
+
 #include "camera_pool.h"
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
 #include "utils/common/module_resources.h"
+
+
+QSettings qSettings;	//TODO/FIXME remove this shit. Have to add to build common as shared object, since it requires extern qSettibns to be defined somewhere...
 
 QString doUnquote(const QString& fileName)
 {
