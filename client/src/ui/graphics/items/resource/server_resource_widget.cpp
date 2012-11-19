@@ -326,31 +326,24 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
 
         QnScopedPainterFontRollback fontRollback(painter);
         Q_UNUSED(fontRollback)
-
         QFont font(this->font());
-
-        // TODO: #gdm it's not trivial to change text size now because of a lot
-        // of hardcoded constants. This needs to be fixed.
-
-
-        // TODO: #gdm I think we should use zoom-based approach on all OSes.
-        // Less code == less bugs.
 #ifdef Q_OS_LINUX
-        qreal zoom(offset * 0.02);
-        font.setPixelSize(20);
-        bool scaleRequired = true;
+        int fontSize = 20;
 #else
-        qreal zoom(1.0);
-        font.setPointSizeF(offset * 0.3);
-        bool scaleRequired = false;
+        int fontSize = 80;
 #endif
-        qreal unzoom = 1/zoom;
-
+        font.setPixelSize(fontSize);
         painter->setFont(font);
+
         /* Draw text values */
         {
-            if (scaleRequired)
-                painter->scale(zoom, zoom);
+            // modify this if you want to change font size
+            qreal zoomCoef = 0.4 * offset;
+
+            qreal zoom(zoomCoef / fontSize);
+            qreal unzoom(fontSize / zoomCoef);
+
+            painter->scale(zoom, zoom);
             qreal x = unzoom * (offset * 1.1 + ow);
             for (int i = 0; i < values.length(); i++){
                 qreal interValue = values[i];
@@ -359,39 +352,39 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 qreal y = unzoom * (offset + oh * (1.0 - interValue));
                 painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
             }
-            if (scaleRequired)
-               painter->scale(unzoom, unzoom);
+            painter->scale(unzoom, unzoom);
         }
-
-        // TODO: #gdm Please clean up this copypasta I've introduced.
-#ifdef Q_OS_LINUX
-        zoom = (offset * 0.04);
-        font.setPixelSize(20);
-        scaleRequired = true;
-#else
-        zoom = (1.0);
-        font.setPointSizeF(offset * 0.6);
-        scaleRequired = false;
-#endif
-        unzoom = 1/zoom;
-
-        painter->setFont(font);
 
         /* Draw legend */
         {
+            // modify this if you want to change squares size
+            qreal squareSize = 0.2 * offset;
+
+            // modify this if you want to change font size
+            qreal zoomCoef = 0.5 * offset;
+
+            int space = offset; // space for the square drawing and between legend elements
+
+            qreal zoom(zoomCoef / fontSize);
+            qreal unzoom(fontSize / zoomCoef);
+
             QnScopedPainterTransformRollback transformRollback(painter);
             Q_UNUSED(transformRollback)
+
+            // move to the center point
             painter->translate(width * 0.5, oh + offset * 1.65);
-            if (scaleRequired)
-                painter->scale(zoom, zoom);
+
+            painter->scale(zoom, zoom);
+
             qreal legendOffset = 0.0;
-            int space = offset; // space for the square drawing and between legend elements
             foreach(QString key, m_sortedKeys)
-                legendOffset += painter->fontMetrics().width(key) + space;
+                legendOffset += painter->fontMetrics().width(key) + space * unzoom;
+
+            // move left to half of the total legend width
             painter->translate(-legendOffset * 0.5, 0.0);
 
             QPainterPath legend;
-            legend.addRect(0.0, 0.0, -offset * 0.2*unzoom, -offset * 0.2*unzoom);
+            legend.addRect(0.0, 0.0, -squareSize * unzoom, -squareSize * unzoom);
 
             QPen legendPen(main_pen);
             legendPen.setWidthF(pen_width * 2 * unzoom);
@@ -401,11 +394,10 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
                 legendPen.setColor(getColorById(counter++));
                 painter->setPen(legendPen);
                 painter->strokePath(legend, legendPen);
-                painter->drawText(offset * 0.1*unzoom, offset * 0.1*unzoom, key);
-                painter->translate(painter->fontMetrics().width(key) + space, 0.0);
+                painter->drawText(offset * 0.1* unzoom, offset * 0.1* unzoom, key);
+                painter->translate(painter->fontMetrics().width(key) + space * unzoom, 0.0);
             }
-            if (scaleRequired)
-                painter->scale(unzoom, unzoom);
+            painter->scale(unzoom, unzoom);
         }
     }
 }

@@ -63,9 +63,7 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
     CLVideoDecoderOutput decodedVideoFrame;
     decoder.decode(video, &decodedVideoFrame);
-    if (m_resolution.width() == 0 && m_resolution.height() == 0 || m_resolution.isEmpty())
-        m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
-    else if (m_resolution.width() == 0)
+    if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {
         m_resolution.setHeight(qPower2Ceil((unsigned) m_resolution.height(),16)); // round resolution height
         m_resolution.setHeight(qMin(decoder.getContext()->height, m_resolution.height())); // strict to source frame height
@@ -75,6 +73,9 @@ bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
         m_resolution.setWidth(qPower2Ceil((unsigned) m_resolution.width(),16)); // round resolution width
         m_resolution.setWidth(qMin(decoder.getContext()->width, m_resolution.width())); // strict to source frame width
     }
+    else if (m_resolution.width() == 0 && m_resolution.height() == 0 || m_resolution.isEmpty())
+        m_resolution = QSize(decoder.getContext()->width, decoder.getContext()->height);
+
     return true;
 }
 
@@ -89,7 +90,7 @@ QnTranscoder::QnTranscoder():
     m_eofCounter(0),
     m_packetizedMode(false)
 {
-
+    QThread::currentThread()->setPriority(QThread::LowPriority); 
 }
 
 QnTranscoder::~QnTranscoder()

@@ -62,7 +62,7 @@ namespace Qn {
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
 
         /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
+        HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
     };
 
 
@@ -221,6 +221,15 @@ namespace Qn {
     enum TimeMode {
         ServerTimeMode, 
         ClientTimeMode  
+    };
+
+    /**
+     * Columns in the resource tree model.
+     */
+    enum ResourceTreeColumn {
+        NameColumn,
+        CheckColumn,
+        ColumnCount
     };
 
 } // namespace Qn

@@ -2628,11 +2628,15 @@ Do you want to continue?"),
         QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
         if (selectedFilter.contains(tr("with Timestamps")))
             role = QnStreamRecorder::Role_FileExportWithTime;
+        QnMediaResourcePtr mediaRes = m_exportedCamera->getDevice().dynamicCast<QnMediaResource>();
         int timeOffset = 0;
-        if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_exportedCamera->getDevice().dynamicCast<QnMediaResource>(), 0);
+        if(qnSettings->timeMode() == Qn::ServerTimeMode) {
+            // time difference between client and server
+            timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(mediaRes, 0);
+        }
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaRes, Qn::InvalidUtcOffset);
         m_exportedCamera->exportMediaPeriodToFile(period.startTimeMs * 1000ll, (period.startTimeMs + period.durationMs) * 1000ll, fileName, selectedExtension.mid(1), 
-                                                  QnStorageResourcePtr(), role, timeOffset);
+                                                  QnStorageResourcePtr(), role, timeOffset, serverTimeZone);
         exportProgressDialog->exec();
     }
 }
