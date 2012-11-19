@@ -25,7 +25,7 @@
 		<global.libs/>      
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-		<linux.oslibs>-lz -lbz2</linux.oslibs>
+		<linux.oslibs>-lz</linux.oslibs>
 		<mac.oslibs>-framework IOKit</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
