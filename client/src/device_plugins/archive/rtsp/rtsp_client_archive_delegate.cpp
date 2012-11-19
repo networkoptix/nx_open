@@ -479,6 +479,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         m_lastPacketFlags = result->flags;
 
 
+    /*
     if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
         // Media server can change quality for LIVE stream (for archive quality controlled by client only)
@@ -496,6 +497,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             }
         }
     }
+    */
 
     m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();
     return result;
@@ -821,13 +823,12 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     if (!m_rtspSession.isOpened())
         return false;
 
-    // in live mode I have swiching quality without seek for improving smooth quality
-    if (isRealTimeSource() || !fastSwitch) {
+    if (!fastSwitch) {
         m_rtspSession.sendSetParameter(paramName, value);
-        return false;
+        return false; // switch quality without seek (it is take more time)
     }
     else 
-        return true;
+        return true; // need send seek command
 }
 
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)

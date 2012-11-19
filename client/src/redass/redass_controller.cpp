@@ -1,6 +1,7 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
+#include "core/resource/camera_resource.h"
 
 Q_GLOBAL_STATIC(QnRedAssController, inst);
 
@@ -36,6 +37,12 @@ QnCamDisplay* QnRedAssController::getDisplayByReader(QnArchiveStreamReader* read
     return 0;
 }
 
+bool QnRedAssController::isSupportedDisplay(QnCamDisplay* display) const
+{
+    QnSecurityCamResourcePtr cam = display->getArchiveReader()->getResource().dynamicCast<QnSecurityCamResource>();
+    return cam && cam->hasDualStreaming() && cam->getStatus() != QnResource::Offline && cam->getStatus() != QnResource::Unauthorized;
+}
+
 QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality findQuality, SearchCondition cond, int* displaySize)
 {
     bool findHQ = findQuality == MEDIA_Quality_High;
@@ -45,6 +52,9 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
         QnCamDisplay* display = itr.key();
+        if (!isSupportedDisplay(display))
+            continue; // ommit cameras without dual streaming, offline and non-authorized cameras
+
         QSize size = display->getScreenSize();
         QSize res = display->getVideoSize();
         qint64 screenSquare = size.width() * size.height();
@@ -80,6 +90,8 @@ void QnRedAssController::onSlowStream(QnArchiveStreamReader* reader)
     QMutexLocker lock(&m_mutex);
 
     QnCamDisplay* display = getDisplayByReader(reader);
+    if (!isSupportedDisplay(display))
+        return;
     m_lastLqTime = m_redAssInfo[display].lqTime = qnSyncTime->currentMSecsSinceEpoch();
     
     if (display->getSpeed() > 1.0 || display->getSpeed() < 0)
@@ -114,6 +126,9 @@ void QnRedAssController::streamBackToNormal(QnArchiveStreamReader* reader)
         return; // reader already at HQ
     
     QnCamDisplay* display = getDisplayByReader(reader);
+    if (!isSupportedDisplay(display))
+        return;
+
     if (qAbs(display->getSpeed()) < m_redAssInfo[display].toLQSpeed || (m_redAssInfo[display].toLQSpeed < 0 && display->getSpeed() > 0))
     {
         // If item leave high speed mode change same item to HQ (do not try to find biggest item)
@@ -177,8 +192,8 @@ void QnRedAssController::onTimer()
         }
     }
 
-    if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
-        return;
+    //if (m_lastSwitchTimer.elapsed() < QUALITY_SWITCH_INTERVAL)
+    //    return;
 
     for (ConsumersMap::iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
     {
@@ -186,6 +201,9 @@ void QnRedAssController::onTimer()
             continue; // do not hanlde recently added items, some start animation can be in progress
 
         QnCamDisplay* display = itr.key();
+
+        if (!isSupportedDisplay(display))
+            continue; // ommit cameras without dual streaming, offline and non-authorized cameras
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
@@ -199,6 +217,7 @@ void QnRedAssController::onTimer()
         if (display->isRealTimeSource() && display->getArchiveReader()->getQuality() == MEDIA_Quality_Low &&   // LQ live stream
             qnSyncTime->currentMSecsSinceEpoch() - m_redAssInfo[display].lqTime > QUALITY_SWITCH_INTERVAL &&  // no drop report several last seconds
             display->queueSize() < 2 && // there are no a lot of packets in the queue (it is possible if CPU slow)
+            m_lastSwitchTimer.elapsed() >= QUALITY_SWITCH_INTERVAL && // no recently slow report by any camera
             !isSmallItem(display))  // is big enough item for HQ
         {
             streamBackToNormal(display->getArchiveReader());

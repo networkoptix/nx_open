@@ -1455,10 +1455,6 @@ int QnCamDisplay::getAvarageFps() const
 void QnFpsStatistics::updateFpsStatistics(QnCompressedVideoDataPtr vd)
 {
     QMutexLocker lock(&m_mutex);
-    if (vd->flags & QnAbstractMediaData::MediaFlags_AfterDrop)
-    {
-        int gg = 4;
-    }
     if ((vd->flags & QnAbstractMediaData::MediaFlags_BOF) || (vd->flags & QnAbstractMediaData::MediaFlags_AfterDrop)) {
         m_lastTime = AV_NOPTS_VALUE;
         return;

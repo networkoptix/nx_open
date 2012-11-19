@@ -43,7 +43,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_currentDP(0),
   m_liveQuality(MEDIA_Quality_High),
   m_newLiveQuality(MEDIA_Quality_None),
-  m_hiQualityRetryCounter(0),
   m_realtimeMode(false),
   m_adaptiveSleep(MAX_FRAME_DURATION*1000),
   m_useUTCTime(true),
@@ -56,18 +55,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
-    foreach(QnRtspDataConsumer* consumer, m_allConsumers)
-    {
-        if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
-        {
-            if (consumer->m_liveQuality == MEDIA_Quality_Low) {
-                setLiveQualityInternal(MEDIA_Quality_Low);
-                m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
-                break;
-            }
-        }
-    }
-
     m_allConsumers << this;
 }
 
@@ -76,23 +63,6 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
     {
         QMutexLocker lock(&m_allConsumersMutex);
         m_allConsumers.remove(this);
-        if (m_firstLiveTime != AV_NOPTS_VALUE)
-        {
-            // If some data was transfered and camera is closing, some bandwidth appears.
-            // Try to switch some camera(s) to high quality
-            foreach(QnRtspDataConsumer* consumer, m_allConsumers)
-            {
-                if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
-                {
-                    if (consumer->m_liveQuality == MEDIA_Quality_Low && consumer->m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-                    {
-                        consumer->resetQualityStatistics();
-                        //if (m_liveQuality == MEDIA_Quality_Low)
-                        break; // try only one camera is current quality is low
-                    }
-                }
-            }
-        }
     }
     stop();
 }
@@ -144,45 +114,6 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
     return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
-void QnRtspDataConsumer::resetQualityStatistics()
-{
-    m_hiQualityRetryCounter = 0;
-}
-
-bool QnRtspDataConsumer::canSwitchToLowQuality()
-{
-    if (!m_owner->isSecondaryLiveDPSupported())
-        return false;
-
-    return true;
-
-    QMutexLocker lock(&m_allConsumersMutex);
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
-        return false;
-
-    m_lastSwitchTime[clientAddress] = currentTime;
-    return true;
-}
-
-bool QnRtspDataConsumer::canSwitchToHiQuality()
-{
-    // RTSP queue is almost empty. But need some addition check to prevent quality change flood
-    QMutexLocker lock(&m_allConsumersMutex);
-    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return false;
-
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
-        return false;
-
-    m_lastSwitchTime[clientAddress] = currentTime;
-    m_hiQualityRetryCounter++;
-    return true;
-}
-
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
 {
     QMutexLocker lock(&m_liveTimingControlMtx);
@@ -213,55 +144,6 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 
     // quality control
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    /*
-    if (isLive)
-    {
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
-        if (isSecondaryProvider)
-            media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
-
-
-        QMutexLocker lock(&m_qualityChangeMutex);
-        if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None && m_liveQuality != MEDIA_Quality_AlwaysHigh)
-        {
-            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
-            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
-            //    m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-            if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
-                m_newLiveQuality = MEDIA_Quality_High;
-        }
-    }
-    */
-
-    // overflow control
-
-    /*
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
-    {
-        m_dataQueue.lock();
-        QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();
-        QMutexLocker lock(&m_qualityChangeMutex);
-        if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh)
-        {
-            qint64 skipTime = m_dataQueue.front()->timestamp;
-            m_dataQueue.clear();
-            copyLastGopFromCamera(false, skipTime-1);
-            m_newLiveQuality = MEDIA_Quality_Low;
-        }
-        else {
-            for (int i = m_dataQueue.size()-1; i >=0; --i)
-            {
-                QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
-                if (media->flags & AV_PKT_FLAG_KEY) 
-                {
-                    m_dataQueue.removeFirst(i);
-                    break;
-                }
-            }
-        }
-        m_dataQueue.unlock();
-    }
-    */
 
     if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
@@ -735,7 +617,6 @@ void QnRtspDataConsumer::clearUnprocessedData()
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
-    m_hiQualityRetryCounter = 0;
 }
 
 void QnRtspDataConsumer::setUseUTCTime(bool value)
