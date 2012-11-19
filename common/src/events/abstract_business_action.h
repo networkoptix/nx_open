@@ -13,6 +13,13 @@ enum BusinessActionType
     BA_Bookmark,           // mark part of camera archive as undeleted
     BA_CameraRecording,    // start camera recording
     BA_PanicRecording,     // activate panic recording mode
+    //!change camera output state
+    /*!
+        Parameters:\n
+            - relayOutputID (string, required)          - id of output to trigger
+            - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+    */
+    BA_TriggerOutput,
 
     // these actions can be executed from any endpoint. Actually these actions call specified function at EC
     BA_SendMail,
@@ -44,10 +51,10 @@ public:
     */
     void setResource(QnResourcePtr resource)   { m_resource = resource; }
 
-    QnResourcePtr getResource()                { return m_resource;     }
+    const QnResourcePtr& getResource()                { return m_resource;     }
 
     void setParams(const QnBusinessParams& params) {m_params = params; }
-    QnBusinessParams getParams() const             { return m_params; }
+    const QnBusinessParams& getParams() const             { return m_params; }
 
     void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
     QnId getBusinessRuleId() const             { return m_businessRuleId; }

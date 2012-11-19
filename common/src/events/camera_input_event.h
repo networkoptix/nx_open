@@ -6,7 +6,7 @@
 #ifndef CAMERA_INPUT_EVENT_H
 #define CAMERA_INPUT_EVENT_H
 
-#include "toggle_business_event.h"
+#include "abstract_business_event.h"
 
 
 class QnCameraInputEvent

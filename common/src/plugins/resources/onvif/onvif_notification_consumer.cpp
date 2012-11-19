@@ -39,13 +39,13 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             continue;
         }
 
-        if( !notification.oasisWsnB2__Topic ||
-            notification.oasisWsnB2__Topic->Dialect != "tns1:Device/Trigger/Relay" )
-        {
-            cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
-                arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : string())), cl_logDEBUG1 );
-            continue;
-        }
+        //if( !notification.oasisWsnB2__Topic ||
+        //    notification.oasisWsnB2__Topic->Dialect != "tns1:Device/Trigger/Relay" )
+        //{
+        //    cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+        //        arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : string())), cl_logDEBUG1 );
+        //    continue;
+        //}
 
         //TODO/IMPL searching for resource by address
         const QString& address = QUrl( QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item) ).host();
@@ -59,7 +59,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
         }
 
         //TODO/IMPL get relay token and state from notification
-        it->second->notificationReceived( string(), false );
+        it->second->notificationReceived( notification );
     }
 
     return SOAP_OK;

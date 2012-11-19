@@ -1,6 +1,9 @@
+
 #include <QList>
 #include "business_rule_processor.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/security_cam_resource.h"
+
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -14,7 +17,6 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
-
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action)
@@ -35,23 +37,55 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         executeActionInternal(action);
 }
 
+static const QLatin1String RELAY_OUTPUT_ID( "relayOutputID" );
+static const QLatin1String RELAY_AUTO_RESET_TIMEOUT( "relayAutoResetTimeout" );
+
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
-    switch(action->actionType())
-    {
-    case BA_SendMail:
-        break;
-    case BA_Alert:
-        break;
-    case BA_ShowPopup:
-        break;
+    QnResourcePtr resource = action->getResource();
 
-    default:
-        break;
+    switch( action->actionType() )
+    {
+        case BA_SendMail:
+            break;
+        case BA_Alert:
+            break;
+        case BA_ShowPopup:
+            break;
+
+        case BA_TriggerOutput:
+        {
+            if( !resource )
+            {
+                cl_log.log( QString::fromLatin1("Received BA_TriggerOutput with no resource reference. Ignoring..."), cl_logWARNING );
+                return false;
+            }
+            QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
+            if( !securityCam )
+            {
+                cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+                    arg(resource->getId()), cl_logWARNING );
+                return false;
+            }
+            QnBusinessParams::const_iterator relayOutputIDIter = action->getParams().find( RELAY_OUTPUT_ID );
+            if( relayOutputIDIter == action->getParams().end() )
+            {
+                cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action without required parameter %1. Ignoring...").arg(RELAY_OUTPUT_ID), cl_logWARNING );
+                return false;
+            }
+            QnBusinessParams::const_iterator autoResetTimeoutIter = action->getParams().find( RELAY_AUTO_RESET_TIMEOUT );
+            return securityCam->setRelayOutputState(
+                relayOutputIDIter->toString(),
+                action->getToggleState() == ToggleState_On,
+                autoResetTimeoutIter == action->getParams().end() ? 0 : autoResetTimeoutIter->toUInt() );
+        }
+
+        default:
+            break;
     }
 
     return false;
-};
+}
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
 {
