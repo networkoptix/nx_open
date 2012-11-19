@@ -61,7 +61,7 @@ public:
     */
     bool ensureThereAreContextsSharedWith(
         GLContext::SYS_GL_CTX_HANDLE parentContext,
-        WId winID = NULL,
+        WId winID = 0,
         int poolSizeIncrement = -1 );
     /*!
         If on pool shared with \a parentContexts, an empty pool is created and returned
