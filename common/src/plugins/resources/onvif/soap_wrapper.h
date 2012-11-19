@@ -11,7 +11,9 @@ class PTZBindingProxy;
 class ImagingBindingProxy;
 class NotificationProducerBindingProxy;
 class CreatePullPointBindingProxy;
+class PullPointSubscriptionBindingProxy;
 class EventBindingProxy;
+class SubscriptionManagerBindingProxy;
 
 class _onvifDevice__CreateUsers;
 class _onvifDevice__CreateUsersResponse;
@@ -206,6 +208,12 @@ class _oasisWsnB2__CreatePullPointResponse;
 class _onvifEvents__CreatePullPointSubscription;
 class _onvifEvents__CreatePullPointSubscriptionResponse;
 
+class _onvifEvents__PullMessages;
+class _onvifEvents__PullMessagesResponse;
+
+class _oasisWsnB2__Renew;
+class _oasisWsnB2__RenewResponse;
+
 
 //
 // SoapWrapper
@@ -215,10 +223,17 @@ template <class T>
 class SoapWrapper
 {
 public:
-    SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
+    /*!
+        \param _timeDrift ???
+    */
+    SoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive );
     virtual ~SoapWrapper();
 
-    soap* getSoap();
     const T* getProxy() const { return m_soapProxy; }
     T* getProxy() { return m_soapProxy; }
     const char* endpoint() const { return m_endpoint; }
@@ -271,7 +286,12 @@ class DeviceSoapWrapper: public SoapWrapper<DeviceBindingProxy>
 public:
 
     //TODO:UTF unuse std::string
-    DeviceSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
+    DeviceSoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~DeviceSoapWrapper();
 
     //Input: normalized manufacturer
@@ -307,7 +327,8 @@ public:
         const std::string& endpoint,
         const std::string& login,
         const std::string& passwd,
-        int _timeDrift );
+        int _timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~DeviceIOWrapper();
 
     int getDigitalInputs(
@@ -332,7 +353,12 @@ class MediaSoapWrapper: public SoapWrapper<MediaBindingProxy>
 
 public:
 
-    MediaSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
+    MediaSoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~MediaSoapWrapper();
 
     int getAudioEncoderConfigurationOptions(AudioOptionsReq& request, AudioOptionsResp& response);
@@ -379,7 +405,12 @@ class PtzSoapWrapper: public SoapWrapper<PTZBindingProxy>
 
 public:
 
-    PtzSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
+    PtzSoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~PtzSoapWrapper();
 
     int doGetConfigurations(_onvifPtz__GetConfigurations& request, _onvifPtz__GetConfigurationsResponse& response);
@@ -407,7 +438,12 @@ class ImagingSoapWrapper: public SoapWrapper<ImagingBindingProxy>
 
 public:
 
-    ImagingSoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift);
+    ImagingSoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
     virtual ~ImagingSoapWrapper();
 
     int getImagingSettings(ImagingSettingsReq& request, ImagingSettingsResp& response);
@@ -432,7 +468,8 @@ public:
         const std::string& endpoint,
         const std::string& login,
         const std::string& passwd,
-        int _timeDrift );
+        int _timeDrift,
+        bool tcpKeepAlive = false );
 
     int Subscribe(
         _oasisWsnB2__Subscribe* const request,
@@ -448,9 +485,25 @@ public:
         const std::string& endpoint,
         const std::string& login,
         const std::string& passwd,
-        int _timeDrift );
+        int _timeDrift,
+        bool tcpKeepAlive = false );
 
 	int createPullPoint( _oasisWsnB2__CreatePullPoint& request, _oasisWsnB2__CreatePullPointResponse& response );
+};
+
+class PullPointSubscriptionWrapper
+:
+    public SoapWrapper<PullPointSubscriptionBindingProxy>
+{
+public:
+    PullPointSubscriptionWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
+
+    int pullMessages( _onvifEvents__PullMessages& request, _onvifEvents__PullMessagesResponse& response );
 };
 
 class EventSoapWrapper
@@ -462,11 +515,27 @@ public:
         const std::string& endpoint,
         const std::string& login,
         const std::string& passwd,
-        int _timeDrift );
+        int _timeDrift,
+        bool tcpKeepAlive = false );
 
 	int createPullPointSubscription(
         _onvifEvents__CreatePullPointSubscription& request,
         _onvifEvents__CreatePullPointSubscriptionResponse& response );
+};
+
+class SubscriptionManagerSoapWrapper
+:
+    public SoapWrapper<SubscriptionManagerBindingProxy>
+{
+public:
+    SubscriptionManagerSoapWrapper(
+        const std::string& endpoint,
+        const std::string& login,
+        const std::string& passwd,
+        int _timeDrift,
+        bool tcpKeepAlive = false );
+
+	int renew( _oasisWsnB2__Renew& request, _oasisWsnB2__RenewResponse& response );
 };
 
 #endif //onvif_soap_wrapper_h
