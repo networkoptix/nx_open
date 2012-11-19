@@ -176,7 +176,7 @@
 				</os> 
 			</activation>
 			<modules>
-				<module>xvbadecoder</module>
+			  <!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
