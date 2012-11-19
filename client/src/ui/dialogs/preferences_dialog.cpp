@@ -149,6 +149,7 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
@@ -176,6 +177,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
+    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
 
     ui->extraMediaFoldersList->clear();

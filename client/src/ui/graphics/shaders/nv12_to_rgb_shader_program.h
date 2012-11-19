@@ -35,7 +35,7 @@ public:
     /**
      * \param transform                 YUV->RGB colorspace transformation to use. 
      */
-    template<class T>
+    //template<class T>
     void setColorTransform(const QMatrix4x4 &transform) {
         setUniformValue(m_colorTransformLocation, transform);
     }
