@@ -5,7 +5,6 @@
 #include <limits>
 
 #include <QtGui/QGraphicsSceneMouseEvent>
-#include <QtGui/QVector2D>
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -18,6 +17,7 @@
 #include <ptz/ptz_mapper.h>
 #include <api/media_server_connection.h>
 
+#include <ui/common/coordinate_transformations.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/animation/animation_event.h>
@@ -286,12 +286,27 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     QVector3D oldPosition = currentMapper().logicalToPhysical(m_ptzPositionByCamera.value(camera));
 
+    qreal focalLength = oldPosition.z();
+    qreal sideSize = 1.0 / focalLength * 35;
+
+    QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPosition.x() / 180 * M_PI, oldPosition.y() / 180 * M_PI);
+    QVector3D x = QVector3D::crossProduct(QVector3D(0, 0, 1), r).normalized() * sideSize;
+    QVector3D y = QVector3D::crossProduct(x, r).normalized() * sideSize;
+    
+    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
+    QVector3D r1 = r + x * delta.x() + y * delta.y();
+    QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
+    if(spherical.phi < 0)
+        spherical.phi += M_PI * 2;
+
+    QVector3D newPosition = currentMapper().physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
+
+#if 0
     /* Calculate delta in degrees. 
      * 
-     * Note that in physical space negative Y (really negative theta in spherical 
+     * Note that in physical space negative Y (really negative theta in sphericalToCartesian 
      * coordinates) points down, while in screenspace negative Y points up.
      * This is why we have to negate the Y-coordinate of delta when computing arctangent. */
-    qreal focalLength = oldPosition.z();
     QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width() * 35 / focalLength;
     delta = QVector2D(std::atan(delta.x()), std::atan(-delta.y())) / M_PI * 180;
 
@@ -311,6 +326,8 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
         v.setZ(-1.0);
     if(v.z() > 1.0)
         v.setZ(1.0);*/
+#endif
+
 
     m_ptzPositionByCamera[camera] = newPosition;
 

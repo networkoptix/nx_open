@@ -26,12 +26,11 @@ QnLoadingProgressPainter::QnLoadingProgressPainter(qreal innerRadius, int sector
         qreal r0 = innerRadius;
         qreal r1 = 1;
 
-
         vertexStream 
-            << polar<QVector2D>(a0, r0)
-            << polar<QVector2D>(a1, r0)
-            << polar<QVector2D>(a1, r1)
-            << polar<QVector2D>(a0, r1);
+            << polarToCartesian<QVector2D>(r0, a0)
+            << polarToCartesian<QVector2D>(r0, a1)
+            << polarToCartesian<QVector2D>(r1, a1)
+            << polarToCartesian<QVector2D>(r1, a0);
     }
     m_vertexCount = sectorCount * 4;
 
