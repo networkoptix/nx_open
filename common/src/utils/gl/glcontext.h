@@ -63,7 +63,7 @@ public:
         \param System id of window to paint to. Window's device context is used to create gl context. If NULL, screen device context is used
         \note This method MUST be called from GUI thread only
     */
-    GLContext( WId wnd = NULL, SYS_GL_CTX_HANDLE contextHandleToShareWith = NULL );
+    GLContext( WId wnd = 0, SYS_GL_CTX_HANDLE contextHandleToShareWith = NULL );
     ~GLContext();
 
     /*!

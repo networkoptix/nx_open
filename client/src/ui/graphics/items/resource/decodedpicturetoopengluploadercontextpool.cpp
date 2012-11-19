@@ -80,7 +80,7 @@ Q_GLOBAL_STATIC( DecodedPictureToOpenGLUploaderContextPool, qn_decodedPictureToO
 
 DecodedPictureToOpenGLUploaderContextPool::DecodedPictureToOpenGLUploaderContextPool()
 :
-    m_paintWindowId( NULL ),
+    m_paintWindowId( 0 ),
     m_optimalGLContextPoolSize( 0 )
 {
 #ifdef _WIN32
