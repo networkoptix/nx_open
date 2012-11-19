@@ -26,8 +26,10 @@
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
+#include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
 
@@ -35,7 +37,6 @@
 // TODO: remove
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
-#include "plugins/resources/camera_settings/camera_settings.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -70,7 +71,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
     setChannelLayout(m_display->videoLayout());
 
-    m_renderer = new QnResourceWidgetRenderer(channelCount());
+    const QGLWidget* viewPortAsGLWidget = qobject_cast<const QGLWidget*>(QnWorkbenchContextAware::display()->view()->viewport());
+    m_renderer = new QnResourceWidgetRenderer(
+            channelCount(),
+            NULL,
+            viewPortAsGLWidget ? viewPortAsGLWidget->context() : NULL );
     connect(m_renderer, SIGNAL(sourceSizeChanged(const QSize &)), this, SLOT(at_renderer_sourceSizeChanged(const QSize &)));
     m_display->addRenderer(m_renderer);
 

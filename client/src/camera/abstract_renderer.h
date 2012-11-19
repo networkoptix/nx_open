@@ -66,7 +66,7 @@ public:
      * 
      * \param image                     New video frame.
      */
-    virtual void draw(CLVideoDecoderOutput *image) = 0;
+    virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image) = 0;
 
     /**
      * \returns                         Value of this renderer's display counter.

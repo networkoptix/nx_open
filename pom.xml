@@ -134,6 +134,7 @@
 				</os>
 			</activation>
 			<modules>
+				<module>quicksyncdecoder</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
@@ -175,6 +176,7 @@
 				</os> 
 			</activation>
 			<modules>
+			  <!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>

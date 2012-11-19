@@ -21,12 +21,11 @@
 	<name>HD Witness Common Lib</name>
 
 	<properties>
-		<buildLib>staticlib</buildLib>
 		<!--Global libs-->
 		<global.libs/>      
 		<!--Specific os libs used-->
 		<windows.oslibs>-lws2_32 -lIphlpapi -lOle32</windows.oslibs>
-		<linux.oslibs>-lz -lbz2</linux.oslibs>
+		<linux.oslibs>-lz</linux.oslibs>
 		<mac.oslibs>-framework IOKit</mac.oslibs>
 		<!--Global defines-->
 		<global.defines/>
@@ -38,4 +37,31 @@
 
 	<build>
 	</build>    
+	
+	<profiles>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>Windows</family>
+				</os>
+			</activation>
+			<properties>
+				<buildLib>staticlib</buildLib>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>linux</name>
+				</os>
+			</activation>
+			<properties>
+				<buildLib>sharedlib</buildLib>
+			</properties>
+		</profile>	
+	</profiles>	
+
 </project>

@@ -61,7 +61,7 @@ QSize QnVideoTranscoder::getResolution() const
 bool QnVideoTranscoder::open(QnCompressedVideoDataPtr video)
 {
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-    CLVideoDecoderOutput decodedVideoFrame;
+    QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     if (m_resolution.width() == 0 && m_resolution.height() > 0)
     {

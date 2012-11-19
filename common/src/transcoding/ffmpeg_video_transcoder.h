@@ -32,7 +32,7 @@ private:
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
     CLFFmpegVideoDecoder* m_videoDecoder;
-    CLVideoDecoderOutput m_decodedVideoFrame;
+    QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
     CLVideoDecoderOutput m_scaledVideoFrame;
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;

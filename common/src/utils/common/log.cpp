@@ -147,10 +147,25 @@ Q_GLOBAL_STATIC(QnLogPrivate, qn_logPrivateInstance);
 // -------------------------------------------------------------------------- //
 // QnLog
 // -------------------------------------------------------------------------- //
+static QAtomicPointer<QnLog> qnLogInstance;
+//static QGlobalStatic<QnLog> qnLogInstance = { Q_BASIC_ATOMIC_INITIALIZER(0), false };
+//Q_GLOBAL_STATIC_WITH_ARGS( QnLog, qnLogInstance, qn_logPrivateInstance() );
+
 QnLog::QnLog(QnLogPrivate *d): d(d) {}
 
-QnLog QnLog::instance() {
-    return QnLog(qn_logPrivateInstance());
+QnLog* QnLog::instance()
+{
+    //return QnLog(qn_logPrivateInstance());
+
+    if( !qnLogInstance )
+    {
+        QnLog* newInstance = new QnLog( qn_logPrivateInstance() );
+        if( !qnLogInstance.testAndSetOrdered( NULL, newInstance ) )
+            delete newInstance;
+        //else
+        //    static QGlobalStaticDeleter<QnLog> cleanup(qnLogInstance);
+    }
+    return qnLogInstance;
 }
 
 bool QnLog::create(const QString& baseName, quint32 maxFileSize, quint8 maxBackupFiles, QnLogLevel logLevel) {
@@ -247,4 +262,10 @@ void QnLog::initLog(const QString& logLevelStr) {
         if (needWarnLogLevel) 
             cl_log.log("Unknown log level specified. Using level ", QnLog::logLevelToString(logLevel), cl_logALWAYS);
     }
+}
+
+void QnLog::initLog( QnLog* externalInstance )
+{
+    //Q_ASSERT( !qnLogInstance );
+    qnLogInstance = externalInstance;
 }
