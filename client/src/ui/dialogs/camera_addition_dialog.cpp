@@ -290,7 +290,14 @@ void QnCameraAdditionDialog::at_scanButton_clicked(){
 
     if (!processor->isCancelled()) {
         if (!processor->isSuccess()) {
-            QMessageBox::critical(this, tr("Error"), processor->getLastError(), QMessageBox::Ok);
+            QString processor_error = processor->getLastError();
+            QString error = tr("Server returned an error:\n%1");
+            if (processor_error.length() == 0){
+                error = error.arg(tr("This server version supports only searching by ip address."));
+            } else {
+                error = error.arg(processor_error);
+            }
+            QMessageBox::critical(this, tr("Error"), error, QMessageBox::Ok);
         } else if (processor->camerasFound().count() > 0) {
             fillTable(processor->camerasFound());
             ui->camerasTable->setEnabled(true);
