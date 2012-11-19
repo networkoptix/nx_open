@@ -60,6 +60,7 @@ private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
     void at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+    void at_ptzMoveTo_replyReceived(int status, int handle);
 
     void at_replyReceived(int status, int handle);
 
@@ -77,6 +78,9 @@ private:
     }
 
     void ensureSelectionItem();
+
+    void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
+    void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
 
 private:
     qreal m_ptzItemZValue;

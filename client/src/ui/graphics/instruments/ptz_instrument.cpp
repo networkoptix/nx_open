@@ -14,6 +14,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
+#include <ptz/ptz_mapper.h>
 #include <api/media_server_connection.h>
 
 #include <ui/animation/opacity_animator.h>
@@ -27,6 +28,15 @@
 
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
+
+
+    QnPtzMapper currentMapper() {
+        return QnPtzMapper(
+            QnPhysicalValueMapper(-1, 1, 0, 360),
+            QnPhysicalValueMapper(0, 1, 0, -90),
+            QnPhysicalValueMapper(0, 1, 34, 678)
+        );
+    }
 
 } // anonymous namespace
 
@@ -271,6 +281,43 @@ void PtzInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
+void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+
+    QPointF d = pos - widget->rect().center();
+
+    qreal dx = 0;//d.x() > 0 ? 0.1 : -0.1;
+    qreal dy = 0;//d.y() > 0 ? 0.1 : -0.1;
+    qreal dz = d.y() > 0 ? 0.1 : -0.1;
+
+    QVector3D v = m_ptzPositionByCamera[camera];
+    v += QVector3D(dx, dy, dz);
+    if(v.x() < -1.0)
+        v.setX(-1.0);
+    if(v.x() > 1.0)
+        v.setX(1.0);
+    if(v.y() < -1.0)
+        v.setY(-1.0);
+    if(v.y() > 1.0)
+        v.setY(1.0);
+    if(v.z() < -1.0)
+        v.setZ(-1.0);
+    if(v.z() > 1.0)
+        v.setZ(1.0);
+
+    m_ptzPositionByCamera[camera] = v;
+
+    qDebug() << "PTZ MOVETO" << v;
+
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+    int handle = server->apiConnection()->asyncPtzMoveTo(camera, v.x(), v.y(), v.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
+    m_cameraByHandle[handle] = camera;
+}
+
+void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
+
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -432,8 +479,9 @@ void PtzInstrument::finishDrag(DragInfo *) {
         PtzSplashItem *splash = newSplashItem(target());
         splash->setSplashType(PtzSplashItem::Rectangular);
         splash->setPos(selectionRect.center());
-        selectionRect.moveCenter(QPointF(0.0, 0.0));
-        splash->setRect(selectionRect);
+        splash->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
+
+        ptzMoveTo(target(), selectionRect);
     }
 
     if(m_ptzStartedEmitted)
@@ -446,6 +494,8 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
         splash->setSplashType(PtzSplashItem::Circular);
         splash->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
         splash->setPos(info->mousePressItemPos());
+
+        ptzMoveTo(target(), info->mousePressItemPos());
     }
 
     emit ptzProcessFinished(target());
@@ -476,9 +526,15 @@ void PtzInstrument::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraReso
 }
 
 void PtzInstrument::at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera) {
-    // TODO
-
     m_ptzPositionByCamera.remove(camera);
+
+    for(QHash<int, QnVirtualCameraResourcePtr>::iterator pos = m_cameraByHandle.begin(); pos != m_cameraByHandle.end();) {
+        if(pos.value() == camera) {
+            pos = m_cameraByHandle.erase(pos);
+        } else {
+            pos++;
+        }
+    }
 }
 
 void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
@@ -488,8 +544,14 @@ void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPo
     }
 
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
-    m_cameraByHandle.remove(handle);
+    if(!camera)
+        return;
 
+    m_cameraByHandle.remove(handle);
     m_ptzPositionByCamera[camera] = QVector3D(xPos, yPox, zoomPos);
+}
+
+void PtzInstrument::at_ptzMoveTo_replyReceived(int status, int handle) {
+    return;
 }
 
