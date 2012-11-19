@@ -149,7 +149,7 @@ int QnImageHandler::executeGet(const QString& path, const QnRequestParamList& pa
         gotFrame = (res->getStatus() == QnResource::Online || res->getStatus() == QnResource::Recording) && decoder.decode(video, &outFrame);
     }
     else {
-        for (int i = 0; i < MAX_GOP_LEN && !gotFrame; ++i)
+        for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
         {
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
             if (gotFrame)
