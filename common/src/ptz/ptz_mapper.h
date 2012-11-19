@@ -5,11 +5,11 @@
 
 #include <utils/common/functors.h>
 
-class QnPhysicalValueMapper {
+class QnScalarSpaceMapper {
 public:
-    QnPhysicalValueMapper() {}
+    QnScalarSpaceMapper() {}
 
-    QnPhysicalValueMapper(qreal logicalMinimum, qreal logicalMaximum, qreal physicalAtMinimum, qreal physicalAtMaximum) {
+    QnScalarSpaceMapper(qreal logicalMinimum, qreal logicalMaximum, qreal physicalAtMinimum, qreal physicalAtMaximum) {
         m_physicalToLogical = QnBoundedLinearFunction(
             QnLinearFunction(physicalAtMinimum, logicalMinimum, physicalAtMaximum, logicalMaximum),
             logicalMinimum,
@@ -17,7 +17,7 @@ public:
         );
 
         m_logicalToPhysical = QnBoundedLinearFunction(
-            QnLinearFunction(physicalAtMinimum, logicalMinimum, physicalAtMaximum, logicalMaximum),
+            QnLinearFunction(logicalMinimum, physicalAtMinimum, logicalMaximum, physicalAtMaximum),
             qMin(physicalAtMinimum, physicalAtMaximum),
             qMax(physicalAtMinimum, physicalAtMaximum)
         );
@@ -37,43 +37,59 @@ private:
 };
 
 
-class QnPtzMapper {
+class QnVectorSpaceMapper {
 public:
     enum Coordinate {
         X,
         Y,
-        Zoom,
+        Z,
         CoordinateCount
     };
 
-    QnPtzMapper() {}
+    QnVectorSpaceMapper() {}
 
-    QnPtzMapper(const QnPhysicalValueMapper &xMapper, const QnPhysicalValueMapper &yMapper, const QnPhysicalValueMapper &zoomMapper) {
+    QnVectorSpaceMapper(const QnScalarSpaceMapper &xMapper, const QnScalarSpaceMapper &yMapper, const QnScalarSpaceMapper &zMapper) {
         m_mappers[X] = xMapper;
         m_mappers[Y] = yMapper;
-        m_mappers[Zoom] = zoomMapper;
+        m_mappers[Z] = zMapper;
     }
 
-    const QnPhysicalValueMapper &mapper(Coordinate coordinate) const {
+    const QnScalarSpaceMapper &mapper(Coordinate coordinate) const {
         assert(coordinate >= 0 && coordinate < CoordinateCount);
 
         return m_mappers[coordinate];
     }
 
-    const QnPhysicalValueMapper &xMapper() const {
+    const QnScalarSpaceMapper &xMapper() const {
         return mapper(X);
     }
 
-    const QnPhysicalValueMapper &yMapper() const {
+    const QnScalarSpaceMapper &yMapper() const {
         return mapper(Y);
     }
 
-    const QnPhysicalValueMapper &zoomMapper() const {
-        return mapper(Zoom);
+    const QnScalarSpaceMapper &zMapper() const {
+        return mapper(Z);
+    }
+
+    QVector3D logicalToPhysical(const QVector3D &logicalValue) const { 
+        return QVector3D(
+            m_mappers[X].logicalToPhysical(logicalValue.x()),
+            m_mappers[Y].logicalToPhysical(logicalValue.y()),
+            m_mappers[Z].logicalToPhysical(logicalValue.z())
+        );
+    }
+
+    QVector3D physicalToLogical(const QVector3D &physicalValue) const { 
+        return QVector3D(
+            m_mappers[X].physicalToLogical(physicalValue.x()),
+            m_mappers[Y].physicalToLogical(physicalValue.y()),
+            m_mappers[Z].physicalToLogical(physicalValue.z())
+        );
     }
 
 private:
-    QnPhysicalValueMapper m_mappers[CoordinateCount];
+    QnScalarSpaceMapper m_mappers[CoordinateCount];
 };
 
 

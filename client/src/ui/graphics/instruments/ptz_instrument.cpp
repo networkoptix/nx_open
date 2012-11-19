@@ -1,5 +1,6 @@
 #include "ptz_instrument.h"
 
+#include <cmath>
 #include <cassert>
 #include <limits>
 
@@ -30,11 +31,11 @@ namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
 
-    QnPtzMapper currentMapper() {
-        return QnPtzMapper(
-            QnPhysicalValueMapper(-1, 1, 0, 360),
-            QnPhysicalValueMapper(0, 1, 0, -90),
-            QnPhysicalValueMapper(0, 1, 34, 678)
+    QnVectorSpaceMapper currentMapper() {
+        return QnVectorSpaceMapper(
+            QnScalarSpaceMapper(-1, 1, 0, 360),
+            QnScalarSpaceMapper(0, 1, 0, -90),
+            QnScalarSpaceMapper(0, 1, 34, 678)
         );
     }
 
@@ -283,14 +284,20 @@ void PtzInstrument::ensureSelectionItem() {
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+    QVector3D oldPosition = currentMapper().logicalToPhysical(m_ptzPositionByCamera.value(camera));
 
-    QPointF d = pos - widget->rect().center();
+    /* Calculate delta in degrees. 
+     * 
+     * Note that in physical space negative Y (really negative theta in spherical 
+     * coordinates) points down, while in screenspace negative Y points up.
+     * This is why we have to negate the Y-coordinate of delta when computing arctangent. */
+    qreal focalLength = oldPosition.z();
+    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width() * 35 / focalLength;
+    delta = QVector2D(std::atan(delta.x()), std::atan(-delta.y())) / M_PI * 180;
 
-    qreal dx = 0;//d.x() > 0 ? 0.1 : -0.1;
-    qreal dy = 0;//d.y() > 0 ? 0.1 : -0.1;
-    qreal dz = d.y() > 0 ? 0.1 : -0.1;
+    QVector3D newPosition = currentMapper().physicalToLogical(oldPosition + QVector3D(delta, 0.0));
 
-    QVector3D v = m_ptzPositionByCamera[camera];
+    /*QVector3D v = m_ptzPositionByCamera[camera];
     v += QVector3D(dx, dy, dz);
     if(v.x() < -1.0)
         v.setX(-1.0);
@@ -303,14 +310,14 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(v.z() < -1.0)
         v.setZ(-1.0);
     if(v.z() > 1.0)
-        v.setZ(1.0);
+        v.setZ(1.0);*/
 
-    m_ptzPositionByCamera[camera] = v;
+    m_ptzPositionByCamera[camera] = newPosition;
 
-    qDebug() << "PTZ MOVETO" << v;
+    qDebug() << "PTZ MOVETO" << newPosition;
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    int handle = server->apiConnection()->asyncPtzMoveTo(camera, v.x(), v.y(), v.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
+    int handle = server->apiConnection()->asyncPtzMoveTo(camera, newPosition.x(), newPosition.y(), newPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
 }
 
