@@ -214,7 +214,7 @@
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes}</echo>
 
-								<dirset id="base_includes_path" dir="${environment.dir}/include" includes="*" erroronmissingdir="true"/>
+								<dirset id="base_includes_path" dir="${environment.dir}/include" includes="*" erroronmissingdir="false"/>
 								<pathconvert pathsep="${line.separator}" property="base_includes" refid="base_includes_path">
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
