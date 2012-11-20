@@ -487,10 +487,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         m_imageSize = imageSize;
     }
 
+    /*
     if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 500*1000) {
         // prevent large difference after seek or EOF
         outFrame->pkt_dts = data->timestamp;
     }
+    */
+    
 
     if (m_flushedBeforeReverseStart) {
         data->flags |= AV_REVERSE_BLOCK_START;
