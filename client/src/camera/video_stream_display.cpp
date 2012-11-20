@@ -39,7 +39,8 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
     m_needResetDecoder(false),
     m_lastDisplayedFrame(NULL),
     m_prevSrcWidth(0),
-    m_prevSrcHeight(0)
+    m_prevSrcHeight(0),
+    m_lastIgnoreTime(AV_NOPTS_VALUE)
 {
     for (int i = 0; i < MAX_FRAME_QUEUE_SIZE; ++i)
         m_frameQueue[i] = new CLVideoDecoderOutput();
@@ -304,6 +305,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     // use only 1 frame for non selected video
     bool reverseMode = m_reverseMode;
 
+    if (reverseMode)
+        m_lastIgnoreTime = AV_NOPTS_VALUE;
+    else if (!draw)
+        m_lastIgnoreTime = data->timestamp;
+
     bool enableFrameQueue = reverseMode ? true : m_enableFrameQueue;
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && !(data->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_canUseBufferedFrameDisplayer)
     {
@@ -482,6 +488,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
     }
 
     if (!draw || !m_drawer)
+        return Status_Skipped;
+    else if (m_lastIgnoreTime != AV_NOPTS_VALUE && decodeToFrame->pkt_dts <= m_lastIgnoreTime)
         return Status_Skipped;
 
     if (useTmpFrame)
@@ -739,6 +747,7 @@ void QnVideoStreamDisplay::afterJump()
     //for (QMap<CodecID, CLAbstractVideoDecoder*>::iterator itr = m_decoder.begin(); itr != m_decoder.end(); ++itr)
     //    (*itr)->resetDecoder();
     m_queueWasFilled = false;
+    m_lastIgnoreTime = AV_NOPTS_VALUE;
 }
 
 void QnVideoStreamDisplay::onNoVideo()

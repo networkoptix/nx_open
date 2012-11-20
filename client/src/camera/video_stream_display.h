@@ -101,6 +101,7 @@ private:
     mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
+    qint64 m_lastIgnoreTime;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
