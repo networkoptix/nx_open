@@ -1,0 +1,120 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!--
+    Example pom for delegating maven goals to msbuild so it builds the "solution"
+ 
+    A solution can be a group of projects, but here we only have one.
+    It should also be possible to have one maven project per solution project, 
+    and have a parent pom to deletegate the build.
+  -->
+	<parent>
+		<artifactId>hdwitness</artifactId>
+		<groupId>com.networkoptix.hdwitness</groupId>
+		<version>1.3.9</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<groupId>com.networkoptix.hdwitness</groupId>
+	<version>1.3.9</version>
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>help</artifactId>
+	<packaging>pom</packaging>
+	<name>HD Witness Help</name>
+
+	<properties>
+		<arch>x86</arch>
+		<ClientHelpSourceDir>${libdir}/bin/${build.configuration}/HTML</ClientHelpSourceDir>                     
+	</properties>
+
+	<build>
+		<defaultGoal>compile</defaultGoal>
+		<directory>target</directory>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>../build-${customization}.properties</file>
+								<file>../build-environment/${arch}/libdir.properties</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>auto-clean</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<excludeDefaultDirectories>true</excludeDefaultDirectories>
+							<filesets>
+								<fileset>
+									<directory>${libdir}</directory>
+									<followSymlinks>false</followSymlinks>
+									<useDefaultExcludes>true</useDefaultExcludes>
+									<includes>
+										<include>**/HTML/**</include>
+									</includes>
+								</fileset>								
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>		
+
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.1.1</version>
+						<executions>
+							<execution>
+								<id>default-cli</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>build.bat</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>		
+								</configuration>
+							</execution>							
+						</executions>
+					</plugin>				
+			
+			<!-- <plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>compress</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<exec dir="${project.build.directory}" executable="build.bat" failifexecutionfails="true" />
+							</target>
+							<skip>${skip.compress}</skip>
+						</configuration>
+					</execution>    
+				</executions>
+			</plugin> -->                      
+		</plugins>
+	</build>
+</project>

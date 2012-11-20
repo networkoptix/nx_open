@@ -134,6 +134,7 @@
 				</os>
 			</activation>
 			<modules>
+				<module>help</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>

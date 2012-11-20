@@ -124,6 +124,8 @@ testcamera/build
 testcamera/x86
 testcamera/x64
 
+help/target
+
 traytool/src/traytool.pro
 traytool/src/version.h
 traytool/src/traytool.vcproj
