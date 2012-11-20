@@ -139,13 +139,13 @@
 				</os>
 			</activation>
 			<dependencies>
-				<dependency>
+				<!--<dependency>
 					<groupId>org.ffmpeg</groupId>
 					<artifactId>ffmpeg-misc-headers-win32</artifactId>
 					<version>dev</version>
 					<type>zip</type>
 					<classifier>${platform}</classifier>	
-				</dependency>		
+				</dependency>	-->	
 				<dependency>
 					<groupId>com.creativelabs</groupId>
 					<artifactId>openal</artifactId>
