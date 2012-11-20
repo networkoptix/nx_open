@@ -1,5 +1,5 @@
-#ifndef QN_PTZ_MAPPER_H
-#define QN_PTZ_MAPPER_H
+#ifndef QN_SPACE_MAPPER_H
+#define QN_SPACE_MAPPER_H
 
 #include <cassert>
 
@@ -93,4 +93,4 @@ private:
 };
 
 
-#endif // QN_PTZ_MAPPER_H
+#endif // QN_SPACE_MAPPER_H

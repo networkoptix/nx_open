@@ -9,12 +9,12 @@
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/fuzzy.h>
+#include <utils/common/space_mapper.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
 
-#include <ptz/ptz_mapper.h>
 #include <api/media_server_connection.h>
 
 #include <ui/common/coordinate_transformations.h>
@@ -300,34 +300,6 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
         spherical.phi += M_PI * 2;
 
     QVector3D newPosition = currentMapper().physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
-
-#if 0
-    /* Calculate delta in degrees. 
-     * 
-     * Note that in physical space negative Y (really negative theta in sphericalToCartesian 
-     * coordinates) points down, while in screenspace negative Y points up.
-     * This is why we have to negate the Y-coordinate of delta when computing arctangent. */
-    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width() * 35 / focalLength;
-    delta = QVector2D(std::atan(delta.x()), std::atan(-delta.y())) / M_PI * 180;
-
-    QVector3D newPosition = currentMapper().physicalToLogical(oldPosition + QVector3D(delta, 0.0));
-
-    /*QVector3D v = m_ptzPositionByCamera[camera];
-    v += QVector3D(dx, dy, dz);
-    if(v.x() < -1.0)
-        v.setX(-1.0);
-    if(v.x() > 1.0)
-        v.setX(1.0);
-    if(v.y() < -1.0)
-        v.setY(-1.0);
-    if(v.y() > 1.0)
-        v.setY(1.0);
-    if(v.z() < -1.0)
-        v.setZ(-1.0);
-    if(v.z() > 1.0)
-        v.setZ(1.0);*/
-#endif
-
 
     m_ptzPositionByCamera[camera] = newPosition;
 
