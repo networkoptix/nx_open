@@ -31,9 +31,7 @@ qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
 {
     if (timeMs >= startTimeMs) 
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
-    else if (timeMs == startTimeMs-1)
-        return 0; // record catalog round usec to msec, sometimes eps in 1 ms occured, ignore it
-    else 
+    else
         return startTimeMs - timeMs;
 }
 
@@ -313,6 +311,12 @@ void DeviceFileCatalog::deserializeTitleFile()
             else 
             {
                 addChunk(chunk);
+                if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+                {
+                    // update catalog to fix bug from previous version
+                    m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+                    needRewriteCatalog = true;
+                }
             }
         }
         else {

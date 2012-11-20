@@ -93,7 +93,7 @@ void QnStreamRecorder::close()
 
         if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
-            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
             fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
         }
 
