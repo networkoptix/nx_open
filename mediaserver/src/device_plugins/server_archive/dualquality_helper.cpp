@@ -6,6 +6,7 @@ static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 QnDialQualityHelper::QnDialQualityHelper()
 {
     m_quality = MEDIA_Quality_High;
+    m_alreadyOnAltChunk = false;
 }
 
 void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
@@ -14,8 +15,12 @@ void QnDialQualityHelper::setResource(QnNetworkResourcePtr netResource)
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 }
 
-void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod) const
+void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& chunk, DeviceFileCatalogPtr& catalog, DeviceFileCatalog::FindMethod findMethod)
 {
+    //qDebug() << "find data for time=" << QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("hh:mm:ss.zzz"));
+    bool altChunkWasSelected = m_alreadyOnAltChunk;
+    m_alreadyOnAltChunk = false;
+
     catalog = (m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi);
     if (catalog == 0)
         return; // no data in archive
@@ -23,6 +28,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
     chunk = catalog->chunkAt(catalog->findFileIndex(time, findMethod));
 
     qint64 timeDistance = chunk.distanceToTime(time);
+
     if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && chunk.endTimeMs() <= time)
         timeDistance = INT_MAX; // actually chunk not found
     if (timeDistance > 0)
@@ -34,7 +40,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
             timeDistanceAlt = INT_MAX; // actually chunk not found
 
-        if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS) 
+        if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS || (timeDistance > 0 && altChunkWasSelected))
         {
             if (timeDistanceAlt == 0)
             {
@@ -64,11 +70,15 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
 
             catalog = catalogAlt;
             chunk = altChunk;
+            m_alreadyOnAltChunk = true;
         }
     }
 }
 
 void QnDialQualityHelper::setPrefferedQuality(MediaQuality quality)
 {
-    m_quality = quality;
+    if (m_quality != quality) {
+        m_quality = quality;
+        m_alreadyOnAltChunk = false;
+    }
 }

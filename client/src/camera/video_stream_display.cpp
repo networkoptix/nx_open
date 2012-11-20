@@ -523,6 +523,57 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::dispay(QnCompress
         return Status_Buffered;
 }
 
+QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor)
+{
+    // use only 1 frame for non selected video
+    if (m_reverseMode || m_decoder.isEmpty())
+        return Status_Skipped;
+
+    CLVideoDecoderOutput m_tmpFrame;
+    m_tmpFrame.setUseExternalData(true);
+
+    QnAbstractVideoDecoder* dec = m_decoder.begin().value();
+
+
+    QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
+    if (dec->getWidth() > 0)
+        scaleFactor = determineScaleFactor(channel, dec->getWidth(), dec->getHeight(), force_factor);
+    PixelFormat pixFmt = dec->GetPixelFormat();
+
+    CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
+    outFrame->channel = channel;
+
+    m_drawer->waitForFrameDisplayed(channel);
+    
+    m_mtx.lock();
+
+    if (!dec->decode(QnCompressedVideoDataPtr(), &m_tmpFrame))
+    {
+        m_mtx.unlock();
+        return Status_Skipped;
+    }
+    m_mtx.unlock();
+
+    pixFmt = dec->GetPixelFormat();
+    if (scaleFactor == QnFrameScaler::factor_unknown) 
+        scaleFactor = determineScaleFactor(channel, dec->getWidth(), dec->getHeight(), force_factor);
+
+    if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
+        QnFrameScaler::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
+    else {
+        if (!rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor)) // universal scaler
+            return Status_Displayed;
+    }
+    outFrame->pkt_dts = m_tmpFrame.pkt_dts;
+    outFrame->metadata = m_tmpFrame.metadata;
+    outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
+
+    if (processDecodedFrame(dec, outFrame, false, false))
+        return Status_Displayed;
+    else
+        return Status_Buffered;
+}
+
 bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode)
 {
     if (quint64(outFrame->pkt_dts) != AV_NOPTS_VALUE)

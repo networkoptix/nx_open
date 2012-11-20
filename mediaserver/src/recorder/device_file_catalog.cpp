@@ -31,6 +31,8 @@ qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
 {
     if (timeMs >= startTimeMs) 
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
+    else if (timeMs == startTimeMs-1)
+        return 0; // record catalog round usec to msec, sometimes eps in 1 ms occured, ignore it
     else 
         return startTimeMs - timeMs;
 }

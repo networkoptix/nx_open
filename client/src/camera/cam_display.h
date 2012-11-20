@@ -206,6 +206,7 @@ protected:
 
     bool m_fullScreen;
     QnFpsStatistics m_fpsStat;
+    int m_prevLQ;
 };
 
 #endif //QN_CAM_DISPLAY_H
