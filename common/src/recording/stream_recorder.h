@@ -117,6 +117,7 @@ private:
     void markNeedKeyData();
     void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
+    qint64 findNextIFrame(qint64 baseTime);
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
@@ -165,6 +166,8 @@ private:
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
     qint64 m_serverTimeZoneMs;
+
+    qint64 m_nextIFrameTime;
 };
 
 #endif // _STREAM_RECORDER_H__
