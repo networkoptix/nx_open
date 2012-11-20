@@ -1472,13 +1472,13 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 
 #ifdef USE_PBO
             ensurePBOInitialized( emptyPictureBuf, lineSizes[i]*h[i] );
-            d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID() );
+            d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, emptyPictureBuf->pboID() );
             //GLvoid* pboData = d->glMapBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, GL_WRITE_ONLY_ARB );
             //Q_ASSERT( pboData );
             ////memcpy( pboData, planes[i], lineSizes[i]*h[i] );
             //memcpy_sse4_stream_stream( (__m128i*)pboData, (__m128i*)planes[i], lineSizes[i]*h[i] );
             //d->glUnmapBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB );
-            d->glBufferSubDataARB(
+            d->glBufferSubData(
                 GL_PIXEL_UNPACK_BUFFER_ARB,
                 0,
                 lineSizes[i]*h[i],
@@ -1506,7 +1506,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                             );
 
 #ifdef USE_PBO
-            d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+            d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
 #endif
 
             bitrateCalculator.bytesProcessed( qPower2Ceil(r_w[i],ROUND_COEFF)*h[i] );
@@ -1716,7 +1716,7 @@ void DecodedPictureToOpenGLUploader::releaseDecodedPicturePool( std::deque<Uploa
     {
         if( pic->m_pboID != (GLuint)-1 )
         {
-            d->glDeleteBuffersARB( 1, &pic->m_pboID );
+            d->glDeleteBuffers( 1, &pic->m_pboID );
             pic->m_pboID = (GLuint)-1;
         }
         delete pic;
@@ -1736,15 +1736,15 @@ void DecodedPictureToOpenGLUploader::ensurePBOInitialized( DecodedPictureToOpenG
 {
     if( picBuf->m_pboID == -1 )
     {
-        d->glGenBuffersARB( 1, &picBuf->m_pboID );
+        d->glGenBuffers( 1, &picBuf->m_pboID );
         picBuf->m_pboSizeBytes = 0;
     }
 
     if( picBuf->m_pboSizeBytes < sizeInBytes )
     {
-        d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, picBuf->m_pboID );
-        d->glBufferDataARB( GL_PIXEL_UNPACK_BUFFER_ARB, sizeInBytes, NULL, GL_STATIC_DRAW_ARB/*GL_STREAM_DRAW_ARB*/ );
-        d->glBindBufferARB( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
+        d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, picBuf->m_pboID );
+        d->glBufferData( GL_PIXEL_UNPACK_BUFFER_ARB, sizeInBytes, NULL, GL_STATIC_DRAW_ARB/*GL_STREAM_DRAW_ARB*/ );
+        d->glBindBuffer( GL_PIXEL_UNPACK_BUFFER_ARB, 0 );
         picBuf->m_pboSizeBytes = sizeInBytes;
     }
 }
