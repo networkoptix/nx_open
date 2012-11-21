@@ -47,8 +47,6 @@
 		</Condition>
 		<?endif?>
 
-		<SystemTools:DeleteFile Id="test1" File="$(var.SystemFolderActual)config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db" DeleteOnUnInstall="yes" CheckIfExists="yes" > REMOVE_DATABASE = "1" </SystemTools:DeleteFile>
-
 		<SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
 		<SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 		<SetProperty Id="APPSERVER_PASSWORD" Value="[APPSERVER_PASSWORD_REG]" After="FindRelatedProducts">$(var.VmsRepairing)</SetProperty>
@@ -66,13 +64,13 @@
 			<![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
 		</SetProperty>
 
-		<SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize">
+		<SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize" Sequence="ui">
 			<![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]>
 		</SetProperty>
-		<SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize">
+		<SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize" Sequence="ui">
 			<![CDATA[ NOT Installed OR !ServerFeature = 3 ]]>
 		</SetProperty>
-		<SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize">
+		<SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize" Sequence="ui">
 			<![CDATA[ NOT Installed OR !ClientFeature = 3 ]]>
 		</SetProperty>
 
@@ -376,6 +374,7 @@
 		<CustomAction Id="CopyMediaServerProfile" BinaryKey="CustomActions.dll" DllEntry="CopyMediaServerProfile" Execute="deferred" Impersonate="no"/>
 		<CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
 		<CustomAction Id="AnalyzeServerDirectoryReg" BinaryKey="CustomActions.dll" DllEntry="AnalyzeServerDirectoryReg"/>
+	    <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
 
 		<CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
@@ -438,6 +437,11 @@
 		<CustomAction Id="CloseTrayToolAction" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
+	    
+
+		<CustomAction Id="DeleteDatabaseFile_Cmd" Property="DeleteDatabaseFile" Execute="immediate" Impersonate="yes"
+            Value="[$(var.SystemFolderActual)]config\systemprofile\AppData\Local\${company.name}\Enterprise Controller\db\ecs.db"/>
+	    
 		<CustomAction Id="LaunchTrayTool" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="traytool.exe" ExeCommand=""/>
 		<CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="client.exe" ExeCommand=""/>
 
@@ -459,8 +463,8 @@
             <UpgradeVersion OnlyDetect='no' Property='NEWERVERSIONINSTALLED' Minimum='${release.version}.${buildNumber}' IncludeMinimum='no' />
         </Upgrade>
 -->
-		<?define EcsNeedsGuid="(&AppServerFeature AND NOT APPSERVER_GUID)"?>
-		<?define ServerNeedsGuid="&ServerFeature AND NOT SERVER_GUID"?>
+		<?define EcsNeedsGuid="(INSTALL_ECS AND NOT APPSERVER_GUID)"?>
+		<?define ServerNeedsGuid="INSTALL_SERVER AND NOT SERVER_GUID"?>
 		<InstallUISequence>
 			<Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
 			<FindRelatedProducts Before="AppSearch" />
@@ -524,14 +528,14 @@
 			</Custom>
 
 			<Custom Action="CopyAppServerProfile_Cmd" After="InstallFiles">
-				<![CDATA[ (&AppServerFeature=3 OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+				<![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
 			<Custom Action="CopyAppServerProfile" After="CopyAppServerProfile_Cmd">
-				<![CDATA[ (&AppServerFeature=3 OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+				<![CDATA[ (INSTALL_ECS OR !AppServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
 
 			<Custom Action="CopyMediaServerProfile_Cmd" After="InstallFiles">
-				<![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+				<![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
 			<Custom Action="CopyMediaServerProfile" After="CopyMediaServerProfile_Cmd">
-				<![CDATA[ (&ServerFeature=3 OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+				<![CDATA[ (INSTALL_SERVER OR !ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
 
 			<Custom Action="CertGenAction_Cmd" After="CopyAppServerProfile">
 				<![CDATA[ $(var.InstallECS) AND REMOVE <> "ALL" ]]></Custom>
@@ -550,8 +554,11 @@
 				<![CDATA[ $(var.VmsInstallingOrChanging) AND $(var.InstallECS) ]]>
 			</Custom>
 
+			<Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
+			<Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
+
 			<Custom Action="LaunchTrayTool" After="InstallFinalize">
-				<![CDATA[ (!AppServerFeature=3 OR &AppServerFeature=3 OR !ServerFeature=3 OR &ServerFeature=3) AND REMOVE <> "ALL" ]]></Custom>
+				<![CDATA[ (!AppServerFeature=3 OR INSTALL_ECS OR !ServerFeature=3 OR INSTALL_SERVER) AND REMOVE <> "ALL" ]]></Custom>
 		</InstallExecuteSequence>
 
 		<Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
@@ -1044,12 +1051,20 @@
 
 			<Publish Dialog="InstallTypeDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
 
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_ECS" Value="{}">INSTALLTYPE=2</Publish>
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="{}">INSTALLTYPE=2</Publish>
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1">INSTALLTYPE=2</Publish>
+		    
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_ECS" Value="1"><![CDATA[ INSTALLTYPE <> 2 ]]></Publish>
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_SERVER" Value="1"><![CDATA[ INSTALLTYPE <> 2 ]]></Publish>
+			<Publish Dialog="InstallTypeDlg" Control="Next" Property="INSTALL_CLIENT" Value="1"><![CDATA[ INSTALLTYPE <> 2 ]]></Publish>
+		    
 			<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="PasswordDlg">INSTALLTYPE=0</Publish>
 			<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="MyFeaturesDlg">INSTALLTYPE=1</Publish>
-			<Publish Dialog="InstallTypeDlg" Control="Next" Event="AddLocal" Value="ALL">INSTALLTYPE=0</Publish>
-
+			<Publish Dialog="InstallTypeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">INSTALLTYPE=2</Publish>
+		    
 			<Publish Dialog="InstallTypeDlg" Control="Next" Property="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="$(var.LaunchClientChecBoxText)">
-				<![CDATA[ INSTALLTYPE=0 ]]>
+				<![CDATA[ INSTALLTYPE=0 OR INSTALLTYPE=2 ]]>
 			</Publish>
 			<Publish Dialog="InstallTypeDlg" Control="Next" Property="SERVER_APPSERVER_HOST" Value="localhost" Order="4">
 				<![CDATA[ INSTALLTYPE=0 ]]>
@@ -1065,13 +1080,13 @@
 			</Publish>
 
 			<Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_HOST" Value="localhost" Order="4">
-				<![CDATA[ INSTALLTYPE=0 ]]>
+				<![CDATA[ INSTALLTYPE=0 OR INSTALLTYPE=2]]>
 			</Publish>
 			<Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_PORT" Value="[APPSERVER_PORT]" Order="4">
-				<![CDATA[ INSTALLTYPE=0 ]]>
+				<![CDATA[ INSTALLTYPE=0 OR INSTALLTYPE=2]]>
 			</Publish>
 			<Publish Dialog="InstallTypeDlg" Control="Next" Property="CLIENT_APPSERVER_LOGIN" Value="[APPSERVER_LOGIN]" Order="4">
-				<![CDATA[ INSTALLTYPE=0 ]]>
+				<![CDATA[ INSTALLTYPE=0 OR INSTALLTYPE=2]]>
 			</Publish>
 
 			<?define EcsPasswordsEqual="(APPSERVER_PASSWORD = APPSERVER_PASSWORD_CONFIRM)" ?>
@@ -1091,15 +1106,8 @@
 				<![CDATA[ $(var.VmsChanging) ]]>
 			</Publish>
 
-			<?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>
-			<?define NeedTrayTool="(&AppServerFeature = 3 OR &ServerFeature = 3)"?>
+			<?define SomeFeaturesSelected="(INSTALL_ECS OR INSTALL_SERVER OR INSTALL_CLIENT)"?>			
 
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
 			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="SpawnDialog" Value="SelectionWarningDlg">
 				<![CDATA[NOT $(var.SomeFeaturesSelected)]]>
 			</Publish>
@@ -1148,13 +1156,6 @@
 			</Publish>
 			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg">
 				<![CDATA[ $(var.ChangingNothing) ]]>
-			</Publish>
-
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="AddLocal" Value="TrayToolFeature">
-				<![CDATA[ $(var.NeedTrayTool) ]]>
-			</Publish>
-			<Publish Dialog="MyFeaturesDlg" Control="Next" Event="Remove" Value="TrayToolFeature">
-				<![CDATA[ NOT $(var.NeedTrayTool) ]]>
 			</Publish>
 
 			<!-- Reset values in case when user returns to this dialog after AppServerDlg -->
@@ -1214,15 +1215,13 @@
 				<![CDATA[ $(var.Inst_C1) ]]>
 			</Publish>
 
-			<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg">1</Publish>
+			<Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg"><![CDATA[ INSTALLTYPE <> 2 ]]></Publish>
+		    <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="InstallTypeDlg"><![CDATA[ INSTALLTYPE = 2 ]]></Publish>
+		    
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
-			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="AppServerDlg" Order="2">
-				<![CDATA[(&AppServerFeature=3)]]>
-			</Publish>
-			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3">
-				<![CDATA[(&AppServerFeature <> 3 AND &ServerFeature=3)]]></Publish>
-			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4">
-				<![CDATA[(&AppServerFeature <> 3 AND &ServerFeature <>3 AND &ClientFeature = 3)]]></Publish>
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="AppServerDlg" Order="2">INSTALL_ECS</Publish>
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="MediaServerDlg" Order="3">NOT INSTALL_ECS AND INSTALL_SERVER</Publish>
+			<Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="ClientDlg" Order="4">NOT INSTALL_ECS AND NOT INSTALL_SERVER AND INSTALL_CLIENT</Publish>
 			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
 			<Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="CheckServerDriveLowSpace">1</Publish>
@@ -1281,10 +1280,10 @@
 
 			<Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK" Value="AppServerDlg">1</Publish>
 			<Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_NEXT" Value="MediaServerDlg">
-				<![CDATA[(NOT BUSYPORT AND &ServerFeature=3)]]>
+				<![CDATA[(NOT BUSYPORT AND INSTALL_SERVER)]]>
 			</Publish>
 			<Publish Dialog="AppServerDlg" Control="Next" Property="PORT_DIALOG_BACK"  Value="VerifyReadyDlg">
-				<![CDATA[(NOT BUSYPORT AND &ServerFeature <> 3)]]></Publish>
+				<![CDATA[(NOT BUSYPORT AND NOT INSTALL_SERVER)]]></Publish>
 
 			<Publish Dialog="PortIsBusyDlg" Control="Back" Event="NewDialog" Value="[PORT_DIALOG_BACK]">1</Publish>
 			<Publish Dialog="PortIsBusyDlg" Control="Next" Event="NewDialog" Value="[PORT_DIALOG_NEXT]">1</Publish>
@@ -1300,7 +1299,7 @@
 			</Publish>
 
 
-			<?define IsPortsValid="((&AppServerFeature=3 AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (&AppServerFeature<>3))" ?>
+			<?define IsPortsValid="((INSTALL_ECS AND SERVER_PORT<>APPSERVER_PORT AND SERVER_PORT<>PROXY_PORT) OR (NOT INSTALL_ECS))" ?>
 			<?define IsSettingsFilled="(SERVER_PORT AND SERVER_APPSERVER_HOST AND SERVER_APPSERVER_PORT AND SERVER_APPSERVER_LOGIN AND SERVER_APPSERVER_PASSWORD)"?>
 			<?define IsSettingsValid="($(var.IsPortsValid) AND $(var.IsSettingsFilled))"?>
 
@@ -1379,7 +1378,7 @@
 			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="UpgradeDlg">
 				<![CDATA[$(var.VmsUpgrading)]]>
 			</Publish>
-			<!--            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstallingOrChanging) AND &ServerFeature <> 3)) ]]></Publish>-->
+			<!--            <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MyFeaturesDlg" Order="2"><![CDATA[ NOT $(var.VmsUpgrading) AND ((Installed AND WixUI_InstallMode <> "Repair") OR (NOT $(var.VmsInstallingOrChanging) AND NOT INSTALL_SERVER)) ]]></Publish>-->
 			<Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">
 				<![CDATA[ $(var.VmsRemoving) OR WixUI_InstallMode = "Repair" ]]>
 			</Publish>
@@ -1391,6 +1390,65 @@
 			<Publish Dialog="VerifyReadyDlg" Control="Back" Property="REMOVE" Value="{}" Order="3">
 				<![CDATA[ Installed ]]>
 			</Publish>
+
+		    <?define NeedTrayTool="(INSTALL_ECS OR INSTALL_SERVER)"?>
+		    
+		    <Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="AddLocal" Value="TrayToolFeature">
+				<![CDATA[ $(var.NeedTrayTool) ]]>
+			</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Install" Event="Remove" Value="TrayToolFeature">
+				<![CDATA[ NOT $(var.NeedTrayTool) ]]>
+			</Publish>
+		    
+		    <Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="AddLocal" Value="TrayToolFeature">
+				<![CDATA[ $(var.NeedTrayTool) ]]>
+			</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="InstallNoShield" Event="Remove" Value="TrayToolFeature">
+				<![CDATA[ NOT $(var.NeedTrayTool) ]]>
+			</Publish>
+		    
+		    <Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+		    		    
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="AddLocal" Value="TrayToolFeature">
+				<![CDATA[ $(var.NeedTrayTool) ]]>
+			</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="Change" Event="Remove" Value="TrayToolFeature">
+				<![CDATA[ NOT $(var.NeedTrayTool) ]]>
+			</Publish>
+
+		    <Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="AppServerFeature">INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ServerFeature">INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="ClientFeature">INSTALL_CLIENT</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="AppServerFeature">NOT INSTALL_ECS</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ServerFeature">NOT INSTALL_SERVER</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="ClientFeature">NOT INSTALL_CLIENT</Publish>
+		    		    
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="AddLocal" Value="TrayToolFeature">
+				<![CDATA[ $(var.NeedTrayTool) ]]>
+			</Publish>
+			<Publish Dialog="VerifyReadyDlg" Control="ChangeNoShield" Event="Remove" Value="TrayToolFeature">
+				<![CDATA[ NOT $(var.NeedTrayTool) ]]>
+			</Publish>
+		    
 
 			<!--            <Publish Dialog="VerifyReadyDlg" Control="Next" Event="ReinstallMode" Value="m" Order="1">WixUI_InstallMode = Change</Publish>
             <Publish Dialog="VerifyReadyDlg" Control="Next" Event="Reinstall" Value="Registry" Order="2">WixUI_InstallMode = Change</Publish>

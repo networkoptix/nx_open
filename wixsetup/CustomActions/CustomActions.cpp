@@ -375,3 +375,24 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
+UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "DeleteFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+        DeleteFile(fileToDelete);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
