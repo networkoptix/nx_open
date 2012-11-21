@@ -161,11 +161,11 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
 void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 {
     QString timeStr;
-    QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000 + m_onscreenDateOffset);
+    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = dt.toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = dt.toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);
