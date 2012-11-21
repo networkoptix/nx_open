@@ -79,7 +79,7 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
-    bool isNoData() const;
+    bool isLongWaiting() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;

@@ -1404,7 +1404,7 @@ bool QnCamDisplay::isStillImage() const
     return m_isStillImage;
 }
 
-bool QnCamDisplay::isNoData() const
+bool QnCamDisplay::isLongWaiting() const
 {
     if (isRealTimeSource())
         return false;
