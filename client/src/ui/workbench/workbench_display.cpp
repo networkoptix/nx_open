@@ -67,6 +67,7 @@
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include "camera/thumbnails_loader.h" // TODO: remove?
+#include "watchers/workbench_server_time_watcher.h"
 
 
 namespace {
@@ -1418,7 +1419,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setDecorationsVisible(true, false);
             widget->setInfoVisible(true, false);
             
-            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(time).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(time).toString(tr("hh:mm:ss"));
+            qint64 displayTime = time;
+            if(qnSettings->timeMode() == Qn::ServerTimeMode)
+                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: do offset adjustments in one place
+
+            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(tr("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 
