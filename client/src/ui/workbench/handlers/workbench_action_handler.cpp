@@ -1127,12 +1127,13 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    if(!layouts.empty()) {
-        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    } else {
-        /* No layouts? Just open dropped media. */
+    foreach(QnLayoutResourcePtr r, layouts)
+        parameters.resources().removeOne(r);
+
+    if (!parameters.resources().empty())
         menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-    }
+    if(!layouts.empty())
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
@@ -1174,8 +1175,8 @@ void QnWorkbenchActionHandler::at_openFileAction_triggered() {
     dialog->setFileMode(QFileDialog::ExistingFiles);
     QStringList filters;
     //filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff *.layout)");
-    filters << tr("All Supported (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
-    filters << tr("Video (*.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
+    filters << tr("All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)");
+    filters << tr("Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)");
     filters << tr("Pictures (*.jpg *.png *.gif *.bmp *.tiff)");
     //filters << tr("Layouts (*.layout)"); // TODO
     filters << tr("All files (*.*)");
