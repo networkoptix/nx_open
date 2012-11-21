@@ -2,6 +2,7 @@
 #include "recorder/storage_manager.h"
 
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
+static const int FIRST_STREAM_FIND_EPS = 1000 * 10;
 
 QnDialQualityHelper::QnDialQualityHelper()
 {
@@ -40,26 +41,27 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
         if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs() <= time)
             timeDistanceAlt = INT_MAX; // actually chunk not found
 
-        if (timeDistance - timeDistanceAlt > SECOND_STREAM_FIND_EPS || (timeDistance > 0 && altChunkWasSelected))
+        int findEps = m_quality == MEDIA_Quality_High ? SECOND_STREAM_FIND_EPS : FIRST_STREAM_FIND_EPS;
+        if (timeDistance - timeDistanceAlt > findEps || (timeDistance > 0 && altChunkWasSelected))
         {
             if (timeDistanceAlt == 0)
             {
                 // if recording hole, alt quality chunk may be slighthy longer then primary. So, distance to such chunk still 0
                 // prevent change quality, if such chunk rest very low
-                if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs()-time < SECOND_STREAM_FIND_EPS)
+                if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && altChunk.endTimeMs()-time < findEps)
                 {
                     DeviceFileCatalog::Chunk nextAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.endTimeMs(), findMethod));
                     //if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
-                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - SECOND_STREAM_FIND_EPS)
+                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - findEps)
                         return;
                     if (nextAltChunk.startTimeMs == altChunk.startTimeMs)
                         return; // EOF reached
                 }
-                else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && time - altChunk.startTimeMs < SECOND_STREAM_FIND_EPS)
+                else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && time - altChunk.startTimeMs < findEps)
                 {
                     DeviceFileCatalog::Chunk prevAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.startTimeMs-1, findMethod));
                     //if (prevAltChunk.endTimeMs() != altChunk.startTimeMs)
-                    if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + SECOND_STREAM_FIND_EPS)
+                    if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + findEps)
                         return;
                 }
             }
