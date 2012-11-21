@@ -694,13 +694,10 @@ float QnCamDisplay::getSpeed() const
 
 void QnCamDisplay::setSpeed(float speed)
 {
-    if (speed == 0)
-        return;
-
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
-        if (sign(m_speed) != sign(speed)) {
+        if (sign(m_speed) != sign(speed) && speed != 0) {
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             if (m_extTimeSrc) {
                 qint64 time = m_extTimeSrc->getCurrentTime();
@@ -732,7 +729,7 @@ void QnCamDisplay::processNewSpeed(float speed)
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
             m_display[i]->setMTDecoding(true);
     }
-    else {
+    else if (speed != 0) {
         setMTDecoding(m_useMtDecoding);
     }
 
@@ -741,7 +738,7 @@ void QnCamDisplay::processNewSpeed(float speed)
 
     if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0))
     {
-        m_dataQueue.clear();
+        //m_dataQueue.clear();
         clearVideoQueue();
         QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
