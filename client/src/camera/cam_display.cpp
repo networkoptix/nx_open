@@ -227,7 +227,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 		}
 
 		m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
-		if (m_afterJumpTimer.elapsed() > 1000)
+		if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
 		{
 			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
 			{
