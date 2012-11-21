@@ -114,6 +114,9 @@ mediaproxy/mediaproxy.mak*
 mediaproxy/x86
 mediaproxy/x64
 
+quicksyncdecoder/x86
+quicksyncdecoder/x64
+
 testcamera/bin
 testcamera/build
 testcamera/src/version.h
