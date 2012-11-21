@@ -1005,7 +1005,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->lock();
         d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
-        if (!d->requestHeaders.value("Range").isNull())
+        if (d->startTime > 0)
         {
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
             d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position
