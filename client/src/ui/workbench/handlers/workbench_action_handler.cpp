@@ -248,6 +248,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::Rotate90Action),                         SIGNAL(triggered()),    this,   SLOT(at_rotate90Action_triggered()));
     connect(action(Qn::Rotate180Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate180Action_triggered()));
     connect(action(Qn::Rotate270Action),                        SIGNAL(triggered()),    this,   SLOT(at_rotate270Action_triggered()));
+    connect(action(Qn::RadassAutoAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassAutoAction_triggered()));
+    connect(action(Qn::RadassLowAction),                        SIGNAL(triggered()),    this,   SLOT(at_radassLowAction_triggered()));
+    connect(action(Qn::RadassHighAction),                       SIGNAL(triggered()),    this,   SLOT(at_radassHighAction_triggered()));
     connect(action(Qn::WhatsThisAction),                        SIGNAL(triggered()),    this,   SLOT(at_whatsThisAction_triggered()));
 
     connect(action(Qn::TogglePanicModeAction),                  SIGNAL(toggled(bool)),  this,   SLOT(at_togglePanicModeAction_toggled(bool)));
@@ -672,6 +675,15 @@ void QnWorkbenchActionHandler::rotateItems(int degrees){
     if(!widgets.empty()) {
         foreach(const QnResourceWidget *widget, widgets)
             widget->item()->setRotation(degrees);
+    }
+}
+
+void QnWorkbenchActionHandler::setItemsResolutionMode(Qn::ResolutionMode resolutionMode) {
+    QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
+    if(!widgets.empty()) {
+        foreach(QnResourceWidget *widget, widgets)
+            if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+                mediaWidget->setResolutionMode(resolutionMode);
     }
 }
 
@@ -2725,6 +2737,18 @@ void QnWorkbenchActionHandler::at_rotate180Action_triggered(){
 
 void QnWorkbenchActionHandler::at_rotate270Action_triggered(){
     rotateItems(270);
+}
+
+void QnWorkbenchActionHandler::at_radassAutoAction_triggered() {
+    setItemsResolutionMode(Qn::AutoResolution);
+}
+
+void QnWorkbenchActionHandler::at_radassLowAction_triggered() {
+    setItemsResolutionMode(Qn::LowResolution);
+}
+
+void QnWorkbenchActionHandler::at_radassHighAction_triggered() {
+    setItemsResolutionMode(Qn::HighResolution);
 }
 
 void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

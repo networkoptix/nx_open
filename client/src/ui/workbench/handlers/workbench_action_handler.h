@@ -182,6 +182,8 @@ protected:
     void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
+
+    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
@@ -279,6 +281,10 @@ protected slots:
     void at_rotate90Action_triggered();
     void at_rotate180Action_triggered();
     void at_rotate270Action_triggered();
+
+    void at_radassAutoAction_triggered();
+    void at_radassLowAction_triggered();
+    void at_radassHighAction_triggered();
 
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();

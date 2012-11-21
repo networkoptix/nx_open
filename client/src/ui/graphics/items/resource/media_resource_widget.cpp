@@ -653,10 +653,10 @@ void QnMediaResourceWidget::updateRadassButton() {
         iconPath = QLatin1String("item/radass_auto.png");
         break;
     case Qn::LowResolution:
-        iconPath = QLatin1String("item/radass_high.png");
+        iconPath = QLatin1String("item/radass_low.png");
         break;
     case Qn::HighResolution:
-        iconPath = QLatin1String("item/radass_low.png");
+        iconPath = QLatin1String("item/radass_high.png");
         break;
     default:
         assert(false);
