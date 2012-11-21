@@ -921,7 +921,12 @@ qint64 QnTimeSlider::localOffset() const {
 }
 
 void QnTimeSlider::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
     m_localOffset = localOffset;
+
+    updateToolTipText();
 }
 
 
