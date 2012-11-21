@@ -1113,12 +1113,13 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
     QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    if(!layouts.empty()) {
-        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
-    } else {
-        /* No layouts? Just open dropped media. */
+    foreach(QnLayoutResourcePtr r, layouts)
+        parameters.resources().removeOne(r);
+
+    if (!parameters.resources().empty())
         menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
-    }
+    if(!layouts.empty())
+        menu()->trigger(Qn::OpenAnyNumberOfLayoutsAction, layouts);
 }
 
 void QnWorkbenchActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
