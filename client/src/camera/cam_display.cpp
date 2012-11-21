@@ -410,7 +410,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                     {
                         if (firstWait)
                         {
-                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000;
+                            m_isLongWaiting = speedSign*(displayedTime - ct) > MAX_FRAME_DURATION*1000 && !m_extTimeSrc->isBuffering();
                             if (m_jumpTime != DATETIME_NOW)
                                 m_isLongWaiting &= speedSign*(displayedTime - m_jumpTime)  > MAX_FRAME_DURATION*1000;
                             
