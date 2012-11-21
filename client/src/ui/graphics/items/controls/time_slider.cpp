@@ -1610,7 +1610,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 
         drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
 
-        if(pos1 >= m_windowEnd)
+        if(pos1 >= m_windowEnd + m_localOffset)
             break;
 
         painter->setPen(QPen(separatorColor, 0));
