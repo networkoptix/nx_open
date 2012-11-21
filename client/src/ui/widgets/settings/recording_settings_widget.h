@@ -44,9 +44,9 @@ private:
 
 private slots:
     void onComboboxChanged(int index);
-    void onMonitorChanged(int);
-    void onDisableAeroChecked(bool);
+    
     void updateRecordingWarning();
+    void updateDisableAeroCheckbox();
 
     void at_browseRecordingFolderButton_clicked();
 
