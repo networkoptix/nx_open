@@ -30,12 +30,17 @@
        <string>Resources</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QnResourceTreeWidget" name="resourceTreeWidget" native="true">
          <property name="acceptDrops">
           <bool>true</bool>
          </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3"/>
         </widget>
        </item>
       </layout>
@@ -45,6 +50,12 @@
        <string>Search</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
+       <property name="spacing">
+        <number>2</number>
+       </property>
+       <property name="margin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QComboBox" name="typeComboBox"/>
        </item>
@@ -73,9 +84,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QnResourceTreeWidget" name="searchTreeWidget" native="true">
-         <layout class="QVBoxLayout" name="verticalLayout_2"/>
-        </widget>
+        <widget class="QnResourceTreeWidget" name="searchTreeWidget" native="true"/>
        </item>
       </layout>
      </widget>

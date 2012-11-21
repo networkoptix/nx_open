@@ -57,9 +57,11 @@ void QnLicenseManagerWidget::updateLicenses() {
     /* Update grid. */
     ui->gridLicenses->clear();
 
+    int idx = 0;
     foreach(const QnLicensePtr &license, m_licenses.licenses()) {
         QTreeWidgetItem *item = new QTreeWidgetItem();
         item->setData(0, Qt::DisplayRole, license->name());
+        item->setData(0, Qt::UserRole, idx++);
         item->setData(1, Qt::DisplayRole, license->cameraCount());
         item->setData(2, Qt::DisplayRole, license->key());
         ui->gridLicenses->addTopLevelItem(item);
@@ -190,12 +192,17 @@ void QnLicenseManagerWidget::at_gridLicenses_currentChanged() {
 }
 
 void QnLicenseManagerWidget::at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int) {
-    const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->indexOfTopLevelItem(item));
+    int idx = item->data(0, Qt::UserRole).toInt();
+    const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
 
 void QnLicenseManagerWidget::at_licenseDetailsButton_clicked() {
-    const QnLicensePtr license = m_licenses.licenses().at(ui->gridLicenses->selectionModel()->selectedRows().front().row());
+    QModelIndex model = ui->gridLicenses->selectionModel()->selectedRows().front();
+    if (model.column() > 0)
+        model = model.sibling(model.row(), 0);
+    int idx = model.data(Qt::UserRole).toInt();
+    const QnLicensePtr license = m_licenses.licenses().at(idx);
     showLicenseDetails(license);
 }
 
