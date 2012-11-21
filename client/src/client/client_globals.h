@@ -224,6 +224,7 @@ namespace Qn {
         ClientTimeMode  
     };
 
+    // TODO: this enum belongs to resource tree model as it's not used outside its context.
     /**
      * Columns in the resource tree model.
      */
@@ -232,6 +233,17 @@ namespace Qn {
         CheckColumn,
         ColumnCount
     };
+
+    /**
+     * Video resolution adjustment mode for RADASS.
+     */
+    enum ResolutionMode {
+        AutoResolution,
+        HighResolution,
+        LowResolution,
+        ResolutionModeCount
+    };
+
 
 } // namespace Qn
 

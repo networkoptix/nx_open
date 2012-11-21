@@ -21,7 +21,7 @@ public:
 
     QnSkin();
 
-    QIcon icon(const QString &name, const QString &checkedName);
+    QIcon icon(const QString &name, const QString &checkedName = QString());
     
     QIcon icon(const char *name, const char *checkedName = NULL) { 
         return icon(QLatin1String(name), QLatin1String(checkedName)); 

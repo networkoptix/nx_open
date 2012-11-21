@@ -55,6 +55,7 @@ namespace {
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent):
     QnResourceWidget(context, item, parent),
+    m_resolutionMode(Qn::AutoResolution),
     m_motionSensitivityValid(false),
     m_binaryMotionMaskValid(false)
 {
@@ -90,6 +91,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateInfoText();
 
     /* Set up buttons. */
+    QnImageButtonWidget *radassButton = new QnImageButtonWidget();
+    radassButton->setProperty(Qn::NoBlockMotionSelection, true);
+    radassButton->setToolTip(tr("Radass mode"));
+    connect(radassButton, SIGNAL(clicked()), this, SLOT(at_radassButton_clicked()));
+
     QnImageButtonWidget *searchButton = new QnImageButtonWidget();
     searchButton->setIcon(qnSkin->icon("item/search.png"));
     searchButton->setCheckable(true);
@@ -119,6 +125,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(zoomOutButton, SIGNAL(pressed()), this, SLOT(at_zoomOutButton_pressed()));
     connect(zoomOutButton, SIGNAL(released()), this, SLOT(at_zoomOutButton_released()));
 
+    buttonBar()->addButton(RadassButton, radassButton);
     buttonBar()->addButton(MotionSearchButton, searchButton);
     buttonBar()->addButton(PtzButton, ptzButton);
     buttonBar()->addButton(ZoomInButton, zoomInButton);
@@ -139,6 +146,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateButtonsVisibility();
     at_camDisplay_liveChanged();
     updateIconButton();
+    updateRadassButton();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -340,8 +348,30 @@ void QnMediaResourceWidget::ensureMotionSelectionCache() {
     }
 }
 
-void QnMediaResourceWidget::invalidateMotionSelectionCache(){
+void QnMediaResourceWidget::invalidateMotionSelectionCache() {
     m_motionSelectionCacheValid = false;
+}
+
+Qn::ResolutionMode QnMediaResourceWidget::resolutionMode() const {
+    return m_resolutionMode;
+}
+
+void QnMediaResourceWidget::setResolutionMode(Qn::ResolutionMode resolutionMode) {
+    if(resolutionMode < 0 || resolutionMode >= Qn::ResolutionModeCount) {
+        qnWarning("Invalid resolution mode '%1'.", static_cast<int>(resolutionMode));
+        return;
+    }
+
+    if(m_resolutionMode == resolutionMode)
+        return;
+
+    m_resolutionMode = resolutionMode;
+
+    // TODO: #VASILENKO insert code here
+
+    updateRadassButton();
+
+    emit resolutionModeChanged();
 }
 
 
@@ -616,6 +646,25 @@ void QnMediaResourceWidget::updateIconButton() {
     }
 }
 
+void QnMediaResourceWidget::updateRadassButton() {
+    QString iconPath;
+    switch(m_resolutionMode) {
+    case Qn::AutoResolution:
+        iconPath = QLatin1String("item/radass_auto.png");
+        break;
+    case Qn::LowResolution:
+        iconPath = QLatin1String("item/radass_high.png");
+        break;
+    case Qn::HighResolution:
+        iconPath = QLatin1String("item/radass_low.png");
+        break;
+    default:
+        assert(false);
+    }
+
+    buttonBar()->button(RadassButton)->setIcon(qnSkin->icon(iconPath));
+}
+
 void QnMediaResourceWidget::updateServerResource() {
     QnMediaServerResourcePtr server;
     if(m_camera)
@@ -766,6 +815,8 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
             if(buttonBar()->button(PtzButton)->isChecked()) // TODO: (buttonBar()->checkedButtons() & PtzButton) doesn't work here
                 result |= ZoomInButton | ZoomOutButton;
         }
+
+        result |= RadassButton;
     }
 
     return result;
@@ -835,6 +886,10 @@ void QnMediaResourceWidget::at_zoomOutButton_pressed() {
 void QnMediaResourceWidget::at_zoomOutButton_released() {
     sendZoomAsync(0.0);
     m_connection.clear();
+}
+
+void QnMediaResourceWidget::at_radassButton_clicked() {
+    setResolutionMode(static_cast<Qn::ResolutionMode>((resolutionMode() + 1) % Qn::ResolutionModeCount));
 }
 
 void QnMediaResourceWidget::at_replyReceived(int status, int handle) {
