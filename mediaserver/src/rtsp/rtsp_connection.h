@@ -69,6 +69,7 @@ public:
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
+    int getTracksCount() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();

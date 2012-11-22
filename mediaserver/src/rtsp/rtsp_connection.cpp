@@ -321,6 +321,12 @@ RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) con
         return RtspServerTrackInfoPtr();
 }
 
+int QnRtspConnectionProcessor::getTracksCount() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->trackInfo.size();
+}
+
 /*
 QnRtspEncoderPtr QnRtspConnectionProcessor::getCodecEncoder(int trackNum) const
 {
