@@ -51,7 +51,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     }
 
     if (camersNamesData.isManufacturerSupported(info.manufacturer) && camersNamesData.isSupported(info.name)) {
-        qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
+        //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
         return;
     }
 
@@ -66,7 +66,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         soapWrapper.setLoginPassword(existResource->getAuth().user().toStdString(), existResource->getAuth().password().toStdString());
     else
         soapWrapper.fetchLoginPassword(info.manufacturer);
-    qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
+    //qDebug() << "OnvifResourceInformationFetcher::findResources: Initial login = " << soapWrapper.getLogin() << ", password = " << soapWrapper.getPassword();
 
     //some cameras returns by default not specific names; for example vivoteck returns "networkcamera" -> just in case we request params one more time.
 
@@ -165,7 +165,7 @@ void OnvifResourceInformationFetcher::createResource(const QString& manufacturer
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (login) {
-        qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
+        //qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
         resource->setAuth(QLatin1String(login), QLatin1String(passwd));
     }
 
