@@ -20,6 +20,11 @@ QnTestCameraProcessor::QnTestCameraProcessor(TCPSocket* socket, QnTcpListener* o
 {
 }
 
+QnTestCameraProcessor::~QnTestCameraProcessor()
+{
+    stop();
+}
+
 void QnTestCameraProcessor::run()
 {
     Q_D(QnTestCameraProcessor);
