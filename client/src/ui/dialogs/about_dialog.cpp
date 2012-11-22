@@ -84,15 +84,12 @@ void QnAboutDialog::retranslateUi()
     QString servers;
 
     if (ecsVersion.isEmpty()) {
-        servers =         tr(
-            "<b>Enterprise controller</b>: not connected."
-            );
+        servers = tr("<b>Enterprise controller</b> not connected.<br>\n");
     } else {
-        servers =         tr(
-            "<b>Enterprise controller: %1</b> version: %2.<br>\n"
-            ).
-            arg(ecsUrl.host() + QLatin1String(":") + QString::number(ecsUrl.port())).
-            arg(ecsVersion);
+        servers = tr("<b>Enterprise controller</b> version %1 at %2:%3.<br>\n").
+            arg(ecsVersion).
+            arg(ecsUrl.host()).
+            arg(ecsUrl.port());
     }
 
     QnId serverTypeId = qnResTypePool->getResourceTypeByName(QLatin1String("Server"))->getId();
@@ -105,16 +102,11 @@ void QnAboutDialog::retranslateUi()
         if (server->getStatus() != QnResource::Online)
             continue;
 
-        QUrl serverUrl(server->getUrl());
-        QString serverString = QString(QLatin1String("%1 (%2)")).
-            arg(server->getName()).
-            arg(serverUrl.host());
-        serverVersions.append(tr("<b>Media Server: %1</b> version: %2.").arg(serverString).arg(server->getVersion()));
+        serverVersions.append(tr("<b>Media Server</b> version %2 at %3.").arg(server->getVersion()).arg(QUrl(server->getUrl()).host()));
     }
     
-    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty()) {
-        servers += serverVersions.join(QLatin1String("<br>"));
-    }
+    if (!ecsVersion.isEmpty() && !serverVersions.isEmpty())
+        servers += serverVersions.join(QLatin1String("<br>\n"));
 
     QString credits = 
         tr(
@@ -146,10 +138,10 @@ void QnAboutDialog::retranslateUi()
 
     QString gpu = 
         tr(
-            "<b>OpenGL version</b>: %1.<br/>"
-            "<b>OpenGL renderer</b>: %2.<br/>"
-            "<b>OpenGL vendor</b>: %3.<br/>"
-            "<b>OpenGL max texture size</b>: %4.<br/>"
+            "<b>OpenGL version</b>: %1.<br/>\n"
+            "<b>OpenGL renderer</b>: %2.<br/>\n"
+            "<b>OpenGL vendor</b>: %3.<br/>\n"
+            "<b>OpenGL max texture size</b>: %4.<br/>\n"
         ).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_VERSION)))).
         arg(QLatin1String(reinterpret_cast<const char *>(glGetString(GL_RENDERER)))). // TODO: same shit, OpenGL calls.
@@ -172,7 +164,9 @@ void QnAboutDialog::at_copyButton_clicked() {
     clipboard->setText(
          QTextDocumentFragment::fromHtml(ui->versionLabel->text()).toPlainText() + 
          QLatin1String("\n") +
-         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText()
+         QTextDocumentFragment::fromHtml(ui->gpuLabel->text()).toPlainText() + 
+         QLatin1String("\n") + 
+         QTextDocumentFragment::fromHtml(ui->serversLabel->text()).toPlainText()
     );
 }
 

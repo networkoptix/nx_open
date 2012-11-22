@@ -732,7 +732,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     if (m_resource->flags() & QnResource::utc) { /* Do not show time for regular media files. */
         qint64 utcTime = m_renderer->lastDisplayedTime(0) / 1000;
         if(qnSettings->timeMode() == Qn::ServerTimeMode)
-            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0);
+            utcTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: do offset adjustments in one place
 
         timeString = tr("\t%1").arg(
             m_display->camDisplay()->isRealTimeSource() ? 

@@ -921,7 +921,12 @@ qint64 QnTimeSlider::localOffset() const {
 }
 
 void QnTimeSlider::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
     m_localOffset = localOffset;
+
+    updateToolTipText();
 }
 
 
@@ -1507,8 +1512,8 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
 
     /* Find initial and maximal positions. */
     QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
-    qint64 startPos = valueFromPosition(positionFromValue(m_windowStart) - overlap, false) + m_localOffset;
-    qint64 endPos = valueFromPosition(positionFromValue(m_windowEnd) + overlap, false) + m_localOffset;
+    qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
+    qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 
     /* Initialize next positions for tickmark steps. */
     for(int i = minStepIndex; i < stepCount; i++)
@@ -1605,7 +1610,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 
         drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
 
-        if(pos1 >= m_windowEnd)
+        if(pos1 >= m_windowEnd + m_localOffset)
             break;
 
         painter->setPen(QPen(separatorColor, 0));

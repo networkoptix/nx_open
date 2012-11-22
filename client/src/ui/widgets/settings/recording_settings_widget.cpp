@@ -10,7 +10,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
 #   include "device_plugins/desktop/win_audio_helper.h"
 #endif
 
@@ -59,7 +59,7 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
 
     connect(ui->primaryAudioDeviceComboBox,     SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
     connect(ui->secondaryAudioDeviceComboBox,   SIGNAL(currentIndexChanged(int)),   this,   SLOT(onComboboxChanged(int)));
-    connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(onMonitorChanged(int)));
+    connect(ui->screenComboBox,                 SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateDisableAeroCheckbox()));
     connect(ui->browseRecordingFolderButton,    SIGNAL(clicked()),                  this,   SLOT(at_browseRecordingFolderButton_clicked()));
     setDefaultSoundIcon(ui->label_primaryDeviceIcon);
     setDefaultSoundIcon(ui->label_secondaryDeviceIcon);
@@ -91,8 +91,11 @@ QnRecordingSettingsWidget::QnRecordingSettingsWidget(QWidget *parent) :
         palette.setColor(QPalette::WindowText, qnGlobals->errorTextColor());
         ui->recordingWarningLabel->setPalette(palette);
     }
+
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
     connect(ui->resolutionComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(updateRecordingWarning()));
+
+    updateDisableAeroCheckbox();
 }
 
 QnRecordingSettingsWidget::~QnRecordingSettingsWidget() {
@@ -149,6 +152,8 @@ void QnRecordingSettingsWidget::setCaptureMode(Qn::CaptureMode c)
     default:
         break;
     }
+
+    updateDisableAeroCheckbox();
 }
 
 Qn::DecoderQuality QnRecordingSettingsWidget::decoderQuality() const
@@ -244,9 +249,30 @@ void QnRecordingSettingsWidget::additionalAdjustSize()
     ui->label_secondaryDeviceText->adjustSize();
 }
 
+void QnRecordingSettingsWidget::updateRecordingWarning() {
+    if (decoderQuality() == Qn::BestQuality && (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ))
+        ui->recordingWarningLabel->setText(tr("Very powerful machine is required for Best quality and high resolution."));
+    else
+        ui->recordingWarningLabel->setText(QString());
+}
+
+void QnRecordingSettingsWidget::updateDisableAeroCheckbox() {
+#ifndef Q_OS_WIN
+    ui->disableAeroCheckBox->setVisible(false);
+#else
+    bool isPrimary = ui->screenComboBox->currentIndex() == qApp->desktop()->primaryScreen();
+
+    ui->disableAeroCheckBox->setEnabled(isPrimary);
+    if(!isPrimary)
+        ui->disableAeroCheckBox->setChecked(false);
+#endif
+}
+
+
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
+#if 0
 void QnRecordingSettingsWidget::onDisableAeroChecked(bool enabled)
 {
     QDesktopWidget *desktop = qApp->desktop();
@@ -276,29 +302,12 @@ void QnRecordingSettingsWidget::onDisableAeroChecked(bool enabled)
         }
     }
 }
-
-void QnRecordingSettingsWidget::onMonitorChanged(int index)
-{
-#ifdef Q_OS_WIN
-    if (index != qApp->desktop()->primaryScreen())
-    {
-        if (ui->disableAeroCheckBox->isChecked())
-            ui->fullscreenButton->setChecked(true);
-        ui->disableAeroCheckBox->setEnabled(false);
-    }
-    else
-    {
-        ui->disableAeroCheckBox->setEnabled(true);
-    }
-#else
-    Q_UNUSED(index)
 #endif
-}
 
 void QnRecordingSettingsWidget::onComboboxChanged(int index)
 {
     additionalAdjustSize();
-#ifdef Q_OS_WIN32
+#ifdef Q_OS_WIN
     QComboBox* c = (QComboBox*) sender();
     WinAudioExtendInfo info(c->itemText(index));
     QLabel* l = c == ui->primaryAudioDeviceComboBox ? ui->label_primaryDeviceIcon : ui->label_secondaryDeviceIcon;
@@ -326,9 +335,3 @@ void QnRecordingSettingsWidget::at_browseRecordingFolderButton_clicked(){
     ui->recordingFolderLabel->setText(dir);
 }
 
-void QnRecordingSettingsWidget::updateRecordingWarning(){
-    if (decoderQuality() == Qn::BestQuality && (resolution() == Qn::Exact1920x1080Resolution || resolution() == Qn::NativeResolution ))
-        ui->recordingWarningLabel->setText(tr("Very powerful machine is required for Best quality and high resolution."));
-    else
-        ui->recordingWarningLabel->setText(QString());
-}
