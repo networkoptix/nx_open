@@ -820,6 +820,13 @@ void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
     }
 }
 
+void QnAppServerConnectionFactory::setCurrentVersion(const QString& version)
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        factory->m_currentVersion = version;
+    }
+}
+
 int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
@@ -827,6 +834,15 @@ int QnAppServerConnectionFactory::defaultMediaProxyPort()
     }
 
     return 0;
+}
+
+QString QnAppServerConnectionFactory::currentVersion()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_currentVersion;
+    }
+
+    return QLatin1String("");
 }
 
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()

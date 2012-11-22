@@ -32,7 +32,7 @@ private:
     void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
     CLFFmpegVideoDecoder* m_videoDecoder;
-    CLVideoDecoderOutput m_decodedVideoFrame;
+    QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
     CLVideoDecoderOutput m_scaledVideoFrame;
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
@@ -49,9 +49,10 @@ private:
     int m_dateTimeXOffs;
     int m_dateTimeYOffs;
     QnStreamQuality m_quality;
-    int m_bufferYOffs;
-    int m_bufferUVOffs;
     int m_onscreenDateOffset;
+
+    int m_bufXOffs;
+    int m_bufYOffs;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

@@ -124,6 +124,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
     if (m_videoCodec != CODEC_ID_NONE)
     {
+        // TODO: #vasilenko avoid using deprecated methods
         AVStream* videoStream = av_new_stream(m_formatCtx, 0);
         if (videoStream == 0)
         {
@@ -160,7 +161,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
             if (!video || video->width < 1 || video->height < 1)
             {
                 CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-                CLVideoDecoderOutput decodedVideoFrame;
+                QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();
                 videoHeight = decoder.getHeight();
@@ -200,6 +201,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
     {
         //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
+        // TODO: #vasilenko avoid using deprecated methods
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
         {
@@ -256,7 +258,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
-    if (m_baseTime == AV_NOPTS_VALUE)
+    Q_UNUSED(result)
+    if ((quint64)m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - 1000*100;
 
     AVRational srcRate = {1, 1000000};

@@ -209,7 +209,7 @@ const QString QnPlOnvifResource::fetchMacAddress(const NetIfacesResp& response,
     return someMacAddress.toUpper().replace(QLatin1Char(':'), QLatin1Char('-'));
 }
 
-bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
+bool QnPlOnvifResource::setHostAddress(const QString &ip, QnDomain domain)
 {
     //QnPhysicalCameraResource::se
     {
@@ -219,7 +219,7 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
         if (!mediaUrl.isEmpty())
         {
             QUrl url(mediaUrl);
-            url.setHost(ip.toString());
+            url.setHost(ip);
             setMediaUrl(url.toString());
         }
 
@@ -227,7 +227,7 @@ bool QnPlOnvifResource::setHostAddress(const QHostAddress &ip, QnDomain domain)
         if (!onvifUrl.isEmpty())
         {
             QUrl url(onvifUrl);
-            url.setHost(ip.toString());
+            url.setHost(ip);
             setDeviceOnvifUrl(url.toString());
         }
     }
@@ -576,9 +576,18 @@ void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
     setParam(ONVIF_URL_PARAM_NAME, src, QnDomainDatabase);
 }
 
+QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
+{
+    QUrl url(QString::fromStdString(onvifUrl));
+    QUrl mediaUrl(getUrl());
+    url.setHost(getHostAddress());
+    if (updatePort && mediaUrl.port(-1) != -1)
+        url.setPort(mediaUrl.port());
+    return url.toString();
+}
+
 bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 {
-    bool result = true;
     QAuthenticator auth(getAuth());
     //TODO:UTF unuse StdString
     DeviceSoapWrapper soapWrapper(getDeviceOnvifUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
@@ -600,7 +609,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << soapWrapper.getEndpointUrl() << " failed. Camera name will remain 'Unknown'. GSoap error code: " << soapRes
                 << ". " << soapWrapper.getLastError();
 
-            result = false;
+            return false;
         } 
         else
         {
@@ -624,7 +633,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
             if (soapWrapper.isNotAuthenticated())
                 setStatus(QnResource::Unauthorized);
-            result = false;
+            return false;
         }
 
         if (response.Capabilities) 
@@ -635,19 +644,19 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
 
             if (response.Capabilities->Media) 
             {
-                setMediaUrl(QString::fromStdString(response.Capabilities->Media->XAddr));
+                setMediaUrl(fromOnvifDiscoveredUrl(response.Capabilities->Media->XAddr));
             }
             if (response.Capabilities->Imaging)
             {
-                setImagingUrl(QString::fromStdString(response.Capabilities->Imaging->XAddr));
+                setImagingUrl(fromOnvifDiscoveredUrl(response.Capabilities->Imaging->XAddr));
             }
             if (response.Capabilities->Device) 
             {
-                setDeviceOnvifUrl(QString::fromStdString(response.Capabilities->Device->XAddr));
+                setDeviceOnvifUrl(fromOnvifDiscoveredUrl(response.Capabilities->Device->XAddr));
             }
             if (response.Capabilities->PTZ) 
             {
-                setPtzfUrl(QString::fromStdString(response.Capabilities->PTZ->XAddr));
+                setPtzfUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
             }
             m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
                 ? response.Capabilities->Extension->DeviceIO->XAddr
@@ -665,7 +674,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         {
             qWarning() << "QnPlOnvifResource::fetchAndSetDeviceInformation: can't fetch MAC address. Reason: SOAP to endpoint "
                 << getDeviceOnvifUrl() << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-            result = false;
+            return false;
         }
 
         const QString& mac = fetchMacAddress(response, QUrl(getDeviceOnvifUrl()).host());
@@ -679,7 +688,7 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
         }
     }
 
-    return result;
+    return true;
 }
 
 //void QnPlOnvifResource::notificationReceived( const std::string& relayToken, bool active )
@@ -1110,7 +1119,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         QString temp = getDeviceOnvifUrl();
 
         QUrl newUrl(getDeviceOnvifUrl());
-        newUrl.setHost(getHostAddress().toString());
+        newUrl.setHost(getHostAddress());
         setDeviceOnvifUrl(newUrl.toString());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getDeviceOnvifUrl();
         result = true;
@@ -1121,7 +1130,7 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         // trying to introduce fix for dw cam 
         QString temp = getMediaUrl();
         QUrl newUrl(getMediaUrl());
-        newUrl.setHost(getHostAddress().toString());
+        newUrl.setHost(getHostAddress());
         setMediaUrl(newUrl.toString());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << getMediaUrl();
         result = true;

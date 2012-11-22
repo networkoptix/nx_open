@@ -83,7 +83,7 @@ class QnAudioTranscoder: public QnCodecTranscoder
 {
 public:
     QnAudioTranscoder(CodecID codecId): QnCodecTranscoder(codecId) {}
-    virtual bool open(QnCompressedAudioDataPtr video) { return true; }
+    virtual bool open(QnCompressedAudioDataPtr video) { Q_UNUSED(video) return true; }
 };
 typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 
@@ -93,6 +93,8 @@ typedef QSharedPointer<QnAudioTranscoder> QnAudioTranscoderPtr;
 */
 class QnTranscoder: public QObject
 {
+    Q_OBJECT
+
 public:
     QnTranscoder();
     virtual ~QnTranscoder();

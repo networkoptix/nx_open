@@ -1,5 +1,6 @@
  - Version 1.2.7 (PC and Mac)
 
+F2 fixed
 
 September 27, 2011 UPDATES - Version 1.2.6 (PC and Mac)
 

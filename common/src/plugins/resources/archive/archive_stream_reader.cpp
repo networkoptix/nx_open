@@ -39,8 +39,8 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_newDataMarker(0),
     m_currentTimeHint(AV_NOPTS_VALUE),
 //private section 2
+    m_jumpInSilenceMode(false),
     m_bofReached(false),
-    m_canChangeQuality(true),
     m_externalLocked(false),
     m_exactJumpToSpecifiedFrame(false),
     m_ignoreSkippingFrame(false),
@@ -59,7 +59,7 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_speed(1.0),
     m_pausedStart(false),
     m_sendMotion(false),
-    m_jumpInSilenceMode(false),
+    m_prevSendMotion(false),
     m_outOfPlaybackMask(false)
 {
     memset(&m_rewSecondaryStarted, 0, sizeof(m_rewSecondaryStarted));
@@ -210,11 +210,13 @@ bool QnArchiveStreamReader::init()
     m_jumpMtx.lock();
     qint64 requiredJumpTime = m_requiredJumpTime;
     m_jumpMtx.unlock();
-    if (requiredJumpTime != qint64(AV_NOPTS_VALUE)) 
+    if (requiredJumpTime != qint64(AV_NOPTS_VALUE) && m_reverseMode == m_prevReverseMode) 
     {
+        // It is optimization: open and jump at same time
         while (1)
         {
             bool seekOk = m_delegate->seek(requiredJumpTime, true) >= 0;
+            Q_UNUSED(seekOk)
             m_jumpMtx.lock();
             if (m_requiredJumpTime == requiredJumpTime) {
                 m_requiredJumpTime = AV_NOPTS_VALUE;
@@ -349,6 +351,12 @@ begin_label:
             // If media data can't be opened report 'no data'
             return createEmptyPacket(m_reverseMode);
         }
+    }
+
+    bool sendMotion = m_sendMotion;
+    if (sendMotion != m_prevSendMotion) {
+        m_delegate->setSendMotion(sendMotion);
+        m_prevSendMotion = sendMotion;
     }
 
     int channelCount = m_delegate->getVideoLayout()->numberOfChannels();
@@ -675,31 +683,12 @@ begin_label:
     if (videoData && (videoData->flags & QnAbstractMediaData::MediaFlags_Ignore) && m_ignoreSkippingFrame)
         goto begin_label;
 
-
-    if (m_currentData && m_eof)
-    {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
-        m_eof = false;
-    }
-
-    if (m_BOF) {
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
-        m_BOF = false;
-        //m_BOFTime = m_currentData->timestamp;
-        /*
-        QString msg;
-        QTextStream str(&msg);
-        str << "set BOF " << QDateTime::fromMSecsSinceEpoch(m_currentData->timestamp/1000).toString("hh:mm:ss.zzz") << " for marker " << m_dataMarker;
-        str.flush();
-        cl_log.log(msg, cl_logWARNING);
-        */
-
-    }
-    if (reverseMode && !delegateForNegativeSpeed)
-        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-
     if (videoData && videoData->context) 
         m_codecContext = videoData->context;
+
+
+    if (reverseMode && !delegateForNegativeSpeed)
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
     if (videoData && singleShotMode && m_skipFramesToTime == 0) {
         m_singleQuantProcessed = true;
@@ -745,6 +734,17 @@ begin_label:
         }
     }
 
+    if (m_currentData && m_eof)
+    {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+        m_eof = false;
+    }
+
+    if (m_BOF) {
+        m_currentData->flags |= QnAbstractMediaData::MediaFlags_BOF;
+        m_BOF = false;
+    }
+
     if (m_isStillImage)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_StillImage;
 
@@ -753,7 +753,7 @@ begin_label:
         m_lastSkipTime = m_lastJumpTime = AV_NOPTS_VALUE; // allow duplicates jump to same position
 
     // process motion
-    if (m_currentData && m_sendMotion)
+    if (m_currentData && sendMotion)
     {
         int channel = m_currentData->channelNumber;
         if (!m_motionConnection[channel])
@@ -1000,12 +1000,6 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 
 bool QnArchiveStreamReader::setSendMotion(bool value)
 {
-    /*
-    if (m_navDelegate) 
-        return m_navDelegate->setSendMotion(value);
-    */
-
-    m_delegate->setSendMotion(value);
     if (m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanSendMotion)
     {
         m_sendMotion = value;
@@ -1014,19 +1008,6 @@ bool QnArchiveStreamReader::setSendMotion(bool value)
     else {
         return false;
     }
-    /*
-    QnAbstractFilterPlaybackDelegate* maskedDelegate = dynamic_cast<QnAbstractFilterPlaybackDelegate*>(m_delegate);
-    if (maskedDelegate) {
-        m_sendMotion = value;
-        maskedDelegate->setSendMotion(value);
-        if (!mFirstTime && !m_delegate->isRealTimeSource())
-            jumpToPreviousFrame(determineDisplayTime(m_reverseMode));
-        return true;
-    }
-    else {
-        return false;
-    }
-    */
 }
 
 
@@ -1049,17 +1030,6 @@ void QnArchiveStreamReader::setPlaybackMask(const QnTimePeriodList& playbackMask
     m_playbackMaskHelper.setPlaybackMask(playbackMask);
 }
 
-void QnArchiveStreamReader::disableQualityChange()
-{
-    m_canChangeQuality = false;
-}
-
-void QnArchiveStreamReader::enableQualityChange()
-{
-    m_canChangeQuality = true;
-}
-
-
 void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
 {
     QMutexLocker lock(&m_jumpMtx);
@@ -1067,23 +1037,9 @@ void QnArchiveStreamReader::onDelegateChangeQuality(MediaQuality quality)
     m_oldQualityFastSwitch = m_qualityFastSwitch = true;
 }
 
-void QnArchiveStreamReader::setQualityForced(MediaQuality quality)
-{
-    if (m_quality != quality || !m_qualityFastSwitch) 
-    {
-        bool useMutex = !m_externalLocked;
-        if (useMutex)
-            m_jumpMtx.lock();
-        m_quality = quality;
-        m_qualityFastSwitch = true;
-        if (useMutex)
-            m_jumpMtx.unlock();
-    }
-}
-
 void QnArchiveStreamReader::setQuality(MediaQuality quality, bool fastSwitch)
 {
-    if (m_canChangeQuality && (m_quality != quality || fastSwitch > m_qualityFastSwitch)) 
+    if (m_quality != quality || fastSwitch > m_qualityFastSwitch)
     {
         bool useMutex = !m_externalLocked;
         if (useMutex)

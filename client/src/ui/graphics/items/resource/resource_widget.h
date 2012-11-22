@@ -12,6 +12,7 @@
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
+#include <ui/common/fixed_rotation.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -243,9 +244,6 @@ public:
 
     Buttons visibleButtons() const;
 
-    // TODO: #gdm implement via visibleButtons() function, then remove this one.
-    bool isInfoButtonVisible() const;
-
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
@@ -430,9 +428,8 @@ private:
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
 
-    // TODO: #gdm move Qn::FixedAngle out in common module and use here.
-    /** Rotation angle in degrees, shall be multiple of 90. Used to rotate static text and images. */
-    int m_desiredRotation;
+    /** Fixed rotation angle in degrees. Used to rotate static text and images. */
+    Qn::FixedRotation m_desiredRotation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)

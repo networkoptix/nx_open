@@ -186,6 +186,7 @@ void QnTcpListener::run()
         }
         removeDisconnectedConnections();
     }
+    removeAllConnections();
 }
 
 void* QnTcpListener::getOpenSSLContext()

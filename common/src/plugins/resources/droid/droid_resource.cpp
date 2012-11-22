@@ -44,18 +44,18 @@ void QnDroidResource::setCropingPhysical(QRect /*croping*/)
 }
 
 
-QHostAddress QnDroidResource::getHostAddress() const
+QString QnDroidResource::getHostAddress() const
 {
     QString url = getUrl();
     int start = QString(QLatin1String("raw://")).length();
     int end = url.indexOf(QLatin1Char(':'), start);
     if (start >= 0 && end > start)
-        return QHostAddress(url.mid(start, end-start));
+        return url.mid(start, end-start);
     else
-        return QHostAddress();
+        return QString();
 }
 
-bool QnDroidResource::setHostAddress(const QHostAddress &/*ip*/, QnDomain /*domain*/)
+bool QnDroidResource::setHostAddress(const QString &/*ip*/, QnDomain /*domain*/)
 {
     return false;
 }

@@ -12,7 +12,7 @@ class DWCameraSetting;
 
 class DWCameraProxy
 {
-    const QHostAddress m_host;
+    const QString m_host;
     int m_port;
     unsigned int m_timeout;
     const QAuthenticator m_auth;
@@ -20,7 +20,7 @@ class DWCameraProxy
 
 public:
 
-    DWCameraProxy(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    DWCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
     bool getFromCamera(DWCameraSetting& src);
     bool setToCamera(DWCameraSetting& src);

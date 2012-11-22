@@ -21,7 +21,7 @@
                 <Control Type="Text" Id="LoginLabel" Width="32" Height="17" X="25" Y="92" Text="Login" />
                 <Control Type="Edit" Id="Login" X="75" Y="89" Width="101" Height="15" Property="SERVER_APPSERVER_LOGIN"/>
                 <Control Type="Text" Id="PasswordLabel" Width="46" Height="15" X="190" Y="92" Text="Password" />
-                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_APPSERVER_PASSWORD"/>
+                <Control Type="Edit" Id="Password" Width="111" Height="15" X="241" Y="89" Property="SERVER_APPSERVER_PASSWORD" Password="yes"/>
                 <Control Id="label1" Type="Text" Height="17" Width="70" X="25" Y="131" Text="Port" />
                 <Control Id="textBox1" Type="Edit" Height="15" Width="83" X="93" Y="129" Property="SERVER_PORT" />
                 <Control Id="label3" Type="Text" Height="17" Width="70" X="25" Y="161" Text="Recording Folder" />

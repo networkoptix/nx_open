@@ -13,6 +13,7 @@
 #include "avi_resource.h"
 #include "motion/light_motion_archive_connection.h"
 #include "core/resource/media_resource.h"
+#include "export/sign_helper.h"
 
 extern QMutex global_ffmpeg_mutex;
 
@@ -99,6 +100,7 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
+    m_startMksec(0),
     m_selectedAudioChannel(0),
     m_audioStreamIndex(-1),
     m_firstVideoIndex(0),
@@ -108,8 +110,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
-    m_fastStreamFind(false),
-    m_startMksec(0)
+    m_fastStreamFind(false)
 {
     close();
     m_audioLayout = new QnAviAudioLayout(this);
@@ -204,7 +205,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);
                 data = QnAbstractMediaDataPtr(audioData);
-                audioData->channelNumber = stream->index; // m_indexToChannel[packet.stream_index]; // defalut value
+                audioData->channelNumber = m_indexToChannel[packet.stream_index];
                 packetTimestamp(audioData, packet);
                 break;
             default:
@@ -341,8 +342,21 @@ QnResourceVideoLayout* QnAviArchiveDelegate::getVideoLayout()
     {
         m_videoLayout = new QnCustomResourceVideoLayout(1, 1);
 
+
         // prevent standart tag name parsing in 'avi' format
         QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
+
+        // check time zone in the 4-th column
+        AVDictionaryEntry* sign = av_dict_get(m_formatContext->metadata, getTagName(Tag_Signature, format), 0, 0);
+        if (sign && sign->value) {
+            QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
+            if (tmp.size() > 4) {
+                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong();
+                QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
+                if (timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
+                    aviRes->setTimeZoneOffset(timeZoneOffset);
+            }
+        }
 
         AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(Tag_Software, format), 0, 0);
         bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));
@@ -392,6 +406,7 @@ bool QnAviArchiveDelegate::findStreams()
         global_ffmpeg_mutex.lock();
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
+            // TODO: #vasilenko avoid using deprecated methods
             av_find_stream_info(m_formatContext);
             m_formatContext->interrupt_callback.callback = 0;
             m_streamsFound = m_formatContext->nb_streams > 0;
@@ -399,6 +414,7 @@ bool QnAviArchiveDelegate::findStreams()
                 m_formatContext->streams[i]->first_dts = 0; // reset first_dts. If don't do it, av_seek will seek to begin of file always
         }
         else {
+            // TODO: #vasilenko avoid using deprecated methods
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         }
 
@@ -418,7 +434,6 @@ bool QnAviArchiveDelegate::findStreams()
 void QnAviArchiveDelegate::initLayoutStreams()
 {
     int videoNum= 0;
-    //int audioNum = 0;
     int lastStreamID = -1;
     m_firstVideoIndex = -1;
 
@@ -445,10 +460,31 @@ void QnAviArchiveDelegate::initLayoutStreams()
             videoNum++;
             break;
 
+        default:
+            break;
+        }
+    }
+
+    lastStreamID = -1;
+    int audioNum = 0;
+    for(unsigned i = 0; i < m_formatContext->nb_streams; i++)
+    {
+        AVStream *strm= m_formatContext->streams[i];
+        AVCodecContext *codecContext = strm->codec;
+
+        if(codecContext->codec_type >= (unsigned)AVMEDIA_TYPE_NB)
+            continue;
+
+        if (strm->id && strm->id == lastStreamID)
+            continue; // duplicate
+        lastStreamID = strm->id;
+
+        switch(codecContext->codec_type)
+        {
         case AVMEDIA_TYPE_AUDIO:
-            //while (m_indexToChannel.size() <= i)
-            //    m_indexToChannel << -1;
-            //m_indexToChannel << audioNum++;
+            while ((uint)m_indexToChannel.size() <= i)
+                m_indexToChannel << -1;
+            m_indexToChannel[i] = videoNum + audioNum++;
             break;
 
         default:
@@ -484,7 +520,7 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
         video->timestamp = AV_NOPTS_VALUE;
     else
         video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
-    if (packet.pts != AV_NOPTS_VALUE) {
+    if ((quint64)packet.pts != AV_NOPTS_VALUE) {
         video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTime;
     }
 }

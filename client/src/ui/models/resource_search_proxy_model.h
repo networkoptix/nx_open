@@ -12,7 +12,8 @@
  * A resource filtering model that uses resource criteria for filtering.
  */
 class QnResourceSearchProxyModel: public QSortFilterProxyModel {
-    Q_OBJECT;
+    Q_OBJECT
+    typedef QSortFilterProxyModel base_type;
 
 public:
     explicit QnResourceSearchProxyModel(QObject *parent = 0);
@@ -47,13 +48,12 @@ public slots:
 
 protected:
     virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;
-
 private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;
 };
 
-Q_DECLARE_METATYPE(QnResourceSearchProxyModel *);
+Q_DECLARE_METATYPE(QnResourceSearchProxyModel *)
 
 
 #endif // QN_RESOURCE_SEARCH_PROXY_MODEL_H

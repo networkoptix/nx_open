@@ -55,9 +55,11 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
+    void setExportScheduleButtonEnabled(bool enabled);
 signals:
     void hasChangesChanged();
     void moreLicensesRequested();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 private slots:
     void at_dbDataChanged();

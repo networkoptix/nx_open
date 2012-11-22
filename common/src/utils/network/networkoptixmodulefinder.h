@@ -6,6 +6,7 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
+#include <set>
 #include <vector>
 
 #include <QHostAddress>
@@ -18,7 +19,7 @@
 
 class UDPSocket;
 
-//!Searches for all Network Optix enterprise controllers in local network environment
+//!Searches for all Network Optix enterprise controllers in local network environment using multicast
 /*!
     Search is done by sending multicast packet to predefined multicast group and waiting for an answer.
     Requests are sent periodically every \a pingTimeoutMillis milliseconds.
@@ -66,6 +67,7 @@ signals:
         \param moduleParameters
         \param localInterfaceIP IP address of local interface, response from enterprise controller has been received on
         \param remoteHostAddress Address of found enterprise controller
+        \param isLocal true, if \a remoteHostAddress is a local address
         \param moduleSeed unique string, reported by module
     */
     void moduleFound(
@@ -74,12 +76,17 @@ signals:
         const TypeSpecificParamMap& moduleParameters,
         const QString& localInterfaceAddress,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& moduleSeed );
     //!Emmited when previously found module did not respond to request in predefined timeout
+    /*!
+        \param isLocal true, if \a remoteHostAddress is a local address
+    */
     void moduleLost(
         const QString& moduleType,
         const TypeSpecificParamMap& moduleParameters,
         const QString& remoteHostAddress,
+        bool isLocal,
         const QString& moduleSeed );
 
 protected:
@@ -92,6 +99,7 @@ private:
         QHostAddress address;
         RevealResponse response;
         quint64 prevResponseReceiveClock;
+        std::set<QString> signalledAddresses;
 
         ModuleContext()
         :
@@ -107,6 +115,7 @@ private:
     quint64 m_prevPingClock;
     //!map<seed, module data>
     std::map<QString, ModuleContext> m_knownEnterpriseControllers;
+    std::set<QString> m_localNetworkAdresses;
 };
 
 #endif  //NETWORKOPTIXMODULEFINDER_H

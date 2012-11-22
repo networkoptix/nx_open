@@ -921,7 +921,12 @@ qint64 QnTimeSlider::localOffset() const {
 }
 
 void QnTimeSlider::setLocalOffset(qint64 localOffset) {
+    if(m_localOffset == localOffset)
+        return;
+
     m_localOffset = localOffset;
+
+    updateToolTipText();
 }
 
 
@@ -1507,8 +1512,8 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
 
     /* Find initial and maximal positions. */
     QPointF overlap(criticalTickmarkTextStepPixels / 2.0, 0.0);
-    qint64 startPos = valueFromPosition(positionFromValue(m_windowStart) - overlap, false);
-    qint64 endPos = valueFromPosition(positionFromValue(m_windowEnd) + overlap, false);
+    qint64 startPos = qMax(minimum() + 1, valueFromPosition(positionFromValue(m_windowStart) - overlap, false)) + m_localOffset;
+    qint64 endPos = qMin(maximum() - 1, valueFromPosition(positionFromValue(m_windowEnd) + overlap, false)) + m_localOffset;
 
     /* Initialize next positions for tickmark steps. */
     for(int i = minStepIndex; i < stepCount; i++)
@@ -1534,12 +1539,12 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         }
         index--;
 
-        qreal x = quickPositionFromValue(pos, false);
+        qreal x = quickPositionFromValue(pos - m_localOffset, false);
 
         /* Draw label if needed. */
         qreal lineHeight = m_stepData[index].currentLineHeight;
         if(!qFuzzyIsNull(m_stepData[index].currentTextOpacity)) {
-            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos + m_localOffset, m_stepData[index].currentTextHeight, m_steps[index]);
+            QPixmap pixmap = m_pixmapCache->positionShortPixmap(pos, m_stepData[index].currentTextHeight, m_steps[index]);
             QRectF textRect(x - pixmap.width() / 2.0, rect.top() + lineHeight, pixmap.width(), pixmap.height());
 
             QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_stepData[index].currentTextOpacity);
@@ -1547,7 +1552,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
         }
 
         /* Calculate line ends. */
-        if(pos >= m_windowStart && pos <= m_windowEnd) {
+        if(pos - m_localOffset >= m_windowStart && pos - m_localOffset <= m_windowEnd) {
             m_tickmarkLines[index] << 
                 QPointF(x, rect.top() + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
                 QPointF(x, rect.top() + lineHeight);
@@ -1584,18 +1589,18 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
     QnScopedPainterBrushRollback brushRollback(painter);
 
     /* Draw highlight. */
-    qint64 pos1 = roundUp(m_windowStart, highlightStep);
+    qint64 pos1 = roundUp(m_windowStart + m_localOffset, highlightStep);
     qint64 pos0 = sub(pos1, highlightStep);
     qreal x0 = quickPositionFromValue(m_windowStart);
     qint64 number = absoluteNumber(pos1, highlightStep);
     while(true) {
-        qreal x1 = quickPositionFromValue(pos1);
+        qreal x1 = quickPositionFromValue(pos1 - m_localOffset);
 
         painter->setPen(Qt::NoPen);
         painter->setBrush(number % 2 ? dateOverlayColorA : dateOverlayColorB);
         painter->drawRect(QRectF(x0, rect.top(), x1 - x0, rect.height()));
 
-        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0 + m_localOffset, textHeight, highlightStep);
+        QPixmap pixmap = m_pixmapCache->positionLongPixmap(pos0, textHeight, highlightStep);
 
         QRectF textRect((x0 + x1) / 2.0 - pixmap.width() / 2.0, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
         if(textRect.left() < rect.left())
@@ -1605,7 +1610,7 @@ void QnTimeSlider::drawDates(QPainter *painter, const QRectF &rect) {
 
         drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
 
-        if(pos1 >= m_windowEnd)
+        if(pos1 >= m_windowEnd + m_localOffset)
             break;
 
         painter->setPen(QPen(separatorColor, 0));

@@ -119,7 +119,7 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
 
 
     virtual bool isResourceAccessible() override;
@@ -144,7 +144,7 @@ public:
         unsigned int autoResetTimeout );
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
-    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
+    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
     int getGovLength() const;
     int getAudioBitrate() const;
@@ -192,6 +192,7 @@ public:
     void notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification );
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
+    QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
 protected:
     void setCodec(CODECS c, bool isPrimary);

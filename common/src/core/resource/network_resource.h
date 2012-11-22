@@ -27,8 +27,8 @@ public:
 
     virtual QString getUniqueId() const;
 
-    virtual QHostAddress getHostAddress() const;
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory);
+    virtual QString getHostAddress() const;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory);
 
     QnMacAddress getMAC() const;
     void setMAC(const QnMacAddress &mac);

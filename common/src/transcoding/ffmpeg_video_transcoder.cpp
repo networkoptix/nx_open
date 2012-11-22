@@ -9,21 +9,22 @@ static const int MIN_TEXT_HEIGHT = 14;
 QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
 QnVideoTranscoder(codecId),
 m_videoDecoder(0),
-scaleContext(0),
+m_decodedVideoFrame(new CLVideoDecoderOutput()),
 m_encoderCtx(0),
+scaleContext(0),
 m_firstEncodedPts(AV_NOPTS_VALUE),
 m_lastSrcWidth(-1),
 m_lastSrcHeight(-1),
 m_mtMode(false),
 m_dateTextPos(Date_None),
-m_timeImg(0),
 m_imageBuffer(0),
+m_timeImg(0),
 m_dateTimeXOffs(0),
 m_dateTimeYOffs(0),
 m_quality(QnQualityNormal),
-m_bufferYOffs(0),
-m_bufferUVOffs(0),
-m_onscreenDateOffset(0)
+m_onscreenDateOffset(0),
+m_bufXOffs(0),
+m_bufYOffs(0)
 {
     m_videoEncodingBuffer = (quint8*) qMallocAligned(MAX_VIDEO_FRAME, 32);
 }
@@ -46,11 +47,11 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 int QnFfmpegVideoTranscoder::rescaleFrame()
 {
-    if (m_decodedVideoFrame.width != m_lastSrcWidth ||  m_decodedVideoFrame.height != m_lastSrcHeight)
+    if (m_decodedVideoFrame->width != m_lastSrcWidth ||  m_decodedVideoFrame->height != m_lastSrcHeight)
     {
         // src resolution is changed
-        m_lastSrcWidth = m_decodedVideoFrame.width;
-        m_lastSrcHeight = m_decodedVideoFrame.height;
+        m_lastSrcWidth = m_decodedVideoFrame->width;
+        m_lastSrcHeight = m_decodedVideoFrame->height;
         if (scaleContext) {
             sws_freeContext(scaleContext);
             scaleContext = 0;
@@ -59,7 +60,7 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
 
     if (scaleContext == 0)
     {
-        scaleContext = sws_getContext(m_decodedVideoFrame.width, m_decodedVideoFrame.height, (PixelFormat) m_decodedVideoFrame.format, 
+        scaleContext = sws_getContext(m_decodedVideoFrame->width, m_decodedVideoFrame->height, (PixelFormat) m_decodedVideoFrame->format, 
                                       m_resolution.width(), m_resolution.height(), (PixelFormat) PIX_FMT_YUV420P, SWS_BILINEAR, NULL, NULL, NULL);
         if (!scaleContext) {
             m_lastErrMessage = QObject::tr("Can't allocate scaler context for resolution %1x%2").arg(m_resolution.width()).arg(m_resolution.height());
@@ -69,12 +70,12 @@ int QnFfmpegVideoTranscoder::rescaleFrame()
     }
 
     sws_scale(scaleContext,
-        m_decodedVideoFrame.data, m_decodedVideoFrame.linesize, 
-        0, m_decodedVideoFrame.height, 
+        m_decodedVideoFrame->data, m_decodedVideoFrame->linesize, 
+        0, m_decodedVideoFrame->height, 
         m_scaledVideoFrame.data, m_scaledVideoFrame.linesize);
-    //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame.pkt_dts;
-    //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame.pkt_pts;
-    m_scaledVideoFrame.pts = m_decodedVideoFrame.pts;
+    //m_scaledVideoFrame.pkt_dts = m_decodedVideoFrame->pkt_dts;
+    //m_scaledVideoFrame.pkt_pts = m_decodedVideoFrame->pkt_pts;
+    m_scaledVideoFrame.pts = m_decodedVideoFrame->pts;
     return 0;
 }
 
@@ -121,33 +122,31 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
     m_timeFont.setBold(true);
     m_timeFont.setPixelSize(qMax(MIN_TEXT_HEIGHT, frame->height / TEXT_HEIGHT_IN_FRAME_PARTS));
     QFontMetrics metric(m_timeFont);
-    int bufYOffs = 0;
+    m_bufYOffs;
 
     switch(m_dateTextPos)
     {
     case Date_LeftTop:
-        bufYOffs = 0;
+        m_bufYOffs = 0;
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
     case Date_RightTop:
-        bufYOffs = 0;
+        m_bufYOffs = 0;
         m_dateTimeXOffs = frame->width - metric.width(timeStr) - metric.averageCharWidth()/2;
         break;
     case Date_RightBottom:
-        bufYOffs = frame->height - metric.height();
+        m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = frame->width - metric.boundingRect(timeStr).width() - metric.averageCharWidth()/2; // - metric.width(QLatin1String("0"));
         break;
     case Date_LeftBottom:
     default:
-        bufYOffs = frame->height - metric.height();
+        m_bufYOffs = frame->height - metric.height();
         m_dateTimeXOffs = metric.averageCharWidth()/2;
         break;
     }
 
-    bufYOffs = qPower2Floor(bufYOffs, 2);
-    int srcBufOffset = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
-    m_bufferYOffs  = srcBufOffset + bufYOffs * frame->linesize[0];
-    m_bufferUVOffs = srcBufOffset/2 + bufYOffs * frame->linesize[1] / 2;
+    m_bufYOffs = qPower2Floor(m_bufYOffs, 2);
+    m_bufXOffs = qPower2Floor(m_dateTimeXOffs, CL_MEDIA_ALIGNMENT);
 
     m_dateTimeXOffs = m_dateTimeXOffs%CL_MEDIA_ALIGNMENT;
     m_dateTimeYOffs = metric.ascent();
@@ -162,18 +161,21 @@ void QnFfmpegVideoTranscoder::initTimeDrawing(CLVideoDecoderOutput* frame, const
 void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 {
     QString timeStr;
-    QDateTime dt = QDateTime::fromMSecsSinceEpoch(frame->pts/1000 + m_onscreenDateOffset);
+    qint64 displayTime = frame->pts/1000 + m_onscreenDateOffset;
     if (frame->pts >= UTC_TIME_DETECTION_THRESHOLD)
-        timeStr = dt.toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
+        timeStr = QDateTime::fromMSecsSinceEpoch(displayTime).toString(QLatin1String("yyyy-MMM-dd hh:mm:ss"));
     else
-        timeStr = dt.toString(QLatin1String("hh:mm:ss.zzz"));
+        timeStr = QTime().addMSecs(displayTime).toString(QLatin1String("hh:mm:ss.zzz"));
 
     if (m_timeImg == 0)
         initTimeDrawing(frame, timeStr);
 
+    int bufPlaneYOffs  = m_bufXOffs + m_bufYOffs * frame->linesize[0];
+    int bufferUVOffs = m_bufXOffs/2 + m_bufYOffs * frame->linesize[1] / 2;
+
     // copy and convert frame buffer to image
     yuv420_argb32_sse2_intr(m_imageBuffer,
-        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         m_timeImg->width(), m_timeImg->height(),
         m_timeImg->bytesPerLine(), 
         frame->linesize[0], frame->linesize[1], 255);
@@ -188,7 +190,7 @@ void QnFfmpegVideoTranscoder::doDrawOnScreenTime(CLVideoDecoderOutput* frame)
 
     // copy and convert RGBA32 image back to frame buffer
     bgra_to_yv12_sse2_intr(m_imageBuffer, m_timeImg->bytesPerLine(), 
-        frame->data[0]+m_bufferYOffs, frame->data[1]+m_bufferUVOffs, frame->data[2]+m_bufferUVOffs,
+        frame->data[0]+bufPlaneYOffs, frame->data[1]+bufferUVOffs, frame->data[2]+bufferUVOffs,
         frame->linesize[0], frame->linesize[1], 
         m_timeImg->width(), m_timeImg->height(), false);
 }
@@ -205,9 +207,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
     QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(media);
     if (m_videoDecoder->decode(video, &m_decodedVideoFrame)) 
     {
-        CLVideoDecoderOutput* decodedFrame = &m_decodedVideoFrame;
-        m_decodedVideoFrame.pts = m_decodedVideoFrame.pkt_dts;
-        if (m_decodedVideoFrame.width != m_resolution.width() || m_decodedVideoFrame.height != m_resolution.height() || m_decodedVideoFrame.format != PIX_FMT_YUV420P) {
+        CLVideoDecoderOutput* decodedFrame = m_decodedVideoFrame.data();
+        m_decodedVideoFrame->pts = m_decodedVideoFrame->pkt_dts;
+        if (m_decodedVideoFrame->width != m_resolution.width() || m_decodedVideoFrame->height != m_resolution.height() || m_decodedVideoFrame->format != PIX_FMT_YUV420P) {
             rescaleFrame();
             decodedFrame = &m_scaledVideoFrame;
         }
@@ -217,9 +219,10 @@ int QnFfmpegVideoTranscoder::transcodePacket(QnAbstractMediaDataPtr media, QnAbs
 
         static AVRational r = {1, 1000000};
         decodedFrame->pts  = av_rescale_q(decodedFrame->pts, r, m_encoderCtx->time_base);
-        if (m_firstEncodedPts == AV_NOPTS_VALUE)
+        if ((quint64)m_firstEncodedPts == AV_NOPTS_VALUE)
             m_firstEncodedPts = decodedFrame->pts;
 
+        //TODO: #vasilenko avoid using deprecated methods
         int encoded = avcodec_encode_video(m_encoderCtx, m_videoEncodingBuffer, MAX_VIDEO_FRAME, decodedFrame);
 
         if (encoded < 0)

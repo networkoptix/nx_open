@@ -314,6 +314,12 @@ UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
 
     {
         CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
+
+        if (CPath(serverFolder).IsDirectory())
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"");
+
         if (serverFolder.Find(L"coldstore://") == 0)
             MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
         else
@@ -362,6 +368,27 @@ UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
         CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
         if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
             MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "DeleteFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+        DeleteFile(fileToDelete);
     }
 
 LExit:

@@ -372,7 +372,7 @@ void QnThumbnailsLoader::process() {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getOnlineCamerasWithSamePhysicalId(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
         {
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_decode)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true);
@@ -408,8 +408,8 @@ void QnThumbnailsLoader::process() {
         if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
-            CLVideoDecoderOutput outFrame;
-            outFrame.setUseExternalData(false);
+            QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
+            outFrame->setUseExternalData(false);
 
             while (frame) {
                 if (!camera)
@@ -421,8 +421,8 @@ void QnThumbnailsLoader::process() {
                 if(m_decode) {
                     if (decoder.decode(frame, &outFrame)) 
                     {
-                        outFrame.pkt_dts = timingsQueue.dequeue();
-                        thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                        outFrame->pkt_dts = timingsQueue.dequeue();
+                        thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                         time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                     }
                 } else {
@@ -454,8 +454,8 @@ void QnThumbnailsLoader::process() {
                         break;
                     }
 
-                    outFrame.pkt_dts = timingsQueue.dequeue();
-                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                    outFrame->pkt_dts = timingsQueue.dequeue();
+                    thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
             }

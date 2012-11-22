@@ -138,7 +138,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
-        //TODO: use avcodec_decode_audio4 instead
+        // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
 		//cl_log.log("after dec",  cl_logALWAYS);

@@ -25,7 +25,7 @@ public:
     bool isPanoramic() const;
     bool isDualSensor() const;
 
-    virtual bool setHostAddress(const QHostAddress& ip, QnDomain domain);
+    virtual bool setHostAddress(const QString& ip, QnDomain domain);
 
     QString toSearchString() const;
 

@@ -22,16 +22,10 @@
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <client/client_globals.h>
 
 #include "file_processor.h"
 
 namespace {
-    enum Columns {
-        NameColumn,
-        ColumnCount
-    };
-
     const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
 
     bool intersects(const QStringList &l, const QStringList &r) {
@@ -58,7 +52,7 @@ namespace {
 // Node
 // -------------------------------------------------------------------------- //
 class QnResourcePoolModel::Node {
-    Q_DECLARE_TR_FUNCTIONS(Node);
+    Q_DECLARE_TR_FUNCTIONS(Node)
 public:
     enum State {
         Normal,     /**< Normal node. */
@@ -77,9 +71,10 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Online),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
-        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode);
+        assert(type == Qn::LocalNode || type == Qn::ServersNode || type == Qn::UsersNode || type == Qn::RootNode || type == Qn::BastardNode);
 
         switch(type) {
         case Qn::RootNode:
@@ -97,6 +92,10 @@ public:
             m_displayName = m_name = tr("Users");
             m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
             break;
+        case Qn::BastardNode:
+            m_displayName = m_name = QLatin1String("_HIDDEN_"); // this node is always hidden
+            m_bastard = true;
+            break;
         default:
             break;
         }
@@ -112,7 +111,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
 
@@ -130,7 +130,8 @@ public:
         m_bastard(false),
         m_parent(NULL),
         m_status(QnResource::Offline),
-        m_modified(false)
+        m_modified(false),
+        m_checked(Qt::Unchecked)
     {
         assert(model != NULL);
     }
@@ -213,6 +214,9 @@ public:
             break;
         case Qn::ServersNode:
             bastard = !m_model->accessController()->hasGlobalPermissions(Qn::GlobalEditServersPermissions);
+            break;
+        case Qn::BastardNode:
+            bastard = true;
             break;
         default:
             break;
@@ -335,7 +339,14 @@ public:
         return m_model->createIndex(row, col, this);
     }
 
-    Qt::ItemFlags flags() const {
+    Qt::ItemFlags flags(int column) const {
+        if (column == Qn::CheckColumn)
+            return Qt::ItemIsEnabled
+                    | Qt::ItemIsSelectable
+                    | Qt::ItemIsUserCheckable
+                    | Qt::ItemIsEditable
+                    | Qt::ItemIsTristate;
+
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled | Qt::ItemIsSelectable;
         
         switch(m_type) {
@@ -362,13 +373,21 @@ public:
         case Qt::WhatsThisRole:
         case Qt::AccessibleTextRole:
         case Qt::AccessibleDescriptionRole:
-            return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            if (column == Qn::NameColumn)
+                return m_displayName + (m_modified ? QLatin1String("*") : QString());
+            break;
         case Qt::DecorationRole:
-            if (column == 0)
+            if (column == Qn::NameColumn)
                 return m_icon;
             break;
         case Qt::EditRole:
-            return m_name;
+            if (column == Qn::NameColumn)
+                return m_name;
+            break;
+        case Qt::CheckStateRole:
+            if (column == Qn::CheckColumn)
+                return m_checked;
+            break;
         case Qn::ResourceRole:
             if(m_resource)
                 return QVariant::fromValue<QnResourcePtr>(m_resource);
@@ -407,7 +426,11 @@ public:
     }
 
     bool setData(const QVariant &value, int role, int column) {
-        Q_UNUSED(column);
+        if (column == Qn::CheckColumn && role == Qt::CheckStateRole){
+            m_checked = (Qt::CheckState)value.toInt();
+            changeInternal();
+            return true;
+        }
 
         if(role != Qt::EditRole)
             return false;
@@ -434,7 +457,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(Qn::NameColumn);
             int row = m_children.indexOf(child);
 
             m_model->beginRemoveRows(index, row, row);
@@ -449,7 +472,7 @@ protected:
         assert(child->parent() == this);
 
         if(isValid() && !isBastard()) {
-            QModelIndex index = this->index(0);
+            QModelIndex index = this->index(Qn::NameColumn);
             int row = m_children.size();
 
             m_model->beginInsertRows(index, row, row);
@@ -464,8 +487,8 @@ protected:
         if(!isValid() || isBastard())
             return;
         
-        QModelIndex index = this->index(0);
-        emit m_model->dataChanged(index, index.sibling(index.row(), ColumnCount - 1));
+        QModelIndex index = this->index(Qn::NameColumn);
+        emit m_model->dataChanged(index, index.sibling(index.row(), Qn::ColumnCount - 1));
     }
 
 private:
@@ -519,39 +542,41 @@ private:
 
     /** Whether this resource is modified. */
     bool m_modified;
+
+    /** Whether this resource is checked. */
+    Qt::CheckState m_checked;
 };
 
 
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(QObject *parent): 
+QnResourcePoolModel::QnResourcePoolModel(QObject *parent, Qn::NodeType rootNodeType):
     QAbstractItemModel(parent), 
     QnWorkbenchContextAware(parent),
-    m_urlsShown(true)
+    m_urlsShown(true),
+    m_rootNodeType(rootNodeType)
 {
     /* Init role names. */
     QHash<int, QByteArray> roles = roleNames();
-    roles.insert(Qn::ResourceRole,      "resource");
-    roles.insert(Qn::ResourceFlagsRole, "flags");
-    roles.insert(Qn::ItemUuidRole,          "uuid");
+    roles.insert(Qn::ResourceRole,              "resource");
+    roles.insert(Qn::ResourceFlagsRole,         "flags");
+    roles.insert(Qn::ItemUuidRole,              "uuid");
     roles.insert(Qn::ResourceSearchStringRole,  "searchString");
     roles.insert(Qn::ResourceStatusRole,        "status");
-    roles.insert(Qn::NodeTypeRole,      "nodeType");
+    roles.insert(Qn::NodeTypeRole,              "nodeType");
     setRoleNames(roles);
 
-    /* Create root. */
-    m_rootNode = new Node(this, Qn::RootNode);
+    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::RootNode << Qn::BastardNode;
 
     /* Create top-level nodes. */
-    m_localNode = new Node(this, Qn::LocalNode);
-    m_localNode->setParent(m_rootNode);
+    foreach(Qn::NodeType t, m_rootNodeTypes)
+        m_rootNodes[t] = new Node(this, t);
 
-    m_usersNode = new Node(this, Qn::UsersNode);
-    m_usersNode->setParent(m_rootNode);
-
-    m_serversNode = new Node(this, Qn::ServersNode);
-    m_serversNode->setParent(m_rootNode);
+    Qn::NodeType parentNodeType = rootNodeType == Qn::RootNode ? Qn::RootNode : Qn::BastardNode;
+    foreach(Qn::NodeType t, m_rootNodeTypes)
+        if (t != rootNodeType && t != parentNodeType)
+            m_rootNodes[t]->setParent(m_rootNodes[parentNodeType]);
 
     /* Connect to context. */
     connect(resourcePool(),     SIGNAL(resourceAdded(QnResourcePtr)),   this, SLOT(at_resPool_resourceAdded(QnResourcePtr)), Qt::QueuedConnection);
@@ -581,11 +606,8 @@ QnResourcePoolModel::~QnResourcePoolModel() {
     /* Free memory. */
     qDeleteAll(m_resourceNodeByResource);
     qDeleteAll(m_itemNodeByUuid);
-
-    delete m_rootNode;
-    delete m_localNode;
-    delete m_serversNode;
-    delete m_usersNode;
+    foreach(Qn::NodeType t, m_rootNodeTypes)
+        delete m_rootNodes[t];
 }
 
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
@@ -595,7 +617,7 @@ QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QnResourcePtr &resource) {
     QnResource *index = resource.data();
     if(!index)
-        return m_rootNode;
+        return m_rootNodes[m_rootNodeType];
 
     QHash<QnResource *, Node *>::iterator pos = m_resourceNodeByResource.find(index);
     if(pos == m_resourceNodeByResource.end())
@@ -612,7 +634,7 @@ QnResourcePoolModel::Node *QnResourcePoolModel::node(const QUuid &uuid) {
 
 QnResourcePoolModel::Node *QnResourcePoolModel::node(const QModelIndex &index) const {
     if(!index.isValid())
-        return m_rootNode;
+        return m_rootNodes[m_rootNodeType];
 
     return static_cast<Node *>(index.internalPointer());
 }
@@ -621,23 +643,23 @@ QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     assert(node->type() == Qn::ResourceNode);
 
     if(!node->resource())
-        return m_rootNode;
+        return m_rootNodes[m_rootNodeType];
 
     if(node->resourceFlags() & QnResource::user) {
         if(!accessController()->hasGlobalPermissions(Qn::GlobalEditUsersPermission)) {
-            return m_rootNode;
+            return m_rootNodes[m_rootNodeType];
         } else {
-            return m_usersNode;
+            return m_rootNodes[Qn::UsersNode];
         }
     }
 
     if(node->resourceFlags() & QnResource::server)
-        return m_serversNode;
+        return m_rootNodes[Qn::ServersNode];
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
     if(!parentResource || (parentResource->flags() & QnResource::local_server) == QnResource::local_server) {
         if(node->resourceFlags() & QnResource::local) {
-            return m_localNode;
+            return m_rootNodes[Qn::LocalNode];
         } else {
             return NULL;
         }
@@ -656,7 +678,7 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
 
     m_urlsShown = urlsShown;
 
-    m_rootNode->updateRecursive();
+    m_rootNodes[m_rootNodeType]->updateRecursive();
 }
 
 
@@ -671,14 +693,14 @@ QModelIndex QnResourcePoolModel::index(int row, int column, const QModelIndex &p
 }
 
 QModelIndex QnResourcePoolModel::buddy(const QModelIndex &index) const {
-    return index.sibling(index.row(), 0);
+    return index;
 }
 
 QModelIndex QnResourcePoolModel::parent(const QModelIndex &index) const {
     if(!index.isValid())
         return QModelIndex();
 
-    return node(index)->parent()->index(0);
+    return node(index)->parent()->index(Qn::NameColumn);
 }
 
 bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
@@ -686,21 +708,20 @@ bool QnResourcePoolModel::hasChildren(const QModelIndex &parent) const {
 }
 
 int QnResourcePoolModel::rowCount(const QModelIndex &parent) const {
-    if (parent.column() > 0)
+    if (parent.column() > Qn::NameColumn)
         return 0;
 
     return node(parent)->children().size();
 }
 
 int QnResourcePoolModel::columnCount(const QModelIndex &/*parent*/) const {
-    return ColumnCount;
+    return Qn::ColumnCount;
 }
 
 Qt::ItemFlags QnResourcePoolModel::flags(const QModelIndex &index) const {
     if(!index.isValid())
         return Qt::NoItemFlags;
-
-    return node(index)->flags();
+    return node(index)->flags(index.column());
 }
 
 QVariant QnResourcePoolModel::data(const QModelIndex &index, int role) const {
@@ -860,9 +881,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 }
 
 void QnResourcePoolModel::at_context_userChanged() {
-    m_localNode->update();
-    m_serversNode->update();
-    m_usersNode->update();
+    m_rootNodes[Qn::LocalNode]->update();
+    m_rootNodes[Qn::ServersNode]->update();
+    m_rootNodes[Qn::UsersNode]->update();
 
     foreach(Node *node, m_resourceNodeByResource)
         node->setParent(expectedParent(node));

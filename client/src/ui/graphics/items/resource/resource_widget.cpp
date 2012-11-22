@@ -123,7 +123,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormatHasPlaceholder(true),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_desiredRotation(0)
+    m_desiredRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
 
@@ -421,31 +421,12 @@ void QnResourceWidget::updateInfoText() {
 }
 
 void QnResourceWidget::updateOverlayRotation(qreal rotation) {
-    while (rotation < -180)
-        rotation += 360;
-    while (rotation > 180)
-        rotation -= 360;
 
-    Qn::FixedItemRotation fixed;
-    if (rotation >= -45 && rotation <= 45) {
-        fixed = Qn::Angle0;
-        m_desiredRotation = 0;
-    }
-    else if (rotation > 135 || rotation < -135) {
-        fixed = Qn::Angle180;
-        m_desiredRotation = 180;
-    }
-    else if (rotation > 0) {
-        fixed = Qn::Angle270;
-        m_desiredRotation = 270;
-    }
-    else {
-        fixed = Qn::Angle90;
-        m_desiredRotation = 90;
-    }
 
-    m_headerOverlayWidget->setDesiredRotation(fixed);
-    m_footerOverlayWidget->setDesiredRotation(fixed);
+    m_desiredRotation = fixedRotationFromDegrees(rotation);
+
+    m_headerOverlayWidget->setDesiredRotation(m_desiredRotation);
+    m_footerOverlayWidget->setDesiredRotation(m_desiredRotation);
 }
 
 
@@ -506,10 +487,6 @@ void QnResourceWidget::setDecorationsVisible(bool visible, bool animate) {
 
 bool QnResourceWidget::isInfoVisible() const {
     return (options() & DisplayInfo);
-}
-
-bool QnResourceWidget::isInfoButtonVisible() const {
-    return calculateButtonsVisibility() & InfoButton;
 }
 
 bool QnResourceWidget::isLocalActive() const {
@@ -893,7 +870,7 @@ QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, 
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
         bool visible = isInfoVisible();
         setInfoVisible(visible);
         setDecorationsVisible(visible || m_mouseInWidget);

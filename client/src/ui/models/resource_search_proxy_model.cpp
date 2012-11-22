@@ -75,4 +75,3 @@ bool QnResourceSearchProxyModel::filterAcceptsRow(int source_row, const QModelIn
 
     return true;
 }
-

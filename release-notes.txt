@@ -1,19 +1,74 @@
+----------------------------------------------- 1.4 -----------------------------------------------
+Bugs Fixed:
+ - Web-Client acquired the default resolution instead of specified-one. As the default resolution is the biggest possible this could result in CPU overloading if trying to view
+   cameras on Web-Client. Fixed
+ - If trying to copy recording settings to other camera(s) the dialog could work incorrectly in sime cases. Fixed
+ - Media Server service now stops correctly
+ - Installer bugs fixed
+  
 ----------------------------------------------- 1.4-Release-Candidate -----------------------------------------------
+
+New Features: 
+ - Traytool is able to perform search for Enterprise Controllers available in the network. Try this on Media Server setup page
+ - Client is able to perform search for Enterprise Controllers available in the network. Try "Find" button at the login dialog
+ - Ability to export with timestamps rendered on video. Requires transcoding on client, so may take a long, slightly decrease quality and increase 
+   processor load up to 100% during export
+ - DST is working correctly in most cases
+ - Time change is correctly supported
+ - Time Zone changing and handling is correctly supported even if components are in different time zones
+ - Time Line can display Local or Server time (specified in System Settings). Export and Thumbnail Search features will depend on this settings as well. 
+   However this setting does not affect Recording Schedule (it is always based on Media Server Time)
+ - Software is automatically checking for upgrade. If found, the corresponding message is displayed 
+
 Improvements:
  - Item's info panel is not hidden if go to fullscreen
+ - It is possible to copy the recording schedule from one camera to others
  - Playback control is not hidden if go to fullscreen
+ - CAL is replaced to CLND
+ - When a camera is discovered its Model is stored in properties. Contrary to Name, Model cannot be changed
+ - Items' buttons states are saved when switching between layouts
+ - Tooltips to Pin/Unpin and Show/Hide buttons are added
+ - Items' Panels and Text (NO DATA etc.) are rotated correctly if rotate them
+ - Time Line is never hidden if at least one video is on Scene. Lastly selected video remains selected even if click on empty space (grey frame is drawn around it)
+ - Motion Detection warning on Recording Settings form is displayed correctly depending on MD support
+ - In "About" screen new information is diaplayed (EC and each Media Server versions, Architectire, compiler etc)
+ - Some renamings
+ - Internet Explorer is supported by web-client. Minimal version required is 9.x.
 
-Bugs Fixed.
+Bugs Fixed:
  - Fixed incorrect support email if click on link on the Licenses page (2 slashes before address).
  - Fixed misclicks on Time Line (clicks were sent underneath)
- - IF double click on the bottom of Time Line zoom out occured but Time Line started moving. Fixed.
- - Sometimes Menu co
+ - Multi-Videos Fixes:
+   - Fixed incorrect displaying of Multi-Videos in Tree: if the file had been overwritten it was displayed twice
+   - Fixed errors in Multi-Videos exported from local files: if the file had been overwritten videos could display incorrectly
+   - If change Multi-Video and then close it, it was suggested to be saved as a regular layout to EC. Fixed
+   - If add a camera in Multi-Video exported file and play it at the end, added camera started playing live video. If add a camera with no archive it started playing live. Fixed.
+   - Fixed an error with Axis1031W: it was played back incorrectly in Multi-Video if Multi-Video had been changed.
+ - Some local files could be exported without audio. Fixed
+ - If pause or ff/rew local files they was resynchronized for a long time. This resulted in high-speed playback without sound for 3-5 seconds before playback starts. Fixed.
+ - If double click on the bottom of Time Line zoom out occured but Time Line started shifting left. Fixed
+ - Sometimes Menu color is changed from grey to white (especially if login remotely to the computer Client is opened on). Fixed
+ - Logout didn't clear workspace. Fixed
+ - License could not be reused if deinstall database and reinstall the software again. Fixed
+ - Expand tree icon is drawn near the bottom element of the tree, even though the element itself is not drawn
+ - Fixed the problem when sometimes screen recording could not be saved. The cause was that the screen recording TEMP folder was equal to Root Media Folder.
+   If it was inaccessible Screen Recording could not be saved even if it had been performed. Now new setting for Temp Folder is introduced. 
+   By default it's User's Temp Folder
+ - Fixed Screen Recording microphone issue if several microphone devices with identical names were registered (usually happens in laptops)
+ - Multi-Video Export fix: if one exported camera contained no data Time Line displayed time in incorrect format  
+ - Installer bugs fixed:
+   - Option "Run Client after installation" was not shown if Client was added via "change" method
+   - If install software for the first time EC Port in Tray Tool was not displayed
+   - Windows XP issue solved
+   - If reinstall/upgrade EC on Linux the installer suggested default values instead of ones entered earlier.
+   - If upgrade media server, than Client mediaDir was replaced by default. Fixed
+   
 ----------------------------------------------- 1.4-Beta -----------------------------------------------
 
 New Features: 
- - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help. Help text is in progress.
+ - Context Help System is implemented. It is necessary to click on "?" and then on the interface element to obtain help. Help text is in progress
  - Daylight Savings Time is Supported
- - Logout function is implemented (Mein Menu item)
+ - Logout function is implemented (Main Menu item).
 
 Improvements:
  - DW cameras could not be added manually if with others cameras. Fixed
@@ -27,8 +82,7 @@ Improvements:
  - Added ability to find DW and Dahua manually with Auto discovery port. Not need to remember Onvif port.
  - Added checkbox "Auto" to the "Add camera(s)" form.
  - Playback buttons are larger
- - "Show info" menu item is added. It is possible to show info for several cameras simultaneously.
- - Fixed bug with layout restoring after log in
+ - "Show info" context menu item is added. It is possible to show info for several cameras simultaneously.
  - Components can be selected separately during the installation (EC, Media Server, Client).'Will be installed on Local Hard Drive' and 
    'Entire Feature will be installed on Local Hard Drive' options are removed
  - Current recording method is displayed in the top left corner of the item's info panel (according to schedule)
@@ -46,8 +100,8 @@ Improvements:
  - If exported file was read only, than it was not displayed under Local. Fixed
 
 Bugs Fixed: 
+ - Fixed bug with layout restoring after log in
  - If set 30 FPS and Motion+LQ recording warning was fired and FPS dropped down to 28. Fixed
- - Fixed the problem when sometimes screen recording could not be saved.
  - Fixed monitoring issue: if restart media server it could not be resumed.
  - On some randome machines software did not start.
  - Camera URL in camera settings form could not be opened. Fixed

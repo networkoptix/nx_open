@@ -90,6 +90,7 @@ QnPreferencesDialog::QnPreferencesDialog(QnWorkbenchContext *context, QWidget *p
     connect(ui->buttonBox,                              SIGNAL(accepted()),                                         this,   SLOT(accept()));
     connect(ui->buttonBox,                              SIGNAL(rejected()),                                         this,   SLOT(reject()));
     connect(context,                                    SIGNAL(userChanged(const QnUserResourcePtr &)),             this,   SLOT(at_context_userChanged()));
+    connect(ui->timeModeComboBox,                       SIGNAL(activated(int)),                                     this,   SLOT(at_timeModeComboBox_activated()));
 
     initLanguages();
     updateFromSettings();
@@ -148,6 +149,7 @@ void QnPreferencesDialog::submitToSettings() {
     m_settings->setAudioDownmixed(ui->downmixAudioCheckBox->isChecked());
     m_settings->setTourCycleTime(ui->tourCycleTimeSpinBox->value() * 1000);
     m_settings->setIpShownInTree(ui->showIpInTreeCheckBox->isChecked());
+    m_settings->setUseHardwareDecoding(ui->isHardwareDecodingCheckBox->isChecked());
     m_settings->setTimeMode(static_cast<Qn::TimeMode>(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex()).toInt()));
 
     QStringList extraMediaFolders;
@@ -175,6 +177,7 @@ void QnPreferencesDialog::updateFromSettings() {
     ui->downmixAudioCheckBox->setChecked(m_settings->isAudioDownmixed());
     ui->tourCycleTimeSpinBox->setValue(m_settings->tourCycleTime() / 1000);
     ui->showIpInTreeCheckBox->setChecked(m_settings->isIpShownInTree());
+    ui->isHardwareDecodingCheckBox->setChecked( m_settings->isHardwareDecodingUsed() );
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(m_settings->timeMode()));
 
     ui->extraMediaFoldersList->clear();
@@ -193,8 +196,7 @@ void QnPreferencesDialog::updateFromSettings() {
         ui->languageComboBox->setCurrentIndex(id);
 }
 
-void QnPreferencesDialog::openLicensesPage()
-{
+void QnPreferencesDialog::openLicensesPage() {
     ui->tabWidget->setCurrentIndex(m_licenseTabIndex);
 }
 
@@ -235,8 +237,7 @@ void QnPreferencesDialog::at_addExtraMediaFolderButton_clicked() {
     ui->extraMediaFoldersList->addItem(dir);
 }
 
-void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked()
-{
+void QnPreferencesDialog::at_removeExtraMediaFolderButton_clicked() {
     foreach(QListWidgetItem *item, ui->extraMediaFoldersList->selectedItems())
         delete item;
 }
@@ -245,23 +246,26 @@ void QnPreferencesDialog::at_extraMediaFoldersList_selectionChanged() {
     ui->removeExtraMediaFolderButton->setEnabled(!ui->extraMediaFoldersList->selectedItems().isEmpty());
 }
 
-void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) 
-{
+void QnPreferencesDialog::at_animateBackgroundCheckBox_stateChanged(int state) {
     bool enabled = state == Qt::Checked;
 
     ui->backgroundColorLabel->setEnabled(enabled);
     ui->backgroundColorPicker->setEnabled(enabled);
 }
 
-void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) 
-{
+void QnPreferencesDialog::at_backgroundColorPicker_colorChanged(const QColor &color) {
     if(color == Qt::black) {
         ui->backgroundColorPicker->setCurrentColor(Qt::white);
         ui->animateBackgroundCheckBox->setChecked(false);
     }
 }
 
-void QnPreferencesDialog::at_context_userChanged()
-{
+void QnPreferencesDialog::at_context_userChanged() {
     ui->tabWidget->setTabEnabled(m_licenseTabIndex, accessController()->globalPermissions() & Qn::GlobalProtectedPermission);
+}
+
+void QnPreferencesDialog::at_timeModeComboBox_activated() {
+    if(ui->timeModeComboBox->itemData(ui->timeModeComboBox->currentIndex(), Qt::UserRole).toInt() == Qn::ClientTimeMode) {
+        QMessageBox::warning(this, tr("Warning"), tr("This settings will not affect Recording Schedule. \nRecording Schedule is always based on Server Time."));
+    }
 }

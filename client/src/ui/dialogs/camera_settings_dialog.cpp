@@ -31,6 +31,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent, Qt::WindowFlags 
     connect(m_settingsWidget,   SIGNAL(hasChangesChanged()),        this,   SLOT(at_settingsWidget_hasChangesChanged()));
     connect(m_settingsWidget,   SIGNAL(modeChanged()),              this,   SLOT(at_settingsWidget_modeChanged()));
     connect(m_settingsWidget,   SIGNAL(advancedSettingChanged()),   this,   SLOT(at_advancedSettingChanged()));
+    connect(m_settingsWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
     at_settingsWidget_hasChangesChanged();
 }
@@ -44,7 +45,9 @@ QnCameraSettingsDialog::~QnCameraSettingsDialog() {
 // Handlers
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
-    m_applyButton->setEnabled(m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges());
+    bool hasChanges = m_settingsWidget->hasDbChanges() || m_settingsWidget->hasAnyCameraChanges();
+    m_applyButton->setEnabled(hasChanges);
+    m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
 void QnCameraSettingsDialog::at_settingsWidget_modeChanged() {

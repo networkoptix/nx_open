@@ -72,6 +72,13 @@ public:
         return m_buffer[index % m_buffer.size()];
     }
 
+    void setAt(const T& value, int i)
+    {
+        QMutexLocker mutex(&m_cs);
+        int index = m_headIndex + i;
+        m_buffer[index % m_buffer.size()] = value;
+    }
+
     T last() const
     {
         QMutexLocker mutex(&m_cs);

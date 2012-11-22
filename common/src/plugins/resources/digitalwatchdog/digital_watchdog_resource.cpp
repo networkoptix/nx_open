@@ -225,7 +225,7 @@ bool QnPlWatchDogResource::setParamPhysical(const QnParam &param, const QVariant
 // class QnPlWatchDogResourceAdditionalSettings
 //
 
-QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host,
+QnPlWatchDogResourceAdditionalSettings::QnPlWatchDogResourceAdditionalSettings(const QString& host,
         int port, unsigned int timeout, const QAuthenticator& auth, const QString& cameraSettingId) :
     m_cameraProxy(new DWCameraProxy(host, port, timeout, auth)),
     m_settings()

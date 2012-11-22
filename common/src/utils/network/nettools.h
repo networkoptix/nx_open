@@ -42,11 +42,15 @@ QN_EXPORT bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
 QN_EXPORT void removeARPrecord(const QHostAddress& ip);
 
+QN_EXPORT QString getMacByIP(const QString& host, bool net = true);
 QN_EXPORT QString getMacByIP(const QHostAddress& ip, bool net = true);
 
 // returns all pingable hosts in the range
 QN_EXPORT QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
 
-bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0);
+QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0);
+
+QN_EXPORT bool isIpv4Address(const QString& addr);
+QN_EXPORT QHostAddress resolveAddress(const QString& addr);
 
 #endif //cl_net_tools_1232

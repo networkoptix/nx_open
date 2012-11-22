@@ -13,6 +13,7 @@
 #   include <sys/socket.h>
 #   include <sys/types.h>
 #   include <netinet/in.h>
+#   include <arpa/inet.h>
 #endif
 
 #include "nettools.h"
@@ -138,16 +139,13 @@ public:
      * even if port is busy (in TIME_WAIT state).
      */
     bool setReuseAddrFlag(bool reuseAddr = true);
-
-protected:
-    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
-
-    void createSocket(int type, int protocol);
-
-private:
-    // Prevent the user from trying to use value semantics on this object
-    Socket(const Socket &sock);
-    void operator=(const Socket &sock);
+    //!if, \a val is \a true, turns non-blocking mode on, else turns it off
+    /*!
+        \return true, if set successfully
+    */
+    bool setNonBlockingMode(bool val);
+    //!Returns true, if in non-blocking mode
+    bool isNonBlockingMode() const;
 
 protected:
     int sockDesc;              // Socket descriptor
@@ -155,6 +153,15 @@ protected:
 
     Socket(int type, int protocol) ;
     Socket(int sockDesc);
+    bool fillAddr(const QString &address, unsigned short port, sockaddr_in &addr);
+    void createSocket(int type, int protocol);
+
+private:
+    bool m_nonBlockingMode;
+
+    // Prevent the user from trying to use value semantics on this object
+    Socket(const Socket &sock);
+    void operator=(const Socket &sock);
 };
 
 /**

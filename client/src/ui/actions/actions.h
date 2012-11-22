@@ -442,6 +442,28 @@ namespace Qn {
          */
         ToggleInfoAction,
 
+        /**
+         * Changes RADASS mode to auto.
+         */
+        RadassAutoAction,
+
+        /**
+         * Changes RADASS mode to high resolution.
+         */
+        RadassHighAction,
+
+        /**
+         * Changes RADASS mode to low resolution.
+         */
+        RadassLowAction,
+
+        /**
+         * Toggles next RADASS state.
+         */
+        ToggleRadassAction,
+
+
+
         /* Layout actions. */
 
         /**

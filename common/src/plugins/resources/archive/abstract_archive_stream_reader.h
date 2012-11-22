@@ -93,8 +93,6 @@ public:
 
     virtual void setQuality(MediaQuality quality, bool fastSwitch) = 0;
     virtual MediaQuality getQuality() const = 0;
-    virtual void disableQualityChange() = 0;
-    virtual void enableQualityChange() = 0;
 
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) = 0;
 

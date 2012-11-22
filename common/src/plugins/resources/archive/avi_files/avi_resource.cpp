@@ -7,7 +7,6 @@
 #include "../filetypesupport.h"
 #include "../single_shot_file_reader.h"
 
-
 QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
@@ -16,6 +15,7 @@ QnAviResource::QnAviResource(const QString& file)
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
 	if (FileTypeSupport::isImageFileExt(file)) 
 		addFlags(QnResource::still_image);
+    m_timeZoneOffset = Qn::InvalidUtcOffset;
 }
 
 QnAviResource::~QnAviResource()
@@ -92,4 +92,14 @@ void QnAviResource::setMotionBuffer(const QnMetaDataLightVector& data, int chann
 const QnMetaDataLightVector& QnAviResource::getMotionBuffer(int channel) const
 {
     return m_motionBuffer[channel];
+}
+
+void QnAviResource::setTimeZoneOffset(qint64 value)
+{
+    m_timeZoneOffset = value;
+}
+
+qint64 QnAviResource::timeZoneOffset() const
+{
+    return m_timeZoneOffset;
 }

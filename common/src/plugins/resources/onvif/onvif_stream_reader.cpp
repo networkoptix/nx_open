@@ -322,13 +322,13 @@ const QString QnOnvifStreamReader::fetchStreamUrl(MediaSoapWrapper& soapWrapper,
         << ") successfully fetched: " << response.MediaUri->Uri.c_str();
 
     
-    QUrl relutUrl(QString::fromStdString(response.MediaUri->Uri));
+    QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri, false));
     
 
     if (relutUrl.host().size()==0)
     {
         QString temp = relutUrl.toString();
-        relutUrl.setHost(m_onvifRes->getHostAddress().toString());
+        relutUrl.setHost(m_onvifRes->getHostAddress());
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << relutUrl.toString();
     }
 
@@ -797,6 +797,7 @@ AudioEncoder* QnOnvifStreamReader::fetchAudioEncoder(AudioConfigsResp& response,
 
 void QnOnvifStreamReader::updateAudioEncoder(AudioEncoder& encoder, bool isPrimary) const
 {
+    Q_UNUSED(isPrimary)
     //encoder.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 
     QnPlOnvifResource::AUDIO_CODECS codec = m_onvifRes->getAudioCodec();

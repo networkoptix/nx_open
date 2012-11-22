@@ -63,7 +63,7 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
         port = 80;
 
     CLHttpStatus status;
-    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), QHostAddress(host), port, timeout, auth)));
+    QString response = QString(QLatin1String(downloadFile(status, QLatin1String("axis-cgi/param.cgi?action=list&group=Network"), host, port, timeout, auth)));
 
     if (response.length()==0)
         return QnResourcePtr(0);
@@ -104,8 +104,9 @@ QnResourcePtr QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAu
 
     resource->setTypeId(rt);
     resource->setName(name);
+    (resource.dynamicCast<QnPlAxisResource>())->setModel(name);
     resource->setMAC(mac);
-    resource->setHostAddress(QHostAddress(host), QnDomainMemory);
+    resource->setHostAddress(host, QnDomainMemory);
     resource->setAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
@@ -173,7 +174,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(QnResourceLi
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
     
         if (net_res->getMAC().toString() == smac) {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }

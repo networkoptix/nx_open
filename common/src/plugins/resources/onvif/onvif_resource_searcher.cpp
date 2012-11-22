@@ -46,7 +46,7 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthe
 {
     if (url.port() == -1)
     {
-        for (int i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i) 
+        for (uint i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i)
         {
             QUrl newUrl(url);
             newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
@@ -118,6 +118,7 @@ void OnvifResourceSearcher::pleaseStop()
 
 QnResourceList OnvifResourceSearcher::findResources()
 {
+
     QnResourceList result;
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected

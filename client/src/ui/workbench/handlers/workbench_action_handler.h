@@ -182,6 +182,8 @@ protected:
     void saveCameraSettingsFromDialog(bool checkControls = false);
 
     void rotateItems(int degrees);
+
+    void setItemsResolutionMode(Qn::ResolutionMode resolutionMode);
     
     QnCameraSettingsDialog *cameraSettingsDialog() const {
         return m_cameraSettingsDialog.data();
@@ -246,6 +248,7 @@ protected slots:
     void at_cameraSettingsAction_triggered();
     void at_clearCameraSettingsAction_triggered();
     void at_cameraSettingsDialog_buttonClicked(QDialogButtonBox::StandardButton button);
+    void at_cameraSettingsDialog_scheduleExported(const QnVirtualCameraResourceList &cameras);
     void at_cameraSettingsDialog_rejected();
     void at_cameraSettingsAdvanced_changed();
     void at_selectionChangeAction_triggered();
@@ -278,6 +281,10 @@ protected slots:
     void at_rotate90Action_triggered();
     void at_rotate180Action_triggered();
     void at_rotate270Action_triggered();
+
+    void at_radassAutoAction_triggered();
+    void at_radassLowAction_triggered();
+    void at_radassHighAction_triggered();
 
     void at_exportTimeSelectionAction_triggered();
     void at_exportLayoutAction_triggered();
@@ -317,6 +324,14 @@ private:
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+
+    /**
+     * @brief validateStorages              Check if all servers have enough space on at least
+     *                                      one storage to enable recording.
+     * @param cameras                       List of cameras where recording will be enabled
+     * @return                              List of servers which has not enough space on all storages.
+     */
+    QnMediaServerResourceList validateStorages(QnVirtualCameraResourceList cameras);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
@@ -343,6 +358,7 @@ private:
     QString m_layoutFileName;
     QnTimePeriod m_exportPeriod;
     QWeakPointer<QnProgressDialog> m_exportProgressDialog;
+    QnLayoutResourcePtr m_exportLayout;  
     QnStorageResourcePtr m_exportStorage;  
     QSharedPointer<QBuffer> m_motionFileBuffer[CL_MAX_CHANNELS];
     QnMediaResourcePtr m_exportedMediaRes;

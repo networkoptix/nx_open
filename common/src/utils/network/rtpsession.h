@@ -239,6 +239,7 @@ private:
     TransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
+    qint64 m_openedTime;
     qint64 m_endTime;
     float m_scale;
     int m_tcpTimeout;
@@ -276,7 +277,6 @@ private:
 
     QString m_realm;
     QString m_nonce;
-    qint64 m_openedTime;
 };
 
 #endif //rtp_session_h_1935_h

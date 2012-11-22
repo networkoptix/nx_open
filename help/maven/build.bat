@@ -1,0 +1,1 @@
+"${environment.dir}/helpandmanual/HELPMAN.EXE" "${basedir}//hdwitness-client.hmxz" /HTML=${ClientHelpSourceDir}//index.html /I=Webhelp,${customization} /O=${basedir}//Twoframe_Classic_Skin_Black.hmskin /V=..//build-${customization}.properties

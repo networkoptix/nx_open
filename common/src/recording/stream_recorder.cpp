@@ -20,7 +20,6 @@ extern QMutex global_ffmpeg_mutex;
 
 QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),
@@ -47,9 +46,10 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_videoTranscoder(0),
     m_dstAudioCodec(CODEC_ID_NONE),
     m_dstVideoCodec(CODEC_ID_NONE),
+    m_onscreenDateOffset(0),
     m_role(Role_ServerRecording),
     m_currentTimeZone(-1),
-    m_onscreenDateOffset(0)
+    m_serverTimeZoneMs(Qn::InvalidUtcOffset)
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
@@ -328,7 +328,7 @@ void QnStreamRecorder::writeData(QnAbstractMediaDataPtr md, int streamIndex)
     av_init_packet(&avPkt);
     avPkt.dts = av_rescale_q(md->timestamp-m_startDateTime, srcRate, stream->time_base);
     QnCompressedVideoDataPtr video = md.dynamicCast<QnCompressedVideoData>();
-    if (video && video->pts != AV_NOPTS_VALUE)
+    if (video && (quint64)video->pts != AV_NOPTS_VALUE)
         avPkt.pts = av_rescale_q(video->pts-m_startDateTime, srcRate, stream->time_base);
     else
         avPkt.pts = avPkt.dts;
@@ -410,6 +410,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature) {
             QByteArray signPattern = QnSignHelper::getSignPattern();
+            if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
+                signPattern.append(QByteArray::number(m_serverTimeZoneMs)); // add server timeZone as one more column to sign pattern
             while (signPattern.size() < QnSignHelper::getMaxSignSize())
                 signPattern.append(" ");
             signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
@@ -423,6 +425,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 
         for (int i = 0; i < m_videoChannels; ++i) 
         {
+            // TODO: #vasilenko avoid using deprecated methods
             AVStream* videoStream = av_new_stream(m_formatCtx, DEFAULT_VIDEO_STREAM_ID+i);
             if (videoStream == 0)
             {
@@ -443,7 +446,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             // m_forceDefaultCtx: for server archive, if file is recreated - we need to use default context.
             // for exporting AVI files we must use original context, so need to reset "force" for exporting purpose
             
-            if (m_role == Role_FileExportWithTime || m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id)
+            if (m_role == Role_FileExportWithTime || (m_dstVideoCodec != CODEC_ID_NONE && m_dstVideoCodec != videoCodecCtx->codec_id))
             {
                 // transcode video
                 if (m_dstVideoCodec == CODEC_ID_NONE)
@@ -464,7 +467,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             else if (m_role == Role_FileExport || m_role == Role_FileExportWithEmptyContext)
             {
                 // determine real width and height
-                CLVideoDecoderOutput outFrame;
+                QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
                 CLFFmpegVideoDecoder decoder(mediaData->compressionType, mediaData, false);
                 decoder.decode(mediaData, &outFrame);
                 if (m_role == Role_FileExport) 
@@ -498,6 +501,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         for (int i = 0; i < audioLayout->numberOfChannels(); ++i) 
         {
             m_isAudioPresent = true;
+            // TODO: #vasilenko avoid using deprecated methods
             AVStream* audioStream = av_new_stream(m_formatCtx, DEFAULT_AUDIO_STREAM_ID+i);
             if (audioStream == 0)
             {
@@ -510,6 +514,10 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
             if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
             {
                 avcodec_copy_context(audioStream->codec, audioLayout->getAudioTrackInfo(i).codecContext->ctx());
+
+                // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
+                if (srcAudioCodec == CODEC_ID_MP3 && audioStream->codec->channels == 1)
+                    audioStream->codec->block_align = 0; 
             }
             else {
                 // transcode audio
@@ -634,6 +642,8 @@ bool QnStreamRecorder::addSignatureFrame(QString &/*errorString*/)
 {
 #ifndef SIGN_FRAME_ENABLED
     QByteArray signText = QnSignHelper::getSignPattern();
+    if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
+        signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
     QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) signText.data(), signText.size());
 #else
     AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
@@ -704,4 +714,9 @@ void QnStreamRecorder::setAudioCodec(CodecID codec)
 void QnStreamRecorder::setOnScreenDateOffset(int timeOffsetMs)
 {
     m_onscreenDateOffset = timeOffsetMs;
+}
+
+void QnStreamRecorder::setServerTimeZoneMs(int value)
+{
+    m_serverTimeZoneMs = value;
 }

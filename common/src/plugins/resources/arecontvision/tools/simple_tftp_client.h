@@ -18,10 +18,10 @@ class CLSimpleTFTPClient
     //2) more friendly with wireless network ( it hates acks).
 
 public:
-    CLSimpleTFTPClient(const QHostAddress& ip, unsigned int timeout, unsigned int retry);
+    CLSimpleTFTPClient(const QString& host, unsigned int timeout, unsigned int retry);
     ~CLSimpleTFTPClient(){};
 
-    const QHostAddress& getHostAddress() const { return m_hostAddress; }
+    const QString& getHostAddress() const { return m_hostAddress; }
 
     int read(const QString& fn, QnByteArray& data);
     const unsigned char* getLastPacket(int& size) const
@@ -40,8 +40,7 @@ private:
     unsigned int m_last_packet_size;
 
     int m_retry;
-    QHostAddress m_hostAddress;
-    QString m_ip;
+    QString m_hostAddress;
     int m_timeout;
 
     int m_status;

@@ -14,7 +14,9 @@ namespace Qn {
         ServersNode,
         UsersNode,
         ResourceNode,   /**< Node that represents a resource. */
-        ItemNode        /**< Node that represents a layout item. */
+        ItemNode,       /**< Node that represents a layout item. */
+        BastardNode,    /**< Node that contains hidden resources. */
+        NodeTypeCount
     };
 
 
@@ -61,7 +63,7 @@ namespace Qn {
         ItemCheckedButtonsRole,                     /**< Role for buttons that a checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
 
         /* Others. */
-        HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
+        HelpTopicIdRole                             /**< Role for item's help topic. Value of type int. */
     };
 
 
@@ -222,6 +224,27 @@ namespace Qn {
         ClientTimeMode  
     };
 
+    // TODO: this enum belongs to resource tree model as it's not used outside its context.
+    /**
+     * Columns in the resource tree model.
+     */
+    enum ResourceTreeColumn {
+        NameColumn,
+        CheckColumn,
+        ColumnCount
+    };
+
+    /**
+     * Video resolution adjustment mode for RADASS.
+     */
+    enum ResolutionMode {
+        AutoResolution,
+        HighResolution,
+        LowResolution,
+        ResolutionModeCount
+    };
+
+
 } // namespace Qn
 
 Q_DECLARE_TYPEINFO(Qn::ItemRole, Q_PRIMITIVE_TYPE);
@@ -231,7 +254,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::MarginFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::ResourceSavingFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::Permissions)
 
-Q_DECLARE_METATYPE(Qn::ItemRole);
-Q_DECLARE_METATYPE(Qn::TimeMode);
+Q_DECLARE_METATYPE(Qn::ItemRole)
+Q_DECLARE_METATYPE(Qn::TimeMode)
 
 #endif // QN_CLIENT_GLOBALS_H

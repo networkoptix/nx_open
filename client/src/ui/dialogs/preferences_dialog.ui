@@ -301,7 +301,7 @@
           <item row="5" column="0">
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Time Mode:</string>
+             <string>Timeline Mode:</string>
             </property>
            </widget>
           </item>
@@ -374,6 +374,13 @@
            <widget class="QCheckBox" name="downmixAudioCheckBox">
             <property name="text">
              <string>Downmix the Audio from 5.1 to 2.1 Channels (Restart Required)</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="isHardwareDecodingCheckBox">
+            <property name="text">
+             <string>Use hardware decoding</string>
             </property>
            </widget>
           </item>

@@ -47,7 +47,7 @@ private slots:
     void at_updateStorage();
     void at_cameraStatusChanged(QnResource::Status oldStatus, QnResource::Status newStatus);
     void at_cameraUpdated();
-
+    void at_initAsyncFinished(QnResourcePtr res, bool state);
 private:
     void updateCamera(QnSecurityCamResourcePtr camera);
 

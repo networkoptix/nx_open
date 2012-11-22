@@ -13,6 +13,11 @@ from common.convert import rmtree
 
 set_env()
 
+if ARCH == 'x64':
+    ecs_builddir_name = 'exe.win-amd64-2.7'
+else:
+    ecs_builddir_name = 'exe.win32-2.7'
+
 if len(sys.argv) == 2 and sys.argv[1].lower() == 'debug':
     CONFIG = 'Debug'
 else:
@@ -43,10 +48,10 @@ def gen_strings():
 gen_strings()
 
 WXS_FILES = "MediaDirDlg.wxs MediaServerDlg.wxs MyFeaturesDlg.wxs SelectionWarning.wxs DowngradeWarningDlg.wxs  ClientDlg.wxs  Product_mvn.wxs AppServerFiles.wxs AppServerDlg.wxs FileAssociations.wxs"
-os.system(r'heat dir ..\appserver\setup\build\exe.win32-2.7 -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
+os.system(r'heat dir ..\appserver\setup\build\' + ecs_builddir_name + ' -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out AppServerFiles.wxs -cg AppServerFilesComponent -dr VmsAppServerDir -var var.AppServerSourceDir -wixvar')
 fixasfiles()
 
-os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/exe.win32-2.7" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
+os.system(r'candle -dAppServerSourceDir="../appserver/setup/build/' + ecs_builddir_name + '" -out obj\%s\ -ext WixFirewallExtension.dll -ext WixUIExtension.dll -ext WixUtilExtension.dll %s' % (CONFIG, WXS_FILES))
 
 if CONFIG == 'Debug':
     output_file = '${arch}/VMS-%s.%s-Debug.msi' % (APPLICATION_VERSION, BUILD_NUMBER)

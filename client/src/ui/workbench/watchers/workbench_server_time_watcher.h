@@ -11,8 +11,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#define InvalidUtcOffset _id(INT64_MAX)
-
 class QnWorkbenchServerTimeWatcher: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 
@@ -22,9 +20,15 @@ public:
     QnWorkbenchServerTimeWatcher(QObject *parent);
     virtual ~QnWorkbenchServerTimeWatcher();
 
+    // TODO: this also handles non-camera offsets, so 'server' naming is not entirely correct.
+
     qint64 utcOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
+    qint64 utcOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
     qint64 localOffset(const QnMediaServerResourcePtr &server, qint64 defaultValue = Qn::InvalidUtcOffset) const;
+
+    qint64 localOffset(const QnMediaResourcePtr &resource, qint64 defaultValue = Qn::InvalidUtcOffset) const;
 
 signals:
     void offsetsChanged();

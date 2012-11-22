@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.3.1</version>
+	<version>1.3.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>hdwitness</artifactId>
 	<packaging>pom</packaging>
@@ -13,6 +13,7 @@
 	</scm>	
 
 	<properties>
+        <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
@@ -134,11 +135,14 @@
 				</os>
 			</activation>
 			<modules>
+				<module>quicksyncdecoder</module>	
+				<module>help</module>	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
 			<properties>
 				<environment.dir>${env.ENVIRONMENT}</environment.dir>
+				<python.dir>${env.ENVIRONMENT}/python/${arch}</python.dir>				
 				<compiler>msvc2008</compiler>
 				<arch>x86</arch>
 				<platform>windows</platform>
@@ -174,12 +178,14 @@
 				</os> 
 			</activation>
 			<modules>
+			  <!--<module>xvbadecoder</module>-->
 				<module>debsetup/client-deb</module>
 				<module>debsetup/mediaserver-deb</module>
 				<module>debsetup/appserver-deb</module>
 			</modules>
 			<properties>
 				<environment.dir>${env.environment}</environment.dir>
+				<python.dir>/usr/bin/</python.dir>				
 				<qt.dir>${env.QTDIR}</qt.dir>				
 				<platform>linux</platform>
 				<compiler>gcc</compiler>

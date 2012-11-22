@@ -47,6 +47,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -68,7 +69,7 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_translation_manager.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
@@ -82,7 +83,9 @@
 
 #include "ui/help/help_handler.h"
 #include "client/client_module.h"
+#include <client/client_connection_data.h>
 #include "platform/platform_abstraction.h"
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -213,11 +216,19 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#endif
+
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
     QnClientModule client(argc, argv);
+    
+#ifdef Q_WS_X11
+	XInitThreads();
+#endif
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -361,7 +372,7 @@ int qnMain(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
@@ -433,7 +444,10 @@ int qnMain(int argc, char *argv[])
 
     mainWindow->show();
     context->action(Qn::EffectiveMaximizeAction)->trigger();
-        
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance()->loadPlugins();
+
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
@@ -516,6 +530,3 @@ int main(int argc, char *argv[]) {
 
 #endif // API_TEST_MAIN
 #endif
-
-
-

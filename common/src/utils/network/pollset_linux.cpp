@@ -9,6 +9,7 @@
 #include "pollset.h"
 
 #include <sys/epoll.h>
+#include <sys/eventfd.h>
 
 #include <map>
 
@@ -29,13 +30,16 @@ public:
     int signalledSockCount;
     size_t epollEventsArrayCapacity;
     epoll_event* epollEventsArray;
+    //!linux event, used to interrupt epoll_wait
+    int eventFD;
 
     PollSetImpl()
     :
         epollSetFD( -1 ),
         signalledSockCount( 0 ),
         epollEventsArrayCapacity( 32 ),
-        epollEventsArray( new epoll_event[epollEventsArrayCapacity] )
+        epollEventsArray( new epoll_event[epollEventsArrayCapacity] ),
+        eventFD( -1 )
     {
     }
 
@@ -77,6 +81,21 @@ public:
         pollSetImpl = right.pollSetImpl;
 		return *this;
     }
+
+    void selectNextSocket()
+    {
+        ++currentIndex;
+        if( (currentIndex < pollSetImpl->signalledSockCount) && (pollSetImpl->epollEventsArray[currentIndex].data.ptr == NULL) )
+        {
+            //reading eventfd and selecting next socket
+            uint64_t val = 0;
+            if( read( pollSetImpl->eventFD, &val, sizeof(val) ) == -1 )
+            {
+                //TODO ???
+            }
+            ++currentIndex;
+        }
+    }
 };
 
 
@@ -111,14 +130,14 @@ PollSet::const_iterator& PollSet::const_iterator::operator=( const const_iterato
 PollSet::const_iterator PollSet::const_iterator::operator++(int)    //it++
 {
     const_iterator bak( *this );
-    ++m_impl->currentIndex;
+    ++(*this);
     return bak;
 }
 
 //!Selects next socket which state has been changed with previous \a poll call
 PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
 {
-    ++m_impl->currentIndex;
+    m_impl->selectNextSocket();
     return *this;
 }
 
@@ -159,19 +178,43 @@ PollSet::PollSet()
 :
     m_impl( new PollSetImpl() )
 {
-    m_impl->epollSetFD = epoll_create( 0 );
+    m_impl->epollSetFD = epoll_create( 256 );
+    m_impl->eventFD = eventfd( 0, EFD_NONBLOCK );
+
+    if( m_impl->epollSetFD > 0 && m_impl->eventFD > 0 )
+    {
+        epoll_event _event;
+        memset( &_event, 0, sizeof(_event) );
+        _event.data.ptr = NULL; //m_impl->eventFD;
+        _event.events = EPOLLIN | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
+        if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_ADD, m_impl->eventFD, &_event ) )
+        {
+            close( m_impl->eventFD );
+            m_impl->eventFD = -1;
+        }
+    }
 }
 
 PollSet::~PollSet()
 {
-    if( m_impl->epollSetFD >= 0 )
+    if( m_impl->epollSetFD > 0 )
     {
         close( m_impl->epollSetFD );
         m_impl->epollSetFD = -1;
     }
+    if( m_impl->eventFD > 0 )
+    {
+        close( m_impl->eventFD );
+        m_impl->eventFD = -1;
+    }
 
     delete m_impl;
     m_impl = NULL;
+}
+
+bool PollSet::isValid() const
+{
+    return (m_impl->epollSetFD > 0) && (m_impl->eventFD > 0);
 }
 
 //!Interrupts \a poll method, blocked in other thread
@@ -180,7 +223,11 @@ PollSet::~PollSet()
 */
 void PollSet::interrupt()
 {
-    //TODO/IMPL
+    uint64_t val = 1;
+    if( write( m_impl->eventFD, &val, sizeof(val) ) != sizeof(val) )
+    {
+        //TODO ???
+    }
 }
 
 //!Add socket to set. Does not take socket ownership
@@ -255,6 +302,12 @@ void PollSet::remove( Socket* const sock, EventType eventType )
     }
 }
 
+size_t PollSet::size( EventType /*eventType*/ ) const
+{
+    //TODO/IMPL return only for events eventType
+    return m_impl->monitoredEvents.size();
+}
+
 static const int INTERRUPT_CHECK_TIMEOUT_MS = 100;
 
 /*!
@@ -277,8 +330,9 @@ int PollSet::poll( int millisToWait )
 PollSet::const_iterator PollSet::begin() const
 {
     const_iterator _begin;
-    _begin.m_impl->currentIndex = 0;
+    _begin.m_impl->currentIndex = -1;
     _begin.m_impl->pollSetImpl = m_impl;
+    _begin.m_impl->selectNextSocket();
     return _begin;
 }
 

@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #endif
 
+#include <QHostInfo>
+
 bool removeDir(const QString &dirName)
 {
     bool result = true;
@@ -201,5 +203,6 @@ int currentTimeZone()
     QDateTime dt1(QDateTime::currentDateTime());
     QDateTime dt2 = dt1.toUTC();
     dt1.setTimeSpec(Qt::UTC);
-    return dt2.secsTo(dt1);
+    int res = dt2.secsTo(dt1);
+    return res;
 }
