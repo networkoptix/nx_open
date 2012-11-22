@@ -324,6 +324,14 @@ private:
     QString binaryFilterName(bool readOnly) const;
     bool validateItemTypes(QnLayoutResourcePtr layout); // used for export local layouts. Disable cameras and local items for same layout
     void removeLayoutFromPool(QnLayoutResourcePtr existingLayout);
+
+    /**
+     * @brief validateStorages              Check if all servers have enough space on at least
+     *                                      one storage to enable recording.
+     * @param cameras                       List of cameras where recording will be enabled
+     * @return                              List of servers which has not enough space on all storages.
+     */
+    QnMediaServerResourceList validateStorages(QnVirtualCameraResourceList cameras);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
