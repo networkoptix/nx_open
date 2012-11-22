@@ -40,6 +40,8 @@ public:
     virtual float bitrate() const override;
 
     void setStorageBitrateCoeff(float value);
+
+    static const int IO_BLOCK_SIZE = 1024*1024*4;
 private:
     QString removeProtocolPrefix(const QString& url);
 private:

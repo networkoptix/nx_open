@@ -9,7 +9,6 @@
 #include "windows.h"
 #endif
 
-static const int IO_BLOCK_SIZE = 1024*1024*4;
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)

@@ -42,7 +42,7 @@ public:
     
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
     
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(QnAbstractDataPacketPtr data) override;
 
     void setStartOffset(qint64 value);
 

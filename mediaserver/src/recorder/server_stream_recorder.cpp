@@ -10,6 +10,8 @@
 #include "core/resource_managment/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
+#include "plugins/storage/file_storage/file_storage_resource.h"
+#include "core/datapacket/media_data_packet.h"
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
@@ -17,7 +19,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_mediaProvider(mediaProvider),
     m_scheduleMutex(QMutex::Recursive),
     m_dualStreamingHelper(0),
-    m_usedPanicMode(false)
+    m_usedPanicMode(false),
+    m_queuedSize(0)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
@@ -44,7 +47,10 @@ bool QnServerStreamRecorder::canAcceptData() const
     if (!isRunning())
         return true;
 
-    bool rez = QnStreamRecorder::canAcceptData();
+    //bool rez = QnStreamRecorder::canAcceptData();
+    bool rez = m_queuedSize <= QnFileStorageResource::IO_BLOCK_SIZE*1.5;
+    
+
     if (!rez) {
         qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
         if (currentTime - m_lastWarningTime > 1000)
@@ -58,8 +64,13 @@ bool QnServerStreamRecorder::canAcceptData() const
 
 void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 {
-    if (!isRunning()) {
+    if (!isRunning()) 
         return;
+    
+    QnAbstractMediaDataPtr media = data.dynamicCast<QnAbstractMediaData>();
+    if (media) {
+        QMutexLocker lock(&m_queueSizeMutex);
+        m_queuedSize += media->data.size();
     }
     QnStreamRecorder::putData(data);
 }
@@ -289,13 +300,14 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
     if (!media)
         return true; // skip data
 
+    {
+        QMutexLocker lock(&m_queueSizeMutex);
+        m_queuedSize -= media->data.size();
+    }
+
     // for empty schedule we record all time
     QMutexLocker lock(&m_scheduleMutex);
-
-    //updateScheduleInfo(media->timestamp/1000);
-
     beforeProcessData(media);
-
     return QnStreamRecorder::processData(data);
 }
 
@@ -349,7 +361,10 @@ void QnServerStreamRecorder::endOfRun()
     QnStreamRecorder::endOfRun();
     if(m_device->getStatus() == QnResource::Recording)
         m_device->setStatus(QnResource::Online);
+
+    QMutexLocker lock(&m_queueSizeMutex);
     m_dataQueue.clear();
+    m_queuedSize = 0;
 }
 
 void QnServerStreamRecorder::setDualStreamingHelper(QnDualStreamingHelperPtr helper)
