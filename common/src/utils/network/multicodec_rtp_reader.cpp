@@ -337,6 +337,8 @@ void QnMulticodecRtpReader::openStream()
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
         transport = QLatin1String("AUTO");
     m_RtpSession.setTransport(transport);
+    if (transport != QLatin1String("UDP"))
+        m_RtpSession.setTCPReadBufferSize(1024*512);
 
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();

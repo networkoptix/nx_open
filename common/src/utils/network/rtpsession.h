@@ -204,6 +204,8 @@ public:
     void setUsePredefinedTracks(int numOfVideoChannel);
 
     static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
+
+    bool setTCPReadBufferSize(int value);
 signals:
     void gotTextResponse(QByteArray text);
 private:

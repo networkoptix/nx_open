@@ -1569,3 +1569,8 @@ void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
 {
     m_numOfPredefinedChannels = numOfVideoChannel;
 }
+
+bool RTPSession::setTCPReadBufferSize(int value)
+{
+    return m_tcpSock.setReadBufferSize(value);
+}
