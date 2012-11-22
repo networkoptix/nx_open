@@ -1056,6 +1056,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         newLayout->setName(name);
         newLayout->setParentId(user->getId());
         newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+        newLayout->setCellSpacing(layout->cellSpacing());
+        newLayout->setCellAspectRatio(layout->cellAspectRatio());
         context()->resourcePool()->addResource(newLayout);
 
         QnLayoutItemDataList items = layout->getItems().values();
