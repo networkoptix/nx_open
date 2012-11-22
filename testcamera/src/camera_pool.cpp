@@ -61,17 +61,20 @@ QnCameraPool::~QnCameraPool()
     delete m_discoveryListener;
 }
 
-void QnCameraPool::addCameras(int count, QStringList fileList, double fps, int offlineFreq)
+void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, double fps, int offlineFreq)
 {
-    qDebug() << "Add" << count << "cameras from file(s)" << fileList << "fps=" << fps << "offlineFreq=" << offlineFreq;
+    qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "fps=" << fps << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
     for (int i = 0; i < count; ++i)
     {
         QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
-        camera->setFileList(fileList);
+        camera->setPrimaryFileList(primaryFileList);
+        camera->setSecondaryFileList(secondaryFileList);
         camera->setFps(fps);
         camera->setOfflineFreq(offlineFreq);
-        foreach(QString fileName, fileList)
+        foreach(QString fileName, primaryFileList)
+            QnFileCache::instance()->getMediaData(fileName);
+        foreach(QString fileName, secondaryFileList)
             QnFileCache::instance()->getMediaData(fileName);
         m_cameras.insert(camera->getMac(), camera);
     }

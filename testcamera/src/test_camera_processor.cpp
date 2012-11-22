@@ -37,15 +37,23 @@ void QnTestCameraProcessor::run()
             qDebug() << "No MAC address specified";
             return;
         }
-        QByteArray macAddress((const char*) buffer, readed);
-        if (!macAddress.isEmpty() && macAddress[0] == '/')
-            macAddress = macAddress.mid(1);
+        QByteArray cameraUrl((const char*) buffer, readed);
+        if (!cameraUrl.isEmpty() && cameraUrl[0] == '/')
+            cameraUrl = cameraUrl.mid(1);
+        int pos = cameraUrl.indexOf('/');
+        QByteArray macAddress;
+        if (pos >= 0)
+            macAddress = cameraUrl.mid(0, pos);
+        else
+            macAddress = cameraUrl;
+
         QnTestCamera* camera = QnCameraPool::instance()->findCamera(macAddress);
         if (camera == 0)
         {
             qDebug() << "No camera found with MAC address " << macAddress;
             return;
         }
-        camera->startStreaming(d->socket);
+        bool isSecondary = cameraUrl.endsWith("secondary");
+        camera->startStreaming(d->socket, isSecondary);
     }
 }

@@ -106,11 +106,13 @@ void QnTestCameraStreamReader::openStream()
     if (isStreamOpened())
         return;
     
-    QString ggg = m_resource->getUrl();
-
-    QUrl url(m_resource->getUrl());
-
+    QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
+    if (getRole() != QnResource::Role_LiveVideo)
+        urlStr += QLatin1String("/secondary");
+
+    QUrl url(urlStr);
+
 
     if (m_tcpSock.isClosed())
         m_tcpSock.reopen();

@@ -83,9 +83,14 @@ QByteArray QnTestCamera::getMac() const
     return m_mac;
 }
 
-void QnTestCamera::setFileList(const QStringList& files)
+void QnTestCamera::setPrimaryFileList(const QStringList& files)
 {
-    m_files = files;
+    m_primaryFiles = files;
+}
+
+void QnTestCamera::setSecondaryFileList(const QStringList& files)
+{
+    m_secondaryFiles = files;
 }
 
 void QnTestCamera::setFps(double fps)
@@ -156,12 +161,16 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
     return true;
 }
 
-void QnTestCamera::startStreaming(TCPSocket* socket)
+void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary)
 {
     int fileIndex = 0;
+    QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
+    if (fileList.isEmpty())
+        return;
     while (1)
     {
-        QString fileName = m_files[fileIndex];
+        QString fileName = fileList[fileIndex];
+        
         QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
         if (data.isEmpty())
         {
@@ -171,7 +180,7 @@ void QnTestCamera::startStreaming(TCPSocket* socket)
 
         if (!doStreamingFile(data, socket))
             break;
-        fileIndex = (fileIndex+1) % m_files.size();
+        fileIndex = (fileIndex+1) % fileList.size();
     }
 }
 
