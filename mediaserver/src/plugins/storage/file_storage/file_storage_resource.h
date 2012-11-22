@@ -37,9 +37,8 @@ public:
     bool isCatalogAccessible() override;
     virtual qint64 getFreeSpace() override;
 
-    virtual float bitrate() const override;
-
     void setStorageBitrateCoeff(float value);
+    virtual float getStorageBitrateCoeff() const override;
 
     static const int IO_BLOCK_SIZE = 1024*1024*4;
 private:

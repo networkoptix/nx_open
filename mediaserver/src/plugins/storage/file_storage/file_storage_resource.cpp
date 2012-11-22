@@ -173,13 +173,13 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-float QnFileStorageResource::bitrate() const
-{
-    return QnStorageResource::bitrate() * m_storageBitrateCoeff;
-}
-
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
     qDebug() << "QnFileStorageResource " << getUrl() << "coeff " << value;
     m_storageBitrateCoeff = value;
+}
+
+float QnFileStorageResource::getStorageBitrateCoeff() const
+{
+    return m_storageBitrateCoeff;
 }

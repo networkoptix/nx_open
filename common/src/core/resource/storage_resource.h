@@ -28,6 +28,8 @@ public:
     int getMaxStoreTime() const;
 
     virtual float bitrate() const;
+    virtual float getStorageBitrateCoeff() const { return 1.0; }
+
     void addBitrate(QnAbstractMediaStreamDataProvider* provider);
     void releaseBitrate(QnAbstractMediaStreamDataProvider* provider);
 
