@@ -374,7 +374,7 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
         totalSpace += storageSpace;
     }
 
@@ -384,7 +384,7 @@ void QnStorageManager::updateStorageStatistics()
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
             continue; // do not use offline storages for writting
 
-        qint64 storageSpace = fileStorage->getFreeSpace() + fileStorage->getWritedSpace();
+        qint64 storageSpace = fileStorage->getFreeSpace() - fileStorage->getSpaceLimit() + fileStorage->getWritedSpace();
         // write to large HDD more often then small HDD
         fileStorage->setStorageBitrateCoeff(1.0 - storageSpace / totalSpace);
     }
