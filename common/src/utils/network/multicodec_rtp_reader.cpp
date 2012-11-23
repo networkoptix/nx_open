@@ -81,8 +81,10 @@ void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer
 {
     bool gotValue = false;
     RtspStatistic stats = m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4, &gotValue);
-    if (gotValue)
-        ioDevice->setStatistic(stats);
+    if (gotValue) {
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+            ioDevice->setStatistic(stats);
+    }
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {

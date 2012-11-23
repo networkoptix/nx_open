@@ -41,7 +41,8 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_owner(owner),
     m_tcpMode(false),
     m_mediaSocket(0),
-    m_rtcpSocket(0)
+    m_rtcpSocket(0),
+    ssrc(0)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
@@ -129,6 +130,16 @@ void RTPIODevice::processRtcpData()
             }
         }
     }
+}
+
+void RTPSession::SDPTrackInfo::setSSRC(quint32 value)
+{
+    ioDevice->setSSRC(value);
+}
+
+quint32 RTPSession::SDPTrackInfo::getSSRC() const
+{
+    return ioDevice->getSSRC();
 }
 
 // ================================================== QnRtspTimeHelper ==========================================
@@ -725,11 +736,10 @@ bool RTPSession::sendSetup()
                 return false;
         }
 
-        QString tmp = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
-
-        if (tmp.size() > 0)
+        QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
+        if (sessionParam.size() > 0)
         {
-            QStringList tmpList = tmp.split(QLatin1Char(';'));
+            QStringList tmpList = sessionParam.split(QLatin1Char(';'));
             m_SessionId = tmpList[0];
 
             for (int i = 0; i < tmpList.size(); ++i)
@@ -742,6 +752,24 @@ bool RTPSession::sendSetup()
                         m_TimeOut = tmpParams[1].toInt();
                         if (m_TimeOut > 0 && m_TimeOut < 5000)
                             m_TimeOut *= 1000; // convert seconds to ms
+                    }
+                }
+            }
+        }
+
+        QString transportParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Transport:"));
+        if (transportParam.size() > 0)
+        {
+            QStringList tmpList = transportParam.split(QLatin1Char(';'));
+            for (int k = 0; k < tmpList.size(); ++k)
+            {
+                tmpList[k] = tmpList[k].trimmed().toLower();
+                if (tmpList[k].startsWith(QLatin1String("ssrc")))
+                {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        bool ok;
+                        m_sdpTracks[i]->setSSRC(tmpParams[1].toInt(&ok, 16));
                     }
                 }
             }
@@ -984,7 +1012,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
             int messageLen = reader.getBits(16);
             if (messageCode == RTCP_SENDER_REPORT)
             {
-                reader.skipBits(32); // sender ssrc
+                stats.ssrc = reader.getBits(32);
                 quint32 intTime = reader.getBits(32);
                 quint32 fracTime = reader.getBits(32);
                 stats.nptTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;

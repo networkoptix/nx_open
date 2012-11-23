@@ -18,13 +18,14 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class RtspStatistic 
 {
 public:
-    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0) {}
+    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
     bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
 
     quint32 timestamp;
     double nptTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
+    quint32 ssrc;
 };
 
 class QnRtspTimeHelper
@@ -52,6 +53,8 @@ public:
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
+    void setSSRC(quint32 value) {ssrc = value; }
+    quint32 getSSRC() const { return ssrc; }
 private:
     void processRtcpData();
 private:
@@ -60,6 +63,7 @@ private:
     RtspStatistic m_statistic;
     UDPSocket* m_mediaSocket;
     UDPSocket* m_rtcpSocket;
+    quint32 ssrc;
 };
 
 class RTPSession: public QObject
@@ -93,6 +97,10 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
         }
+
+        void setSSRC(quint32 value);
+        quint32 getSSRC() const;
+
         ~SDPTrackInfo() { delete ioDevice; }
 
         QString codecName;
