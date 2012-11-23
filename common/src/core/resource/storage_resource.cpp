@@ -54,18 +54,21 @@ quint16 QnAbstractStorageResource::getIndex() const
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
-    foreach(QnAbstractMediaStreamDataProvider* provider, m_providers)
+	QMutexLocker lock(&m_mutex);
+    foreach(const QnAbstractMediaStreamDataProvider* provider, m_providers)
         rez += provider->getBitrate();
     return rez;
 }
 
 void QnAbstractStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
+	QMutexLocker lock(&m_mutex);
     m_providers << provider;
 }
 
 void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
+	QMutexLocker lock(&m_mutex);
     m_providers.remove(provider);
 }
 
