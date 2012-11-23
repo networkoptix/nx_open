@@ -701,8 +701,9 @@ int QnRtspConnectionProcessor::composeSetup()
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
                         }
                     }
+                    //if (trackInfo->getSSRC())
+                    //    transport.append(";ssrc=").append(QByteArray::number(trackInfo->getSSRC()));
                 }
-                //d->trackPorts.insert(trackId, QPair<int,int>(ports[0].toInt(), ports.size() > 1 ? ports[1].toInt() : 0));
             }
         }
     }

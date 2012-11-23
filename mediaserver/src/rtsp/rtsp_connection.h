@@ -36,6 +36,10 @@ struct RtspServerTrackInfo
         return false;
     }
 
+    quint32 getSSRC() const {
+        return encoder ? encoder->getSSRC() : 0;
+    }
+
     int clientPort;
     int clientRtcpPort;
     quint16 sequence;

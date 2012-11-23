@@ -640,23 +640,17 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
     if (m_outputPos >= m_outputBuffer.size() - RtpHeader::RTP_HEADER_SIZE || packetIndex >= packets.size())
         return false;
 
-    RtpHeader* rtpHeader = (RtpHeader*) (m_outputBuffer.data() + m_outputPos);
-    /*
-    if (rtpHeader->payloadType != getPayloadtype()) 
-    {
-        m_outputPos += packets[packetIndex];
-        packetIndex++;
-        return getNextPacket(sendBuffer); // skip RTCP packet
+	/*
+    if (packets[packetIndex] >= 12) {
+        quint32* srcBuffer = (quint32*) (m_outputBuffer.data() + m_outputPos);
+        RtpHeader* rtpHeader = (RtpHeader*) srcBuffer;
+        bool isRtcp = rtpHeader->payloadType >= 72 && rtpHeader->payloadType <= 76;
+        if (!isRtcp)
+            rtpHeader->ssrc = htonl(getSSRC());
+        else
+            srcBuffer[1] = htonl(getSSRC());
     }
-    */
-    /*
-    if (m_isFirstPacket)
-    {
-        m_isFirstPacket = false;
-        m_firstTime = ntohl(rtpHeader->timestamp);
-    }
-    rtpHeader->timestamp = htonl(ntohl(rtpHeader->timestamp) - m_firstTime);
-    */
+	*/
 
     sendBuffer.write(m_outputBuffer.data() + m_outputPos, packets[packetIndex]);
     m_outputPos += packets[packetIndex];
