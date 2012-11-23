@@ -16,7 +16,8 @@ Q_GLOBAL_STATIC(QnStorageManager, inst)
 
 
 QnStorageManager::QnStorageManager():
-    m_mutex(QMutex::Recursive),
+    m_mutexStorages(QMutex::Recursive),
+    m_mutexCatalog(QMutex::Recursive),
     m_storageFileReaded(false),
     m_storagesStatisticsReady(false)
 {
@@ -113,7 +114,7 @@ int QnStorageManager::detectStorageIndex(const QString& path)
 void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 {
     storage->setIndex(detectStorageIndex(storage->getUrl()));
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
     
     cl_log.log(QString(QLatin1String("Adding storage. Path: %1. SpaceLimit: %2MiB. Currently avaiable: %3MiB")).arg(storage->getUrl()).arg(storage->getSpaceLimit() / 1024 / 1024).arg(storage->getFreeSpace() / 1024 / 1024), cl_logINFO);
@@ -129,7 +130,7 @@ void QnStorageManager::addStorage(QnStorageResourcePtr storage)
 
 QnStorageResourcePtr QnStorageManager::removeStorage(QnStorageResourcePtr storage)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     m_storagesStatisticsReady = false;
 
     // remove existing storage record if exists
@@ -156,7 +157,7 @@ bool QnStorageManager::existsStorageWithID(const QnAbstractStorageResourceList& 
 
 void QnStorageManager::removeAbsentStorages(QnAbstractStorageResourceList newStorages)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
     {
         if (!existsStorageWithID(newStorages, itr.value()->getId()))
@@ -246,7 +247,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         QString mac;
         DeviceFileCatalogPtr catalog;
         {
-            QMutexLocker lock(&m_mutex);
+            QMutexLocker lock(&m_mutexCatalog);
             for (FileCatalogMap::Iterator itr = m_devFileCatalogHi.begin(); itr != m_devFileCatalogHi.end(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
@@ -392,7 +393,7 @@ void QnStorageManager::updateStorageStatistics()
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     QnStorageResourcePtr result;
     float minBitrate = INT_MAX;
 
@@ -476,7 +477,7 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, const 
 
 DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnResource::ConnectionRole role)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexCatalog);
     bool hiQuality = role == QnResource::Role_LiveVideo;
     FileCatalogMap& catalog = hiQuality ? m_devFileCatalogHi : m_devFileCatalogLow;
     DeviceFileCatalogPtr fileCatalog = catalog[mac];
@@ -510,7 +511,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         QString root = itr.value()->getUrl();
@@ -522,7 +523,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     int storageIndex;
     QString quality, mac;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
@@ -539,7 +540,7 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
 
 bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_mutex);
+    QMutexLocker lock(&m_mutexStorages);
     int storageIndex;
     QString quality, mac;
 
