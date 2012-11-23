@@ -50,11 +50,10 @@ int main(int argc, char *argv[])
         qDebug() << "count=N";
         qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
         qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
-        qDebug() << "[fps=N] (optional, default value 30)";
         qDebug() << "[offline=0.100] (optional, default value 0 - no offline)";
         qDebug() << "";
         qDebug() << "example:";
-        QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20;fps=30");
+        QString str = QFileInfo(argv[0]).baseName() + QString(" files=\"c:/test.264\";count=20");
         qDebug() << str;
         return 1;
     }
@@ -66,7 +65,6 @@ int main(int argc, char *argv[])
         QString param = argv[i];
         QStringList params = param.split(';');
 
-        double fps = 30.0;
         int offlineFreq = 0;
         int count = 0;
         QString primaryFileNames;
@@ -85,9 +83,8 @@ int main(int argc, char *argv[])
             data[0] = data[0].toLower().trimmed();
             while (!data[0].isEmpty() && data[0] == "-")
                 data[0] = data[0].mid(1);
-            if (data[0] == "fps")
-                fps = data[1].toInt();
-            else if (data[0] == "offline")
+
+            if (data[0] == "offline")
                 offlineFreq = data[1].toInt();
             else if (data[0] == "count")
                 count = data[1].toInt();
@@ -123,7 +120,7 @@ int main(int argc, char *argv[])
         if(secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
-        QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, fps, offlineFreq);
+        QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);
     }
 
 

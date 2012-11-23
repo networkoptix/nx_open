@@ -70,7 +70,6 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
         m_mac += last.left(2);
         last = last.mid(2);
     }
-    m_fps = 30.0;
     m_offlineFreq = 0;
     m_isEnabled = true;
     m_offlineDuration = 0;
@@ -93,17 +92,12 @@ void QnTestCamera::setSecondaryFileList(const QStringList& files)
     m_secondaryFiles = files;
 }
 
-void QnTestCamera::setFps(double fps)
-{
-    m_fps = fps;
-}
-
 void QnTestCamera::setOfflineFreq(double offlineFreq)
 {
     m_offlineFreq = offlineFreq;
 }
 
-bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket)
+bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps)
 {
     double streamingTime = 0;
     QTime timer;
@@ -152,7 +146,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
             return false;
         }
 
-        streamingTime += 1000.0 / m_fps;
+        streamingTime += 1000.0 / fps;
         int waitingTime = streamingTime - timer.elapsed();
         if (waitingTime > 0)
             QnSleep::msleep(waitingTime);
@@ -161,7 +155,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
     return true;
 }
 
-void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary)
+void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary, int fps)
 {
     int fileIndex = 0;
     QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
@@ -178,7 +172,7 @@ void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary)
             break;
         }
 
-        if (!doStreamingFile(data, socket))
+        if (!doStreamingFile(data, socket, fps))
             break;
         fileIndex = (fileIndex+1) % fileList.size();
     }

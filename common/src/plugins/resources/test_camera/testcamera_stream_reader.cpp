@@ -108,9 +108,8 @@ void QnTestCameraStreamReader::openStream()
     
     QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
-    if (getRole() != QnResource::Role_LiveVideo)
-        urlStr += QLatin1String("/secondary");
 
+    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == QnResource::Role_LiveVideo).arg(getFps());
     QUrl url(urlStr);
 
 
@@ -125,7 +124,7 @@ void QnTestCameraStreamReader::openStream()
         closeStream();
         return;
     }
-    QByteArray path = url.path().toLocal8Bit();
+    QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
     m_tcpSock.send(path.data(), path.size());
 }
 

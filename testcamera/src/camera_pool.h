@@ -16,7 +16,7 @@ public:
     virtual ~QnCameraPool();
     static QnCameraPool* instance();
     
-    void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, double fps, int offlineFreq);
+    void addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq);
     QnTestCamera* findCamera(const QString& mac) const;
     QByteArray getDiscoveryResponse();
 protected:

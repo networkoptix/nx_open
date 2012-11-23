@@ -19,14 +19,13 @@ public:
     void setPrimaryFileList(const QStringList& files);
     void setSecondaryFileList(const QStringList& files);
 
-    void setFps(double fps);
     void setOfflineFreq(double offlineFreq);
 
-    void startStreaming(TCPSocket* socket, bool isSecondary);
+    void startStreaming(TCPSocket* socket, bool isSecondary, int fps);
 
     bool isEnabled();
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket);
+    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps);
     void makeOfflineFlood();
 private:
     quint32 m_num;
@@ -35,7 +34,6 @@ private:
     QStringList m_secondaryFiles;
     int m_prefixLen;
     int m_offlineFreq;
-    double m_fps;
     QnMediaContextPtr m_context;
     bool m_isEnabled;
     QTime m_offlineTimer;
