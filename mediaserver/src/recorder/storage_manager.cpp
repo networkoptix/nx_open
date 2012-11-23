@@ -492,7 +492,8 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    QMutexLocker lock(&m_mutexStorages);
+    for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
@@ -523,7 +524,6 @@ QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 
 bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnAbstractMediaStreamDataProvider* provider, qint64 fileSize)
 {
-    QMutexLocker lock(&m_mutexStorages);
     int storageIndex;
     QString quality, mac;
     QnStorageResourcePtr storage = extractStorageFromFileName(storageIndex, fileName, mac, quality);
@@ -540,7 +540,6 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
 
 bool QnStorageManager::fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_mutexStorages);
     int storageIndex;
     QString quality, mac;
 
