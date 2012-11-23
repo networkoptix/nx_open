@@ -408,11 +408,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 
     for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
-        if (itr.value()->getStatus() != QnResource::Offline) {
-            qDebug() << "QnFileStorageResource " << itr.value()->getUrl() << "current bitrate=" << itr.value()->bitrate();
-            float bitrate = itr.value()->bitrate() * itr.value()->getStorageBitrateCoeff();
+		QnStorageResourcePtr storage = itr.value();
+        if (storage->getStatus() != QnResource::Offline) {
+            qDebug() << "QnFileStorageResource " << storage->getUrl() << "current bitrate=" << storage->bitrate();
+            float bitrate = storage->bitrate() * storage->getStorageBitrateCoeff();
             minBitrate = qMin(minBitrate, bitrate);
-            bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, itr.value());
+            bitrateInfo << QPair<float, QnStorageResourcePtr>(bitrate, storage);
         }
     }
     for (int i = 0; i < bitrateInfo.size(); ++i)
