@@ -145,7 +145,8 @@ quint32 RTPSession::SDPTrackInfo::getSSRC() const
 // ================================================== QnRtspTimeHelper ==========================================
 
 QnRtspTimeHelper::QnRtspTimeHelper():
-    m_cameraClockToLocalDiff(INT_MAX)
+    m_cameraClockToLocalDiff(INT_MAX),
+    m_lastTime(AV_NOPTS_VALUE)
 {
 
 }
@@ -160,6 +161,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 void QnRtspTimeHelper::reset()
 {
     m_cameraClockToLocalDiff = INT_MAX;
+    m_lastTime = AV_NOPTS_VALUE;
 }
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
@@ -174,8 +176,14 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
-        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed)
-            return resultInSecs * 1000000ll;
+        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) {
+            qint64 rez = resultInSecs * 1000000ll;
+            // check for negative time if camera timings is inaccurate
+            if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
+                rez = m_lastTime + MIN_FRAME_DURATION;
+            m_lastTime = rez;
+            return rez;
+        }
         else {
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);

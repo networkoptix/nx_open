@@ -39,6 +39,7 @@ private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
 private:
     double m_cameraClockToLocalDiff; // in secs
+    qint64 m_lastTime;
 };
 
 class RTPIODevice
