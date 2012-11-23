@@ -42,7 +42,7 @@ public:
     static QString dateTimeStr(qint64 dateTimeMs, qint16 timeZone);
 
     QnStorageResourcePtr getStorageByUrl(const QString& fileName);
-    QnStorageResourcePtr storageRoot(int storage_index) const { return m_storageRoots.value(storage_index); }
+    QnStorageResourcePtr storageRoot(int storage_index) const { QMutexLocker lock(&m_mutex); return m_storageRoots.value(storage_index); }
     bool isStorageAvailable(int storage_index) const 
     {
         QnStorageResourcePtr storage = storageRoot(storage_index);
@@ -56,7 +56,7 @@ public:
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
-    StorageMap getAllStorages() const { return m_storageRoots; }
+    StorageMap getAllStorages() const { QMutexLocker lock(&m_mutex); return m_storageRoots; }
 public slots:
     void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:

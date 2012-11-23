@@ -368,7 +368,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 void QnStorageManager::updateStorageStatistics()
 {
     double totalSpace = 0;
-    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
@@ -378,7 +378,7 @@ void QnStorageManager::updateStorageStatistics()
         totalSpace += storageSpace;
     }
 
-    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QnFileStorageResourcePtr fileStorage = qSharedPointerDynamicCast<QnFileStorageResource> (itr.value());
         if (!fileStorage || fileStorage->getStatus() == QnResource::Offline)
@@ -406,7 +406,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
 
-    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         if (itr.value()->getStatus() != QnResource::Offline) {
             qDebug() << "QnFileStorageResource " << itr.value()->getUrl() << "current bitrate=" << itr.value()->bitrate();
