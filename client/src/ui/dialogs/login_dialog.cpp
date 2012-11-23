@@ -75,7 +75,7 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     layout->addWidget(m_renderingWidget);
 
     m_connectionsModel = new QStandardItemModel(this);
-    ui->connectionsComboBox->setModel(m_connectionsModel);
+//    ui->connectionsComboBox->setModel(m_connectionsModel);
 
     connect(ui->connectionsComboBox,        SIGNAL(currentIndexChanged(int)),       this,   SLOT(at_connectionsComboBox_currentIndexChanged(int)));
     connect(ui->testButton,                 SIGNAL(clicked()),                      this,   SLOT(at_testButton_clicked()));
@@ -110,6 +110,11 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         SLOT(accept()) );
 
     connect( ui->selectEntCtrlButton, SIGNAL(clicked()), this, SLOT(onSelectEntCtrlButtonClicked()) );
+
+    m_combineConnectionsModel = new QnCombineConnectionsModel(this);
+    m_combineConnectionsModel->addChild(m_connectionsModel);
+    m_combineConnectionsModel->addChild(&m_foundEntCtrlModel);
+    ui->connectionsComboBox->setModel(m_combineConnectionsModel);
 }
 
 LoginDialog::~LoginDialog() {

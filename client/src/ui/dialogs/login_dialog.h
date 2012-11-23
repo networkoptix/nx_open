@@ -23,6 +23,44 @@ namespace Ui {
     class FindAppServerDialog;
 }
 
+class QnCombineConnectionsModel : public QAbstractListModel {
+    Q_OBJECT
+
+public:
+    QnCombineConnectionsModel(QObject* parent = 0): QAbstractListModel(parent) {}
+
+    int rowCount(const QModelIndex &parent = QModelIndex()) const {
+        int count = 0;
+        foreach (QAbstractItemModel *child, m_children)
+            count += child->rowCount(parent);
+        return count;
+    }
+
+    QVariant data(const QModelIndex &index, int role) const {
+        int row = index.row();
+        int count = 0;
+        foreach (QAbstractItemModel *child, m_children) {
+            if (count + child->rowCount() < row)
+                count += child->rowCount();
+            else
+                return child->data(child->index(row - count, index.column()), role);
+        }
+        return QVariant();
+    }
+
+    QVariant headerData(int section, Qt::Orientation orientation,
+                             int role = Qt::DisplayRole) const {
+        return QVariant();
+    }
+
+    void addChild(QAbstractItemModel *child) {
+        m_children.append(child);
+    }
+
+private:
+    QList<QAbstractItemModel*> m_children;
+};
+
 class LoginDialog : public QDialog {
     Q_OBJECT
 public:
@@ -72,6 +110,8 @@ private:
     QnRenderingWidget* m_renderingWidget;
     NetworkOptixModuleFinder m_entCtrlFinder;
     FoundEnterpriseControllersModel m_foundEntCtrlModel;
+
+    QnCombineConnectionsModel* m_combineConnectionsModel;
 };
 
 #endif // LOGINDIALOG_H
