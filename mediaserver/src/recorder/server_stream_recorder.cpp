@@ -13,7 +13,7 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
 
-static const int MAX_BUFFERED_SIZE = 1024*1024*15;
+static const int MAX_BUFFERED_SIZE = 1024*1024*30;
 
 QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::ConnectionRole role, QnAbstractMediaStreamDataProvider* mediaProvider):
     QnStreamRecorder(dev),
