@@ -40,12 +40,10 @@ void QnTestCameraProcessor::run()
         QByteArray cameraUrl((const char*) buffer, readed);
         if (!cameraUrl.isEmpty() && cameraUrl[0] == '/')
             cameraUrl = cameraUrl.mid(1);
-        int pos = cameraUrl.indexOf('/');
-        QByteArray macAddress;
-        if (pos >= 0)
-            macAddress = cameraUrl.mid(0, pos);
-        else
-            macAddress = cameraUrl;
+
+        int pos = cameraUrl.indexOf('?');
+        QByteArray macAddress = cameraUrl.left(pos);
+        QList<QByteArray> params = cameraUrl.mid(pos+1).split('&');
 
         QnTestCamera* camera = QnCameraPool::instance()->findCamera(macAddress);
         if (camera == 0)
@@ -53,7 +51,18 @@ void QnTestCameraProcessor::run()
             qDebug() << "No camera found with MAC address " << macAddress;
             return;
         }
-        bool isSecondary = cameraUrl.endsWith("secondary");
-        camera->startStreaming(d->socket, isSecondary);
+        bool isSecondary = false;
+        int fps = 10;
+        for (int i = 0; i < params.size(); ++ i)
+        {
+            QList<QByteArray> paramVal = params[i].split('=');
+            if (paramVal[0] == "primary" && paramVal.size() == 2) {
+                if (paramVal[1] != "1")
+                    isSecondary = true;
+            }
+            else if (paramVal[0] == "fps" && paramVal.size() == 2)
+                fps = paramVal[1].toInt();
+        }
+        camera->startStreaming(d->socket, isSecondary, fps);
     }
 }
