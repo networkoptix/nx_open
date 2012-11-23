@@ -62,6 +62,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
@@ -691,15 +692,19 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     m_hasControlsChanges = false;
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged(){
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
     at_dbDataChanged();
     at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
     m_hasControlsChanges = true;
+}
+
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)

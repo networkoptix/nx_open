@@ -53,6 +53,8 @@
 #include "openal/qtvaudiodevice.h"
 #include "ui/graphics/items/controls/volume_slider.h"
 
+//#define QN_MAIN_WINDOW_CHANGES_OPACITY
+
 namespace {
 
     QToolButton *newActionButton(QAction *action, bool popup = false, qreal sizeMultiplier = 1.0, int helpTopicId = -1) {
@@ -578,9 +580,11 @@ void QnMainWindow::at_volumeSliderNotifier_manipulated() {
 }
 
 void QnMainWindow::at_audioDevice_volumeChanged() {
+#ifdef QN_MAIN_WINDOW_CHANGES_OPACITY
     if(m_changeOpacity) {
         qreal volume = QtvAudioDevice::instance()->volume();
 
         setWindowOpacity(qMin(0.7 + 0.5 * volume, 1.0));
     }
+#endif
 }

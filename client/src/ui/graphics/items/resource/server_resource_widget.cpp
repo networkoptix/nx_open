@@ -291,8 +291,10 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         QnScopedPainterTransformRollback transformRollback(painter);
         Q_UNUSED(transformRollback)
 
+        qreal space_offset = pen_width * 2;
+
         QTransform graphTransform = painter->transform();
-        graphTransform.translate(offset, oh + offset);
+        graphTransform.translate(offset, oh + offset - space_offset);
         painter->setTransform(graphTransform);
 
         QPen graphPen;
@@ -304,7 +306,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         foreach(QString key, m_sortedKeys) {
             QnStatisticsData &stats = m_history[key];
             qreal currentValue = 0;
-            QPainterPath path = createChartPath(stats, x_step, -1.0 * oh, elapsed_step, &currentValue);
+            QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - space_offset*2), elapsed_step, &currentValue);
             values.append(currentValue);
             graphPen.setColor(getColorById(counter++));
             painter->strokePath(path, graphPen);

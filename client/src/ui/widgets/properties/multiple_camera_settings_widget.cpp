@@ -36,6 +36,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
@@ -271,7 +272,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     m_hasControlsChanges = false;
 }
 
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged(){
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
@@ -283,8 +284,12 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
     m_hasScheduleEnabledChanges = true;
 }
 
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
     m_hasControlsChanges = true;
+}
+
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
+    m_hasControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked()

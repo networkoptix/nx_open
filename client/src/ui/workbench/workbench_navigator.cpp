@@ -811,15 +811,13 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
-    // todo: #Sasha. Invalid boundingPeriod near daylight time
+    // todo: #ELRIC. Invalid boundingPeriod near daylight time
     boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
         QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
-        // todo: signal deadlock here!
-        // #GDM, fix it!
-        //period.addPeriod(calendarPeriod);
+        targetPeriod.addPeriod(boundingPeriod.intersected(calendarPeriod));
     }
 
     // TODO: 'All cameras' line is shown even when SYNC is off, so this condition is not valid.

@@ -164,6 +164,8 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         const QnWorkbenchLayoutSnapshot &snapshot = m_storage->snapshot(resource);
         resource->setItems(snapshot.items);
         resource->setName(snapshot.name);
+        resource->setCellAspectRatio(snapshot.cellAspectRatio);
+        resource->setCellSpacing(snapshot.cellSpacing);
     }
     connectTo(resource);
 
