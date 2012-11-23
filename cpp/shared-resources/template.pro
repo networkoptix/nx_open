@@ -93,6 +93,8 @@ win* {
   staticlib {
     DEFINES += QN_EXPORT=
   }
+  
+  QMAKE_MOC = $$QMAKE_MOC -DQ_OS_WIN
 }
 
 unix {
