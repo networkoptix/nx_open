@@ -255,6 +255,9 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
+    if (md->dataType == QnAbstractMediaData::META_V1)
+        return saveMotion(md.dynamicCast<QnMetaDataV1>());
+
     if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
         qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
@@ -282,10 +285,6 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_prevAudioFormat = audioFormat; 
     }
     
-
-    if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md.dynamicCast<QnMetaDataV1>());
-
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
     //if (!vd)
     //    return true; // ignore audio data
