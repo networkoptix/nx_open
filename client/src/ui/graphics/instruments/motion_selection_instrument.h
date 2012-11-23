@@ -5,10 +5,8 @@
 
 #include <QtCore/QWeakPointer>
 
-#include "selection_item.h"
-
 class QnMediaResourceWidget;
-class MotionSelectionItem;
+class SelectionItem;
 
 class MotionSelectionInstrument: public DragProcessingInstrument {
     Q_OBJECT;
@@ -19,8 +17,11 @@ public:
     MotionSelectionInstrument(QObject *parent = NULL);
     virtual ~MotionSelectionInstrument();
 
-    void setColor(SelectionItem::ColorRole role, const QColor &color);
-    QColor color(SelectionItem::ColorRole role) const;
+    void setPen(const QPen &pen);
+    QPen pen() const;
+
+    void setBrush(const QBrush &brush);
+    QBrush brush() const;
 
     /**
      * \param selectionModifiers        Keyboard modifiers that must be pressed for the 
@@ -72,7 +73,8 @@ protected:
     void ensureSelectionItem();
 
 private:
-    QColor m_colors[SelectionItem::ColorRoleCount];
+    QBrush m_brush;
+    QPen m_pen;
     QWeakPointer<SelectionItem> m_selectionItem;
     QWeakPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;

@@ -13,6 +13,8 @@
 
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include "selection_item.h"
+
 namespace {
 
     struct BlocksMotionSelection {
@@ -49,31 +51,36 @@ MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     m_selectionModifiers(0),
     m_multiSelectionModifiers(Qt::ControlModifier)
 {
+    /* Default-initialize pen & brush from temporary selection item. */
+    QScopedPointer<SelectionItem> item(new SelectionItem());
+    m_pen = item->pen();
+    m_brush = item->brush();
 }
 
 MotionSelectionInstrument::~MotionSelectionInstrument() {
     ensureUninstalled();
 }
 
-void MotionSelectionInstrument::setColor(SelectionItem::ColorRole role, const QColor &color) {
-    if(role < 0 || role >= SelectionItem::ColorRoleCount) {
-        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
-        return;
-    }
-
-    m_colors[role] = color;
+void MotionSelectionInstrument::setPen(const QPen &pen) {
+    m_pen = pen;
 
     if(selectionItem())
-        selectionItem()->setColor(role, color);
+        selectionItem()->setPen(pen);
 }
 
-QColor MotionSelectionInstrument::color(SelectionItem::ColorRole role) const {
-    if(role < 0 || role >= SelectionItem::ColorRoleCount) {
-        qnWarning("Invalid color role '%1'.", static_cast<int>(role));
-        return QColor();
-    }
+QPen MotionSelectionInstrument::pen() const {
+    return m_pen;
+}
 
-    return m_colors[role];
+void MotionSelectionInstrument::setBrush(const QBrush &brush) {
+    m_brush = brush;
+
+    if(selectionItem())
+        selectionItem()->setBrush(brush);
+}
+
+QBrush MotionSelectionInstrument::brush() const {
+    return m_brush;
 }
 
 void MotionSelectionInstrument::setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers) {
@@ -119,11 +126,8 @@ void MotionSelectionInstrument::ensureSelectionItem() {
 
     m_selectionItem = new SelectionItem();
     selectionItem()->setVisible(false);
-    
-    if(m_colors[SelectionItem::Border].isValid())
-        selectionItem()->setColor(SelectionItem::Border, m_colors[SelectionItem::Border]);
-    if(m_colors[SelectionItem::Base].isValid())
-        selectionItem()->setColor(SelectionItem::Base, m_colors[SelectionItem::Base]);
+    selectionItem()->setPen(m_pen);
+    selectionItem()->setBrush(m_brush);
 
     if(scene() != NULL)
         scene()->addItem(selectionItem());

@@ -1,24 +1,17 @@
 #ifndef QN_SELECTION_ITEM_H
 #define QN_SELECTION_ITEM_H
 
-#include <QtGui/QGraphicsObject>
+#include <ui/graphics/items/standard/graphics_path_item.h>
 
-class SelectionItem: public QGraphicsObject {
+class SelectionItem: public GraphicsPathItem {
     Q_OBJECT;
 
-    typedef QGraphicsObject base_type;
+    typedef GraphicsPathItem base_type;
 
 public:
-    enum ColorRole {
-        Base,           /**< Color of the selection rect. */
-        Border,         /**< Color of the selection rect's border. */
-        ColorRoleCount
-    };
-
     SelectionItem(QGraphicsItem *parent = NULL);
     virtual ~SelectionItem();
 
-    virtual QRectF boundingRect() const override;
     QRectF rect() const;
     void setRect(const QRectF &rect);
     void setRect(const QPointF &origin, const QPointF &corner);
@@ -28,9 +21,6 @@ public:
 
     const QPointF &corner() const;
     void setCorner(const QPointF &corner);
-
-    const QColor &color(ColorRole colorRole) const;
-    void setColor(ColorRole colorRole, const QColor &color);
 
     /**
      * Sets this item's viewport. This item will be drawn only on the given
@@ -51,9 +41,6 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    /** Colors for drawing the selection rect. */
-    QColor m_colors[ColorRoleCount];
-    
     /** Origin of the selection item, in parent coordinates. */
     QPointF m_origin;
 

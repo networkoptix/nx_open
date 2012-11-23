@@ -115,14 +115,14 @@ T qMod(T l, T r) {
     return (l % r + r) % r;
 }
 
-float qMod(float l, float r) {
+inline float qMod(float l, float r) {
     float result = std::fmod(l, r);
     if(result < 0.0f)
         result += r;
     return result;
 }
 
-double qMod(double l, double r) {
+inline double qMod(double l, double r) {
     double result = std::fmod(l, r);
     if(result < 0.0)
         result += r;

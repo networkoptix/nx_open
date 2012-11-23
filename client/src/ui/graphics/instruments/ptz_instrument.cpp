@@ -84,7 +84,7 @@ public:
             path.arcTo(rect, a - da, 2 * da);
         }
 
-        QnScopedPainterPenRollback penRollback(painter, QPen(color(Border).lighter(120), elementHalfSize / 2.0));
+        QnScopedPainterPenRollback penRollback(painter, QPen(pen().color().lighter(120), elementHalfSize / 2.0));
         painter->drawPath(path);
     }
 
@@ -274,8 +274,8 @@ void PtzInstrument::ensureSelectionItem() {
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setColor(SelectionItem::Border, toTransparent(ptzColor, 0.75));
-    selectionItem()->setColor(SelectionItem::Base, toTransparent(ptzColor.lighter(120), 0.25));
+    selectionItem()->setPen(toTransparent(ptzColor, 0.75));
+    selectionItem()->setBrush(toTransparent(ptzColor.lighter(120), 0.25));
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
     if(scene() != NULL)
@@ -297,7 +297,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
     if(spherical.phi < 0)
-        spherical.phi += M_PI * 2;
+        spherical.phi += M_PI * 2.0;
 
     QVector3D newPosition = currentMapper().physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
 
