@@ -119,14 +119,22 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     currentParts[1] = fileDate.date().month();
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
-    //QDir dir;
+
     bool sameDir = true;
+
+    IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
+    if (itr == m_prevPartsMap->end()) {
+        itr = m_prevPartsMap->insert(chunk.storageIndex, QVector<QPair<int, bool> >());
+        itr.value().resize(4);
+    }
+    IOPath& prevParts = itr.value();
+
     for (int i = 0; i < 4; ++i)
     {
-        if (m_prevParts[i].first == currentParts[i])
+        if (prevParts[i].first == currentParts[i])
         {
             // optimization. Check file existing without IO operation
-            if (!m_prevParts[i].second)
+            if (!prevParts[i].second)
                 return false;
         }
         else 
@@ -142,13 +150,13 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
                 prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
                 if (exist)
                     exist &= storage->isDirExists(prefix);
-                m_prevParts[j].first = currentParts[j];
-                m_prevParts[j].second = exist;
+                prevParts[j].first = currentParts[j];
+                prevParts[j].second = exist;
             }
             break;
         }
     }
-    if (!m_prevParts[3].second)
+    if (!prevParts[3].second)
         return false;
     if (!sameDir) {
         m_existFileList = storage->getFileList(prefix);
@@ -176,8 +184,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     //if (!m_existFileList.contains(fName))
     //    return false;
 
-    m_duplicateName = fName == m_prevFileName;
-    m_prevFileName = fName;
+    m_duplicateName = (fName == m_prevFileNames[chunk.storageIndex]) && sameDir;
+    m_prevFileNames[chunk.storageIndex] = fName;
     return true;
 }
 

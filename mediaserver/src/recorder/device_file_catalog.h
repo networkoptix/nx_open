@@ -83,10 +83,14 @@ private:
     int m_firstDeleteCount;
     QString m_macAddress;
 
-    QPair<int, bool> m_prevParts[4];
+    typedef QVector<QPair<int, bool> > IOPath;
+    typedef QMap<int, IOPath > IOCacheMap;
+    IOCacheMap m_prevPartsMap[4];
+
+    //QPair<int, bool> m_prevParts[4];
     QFileInfoList m_existFileList;
     bool m_duplicateName;
-    QString m_prevFileName;
+    QMap<int,QString> m_prevFileNames;
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
     QMutex m_IOMutex;
