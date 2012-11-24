@@ -24,21 +24,13 @@ public:
 private:
     void processPostponedFiles();
     void postponeFile(const QString& fileName);
-    void checkAndDeleteFileInternal(const QString& fileName);
     bool internalDeleteFile(const QString& fileName);
 private:
-    struct DeleteInfo
-    {
-        DeleteInfo() {}
-        DeleteInfo(const QString& _name, bool _isDir): name(_name), isDir(_isDir) {}
-        QString name;
-        bool isDir;
-    };
 
     mutable QMutex m_mutex;
     QString m_mediaRoot;
     QSet<QString> m_postponedFiles;
-    QQueue<DeleteInfo> m_toDeleteList;
+    QQueue<QString> m_newPostponedFiles;
     QFile m_deleteCatalog;
     bool m_firstTime;
     QTime m_postponeTimer;
