@@ -61,6 +61,7 @@ private:
     int m_maxStoreTime; // at seconds
     quint16 m_index;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
+    mutable QMutex m_bitrateMtx;
 };
 
 
@@ -152,6 +153,8 @@ public:
     virtual void setUrl(const QString& value);
 protected:
     qint64 m_writedSpace;
+private:
+    mutable QMutex m_writedSpaceMtx;
 };
 
 typedef QnStorageResource* (*StorageTypeInstance)();

@@ -54,7 +54,7 @@ quint16 QnAbstractStorageResource::getIndex() const
 float QnAbstractStorageResource::bitrate() const
 {
     float rez = 0;
-	QMutexLocker lock(&m_mutex);
+	QMutexLocker lock(&m_bitrateMtx);
     foreach(const QnAbstractMediaStreamDataProvider* provider, m_providers)
         rez += provider->getBitrate();
     return rez;
@@ -62,13 +62,13 @@ float QnAbstractStorageResource::bitrate() const
 
 void QnAbstractStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-	QMutexLocker lock(&m_mutex);
+	QMutexLocker lock(&m_bitrateMtx);
     m_providers << provider;
 }
 
 void QnAbstractStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-	QMutexLocker lock(&m_mutex);
+	QMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
 
@@ -210,11 +210,13 @@ void QnStorageResource::closeFfmpegIOContext(AVIOContext* ioContext)
 
 qint64 QnStorageResource::getWritedSpace() const
 {
+    QMutexLocker lock(&m_writedSpaceMtx);
     return m_writedSpace;
 }
 
 void QnStorageResource::addWritedSpace(qint64 value)
 {
+    QMutexLocker lock(&m_writedSpaceMtx);
     m_writedSpace += value;
 }
 
