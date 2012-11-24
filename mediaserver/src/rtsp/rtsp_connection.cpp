@@ -292,7 +292,7 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
-    QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
+    QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp", true);
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
