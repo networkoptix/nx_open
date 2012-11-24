@@ -80,6 +80,8 @@ private:
     QMap<QString, int> m_storageIndexes;
     bool m_storageFileReaded;
     bool m_storagesStatisticsReady;
+    QTime m_lastClearanceTime;
+    QMutex m_spaceClearanceMtx;
 };
 
 #define qnStorageMan QnStorageManager::instance()

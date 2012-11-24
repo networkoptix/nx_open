@@ -9,6 +9,7 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
+static const int SPACE_CLEARANCE_INTERVAL = 60 * 1000;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -21,6 +22,7 @@ QnStorageManager::QnStorageManager():
     m_storageFileReaded(false),
     m_storagesStatisticsReady(false)
 {
+    m_lastClearanceTime.start();
 }
 
 void QnStorageManager::loadFullFileCatalog()
@@ -231,6 +233,13 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
 
 void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 {
+    {
+        QMutexLocker lock(&m_spaceClearanceMtx);
+        if (m_lastClearanceTime.elapsed() < SPACE_CLEARANCE_INTERVAL)
+            return;
+        m_lastClearanceTime.restart();
+    }
+
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
 
@@ -298,73 +307,6 @@ void QnStorageManager::at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newE
     foreach(DeviceFileCatalogPtr catalogLow, m_devFileCatalogLow)
         catalogLow->deleteRecordsByStorage(storageIndex, newStartTimeMs);
 }
-
-/*
-QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
-{
-    Q_UNUSED(provider)
-    QMutexLocker lock(&m_mutex);
-    QnStorageResourcePtr result;
-    qint64 maxFreeSpace = 0;
-    float minBitrate = (float)INT_MAX;
-
-    // balance storages evenly by bitrate
-    bool balanceByBitrate = true;
-    if (rand()%100 < 10)
-    {
-        // sometimes preffer drive with maximum free space
-        qint64 maxSpace = 0;
-        qint64 minSpace = INT64_MAX;
-        //for (int i = 0; i < m_storageRoots.size(); ++i)
-        for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-        {
-            if (itr.value()->getStatus() == QnResource::Offline)
-                continue; // do not use offline storages for writting
-            if (!itr.value()->isNeedControlFreeSpace()) {
-                maxSpace = minSpace = 0; // do not count free space, balance by bitrate
-                break;
-            }
-            qint64 freeSpace = itr.value()->getFreeSpace();
-            maxSpace = qMax(maxSpace, freeSpace);
-            minSpace = qMin(minSpace, freeSpace);
-        }
-
-        // If free space difference is small, keep balanceByBitrate strategy
-        balanceByBitrate = maxSpace - minSpace <= BALANCE_BY_FREE_SPACE_THRESHOLD; 
-    }
-    
-    for (StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
-    {
-        if (itr.value()->getStatus() == QnResource::Offline)
-            continue; // do not use offline storages for writting
-
-        if (balanceByBitrate) 
-        {   // select storage with mimimum bitrate
-            float bitrate = itr.value()->bitrate();
-            if (bitrate < minBitrate)
-            {
-                minBitrate = bitrate;
-                result = itr.value();
-            }
-        }
-        else 
-        {   // select storage with maximum free space
-            qint64 freeSpace = itr.value()->getFreeSpace();
-            if (freeSpace > maxFreeSpace)
-            {
-                maxFreeSpace = freeSpace;
-                result = itr.value();
-            }
-        }
-    }
-
-    if (result)
-        qWarning() << "Selected storage for new file: " << result->getUrl() << ". strategy:" << (balanceByBitrate ? " bitrate balance" : "free space balance");
-
-
-    return result;
-}
-*/
 
 void QnStorageManager::updateStorageStatistics()
 {
@@ -466,7 +408,6 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
     int fileNum = 0;
     if (!baseNameList.isEmpty()) 
         fileNum = baseNameList.last().toInt() + 1;
-    clearSpace(storage);
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
@@ -531,6 +472,8 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
     storage->releaseBitrate(provider);
     storage->addWritedSpace(fileSize);
+    clearSpace(storage);
+
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
