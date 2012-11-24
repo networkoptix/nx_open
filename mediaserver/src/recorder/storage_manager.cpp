@@ -77,7 +77,7 @@ bool QnStorageManager::serializeStorageFile()
     if (!storageFile.open(QFile::WriteOnly | QFile::Truncate))
         return false;
     storageFile.write("path; index\n");
-    for (QMap<QString, int>::const_iterator itr = m_storageIndexes.begin(); itr != m_storageIndexes.end(); ++itr)
+    for (QMap<QString, int>::const_iterator itr = m_storageIndexes.constBegin(); itr != m_storageIndexes.constEnd(); ++itr)
     {
         storageFile.write(itr.key().toUtf8());
         storageFile.write(";");
@@ -248,7 +248,7 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         DeviceFileCatalogPtr catalog;
         {
             QMutexLocker lock(&m_mutexCatalog);
-            for (FileCatalogMap::Iterator itr = m_devFileCatalogHi.begin(); itr != m_devFileCatalogHi.end(); ++itr)
+            for (FileCatalogMap::const_iterator itr = m_devFileCatalogHi.constBegin(); itr != m_devFileCatalogHi.constEnd(); ++itr)
             {
                 qint64 firstTime = itr.value()->firstTime();
                 if (firstTime != AV_NOPTS_VALUE && firstTime < minTime)
@@ -513,7 +513,7 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
 QnStorageResourcePtr QnStorageManager::getStorageByUrl(const QString& fileName)
 {
     QMutexLocker lock(&m_mutexStorages);
-    for(StorageMap::const_iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
+    for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
     {
         QString root = itr.value()->getUrl();
         if (fileName.startsWith(root))
