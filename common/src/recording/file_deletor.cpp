@@ -59,7 +59,9 @@ void QnFileDeletor::deleteFile(const QString& fileName)
 void QnFileDeletor::postponeFile(const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
-    m_postponedFiles.append(fileName);
+    if (m_postponedFiles.contains(fileName))
+        return;
+    m_postponedFiles << fileName;
     if (!m_deleteCatalog.isOpen())
     {
         m_deleteCatalog.open(QFile::WriteOnly | QFile::Append);
@@ -81,7 +83,7 @@ void QnFileDeletor::processPostponedFiles()
             QByteArray line = m_deleteCatalog.readLine().trimmed();
             while(!line.isEmpty())
             {
-                m_postponedFiles.append(QString::fromUtf8(line));
+                m_postponedFiles << QString::fromUtf8(line);
                 line = m_deleteCatalog.readLine().trimmed();
             }
             m_deleteCatalog.close();
@@ -92,8 +94,8 @@ void QnFileDeletor::processPostponedFiles()
     if (m_postponedFiles.isEmpty())
         return;
 
-    QStringList newList;
-    for (QStringList::Iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
+    QSet<QString> newList;
+    for (QSet<QString>::Iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
     {
         if (QFile::exists(*itr) && !internalDeleteFile(*itr))
             newList << *itr;

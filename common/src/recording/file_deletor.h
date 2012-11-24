@@ -22,7 +22,7 @@ private:
 private:
     mutable QMutex m_mutex;
     QString m_mediaRoot;
-    QStringList m_postponedFiles;
+    QSet<QString> m_postponedFiles;
     QFile m_deleteCatalog;
     bool m_firstTime;
 };

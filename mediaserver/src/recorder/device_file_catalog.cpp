@@ -444,16 +444,15 @@ bool DeviceFileCatalog::deleteFirstRecord()
 
         storage->addWritedSpace(-storage->getFileSize(delFileName));
         storage->removeFile(delFileName);
-        bool isLastChunkOfMonth = true;
         QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
         if (m_firstDeleteCount < m_chunks.size()-1)
         {
             QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
-            isLastChunkOfMonth = curDate.year() != nextDate.year() || curDate.month() != nextDate.month();
-        }
-        if (isLastChunkOfMonth) {
-            QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
-            storage->removeDir(motionDirName);
+            if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
+            {
+                QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
+                storage->removeDir(motionDirName);
+            }
         }
         m_firstDeleteCount++;
     }
