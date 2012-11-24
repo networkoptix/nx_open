@@ -514,11 +514,20 @@ double CLFFmpegVideoDecoder::getSampleAspectRatio() const
 
     if (qAbs(result)< 1e-7) {
         result = 1.0; // if sample_aspect_ratio==0 it's unknown based on ffmpeg docs. so we assume it's 1.0 then
-        if (m_context->width == 720) {
+        if (m_context->width == 720) { // TODO: add a table!
             if (m_context->height == 480)
                 result = (4.0/3.0) / (720.0/480.0);
             else if (m_context->height == 576)
                 result = (4.0/3.0) / (720.0/576.0);
+            else if (m_context->height == 240)
+                result = (4.0/3.0) / (720.0/240.0);
+        } else if(m_context->width == 704) {
+            if (m_context->height == 480)
+                result = (4.0/3.0) / (704.0/480.0);
+            else if (m_context->height == 576)
+                result = (4.0/3.0) / (704.0/576.0);
+            else if (m_context->height == 240)
+                result = (4.0/3.0) / (704.0/240.0);
         }
     }
 

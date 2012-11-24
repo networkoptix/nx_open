@@ -63,6 +63,7 @@ signals:
     void moreLicensesRequested();
     void gridParamsChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
+    void controlsChangesApplied();
 
 private slots:
     void updateGridParams(bool fromUserInput = false);
