@@ -88,10 +88,10 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     QPointF rotationCenter = geometry.center();
     switch (m_fixedRotation) {
         case Qn::Angle90:
-            rotationCenter.setY(rotationCenter.x());
+            rotationCenter.setX(rotationCenter.y());
             break;
         case Qn::Angle270:
-            rotationCenter.setX(rotationCenter.y());
+            rotationCenter.setY(rotationCenter.x());
             break;
         default:
             break;
@@ -99,7 +99,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 
     setTransformOriginPoint(rotationCenter);
     // Rotating counterclockwise to match with item rotation
-    setRotation(-1 * m_fixedRotation);
+    setRotation(m_fixedRotation);
 
     setTransform(QTransform::fromScale(scale, scale));
 }

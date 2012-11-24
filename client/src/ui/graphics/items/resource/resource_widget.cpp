@@ -763,7 +763,7 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     painter->setOpacity(opacity * qAbs(std::sin(QDateTime::currentMSecsSinceEpoch() / qreal(TEXT_FLASHING_PERIOD * 2) * M_PI)));
 
     painter->translate(rect().center());
-    painter->rotate(-1.0 * m_desiredRotation);
+    painter->rotate(m_desiredRotation);
     painter->translate(offset * unit);
     if (m_desiredRotation % 180 != 0) {
         qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
@@ -810,7 +810,7 @@ void QnResourceWidget::paintOverlay(QPainter *painter, const QRectF &rect, Overl
         glPushMatrix();
         glTranslatef(overlayRect.center().x(), overlayRect.center().y(), 1.0);
         glScalef(overlayRect.width() / 2, overlayRect.height() / 2, 1.0);
-        glRotatef(-1.0 * m_desiredRotation, 0.0, 0.0, 1.0);
+        glRotatef(m_desiredRotation, 0.0, 0.0, 1.0);
         if(overlay == LoadingOverlay) {
             m_loadingProgressPainter->paint(
                 static_cast<qreal>(currentTimeMSec % defaultProgressPeriodMSec) / defaultProgressPeriodMSec,
