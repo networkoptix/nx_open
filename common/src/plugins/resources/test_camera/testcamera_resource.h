@@ -13,6 +13,7 @@ public:
     static const char* MANUFACTURE;
 
     QnTestCameraResource();
+    virtual bool hasDualStreaming() const override {return false; }
 
     virtual int getMaxFps() override; 
     virtual bool isResourceAccessible() override;
