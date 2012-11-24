@@ -11,6 +11,59 @@ QnFileDeletor* QnFileDeletor::instance()
 
 QnFileDeletor::QnFileDeletor()
 {
+    m_postponeTimer.start();
+    start();
+}
+
+QnFileDeletor::~QnFileDeletor()
+{
+    pleaseStop();
+    wait();
+}
+
+void QnFileDeletor::run()
+{
+    while (!m_needStop)
+    {
+        if (m_postponeTimer.elapsed() > 1000*60) {
+            processPostponedFiles();
+            m_postponeTimer.restart();
+        }
+
+        DeleteInfo toDelete;
+        m_mutex.lock();
+        if (!m_toDeleteList.isEmpty())
+            toDelete = m_toDeleteList.dequeue();
+        m_mutex.unlock();
+
+        if (!toDelete.name.isEmpty()) {
+            if (toDelete.isDir)
+            {
+                QDir dir(toDelete.name);
+                QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+                foreach(const QFileInfo& fi, list)
+                    checkAndDeleteFileInternal(fi.absoluteFilePath());
+            }
+            else {
+                checkAndDeleteFileInternal(toDelete.name);
+            }
+        }
+        else {
+            msleep(1000);
+        }
+    }
+}
+
+void QnFileDeletor::checkAndDeleteFileInternal(const QString& fileName)
+{
+    if (QFile::exists(fileName))
+    {
+        if (!internalDeleteFile(fileName))
+        {
+            cl_log.log("Can't delete file right now. Postpone deleting. Name=", fileName, cl_logWARNING);
+            postponeFile(fileName);
+        }
+    }
 }
 
 void QnFileDeletor::init(const QString& tmpRoot)
@@ -37,28 +90,18 @@ bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 
 void QnFileDeletor::deleteDir(const QString& dirName)
 {
-    QDir dir(dirName);
-    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
-    foreach(const QFileInfo& fi, list)
-        deleteFile(fi.absoluteFilePath());
+    QMutexLocker lock(&m_mutex);
+    m_toDeleteList << DeleteInfo(dirName, true);
 }
 
 void QnFileDeletor::deleteFile(const QString& fileName)
 {
-    processPostponedFiles();
-    if (QFile::exists(fileName))
-    {
-        if (!internalDeleteFile(fileName))
-        {
-            cl_log.log("Can't delete file right now. Postpone deleting. Name=", fileName, cl_logWARNING);
-            postponeFile(fileName);
-        }
-    }
+    QMutexLocker lock(&m_mutex);
+    m_toDeleteList << DeleteInfo(fileName, false);
 }
 
 void QnFileDeletor::postponeFile(const QString& fileName)
 {
-    QMutexLocker lock(&m_mutex);
     if (m_postponedFiles.contains(fileName))
         return;
     m_postponedFiles << fileName;
@@ -74,7 +117,6 @@ void QnFileDeletor::postponeFile(const QString& fileName)
 void QnFileDeletor::processPostponedFiles()
 {
 
-    QMutexLocker lock(&m_mutex);
     if (m_firstTime)
     {
         // read postpone file

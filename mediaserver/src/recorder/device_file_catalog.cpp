@@ -353,15 +353,18 @@ void DeviceFileCatalog::deserializeTitleFile()
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
-    QMutexLocker lock(&m_mutex);
 
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
-    itr = m_chunks.insert(itr, chunk);
-    m_lastAddIndex = itr - m_chunks.begin();
-    //if (m_lastAddIndex < m_chunks.size()-1)
-    //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
+    {
+        QMutexLocker lock(&m_mutex);
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+        itr = m_chunks.insert(itr, chunk);
+        m_lastAddIndex = itr - m_chunks.begin();
+        //if (m_lastAddIndex < m_chunks.size()-1)
+        //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
+    }
+
+    QMutexLocker lock(&m_IOMutex);
     QTextStream str(&m_file);
-
     str << chunk.timeZone << ';' << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
     if (chunk.durationMs >= 0)
         str << chunk.durationMs  << '\n';
@@ -371,10 +374,14 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 void DeviceFileCatalog::updateDuration(int durationMs)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
-    QMutexLocker lock(&m_mutex);
-    //m_chunks.last().durationMs = durationMs;
-    if (m_lastAddIndex >= 0)
-        m_chunks[m_lastAddIndex].durationMs = durationMs;
+    {
+        QMutexLocker lock(&m_mutex);
+        //m_chunks.last().durationMs = durationMs;
+        if (m_lastAddIndex >= 0)
+            m_chunks[m_lastAddIndex].durationMs = durationMs;
+    }
+
+    QMutexLocker lock(&m_IOMutex);
     QTextStream str(&m_file);
     str << durationMs << '\n';
     str.flush();

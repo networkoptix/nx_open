@@ -5,9 +5,13 @@
 #include <QString>
 #include <QMutex>
 #include <QStringList>
+#include <QThread>
+#include <QTimer>
+#include "utils/common/long_runnable.h"
 
-class QnFileDeletor
+class QnFileDeletor: public QnLongRunnable
 {
+    Q_OBJECT
 public:
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
@@ -15,16 +19,30 @@ public:
     void deleteDir(const QString& dirName);
     
     QnFileDeletor();
+    ~QnFileDeletor();
+
+    virtual void run() override;
 private:
     void processPostponedFiles();
     void postponeFile(const QString& fileName);
+    void checkAndDeleteFileInternal(const QString& fileName);
     bool internalDeleteFile(const QString& fileName);
 private:
+    struct DeleteInfo
+    {
+        DeleteInfo() {}
+        DeleteInfo(const QString& _name, bool _isDir): name(_name), isDir(_isDir) {}
+        QString name;
+        bool isDir;
+    };
+
     mutable QMutex m_mutex;
     QString m_mediaRoot;
     QSet<QString> m_postponedFiles;
+    QQueue<DeleteInfo> m_toDeleteList;
     QFile m_deleteCatalog;
     bool m_firstTime;
+    QTime m_postponeTimer;
 };
 
 #define qnFileDeletor QnFileDeletor::instance()

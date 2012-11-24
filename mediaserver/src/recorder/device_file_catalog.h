@@ -89,6 +89,7 @@ private:
     QString m_prevFileName;
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
+    QMutex m_IOMutex;
 
 };
 
