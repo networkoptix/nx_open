@@ -20,46 +20,7 @@ class QnRenderingWidget;
 
 namespace Ui {
     class LoginDialog;
-    class FindAppServerDialog;
 }
-
-class QnCombineConnectionsModel : public QAbstractListModel {
-    Q_OBJECT
-
-public:
-    QnCombineConnectionsModel(QObject* parent = 0): QAbstractListModel(parent) {}
-
-    int rowCount(const QModelIndex &parent = QModelIndex()) const {
-        int count = 0;
-        foreach (QAbstractItemModel *child, m_children)
-            count += child->rowCount(parent);
-        return count;
-    }
-
-    QVariant data(const QModelIndex &index, int role) const {
-        int row = index.row();
-        int count = 0;
-        foreach (QAbstractItemModel *child, m_children) {
-            if (count + child->rowCount() < row)
-                count += child->rowCount();
-            else
-                return child->data(child->index(row - count, index.column()), role);
-        }
-        return QVariant();
-    }
-
-    QVariant headerData(int section, Qt::Orientation orientation,
-                             int role = Qt::DisplayRole) const {
-        return QVariant();
-    }
-
-    void addChild(QAbstractItemModel *child) {
-        m_children.append(child);
-    }
-
-private:
-    QList<QAbstractItemModel*> m_children;
-};
 
 class LoginDialog : public QDialog {
     Q_OBJECT
@@ -93,14 +54,15 @@ private slots:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(int index);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
-    void onSelectEntCtrlButtonClicked();
+
+    void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
+        const QString& remoteHostAddress, bool isLocal, const QString& seed);
+    void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
 
 private:
     Q_DISABLE_COPY(LoginDialog)
 
     QScopedPointer<Ui::LoginDialog> ui;
-    QScopedPointer<QDialog> m_findAppServerDialog;
-    QScopedPointer<Ui::FindAppServerDialog> m_findAppServerDialogUI;
     QWeakPointer<QnWorkbenchContext> m_context;
     QStandardItemModel *m_connectionsModel;
     QDataWidgetMapper *m_dataWidgetMapper;
@@ -108,10 +70,12 @@ private:
     QnConnectInfoPtr m_connectInfo;
 
     QnRenderingWidget* m_renderingWidget;
-    NetworkOptixModuleFinder m_entCtrlFinder;
-    FoundEnterpriseControllersModel m_foundEntCtrlModel;
+    NetworkOptixModuleFinder* m_entCtrlFinder;
 
-    QnCombineConnectionsModel* m_combineConnectionsModel;
+    /**
+     * @brief m_foundEcs    Hash list of automatically found Enterprise Controllers based on seed as key.
+     */
+    QMultiHash<QString, QUrl> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H
