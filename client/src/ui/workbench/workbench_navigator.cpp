@@ -1054,7 +1054,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         Qn::SliderScope, 
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodParameter, selection).
-            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)) // TODO: move this out into global scope!
+            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)). // TODO: move this out into global scope!
+            withArgument(Qn::AllTimePeriodsParameter, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingRole))
     ));
     if(menu->isEmpty())
         return;
