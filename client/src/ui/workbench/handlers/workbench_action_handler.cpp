@@ -2195,11 +2195,13 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+    QString mediaFileFilter = tr("Media File (*.nov)");
+    QString mediaFileROFilter = tr("Media File (read only) (*.nov)");
 
     QString mediaFilter =
-              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
             + filterSeparator
-            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileROFilter
             + filterSeparator
             + binaryFilterName(false)
             + filterSeparator
@@ -2217,7 +2219,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(tr("read only"));
+        exportReadOnly = selectedFilter.contains(mediaFileROFilter);
         if (fileName.isEmpty())
             return false;
 
