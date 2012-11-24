@@ -85,6 +85,7 @@ public:
         }
 
         QnScopedPainterPenRollback penRollback(painter, QPen(pen().color().lighter(120), elementHalfSize / 2.0));
+        QnScopedPainterBrushRollback brushRollback(painter, Qt::NoBrush);
         painter->drawPath(path);
     }
 
