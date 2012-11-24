@@ -1,19 +1,28 @@
 #include "viewport_bound_widget.h"
+
 #include <cmath> /* For std::sqrt. */
-#include <QGraphicsView>
+
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsScale>
+
 #include <utils/common/fuzzy.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/warnings.h>
+
 #include <ui/graphics/instruments/transform_listener_instrument.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 
 
 QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem *parent):
     base_type(parent),
-    m_desiredSize(QSizeF(0.0, 0.0)),
-    m_inUpdateScale(false),
-    m_fixedRotation(Qn::Angle0)
+    m_fixedSize(QSizeF(0.0, 0.0)),
+    m_inUpdateScale(false)
 {
+    m_scale = new QGraphicsScale(this);
+    QList<QGraphicsTransform *> transformations = this->transformations();
+    transformations.push_back(m_scale);
+    setTransformations(transformations);
+
     itemChange(ItemSceneHasChanged, QVariant::fromValue(scene()));
 }
 
@@ -21,29 +30,21 @@ QnViewportBoundWidget::~QnViewportBoundWidget() {
     return;
 }
 
-const QSizeF &QnViewportBoundWidget::desiredSize() {
-    return m_desiredSize;
+const QSizeF &QnViewportBoundWidget::fixedSize() {
+    return m_fixedSize;
 }
 
-void QnViewportBoundWidget::setDesiredSize(const QSizeF &desiredSize) {
-    if(qFuzzyCompare(m_desiredSize, desiredSize))
+void QnViewportBoundWidget::setFixedSize(const QSizeF &fixedSize) {
+    if(qFuzzyCompare(m_fixedSize, fixedSize))
         return;
 
-    m_desiredSize = desiredSize;
+    m_fixedSize = fixedSize;
 
-    updateScale();
-}
-
-void QnViewportBoundWidget::setDesiredRotation(Qn::FixedItemRotation fixedRotation){
-    if (m_fixedRotation == fixedRotation)
-        return;
-
-    m_fixedRotation = fixedRotation;
     updateScale();
 }
 
 void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
-    if (m_desiredSize.isNull())
+    if (m_fixedSize.isNull())
         return;
 
     if(!view)
@@ -63,11 +64,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    QSizeF geometrySize = m_desiredSize / scale;
-    if (m_fixedRotation == Qn::Angle90 || m_fixedRotation == Qn::Angle270)
-        geometrySize.transpose();
-
-    QRectF geometry = QRectF(QPointF(0, 0), geometrySize);
+    QRectF geometry = QRectF(QPointF(0, 0), m_fixedSize / scale);
     setGeometry(geometry);
 
     QSizeF resultingSize = size();
@@ -85,23 +82,8 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
         setGeometry(geometry);
     }
 
-    QPointF rotationCenter = geometry.center();
-    switch (m_fixedRotation) {
-        case Qn::Angle90:
-            rotationCenter.setX(rotationCenter.y());
-            break;
-        case Qn::Angle270:
-            rotationCenter.setY(rotationCenter.x());
-            break;
-        default:
-            break;
-    }
-
-    setTransformOriginPoint(rotationCenter);
-    // Rotating counterclockwise to match with item rotation
-    setRotation(m_fixedRotation);
-
-    setTransform(QTransform::fromScale(scale, scale));
+    m_scale->setXScale(scale);
+    m_scale->setYScale(scale);
 }
 
 

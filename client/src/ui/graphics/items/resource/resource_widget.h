@@ -12,6 +12,7 @@
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/geometry.h>
+#include <ui/common/fixed_rotation.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/help_topic_queryable.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -243,13 +244,13 @@ public:
 
     Buttons visibleButtons() const;
 
-    // TODO: #gdm implement via visibleButtons() function, then remove this one.
-    bool isInfoButtonVisible() const;
-
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
     using base_type::mapRectToScene;
+
+    void addOverlayWidget(QGraphicsWidget *widget, bool autoRotate = false, bool bindToViewport = false);
+    void removeOverlayWidget(QGraphicsWidget *widget);
 
 signals:
     void aspectRatioChanged();
@@ -306,12 +307,7 @@ protected:
     virtual QString calculateInfoText() const;
     Q_SLOT void updateInfoText();
 
-    /**
-     * Updates overlay widget's rotation.
-     *
-     * \param rotation                  Target rotation angle in degrees.
-     */
-    void updateOverlayRotation(qreal rotation);
+    void updateOverlayWidgetsGeometry();
 
     QnImageButtonBar *buttonBar() const {
         return m_buttonBar;
@@ -361,6 +357,12 @@ private:
         Qn::RenderStatus renderStatus;
     };
 
+    struct OverlayWidget {
+        QGraphicsWidget *widget;
+        QnViewportBoundWidget *boundWidget;
+        QnFixedRotationTransform *rotationTransform;
+    };
+
 private:
     /** Paused painter. */
     QSharedPointer<QnPausedPainter> m_pausedPainter;
@@ -401,6 +403,9 @@ private:
     QString m_titleTextFormat, m_infoTextFormat;
     bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
 
+    /** List of overlay widgets. */
+    QList<OverlayWidget> m_overlayWidgets;
+
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
     QGraphicsLinearLayout *m_headerLayout;
@@ -430,9 +435,8 @@ private:
     /** Whether mouse cursor is in widget. Usable to show/hide decorations. */
     bool m_mouseInWidget;
 
-    // TODO: #gdm move Qn::FixedAngle out in common module and use here.
-    /** Rotation angle in degrees, shall be multiple of 90. Used to rotate static text and images. */
-    int m_desiredRotation;
+    /** Fixed rotation angle in degrees. Used to rotate static text and images. */
+    Qn::FixedRotation m_overlayRotation;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
