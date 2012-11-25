@@ -69,6 +69,9 @@ private:
     void getTimePeriodInternal(QVector<QnTimePeriodList>& cameras, QnNetworkResourcePtr camera, qint64 startTime, qint64 endTime, qint64 detailLevel, DeviceFileCatalogPtr catalog);
     bool existsStorageWithID(const QnAbstractStorageResourceList& storages, QnId id) const;
     void updateStorageStatistics();
+
+    int getFileNumFromCache(const QString& base, const QString& folder);
+    void putFileNumToCache(const QString& base, int fileNum);
 private:
     StorageMap m_storageRoots;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;
@@ -82,6 +85,10 @@ private:
     bool m_storagesStatisticsReady;
     QTime m_lastClearanceTime;
     QMutex m_spaceClearanceMtx;
+
+    typedef QMap<QString, QPair<QString, int > > FileNumCache;
+    FileNumCache m_fileNumCache;
+    QMutex m_cacheMutex;
 };
 
 #define qnStorageMan QnStorageManager::instance()

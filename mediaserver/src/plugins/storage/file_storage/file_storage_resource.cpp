@@ -94,8 +94,10 @@ qint64 QnFileStorageResource::getFreeSpace()
 QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
-    dir.cd(dirName);
-    return dir.entryInfoList(QDir::Files);
+    if (dir.cd(dirName))
+        return dir.entryInfoList(QDir::Files);
+    else
+        return QFileInfoList();
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& fillName) const

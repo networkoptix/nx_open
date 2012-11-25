@@ -385,6 +385,25 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     return result;
 }
 
+int QnStorageManager::getFileNumFromCache(const QString& base, const QString& folder)
+{
+    QMutexLocker lock(&m_cacheMutex);
+    FileNumCache::iterator itr = m_fileNumCache.find(base);
+    if (itr == m_fileNumCache.end())
+        itr = m_fileNumCache.insert(base, QPair<QString, int >());
+    if (itr.value().first != folder) {
+        itr.value().first = folder;
+        itr.value().second = -1;
+    }
+    return itr.value().second;
+}
+
+void QnStorageManager::putFileNumToCache(const QString& base, int fileNum)
+{
+    QMutexLocker lock(&m_cacheMutex);
+    m_fileNumCache[base].second = fileNum;
+}
+
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr camera, const QString& prefix, QnStorageResourcePtr& storage)
 {
     if (!storage) {
@@ -396,18 +415,27 @@ QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, c
 
     if (!prefix.isEmpty())
         base += prefix + "/";
+    base += camera->getPhysicalId();
 
-    QString text = base + camera->getPhysicalId();
     Q_ASSERT(!camera->getPhysicalId().isEmpty());
-    text += QString("/") + dateTimeStr(dateTime, timeZone);
-    QList<QFileInfo> list = storage->getFileList(text);
-    QList<QString> baseNameList;
-    foreach(const QFileInfo& info, list)
-        baseNameList << info.baseName();
-    qSort(baseNameList.begin(), baseNameList.end());
-    int fileNum = 0;
-    if (!baseNameList.isEmpty()) 
-        fileNum = baseNameList.last().toInt() + 1;
+    QString text = base + QString("/") + dateTimeStr(dateTime, timeZone);
+
+    int fileNum = getFileNumFromCache(base, text);
+    if (fileNum == -1)
+    {
+        fileNum = 0;
+        QList<QFileInfo> list = storage->getFileList(text);
+        QList<QString> baseNameList;
+        foreach(const QFileInfo& info, list)
+            baseNameList << info.baseName();
+        qSort(baseNameList.begin(), baseNameList.end());
+        if (!baseNameList.isEmpty()) 
+            fileNum = baseNameList.last().toInt() + 1;
+    }
+    else {
+        fileNum++; // using cached value
+    }
+    putFileNumToCache(base, fileNum);
     return text + strPadLeft(QString::number(fileNum), 3, '0');
 }
 
