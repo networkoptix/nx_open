@@ -110,7 +110,8 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        secondaryFiles = secondaryFileNames.split(',');
+        if (!secondaryFileNames.isEmpty())
+            secondaryFiles = secondaryFileNames.split(',');
         for (int k = 0; k < secondaryFiles.size(); ++k)
             if (!QFile::exists(secondaryFiles[k])) {
                 qWarning() << "File" << secondaryFiles[k] << "not found";
