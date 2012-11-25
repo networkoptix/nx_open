@@ -124,10 +124,9 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
 
     IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
     if (itr == m_prevPartsMap->end()) {
-        itr = m_prevPartsMap->insert(chunk.storageIndex, QVector<QPair<int, bool> >());
-        itr.value().resize(4);
+        itr = m_prevPartsMap->insert(chunk.storageIndex, IOCacheEntry());
     }
-    IOPath& prevParts = itr.value();
+    CachedDirInfo& prevParts = itr.value().dirInfo;
 
     for (int i = 0; i < 4; ++i)
     {
@@ -159,12 +158,12 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     if (!prevParts[3].second)
         return false;
     if (!sameDir) {
-        m_existFileList = storage->getFileList(prefix);
+        itr.value().entryList = storage->getFileList(prefix);
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
 
     bool found = false;
-    foreach(const QFileInfo& info, m_existFileList)
+    foreach(const QFileInfo& info, itr.value().entryList)
     {
         if (info.fileName() == fName)
         {

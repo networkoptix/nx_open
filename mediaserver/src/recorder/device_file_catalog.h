@@ -83,12 +83,18 @@ private:
     int m_firstDeleteCount;
     QString m_macAddress;
 
-    typedef QVector<QPair<int, bool> > IOPath;
-    typedef QMap<int, IOPath > IOCacheMap;
+    typedef QVector<QPair<int, bool> > CachedDirInfo;
+    struct IOCacheEntry
+    {
+        CachedDirInfo dirInfo;
+        QFileInfoList entryList;
+
+        IOCacheEntry() { dirInfo.resize(4); }
+    };
+
+    typedef QMap<int, IOCacheEntry > IOCacheMap;
     IOCacheMap m_prevPartsMap[4];
 
-    //QPair<int, bool> m_prevParts[4];
-    QFileInfoList m_existFileList;
     bool m_duplicateName;
     QMap<int,QString> m_prevFileNames;
     QnResource::ConnectionRole m_role;
