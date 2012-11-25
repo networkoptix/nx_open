@@ -674,7 +674,11 @@ void QnMain::run()
             server = createServer();
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
-        server->setNetAddrList(allLocalAddresses());
+        QList<QHostAddress> serverIfaceList = allLocalAddresses();
+        QString extIp = qSettings.value("externalIP").toString();
+        if (!extIp.isEmpty())
+            serverIfaceList << QHostAddress(extIp);
+        server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
