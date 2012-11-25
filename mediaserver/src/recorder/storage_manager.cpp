@@ -9,7 +9,7 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const int SPACE_CLEARANCE_INTERVAL = 60 * 1000;
+static const int SPACE_CLEARANCE_INTERVAL = 30 * 1000;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
