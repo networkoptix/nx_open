@@ -50,7 +50,7 @@ bool QnServerStreamRecorder::canAcceptData() const
         return true;
 
     //bool rez = QnStreamRecorder::canAcceptData();
-    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_queuedSize < 1000;
+    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     
 
     if (!rez) {
