@@ -7,6 +7,7 @@
 #include "utils/fs/file.h"
 #include "utils/common/threadqueue.h"
 #include "utils/common/long_runnable.h"
+#include "utils/common/byte_array.h"
 
 class QBufferedFile;
 
@@ -97,10 +98,11 @@ protected:
 private:
     bool isWritable() const;
     void flushBuffer();
-    void disableDirectIO();
+    bool prepareBuffer(int bufOffset);
+    bool updatePos();
 private:
     QnFile m_fileEngine;
-    int m_bufferSize;
+    const int m_bufferSize;
     int m_minBufferSize;
     quint8* m_buffer;
     QueueFileWriter* m_queueWriter;
@@ -109,11 +111,13 @@ private:
     bool m_isDirectIO;
     int m_bufferLen;
     int m_bufferPos;
-    qint64 m_totalWrited;
+    qint64 m_actualFileSize;
     qint64 m_filePos;
     QIODevice::OpenMode m_openMode;
 
     friend class QueueFileWriter;
+    QnByteArray m_cachedBuffer; // cached file begin
+    qint64 m_lastSeekPos;
 };
 
 #endif // __BUFFERED_FILE_H__

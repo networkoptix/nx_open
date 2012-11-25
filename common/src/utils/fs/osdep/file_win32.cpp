@@ -29,7 +29,7 @@ QnFile::~QnFile()
 		close();
 }
 
-bool QnFile::open(QIODevice::OpenMode& openMode, unsigned int systemDependentFlags)
+bool QnFile::open(const QIODevice::OpenMode& openMode, unsigned int systemDependentFlags)
 {
     // All files are opened in share mode (both read and write).
     DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;

@@ -68,7 +68,7 @@ QnFile::~QnFile()
 		close();
 }
 
-bool QnFile::open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
+bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
 {
 	if( isOpen() )
 		close();
