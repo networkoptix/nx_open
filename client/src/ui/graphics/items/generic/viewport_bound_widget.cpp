@@ -72,7 +72,12 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
 
     QSizeF resultingSize = size();
     if(resultingSize.width() > geometry.width() || resultingSize.height() > geometry.height()) {
-        qreal k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
+        qreal k;
+        if(qFuzzyIsNull(geometry.width()) || qFuzzyIsNull(geometry.height())) {
+            k = 1.0e6; 
+        } else {
+            k = qMax(resultingSize.width() / geometry.width(), resultingSize.height() / geometry.height());
+        }
 
         geometry.setSize(geometry.size() * k);
         scale /= k;
@@ -81,8 +86,7 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
     }
 
     QPointF rotationCenter = geometry.center();
-    qreal rotation;
-    switch (m_fixedRotation){
+    switch (m_fixedRotation) {
         case Qn::Angle90:
             rotationCenter.setX(rotationCenter.y());
             break;
@@ -92,10 +96,10 @@ void QnViewportBoundWidget::updateScale(QGraphicsView *view) {
         default:
             break;
     }
-    rotation = m_fixedRotation;
 
     setTransformOriginPoint(rotationCenter);
-    setRotation(rotation);
+    // Rotating counterclockwise to match with item rotation
+    setRotation(m_fixedRotation);
 
     setTransform(QTransform::fromScale(scale, scale));
 }
