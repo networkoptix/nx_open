@@ -127,6 +127,7 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
     m_fileEngine(fileName), 
     m_bufferSize(fileBlockSize+minBufferSize),
     m_buffer(0),
+    m_sectorBuffer(0),
     m_queueWriter(0),
     m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
     m_lastSeekPos(AV_NOPTS_VALUE)
@@ -138,14 +139,17 @@ QBufferedFile::QBufferedFile(const QString& fileName, int fileBlockSize, int min
     m_actualFileSize = 0;
     m_isDirectIO = false;
 
-    if (m_bufferSize > 0)
+    if (m_bufferSize > 0) {
         m_buffer = (quint8*) qMallocAligned(m_bufferSize, SECTOR_SIZE);
+        m_sectorBuffer = (quint8*) qMallocAligned(SECTOR_SIZE, SECTOR_SIZE);
+    }
 }
 
 QBufferedFile::~QBufferedFile()
 {
     close();
     qFreeAligned(m_buffer);
+    qFreeAligned(m_sectorBuffer);
 }
 qint64 QBufferedFile::size() const
 {
@@ -160,14 +164,27 @@ qint64 QBufferedFile::writeUnbuffered(const char * data, qint64 len )
     return m_fileEngine.write(data, len);
 }
 
+void QBufferedFile::mergeBufferWithExistingData()
+{
+    qint64 pos = qPower2Floor(m_bufferLen, SECTOR_SIZE);
+    qint64 toReadRest = pos + SECTOR_SIZE - m_bufferLen;
+    m_fileEngine.seek(m_filePos + pos);
+    if (m_fileEngine.read((char*) m_sectorBuffer, SECTOR_SIZE) > 0)
+        memcpy(m_buffer+m_bufferLen, m_sectorBuffer + (SECTOR_SIZE-toReadRest), toReadRest);
+    m_fileEngine.seek(m_filePos);
+}
+
 void QBufferedFile::flushBuffer()
 {
     if (!m_buffer)
         return;
 
     int toWrite = m_bufferLen;
-    if(m_isDirectIO)
+    if(m_isDirectIO) {
         toWrite = qPower2Ceil((quint32) m_bufferLen, SECTOR_SIZE);
+        if (toWrite > m_bufferLen && m_filePos+m_bufferLen < m_actualFileSize)
+            mergeBufferWithExistingData();
+    }
     qint64 writed = m_queueWriter->write(this, (const char*) m_buffer, toWrite);
     if (writed == toWrite)
         m_filePos += toWrite;
@@ -284,7 +301,7 @@ bool QBufferedFile::prepareBuffer(int bufOffset)
         int readed = m_fileEngine.read((char*) m_buffer, toRead);
         if (readed != toRead)
             return false;
-        m_bufferLen = readed;
+        m_bufferLen = qMin((qint64) readed, m_actualFileSize - m_filePos);
         m_fileEngine.seek(m_filePos);
     }
     m_bufferPos = bufOffset;

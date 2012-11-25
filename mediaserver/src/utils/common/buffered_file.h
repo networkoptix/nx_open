@@ -100,11 +100,13 @@ private:
     void flushBuffer();
     bool prepareBuffer(int bufOffset);
     bool updatePos();
+    void mergeBufferWithExistingData();
 private:
     QnFile m_fileEngine;
     const int m_bufferSize;
     int m_minBufferSize;
     quint8* m_buffer;
+    quint8* m_sectorBuffer;
     QueueFileWriter* m_queueWriter;
     unsigned int m_systemDependentFlags;
 private:
