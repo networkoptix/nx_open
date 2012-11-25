@@ -51,8 +51,10 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_currentTimeZone(-1),
     m_onscreenDateOffset(0),
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
-    m_nextIFrameTime(AV_NOPTS_VALUE)
+    m_nextIFrameTime(AV_NOPTS_VALUE),
+    m_truncateIntervalEps(0)
 {
+    srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
@@ -318,7 +320,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     if (md->flags & AV_PKT_FLAG_KEY)
     {
         m_gotKeyFrame[channel] = true;
-        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > m_truncateInterval)
+        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval+m_truncateIntervalEps))
         {
             m_endDateTime = md->timestamp;
             close();
@@ -595,6 +597,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
     }
     fileStarted(m_startDateTime/1000, m_currentTimeZone, m_fileName, m_mediaProvider);
+    if (m_truncateInterval > 4000000ll)
+        m_truncateIntervalEps = (rand() % (m_truncateInterval/4000000ll)) * 1000000ll;
 
     return true;
 }

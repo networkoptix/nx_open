@@ -168,6 +168,7 @@ private:
     qint64 m_serverTimeZoneMs;
 
     qint64 m_nextIFrameTime;
+    qint64 m_truncateIntervalEps;
 };
 
 #endif // _STREAM_RECORDER_H__
