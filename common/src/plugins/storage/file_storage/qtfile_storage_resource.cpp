@@ -2,9 +2,6 @@
 #include "recording/file_deletor.h"
 #include "utils/common/util.h"
 
-static const int IO_BLOCK_SIZE = 1024*1024*4;
-static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
-
 QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
 {
     QString fileName = removeProtocolPrefix(url);
