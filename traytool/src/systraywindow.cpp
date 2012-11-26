@@ -658,7 +658,7 @@ void QnSystrayWindow::onSettingsAction()
         m_mServerSettings.setValue("publicIPEnabled", 1);
     int allowPublicIP = m_mServerSettings.value("publicIPEnabled").toInt();
     ui->groupBoxPublicIP->setChecked(allowPublicIP > 0);
-    ui->radioButtonPublicIPAuto->setChecked(allowPublicIP == 1);
+    ui->radioButtonPublicIPAuto->setChecked(allowPublicIP < 1);
     ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
     onRadioButtonPublicIpChanged();
 
