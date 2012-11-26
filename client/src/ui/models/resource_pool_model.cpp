@@ -666,6 +666,29 @@ QnResourcePoolModel::Node *QnResourcePoolModel::node(const QModelIndex &index) c
     return static_cast<Node *>(index.internalPointer());
 }
 
+void QnResourcePoolModel::deleteNode(Node *node) {
+    assert(node->type() == Qn::ResourceNode || node->type() == Qn::ItemNode);
+
+    // TODO: implement this in Node's destructor.
+
+    foreach(Node *childNode, node->children())
+        deleteNode(childNode);
+
+    switch(node->type()) {
+    case Qn::ResourceNode:
+        m_resourceNodeByResource.remove(node->resource().data());
+        break;
+    case Qn::ItemNode:
+        m_itemNodeByUuid.remove(node->uuid());
+        m_itemNodesByResource[node->resource().data()].removeAll(node);
+        break;
+    default:
+        break;
+    }
+
+    delete node;
+}
+
 QnResourcePoolModel::Node *QnResourcePoolModel::expectedParent(Node *node) {
     assert(node->type() == Qn::ResourceNode);
 
@@ -901,10 +924,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
     disconnect(resource.data(), NULL, this, NULL);
 
-    Node *node = this->node(resource);
-    node->clear();
-
-    // TODO: delete node here?
+    deleteNode(node(resource));
 }
 
 void QnResourcePoolModel::at_context_userChanged() {
@@ -980,8 +1000,7 @@ void QnResourcePoolModel::at_resource_itemAdded(const QnLayoutItemData &item) {
 }
 
 void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &item) {
-    Node *node = this->node(item.uuid);
-    node->clear();
+    deleteNode(node(item.uuid));
 }
 
 void QnResourcePoolModel::at_resource_itemRemoved(const QnLayoutItemData &item) {
