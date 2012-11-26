@@ -189,7 +189,7 @@ void NetworkOptixModuleFinder::run()
             }
 
             cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. Recevied valid response from (%1:%2), server type %3, version %4").
-                arg(remoteAddressStr).arg(remotePort).arg(response.type), cl_logDEBUG1 );
+                        arg(remoteAddressStr).arg(remotePort).arg(response.type).arg(response.version), cl_logDEBUG1 );
 
             //received valid response, checking if already know this enterprise controller
             QHostAddress remoteAddress(remoteAddressStr);
@@ -202,10 +202,10 @@ void NetworkOptixModuleFinder::run()
                 //new enterprise controller found
                 const QHostAddress& localAddress = QHostAddress(udpSocket->getLocalAddress());
                 if( p.second )  //new module found
-                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local address %4").
+                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New remote server of type %1 found at address (%2:%3) on local interface %4").
                         arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 else    //new address of existing module
-                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local address %4").
+                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. New address (%2:%3) of remote server of type %1 found on local interface %4").
                         arg(response.type).arg(remoteAddressStr).arg(remotePort).arg(localAddress.toString()), cl_logDEBUG1 );
                 emit moduleFound(
                     response.type,
