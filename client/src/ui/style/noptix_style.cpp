@@ -141,6 +141,14 @@ void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptio
         if(drawToolButtonComplexControl(option, painter, widget))
             return;
         break;
+    case CC_ScrollBar:
+    {
+        QColor backupText = option->palette.color(QPalette::Text);
+        (const_cast<QStyleOptionComplex *>(option))->palette.setColor(QPalette::Text, QColor(255, 255, 255));
+        base_type::drawComplexControl(control, option, painter, widget);
+        (const_cast<QStyleOptionComplex *>(option))->palette.setColor(QPalette::Text, backupText);
+        return;
+    }
     default:
         break;
     }

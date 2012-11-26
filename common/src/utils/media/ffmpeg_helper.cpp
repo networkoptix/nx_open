@@ -3,7 +3,7 @@
 #include "bitStream.h"
 #include "vc1Parser.h"
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 static inline QByteArray codecIDToByteArray(CodecID codecID)
 {
@@ -602,7 +602,7 @@ void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray
 
 AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     AVCodec* codec = 0;
     AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();

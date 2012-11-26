@@ -7,7 +7,7 @@
 #include "utils/common/math.h"
 
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -56,7 +56,7 @@ m_forceSliceDecoding(-1)
 {
     m_mtDecoding = mtDecoding;
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (data->context)
     {
         m_passedContext = avcodec_alloc_context3(0);
@@ -213,7 +213,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     closeDecoder();
 
@@ -225,7 +225,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //closeDecoder();
     //openDecoder();

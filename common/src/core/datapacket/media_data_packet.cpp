@@ -10,11 +10,11 @@
 #endif
 #include "utils/common/math.h"
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     m_ctx = avcodec_alloc_context3(NULL);
     avcodec_copy_context(m_ctx, ctx);
 }
@@ -23,7 +23,7 @@ QnMediaContext::QnMediaContext(CodecID codecId)
 {
     if (codecId != CODEC_ID_NONE)
     {
-        QMutexLocker mutex(&global_ffmpeg_mutex);
+        //QMutexLocker mutex(&global_ffmpeg_mutex);
         AVCodec* codec = avcodec_find_decoder(codecId);
         m_ctx = avcodec_alloc_context3(codec);
         avcodec_open2(m_ctx, codec, NULL);
@@ -45,7 +45,7 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 QnMediaContext::~QnMediaContext()
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (m_ctx) {
         if (m_ctx->codec)
             avcodec_close(m_ctx);
