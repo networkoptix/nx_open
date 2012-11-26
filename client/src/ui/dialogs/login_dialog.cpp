@@ -393,8 +393,14 @@ void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, co
     QString port = moduleParameters[portId];
     url.setPort(port.toInt());
 
+    QMultiHash<QString, QUrl>::iterator i = m_foundEcs.find(seed);
+    while (i != m_foundEcs.end() && i.key() == seed) {
+        QUrl found = i.value();
+        if (found.host() == url.host() && found.port() == url.port())
+            return; // found the same host, e.g. two interfaces on local controller
+        ++i;
+    }
     m_foundEcs.insert(seed, url);
-
     resetConnectionsModel();
 }
 
