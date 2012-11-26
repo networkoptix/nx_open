@@ -2,6 +2,7 @@
 #define QN_SCHEDULE_GRID_WIDGET_H
 
 #include <QtGui/QWidget>
+#include <core/misc/schedule_recording_type.h>
 
 static const int SEL_CELL_CLR_DELTA = 40;
 static const int TEXT_SPACING = 4;
@@ -18,7 +19,7 @@ public:
     explicit QnScheduleGridWidget(QWidget *parent = 0);
     virtual ~QnScheduleGridWidget();
 
-    enum ParamType { FirstParam, SecondParam, ColorParam, ColorInsideParam, ParamType_Count };
+    enum ParamType { FirstParam, SecondParam, RecordTypeParam, ParamType_Count };
 
     void setDefaultParam(ParamType number, const QVariant& value);
     void setShowFirstParam(bool value);
@@ -30,6 +31,9 @@ public:
     QVariant cellValue(const QPoint &cell, ParamType paramType) const;
     void setCellValue(const QPoint &cell, ParamType paramType, const QVariant &value);
     void resetCellValues();
+
+    Qn::RecordingType cellRecordingType(const QPoint &cell) const;
+    void setCellRecordingType(const QPoint &cell, const Qn::RecordingType &value);
 
     virtual QSize minimumSizeHint() const;
 
@@ -86,6 +90,9 @@ private:
     bool m_mousePressed;
     QFont m_labelsFont;
     QFont m_gridFont;
+
+    QColor m_colors[Qn::RecordingType_Count];
+    QColor m_insideColors[Qn::RecordingType_Count];
 
     bool m_enabled;
     bool m_readOnly;

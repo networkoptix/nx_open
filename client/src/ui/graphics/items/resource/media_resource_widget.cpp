@@ -618,25 +618,25 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = QnScheduleTask::RecordingType_Never;
+    int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
         recordingMode = currentRecordingMode();
     
     iconButton()->setVisible(true);
     switch(recordingMode) {
-    case QnScheduleTask::RecordingType_Never:
+    case Qn::RecordingType_Never:
         iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
         iconButton()->setToolTip(tr("Not recording."));
         break;
-    case QnScheduleTask::RecordingType_Run:
+    case Qn::RecordingType_Run:
         iconButton()->setIcon(qnSkin->icon("item/recording.png"));
         iconButton()->setToolTip(tr("Recording everything."));
         break;
-    case QnScheduleTask::RecordingType_MotionOnly:
+    case Qn::RecordingType_MotionOnly:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
         iconButton()->setToolTip(tr("Recording motion only."));
         break;
-    case QnScheduleTask::RecordingType_MotionPlusLQ:
+    case Qn::RecordingType_MotionPlusLQ:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
         iconButton()->setToolTip(tr("Recording motion and low quality."));
         break;
@@ -680,7 +680,7 @@ void QnMediaResourceWidget::updateServerResource() {
 
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
-        return QnScheduleTask::RecordingType_Never;
+        return Qn::RecordingType_Never;
 
     // TODO: this should be a resource parameter that is update from the server.
 
@@ -692,7 +692,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
         if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
             return task.getRecordingType();
 
-    return QnScheduleTask::RecordingType_Never;
+    return Qn::RecordingType_Never;
 }
 
 

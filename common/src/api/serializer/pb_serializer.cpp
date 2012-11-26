@@ -112,7 +112,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
                                         pb_scheduleTask.dayofweek(),
                                         pb_scheduleTask.starttime(),
                                         pb_scheduleTask.endtime(),
-                                        (QnScheduleTask::RecordingType) pb_scheduleTask.recordtype(),
+                                        (Qn::RecordingType) pb_scheduleTask.recordtype(),
                                         pb_scheduleTask.beforethreshold(),
                                         pb_scheduleTask.afterthreshold(),
                                         (QnStreamQuality) pb_scheduleTask.streamquality(),

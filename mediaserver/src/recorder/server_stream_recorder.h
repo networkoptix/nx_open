@@ -38,7 +38,7 @@ protected:
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
-    bool isMotionRec(QnScheduleTask::RecordingType recType) const;
+    bool isMotionRec(Qn::RecordingType recType) const;
 private:
     mutable QMutex m_scheduleMutex;
     QnScheduleTaskList m_schedule;
