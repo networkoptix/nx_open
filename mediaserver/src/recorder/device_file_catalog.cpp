@@ -400,9 +400,17 @@ void DeviceFileCatalog::updateDuration(int durationMs)
 
 void DeviceFileCatalog::deleteRecordsBeforeTime(qint64 timeMs)
 {
-    QMutexLocker lock(&m_mutex);
-    while (!m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs)
+    m_mutex.lock();
+	bool needDelete = !m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs;
+	m_mutex.unlock();
+
+	while (needDelete) {
         deleteFirstRecord();
+
+		m_mutex.lock();
+		needDelete = !m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs;
+		m_mutex.unlock();
+	}
 }
 
 
@@ -449,43 +457,54 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 
 bool DeviceFileCatalog::deleteFirstRecord()
 {
-    QMutexLocker lock(&m_mutex);
-    if (m_chunks.isEmpty())
-        return false;
+	QnStorageResourcePtr storage;
+	QString delFileName;
+	QString motionDirName;
 
-    static const int DELETE_COEFF = 1000;
+	{
+		QMutexLocker lock(&m_mutex);
+		if (m_chunks.isEmpty())
+			return false;
 
-    if (m_firstDeleteCount < m_chunks.size()) 
-    {
-        QnStorageResourcePtr storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
-        QString delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+		static const int DELETE_COEFF = 1000;
 
-        storage->addWritedSpace(-storage->getFileSize(delFileName));
-        storage->removeFile(delFileName);
-        QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
-        if (m_firstDeleteCount < m_chunks.size()-1)
-        {
-            QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
-            if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
-            {
-                QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
-                storage->removeDir(motionDirName);
-            }
-        }
-        m_firstDeleteCount++;
-    }
-    else {
-        m_firstDeleteCount = 0;
-        emit firstDataRemoved(m_chunks.size());
-        m_chunks.clear();
-        m_lastAddIndex = -1;
-    }
-    if (m_firstDeleteCount == DELETE_COEFF) {
-        emit firstDataRemoved(DELETE_COEFF);
-        m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
-        m_lastAddIndex -= DELETE_COEFF;
-        m_firstDeleteCount = 0;
-    }
+		if (m_firstDeleteCount < m_chunks.size()) 
+		{
+			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
+			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+
+			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
+
+			if (m_firstDeleteCount < m_chunks.size()-1)
+			{
+				QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
+				if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
+					motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
+			}
+			m_firstDeleteCount++;
+		}
+		else {
+			m_firstDeleteCount = 0;
+			emit firstDataRemoved(m_chunks.size());
+			m_chunks.clear();
+			m_lastAddIndex = -1;
+		}
+		if (m_firstDeleteCount == DELETE_COEFF) {
+			emit firstDataRemoved(DELETE_COEFF);
+			m_chunks.erase(m_chunks.begin(), m_chunks.begin() + DELETE_COEFF);
+			m_lastAddIndex -= DELETE_COEFF;
+			m_firstDeleteCount = 0;
+		}
+	}
+
+	if (!delFileName.isEmpty())
+	{
+		storage->addWritedSpace(-storage->getFileSize(delFileName));
+		storage->removeFile(delFileName);
+	}
+	if (!motionDirName.isEmpty())
+		storage->removeDir(motionDirName);
+
     return true;
 }
 
@@ -526,7 +545,6 @@ void DeviceFileCatalog::updateChunkDuration(Chunk& chunk)
 
 QString DeviceFileCatalog::fullFileName(const Chunk& chunk) const
 {
-    QMutexLocker lock(&m_mutex);
     QnResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return QString();
