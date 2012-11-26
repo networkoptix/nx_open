@@ -358,6 +358,10 @@ void LoginDialog::at_saveButton_clicked() {
 
     resetConnectionsModel();
 
+    int idx = 1;
+    if (connections.contains(QnConnectionDataList::defaultLastUsedName()))
+        idx++;
+    ui->connectionsComboBox->setCurrentIndex(idx);
     ui->passwordLineEdit->setText(password);
 
 }
