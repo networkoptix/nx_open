@@ -40,7 +40,7 @@ QnOnvifPtzController::QnOnvifPtzController(QnResourcePtr res): QnAbstractPtzCont
 
     if (ptz.doGetNode(nodeRequest, nodeResponse) == SOAP_OK)
     {
-        qCritical() << "reading PTZ token success";
+        //qCritical() << "reading PTZ token success";
         if (nodeResponse.PTZNode) 
         {
             //qCritical() << "reading PTZ token success and data exists";
