@@ -213,16 +213,20 @@ void LoginDialog::resetConnectionsModel() {
     headerFoundItem->setFlags(Qt::ItemIsEnabled);
     m_connectionsModel->appendRow(headerFoundItem);
 
-    foreach (QUrl url, m_foundEcs) {
-        QList<QStandardItem *> row;
-        row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
-            << new QStandardItem(url.host())
-            << new QStandardItem(QString::number(url.port()))
-            << new QStandardItem(QString());
-        m_connectionsModel->appendRow(row);
-     }
-
-
+    if (m_foundEcs.size() == 0) {
+        QStandardItem* noLocalEcs = new QStandardItem(space + tr("<none>"));
+        noLocalEcs->setFlags(Qt::ItemIsEnabled);
+        m_connectionsModel->appendRow(noLocalEcs);
+    } else {
+        foreach (QUrl url, m_foundEcs) {
+            QList<QStandardItem *> row;
+            row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
+                << new QStandardItem(url.host())
+                << new QStandardItem(QString::number(url.port()))
+                << new QStandardItem(QString());
+            m_connectionsModel->appendRow(row);
+        }
+    }
     ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
     ui->passwordLineEdit->clear();
 }
@@ -358,6 +362,10 @@ void LoginDialog::at_saveButton_clicked() {
 
     resetConnectionsModel();
 
+    int idx = 1;
+    if (connections.contains(QnConnectionDataList::defaultLastUsedName()))
+        idx++;
+    ui->connectionsComboBox->setCurrentIndex(idx);
     ui->passwordLineEdit->setText(password);
 
 }
@@ -393,8 +401,14 @@ void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, co
     QString port = moduleParameters[portId];
     url.setPort(port.toInt());
 
+    QMultiHash<QString, QUrl>::iterator i = m_foundEcs.find(seed);
+    while (i != m_foundEcs.end() && i.key() == seed) {
+        QUrl found = i.value();
+        if (found.host() == url.host() && found.port() == url.port())
+            return; // found the same host, e.g. two interfaces on local controller
+        ++i;
+    }
     m_foundEcs.insert(seed, url);
-
     resetConnectionsModel();
 }
 
