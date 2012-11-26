@@ -1,10 +1,31 @@
------------------------------------------------ 1.4 -----------------------------------------------
+----------------------------------------------- 1.4-Release-Candidate #2 -----------------------------------------------
+Features:
+ - Ability to use Public IP for EC
+
+ Improvements:
+ - Many disk writing optimizations (accroding to load-testing results) 
+ - Better RADASS
+ - Added support local and server time in export multi-video.
+ - "Client Only" is added to the installer
+ - Client help is finished
+
 Bugs Fixed:
  - Web-Client acquired the default resolution instead of specified-one. As the default resolution is the biggest possible this could result in CPU overloading if trying to view
    cameras on Web-Client. Fixed
  - If trying to copy recording settings to other camera(s) the dialog could work incorrectly in sime cases. Fixed
  - Media Server service now stops correctly
+ - Playback Fixes: 
+   - primary and secondary streams were desynchronized in some cases.
+   - if set Pause and change items, time on slider was not changed. Fixed
+ - If an item has been exported from local file Incorrect, time on such item might be incorrect. Fixed.
+ - If click "Copy to Clipboard" on the "About" form not all information was copied. Fixed
+ - Screen Recording fix: Removed the check mark "Disable aero" for secondary screen. 
+ - Web-Client bugs fixed. Different Time Zones are still neing handled incorrectly.
  - Installer bugs fixed
+ - Licenses Form: If sort licenses by name, than Incorrect license details were be displayed. Fixed
+ - Server time displayed on timeline but client time on items. Fixed
+ - If change time back, motion detection didn't wotk. Fixed
+ - If open a folder with *.nov and *.avi files, only *.nov was be opened. Fixed
   
 ----------------------------------------------- 1.4-Release-Candidate -----------------------------------------------
 
