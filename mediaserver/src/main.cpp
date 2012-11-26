@@ -591,6 +591,9 @@ QHostAddress QnMain::getPublicAddress()
     static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
     static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 
+    if (qSettings.value("publicIPEnabled").isNull())
+        qSettings.setValue("publicIPEnabled", 1);
+
     int publicIPEnabled = qSettings.value("publicIPEnabled").toInt();
 
     if (publicIPEnabled == 0)
