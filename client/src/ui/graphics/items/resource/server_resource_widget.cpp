@@ -261,10 +261,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     }
     painter->endNativePainting();
 
-    const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
 
     qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
             (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
+
+    const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
+    const qreal y_step = oh * 0.025;
 
     /** Draw grid */
     {
@@ -277,7 +279,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             grid_path.moveTo(i, offset);
             grid_path.lineTo(i, oh + offset);
         }
-        for (qreal i = x_step*2 + offset; i < oh + offset; i += x_step*4){
+        for (qreal i = y_step*4 + offset; i < oh + offset; i += y_step*4){
             grid_path.moveTo(offset, i);
             grid_path.lineTo(ow + offset, i);
         }
@@ -302,7 +304,6 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setCapStyle(Qt::FlatCap);
 
         int counter = 0;
-
         foreach(QString key, m_sortedKeys) {
             QnStatisticsData &stats = m_history[key];
             qreal currentValue = 0;
