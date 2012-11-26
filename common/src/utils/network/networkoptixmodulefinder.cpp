@@ -134,7 +134,7 @@ void NetworkOptixModuleFinder::run()
                 {
                     //failed to send packet ???
                     SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
+                    cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logDEBUG1 );
                     //TODO/IMPL if corresponding interface is down, should remove socket from set
                 }
             }
@@ -147,7 +147,7 @@ void NetworkOptixModuleFinder::run()
         if( socketCount < 0 )
         {
             SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-            cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. poll failed. ").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
+            cl_log.log( QString::fromAscii("NetworkOptixModuleFinder. poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR );
             msleep( ERROR_WAIT_TIMEOUT_MS );
             continue;
         }

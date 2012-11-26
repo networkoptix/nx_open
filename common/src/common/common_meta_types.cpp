@@ -5,6 +5,7 @@
 #include <utils/network/mac_address.h>
 #include <utils/common/request_param.h>
 #include <utils/appcast/update_info.h>
+#include <utils/network/networkoptixmodulerevealcommon.h>
 
 #include <api/message.h>
 #include <api/media_server_cameras_data.h>
@@ -63,6 +64,8 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnTimePeriodList>();
 
     qRegisterMetaType<QnUpdateInfoItemList>();
+
+    qRegisterMetaType<TypeSpecificParamMap>("TypeSpecificParamMap");
 
     qn_commonMetaTypes_initialized = true;
 }
