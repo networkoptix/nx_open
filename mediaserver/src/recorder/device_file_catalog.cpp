@@ -398,22 +398,6 @@ void DeviceFileCatalog::updateDuration(int durationMs)
     str.flush();
 }
 
-void DeviceFileCatalog::deleteRecordsBeforeTime(qint64 timeMs)
-{
-    m_mutex.lock();
-	bool needDelete = !m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs;
-	m_mutex.unlock();
-
-	while (needDelete) {
-        deleteFirstRecord();
-
-		m_mutex.lock();
-		needDelete = !m_chunks.isEmpty() && m_firstDeleteCount < m_chunks.size() && m_chunks[m_firstDeleteCount].startTimeMs < timeMs;
-		m_mutex.unlock();
-	}
-}
-
-
 void DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
