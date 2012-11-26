@@ -50,8 +50,11 @@ QnStreamRecorder::QnStreamRecorder(QnResourcePtr dev):
     m_role(Role_ServerRecording),
     m_currentTimeZone(-1),
     m_onscreenDateOffset(0),
-    m_serverTimeZoneMs(Qn::InvalidUtcOffset)
+    m_serverTimeZoneMs(Qn::InvalidUtcOffset),
+    m_nextIFrameTime(AV_NOPTS_VALUE),
+    m_truncateIntervalEps(0)
 {
+    srand(QDateTime::currentMSecsSinceEpoch());
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false
     memset(m_motionFileList, 0, sizeof(m_motionFileList));
 }
@@ -92,7 +95,7 @@ void QnStreamRecorder::close()
 
         if (m_startDateTime != qint64(AV_NOPTS_VALUE))
         {
-            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? (m_endDateTime - m_startDateTime)/1000 : 0;
+            qint64 fileDuration = m_startDateTime != qint64(AV_NOPTS_VALUE)  ? m_endDateTime/1000 - m_startDateTime/1000 : 0; // bug was here! rounded sum is not same as rounded summand!
             fileFinished(fileDuration, m_fileName, m_mediaProvider, m_storage->getFileSizeByIOContext(m_ioContext));
         }
 
@@ -148,6 +151,18 @@ void QnStreamRecorder::flushPrebuffer()
         else
             markNeedKeyData();
     }
+    m_nextIFrameTime = AV_NOPTS_VALUE;
+}
+
+qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
+{
+    for (int i = 0; i < m_prebuffer.size(); ++i)
+    {
+        QnAbstractMediaDataPtr media = m_prebuffer.at(i);
+        if (media->dataType == QnAbstractMediaData::VIDEO && media->timestamp > baseTime && (media->flags & AV_PKT_FLAG_KEY))
+            return media->timestamp;
+    }
+    return AV_NOPTS_VALUE;
 }
 
 bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
@@ -180,15 +195,47 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
         return true;
     }
 
-    m_prebuffer.push(md);
-    while (!m_prebuffer.isEmpty() && md->timestamp-m_prebuffer.front()->timestamp >= m_prebufferingUsec)
+    if (md->dataType == QnAbstractMediaData::META_V1)
     {
-        QnAbstractMediaDataPtr d;
-        m_prebuffer.pop(d);
-        if (needSaveData(d))
-            saveData(d);
-        else
-            markNeedKeyData();
+        if (needSaveData(md))
+            saveData(md);
+    }
+    else {
+        m_prebuffer.push(md);
+        if (m_prebufferingUsec == 0) 
+        {
+            m_nextIFrameTime = AV_NOPTS_VALUE;
+            while (!m_prebuffer.isEmpty())
+            {
+                QnAbstractMediaDataPtr d;
+                m_prebuffer.pop(d);
+                if (needSaveData(d))
+                    saveData(d);
+                else if (md->dataType == QnAbstractMediaData::VIDEO)
+                    markNeedKeyData();
+            }
+        }
+        else 
+        {
+            bool isKeyFrame = md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY);
+            if (m_nextIFrameTime == AV_NOPTS_VALUE && isKeyFrame)
+                m_nextIFrameTime = md->timestamp;
+
+            if (m_nextIFrameTime != AV_NOPTS_VALUE && md->timestamp - m_nextIFrameTime >= m_prebufferingUsec)
+            {
+                while (!m_prebuffer.isEmpty() && m_prebuffer.front()->timestamp < m_nextIFrameTime)
+                {
+                    QnAbstractMediaDataPtr d;
+                    m_prebuffer.pop(d);
+                    if (needSaveData(d))
+                        saveData(d);
+                    else if (md->dataType == QnAbstractMediaData::VIDEO) {
+                        markNeedKeyData();
+                    }
+                }
+                m_nextIFrameTime = findNextIFrame(m_nextIFrameTime);
+            }
+        }
     }
 
     if (m_waitEOF && m_dataQueue.size() == 0) {
@@ -210,6 +257,9 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
 
 bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
 {
+    if (md->dataType == QnAbstractMediaData::META_V1)
+        return saveMotion(md.dynamicCast<QnMetaDataV1>());
+
     if (m_endDateTime != qint64(AV_NOPTS_VALUE) && md->timestamp - m_endDateTime > MAX_FRAME_DURATION*2*1000ll && m_truncateInterval > 0) {
         // if multifile recording allowed, recreate file if recording hole is detected
         qDebug() << "Data hole detected for camera" << m_device->getUniqueId() << ". Diff between packets=" << (md->timestamp - m_endDateTime)/1000 << "ms";
@@ -237,10 +287,6 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
         m_prevAudioFormat = audioFormat; 
     }
     
-
-    if (md->dataType == QnAbstractMediaData::META_V1)
-        return saveMotion(md.dynamicCast<QnMetaDataV1>());
-
     QnCompressedVideoDataPtr vd = qSharedPointerDynamicCast<QnCompressedVideoData>(md);
     //if (!vd)
     //    return true; // ignore audio data
@@ -274,7 +320,7 @@ bool QnStreamRecorder::saveData(QnAbstractMediaDataPtr md)
     if (md->flags & AV_PKT_FLAG_KEY)
     {
         m_gotKeyFrame[channel] = true;
-        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > m_truncateInterval)
+        if (m_truncateInterval > 0 && md->timestamp - m_startDateTime > (m_truncateInterval+m_truncateIntervalEps))
         {
             m_endDateTime = md->timestamp;
             close();
@@ -364,6 +410,7 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     Q_ASSERT(m_mediaProvider);
+    Q_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
@@ -550,6 +597,8 @@ bool QnStreamRecorder::initFfmpegContainer(QnCompressedVideoDataPtr mediaData)
         }
     }
     fileStarted(m_startDateTime/1000, m_currentTimeZone, m_fileName, m_mediaProvider);
+    if (m_truncateInterval > 4000000ll)
+        m_truncateIntervalEps = (rand() % (m_truncateInterval/4000000ll)) * 1000000ll;
 
     return true;
 }

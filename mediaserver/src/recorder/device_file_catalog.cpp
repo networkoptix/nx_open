@@ -31,7 +31,7 @@ qint64 DeviceFileCatalog::Chunk::distanceToTime(qint64 timeMs) const
 {
     if (timeMs >= startTimeMs) 
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
-    else 
+    else
         return startTimeMs - timeMs;
 }
 
@@ -119,14 +119,21 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     currentParts[1] = fileDate.date().month();
     currentParts[2] = fileDate.date().day();
     currentParts[3] = fileDate.time().hour();
-    //QDir dir;
+
     bool sameDir = true;
+
+    IOCacheMap::iterator itr = m_prevPartsMap->find(chunk.storageIndex);
+    if (itr == m_prevPartsMap->end()) {
+        itr = m_prevPartsMap->insert(chunk.storageIndex, IOCacheEntry());
+    }
+    CachedDirInfo& prevParts = itr.value().dirInfo;
+
     for (int i = 0; i < 4; ++i)
     {
-        if (m_prevParts[i].first == currentParts[i])
+        if (prevParts[i].first == currentParts[i])
         {
             // optimization. Check file existing without IO operation
-            if (!m_prevParts[i].second)
+            if (!prevParts[i].second)
                 return false;
         }
         else 
@@ -142,21 +149,21 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
                 prefix += strPadLeft(QString::number(currentParts[j]), 2, '0') + QString('/');
                 if (exist)
                     exist &= storage->isDirExists(prefix);
-                m_prevParts[j].first = currentParts[j];
-                m_prevParts[j].second = exist;
+                prevParts[j].first = currentParts[j];
+                prevParts[j].second = exist;
             }
             break;
         }
     }
-    if (!m_prevParts[3].second)
+    if (!prevParts[3].second)
         return false;
     if (!sameDir) {
-        m_existFileList = storage->getFileList(prefix);
+        itr.value().entryList = storage->getFileList(prefix);
     }
     QString fName = strPadLeft(QString::number(chunk.fileIndex), 3, '0') + QString(".mkv");
 
     bool found = false;
-    foreach(const QFileInfo& info, m_existFileList)
+    foreach(const QFileInfo& info, itr.value().entryList)
     {
         if (info.fileName() == fName)
         {
@@ -176,8 +183,8 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
     //if (!m_existFileList.contains(fName))
     //    return false;
 
-    m_duplicateName = fName == m_prevFileName;
-    m_prevFileName = fName;
+    m_duplicateName = (fName == m_prevFileNames[chunk.storageIndex]) && sameDir;
+    m_prevFileNames[chunk.storageIndex] = fName;
     return true;
 }
 
@@ -208,8 +215,12 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
     recorder.close();
     delete reader;
 
+    qint64 oldSize = storage->getFileSize(fileName);
+    qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
+
     if (storage->removeFile(fileName)) {
         storage->renameFile(fileName+".new.mkv", fileName);
+        storage->addWritedSpace(newSize - oldSize);
     }
     return rez;
 }
@@ -311,6 +322,12 @@ void DeviceFileCatalog::deserializeTitleFile()
             else 
             {
                 addChunk(chunk);
+                if (m_chunks.size() > 1 && m_chunks.last().startTimeMs == m_chunks[m_chunks.size()-2].endTimeMs() + 1)
+                {
+                    // update catalog to fix bug from previous version
+                    m_chunks[m_chunks.size()-2].durationMs = m_chunks.last().startTimeMs - m_chunks[m_chunks.size()-2].startTimeMs;
+                    needRewriteCatalog = true;
+                }
             }
         }
         else {
@@ -347,15 +364,18 @@ void DeviceFileCatalog::deserializeTitleFile()
 void DeviceFileCatalog::addRecord(const Chunk& chunk)
 {
     Q_ASSERT(chunk.durationMs < 1000 * 1000);
-    QMutexLocker lock(&m_mutex);
 
-    ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
-    itr = m_chunks.insert(itr, chunk);
-    m_lastAddIndex = itr - m_chunks.begin();
-    //if (m_lastAddIndex < m_chunks.size()-1)
-    //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
+    {
+        QMutexLocker lock(&m_mutex);
+        ChunkMap::iterator itr = qUpperBound(m_chunks.begin()+m_firstDeleteCount, m_chunks.end(), chunk.startTimeMs);
+        itr = m_chunks.insert(itr, chunk);
+        m_lastAddIndex = itr - m_chunks.begin();
+        //if (m_lastAddIndex < m_chunks.size()-1)
+        //    itr->durationMs = 0; // if insert to the archive middle, reset 'continue recording' mark
+    }
+
+    QMutexLocker lock(&m_IOMutex);
     QTextStream str(&m_file);
-
     str << chunk.timeZone << ';' << chunk.startTimeMs << ';' << chunk.storageIndex << ';' << chunk.fileIndex << ';';
     if (chunk.durationMs >= 0)
         str << chunk.durationMs  << '\n';
@@ -365,10 +385,14 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
 void DeviceFileCatalog::updateDuration(int durationMs)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
-    QMutexLocker lock(&m_mutex);
-    //m_chunks.last().durationMs = durationMs;
-    if (m_lastAddIndex >= 0)
-        m_chunks[m_lastAddIndex].durationMs = durationMs;
+    {
+        QMutexLocker lock(&m_mutex);
+        //m_chunks.last().durationMs = durationMs;
+        if (m_lastAddIndex >= 0)
+            m_chunks[m_lastAddIndex].durationMs = durationMs;
+    }
+
+    QMutexLocker lock(&m_IOMutex);
     QTextStream str(&m_file);
     str << durationMs << '\n';
     str.flush();
@@ -438,16 +462,15 @@ bool DeviceFileCatalog::deleteFirstRecord()
 
         storage->addWritedSpace(-storage->getFileSize(delFileName));
         storage->removeFile(delFileName);
-        bool isLastChunkOfMonth = true;
         QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
         if (m_firstDeleteCount < m_chunks.size()-1)
         {
             QDate nextDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount+1].startTimeMs).date();
-            isLastChunkOfMonth = curDate.year() != nextDate.year() || curDate.month() != nextDate.month();
-        }
-        if (isLastChunkOfMonth) {
-            QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
-            storage->removeDir(motionDirName);
+            if (curDate.year() != nextDate.year() || curDate.month() != nextDate.month())
+            {
+                QString motionDirName = QnMotionHelper::instance()->getMotionDir(curDate, m_macAddress);
+                storage->removeDir(motionDirName);
+            }
         }
         m_firstDeleteCount++;
     }

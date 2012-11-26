@@ -9,7 +9,6 @@
 #include "windows.h"
 #endif
 
-static const int IO_BLOCK_SIZE = 1024*1024*4;
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
@@ -95,8 +94,10 @@ qint64 QnFileStorageResource::getFreeSpace()
 QFileInfoList QnFileStorageResource::getFileList(const QString& dirName)
 {
     QDir dir;
-    dir.cd(dirName);
-    return dir.entryInfoList(QDir::Files);
+    if (dir.cd(dirName))
+        return dir.entryInfoList(QDir::Files);
+    else
+        return QFileInfoList();
 }
 
 qint64 QnFileStorageResource::getFileSize(const QString& fillName) const
@@ -174,13 +175,13 @@ float QnFileStorageResource::getAvarageWritingUsage() const
     return writer ? writer->getAvarageUsage() : 0;
 }
 
-float QnFileStorageResource::bitrate() const
-{
-    return QnStorageResource::bitrate() * m_storageBitrateCoeff;
-}
-
 void QnFileStorageResource::setStorageBitrateCoeff(float value)
 {
     qDebug() << "QnFileStorageResource " << getUrl() << "coeff " << value;
     m_storageBitrateCoeff = value;
+}
+
+float QnFileStorageResource::getStorageBitrateCoeff() const
+{
+    return m_storageBitrateCoeff;
 }

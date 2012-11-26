@@ -70,7 +70,6 @@ QnTestCamera::QnTestCamera(quint32 num): m_num(num)
         m_mac += last.left(2);
         last = last.mid(2);
     }
-    m_fps = 30.0;
     m_offlineFreq = 0;
     m_isEnabled = true;
     m_offlineDuration = 0;
@@ -83,14 +82,14 @@ QByteArray QnTestCamera::getMac() const
     return m_mac;
 }
 
-void QnTestCamera::setFileList(const QStringList& files)
+void QnTestCamera::setPrimaryFileList(const QStringList& files)
 {
-    m_files = files;
+    m_primaryFiles = files;
 }
 
-void QnTestCamera::setFps(double fps)
+void QnTestCamera::setSecondaryFileList(const QStringList& files)
 {
-    m_fps = fps;
+    m_secondaryFiles = files;
 }
 
 void QnTestCamera::setOfflineFreq(double offlineFreq)
@@ -98,7 +97,7 @@ void QnTestCamera::setOfflineFreq(double offlineFreq)
     m_offlineFreq = offlineFreq;
 }
 
-bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket)
+bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps)
 {
     double streamingTime = 0;
     QTime timer;
@@ -147,7 +146,7 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
             return false;
         }
 
-        streamingTime += 1000.0 / m_fps;
+        streamingTime += 1000.0 / fps;
         int waitingTime = streamingTime - timer.elapsed();
         if (waitingTime > 0)
             QnSleep::msleep(waitingTime);
@@ -156,12 +155,16 @@ bool QnTestCamera::doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSock
     return true;
 }
 
-void QnTestCamera::startStreaming(TCPSocket* socket)
+void QnTestCamera::startStreaming(TCPSocket* socket, bool isSecondary, int fps)
 {
     int fileIndex = 0;
+    QStringList& fileList = isSecondary ? m_secondaryFiles : m_primaryFiles;
+    if (fileList.isEmpty())
+        return;
     while (1)
     {
-        QString fileName = m_files[fileIndex];
+        QString fileName = fileList[fileIndex];
+        
         QList<QnCompressedVideoDataPtr> data = QnFileCache::instance()->getMediaData(fileName);
         if (data.isEmpty())
         {
@@ -169,9 +172,9 @@ void QnTestCamera::startStreaming(TCPSocket* socket)
             break;
         }
 
-        if (!doStreamingFile(data, socket))
+        if (!doStreamingFile(data, socket, fps))
             break;
-        fileIndex = (fileIndex+1) % m_files.size();
+        fileIndex = (fileIndex+1) % fileList.size();
     }
 }
 

@@ -46,6 +46,8 @@ public:
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);
     //
+    bool isBuffering() const;
+
     virtual void onBufferingFinished(QnlTimeSource* source) override;
     virtual void onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime) override;
     virtual void setSpeed(double value, qint64 currentTimeHint) override;

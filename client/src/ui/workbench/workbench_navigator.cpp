@@ -1131,7 +1131,8 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
                 if (m_timeSlider->isSliderDown() && !m_preciseNextSeek) {
                     reader->jumpTo(value * 1000, 0);
                 } else {
-                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                    if (reader->getQuality() != MEDIA_Quality_Low)
+                        reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                     m_preciseNextSeek = false;
                 }
             }

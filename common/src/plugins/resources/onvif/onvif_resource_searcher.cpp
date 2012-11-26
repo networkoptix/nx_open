@@ -97,7 +97,7 @@ QnResourcePtr OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, cons
             if (NameHelper::instance().isSupported(modelName))
                 return QnResourcePtr();
         }
-        QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer);
+        QnId rt = qnResTypePool->getResourceTypeId(QLatin1String("OnvifDevice"), manufacturer, false);
         if (rt)
             resource->setTypeId(rt);
 

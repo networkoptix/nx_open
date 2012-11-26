@@ -54,7 +54,7 @@ int QnFileSystemHandler::executeGet(const QString& path, const QnRequestParamLis
         result.append("<root>\n");
         result.append(QString("Unknown storage plugin '%1'").arg(prefix));
         result.append("</root>\n");
-        return CODE_INVALID_PARAMETER;
+        return CODE_OK;
     }
 
     pathStr = pathStr.mid(prefix.length());

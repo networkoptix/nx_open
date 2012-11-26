@@ -25,7 +25,7 @@ public:
     void setFileName(const QString& fName) { m_fileName = fName; }
     QString getFileName() const { return m_fileName; }
 
-	virtual bool open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags = 0);
+	virtual bool open(const QIODevice::OpenMode& mode, unsigned int systemDependentFlags = 0);
 	virtual void close();
 	virtual qint64 read(char* buffer, qint64 count);
 

@@ -586,6 +586,50 @@ void QnMain::initTcpListener()
 #endif
 }
 
+QHostAddress QnMain::getPublicAddress()
+{
+    static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
+    static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+
+    int publicIPEnabled = qSettings.value("publicIPEnabled").toInt();
+
+    if (publicIPEnabled == 0)
+        return QHostAddress(); // disabled
+    else if (publicIPEnabled > 1)
+        return QHostAddress(qSettings.value("staticPublicIP").toString()); // manually added
+
+    QStringList urls = qSettings.value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
+
+    QNetworkAccessManager networkManager;
+    QList<QNetworkReply*> replyList;
+    for (int i = 0; i < urls.size(); ++i)
+        replyList << networkManager.get(QNetworkRequest(urls[i].trimmed()));
+
+    QString result;
+    QTime t;
+    t.start();
+    while (t.elapsed() < 4000 && result.isEmpty()) 
+    {
+        msleep(1);
+        qApp->processEvents();
+        for (int i = 0; i < replyList.size(); ++i) 
+        {
+            if (replyList[i]->isFinished()) {
+                QByteArray response = QByteArray(" ") + replyList[i]->readAll() + QByteArray(" ");
+                int ipPos = iPRegExpr.indexIn(response);
+                if (ipPos >= 0) {
+                    result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
+                    break;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < replyList.size(); ++i)
+        replyList[i]->deleteLater();
+
+    return QHostAddress(result);
+}
+
 void QnMain::run()
 {
     // Create SessionManager
@@ -666,6 +710,8 @@ void QnMain::run()
 
     initTcpListener();
 
+    QHostAddress publicAddress = getPublicAddress();
+
     while (m_mediaServer.isNull())
     {
         QnMediaServerResourcePtr server = findServer(appServerConnection);
@@ -674,7 +720,19 @@ void QnMain::run()
             server = createServer();
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
-        server->setNetAddrList(allLocalAddresses());
+
+        QList<QHostAddress> serverIfaceList = allLocalAddresses();
+        if (!publicAddress.isNull()) {
+            bool isExists = false;
+            for (int i = 0; i < serverIfaceList.size(); ++i)
+            {
+                if (serverIfaceList[i] == publicAddress)
+                    isExists = true;
+            }
+            if (!isExists)
+                serverIfaceList << publicAddress;
+        }
+        server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))

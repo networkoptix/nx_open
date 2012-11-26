@@ -53,7 +53,8 @@ public:
       * Return last decoded frame
       */
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
-
+    QSize getScreenSize() const;
+    QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
 private:
     mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -100,6 +101,7 @@ private:
     mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
+    qint64 m_lastIgnoreTime;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);

@@ -204,7 +204,7 @@ QString QnTCPConnectionProcessor::extractPath(const QString& fullUrl)
     return fullUrl.mid(pos+1);
 }
 
-void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType)
+void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, bool displayDebug)
 {
     Q_D(QnTCPConnectionProcessor);
     d->responseHeaders.setStatusLine(code, codeToMessage(code), d->requestHeaders.majorVersion(), d->requestHeaders.minorVersion());
@@ -228,8 +228,10 @@ void QnTCPConnectionProcessor::sendResponse(const QByteArray& transport, int cod
         response += d->responseBody;
     }
 
-    qDebug() << "Server response to " << d->socket->getPeerAddress();
-    qDebug() << "\n" << response;
+    if (displayDebug) {
+        qDebug() << "Server response to " << d->socket->getPeerAddress();
+        qDebug() << "\n" << response;
+    }
 
     QMutexLocker lock(&d->sockMutex);
     if (d->ssl)

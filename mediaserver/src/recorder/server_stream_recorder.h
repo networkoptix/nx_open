@@ -55,6 +55,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QnScheduleTask m_panicSchedileRecord;
     bool m_usedPanicMode;
+    qint64 m_queuedSize;
+    QMutex m_queueSizeMutex;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

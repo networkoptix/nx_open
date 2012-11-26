@@ -10,10 +10,11 @@
 #include "utils/common/synctime.h"
 #include "core/resource/camera_history.h"
 #include "core/resource/media_server_resource.h"
+#include "redass/redass_controller.h"
 
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
-QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
+QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
     m_rtpData(0),
     m_tcpMode(true),
@@ -33,13 +34,17 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate():
     m_forcedEndTime(AV_NOPTS_VALUE),
     m_isMultiserverAllowed(true),
     m_audioLayout(0),
-    m_playNowModeAllowed(true)
+    m_playNowModeAllowed(true),
+    m_reader(reader)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
     m_flags |= Flag_CanProcessNegativeSpeed;
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
+
+    if (reader)
+        connect(this, SIGNAL(dataDropped(QnArchiveStreamReader*)), qnRedAssController, SLOT(onSlowStream(QnArchiveStreamReader*)));
 }
 
 void QnRtspClientArchiveDelegate::setResource(QnResourcePtr resource)
@@ -474,6 +479,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         m_lastPacketFlags = result->flags;
 
 
+    /*
     if (result && result->flags & QnAbstractMediaData::MediaFlags_LIVE)
     {
         // Media server can change quality for LIVE stream (for archive quality controlled by client only)
@@ -491,6 +497,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             }
         }
     }
+    */
 
     m_lastReceivedTime = qnSyncTime->currentMSecsSinceEpoch();
     return result;
@@ -610,6 +617,8 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
     QByteArray ba((const char*)payload, data + dataSize - payload);
     if (ba.startsWith("npt="))
         m_rtspSession.parseRangeHeader(QLatin1String(ba));
+    else if (ba.startsWith("drop-report"))
+        emit dataDropped(m_reader);
 }
 
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(const quint8* data, int dataSize, int channelNum)
@@ -803,9 +812,7 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     m_qualityFastSwitch = fastSwitch;
 
     QByteArray value; // = quality == MEDIA_Quality_High ? "high" : "low";
-    if (quality == MEDIA_Quality_AlwaysHigh)
-        value = "alwaysHigh";
-    else if (quality == MEDIA_Quality_High)
+    if (quality == MEDIA_Quality_High)
         value = "high";
     else
         value = "low";
@@ -816,13 +823,12 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
     if (!m_rtspSession.isOpened())
         return false;
 
-    // in live mode I have swiching quality without seek for improving smooth quality
-    if (isRealTimeSource() || !fastSwitch) {
+    if (!fastSwitch) {
         m_rtspSession.sendSetParameter(paramName, value);
-        return false;
+        return false; // switch quality without seek (it is take more time)
     }
     else 
-        return true;
+        return true; // need send seek command
 }
 
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)

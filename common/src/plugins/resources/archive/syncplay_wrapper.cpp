@@ -526,6 +526,18 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
     }
 }
 
+bool QnArchiveSyncPlayWrapper::isBuffering() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
+
+    QMutexLocker lock(&d->timeMutex);
+    for (QList<ReaderInfo>::const_iterator i = d->readers.begin(); i != d->readers.end(); ++i) {
+        if (i->enabled && i->buffering)
+            return true;
+    }
+    return false;
+}
+
 void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
 {
     Q_D(QnArchiveSyncPlayWrapper);

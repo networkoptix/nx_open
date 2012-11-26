@@ -30,6 +30,15 @@ bool QnTimePeriodList::intersects(const QnTimePeriod &period) const {
     return false;
 }
 
+bool QnTimePeriodList::containTime(qint64 timeMs) const 
+{
+    const_iterator firstPos = findNearestPeriod(timeMs, true);
+    if (firstPos != end())
+        return firstPos->contains(timeMs);
+    else
+        return false;
+}
+
 QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriod &period) const {
     QnTimePeriodList result;
 
