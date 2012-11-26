@@ -34,6 +34,8 @@ namespace {
                     widget->setEnabled(enabled);
     }
 
+    static QString space = QLatin1String ("    ");
+
 } // anonymous namespace
 
 
@@ -124,7 +126,10 @@ QUrl LoginDialog::currentUrl() const {
 }
 
 QString LoginDialog::currentName() const {
-    return ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    QString itemText = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    if (itemText.startsWith(space))
+        return itemText.remove(0, space.length());
+    return itemText;
 }
 
 QnConnectInfoPtr LoginDialog::currentInfo() const {
@@ -173,43 +178,52 @@ void LoginDialog::resetConnectionsModel() {
     if (connections.isEmpty())
         connections.append(qnSettings->defaultConnection());
 
-    QList<QStandardItem *> headerSaved;
-    headerSaved << new QStandardItem(tr("Saved Sessions"))
-        << new QStandardItem(QString())
-        << new QStandardItem(QString::number(7000))
-        << new QStandardItem(QString())
-        << new QStandardItem(QLatin1String("h"));
-    m_connectionsModel->appendRow(headerSaved);
+    int selectedIndex = -1;
 
-    foreach (const QnConnectionData &connection, connections) {
+    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedName());
+    if (lastUsed != QnConnectionData()) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(connection.name)
-            << new QStandardItem(connection.url.host())
-            << new QStandardItem(QString::number(connection.url.port()))
-            << new QStandardItem(connection.url.userName())
-            << new QStandardItem(QLatin1String("c"));
+        row << new QStandardItem(lastUsed.name)
+            << new QStandardItem(lastUsed.url.host())
+            << new QStandardItem(QString::number(lastUsed.url.port()))
+            << new QStandardItem(lastUsed.url.userName());
         m_connectionsModel->appendRow(row);
+        selectedIndex = 0;
     }
 
-    QList<QStandardItem *> headerFound;
-    headerFound << new QStandardItem(tr("Local Area ECs"))
-                << new QStandardItem(QString())
-                << new QStandardItem(QString::number(7000))
-                << new QStandardItem(QString())
-                << new QStandardItem(QLatin1String("h"));
-    m_connectionsModel->appendRow(headerFound);
+    QStandardItem *headerSavedItem = new QStandardItem(tr("Saved Sessions"));
+    headerSavedItem->setFlags(Qt::ItemIsEnabled);
+    m_connectionsModel->appendRow(headerSavedItem);
+
+    foreach (const QnConnectionData &connection, connections) {
+        if (connection.name == QnConnectionDataList::defaultLastUsedName())
+            continue;
+
+        QList<QStandardItem *> row;
+        row << new QStandardItem(space + connection.name)
+            << new QStandardItem(connection.url.host())
+            << new QStandardItem(QString::number(connection.url.port()))
+            << new QStandardItem(connection.url.userName());
+        m_connectionsModel->appendRow(row);
+        if (selectedIndex < 0)
+            selectedIndex = 1; // skip header row
+    }
+
+    QStandardItem* headerFoundItem = new QStandardItem(tr("Local Area ECs"));
+    headerFoundItem->setFlags(Qt::ItemIsEnabled);
+    m_connectionsModel->appendRow(headerFoundItem);
 
     foreach (QUrl url, m_foundEcs) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(url.host() + QLatin1Char(':') + QString::number(url.port()))
+        row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
             << new QStandardItem(url.host())
             << new QStandardItem(QString::number(url.port()))
-            << new QStandardItem(QString())
-            << new QStandardItem(QLatin1String("a"));
+            << new QStandardItem(QString());
         m_connectionsModel->appendRow(row);
      }
 
-    ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
+
+    ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
     ui->passwordLineEdit->clear();
 }
 
@@ -289,8 +303,6 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
     QModelIndex idx = m_connectionsModel->index(index, 0);
     m_dataWidgetMapper->setCurrentModelIndex(idx);
-    QModelIndex idx2 = m_connectionsModel->index(index, 4);
-    qDebug() << "selected" << m_connectionsModel->data(idx2);
     ui->passwordLineEdit->clear();
     updateFocus();
 }
