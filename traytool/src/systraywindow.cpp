@@ -123,7 +123,10 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
     connect(ui->findAppServerButton, SIGNAL(clicked()), this, SLOT(onFindAppServerButtonClicked()));
 
     connect(ui->appServerUrlComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(onAppServerUrlHistoryComboBoxCurrentChanged(int)));
-    
+
+    connect(ui->radioButtonPublicIPAuto, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
+    connect(ui->radioButtonCustomPublicIP, SIGNAL(toggled (bool)), this, SLOT(onRadioButtonPublicIpChanged()));
+
     m_findServices.start(10000);
     m_updateServiceStatus.start(500);
 
@@ -272,6 +275,11 @@ void QnSystrayWindow::showMessage(const QString& message)
         m_delayedMessages << message;
         QTimer::singleShot(1500, this, SLOT(onDelayedMessage()));
     }
+}
+
+void QnSystrayWindow::onRadioButtonPublicIpChanged()
+{
+    ui->staticPublicIPEdit->setEnabled(ui->radioButtonCustomPublicIP->isChecked());
 }
 
 void QnSystrayWindow::onDelayedMessage()
@@ -644,6 +652,15 @@ void QnSystrayWindow::onSettingsAction()
     ui->appServerLogin->setText(m_mServerSettings.value("appserverLogin").toString());
     ui->appServerPassword->setText(m_mServerSettings.value("appserverPassword").toString());
     ui->rtspPortLineEdit->setText(m_mServerSettings.value("rtspPort").toString());
+    
+    ui->staticPublicIPEdit->setText(m_mServerSettings.value("staticPublicIP").toString());
+    if (m_mServerSettings.value("publicIPEnabled").isNull())
+        m_mServerSettings.setValue("publicIPEnabled", 1);
+    int allowPublicIP = m_mServerSettings.value("publicIPEnabled").toInt();
+    ui->groupBoxPublicIP->setChecked(allowPublicIP > 0);
+    ui->radioButtonPublicIPAuto->setChecked(allowPublicIP == 1);
+    ui->radioButtonCustomPublicIP->setChecked(allowPublicIP > 1);
+    onRadioButtonPublicIpChanged();
 
     QString rtspTransport = m_mServerSettings.value("rtspTransport", "AUTO").toString().toUpper();
     if (rtspTransport == "UDP")
@@ -691,6 +708,19 @@ bool QnSystrayWindow::isMediaServerParamChanged() const
     if (ui->apiPortLineEdit->text().toInt() != m_mServerSettings.value("apiPort").toInt())
         return true;
 #endif
+
+    if (m_mServerSettings.value("staticPublicIP").toString().trimmed() != ui->staticPublicIPEdit->text().trimmed() && ui->radioButtonCustomPublicIP->isChecked())
+        return true;
+
+    int publicIPState;
+    if (!ui->groupBoxPublicIP->isChecked())
+        publicIPState = 0;
+    else if (ui->radioButtonPublicIPAuto->isChecked())
+        publicIPState = 1;
+    else
+        publicIPState = 2;
+    if (m_mServerSettings.value("publicIPEnabled").toInt() != publicIPState)
+        return true;
 
     return false;
 }
@@ -817,6 +847,13 @@ bool QnSystrayWindow::validateData()
             return false;
         }
     }
+    QString staticPublicIP = ui->staticPublicIPEdit->text().trimmed();
+    if (!staticPublicIP.isEmpty() && QHostAddress(staticPublicIP).isNull())
+    {
+        QMessageBox::warning(this, tr("Systray"), QString(" Invalid IP address specified for public IP address"));
+        return false;
+    }
+
     return true;
 }
 
@@ -850,6 +887,15 @@ void QnSystrayWindow::saveData()
     m_settings.setValue("appserverUrlHistory", rez);
 
     setAppServerURL( QString::fromAscii("https://%1:%2").arg(ui->appIPEdit->text()).arg(ui->appPortSpinBox->value()) );
+
+
+    m_mServerSettings.setValue("staticPublicIP", ui->staticPublicIPEdit->text());
+    if (!ui->groupBoxPublicIP->isChecked())
+        m_mServerSettings.setValue("publicIPEnabled", 0);
+    else if (ui->radioButtonPublicIPAuto->isChecked())
+        m_mServerSettings.setValue("publicIPEnabled", 1);
+    else
+        m_mServerSettings.setValue("publicIPEnabled", 2);
 }
 
 void QnSystrayWindow::onTestButtonClicked()
