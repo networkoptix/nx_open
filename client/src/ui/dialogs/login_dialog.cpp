@@ -213,16 +213,20 @@ void LoginDialog::resetConnectionsModel() {
     headerFoundItem->setFlags(Qt::ItemIsEnabled);
     m_connectionsModel->appendRow(headerFoundItem);
 
-    foreach (QUrl url, m_foundEcs) {
-        QList<QStandardItem *> row;
-        row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
-            << new QStandardItem(url.host())
-            << new QStandardItem(QString::number(url.port()))
-            << new QStandardItem(QString());
-        m_connectionsModel->appendRow(row);
-     }
-
-
+    if (m_foundEcs.size() == 0) {
+        QStandardItem* noLocalEcs = new QStandardItem(space + tr("<none>"));
+        noLocalEcs->setFlags(Qt::ItemIsEnabled);
+        m_connectionsModel->appendRow(noLocalEcs);
+    } else {
+        foreach (QUrl url, m_foundEcs) {
+            QList<QStandardItem *> row;
+            row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
+                << new QStandardItem(url.host())
+                << new QStandardItem(QString::number(url.port()))
+                << new QStandardItem(QString());
+            m_connectionsModel->appendRow(row);
+        }
+    }
     ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
     ui->passwordLineEdit->clear();
 }
