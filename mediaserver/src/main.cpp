@@ -184,10 +184,36 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
+
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QMutex** qMutex = (QMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
 void ffmpegInit()
 {
     //avcodec_init();
     av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
@@ -899,7 +925,7 @@ void stopServer(int signal)
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
-
+    av_lockmgr_register(NULL);
     qApp->quit();
 }
 

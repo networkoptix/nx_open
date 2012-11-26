@@ -109,10 +109,35 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 #ifndef UNICLIENT_TESTS
 
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QMutex** qMutex = (QMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
 void ffmpegInit()
 {
     //avcodec_init();
     av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
 
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
@@ -499,7 +524,7 @@ int qnMain(int argc, char *argv[])
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
-
+    av_lockmgr_register(NULL);
     return result;
 }
 
