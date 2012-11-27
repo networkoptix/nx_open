@@ -53,9 +53,13 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
                 continue;
             m_rtpChannel = values[1].toUInt();
         }
-        else if (lines[i].startsWith("a=fmtp:"))
+    }
+
+    for (int i = 0; i < lines.size(); ++ i)
+    {
+        lines[i] = lines[i].trimmed();
+        if (lines[i].startsWith("a=fmtp:"))
         {
-            //QList<QByteArray> values = lines[i].split(' ');
             int valueIndex = lines[i].indexOf(' ');
             if (valueIndex == -1)
                 continue;
@@ -63,8 +67,7 @@ void CLH264RtpParser::setSDPInfo(QList<QByteArray> lines)
             QList<QByteArray> fmpParam = lines[i].left(valueIndex).split(':'); //values[0].split(':');
             if (fmpParam.size() < 2 || fmpParam[1].toUInt() != (uint)m_rtpChannel)
                 continue;
-            //if (values.size() < 2)
-            //    continue;
+
             QList<QByteArray> h264Params = lines[i].mid(valueIndex+1).split(';');
             for (int i = 0; i < h264Params.size(); ++i)
             {
