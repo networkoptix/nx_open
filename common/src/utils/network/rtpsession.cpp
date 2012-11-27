@@ -595,6 +595,7 @@ bool RTPSession::sendOptions()
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    request += USER_AGENT_STR;
     addAuth(request);
     request += "\r\n";
 
@@ -696,7 +697,7 @@ bool RTPSession::sendSetup()
         request += QByteArray::number(m_csec++);
         request += "\r\n";
         addAuth(request);
-        request += "User-Agent: Network Optix\r\n";
+        request += USER_AGENT_STR;
         request += "Transport: RTP/AVP/";
         request += m_prefferedTransport == TRANSPORT_UDP ? "UDP" : "TCP";
         request += ";unicast;";
@@ -822,6 +823,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
+    request += USER_AGENT_STR;
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
