@@ -304,7 +304,6 @@ void DeviceFileCatalog::deserializeTitleFile()
         }
         else if (fileExists(chunk, chunkFileSize))
         {
-            storage->addWritedSpace(chunkFileSize);
             chunk.setFileSize(chunkFileSize);
 
             if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
@@ -316,6 +315,7 @@ void DeviceFileCatalog::deserializeTitleFile()
                 needRewriteCatalog = true;
                 continue;
             }
+			storage->addWritedSpace(chunkFileSize);
 
             if (lastFileDuplicateName()) {
                 if (m_chunks.isEmpty())
