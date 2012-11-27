@@ -2226,7 +2226,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(mediaFileROFilter);
+        exportReadOnly = selectedFilter.contains(mediaFileROFilter) || selectedFilter.contains(binaryFilterName(true));
         if (fileName.isEmpty())
             return false;
 
