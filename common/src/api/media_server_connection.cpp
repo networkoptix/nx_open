@@ -16,6 +16,10 @@
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
+/**
+ * Note that instance of this class will be used from several threads, and
+ * must therefore be thread-safe.
+ */
 class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
 public:
     QnNetworkProxyFactory()
@@ -28,16 +32,22 @@ public:
 
     void removeFromProxyList(const QUrl& url)
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.remove(url);
     }
 
     void addToProxyList(const QUrl& url, const QString& addr, int port)
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.clear();
     }
 
@@ -56,6 +66,8 @@ protected:
         url.setPath(QString());
         url.setUserInfo(QString());
         url.setQueryItems(QList<QPair<QString, QString> >());
+
+        QMutexLocker locker(&m_mutex);
         QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
@@ -71,6 +83,7 @@ private:
         QString addr;
         int port;
     };
+    QMutex m_mutex;
     QMap<QUrl, ProxyInfo> m_proxyInfo;
 };
 

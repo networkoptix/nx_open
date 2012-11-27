@@ -12,13 +12,14 @@ public:
 
     void setResource(QnNetworkResourcePtr netResource);
     void setPrefferedQuality(MediaQuality quality);
-    void findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& resultChunk, DeviceFileCatalogPtr& resultCatalog, DeviceFileCatalog::FindMethod findMethod) const;
+    void findDataForTime(const qint64 time, DeviceFileCatalog::Chunk& resultChunk, DeviceFileCatalogPtr& resultCatalog, DeviceFileCatalog::FindMethod findMethod);
 
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 private:
     DeviceFileCatalogPtr m_catalogHi;
     DeviceFileCatalogPtr m_catalogLow;
     MediaQuality m_quality;
+    bool m_alreadyOnAltChunk;
 };
 
 #endif // __DUAL_QUALITY_HELPER__

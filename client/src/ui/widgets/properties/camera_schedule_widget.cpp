@@ -94,11 +94,13 @@ QnCameraScheduleWidget::~QnCameraScheduleWidget() {
 void QnCameraScheduleWidget::connectToGridWidget() 
 {
     connect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
+    connect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
 }
 
 void QnCameraScheduleWidget::disconnectFromGridWidget() 
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
+    disconnect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)

@@ -89,7 +89,7 @@ private slots:
 
     void onFindAppServerButtonClicked();
     void onAppServerUrlHistoryComboBoxCurrentChanged( int index );
-
+    void onRadioButtonPublicIpChanged();
 private:
     QAction* actionByName(const QString& name);
     QString nameByAction(QAction* action);

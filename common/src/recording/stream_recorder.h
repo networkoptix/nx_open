@@ -42,7 +42,7 @@ public:
     
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
     
-    virtual bool processData(QnAbstractDataPacketPtr data);
+    virtual bool processData(QnAbstractDataPacketPtr data) override;
 
     void setStartOffset(qint64 value);
 
@@ -117,6 +117,7 @@ private:
     void markNeedKeyData();
     void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
+    qint64 findNextIFrame(qint64 baseTime);
 protected:
     QnResourcePtr m_device;
     bool m_firstTime;
@@ -165,6 +166,9 @@ private:
     CodecID m_dstVideoCodec;
     int m_onscreenDateOffset;
     qint64 m_serverTimeZoneMs;
+
+    qint64 m_nextIFrameTime;
+    qint64 m_truncateIntervalEps;
 };
 
 #endif // _STREAM_RECORDER_H__

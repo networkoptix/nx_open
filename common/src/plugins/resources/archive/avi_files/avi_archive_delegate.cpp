@@ -15,7 +15,7 @@
 #include "core/resource/media_resource.h"
 #include "export/sign_helper.h"
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 class QnAviAudioLayout: public QnResourceAudioLayout
 {
@@ -403,7 +403,7 @@ bool QnAviArchiveDelegate::findStreams()
         return false;
     if (!m_streamsFound)
     {
-        global_ffmpeg_mutex.lock();
+        //global_ffmpeg_mutex.lock();
         if (m_fastStreamFind) {
             m_formatContext->interrupt_callback.callback = &interruptDetailFindStreamInfo;
             // TODO: #vasilenko avoid using deprecated methods
@@ -418,7 +418,7 @@ bool QnAviArchiveDelegate::findStreams()
             m_streamsFound = av_find_stream_info(m_formatContext) >= 0;
         }
 
-        global_ffmpeg_mutex.unlock();
+        //global_ffmpeg_mutex.unlock();
         if (m_streamsFound) 
         {
             m_duration = m_formatContext->duration;

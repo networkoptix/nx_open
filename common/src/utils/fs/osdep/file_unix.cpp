@@ -24,7 +24,7 @@
 
 
 void makeUnixOpenFlags( 
-    QIODevice::OpenMode& oflag,
+    const QIODevice::OpenMode& oflag,
 	int* const unixOflag )
 {
 	int sysFlags = 0;
@@ -68,12 +68,12 @@ QnFile::~QnFile()
 		close();
 }
 
-bool QnFile::open(QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
+bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentFlags)
 {
 	if( isOpen() )
 		close();
 
-	int sysFlags = 0;
+    int sysFlags = 0;
     makeUnixOpenFlags( mode, &sysFlags );
     int handle = ::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 

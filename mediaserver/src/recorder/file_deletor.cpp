@@ -1,6 +1,10 @@
 #include "file_deletor.h"
 #include "utils/common/log.h"
 #include "utils/common/util.h"
+#include "storage_manager.h"
+
+static const int POSTPONE_FILES_INTERVAL = 1000*60;
+static const int SPACE_CLEARANCE_INTERVAL = 15 * 1000;
 
 Q_GLOBAL_STATIC (QnFileDeletor, inst);
 
@@ -11,6 +15,34 @@ QnFileDeletor* QnFileDeletor::instance()
 
 QnFileDeletor::QnFileDeletor()
 {
+    m_postponeTimer.start();
+    m_storagesTimer.start();
+    start();
+}
+
+QnFileDeletor::~QnFileDeletor()
+{
+    pleaseStop();
+    wait();
+}
+
+void QnFileDeletor::run()
+{
+    while (!m_needStop)
+    {
+        if (m_postponeTimer.elapsed() > POSTPONE_FILES_INTERVAL) {
+            processPostponedFiles();
+            m_postponeTimer.restart();
+        }
+        
+        if (m_storagesTimer.elapsed() > SPACE_CLEARANCE_INTERVAL)
+        {
+            qnStorageMan->clearSpace();
+            m_storagesTimer.restart();
+        }
+
+        msleep(500);
+    }
 }
 
 void QnFileDeletor::init(const QString& tmpRoot)
@@ -45,7 +77,6 @@ void QnFileDeletor::deleteDir(const QString& dirName)
 
 void QnFileDeletor::deleteFile(const QString& fileName)
 {
-    processPostponedFiles();
     if (QFile::exists(fileName))
     {
         if (!internalDeleteFile(fileName))
@@ -59,20 +90,12 @@ void QnFileDeletor::deleteFile(const QString& fileName)
 void QnFileDeletor::postponeFile(const QString& fileName)
 {
     QMutexLocker lock(&m_mutex);
-    m_postponedFiles.append(fileName);
-    if (!m_deleteCatalog.isOpen())
-    {
-        m_deleteCatalog.open(QFile::WriteOnly | QFile::Append);
-    }
-    QTextStream str(&m_deleteCatalog);
-    str << fileName.toUtf8().data() << "\n";
-    str.flush();
+    m_newPostponedFiles << fileName;
 }
 
 void QnFileDeletor::processPostponedFiles()
 {
 
-    QMutexLocker lock(&m_mutex);
     if (m_firstTime)
     {
         // read postpone file
@@ -81,7 +104,7 @@ void QnFileDeletor::processPostponedFiles()
             QByteArray line = m_deleteCatalog.readLine().trimmed();
             while(!line.isEmpty())
             {
-                m_postponedFiles.append(QString::fromUtf8(line));
+                m_postponedFiles << QString::fromUtf8(line);
                 line = m_deleteCatalog.readLine().trimmed();
             }
             m_deleteCatalog.close();
@@ -89,11 +112,31 @@ void QnFileDeletor::processPostponedFiles()
         m_firstTime = false;
     }
 
+    QQueue<QString> newPostponedFiles;
+    {
+        QMutexLocker lock(&m_mutex);
+        newPostponedFiles = m_newPostponedFiles;
+        m_newPostponedFiles.clear();
+    }
+
+    while (!newPostponedFiles.isEmpty()) 
+    {
+        QString fileName = newPostponedFiles.dequeue();
+        if (m_postponedFiles.contains(fileName))
+            continue;
+        m_postponedFiles << fileName;
+        if (!m_deleteCatalog.isOpen())
+            m_deleteCatalog.open(QFile::WriteOnly | QFile::Append);
+        QTextStream str(&m_deleteCatalog);
+        str << fileName.toUtf8().data() << "\n";
+        str.flush();
+    }
+
     if (m_postponedFiles.isEmpty())
         return;
 
-    QStringList newList;
-    for (QStringList::Iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
+    QSet<QString> newList;
+    for (QSet<QString>::Iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
     {
         if (QFile::exists(*itr) && !internalDeleteFile(*itr))
             newList << *itr;

@@ -34,6 +34,8 @@ public:
      */
     bool intersects(const QnTimePeriod &period) const;
 
+    bool containTime(qint64 timeMs) const;
+
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
 
     /**

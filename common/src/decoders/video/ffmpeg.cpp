@@ -7,7 +7,7 @@
 #include "utils/common/math.h"
 
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -57,7 +57,7 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 {
     m_mtDecoding = mtDecoding;
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (data->context)
     {
         m_passedContext = avcodec_alloc_context3(0);
@@ -233,7 +233,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnCompressedVideoDataPtr data)
 
 void CLFFmpegVideoDecoder::resetDecoder(QnCompressedVideoDataPtr data)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //closeDecoder();
     //openDecoder();
@@ -286,153 +286,159 @@ int CLFFmpegVideoDecoder::findMotionInfo(qint64 pkt_dts)
 bool CLFFmpegVideoDecoder::decode(const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
-
-    if (m_codec==0)
-    {
-        if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
-            // try to decode in QT for still image
-            cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
-            return false;
-        }
-    }
-
-    if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
-    {
-        m_decodeMode = m_newDecodeMode;
-        m_newDecodeMode = DecodeMode_NotDefined;
-        m_lightModeFrameCounter = 0;
-    }
-
-    if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
-    {
-
-        if (data->compressionType == CODEC_ID_MJPEG)
-        {
-            uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
-            if (m_lightModeFrameCounter < period)
-            {
-                ++m_lightModeFrameCounter;
-                return false;
-            }
-            else
-                m_lightModeFrameCounter = 0;
-
-        }
-        else if (!(data->flags & AV_PKT_FLAG_KEY))
-        {
-            if (m_decodeMode == DecodeMode_Fastest)
-                return false;
-            else if (m_frameTypeExtractor->getFrameType((quint8*) data->data.data(), data->data.size()) == FrameTypeExtractor::B_Frame)
-                return false;
-        }
-    }
-
-#ifdef _USE_DXVA
-    bool needResetCodec = false;
-
-    if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data->codec, data->width, data->height)
-        || m_tryHardwareAcceleration && !m_decoderContext.isHardwareAcceleration() && isHardwareAccellerationPossible(data->codec, data->width, data->height))
-    {
-        m_decoderContext.setHardwareAcceleration(!m_decoderContext.isHardwareAcceleration());
-        m_needRecreate = true;
-    }
-#endif
-
-    if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
-    {
-        m_needRecreate = false;
-        resetDecoder(data);
-    }
-
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
-    avpkt.data = (unsigned char*)data->data.data();
-    avpkt.size = data->data.size();
-    avpkt.dts = avpkt.pts = data->timestamp;
-    // HACK for CorePNG to decode as normal PNG by default
-    avpkt.flags = AV_PKT_FLAG_KEY;
-    
-    // from avcodec_decode_video2() docs:
-    // 1) The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
-    // the actual read bytes because some optimized bitstream readers read 32 or 64
-    // bits at once and could read over the end.
-    // 2) The end of the input buffer buf should be set to 0 to ensure that
-    // no overreading happens for damaged MPEG streams.
-
-    // 1 is already guaranteed by QnByteArray, let's apply 2 here...
-    if (avpkt.data)
-        memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-
+    AVFrame* copyFromFrame = m_frame;
     int got_picture = 0;
 
-    // ### handle errors
-    if (m_context->pix_fmt == -1)
-        m_context->pix_fmt = PixelFormat(0);
-
-    
-    bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
-    // workaround ffmpeg crush
-    if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
+    if (data)
     {
-        int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
-        const quint8* dataEnd = avpkt.data + avpkt.size;
-        const quint8* curPtr = avpkt.data;
-        if ((curPtr[nalLen]&0x1f) == nuDelimiter)
-            curPtr = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-
-        if (dataEnd - curPtr > nalLen && (curPtr[nalLen]&0x1f) == nuSPS)
+        if (m_codec==0)
         {
-            SPSUnit sps;
-            const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
-            sps.decodeBuffer(curPtr + nalLen, end);
-            sps.deserialize();
-            if (m_currentWidth == -1) {
-                m_currentWidth = sps.getWidth();
-                m_currentHeight = sps.getHeight();
+            if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
+                // try to decode in QT for still image
+                cl_log.log(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
+                return false;
             }
-            else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
+        }
+
+        if (m_newDecodeMode != DecodeMode_NotDefined && (data->flags & AV_PKT_FLAG_KEY))
+        {
+            m_decodeMode = m_newDecodeMode;
+            m_newDecodeMode = DecodeMode_NotDefined;
+            m_lightModeFrameCounter = 0;
+        }
+
+        if ((m_decodeMode > DecodeMode_Full || (data->flags & QnAbstractMediaData::MediaFlags_Ignore)) && data->data.data())
+        {
+
+            if (data->compressionType == CODEC_ID_MJPEG)
             {
-                m_currentWidth = sps.getWidth();
-                m_currentHeight = sps.getHeight();
-                resetDecoder(data);
+                uint period = m_decodeMode == DecodeMode_Fast ? LIGHT_CPU_MODE_FRAME_PERIOD : LIGHT_CPU_MODE_FRAME_PERIOD*2;
+                if (m_lightModeFrameCounter < period)
+                {
+                    ++m_lightModeFrameCounter;
+                    return false;
+                }
+                else
+                    m_lightModeFrameCounter = 0;
+
+            }
+            else if (!(data->flags & AV_PKT_FLAG_KEY))
+            {
+                if (m_decodeMode == DecodeMode_Fastest)
+                    return false;
+                else if (m_frameTypeExtractor->getFrameType((quint8*) data->data.data(), data->data.size()) == FrameTypeExtractor::B_Frame)
+                    return false;
+            }
+        }
+#ifdef _USE_DXVA
+        bool needResetCodec = false;
+
+        if (m_decoderContext.isHardwareAcceleration() && !isHardwareAccellerationPossible(data->codec, data->width, data->height)
+            || m_tryHardwareAcceleration && !m_decoderContext.isHardwareAcceleration() && isHardwareAccellerationPossible(data->codec, data->width, data->height))
+        {
+            m_decoderContext.setHardwareAcceleration(!m_decoderContext.isHardwareAcceleration());
+            m_needRecreate = true;
+        }
+#endif
+
+        if (m_needRecreate && (data->flags & AV_PKT_FLAG_KEY))
+        {
+            m_needRecreate = false;
+            resetDecoder(data);
+        }
+
+        AVPacket avpkt;
+        av_init_packet(&avpkt);
+        avpkt.data = (unsigned char*)data->data.data();
+        avpkt.size = data->data.size();
+        avpkt.dts = avpkt.pts = data->timestamp;
+        // HACK for CorePNG to decode as normal PNG by default
+        avpkt.flags = AV_PKT_FLAG_KEY;
+        
+        // from avcodec_decode_video2() docs:
+        // 1) The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than
+        // the actual read bytes because some optimized bitstream readers read 32 or 64
+        // bits at once and could read over the end.
+        // 2) The end of the input buffer buf should be set to 0 to ensure that
+        // no overreading happens for damaged MPEG streams.
+
+        // 1 is already guaranteed by QnByteArray, let's apply 2 here...
+        if (avpkt.data)
+            memset(avpkt.data + avpkt.size, 0, FF_INPUT_BUFFER_PADDING_SIZE);
+
+        // ### handle errors
+        if (m_context->pix_fmt == -1)
+            m_context->pix_fmt = PixelFormat(0);
+
+        
+        bool dataWithNalPrefixes = (m_context->extradata==0 || m_context->extradata[0] == 0);
+        // workaround ffmpeg crush
+        if (m_checkH264ResolutionChange && avpkt.size > 4 && dataWithNalPrefixes)
+        {
+            int nalLen = avpkt.data[2] == 0x01 ? 3 : 4;
+            const quint8* dataEnd = avpkt.data + avpkt.size;
+            const quint8* curPtr = avpkt.data;
+            if ((curPtr[nalLen]&0x1f) == nuDelimiter)
+                curPtr = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+
+            if (dataEnd - curPtr > nalLen && (curPtr[nalLen]&0x1f) == nuSPS)
+            {
+                SPSUnit sps;
+                const quint8* end = NALUnit::findNALWithStartCode(curPtr+nalLen, dataEnd, true);
+                sps.decodeBuffer(curPtr + nalLen, end);
+                sps.deserialize();
+                if (m_currentWidth == -1) {
+                    m_currentWidth = sps.getWidth();
+                    m_currentHeight = sps.getHeight();
+                }
+                else if (sps.getWidth() != m_currentWidth || sps.getHeight() != m_currentHeight)
+                {
+                    m_currentWidth = sps.getWidth();
+                    m_currentHeight = sps.getHeight();
+                    resetDecoder(data);
+                }
+            }
+        }
+        if (data->motion) {
+            while (m_motionMap.size() > MAX_DECODE_THREAD+1)
+                m_motionMap.remove(0);
+            m_motionMap << QPair<qint64, QnMetaDataV1Ptr>(data->timestamp, data->motion);
+        }
+
+        // -------------------------
+        if(m_context->codec)
+        {
+            avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+            for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
+                avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
+        }
+
+        // sometimes ffmpeg can't decode image files. Try to decode in QT
+        m_usedQtImage = false;
+        if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_StillImage))
+        {
+            m_tmpImg.loadFromData(avpkt.data, avpkt.size);
+            if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
+                got_picture = 1;
+                m_tmpQtFrame.setUseExternalData(true);
+                m_tmpQtFrame.format = PIX_FMT_BGRA;
+                m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
+                m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
+                m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
+                m_tmpQtFrame.linesize[1] = m_tmpQtFrame.linesize[2] = m_tmpQtFrame.linesize[3] = 0;
+                m_context->width = m_tmpQtFrame.width = m_tmpImg.width();
+                m_context->height = m_tmpQtFrame.height = m_tmpImg.height();
+                m_tmpQtFrame.pkt_dts = data->timestamp;
+                copyFromFrame = &m_tmpQtFrame;
+                m_usedQtImage = true;
             }
         }
     }
-    if (data->motion) {
-        while (m_motionMap.size() > MAX_DECODE_THREAD+1)
-            m_motionMap.remove(0);
-        m_motionMap << QPair<qint64, QnMetaDataV1Ptr>(data->timestamp, data->motion);
-    }
-
-    // -------------------------
-    if(m_context->codec)
-    {
-        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-        for(int i = 0; i < 2 && !got_picture && (data->flags & QnAbstractMediaData::MediaFlags_DecodeTwice); ++i)
-            avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt);
-    }
-
-    AVFrame* copyFromFrame = m_frame;
-
-    // sometimes ffmpeg can't decode image files. Try to decode in QT
-    m_usedQtImage = false;
-    if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_StillImage))
-    {
-        m_tmpImg.loadFromData(avpkt.data, avpkt.size);
-        if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
-            got_picture = 1;
-            m_tmpQtFrame.setUseExternalData(true);
-            m_tmpQtFrame.format = PIX_FMT_BGRA;
-            m_tmpQtFrame.data[0] = (quint8*) m_tmpImg.constBits();
-            m_tmpQtFrame.data[1] = m_tmpQtFrame.data[2] = m_tmpQtFrame.data[3] = 0;
-            m_tmpQtFrame.linesize[0] = m_tmpImg.bytesPerLine();
-            m_tmpQtFrame.linesize[1] = m_tmpQtFrame.linesize[2] = m_tmpQtFrame.linesize[3] = 0;
-            m_context->width = m_tmpQtFrame.width = m_tmpImg.width();
-            m_context->height = m_tmpQtFrame.height = m_tmpImg.height();
-            m_tmpQtFrame.pkt_dts = data->timestamp;
-            copyFromFrame = &m_tmpQtFrame;
-            m_usedQtImage = true;
-        }
+    else {
+        AVPacket avpkt;
+        avpkt.data = 0;
+        avpkt.size = 0;
+        avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt); // flush
     }
 
     if (got_picture)

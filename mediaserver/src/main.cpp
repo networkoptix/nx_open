@@ -24,7 +24,6 @@
 #include "recorder/storage_manager.h"
 #include "api/app_server_connection.h"
 #include "appserver/processor.h"
-#include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks_handler.h"
 #include "core/resource/media_server_resource.h"
@@ -65,7 +64,7 @@
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/time_handler.h"
 #include "platform/platform_abstraction.h"
-#include "rest/handlers/version_handler.h"
+#include "recorder/file_deletor.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -185,10 +184,36 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
+
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QMutex** qMutex = (QMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
 void ffmpegInit()
 {
     //avcodec_init();
     av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
@@ -588,6 +613,53 @@ void QnMain::initTcpListener()
 #endif
 }
 
+QHostAddress QnMain::getPublicAddress()
+{
+    static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
+    static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+
+    if (qSettings.value("publicIPEnabled").isNull())
+        qSettings.setValue("publicIPEnabled", 1);
+
+    int publicIPEnabled = qSettings.value("publicIPEnabled").toInt();
+
+    if (publicIPEnabled == 0)
+        return QHostAddress(); // disabled
+    else if (publicIPEnabled > 1)
+        return QHostAddress(qSettings.value("staticPublicIP").toString()); // manually added
+
+    QStringList urls = qSettings.value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
+
+    QNetworkAccessManager networkManager;
+    QList<QNetworkReply*> replyList;
+    for (int i = 0; i < urls.size(); ++i)
+        replyList << networkManager.get(QNetworkRequest(urls[i].trimmed()));
+
+    QString result;
+    QTime t;
+    t.start();
+    while (t.elapsed() < 4000 && result.isEmpty()) 
+    {
+        msleep(1);
+        qApp->processEvents();
+        for (int i = 0; i < replyList.size(); ++i) 
+        {
+            if (replyList[i]->isFinished()) {
+                QByteArray response = QByteArray(" ") + replyList[i]->readAll() + QByteArray(" ");
+                int ipPos = iPRegExpr.indexIn(response);
+                if (ipPos >= 0) {
+                    result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
+                    break;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < replyList.size(); ++i)
+        replyList[i]->deleteLater();
+
+    return QHostAddress(result);
+}
+
 void QnMain::run()
 {
     // Create SessionManager
@@ -668,6 +740,8 @@ void QnMain::run()
 
     initTcpListener();
 
+    QHostAddress publicAddress = getPublicAddress();
+
     while (m_mediaServer.isNull())
     {
         QnMediaServerResourcePtr server = findServer(appServerConnection);
@@ -676,7 +750,19 @@ void QnMain::run()
             server = createServer();
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
-        server->setNetAddrList(allLocalAddresses());
+
+        QList<QHostAddress> serverIfaceList = allLocalAddresses();
+        if (!publicAddress.isNull()) {
+            bool isExists = false;
+            for (int i = 0; i < serverIfaceList.size(); ++i)
+            {
+                if (serverIfaceList[i] == publicAddress)
+                    isExists = true;
+            }
+            if (!isExists)
+                serverIfaceList << publicAddress;
+        }
+        server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
@@ -840,7 +926,7 @@ void stopServer(int signal)
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
-
+    av_lockmgr_register(NULL);
     qApp->quit();
 }
 

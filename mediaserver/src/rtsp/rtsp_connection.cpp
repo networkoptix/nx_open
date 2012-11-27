@@ -292,7 +292,7 @@ QString QnRtspConnectionProcessor::getRangeHeaderIfChanged()
 
 void QnRtspConnectionProcessor::sendResponse(int code)
 {
-    QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp");
+    QnTCPConnectionProcessor::sendResponse("RTSP", code, "application/sdp", true);
 }
 
 int QnRtspConnectionProcessor::getMetadataChannelNum() const
@@ -319,6 +319,12 @@ RtspServerTrackInfoPtr QnRtspConnectionProcessor::getTrackInfo(int trackNum) con
         return itr.value();
     else
         return RtspServerTrackInfoPtr();
+}
+
+int QnRtspConnectionProcessor::getTracksCount() const
+{
+    Q_D(const QnRtspConnectionProcessor);
+    return d->trackInfo.size();
 }
 
 /*
@@ -695,8 +701,9 @@ int QnRtspConnectionProcessor::composeSetup()
                             transport.append("-").append(QByteArray::number(trackInfo->rtcpSocket->getLocalPort()));
                         }
                     }
+                    //if (trackInfo->getSSRC())
+                    //    transport.append(";ssrc=").append(QByteArray::number(trackInfo->getSSRC()));
                 }
-                //d->trackPorts.insert(trackId, QPair<int,int>(ports[0].toInt(), ports.size() > 1 ? ports[1].toInt() : 0));
             }
         }
     }
@@ -1005,7 +1012,7 @@ int QnRtspConnectionProcessor::composePlay()
         d->archiveDP->lock();
         d->archiveDP->setSpeed(d->rtspScale);
         d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
-        if (!d->requestHeaders.value("Range").isNull())
+        if (d->startTime > 0)
         {
             d->dataProcessor->setSingleShotMode(d->startTime != DATETIME_NOW && d->startTime == d->endTime);
             d->dataProcessor->setWaitCSeq(d->startTime, d->lastPlayCSeq); // ignore rest packets before new position

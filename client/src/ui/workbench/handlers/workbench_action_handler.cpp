@@ -320,13 +320,15 @@ QWidget *QnWorkbenchActionHandler::widget() const {
     return m_widget.data();
 }
 
-QString QnWorkbenchActionHandler::newLayoutName() const {
+QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) const {
     const QString zeroName = tr("New layout");
     const QString nonZeroName = tr("New layout %1");
     QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
 
     QStringList layoutNames;
-    QnId parentId = context()->user() ? context()->user()->getId() : QnId();
+
+    QnUserResourcePtr parent = !user.isNull() ? user : context()->user();
+    QnId parentId = parent ? parent->getId() : QnId();
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
         if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
@@ -1003,7 +1005,7 @@ void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    layout->setName(newLayoutName());
+    layout->setName(newLayoutName(QnUserResourcePtr()));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -1070,6 +1072,8 @@ void QnWorkbenchActionHandler::at_saveLayoutAsAction_triggered(const QnLayoutRes
         newLayout->setName(name);
         newLayout->setParentId(user->getId());
         newLayout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
+        newLayout->setCellSpacing(layout->cellSpacing());
+        newLayout->setCellAspectRatio(layout->cellAspectRatio());
         context()->resourcePool()->addResource(newLayout);
 
         QnLayoutItemDataList items = layout->getItems().values();
@@ -1902,7 +1906,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(newLayoutName());
+    dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
@@ -2046,31 +2050,38 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     dialog->setElementFlags(QnUserSettingsDialog::AccessRights, accessRightsFlags);
     dialog->setEditorPermissions(accessController()->globalPermissions());
     
+
+    // TODO #elric: This is a totally evil hack. Store password hash/salt in user.
+    QString userPassword = qnSettings->lastUsedConnection().url.password();
     if(user == context()->user()) {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, passwordFlags);
-        dialog->setCurrentPassword(qnSettings->lastUsedConnection().url.password()); // TODO: This is a totally evil hack. Store password hash/salt in user.
+        dialog->setCurrentPassword(userPassword);
     } else {
         dialog->setElementFlags(QnUserSettingsDialog::CurrentPassword, 0);
     }
 
-    QString oldPassword = user->getPassword();
-    user->setPassword(QLatin1String("******"));
-
     dialog->setUser(user);
-    if(!dialog->exec())
-        return;
-
-    user->setPassword(oldPassword);
-
-    if(!dialog->hasChanges())
+    if(!dialog->exec() || !dialog->hasChanges())
         return;
 
     if(permissions & Qn::SavePermission) {
         dialog->submitToResource();
+
+        if (user->isAdmin() && userPassword != user->getPassword()) {
+            QString message = tr("You have changed administrator password. Do not forget to change password on all connected mediaservers or they will stop working. Press 'Discard' to restore administrator password.");
+            int button = QMessageBox::warning(widget(), tr("Changes are not applied"), message,
+                                 QMessageBox::Ok, QMessageBox::Discard);
+            if (button == QMessageBox::Discard) {
+                user->setPassword(QString()); // TODO #gdm ask elric: why the hell we store empty strings?
+                return; // we cannot change anything else for the Owner so we can return safely
+            }
+        }
+
+        // TODO #gdm ask elric: should we restore empty user->password at at_resources_saved()?
         connection()->saveAsync(user, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 
         QString newPassword = user->getPassword();
-        if(newPassword != oldPassword) {
+        if(user == context()->user() && newPassword != userPassword) {
             /* Password was changed. Change it in global settings and hope for the best. */
             QnConnectionData data = qnSettings->lastUsedConnection();
             data.url.setPassword(newPassword);
@@ -2207,11 +2218,13 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     QString fileName;
     QString selectedExtension;
     QString filterSeparator(QLatin1String(";;"));
+    QString mediaFileFilter = tr("Media File (*.nov)");
+    QString mediaFileROFilter = tr("Media File (read only) (*.nov)");
 
     QString mediaFilter =
-              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (*.nov)")
+              QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileFilter
             + filterSeparator
-            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + tr("Media File (read only) (*.nov)")
+            + QLatin1String(QN_ORGANIZATION_NAME) + QLatin1Char(' ') + mediaFileROFilter
             + filterSeparator
             + binaryFilterName(false)
             + filterSeparator
@@ -2229,7 +2242,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(tr("read only"));
+        exportReadOnly = selectedFilter.contains(mediaFileROFilter) || selectedFilter.contains(binaryFilterName(true));
         if (fileName.isEmpty())
             return false;
 

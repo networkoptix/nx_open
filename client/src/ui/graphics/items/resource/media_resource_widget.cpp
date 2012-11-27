@@ -32,11 +32,14 @@
 #include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
+#include "ui/workbench/workbench_navigator.h"
 
 
 // TODO: remove
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
+#include "plugins/resources/camera_settings/camera_settings.h"
+#include "camera/caching_time_period_loader.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -831,8 +834,13 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
         return UnauthorizedOverlay;
-    } else if (m_display->camDisplay()->isNoData()) {
-        return NoDataOverlay;
+    } else if (m_display->camDisplay()->isLongWaiting()) 
+    {
+        QnCachingTimePeriodLoader* loader = context()->navigator()->loader(m_resource);
+        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime()/1000))
+            return base_type::calculateChannelOverlay(channel, QnResource::Online);
+        else
+            return NoDataOverlay;
     } else if (m_display->isPaused()) {
         return EmptyOverlay;
     } else {

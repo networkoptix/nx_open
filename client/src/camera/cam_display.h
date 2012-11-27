@@ -79,7 +79,7 @@ public:
     void setExternalTimeSource(QnlTimeSource* value);
 
     bool canAcceptData() const;
-    bool isNoData() const;
+    bool isLongWaiting() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
@@ -206,6 +206,7 @@ protected:
 
     bool m_fullScreen;
     QnFpsStatistics m_fpsStat;
+    int m_prevLQ;
 };
 
 #endif //QN_CAM_DISPLAY_H

@@ -7,6 +7,7 @@ class QnTestCameraProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnTestCameraProcessor(TCPSocket* socket, QnTcpListener* owner);
+    virtual ~QnTestCameraProcessor();
     virtual void run() override;
 private:
     QN_DECLARE_PRIVATE_DERIVED(QnTestCameraProcessor);
