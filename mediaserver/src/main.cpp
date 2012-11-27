@@ -65,6 +65,7 @@
 #include "rest/handlers/time_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
+#include "rest/handlers/version_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
