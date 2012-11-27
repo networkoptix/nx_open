@@ -253,8 +253,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
         }
         item.resource.id = aviResource->getId();
 
-        int numberOfChannels = aviResource->getVideoLayout()->numberOfChannels();
-        for (int channel = 0; channel < numberOfChannels; ++channel)
+        for (int channel = 0; channel < CL_MAX_CHANNELS; ++channel)
         {
             QString normMotionName = path.mid(path.lastIndexOf(L'?')+1);
             QIODevice* motionIO = layoutStorage.open(QString(QLatin1String("motion%1_%2.bin")).arg(channel).arg(QFileInfo(normMotionName).baseName()), QIODevice::ReadOnly);
@@ -272,6 +271,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& xf
                 if (!motionData.empty())
                     aviResource->setMotionBuffer(motionData, channel);
             }
+            else
+                break;
         }
 
         updatedItems.insert(item.uuid, item);
