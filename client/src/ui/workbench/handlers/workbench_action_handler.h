@@ -152,7 +152,7 @@ public:
 protected:
     QnAppServerConnectionPtr connection() const;
 
-    QString newLayoutName() const;
+    QString newLayoutName(const QnUserResourcePtr &user) const;
     bool canAutoDelete(const QnResourcePtr &resource) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourcePtr &resource, bool usePosition, const QPointF &position = QPointF()) const;
     void addToLayout(const QnLayoutResourcePtr &layout, const QnResourceList &resources, bool usePosition, const QPointF &position = QPointF()) const;

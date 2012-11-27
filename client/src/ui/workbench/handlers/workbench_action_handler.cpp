@@ -315,13 +315,15 @@ QWidget *QnWorkbenchActionHandler::widget() const {
     return m_widget.data();
 }
 
-QString QnWorkbenchActionHandler::newLayoutName() const {
+QString QnWorkbenchActionHandler::newLayoutName(const QnUserResourcePtr &user) const {
     const QString zeroName = tr("New layout");
     const QString nonZeroName = tr("New layout %1");
     QRegExp pattern = QRegExp(tr("New layout ?([0-9]+)?"));
 
     QStringList layoutNames;
-    QnId parentId = context()->user() ? context()->user()->getId() : QnId();
+
+    QnUserResourcePtr parent = !user.isNull() ? user : context()->user();
+    QnId parentId = parent ? parent->getId() : QnId();
     foreach(const QnResourcePtr &resource, context()->resourcePool()->getResourcesWithParentId(parentId))
         if(resource->flags() & QnResource::layout)
             layoutNames.push_back(resource->getName());
@@ -989,7 +991,7 @@ void QnWorkbenchActionHandler::at_openNewWindowLayoutsAction_triggered() {
 
 void QnWorkbenchActionHandler::at_openNewTabAction_triggered() {
     QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
-    layout->setName(newLayoutName());
+    layout->setName(newLayoutName(QnUserResourcePtr()));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);
@@ -1890,7 +1892,7 @@ void QnWorkbenchActionHandler::at_newUserLayoutAction_triggered() {
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, widget()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(newLayoutName());
+    dialog->setName(newLayoutName(user));
     dialog->setWindowModality(Qt::ApplicationModal);
     if(!dialog->exec())
         return;
@@ -2226,7 +2228,7 @@ bool QnWorkbenchActionHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         );
 
         selectedExtension = selectedFilter.mid(selectedFilter.lastIndexOf(QLatin1Char('.')), 4);
-        exportReadOnly = selectedFilter.contains(mediaFileROFilter);
+        exportReadOnly = selectedFilter.contains(mediaFileROFilter) || selectedFilter.contains(binaryFilterName(true));
         if (fileName.isEmpty())
             return false;
 
