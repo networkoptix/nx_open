@@ -76,7 +76,7 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnCompressedV
 
 CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     closeDecoder();
 

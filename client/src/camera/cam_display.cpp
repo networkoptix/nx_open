@@ -501,7 +501,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_lastDecodedTime = vd->timestamp;
             }
 
-            m_lastFrameDisplayed = m_display[channel]->dispay(vd, draw, scaleFactor);
+            m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
         }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)

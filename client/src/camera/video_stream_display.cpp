@@ -570,8 +570,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     if (m_reverseMode || m_decoder.isEmpty())
         return Status_Skipped;
 
-    CLVideoDecoderOutput m_tmpFrame;
-    m_tmpFrame.setUseExternalData(true);
+    QSharedPointer<CLVideoDecoderOutput> m_tmpFrame(new CLVideoDecoderOutput());
+    m_tmpFrame->setUseExternalData(true);
 
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
 
@@ -581,7 +581,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
         scaleFactor = determineScaleFactor(channel, dec->getWidth(), dec->getHeight(), force_factor);
     PixelFormat pixFmt = dec->GetPixelFormat();
 
-    CLVideoDecoderOutput* outFrame = m_frameQueue[m_frameQueueIndex];
+    QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = channel;
 
     m_drawer->waitForFrameDisplayed(channel);
@@ -600,13 +600,13 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
         scaleFactor = determineScaleFactor(channel, dec->getWidth(), dec->getHeight(), force_factor);
 
     if (QnGLRenderer::isPixelFormatSupported(pixFmt) && CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) && scaleFactor <= QnFrameScaler::factor_8)
-        QnFrameScaler::downscale(&m_tmpFrame, outFrame, scaleFactor); // fast scaler
+        QnFrameScaler::downscale(m_tmpFrame.data(), outFrame.data(), scaleFactor); // fast scaler
     else {
-        if (!rescaleFrame(m_tmpFrame, *outFrame, m_tmpFrame.width / scaleFactor, m_tmpFrame.height / scaleFactor)) // universal scaler
+        if (!rescaleFrame(*(m_tmpFrame.data()), *outFrame, m_tmpFrame->width / scaleFactor, m_tmpFrame->height / scaleFactor)) // universal scaler
             return Status_Displayed;
     }
-    outFrame->pkt_dts = m_tmpFrame.pkt_dts;
-    outFrame->metadata = m_tmpFrame.metadata;
+    outFrame->pkt_dts = m_tmpFrame->pkt_dts;
+    outFrame->metadata = m_tmpFrame->metadata;
     outFrame->sample_aspect_ratio = dec->getSampleAspectRatio();
 
     if (processDecodedFrame(dec, outFrame, false, false))
