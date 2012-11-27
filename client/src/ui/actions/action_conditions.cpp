@@ -347,5 +347,8 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    return resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:")) ? Qn::EnabledAction : Qn::InvisibleAction;
+    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+    return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }
