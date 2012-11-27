@@ -127,8 +127,8 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         //If media url is empty it will be filled in resource init method
     }
 
-    qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
-             << ", UniqueId: " << info.uniqId << ", manufacturer: " << manufacturer << ", name: " << name;
+    //qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
+    //         << ", UniqueId: " << info.uniqId << ", manufacturer: " << manufacturer << ", name: " << name;
 
     createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
         name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), mediaUrl, deviceUrl, result);
