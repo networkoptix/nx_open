@@ -1,6 +1,9 @@
 #ifndef __FILE_DELETOR_H__
 #define __FILE_DELETOR_H__
 
+#include <QTime>
+#include <QDir>
+#include <QQueue>
 #include <QFile>
 #include <QString>
 #include <QMutex>
@@ -34,6 +37,7 @@ private:
     QFile m_deleteCatalog;
     bool m_firstTime;
     QTime m_postponeTimer;
+    QTime m_storagesTimer;
 };
 
 #define qnFileDeletor QnFileDeletor::instance()

@@ -24,7 +24,6 @@
 #include "recorder/storage_manager.h"
 #include "api/app_server_connection.h"
 #include "appserver/processor.h"
-#include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks_handler.h"
 #include "core/resource/media_server_resource.h"
@@ -65,6 +64,7 @@
 #include "rest/handlers/image_handler.h"
 #include "rest/handlers/gettime_handler.h"
 #include "platform/platform_abstraction.h"
+#include "recorder/file_deletor.h"
 
 #define USE_SINGLE_STREAMING_PORT
 

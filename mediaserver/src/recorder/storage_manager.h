@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QFile>
 #include <QMutex>
+#include <QTimer>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
@@ -57,6 +58,7 @@ public:
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
     StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
+    void clearSpace();
 public slots:
     void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);
 private:
@@ -83,12 +85,12 @@ private:
     QMap<QString, int> m_storageIndexes;
     bool m_storageFileReaded;
     bool m_storagesStatisticsReady;
-    QTime m_lastClearanceTime;
-    QMutex m_spaceClearanceMtx;
+    QTimer m_timer;
 
     typedef QMap<QString, QPair<QString, int > > FileNumCache;
     FileNumCache m_fileNumCache;
     QMutex m_cacheMutex;
+    bool m_catalogLoaded;
 };
 
 #define qnStorageMan QnStorageManager::instance()

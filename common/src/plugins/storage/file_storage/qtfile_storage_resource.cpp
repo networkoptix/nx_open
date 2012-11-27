@@ -1,5 +1,4 @@
 #include "qtfile_storage_resource.h"
-#include "recording/file_deletor.h"
 #include "utils/common/util.h"
 
 QIODevice* QnQtFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
@@ -28,8 +27,7 @@ bool QnQtFileStorageResource::isNeedControlFreeSpace()
 
 bool QnQtFileStorageResource::removeFile(const QString& url)
 {
-    qnFileDeletor->deleteFile(removeProtocolPrefix(url));
-    return true;
+    return QFile::remove(removeProtocolPrefix(url));
 }
 
 bool QnQtFileStorageResource::renameFile(const QString& oldName, const QString& newName)
@@ -40,7 +38,10 @@ bool QnQtFileStorageResource::renameFile(const QString& oldName, const QString& 
 
 bool QnQtFileStorageResource::removeDir(const QString& url)
 {
-    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
+    QDir dir(removeProtocolPrefix(url));
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    foreach(const QFileInfo& fi, list)
+        removeFile(fi.absoluteFilePath());
     return true;
 }
 

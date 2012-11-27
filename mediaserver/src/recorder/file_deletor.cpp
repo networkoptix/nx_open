@@ -1,6 +1,10 @@
 #include "file_deletor.h"
 #include "utils/common/log.h"
 #include "utils/common/util.h"
+#include "storage_manager.h"
+
+static const int POSTPONE_FILES_INTERVAL = 1000*60;
+static const int SPACE_CLEARANCE_INTERVAL = 15 * 1000;
 
 Q_GLOBAL_STATIC (QnFileDeletor, inst);
 
@@ -12,6 +16,7 @@ QnFileDeletor* QnFileDeletor::instance()
 QnFileDeletor::QnFileDeletor()
 {
     m_postponeTimer.start();
+    m_storagesTimer.start();
     start();
 }
 
@@ -25,10 +30,17 @@ void QnFileDeletor::run()
 {
     while (!m_needStop)
     {
-        if (m_postponeTimer.elapsed() > 1000*60) {
+        if (m_postponeTimer.elapsed() > POSTPONE_FILES_INTERVAL) {
             processPostponedFiles();
             m_postponeTimer.restart();
         }
+        
+        if (m_storagesTimer.elapsed() > SPACE_CLEARANCE_INTERVAL)
+        {
+            qnStorageMan->clearSpace();
+            m_storagesTimer.restart();
+        }
+
         msleep(500);
     }
 }

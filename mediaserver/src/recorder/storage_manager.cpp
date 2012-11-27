@@ -9,7 +9,6 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 
 static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
-static const int SPACE_CLEARANCE_INTERVAL = 30 * 1000;
 
 Q_GLOBAL_STATIC(QnStorageManager, inst)
 
@@ -20,15 +19,16 @@ QnStorageManager::QnStorageManager():
     m_mutexStorages(QMutex::Recursive),
     m_mutexCatalog(QMutex::Recursive),
     m_storageFileReaded(false),
-    m_storagesStatisticsReady(false)
+    m_storagesStatisticsReady(false),
+    m_catalogLoaded(false)
 {
-    m_lastClearanceTime.start();
 }
 
 void QnStorageManager::loadFullFileCatalog()
 {
     loadFullFileCatalogInternal(QnResource::Role_LiveVideo);
     loadFullFileCatalogInternal(QnResource::Role_SecondaryLiveVideo);
+    m_catalogLoaded = true;
 }
 
 void QnStorageManager::loadFullFileCatalogInternal(QnResource::ConnectionRole role)
@@ -231,15 +231,17 @@ QnTimePeriodList QnStorageManager::getRecordedPeriods(QnResourceList resList, qi
     return QnTimePeriod::mergeTimePeriods(cameras);
 }
 
+void QnStorageManager::clearSpace()
+{
+    if (!m_catalogLoaded)
+        return;
+    StorageMap storages = getAllStorages();
+    foreach(QnStorageResourcePtr storage, storages)
+        clearSpace(storage);
+}
+
 void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
 {
-    {
-        QMutexLocker lock(&m_spaceClearanceMtx);
-        if (m_lastClearanceTime.elapsed() < SPACE_CLEARANCE_INTERVAL)
-            return;
-        m_lastClearanceTime.restart();
-    }
-
     if (storage->getSpaceLimit() == 0)
         return; // unlimited
 
@@ -250,7 +252,11 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         return;
 
     qint64 freeSpace = storage->getFreeSpace();
-    while (freeSpace != -1 && freeSpace < storage->getSpaceLimit())
+    if (freeSpace == -1)
+        return;
+    qint64 toDelete = storage->getSpaceLimit() - freeSpace;
+
+    while (toDelete > 0)
     {
         qint64 minTime = 0x7fffffffffffffffll;
         QString mac;
@@ -271,7 +277,8 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
         }
         if (catalog != 0) 
         {
-            catalog->deleteFirstRecord();
+            qint64 fileSize = catalog->deleteFirstRecord();
+            toDelete -= fileSize;
             DeviceFileCatalogPtr catalogLowRes = getFileCatalog(mac, QnResource::Role_SecondaryLiveVideo);
             if (catalogLowRes != 0) 
             {
@@ -279,16 +286,17 @@ void QnStorageManager::clearSpace(QnStorageResourcePtr storage)
                 if (minTime != AV_NOPTS_VALUE) {
                     int idx = catalogLowRes->findFileIndex(minTime, DeviceFileCatalog::OnRecordHole_NextChunk);
                     if (idx != -1)
-                        catalogLowRes->deleteRecordsBefore(idx);
+                        toDelete -= catalogLowRes->deleteRecordsBefore(idx);
                 }
                 else {
                     catalogLowRes->clear();
                 }
             }
+            if (fileSize == 0)
+                break; // nothing to delete
         }
         else
             break; // nothing to delete
-        freeSpace = storage->getFreeSpace();
     }
 }
 
@@ -500,12 +508,12 @@ bool QnStorageManager::fileFinished(int durationMs, const QString& fileName, QnA
         return false;
     storage->releaseBitrate(provider);
     storage->addWritedSpace(fileSize);
-    clearSpace(storage);
 
     DeviceFileCatalogPtr catalog = getFileCatalog(mac, quality);
     if (catalog == 0)
         return false;
-    catalog->updateDuration(durationMs);
+    catalog->updateDuration(durationMs, fileSize);
+
     return true;
 }
 

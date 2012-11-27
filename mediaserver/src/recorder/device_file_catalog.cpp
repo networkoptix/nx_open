@@ -2,7 +2,7 @@
 #include "device_file_catalog.h"
 #include "storage_manager.h"
 #include "utils/common/util.h"
-#include "recording/file_deletor.h"
+#include "recorder/file_deletor.h"
 #include "plugins/resources/archive/avi_files/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
 #include "plugins/resources/archive/avi_files/avi_resource.h"
@@ -97,8 +97,9 @@ bool DeviceFileCatalog::lastFileDuplicateName() const
     return m_duplicateName;
 }
 
-bool DeviceFileCatalog::fileExists(const Chunk& chunk)
+bool DeviceFileCatalog::fileExists(const Chunk& chunk, qint64& fileSize)
 {
+    fileSize = 0;
     QnStorageResourcePtr storage = qnStorageMan->storageRoot(chunk.storageIndex);
     if (!storage)
         return false;
@@ -168,13 +169,13 @@ bool DeviceFileCatalog::fileExists(const Chunk& chunk)
         if (info.fileName() == fName)
         {
             found = true;
-            if (info.size() < 1024) 
+            fileSize = info.size();
+            if (fileSize < 1024) 
             {
                 // file is absent or empty media file
                 storage->removeFile(info.absoluteFilePath()); // // delete broken file
                 return false; 
             }
-            storage->addWritedSpace(info.size());
             break;
         }
     }
@@ -294,14 +295,18 @@ void DeviceFileCatalog::deserializeTitleFile()
             }
         }
 
+        qint64 chunkFileSize = 0;
         if (!qnStorageMan->isStorageAvailable(chunk.storageIndex)) 
         {
             ;
             // Skip chunks for unavaileble storage
              //addChunk(chunk, lastStartTime);
         }
-        else if (fileExists(chunk)) 
+        else if (fileExists(chunk, chunkFileSize))
         {
+            storage->addWritedSpace(chunkFileSize);
+            chunk.setFileSize(chunkFileSize);
+
             if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
             {
                 const QString fileName = fullFileName(chunk);
@@ -382,14 +387,16 @@ void DeviceFileCatalog::addRecord(const Chunk& chunk)
     str.flush();
 }
 
-void DeviceFileCatalog::updateDuration(int durationMs)
+void DeviceFileCatalog::updateDuration(int durationMs, qint64 fileSize)
 {
     Q_ASSERT(durationMs < 1000 * 1000);
     {
         QMutexLocker lock(&m_mutex);
         //m_chunks.last().durationMs = durationMs;
-        if (m_lastAddIndex >= 0)
+        if (m_lastAddIndex >= 0) {
             m_chunks[m_lastAddIndex].durationMs = durationMs;
+            m_chunks[m_lastAddIndex].setFileSize(fileSize);
+        }
     }
 
     QMutexLocker lock(&m_IOMutex);
@@ -398,11 +405,13 @@ void DeviceFileCatalog::updateDuration(int durationMs)
     str.flush();
 }
 
-void DeviceFileCatalog::deleteRecordsBefore(int idx)
+qint64 DeviceFileCatalog::deleteRecordsBefore(int idx)
 {
     int count = idx - m_firstDeleteCount; // m_firstDeleteCount may be changed during delete
+    qint64 rez = 0;
     for (int i = 0; i < count; ++i)
-        deleteFirstRecord();
+        rez += deleteFirstRecord();
+    return rez;
 }
 
 void DeviceFileCatalog::clear()
@@ -439,16 +448,16 @@ void DeviceFileCatalog::deleteRecordsByStorage(int storageIndex, qint64 timeMs)
 }
 
 
-bool DeviceFileCatalog::deleteFirstRecord()
+qint64 DeviceFileCatalog::deleteFirstRecord()
 {
 	QnStorageResourcePtr storage;
 	QString delFileName;
 	QString motionDirName;
-
+    qint64 deletedSize = 0;
 	{
 		QMutexLocker lock(&m_mutex);
 		if (m_chunks.isEmpty())
-			return false;
+			return deletedSize;
 
 		static const int DELETE_COEFF = 1000;
 
@@ -456,6 +465,7 @@ bool DeviceFileCatalog::deleteFirstRecord()
 		{
 			storage = qnStorageMan->storageRoot(m_chunks[m_firstDeleteCount].storageIndex);
 			delFileName = fullFileName(m_chunks[m_firstDeleteCount]);
+            deletedSize = m_chunks[m_firstDeleteCount].getFileSize();
 
 			QDate curDate = QDateTime::fromMSecsSinceEpoch(m_chunks[m_firstDeleteCount].startTimeMs).date();
 
@@ -483,13 +493,15 @@ bool DeviceFileCatalog::deleteFirstRecord()
 
 	if (!delFileName.isEmpty())
 	{
-		storage->addWritedSpace(-storage->getFileSize(delFileName));
+        if (deletedSize == 0)
+            deletedSize = storage->getFileSize(delFileName); // obtain file size from a disk
+		storage->addWritedSpace(-deletedSize);
 		storage->removeFile(delFileName);
 	}
 	if (!motionDirName.isEmpty())
 		storage->removeDir(motionDirName);
 
-    return true;
+    return deletedSize;
 }
 
 int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) const

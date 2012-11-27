@@ -1,9 +1,9 @@
 #include <QDir>
 
 #include "file_storage_resource.h"
-#include "recording/file_deletor.h"
 #include "utils/common/util.h"
 #include "utils/common/buffered_file.h"
+#include "recorder/file_deletor.h"
 
 #ifdef Q_OS_WIN
 #include "windows.h"
