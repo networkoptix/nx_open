@@ -43,8 +43,8 @@ public:
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
 
-    void setMaxFps(int maxFps);
-    int getMaxFps();
+    void setMaxFps(int maxFps, int maxDualStreamFps);
+    int getMaxFps(bool motionPlusLqOnly);
 
 signals:
     void cellActivated(const QPoint &cell);
