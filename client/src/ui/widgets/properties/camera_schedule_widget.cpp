@@ -704,16 +704,20 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         camera->setScheduleDisabled(!recordingEnabled);
         if (recordingEnabled){
             int maxFps = camera->getMaxFps();
+            int maxDualStreamFps = maxFps;
 
             //TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of the live_stream_provider module
-            if (camera->streamFpsSharingMethod() == shareFps && camera->getMotionType() == MT_SoftwareGrid)
+            if (camera->streamFpsSharingMethod() == shareFps)
                 //maxFps = maxFps - camera->reservedSecondStreamFps(); // maybe this way better?
-                maxFps = maxFps - MIN_SECOND_STREAM_FPS;
+                maxDualStreamFps -= MIN_SECOND_STREAM_FPS;
 
             QnScheduleTaskList tasks;
             foreach(const QnScheduleTask::Data &data, scheduleTasks()){
                 QnScheduleTask task(data);
-                task.setFps(qMin(task.getFps(), maxFps));
+                if (task.getRecordingType() == QnScheduleTask::RecordingType_MotionPlusLQ)
+                    task.setFps(qMin(task.getFps(), maxDualStreamFps));
+                else
+                    task.setFps(qMin(task.getFps(), maxFps));
                 tasks.append(task);
             }
 
