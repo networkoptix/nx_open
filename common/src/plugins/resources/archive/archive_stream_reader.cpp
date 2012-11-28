@@ -459,11 +459,11 @@ begin_label:
                     m_topIFrameTime = displayTime;
             }
             else
-                setSkipFramesToTime(displayTime+1, true);
+                setSkipFramesToTime(displayTime, false);
         }
         else {
             if (!reverseMode && displayTime != DATETIME_NOW && displayTime != AV_NOPTS_VALUE)
-                setSkipFramesToTime(displayTime+1, true);
+                setSkipFramesToTime(displayTime, false);
         }
         
         m_lastGopSeekTime = -1;
@@ -695,7 +695,7 @@ begin_label:
     if (reverseMode && !delegateForNegativeSpeed)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
-    if (videoData && singleShotMode && m_skipFramesToTime == 0) {
+    if (videoData && singleShotMode && !(videoData->flags | QnAbstractMediaData::MediaFlags_Ignore)) {
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
