@@ -566,7 +566,7 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     qint64 bt = d->bufferingTime;
     d->bufferingTime = AV_NOPTS_VALUE;
 
-    qDebug() << "correctTime after end of buffering=" << (getCurrentTime() - bt)/1000.0;
+    //qDebug() << "correctTime after end of buffering=" << (getCurrentTime() - bt)/1000.0;
     reinitTime(getDisplayedTime());
 }
 
