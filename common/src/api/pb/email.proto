@@ -1,0 +1,14 @@
+package pb;
+
+option java_package = "com.google.protobuf.implementation";
+option java_outer_classname = "EmailProtos";
+
+message Email {
+    requred string to        = 1;
+    optional string subject  = 2;
+    optional string body     = 3;
+}
+
+message Emails {
+    repeated Email email = 1;
+}

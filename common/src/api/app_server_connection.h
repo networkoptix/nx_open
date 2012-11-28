@@ -124,6 +124,8 @@ public:
 
     qint64 getCurrentTime();
 
+    int sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString);
+
     void stop();
 
     static int getMediaProxyPort();
