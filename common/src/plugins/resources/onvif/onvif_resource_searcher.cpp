@@ -119,6 +119,7 @@ void OnvifResourceSearcher::pleaseStop()
 QnResourceList OnvifResourceSearcher::findResources()
 {
     QnResourceList result;
+    return result;
 
     //Order is important! mdns should be the first to avoid creating ONVIF resource, when special is expected
     //mdnsSearcher.findResources(result, specialResourceCreator);

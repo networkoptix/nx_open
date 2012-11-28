@@ -95,14 +95,20 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
     QVector<QString> srcMediaFiles;
     getSrcFileList(srcMediaFiles, srcDataFolder, QString());
 
+    cl_log.log("======inside0::::createLaunchingFile", cl_logALWAYS); //brian
+
     QFile dstFile(dstName);
     if (!dstFile.open(QIODevice::WriteOnly))
         return -1;
+
+    cl_log.log("======inside1::::createLaunchingFile", cl_logALWAYS); //brian
 
     if (appendFile(dstFile, launcherFile) != 0)
         return -2;
     filePosList.push_back(dstFile.pos());
     fileNameList.push_back(launcherFile);
+
+    cl_log.log("======inside2::::createLaunchingFile", cl_logALWAYS); //brian
 
     for (int i= 0; i < srcMediaFiles.size(); ++i)
     {
@@ -115,6 +121,8 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
             }
         }
     }
+
+    cl_log.log("======inside3::::createLaunchingFile", cl_logALWAYS); //brian
     
     filePosList.push_back(dstFile.pos());
     fileNameList.push_back(novFileName);
@@ -122,19 +130,28 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
     if (writeIndex(dstFile, filePosList, fileNameList) != 0)
         return -4;
 
+    cl_log.log("======inside4::::createLaunchingFile", cl_logALWAYS); //brian
+
     qint64 novPos = dstFile.pos();
     if (novFileName.isEmpty()) {
         QnLayoutFileStorageResource::QnLayoutFileIndex idex;
+        cl_log.log("======inside5::::createLaunchingFile", cl_logALWAYS); //brian
         dstFile.write((const char*) &idex, sizeof(idex)); // nov file start
+        cl_log.log("======inside6::::createLaunchingFile", cl_logALWAYS); //brian
     }
     else {
         if (appendFile(dstFile, novFileName) != 0)
             return -3;
     }
 
+    cl_log.log("======inside7::::createLaunchingFile", cl_logALWAYS); //brian
+
     dstFile.write((const char*) &novPos, sizeof(qint64)); // nov file start
     dstFile.write((const char*) &MAGIC, sizeof(qint64)); // magic
 
+    cl_log.log("======inside8::::createLaunchingFile", cl_logALWAYS); //brian
     dstFile.close();
+
+    cl_log.log("======inside9::::createLaunchingFile", cl_logALWAYS); //brian
     return 0;
 }
