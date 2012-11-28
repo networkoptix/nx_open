@@ -68,6 +68,7 @@ public:
     virtual void serializeCameras(const QnVirtualCameraResourceList& cameras, QByteArray& data) = 0;
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
+    virtual void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) = 0;
 
 protected:
     virtual void serializeCamera(const QnVirtualCameraResourcePtr& resource, QByteArray& data) = 0;

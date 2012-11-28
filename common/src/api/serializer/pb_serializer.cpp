@@ -7,6 +7,7 @@
 #include "license.pb.h"
 #include "cameraServerItem.pb.h"
 #include "connectinfo.pb.h"
+#include "email.pb.h"
 
 #include "pb_serializer.h"
 
@@ -829,6 +830,20 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
 
     std::string str;
     pb_cameraServerItems.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
+{
+    pb::Emails pb_emails;
+    pb::Email& email = *(pb_emails.add_email());
+
+    email.set_to(to.toUtf8().constData());
+    email.set_subject(subject.toUtf8().constData());
+    email.set_body(message.toUtf8().constData());
+
+    std::string str;
+    pb_emails.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 
