@@ -1128,13 +1128,13 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (value == DATETIME_NOW) {
                 reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                if (m_timeSlider->isSliderDown() && !m_preciseNextSeek) {
+                if (m_preciseNextSeek)
+                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                else if (m_timeSlider->isSliderDown())
                     reader->jumpTo(value * 1000, 0);
-                } else {
-                    if (reader->getQuality() != MEDIA_Quality_Low)
-                        reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
-                    m_preciseNextSeek = false;
-                }
+                else if (reader->getQuality() != MEDIA_Quality_Low)
+                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                m_preciseNextSeek = false;
             }
         }
 
