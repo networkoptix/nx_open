@@ -532,26 +532,34 @@ bool QnScheduleGridWidget::isValidColumn(int column) const {
     return column >= 0 && column < columnCount();
 }
 
-void QnScheduleGridWidget::setMaxFps(int maxFps)
+void QnScheduleGridWidget::setMaxFps(int maxFps, int maxDualStreamFps)
 {
     for (int x = 0; x < columnCount(); ++x)
     {
         for (int y = 0; y < rowCount(); ++y)
         {
             int fps = m_gridParams[x][y][FirstParam].toInt();
-            if(fps > maxFps) 
-                setCellValueInternal(QPoint(x, y), FirstParam, maxFps);
+            int value = maxFps;
+            if (m_gridParams[x][y][RecordTypeParam] == Qn::RecordingType_MotionPlusLQ)
+                value = maxDualStreamFps;
+            if(fps > value)
+                setCellValueInternal(QPoint(x, y), FirstParam, value);
         }
     }
 }
 
-int QnScheduleGridWidget::getMaxFps()
+int QnScheduleGridWidget::getMaxFps(bool motionPlusLqOnly)
 {
     int fps = 0;
-    for (int x = 0; x < columnCount(); ++x)
+    for (int x = 0; x < columnCount(); ++x) {
         for (int y = 0; y < rowCount(); ++y) {
-            if (m_gridParams[x][y][RecordTypeParam] != Qn::RecordingType_Never)
-                fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
+            Qn::RecordingType rt = static_cast<Qn::RecordingType>(m_gridParams[x][y][RecordTypeParam].toUInt());
+            if (motionPlusLqOnly && rt != Qn::RecordingType_MotionPlusLQ)
+                continue;
+            if (rt == Qn::RecordingType_Never)
+                continue;
+            fps = qMax(fps, m_gridParams[x][y][FirstParam].toInt());
         }
+    }
     return fps;
 }

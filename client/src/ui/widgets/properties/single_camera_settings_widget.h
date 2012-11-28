@@ -18,8 +18,8 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
     typedef QWidget base_type;
 

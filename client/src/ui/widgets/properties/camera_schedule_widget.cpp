@@ -31,7 +31,10 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_disableUpdateGridParams(false),
     m_motionAvailable(true),
     m_changesDisabled(false),
-    m_readOnly(false)
+    m_readOnly(false),
+    m_maxFps(0),
+    m_maxDualStreamingFps(0),
+    m_inUpdate(0)
 {
     ui->setupUi(this);
 
@@ -52,6 +55,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->recordAlwaysButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
     connect(ui->recordMotionButton,      SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
     connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
+    connect(ui->recordMotionPlusLQButton,SIGNAL(toggled(bool)),              this,   SLOT(updateMaxFpsValue(bool)));
     connect(ui->noRecordButton,          SIGNAL(toggled(bool)),              this,   SLOT(updateGridParams()));
     connect(ui->qualityComboBox,         SIGNAL(currentIndexChanged(int)),   this,   SLOT(updateGridParams()));
     connect(ui->fpsSpinBox,              SIGNAL(valueChanged(double)),       this,   SLOT(updateGridParams()));
@@ -101,6 +105,21 @@ void QnCameraScheduleWidget::disconnectFromGridWidget()
 {
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
     disconnect(ui->gridWidget, SIGNAL(cellValueNotChanged(const QPoint &)), this, SIGNAL(controlsChangesApplied()));
+}
+
+void QnCameraScheduleWidget::beginUpdate() {
+    m_inUpdate++;
+    if (m_inUpdate > 1)
+        return;
+    disconnectFromGridWidget();
+
+}
+
+void QnCameraScheduleWidget::endUpdate() {
+    m_inUpdate--;
+    if (m_inUpdate > 0)
+        return;
+    connectToGridWidget();
 }
 
 void QnCameraScheduleWidget::setChangesDisabled(bool val)
@@ -354,11 +373,13 @@ int QnCameraScheduleWidget::qualityTextToIndex(const QString &text)
 
 void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
 {
+    if (m_inUpdate > 0)
+        return;
+
     if (m_disableUpdateGridParams)
         return;
 
     Qn::RecordingType recordType = Qn::RecordingType_Never;
-    QColor color;
     if (ui->recordAlwaysButton->isChecked())
         recordType = Qn::RecordingType_Run;
     else if (ui->recordMotionButton->isChecked())
@@ -398,22 +419,37 @@ void QnCameraScheduleWidget::setFps(int value)
     ui->fpsSpinBox->setValue(value);
 }
 
-int QnCameraScheduleWidget::getMaxFps() const
-{
-    return ui->fpsSpinBox->maximum();
-}
-
-void QnCameraScheduleWidget::setMaxFps(int value)
-{
+void QnCameraScheduleWidget::setMaxFps(int value, int dualStreamValue) {
+    /* Silently ignoring invalid input is OK here. */
     if(value < ui->fpsSpinBox->minimum())
-        value = ui->fpsSpinBox->minimum(); /* Silently ignoring invalid input is OK here. */
-    ui->fpsSpinBox->setMaximum(value);
-    ui->gridWidget->setMaxFps(value);
+        value = ui->fpsSpinBox->minimum();
+    if(dualStreamValue < ui->fpsSpinBox->minimum())
+        dualStreamValue = ui->fpsSpinBox->minimum();
+
+    m_maxFps = value;
+    m_maxDualStreamingFps = dualStreamValue;
+
+    int currentMaxFps = getGridMaxFps();
+    int currentMaxDualStreamingFps = getGridMaxFps(true);
+    if (currentMaxFps > value)
+    {
+        QMessageBox::warning(this, tr("FPS value is too high"),
+            tr("Current fps in schedule grid is %1. Fps was dropped down to maximum camera fps %2").arg(currentMaxFps).arg(value));
+    }
+    if (currentMaxDualStreamingFps > dualStreamValue)
+    {
+        QMessageBox::warning(this, tr("FPS value is too high"),
+            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2")
+                             .arg(currentMaxDualStreamingFps).arg(dualStreamValue));
+    }
+
+    updateMaxFpsValue(ui->recordMotionPlusLQButton->isChecked());
+    ui->gridWidget->setMaxFps(value, dualStreamValue);
 }
 
-int QnCameraScheduleWidget::getGridMaxFps()
+int QnCameraScheduleWidget::getGridMaxFps(bool motionPlusLqOnly)
 {
-    return ui->gridWidget->getMaxFps();
+    return ui->gridWidget->getMaxFps(motionPlusLqOnly);
 }
 
 void QnCameraScheduleWidget::setScheduleEnabled(bool enabled)
@@ -553,6 +589,12 @@ void QnCameraScheduleWidget::updateMotionButtons() {
     }
 }
 
+void QnCameraScheduleWidget::updateMaxFpsValue(bool motionPlusLqToggled) {
+    if (motionPlusLqToggled)
+        ui->fpsSpinBox->setMaximum(m_maxDualStreamingFps);
+    else
+        ui->fpsSpinBox->setMaximum(m_maxFps);
+}
 
 // -------------------------------------------------------------------------- //
 // Handlers
