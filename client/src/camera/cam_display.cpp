@@ -697,7 +697,7 @@ void QnCamDisplay::setSpeed(float speed)
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
-        if (sign(m_speed) != sign(speed) && speed != 0) {
+        if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             if (m_extTimeSrc) {
                 qint64 time = m_extTimeSrc->getCurrentTime();
