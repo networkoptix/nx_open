@@ -14,6 +14,7 @@ QnCameraInputEvent::QnCameraInputEvent(
 :
     m_inputPortID( inputPortID )
 {
+    setEventType( BE_Camera_Input );
     setResource( resource );
     setToggleState( toggleState );
     setDateTime( timestamp );

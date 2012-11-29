@@ -22,10 +22,21 @@ enum BusinessActionType
     BA_TriggerOutput,
 
     // these actions can be executed from any endpoint. Actually these actions call specified function at EC
+    /*!
+        Parameters:\n
+            - emailAddress (string, required)
+    */
     BA_SendMail,
     BA_Alert,
     BA_ShowPopup
 };
+
+namespace BusinessActionParamName
+{
+    static QLatin1String relayOutputID( "relayOutputID" );
+    static QLatin1String relayAutoResetTimeout( "relayAutoResetTimeout" );
+    static QLatin1String emailAddress( "emailAddress" );
+}
 
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;

@@ -1,5 +1,8 @@
+
 #include "business_event_rule.h"
 #include "recording_business_action.h"
+#include "sendmail_business_action.h"
+
 
 QnBusinessEventRule::QnBusinessEventRule()
 {
@@ -18,6 +21,8 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
         case BA_Bookmark:
         case BA_PanicRecording:
         case BA_SendMail:
+            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction);
+            break;
         case BA_Alert:
         case BA_ShowPopup:
         default:
