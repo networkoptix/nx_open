@@ -7,7 +7,6 @@
 #include "axis_stream_reader.h"
 #include "events/business_event_connector.h"
 #include "utils/common/synctime.h"
-#include "utils/common/stdext.h"
 
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";

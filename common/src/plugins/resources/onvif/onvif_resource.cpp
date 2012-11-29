@@ -19,7 +19,6 @@
 #include "utils/common/synctime.h"
 #include "utils/common/math.h"
 #include "utils/common/timermanager.h"
-#include "utils/common/stdext.h"
 #include "api/app_server_connection.h"
 #include "events/business_event_connector.h"
 #include "soap/soapserver.h"
