@@ -23,18 +23,7 @@ struct RtspServerTrackInfo
         delete rtcpSocket;
     }
 
-    bool openServerSocket(const QString& peerAddress)
-    {
-        mediaSocket = new UDPSocket();
-        rtcpSocket = new UDPSocket();
-        if (mediaSocket->setLocalPort(0) && rtcpSocket->setLocalPort(0))
-        {
-            mediaSocket->setDestAddr(peerAddress, clientPort);
-            rtcpSocket->setDestAddr(peerAddress, clientRtcpPort);
-            return true;
-        }
-        return false;
-    }
+    bool openServerSocket(const QString& peerAddress);
 
     quint32 getSSRC() const {
         return encoder ? encoder->getSSRC() : 0;
@@ -47,6 +36,7 @@ struct RtspServerTrackInfo
     UDPSocket* mediaSocket;
     UDPSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
+    static QMutex m_createSocketMutex;
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;
