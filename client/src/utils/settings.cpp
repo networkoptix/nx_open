@@ -189,6 +189,7 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
     }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
+    case DEV_MODE:
         return defaultValue; /* Not to be read from settings. */
     default:
         return base_type::readValueFromSettings(settings, id, defaultValue);
@@ -234,6 +235,7 @@ void QnSettings::writeValueToSettings(QSettings *settings, int id, const QVarian
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case UPDATE_FEED_URL:
+    case DEV_MODE:
         break; /* Not to be saved to settings. */
     default:
         base_type::writeValueToSettings(settings, id, value);
