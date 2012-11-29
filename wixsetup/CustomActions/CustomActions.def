@@ -14,3 +14,5 @@ FixClientFolder
 CopyMediaServerProfile
 CopyAppServerProfile
 IsClientFolderExists
+AnalyzeServerDirectoryReg
+DeleteDatabaseFile

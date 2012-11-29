@@ -24,7 +24,6 @@
 #include "recorder/storage_manager.h"
 #include "api/app_server_connection.h"
 #include "appserver/processor.h"
-#include "recording/file_deletor.h"
 #include "rest/server/rest_server.h"
 #include "rest/handlers/recorded_chunks_handler.h"
 #include "core/resource/media_server_resource.h"
@@ -36,6 +35,7 @@
 #include "settings.h"
 
 #include <fstream>
+#include "soap/soapserver.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
@@ -66,8 +66,11 @@
 #include "events/mserver_business_rule_processor.h"
 #include "events/business_event_rule.h"
 #include "events/business_rule_processor.h"
-#include "rest/handlers/gettime_handler.h"
 #include "rest/handlers/exec_action_handler.h"
+#include "rest/handlers/time_handler.h"
+#include "platform/platform_abstraction.h"
+#include "recorder/file_deletor.h"
+#include "rest/handlers/version_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -187,10 +190,36 @@ QString defaultLocalAddress(const QHostAddress& target)
 
 }
 
+
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QMutex** qMutex = (QMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
 void ffmpegInit()
 {
     //avcodec_init();
     av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true); // true means use it plugin if no <protocol>:// prefix
     QnStoragePluginFactory::instance()->registerStoragePlugin("coldstore", QnPlColdStoreStorage::instance, false); // true means use it plugin if no <protocol>:// prefix
@@ -411,6 +440,7 @@ void initAppServerEventConnection(const QSettings &settings, const QnMediaServer
     appServerEventsUrl.setPath("/events/");
     appServerEventsUrl.addQueryItem("xid", mediaServer->getId().toString());
     appServerEventsUrl.addQueryItem("guid", QnAppServerConnectionFactory::clientGuid());
+    appServerEventsUrl.addQueryItem("version", QN_ENGINE_VERSION);
     appServerEventsUrl.addQueryItem("format", "pb");
 
     static const int EVENT_RECONNECT_TIMEOUT = 3000;
@@ -568,8 +598,9 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
-    QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
+    QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/version", new QnVersionHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
@@ -583,12 +614,60 @@ void QnMain::initTcpListener()
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->start();
     m_progressiveDownloadingServer->enableSSLMode();
     m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
     m_restServer->start();
     m_progressiveDownloadingServer->start();
     m_rtspListener->start();
 #endif
+}
+
+QHostAddress QnMain::getPublicAddress()
+{
+    static const QString DEFAULT_URL_LIST("http://checkrealip.com; http://www.thisip.org/cgi-bin/thisip.cgi; http://checkip.eurodyndns.org");
+    static const QRegExp iPRegExpr("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+
+    if (qSettings.value("publicIPEnabled").isNull())
+        qSettings.setValue("publicIPEnabled", 1);
+
+    int publicIPEnabled = qSettings.value("publicIPEnabled").toInt();
+
+    if (publicIPEnabled == 0)
+        return QHostAddress(); // disabled
+    else if (publicIPEnabled > 1)
+        return QHostAddress(qSettings.value("staticPublicIP").toString()); // manually added
+
+    QStringList urls = qSettings.value("publicIPServers", DEFAULT_URL_LIST).toString().split(";");
+
+    QNetworkAccessManager networkManager;
+    QList<QNetworkReply*> replyList;
+    for (int i = 0; i < urls.size(); ++i)
+        replyList << networkManager.get(QNetworkRequest(urls[i].trimmed()));
+
+    QString result;
+    QTime t;
+    t.start();
+    while (t.elapsed() < 4000 && result.isEmpty()) 
+    {
+        msleep(1);
+        qApp->processEvents();
+        for (int i = 0; i < replyList.size(); ++i) 
+        {
+            if (replyList[i]->isFinished()) {
+                QByteArray response = QByteArray(" ") + replyList[i]->readAll() + QByteArray(" ");
+                int ipPos = iPRegExpr.indexIn(response);
+                if (ipPos >= 0) {
+                    result = response.mid(ipPos+1, iPRegExpr.matchedLength()-2);
+                    break;
+                }
+            }
+        }
+    }
+    for (int i = 0; i < replyList.size(); ++i)
+        replyList[i]->deleteLater();
+
+    return QHostAddress(result);
 }
 
 void QnMain::run()
@@ -671,6 +750,8 @@ void QnMain::run()
 
     initTcpListener();
 
+    QHostAddress publicAddress = getPublicAddress();
+
     while (m_mediaServer.isNull())
     {
         QnMediaServerResourcePtr server = findServer(appServerConnection);
@@ -679,7 +760,19 @@ void QnMain::run()
             server = createServer();
 
         setServerNameAndUrls(server, defaultLocalAddress(appserverHost));
-        server->setNetAddrList(allLocalAddresses());
+
+        QList<QHostAddress> serverIfaceList = allLocalAddresses();
+        if (!publicAddress.isNull()) {
+            bool isExists = false;
+            for (int i = 0; i < serverIfaceList.size(); ++i)
+            {
+                if (serverIfaceList[i] == publicAddress)
+                    isExists = true;
+            }
+            if (!isExists)
+                serverIfaceList << publicAddress;
+        }
+        server->setNetAddrList(serverIfaceList);
 
         QnAbstractStorageResourceList storages = server->getStorages();
         if (storages.isEmpty() || (storages.size() == 1 && storages.at(0)->getUrl() != defaultStoragePath() ))
@@ -731,7 +824,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
@@ -780,6 +873,10 @@ void QnMain::run()
 
     connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
+
     exec();
 }
 
@@ -798,6 +895,8 @@ protected:
     {
         QtSingleCoreApplication *app = application();
         QString guid = serverGuid();
+
+        new QnPlatformAbstraction(app);
 
         if (guid.isEmpty())
         {
@@ -819,6 +918,8 @@ protected:
 
     void stop()
     {
+        m_main.exit();
+        m_main.wait();
         stopServer(0);
     }
 
@@ -839,14 +940,23 @@ void stopServer(int signal)
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
-
+    av_lockmgr_register(NULL);
     qApp->quit();
 }
 
-#include "api/session_manager.h"
+//#define TEST_HTTP
+
+#ifdef TEST_HTTP
+int testHttpClient();
+#endif
 
 int main(int argc, char* argv[])
 {
+#ifdef TEST_HTTP
+    return testHttpClient();
+#endif
+
+
     QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);
@@ -855,3 +965,32 @@ int main(int argc, char* argv[])
 
     return result;
 }
+
+#ifdef TEST_HTTP
+
+#include <fstream>
+#include <utils/network/http/httpclient.h>
+
+int testHttpClient()
+{
+    std::ofstream f( "F:\\temp\\Far30b2942.x86.20121110.msi", std::ios_base::out | std::ios_base::binary );
+    if( !f.is_open() )
+        return 2;
+
+    nx_http::HttpClient httpClient;
+    if( !httpClient.doGet( QUrl( QLatin1String("http://www.farmanager.com/files/Far30b2942.x86.20121110.msi") ) ) )
+    //if( !httpClient.doGet( QUrl( QLatin1String("http://192.168.0.31/HUY") ) ) )
+        return 1;
+
+    if( !httpClient.startReadMessageBody() )
+        return 3;
+    while( !httpClient.eof() )
+    {
+        const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
+        f.write( buf.data(), buf.size() );
+    }
+    f.close();
+
+    return 0;
+}
+#endif

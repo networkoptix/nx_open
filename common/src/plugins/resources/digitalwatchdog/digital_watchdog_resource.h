@@ -46,7 +46,7 @@ class QnPlWatchDogResourceAdditionalSettings
 
 public:
     
-    QnPlWatchDogResourceAdditionalSettings(const QHostAddress& host, int port, unsigned int timeout,
+    QnPlWatchDogResourceAdditionalSettings(const QString& host, int port, unsigned int timeout,
         const QAuthenticator& auth, const QString& cameraSettingId);
     ~QnPlWatchDogResourceAdditionalSettings();
 

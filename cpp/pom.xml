@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>hdwitness</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>1.3.1</version>
+		<version>1.3.9</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>1.3.1</version>
+	<version>1.3.9</version>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>cpp</artifactId>
 	<packaging>pom</packaging>
@@ -144,7 +144,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>python</executable>
+							<executable>${python.dir}/python</executable>
 							<arguments>
 								<argument>gen-resources.py</argument>
 							</arguments>
@@ -158,7 +158,7 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>python</executable>
+							<executable>${python.dir}/python</executable>
 							<arguments>
 								<argument>build-prepare.py</argument>
 							</arguments>
@@ -213,6 +213,12 @@
 									<map from="" to="INCLUDEPATH += "/>
 								</pathconvert>								
 								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${includes}</echo>
+
+								<dirset id="base_includes_path" dir="${environment.dir}/include" includes="*" erroronmissingdir="false"/>
+								<pathconvert pathsep="${line.separator}" property="base_includes" refid="base_includes_path">
+									<map from="" to="INCLUDEPATH += "/>
+								</pathconvert>								
+								<echo file="${project.build.directory}/${project.artifactId}.pro" append="true">${line.separator}${base_includes}</echo>								
 
 								<fileset id="debug_libs_path" dir="${libdir}/build/bin/debug" erroronmissingdir="false">
 									<include name="**/*.lib" />
@@ -386,7 +392,7 @@
 									<goal>exec</goal>
 								</goals>
 								<configuration>
-									<executable>${environment.dir}/qt/bin/qmake</executable>
+									<executable>qmake</executable>
 									<workingDirectory>${project.build.directory}</workingDirectory>		
 									<arguments>
 										<commandlineArgs>-tp</commandlineArgs>

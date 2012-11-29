@@ -87,7 +87,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!widget->isInfoButtonVisible())
+        if (!widget->visibleButtons() & QnResourceWidget::InfoButton)
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {
@@ -293,6 +293,7 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
         return Qn::DisabledAction;
 
+    // Export selection
     if (m_centralItemRequired) {
         QnResourcePtr resource = parameters.resource();
         if(resource->flags() & QnResource::sync) {
@@ -300,7 +301,13 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
             if(!periods.intersects(period))
                 return Qn::DisabledAction;
         }
-    }    
+    }
+    // Export layout
+    else {
+        QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::AllTimePeriodsParameter);
+        if(!periods.intersects(period))
+            return Qn::DisabledAction;
+    }
     return Qn::EnabledAction;
 }
 
@@ -340,5 +347,8 @@ Qn::ActionVisibility QnOpenInFolderActionCondition::check(const QnResourceList &
         return Qn::InvisibleAction;
 
     QnResourcePtr resource = resources[0];
-    return resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:")) ? Qn::EnabledAction : Qn::InvisibleAction;
+    bool isLocalResource = resource->hasFlags(QnResource::url | QnResource::local | QnResource::media) && !resource->getUrl().startsWith(QLatin1String("layout:"));
+    bool isExportedLayout = resource->hasFlags(QnResource::url | QnResource::local | QnResource::layout);
+
+    return isLocalResource || isExportedLayout ? Qn::EnabledAction : Qn::InvisibleAction;
 }

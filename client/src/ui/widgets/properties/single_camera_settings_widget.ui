@@ -25,16 +25,30 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0">
           <widget class="QLabel" name="nameLabel">
            <property name="text">
             <string>Name:</string>
            </property>
           </widget>
          </item>
-         <item>
+         <item row="0" column="1">
           <widget class="QLineEdit" name="nameEdit"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Model:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="modelEdit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

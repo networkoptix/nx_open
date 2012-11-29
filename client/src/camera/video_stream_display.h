@@ -1,9 +1,11 @@
+
 #ifndef QN_VIDEO_STREAM_DISPLAY_H
 #define QN_VIDEO_STREAM_DISPLAY_H
 
-
 #include "decoders/video/abstractdecoder.h"
 #include "decoders/frame_scaler.h"
+#include "../ui/workbench/workbench_context_aware.h"
+
 
 class QnAbstractVideoDecoder;
 struct QnCompressedVideoData;
@@ -12,7 +14,6 @@ class QnBufferedFrameDisplayer;
 
 static const int MAX_FRAME_QUEUE_SIZE = 12;
 static const int MAX_QUEUE_TIME = 1000 * 200;
-
 
 /**
   * Display one video stream. Decode the video and pass it to video window.
@@ -25,8 +26,10 @@ public:
     QnVideoStreamDisplay(bool can_downscale);
     ~QnVideoStreamDisplay();
     void setDrawer(QnAbstractRenderer* draw);
-    FrameDisplayStatus dispay(QnCompressedVideoDataPtr data, bool draw,
-                QnFrameScaler::DownscaleFactor force_factor = QnFrameScaler::factor_any);
+    FrameDisplayStatus display(
+        QnCompressedVideoDataPtr data,
+        bool draw,
+        QnFrameScaler::DownscaleFactor force_factor = QnFrameScaler::factor_any);
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
@@ -53,7 +56,8 @@ public:
       * Return last decoded frame
       */
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
-
+    QSize getScreenSize() const;
+    QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
 private:
     mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;
@@ -65,8 +69,8 @@ private:
       * to reduce image size for weak video cards 
       */
 
-    CLVideoDecoderOutput* m_frameQueue[MAX_FRAME_QUEUE_SIZE];
-    CLVideoDecoderOutput* m_prevFrameToDelete;
+    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[MAX_FRAME_QUEUE_SIZE];
+    QSharedPointer<CLVideoDecoderOutput> m_prevFrameToDelete;
     int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
@@ -84,22 +88,24 @@ private:
     bool m_needReinitDecoders;
     bool m_reverseMode;
     bool m_prevReverseMode;
-    QQueue<CLVideoDecoderOutput*> m_reverseQueue;
+    QQueue<QSharedPointer<CLVideoDecoderOutput> > m_reverseQueue;
     bool m_flushedBeforeReverseStart;
     qint64 m_lastDisplayedTime;
     qint64 m_reverseSizeInBytes;
     bool m_timeChangeEnabled;
     QnBufferedFrameDisplayer* m_bufferedFrameDisplayer;
     bool m_canUseBufferedFrameDisplayer;
+
 private:
     float m_speed;
     bool m_queueWasFilled;
     bool m_needResetDecoder;
-    CLVideoDecoderOutput* m_lastDisplayedFrame;
+    QSharedPointer<CLVideoDecoderOutput> m_lastDisplayedFrame;
     QSize m_imageSize;
     mutable QMutex m_imageSizeMtx;
     int m_prevSrcWidth;
     int m_prevSrcHeight;
+    qint64 m_lastIgnoreTime;
 
     void reorderPrevFrames();
     bool allocScaleContext(const CLVideoDecoderOutput& outFrame, int newWidth, int newHeight);
@@ -112,10 +118,14 @@ private:
         int srcWidth, 
         int srcHeight, 
         QnFrameScaler::DownscaleFactor force_factor);
-    bool processDecodedFrame(QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame, bool enableFrameQueue, bool reverseMode);
+    bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
-    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, CLVideoDecoderOutput* outFrame );
+    /*!
+        \param outFrame MUST contain initialized \a CLVideoDecoderOutput object, but method is allowed to return just reference 
+            to another frame and not copy data to this object (TODO)
+    */
+    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 };
 
 #endif //QN_VIDEO_STREAM_DISPLAY_H

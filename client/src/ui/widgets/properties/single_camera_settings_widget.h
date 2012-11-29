@@ -18,8 +18,8 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
     typedef QWidget base_type;
 
@@ -67,6 +67,8 @@ public:
     /** Check if motion region is valid */
     bool isValidMotionRegion();
 
+    void setExportScheduleButtonEnabled(bool enabled);
+
 public slots:
     void setAdvancedParam(const CameraSetting& val);
     void refreshAdvancedSettings();
@@ -75,6 +77,7 @@ signals:
     void hasChangesChanged();
     void moreLicensesRequested();
     void advancedSettingChanged();
+    void scheduleExported(const QnVirtualCameraResourceList &);
 
 protected:
     virtual void showEvent(QShowEvent *event) override;
@@ -87,11 +90,12 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
+    void at_cameraScheduleWidget_controlsChangesApplied();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();
     void at_advancedSettingsLoaded(int httpStatusCode, const QList<QPair<QString, QVariant> >& params);
-    void at_pingButtonClicked();
+    void at_pingButton_clicked();
 
     void updateMaxFPS();
     void updateMotionWidgetSensitivity();

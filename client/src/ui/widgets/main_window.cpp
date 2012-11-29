@@ -41,15 +41,21 @@
 #include "ui/style/globals.h"
 #include "ui/style/noptix_style.h"
 #include "ui/style/proxy_style.h"
-#include "ui/events/system_menu_event.h"
+#include "ui/workaround/system_menu_event.h"
 #include <ui/screen_recording/screen_recorder.h>
 
 #include "file_processor.h"
 #include "utils/settings.h"
 
-#include "resource_tree_widget.h"
+#include "resource_browser_widget.h"
 #include "dwm.h"
 #include "layout_tab_bar.h"
+#include "../../ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
+
+#include "openal/qtvaudiodevice.h"
+#include "ui/graphics/items/controls/volume_slider.h"
+
+//#define QN_MAIN_WINDOW_CHANGES_OPACITY
 
 namespace {
 
@@ -105,7 +111,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_controller(0),
     m_titleVisible(true),
     m_dwm(NULL),
-    m_drawCustomFrame(false)
+    m_drawCustomFrame(false),
+    m_changeOpacity(false)
 {
     setAttribute(Qt::WA_AlwaysShowToolTips);
 
@@ -259,6 +266,13 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
     setLayout(m_globalLayout);
+
+
+    /* Transparency. */
+    connect(QnVolumeSliderNotifier::instance(), SIGNAL(manipulated()), this, SLOT(at_volumeSliderNotifier_manipulated()));
+    connect(QtvAudioDevice::instance(), SIGNAL(volumeChanged()), this, SLOT(at_audioDevice_volumeChanged()));
+    at_audioDevice_volumeChanged();
+
 
     /* Post-initialize. */
     updateDwmState();
@@ -461,6 +475,13 @@ bool QnMainWindow::event(QEvent *event) {
     return result;
 }
 
+void QnMainWindow::closeEvent(QCloseEvent* event)
+{
+    //Informing DecodedPictureToOpenGLUploaderContextPool that window is about to destroy so that it can destroy its gl contexts 
+        //before destroying window (destroying gl context after window destruction is bad and causes access violation on catalyst drivers)
+    DecodedPictureToOpenGLUploaderContextPool::instance()->setPaintWindow( NULL );
+}
+
 void QnMainWindow::mouseReleaseEvent(QMouseEvent *event) {
     base_type::mouseReleaseEvent(event);
 
@@ -563,3 +584,16 @@ void QnMainWindow::at_tabBar_closeRequested(QnWorkbenchLayout *layout) {
     menu()->trigger(Qn::CloseLayoutAction, layouts);
 }
 
+void QnMainWindow::at_volumeSliderNotifier_manipulated() {
+    m_changeOpacity = true;
+}
+
+void QnMainWindow::at_audioDevice_volumeChanged() {
+#ifdef QN_MAIN_WINDOW_CHANGES_OPACITY
+    if(m_changeOpacity) {
+        qreal volume = QtvAudioDevice::instance()->volume();
+
+        setWindowOpacity(qMin(0.7 + 0.5 * volume, 1.0));
+    }
+#endif
+}

@@ -42,7 +42,7 @@ protected:
     void sendBuffer(const QnByteArray& sendBuffer);
     //void clearBuffer();
 
-    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType);
+    void sendResponse(const QByteArray& transport, int code, const QByteArray& contentType, bool displayDebug = false);
     QString codeToMessage(int code);
 
     void copyClientRequestTo(QnTCPConnectionProcessor& other);

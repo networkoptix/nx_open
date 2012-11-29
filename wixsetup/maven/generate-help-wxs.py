@@ -14,6 +14,6 @@ def fixasfiles():
     open('ClientHelp.wxs', 'w').write(text)
 
 if __name__ == '__main__':
-    os.system(r'heat dir ..\..\help\HTML -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${installer.customization}HelpDir -var var.ClientHelpSourceDir')
+    os.system(r'heat dir ${ClientHelpSourceDir} -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientHelp.wxs -cg ClientHelpComponent -dr ${installer.customization}HelpDir -var var.ClientHelpSourceDir')
     fixasfiles()
 

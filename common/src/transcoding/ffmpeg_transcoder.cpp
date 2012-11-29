@@ -3,7 +3,7 @@
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 static const int IO_BLOCK_SIZE = 1024*16;
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
@@ -67,7 +67,7 @@ QnFfmpegTranscoder::~QnFfmpegTranscoder()
 
 void QnFfmpegTranscoder::closeFfmpegContext()
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (m_formatCtx)
     {
         for (unsigned i = 0; i < m_formatCtx->nb_streams; ++i)
@@ -102,9 +102,9 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
         return -1;
     }
 
-    global_ffmpeg_mutex.lock();
+    //global_ffmpeg_mutex.lock();
     int err = avformat_alloc_output_context2(&m_formatCtx, outputCtx, 0, "");
-    global_ffmpeg_mutex.unlock();
+    //global_ffmpeg_mutex.unlock();
     if (err != 0)
     {
         m_lastErrMessage = tr("Can't create output context for format %1").arg(container);
@@ -120,10 +120,11 @@ int QnFfmpegTranscoder::setContainer(const QString& container)
 
 int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDataPtr audio)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     if (m_videoCodec != CODEC_ID_NONE)
     {
+        // TODO: #vasilenko avoid using deprecated methods
         AVStream* videoStream = av_new_stream(m_formatCtx, 0);
         if (videoStream == 0)
         {
@@ -160,7 +161,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
             if (!video || video->width < 1 || video->height < 1)
             {
                 CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
-                CLVideoDecoderOutput decodedVideoFrame;
+                QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
                 decoder.decode(video, &decodedVideoFrame);
                 videoWidth = decoder.getWidth();
                 videoHeight = decoder.getHeight();
@@ -200,6 +201,7 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
     {
         //Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented! Under construction!!!");
 
+        // TODO: #vasilenko avoid using deprecated methods
         AVStream* audioStream = av_new_stream(m_formatCtx, 0);
         if (audioStream == 0)
         {
@@ -256,7 +258,8 @@ int QnFfmpegTranscoder::open(QnCompressedVideoDataPtr video, QnCompressedAudioDa
 
 int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, QnByteArray& result)
 {
-    if (m_baseTime == AV_NOPTS_VALUE)
+    Q_UNUSED(result)
+    if ((quint64)m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - 1000*100;
 
     AVRational srcRate = {1, 1000000};

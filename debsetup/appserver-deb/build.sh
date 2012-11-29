@@ -45,8 +45,6 @@ cp /lib/$ARCH-linux-gnu/libssl.so.1.0.0 $LIBSTAGE
 cp /lib/$ARCH-linux-gnu/libcrypto.so.1.0.0 $LIBSTAGE
 
 mkdir -p $ETCSTAGE
-touch $ETCSTAGE/entcontroller.conf
-
 mkdir -p $INITSTAGE
 mkdir -p $INITDSTAGE
 

@@ -134,14 +134,14 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
     
         if (net_res->getMAC().toString() == smac)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return local_results; // already found;
         }
     }
 
 
-    QnNetworkResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource ( new QnPlIqResource() );
 
     QnId rt = qnResTypePool->getResourceTypeId(manufacture(), name);
     if (!rt.isValid())
@@ -156,6 +156,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(QnResourceList
 
     resource->setTypeId(rt);
     resource->setName(name);
+    resource->setModel(name);
     resource->setMAC(smac);
 
     local_results.push_back(resource);
@@ -195,7 +196,7 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
 
         if (net_res->getMAC() == macAddr)
         {
-            if (isNewDiscoveryAddressBetter(net_res->getHostAddress().toString(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
+            if (isNewDiscoveryAddressBetter(net_res->getHostAddress(), discoveryAddress.toString(), net_res->getDiscoveryAddr().toString()))
                 net_res->setDiscoveryAddr(discoveryAddress);
             return; // already found;
         }
@@ -208,13 +209,14 @@ void QnPlIqResourceSearcher::processNativePacket(QnResourceList& result, QByteAr
         return;
     }
 
-    QnNetworkResourcePtr resource ( new QnPlIqResource() );
+    QnPlIqResourcePtr resource ( new QnPlIqResource() );
     in_addr* peer_addr = (in_addr*) (responseData.data() + 32);
     QHostAddress peerAddress(QLatin1String(inet_ntoa(*peer_addr)));
     resource->setTypeId(rt);
     resource->setName(nameStr);
+    resource->setModel(nameStr);
     resource->setMAC(macAddr);
-    resource->setHostAddress(peerAddress, QnDomainMemory);
+    resource->setHostAddress(peerAddress.toString(), QnDomainMemory);
     resource->setDiscoveryAddr(discoveryAddress);
 
     result.push_back(resource);

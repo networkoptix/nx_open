@@ -5,7 +5,8 @@
 
 #include <core/resource/layout_resource.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
+
 #include "workbench_state.h"
 #include "workbench_context_aware.h"
 
@@ -213,6 +214,8 @@ private slots:
     void at_layout_cellSpacingChanged();
 
     void updateSingleRoleItem();
+    void updateActiveRoleItem();
+    void updateCentralRoleItem();
 
 private:
     /** Current layout. */

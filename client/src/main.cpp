@@ -47,6 +47,7 @@
 #include "core/resource/storage_resource.h"
 
 #include "plugins/resources/axis/axis_resource_searcher.h"
+#include "plugins/pluginmanager.h"
 #include "core/resource/resource_directory_browser.h"
 
 #include "tests/auto_tester.h"
@@ -68,7 +69,7 @@
 #include "client_message_processor.h"
 #include "ui/workbench/workbench_translation_manager.h"
 
-#ifdef Q_WS_X11
+#ifdef Q_OS_LINUX
     #include "ui/workaround/x11_launcher_workaround.h"
 #endif
 #include "utils/common/cryptographic_hash.h"
@@ -81,7 +82,10 @@
 #endif
 
 #include "ui/help/help_handler.h"
-#include "client_module.h"
+#include "client/client_module.h"
+#include <client/client_connection_data.h>
+#include "platform/platform_abstraction.h"
+
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {
@@ -107,10 +111,35 @@ void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args
 
 #ifndef UNICLIENT_TESTS
 
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QMutex** qMutex = (QMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
 void ffmpegInit()
 {
     //avcodec_init();
     av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
 
     // client uses ordinary QT file to access file system, server uses buffering access implemented inside QnFileStorageResource
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
@@ -144,11 +173,11 @@ void addTestData()
     resource->setParentId(server->getId());
     qnResPool->addResource(QnResourcePtr(resource));
     */
-
+ 
     /*
     QnFakeCameraPtr testCamera(new QnFakeCamera());
     testCamera->setParentId(server->getId());
-    testCamera->setMAC(QnMacAddress("00000"));
+    testCamera->setMAC(QnMacAddress("00000"));    
     testCamera->setUrl("00000");
     testCamera->setName("testCamera");
     qnResPool->addResource(QnResourcePtr(testCamera));
@@ -190,7 +219,7 @@ void initAppServerConnection()
     if(!appServerUrl.isValid())
         appServerUrl = qnSettings->defaultConnection().url;
 
-    // TODO: Ivan. Enable it when removing all places on receiving messages.
+    // TODO: #Ivan. Enable it when removing all places on receiving messages.
     // QnAppServerConnectionFactory::setClientGuid(QUuid::createUuid().toString());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnServerCameraFactory::instance());
@@ -212,11 +241,19 @@ static void myMsgHandler(QtMsgType type, const char *msg)
     qnLogMsgHandler( type, msg );
 }
 
+#ifdef Q_WS_X11
+#include <X11/Xlib.h>
+#endif
+
 #ifndef API_TEST_MAIN
 
 int qnMain(int argc, char *argv[])
 {
     QnClientModule client(argc, argv);
+    
+#ifdef Q_WS_X11
+	XInitThreads();
+#endif
 
     QTextStream out(stdout);
     QThread::currentThread()->setPriority(QThread::HighestPriority);
@@ -229,6 +266,9 @@ int qnMain(int argc, char *argv[])
     QApplication::setOrganizationName(QLatin1String(QN_ORGANIZATION_NAME));
     QApplication::setApplicationName(QLatin1String(QN_APPLICATION_NAME));
     QApplication::setApplicationVersion(QLatin1String(QN_APPLICATION_VERSION));
+
+    /* We don't want changes in desktop color settings to mess up our custom style. */
+    QApplication::setDesktopSettingsAware(false);
 
     /* Parse command line. */
     QnAutoTester autoTester(argc, argv);
@@ -282,6 +322,8 @@ int qnMain(int argc, char *argv[])
     }
     application->setQuitOnLastWindowClosed(true);
     application->setWindowIcon(qnSkin->icon("window_icon.png"));
+
+    QScopedPointer<QnPlatformAbstraction> platform(new QnPlatformAbstraction());
 
 #ifdef Q_WS_X11
  //   QnX11LauncherWorkaround x11LauncherWorkaround;
@@ -355,7 +397,7 @@ int qnMain(int argc, char *argv[])
 
     //===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::FFMPEG );
+    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
 
     QnServerCameraProcessor serverCameraProcessor;
     QnResourceDiscoveryManager::instance().setResourceProcessor(&serverCameraProcessor);
@@ -427,7 +469,10 @@ int qnMain(int argc, char *argv[])
 
     mainWindow->show();
     context->action(Qn::EffectiveMaximizeAction)->trigger();
-        
+
+    //initializing plugin manager. TODO supply plugin dir (from settings)
+    PluginManager::instance()->loadPlugins();
+
     /* Process input files. */
     for (int i = 1; i < argc; ++i)
         mainWindow->handleMessage(QFile::decodeName(argv[i]));
@@ -492,7 +537,7 @@ int qnMain(int argc, char *argv[])
 
     /* Write out settings. */
     qnSettings->setAudioVolume(QtvAudioDevice::instance()->volume());
-
+    av_lockmgr_register(NULL);
     return result;
 }
 
@@ -510,6 +555,3 @@ int main(int argc, char *argv[]) {
 
 #endif // API_TEST_MAIN
 #endif
-
-
-

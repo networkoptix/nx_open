@@ -126,6 +126,8 @@ public:
 
     qint64 getCurrentTime();
 
+    int sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString);
+
     void stop();
 
     static int getMediaProxyPort();
@@ -162,12 +164,14 @@ public:
     static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
+    static QString currentVersion();
 	static QnResourceFactory* defaultFactory();
 
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
     static void setDefaultMediaProxyPort(int port);
+    static void setCurrentVersion(const QString& version);
 
     static QnAppServerConnectionPtr createConnection();
     static QnAppServerConnectionPtr createConnection(const QUrl& url);
@@ -177,6 +181,7 @@ private:
     QString m_clientGuid;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
+    QString m_currentVersion;
     QnResourceFactory* m_resourceFactory;
     QnApiPbSerializer m_serializer;
 };

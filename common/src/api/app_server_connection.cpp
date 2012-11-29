@@ -753,6 +753,27 @@ qint64 QnAppServerConnection::getCurrentTime()
     return data.toLongLong();
 }
 
+int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString)
+{
+    QnRequestParamList requestParams(m_requestParams);
+    QByteArray reply;
+
+    QByteArray body;
+    m_serializer.serializeEmail(to, subject, message, body);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("email"), requestParams, body, reply, errorString);
+    if (status != 0) {
+        qWarning() << "Can't send email " << errorString;
+        return status;
+    }
+
+    if (reply != "OK") {
+        errorString = reply;
+        return -1;
+    }
+
+    return 0;
+}
+
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
 {
     QnRequestParamList requestParams(m_requestParams);
@@ -820,6 +841,13 @@ void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
     }
 }
 
+void QnAppServerConnectionFactory::setCurrentVersion(const QString& version)
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        factory->m_currentVersion = version;
+    }
+}
+
 int QnAppServerConnectionFactory::defaultMediaProxyPort()
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
@@ -827,6 +855,15 @@ int QnAppServerConnectionFactory::defaultMediaProxyPort()
     }
 
     return 0;
+}
+
+QString QnAppServerConnectionFactory::currentVersion()
+{
+    if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
+        return factory->m_currentVersion;
+    }
+
+    return QLatin1String("");
 }
 
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()

@@ -12,7 +12,7 @@ RESOURCES += ${project.build.directory}/build/${project.artifactId}.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-generated.qrc
 RESOURCES += ${project.build.directory}/build/${project.artifactId}-translations.qrc
 
-!contains(BUILDLIB, staticlib) {
+isEmpty(BUILDLIB) {
   ICON = ${project.build.directory}/hdw_logo.ico
 }
 
@@ -44,7 +44,9 @@ CONFIG(release, debug|release) {
   LIBS = -L${libdir}/build/bin/release -L${environment.dir}/qt/bin/${arch}/release
 }
 
-LIBS += -lcommon	
+!contains(TARGET,common) {
+  LIBS += -lcommon	
+}
 
 LIBS += ${global.libs}
 DEFINES += ${global.defines}
@@ -64,7 +66,7 @@ win32-msvc*:OVERRIDE_DEFINITION = "override=override"
 DEFINES += $$OVERRIDE_DEFINITION
 
 win* {
-  !contains(BUILDLIB, staticlib) {
+  isEmpty(BUILDLIB) {
     RC_FILE = ${project.build.directory}/hdwitness.rc
 	ICON = ${project.build.directory}/hdw_logo.ico	
   }

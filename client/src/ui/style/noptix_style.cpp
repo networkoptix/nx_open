@@ -141,6 +141,14 @@ void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptio
         if(drawToolButtonComplexControl(option, painter, widget))
             return;
         break;
+    case CC_ScrollBar:
+    {
+        QColor backupText = option->palette.color(QPalette::Text);
+        (const_cast<QStyleOptionComplex *>(option))->palette.setColor(QPalette::Text, QColor(255, 255, 255));
+        base_type::drawComplexControl(control, option, painter, widget);
+        (const_cast<QStyleOptionComplex *>(option))->palette.setColor(QPalette::Text, backupText);
+        return;
+    }
     default:
         break;
     }
@@ -515,6 +523,9 @@ bool QnNoptixStyle::drawBranchPrimitive(const QStyleOption *option, QPainter *pa
 
     if(!option->rect.isValid())
         return false;
+
+    if(widget->rect().bottom() < option->rect.bottom() && widget->property(Qn::HideLastRowInTreeIfNotEnoughSpace).toBool())
+        return true;
 
     if (option->state & State_Children) {
         const QIcon &icon = (option->state & State_Open) ? m_branchOpen : m_branchClosed;

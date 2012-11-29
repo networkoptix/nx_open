@@ -38,7 +38,8 @@ public:
     virtual bool isEnabled() const { return true; }
 
     virtual void reinitTime(qint64 newTime) { Q_UNUSED(newTime); }
-    
+  
+    virtual bool isBuffering() const { return false; }
 };
 
 #endif //QnExternalTimeSource_h_1919

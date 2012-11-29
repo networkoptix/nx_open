@@ -1,6 +1,10 @@
+
 #include <QList>
 #include "business_rule_processor.h"
 #include "core/resource/media_server_resource.h"
+#include "core/resource/security_cam_resource.h"
+#include "api/app_server_connection.h"
+
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -16,7 +20,6 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
-
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action)
@@ -37,23 +40,33 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         executeActionInternal(action);
 }
 
+static const QLatin1String RELAY_OUTPUT_ID( "relayOutputID" );
+static const QLatin1String RELAY_AUTO_RESET_TIMEOUT( "relayAutoResetTimeout" );
+
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
-    switch(action->actionType())
-    {
-    case BA_SendMail:
-        break;
-    case BA_Alert:
-        break;
-    case BA_ShowPopup:
-        break;
+    QnResourcePtr resource = action->getResource();
 
-    default:
-        break;
+    switch( action->actionType() )
+    {
+        case BA_SendMail:
+            return sendMail( action );
+
+        case BA_Alert:
+            break;
+
+        case BA_ShowPopup:
+            break;
+
+        case BA_TriggerOutput:
+            return triggerCameraOutput( action );
+
+        default:
+            break;
     }
 
     return false;
-};
+}
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
 {
@@ -119,4 +132,55 @@ void QnBusinessRuleProcessor::at_actionDelivered(QnAbstractBusinessActionPtr act
 void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action)
 {
     // todo: implement me
+}
+
+bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActionPtr& action )
+{
+    const QnResourcePtr& resource = action->getResource();
+
+    if( !resource )
+    {
+        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput with no resource reference. Ignoring..."), cl_logWARNING );
+        return false;
+    }
+    QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
+    if( !securityCam )
+    {
+        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+            arg(resource->getId()), cl_logWARNING );
+        return false;
+    }
+    QnBusinessParams::const_iterator relayOutputIDIter = action->getParams().find( RELAY_OUTPUT_ID );
+    if( relayOutputIDIter == action->getParams().end() )
+    {
+        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action without required parameter %1. Ignoring...").arg(RELAY_OUTPUT_ID), cl_logWARNING );
+        return false;
+    }
+    QnBusinessParams::const_iterator autoResetTimeoutIter = action->getParams().find( RELAY_AUTO_RESET_TIMEOUT );
+    return securityCam->setRelayOutputState(
+        relayOutputIDIter->toString(),
+        action->getToggleState() == ToggleState_On,
+        autoResetTimeoutIter == action->getParams().end() ? 0 : autoResetTimeoutIter->toUInt() );
+}
+
+bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& action )
+{
+    cl_log.log( QString::fromLatin1("Sending mail to %1"), cl_logDEBUG1 );
+
+    const QnBusinessParams& actionParams = action->getParams();
+    QnBusinessParams::const_iterator emailIter = actionParams.find( BusinessActionParamName::emailAddress );
+    if( emailIter == actionParams.end() )
+    {
+        cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"%1\". Ignoring...").
+            arg(BusinessActionParamName::emailAddress), cl_logWARNING );
+        return false;
+    }
+
+    const QByteArray& serializedAction = action->serialize();
+    const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
+
+    //appServerConnection->sendMail( emailIter->second.toString(), serializedAction);
+
+        //TODO/IMPL
+    return false;
 }

@@ -8,6 +8,7 @@
 #include "cameraServerItem.pb.h"
 #include "connectinfo.pb.h"
 #include "businessRule.pb.h"
+#include "email.pb.h"
 
 #include "pb_serializer.h"
 
@@ -86,6 +87,9 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
     if (pb_camera.has_physicalid())
         camera->setPhysicalId(QString::fromStdString(pb_camera.physicalid()));
 
+    camera->setModel(QString::fromStdString(pb_camera.model()));
+    camera->setFirmware(QString::fromStdString(pb_camera.firmware()));
+
     camera->setAuth(QString::fromUtf8(pb_camera.login().c_str()), QString::fromUtf8(pb_camera.password().c_str()));
     camera->setMotionType(static_cast<MotionType>(pb_camera.motiontype()));
 
@@ -112,7 +116,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
                                         pb_scheduleTask.dayofweek(),
                                         pb_scheduleTask.starttime(),
                                         pb_scheduleTask.endtime(),
-                                        (QnScheduleTask::RecordingType) pb_scheduleTask.recordtype(),
+                                        (Qn::RecordingType) pb_scheduleTask.recordtype(),
                                         pb_scheduleTask.beforethreshold(),
                                         pb_scheduleTask.afterthreshold(),
                                         (QnStreamQuality) pb_scheduleTask.streamquality(),
@@ -154,6 +158,9 @@ void parseServer(QnMediaServerResourcePtr &server, const pb::Resource &pb_server
     server->setApiUrl(QString::fromUtf8(pb_server.apiurl().c_str()));
     if (pb_server.has_streamingurl())
         server->setStreamingUrl(QString::fromUtf8(pb_server.streamingurl().c_str()));
+
+    if (pb_server.has_version())
+        server->setVersion(QString::fromUtf8(pb_server.version().c_str()));
 
     if (pb_serverResource.has_status())
         server->setStatus(static_cast<QnResource::Status>(pb_serverResource.status()));
@@ -479,6 +486,8 @@ void serializeCamera_i(pb::Resource& pb_cameraResource, const QnVirtualCameraRes
     pb_cameraResource.set_url(cameraPtr->getUrl().toUtf8().constData());
     pb_camera.set_mac(cameraPtr->getMAC().toString().toUtf8().constData());
     pb_camera.set_physicalid(cameraPtr->getPhysicalId().toUtf8().constData());
+    pb_camera.set_model(cameraPtr->getModel().toUtf8().constData());
+    pb_camera.set_firmware(cameraPtr->getFirmware().toUtf8().constData());
     pb_camera.set_login(cameraPtr->getAuth().user().toUtf8().constData());
     pb_camera.set_password(cameraPtr->getAuth().password().toUtf8().constData());
     pb_cameraResource.set_disabled(cameraPtr->isDisabled());
@@ -892,6 +901,20 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRule &busines
 
     std::string str;
     pb_businessRules.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void QnApiPbSerializer::serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
+{
+    pb::Emails pb_emails;
+    pb::Email& email = *(pb_emails.add_email());
+
+    email.set_to(to.toUtf8().constData());
+    email.set_subject(subject.toUtf8().constData());
+    email.set_body(message.toUtf8().constData());
+
+    std::string str;
+    pb_emails.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 

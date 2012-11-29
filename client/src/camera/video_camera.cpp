@@ -1,13 +1,13 @@
 #include "video_camera.h"
 #include "core/dataprovider/media_streamdataprovider.h"
-#include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "ui/style/skin.h"
 #include "core/resource/security_cam_resource.h"
 #include "device_plugins/archive/rtsp/rtsp_client_archive_delegate.h"
+#include "plugins/resources/archive/archive_stream_reader.h"
 
 QnVideoCamera::QnVideoCamera(QnMediaResourcePtr resource, QnAbstractMediaStreamDataProvider* reader) :
     m_resource(resource),
-    m_camdispay(resource),
+    m_camdispay(resource, dynamic_cast<QnArchiveStreamReader*>(reader)),
     m_reader(reader),
     m_extTimeSrc(NULL),
     m_isVisible(true),
@@ -130,7 +130,8 @@ void QnVideoCamera::setQuality(QnStreamQuality q, bool increase)
         */
 }
 
-void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, QnStreamRecorder::Role role)
+void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, const QString& fileName, const QString& format, QnStorageResourcePtr storage, 
+                                            QnStreamRecorder::Role role, int timeOffsetMs, int serverTimeZoneMs)
 {
     if (startTime > endTime)
         qSwap(startTime, endTime);
@@ -176,6 +177,8 @@ void QnVideoCamera::exportMediaPeriodToFile(qint64 startTime, qint64 endTime, co
     m_exportRecorder->setEofDateTime(endTime);
     m_exportRecorder->setFileName(fileName);
     m_exportRecorder->setRole(role);
+    m_exportRecorder->setOnScreenDateOffset(timeOffsetMs);
+    m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
 
 #ifndef _DEBUG

@@ -179,7 +179,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setTypeId(rt);
                 resource->setName(name);
                 resource->setMAC(smac);
-                resource->setHostAddress(QHostAddress(ad.ip), QnDomainMemory);
+                resource->setHostAddress(QHostAddress(ad.ip).toString(), QnDomainMemory);
                 
                 resource->setDiscoveryAddr(QHostAddress(ad.localAddr));
 

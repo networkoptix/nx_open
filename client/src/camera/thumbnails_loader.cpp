@@ -10,7 +10,7 @@
 #include <utils/common/math.h>
 #include <utils/common/synctime.h>
 #include <utils/common/performance.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
@@ -363,7 +363,7 @@ void QnThumbnailsLoader::process() {
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
     qDebug() << "QnThumbnailsLoader::process START [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ")";
-    qint64 startRealTime = qnSyncTime->currentMSecsSinceEpoch();
+    qint64 startRealTime = QDateTime::currentMSecsSinceEpoch();
     qint64 startCpuTime = QnPerformance::currentThreadTimeMSecs();
 #endif
 
@@ -372,7 +372,7 @@ void QnThumbnailsLoader::process() {
         QnNetworkResourceList cameras = QnCameraHistoryPool::instance()->getOnlineCamerasWithSamePhysicalId(camera, period);
         for (int i = 0; i < cameras.size(); ++i) 
         {
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate());
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_decode)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true);
@@ -408,8 +408,8 @@ void QnThumbnailsLoader::process() {
         if (frame)
         {
             CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
-            CLVideoDecoderOutput outFrame;
-            outFrame.setUseExternalData(false);
+            QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
+            outFrame->setUseExternalData(false);
 
             while (frame) {
                 if (!camera)
@@ -421,8 +421,8 @@ void QnThumbnailsLoader::process() {
                 if(m_decode) {
                     if (decoder.decode(frame, &outFrame)) 
                     {
-                        outFrame.pkt_dts = timingsQueue.dequeue();
-                        thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                        outFrame->pkt_dts = timingsQueue.dequeue();
+                        thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                         time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                     }
                 } else {
@@ -454,8 +454,8 @@ void QnThumbnailsLoader::process() {
                         break;
                     }
 
-                    outFrame.pkt_dts = timingsQueue.dequeue();
-                    thumbnail = generateThumbnail(outFrame, boundingSize, timeStep, generation);
+                    outFrame->pkt_dts = timingsQueue.dequeue();
+                    thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
                     time = processThumbnail(thumbnail, time, thumbnail.time(), frameFlags.dequeue() & QnAbstractMediaData::MediaFlags_BOF);
                 }
             }
@@ -467,7 +467,7 @@ void QnThumbnailsLoader::process() {
     }
 
 #ifdef QN_THUMBNAILS_LOADER_DEBUG
-    qint64 totalRealTime = qnSyncTime->currentMSecsSinceEpoch() - startRealTime;
+    qint64 totalRealTime = QDateTime::currentMSecsSinceEpoch() - startRealTime;
     qint64 totalCpuTime = QnPerformance::currentThreadTimeMSecs() - startCpuTime;
     qDebug() << "QnThumbnailsLoader::process END [" << period.startTimeMs << "," << period.endTimeMs() + timeStep << ") IN " << totalCpuTime << "/" << totalRealTime << "ms cpu/real time";
 #endif

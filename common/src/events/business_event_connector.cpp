@@ -1,5 +1,6 @@
 #include "business_event_connector.h"
 #include "motion_business_event.h"
+#include "camera_input_event.h"
 #include "core/resource/resource.h"
 #include "business_rule_processor.h"
 
@@ -19,4 +20,21 @@ void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool va
     motionEvent->setResource(resource->toSharedPointer());
 
     bRuleProcessor->processBusinessEvent(motionEvent);
+}
+
+void QnBusinessEventConnector::at_cameraInput(
+    QnResourcePtr resource,
+    const QString& inputPortID,
+    bool value,
+    qint64 timestamp )
+{
+    if( !resource )
+        return;
+
+    bRuleProcessor->processBusinessEvent(
+        QnCameraInputEventPtr( new QnCameraInputEvent(
+            resource->toSharedPointer(),
+            inputPortID,
+            value ? ToggleState_On : ToggleState_Off,
+            timestamp ) ) );
 }

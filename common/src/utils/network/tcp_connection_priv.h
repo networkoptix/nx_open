@@ -22,6 +22,7 @@ static const int CODE_OK = 200;
 static const int CODE_AUTH_REQUIRED = 401;
 static const int CODE_NOT_FOUND = 404;
 static const int CODE_INVALID_PARAMETER = 451;
+static const int CODE_UNSPOORTED_TRANSPORT = 461;
 static const int CODE_NOT_IMPLEMETED = 501;
 static const int CODE_INTERNAL_ERROR = 500;
 

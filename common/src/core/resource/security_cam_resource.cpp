@@ -245,6 +245,24 @@ StreamFpsSharingMethod QnSecurityCamResource::streamFpsSharingMethod() const
     return sharePixels;
 }
 
+QStringList QnSecurityCamResource::getRelayOutputList() const
+{
+    return QStringList();
+}
+
+QStringList QnSecurityCamResource::getInputPortList() const
+{
+    return QStringList();
+}
+
+bool QnSecurityCamResource::setRelayOutputState(
+    const QString& /*ouputID*/,
+    bool /*activate*/,
+    unsigned int /*autoResetTimeout*/ )
+{
+    return false;
+}
+
 MotionType QnSecurityCamResource::getCameraBasedMotionType() const
 {
     MotionTypeFlags rez = supportedMotionType();

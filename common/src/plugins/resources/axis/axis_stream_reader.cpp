@@ -104,7 +104,7 @@ void QnAxisStreamReader::openStream()
             }
             else if (status == CL_HTTP_NOT_FOUND && !m_oldFirmwareWarned) 
             {
-                cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress().toString() , cl_logERROR);
+                cl_log.log("Axis camera must be have old firmware!!!!  ip = ",  res->getHostAddress() , cl_logERROR);
                 m_oldFirmwareWarned = true;
             }
 
@@ -130,7 +130,7 @@ void QnAxisStreamReader::openStream()
     float ar = res->getResolutionAspectRatio(res->getMaxResolution());
     QString resolution = (role == QnResource::Role_LiveVideo) 
         ? QLatin1String(res->getMaxResolution()) 
-        : res->getNearestResolution("320x240", ar);
+        : res->getNearestResolution("480x316", ar);
     if (resolution.isEmpty()) 
         qWarning() << "Can't determine max resolution for axis camera " << res->getName() << "use default resolution";
     QnStreamQuality quality = getQuality();

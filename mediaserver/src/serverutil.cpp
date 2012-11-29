@@ -31,7 +31,7 @@ void syncStoragesToSettings(QnMediaServerResourcePtr server)
     qSettings.endArray();
 
     if (storages.size() == 1) {
-        qSettings.setValue("mediaDir", storages.at(0)->getUrl());
+        qSettings.setValue("mediaDir", QDir::toNativeSeparators(storages.at(0)->getUrl()));
     }
 }
 

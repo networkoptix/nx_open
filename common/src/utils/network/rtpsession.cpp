@@ -41,7 +41,8 @@ RTPIODevice::RTPIODevice(RTPSession* owner, bool useTCP):
     m_owner(owner),
     m_tcpMode(false),
     m_mediaSocket(0),
-    m_rtcpSocket(0)
+    m_rtcpSocket(0),
+    ssrc(0)
 {
     m_tcpMode = useTCP;
     if (!m_tcpMode) 
@@ -131,10 +132,21 @@ void RTPIODevice::processRtcpData()
     }
 }
 
+void RTPSession::SDPTrackInfo::setSSRC(quint32 value)
+{
+    ioDevice->setSSRC(value);
+}
+
+quint32 RTPSession::SDPTrackInfo::getSSRC() const
+{
+    return ioDevice->getSSRC();
+}
+
 // ================================================== QnRtspTimeHelper ==========================================
 
 QnRtspTimeHelper::QnRtspTimeHelper():
-    m_cameraClockToLocalDiff(INT_MAX)
+    m_cameraClockToLocalDiff(INT_MAX),
+    m_lastTime(AV_NOPTS_VALUE)
 {
 
 }
@@ -149,6 +161,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 void QnRtspTimeHelper::reset()
 {
     m_cameraClockToLocalDiff = INT_MAX;
+    m_lastTime = AV_NOPTS_VALUE;
 }
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
@@ -163,8 +176,14 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
-        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed)
-            return resultInSecs * 1000000ll;
+        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) {
+            qint64 rez = resultInSecs * 1000000ll;
+            // check for negative time if camera timings is inaccurate
+            if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
+                rez = m_lastTime + MIN_FRAME_DURATION;
+            m_lastTime = rez;
+            return rez;
+        }
         else {
             reset();
             return getUsecTime(rtpTime, statistics, frequency, false);
@@ -387,7 +406,7 @@ bool RTPSession::checkIfDigestAuthIsneeded(const QByteArray& response)
 
 bool RTPSession::open(const QString& url, qint64 startTime)
 {
-    if (startTime != AV_NOPTS_VALUE)
+    if ((quint64)startTime != AV_NOPTS_VALUE)
         m_openedTime = startTime;
     m_SessionId.clear();
     m_responseCode = CODE_OK;
@@ -556,7 +575,7 @@ bool RTPSession::sendDescribe()
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
-    if (m_openedTime != AV_NOPTS_VALUE)
+    if ((quint64)m_openedTime != AV_NOPTS_VALUE)
         addRangeHeader(request, m_startTime, AV_NOPTS_VALUE);
     request += USER_AGENT_STR;
     request += "Accept: application/sdp\r\n\r\n";
@@ -576,6 +595,7 @@ bool RTPSession::sendOptions()
     request += "CSeq: ";
     request += QByteArray::number(m_csec++);
     request += "\r\n";
+    request += USER_AGENT_STR;
     addAuth(request);
     request += "\r\n";
 
@@ -677,7 +697,7 @@ bool RTPSession::sendSetup()
         request += QByteArray::number(m_csec++);
         request += "\r\n";
         addAuth(request);
-        request += "User-Agent: Network Optix\r\n";
+        request += USER_AGENT_STR;
         request += "Transport: RTP/AVP/";
         request += m_prefferedTransport == TRANSPORT_UDP ? "UDP" : "TCP";
         request += ";unicast;";
@@ -725,11 +745,10 @@ bool RTPSession::sendSetup()
                 return false;
         }
 
-        QString tmp = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
-
-        if (tmp.size() > 0)
+        QString sessionParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Session:"));
+        if (sessionParam.size() > 0)
         {
-            QStringList tmpList = tmp.split(QLatin1Char(';'));
+            QStringList tmpList = sessionParam.split(QLatin1Char(';'));
             m_SessionId = tmpList[0];
 
             for (int i = 0; i < tmpList.size(); ++i)
@@ -742,6 +761,24 @@ bool RTPSession::sendSetup()
                         m_TimeOut = tmpParams[1].toInt();
                         if (m_TimeOut > 0 && m_TimeOut < 5000)
                             m_TimeOut *= 1000; // convert seconds to ms
+                    }
+                }
+            }
+        }
+
+        QString transportParam = extractRTSPParam(QLatin1String(responce), QLatin1String("Transport:"));
+        if (transportParam.size() > 0)
+        {
+            QStringList tmpList = transportParam.split(QLatin1Char(';'));
+            for (int k = 0; k < tmpList.size(); ++k)
+            {
+                tmpList[k] = tmpList[k].trimmed().toLower();
+                if (tmpList[k].startsWith(QLatin1String("ssrc")))
+                {
+                    QStringList tmpParams = tmpList[k].split(QLatin1Char('='));
+                    if (tmpParams.size() > 1) {
+                        bool ok;
+                        m_sdpTracks[i]->setSSRC(tmpParams[1].toInt(&ok, 16));
                     }
                 }
             }
@@ -786,6 +823,7 @@ bool RTPSession::sendSetParameter(const QByteArray& paramName, const QByteArray&
     request += QByteArray::number(m_csec++);
     request += "\r\n";
     addAuth(request);
+    request += USER_AGENT_STR;
     request += "Session: ";
     request += m_SessionId;
     request += "\r\n";
@@ -982,9 +1020,10 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
         {
             int messageCode = reader.getBits(8);
             int messageLen = reader.getBits(16);
+            Q_UNUSED(messageLen)
             if (messageCode == RTCP_SENDER_REPORT)
             {
-                reader.skipBits(32); // sender ssrc
+                stats.ssrc = reader.getBits(32);
                 quint32 intTime = reader.getBits(32);
                 quint32 fracTime = reader.getBits(32);
                 stats.nptTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
@@ -1568,4 +1607,9 @@ QString RTPSession::mediaTypeToStr(TrackType trackType)
 void RTPSession::setUsePredefinedTracks(int numOfVideoChannel)
 {
     m_numOfPredefinedChannels = numOfVideoChannel;
+}
+
+bool RTPSession::setTCPReadBufferSize(int value)
+{
+    return m_tcpSock.setReadBufferSize(value);
 }

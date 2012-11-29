@@ -197,7 +197,8 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     if (m_currentChunk.durationMs == -1)
         m_currentChunkCatalog->updateChunkDuration(m_currentChunk); // may be opened chunk already closed. Update duration if needed
     if (m_currentChunk.durationMs == -1) {
-        m_eof = true;
+        if (!m_reverseMode)
+            m_eof = true;
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
@@ -235,7 +236,7 @@ begin_label:
                     data = QnAbstractMediaDataPtr(new QnCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
                 }
-                if (data)
+                else if (data)
                     data->timestamp +=m_currentChunk.startTimeMs*1000;
                 return data;
             }
@@ -371,9 +372,6 @@ bool QnServerArchiveDelegate::setQuality(MediaQuality quality, bool fastSwitch)
 
 bool QnServerArchiveDelegate::setQualityInternal(MediaQuality quality, bool fastSwitch, qint64 timeMs, bool recursive)
 {
-    if (quality == MEDIA_Quality_AlwaysHigh)
-        quality = MEDIA_Quality_High;
-
     m_dialQualityHelper.setPrefferedQuality(quality);
     m_quality = quality;
     m_newQualityTmpData.clear();

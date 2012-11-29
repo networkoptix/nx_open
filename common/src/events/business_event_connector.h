@@ -14,6 +14,15 @@ public:
     static QnBusinessEventConnector* instance();
 public slots:
     void at_motionDetected(QnResourcePtr resource, bool value, qint64 timestamp);
+    /*!
+        \param inputPortID device-specific ID of input port
+        \param value true, if input activated. false, if deactivated
+    */
+    void at_cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

@@ -17,13 +17,17 @@ struct MpegEncContext;
 
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
-
-class CLFFmpegVideoDecoder : public QnAbstractVideoDecoder
+class CLFFmpegVideoDecoder
+:
+    public QnAbstractVideoDecoder
 {
 public:
-    CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding);
-    bool decode(const QnCompressedVideoDataPtr data, CLVideoDecoderOutput* outFrame);
+    /*!
+        \param swDecoderCount Atomically incremented in constructor and atommically decremented in destructor
+    */
+    CLFFmpegVideoDecoder(CodecID codec, const QnCompressedVideoDataPtr data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
     ~CLFFmpegVideoDecoder();
+    bool decode( const QnCompressedVideoDataPtr data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void showMotion(bool show);
 
@@ -37,8 +41,11 @@ public:
     AVCodecContext* getContext() const;
 
     PixelFormat GetPixelFormat() const;
+    QnAbstractPictureDataRef::PicStorageType targetMemoryType() const;
     int getWidth() const  { return m_context->width;  }
     int getHeight() const { return m_context->height; }
+    //!Implementation of QnAbstractVideoDecoder::getOriginalPictureSize
+    virtual QSize getOriginalPictureSize() const;
     double getSampleAspectRatio() const;
     virtual PixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
@@ -47,6 +54,11 @@ public:
     virtual void setMTDecoding(bool value);
     virtual void resetDecoder(QnCompressedVideoDataPtr data);
     virtual void setOutPictureSize( const QSize& outSize );
+    //!Implementation of QnAbstractVideoDecoder::getDecoderCaps
+    /*!
+        Supports \a multiThreadedMode
+    */
+    virtual unsigned int getDecoderCaps() const;
 
 private:
     static AVCodec* findCodec(CodecID codecId);
@@ -94,6 +106,7 @@ private:
     int m_forceSliceDecoding;
     typedef QVector<QPair<qint64, QnMetaDataV1Ptr> > MotionMap; // I have used vector instead map because of 2-3 elements is tipical size
     MotionMap m_motionMap; 
+    QAtomicInt* const m_swDecoderCount;
 };
 
 #endif //cl_ffmpeg_h

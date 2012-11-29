@@ -28,11 +28,19 @@ public:
 
     void setMotionBuffer(const QnMetaDataLightVector& data, int channel);
     const QnMetaDataLightVector& getMotionBuffer(int channel) const;
+
+    /* Set item time zone offset in ms */
+    void setTimeZoneOffset(qint64 value);
+
+    /* Return item time zone offset in ms */
+    qint64 timeZoneOffset() const;
+
 protected:
 
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
+    qint64 m_timeZoneOffset;
 };
 
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;

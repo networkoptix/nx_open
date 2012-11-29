@@ -46,11 +46,15 @@ public:
     //virtual bool setMotionRegion(const QRegion& region);
     //virtual bool setSendMotion(bool value);
     //
+    bool isBuffering() const;
+
     virtual void onBufferingFinished(QnlTimeSource* source) override;
     virtual void onBufferingStarted(QnlTimeSource* source, qint64 bufferingTime) override;
     virtual void setSpeed(double value, qint64 currentTimeHint) override;
 
     virtual void reinitTime(qint64 newTime) override;
+
+    void setLiveModeEnabled(bool value);
 
 public slots:
     void onEofReached(QnlTimeSource* src, bool value);
@@ -70,7 +74,7 @@ private:
     qint64 getDisplayedTimeInternal() const;
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);
-
+    qint64 maxArchiveTime() const;
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <ui/common/geometry.h>
-#include <ui/workbench/workbench_globals.h>
+#include <client/client_globals.h>
 #include "rect_animator.h"
 #include "viewport_geometry_accessor.h"
 

@@ -36,6 +36,10 @@ struct RtspServerTrackInfo
         return false;
     }
 
+    quint32 getSSRC() const {
+        return encoder ? encoder->getSSRC() : 0;
+    }
+
     int clientPort;
     int clientRtcpPort;
     quint16 sequence;
@@ -61,8 +65,6 @@ public:
     bool isLiveDP(QnAbstractStreamDataProvider* dp);
 
     void setQuality(MediaQuality quality);
-    bool isSecondaryLiveDP(QnAbstractStreamDataProvider* provider) const;
-    bool isPrimaryLiveDP(QnAbstractStreamDataProvider* dp) const;
     bool isSecondaryLiveDPSupported() const;
     QHostAddress getPeerAddress() const;
     QString getRangeHeaderIfChanged();
@@ -71,6 +73,7 @@ public:
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
+    int getTracksCount() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();

@@ -9,6 +9,8 @@
 
 #include <api/api_fwd.h>
 
+#include <client/client_globals.h>
+
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 
@@ -19,10 +21,12 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button MotionSearchButton = static_cast<Button>(0x8);
-    static const Button PtzButton = static_cast<Button>(0x10);
-    static const Button ZoomInButton = static_cast<Button>(0x20);
-    static const Button ZoomOutButton = static_cast<Button>(0x40);
+    static const Button RadassButton = static_cast<Button>(0x08);
+    static const Button MotionSearchButton = static_cast<Button>(0x10);
+    static const Button PtzButton = static_cast<Button>(0x20);
+    static const Button ZoomInButton = static_cast<Button>(0x40);
+    static const Button ZoomOutButton = static_cast<Button>(0x80);
+#define RadassButton RadassButton
 #define MotionSearchButton MotionSearchButton
 #define PtzButton PtzButton
 #define ZoomInButton ZoomInButton
@@ -90,8 +94,12 @@ public:
 
     bool isMotionSensitivityEmpty() const;
 
+    Qn::ResolutionMode resolutionMode() const;
+    void setResolutionMode(Qn::ResolutionMode resolutionMode);
+
 signals:
     void motionSelectionChanged();
+    void resolutionModeChanged();
 
 protected:
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override;
@@ -138,6 +146,7 @@ private slots:
     void at_zoomInButton_released();
     void at_zoomOutButton_pressed();
     void at_zoomOutButton_released();
+    void at_radassButton_clicked();
 
     void at_replyReceived(int status, int handle);
     void at_replyReceived(int status, const QList<QPair<QString, bool> > &operationResult);
@@ -146,8 +155,11 @@ private slots:
 
 private:
     void sendZoomAsync(qreal zoomSpeed);
-    Q_SLOT void updateIconButton();
     int currentRecordingMode();
+
+    Q_SLOT void updateIconButton();
+    Q_SLOT void updateRadassButton();
+    Q_SLOT void updateServerResource();
 
 private:
     /** Media resource. */
@@ -156,8 +168,14 @@ private:
     /** Camera resource. */
     QnVirtualCameraResourcePtr m_camera;
 
+    /** Camera's media server resource. */
+    QnMediaServerResourcePtr m_server;
+
     /** Connection for camera's server */
     QnMediaServerConnectionPtr m_connection; // TODO: move out?
+
+    /** Current resolution mode of this widget. */
+    Qn::ResolutionMode m_resolutionMode;
 
     /** Display. */
     QnResourceDisplay *m_display;

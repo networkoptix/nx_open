@@ -55,13 +55,7 @@ public:
     virtual QnTimePeriod getPlaybackRange() const override;
     virtual void setPlaybackMask(const QnTimePeriodList& playbackMask) override;
     virtual void setQuality(MediaQuality quality, bool fastSwitch) override;
-    /*
-    *   setQualityForced same as setQuality but ignore 'disableQualityChange' mode
-    */
-    void setQualityForced(MediaQuality quality);
     virtual MediaQuality getQuality() const override;
-    virtual void disableQualityChange() override;
-    virtual void enableQualityChange() override;
 
     virtual void setSpeed(double value, qint64 currentTimeHint = AV_NOPTS_VALUE) override;
     virtual double getSpeed() const override;
@@ -134,7 +128,6 @@ private:
 private:
     bool m_jumpInSilenceMode;
     bool m_bofReached;
-    bool m_canChangeQuality;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
     bool m_ignoreSkippingFrame;
@@ -164,6 +157,8 @@ private:
     QnAbstractMotionArchiveConnectionPtr m_motionConnection[CL_MAX_CHANNELS];
     bool m_pausedStart;
     bool m_sendMotion;
+    bool m_prevSendMotion;
+    bool m_outOfPlaybackMask;
 
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);

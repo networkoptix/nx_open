@@ -15,23 +15,25 @@ public:
     QnTestCamera(quint32 num);
 
     QByteArray getMac() const;
-    void setFileList(const QStringList& files);
-    void setFps(double fps);
+
+    void setPrimaryFileList(const QStringList& files);
+    void setSecondaryFileList(const QStringList& files);
+
     void setOfflineFreq(double offlineFreq);
 
-    void startStreaming(TCPSocket* socket);
+    void startStreaming(TCPSocket* socket, bool isSecondary, int fps);
 
     bool isEnabled();
 private:
-    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket);
+    bool doStreamingFile(QList<QnCompressedVideoDataPtr> data, TCPSocket* socket, int fps);
     void makeOfflineFlood();
 private:
     quint32 m_num;
     QByteArray m_mac;
-    QStringList m_files;
+    QStringList m_primaryFiles;
+    QStringList m_secondaryFiles;
     int m_prefixLen;
     int m_offlineFreq;
-    double m_fps;
     QnMediaContextPtr m_context;
     bool m_isEnabled;
     QTime m_offlineTimer;

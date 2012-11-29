@@ -476,7 +476,7 @@ QnActionManager::QnActionManager(QObject *parent):
     } factory.endSubMenu();
 
     factory(Qn::OpenCurrentUserLayoutMenu).
-        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget | Qn::RequiresChildren).
+        flags(Qn::TitleBar | Qn::SingleTarget | Qn::NoTarget).
         text(tr("Open Layout...")).
         childFactory(new QnOpenCurrentUserLayoutActionFactory(this)).
         icon(qnSkin->icon("titlebar/dropdown.png"));
@@ -642,14 +642,6 @@ QnActionManager::QnActionManager(QObject *parent):
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
         condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
-    factory(Qn::OpenInFolderAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Open Containing Folder")).
-        shortcut(tr("Ctrl+Enter")).
-        shortcut(tr("Ctrl+Return")).
-        autoRepeat(false).
-        condition(new QnOpenInFolderActionCondition(this)); 
-
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Open Layout in a New Tab")).
@@ -670,6 +662,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout(s)")).
         condition(hasFlags(QnResource::layout));
 
+    factory(Qn::OpenInFolderAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Open Containing Folder")).
+        shortcut(tr("Ctrl+Enter")).
+        shortcut(tr("Ctrl+Return")).
+        autoRepeat(false).
+        condition(new QnOpenInFolderActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).
@@ -734,6 +733,35 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Toggle Info")).
         shortcut(tr("Alt+I")).
         condition(new QnDisplayInfoActionCondition(this));
+
+    factory().
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+        text(tr("Change Resolution..."));
+
+    factory.beginSubMenu(); {
+        factory(Qn::RadassAutoAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("Auto")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+
+        factory(Qn::RadassLowAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("Low")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+
+        factory(Qn::RadassHighAction).
+            flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
+            text(tr("High")).
+            condition(hasFlags(QnResource::remote | QnResource::media), Qn::Any);
+    } factory.endSubMenu();
+
+#if 0
+    factory(Qn::ToggleRadassAction).
+        flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::HotkeyOnly).
+        text(tr("Toggle Resolution Mode")).
+        shortcut(tr("Alt+I")).
+        condition(new QnDisplayInfoActionCondition(this));
+#endif
 
     factory(Qn::StartSmartSearchAction).
         flags(Qn::Scene | Qn::SingleTarget | Qn::MultiTarget).
@@ -879,7 +907,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Aspect Ratio"));
+        text(tr("Change Cell Aspect Ratio..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -903,7 +931,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).
-        text(tr("Change Cell Spacing"));
+        text(tr("Change Cell Spacing..."));
 
     factory.beginSubMenu(); {
         factory.beginGroup();
@@ -1100,6 +1128,11 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Show Title Bar")).
         toggledText(tr("Hide Title Bar")).
         condition(new QnToggleTitleBarActionCondition(this));
+
+    factory(Qn::PinTreeAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        text(tr("Pin Tree")).
+        toggledText(tr("Unpin Tree"));
 
     factory(Qn::ToggleTreeAction).
         flags(Qn::Tree | Qn::NoTarget).

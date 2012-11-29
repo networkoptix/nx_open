@@ -8,17 +8,31 @@
 class QnFfmpegVideoTranscoder: public QnVideoTranscoder
 {
 public:
+    enum OnScreenDatePos {Date_None, Date_LeftTop, Date_RightTop, Date_RightBottom, Date_LeftBottom};
+
     QnFfmpegVideoTranscoder(CodecID codecId);
     ~QnFfmpegVideoTranscoder();
 
     virtual int transcodePacket(QnAbstractMediaDataPtr media, QnAbstractMediaDataPtr& result) override;
     virtual bool open(QnCompressedVideoDataPtr video) override;
     AVCodecContext* getCodecContext();
+
+    /* Allow multithread transcoding */
+    void setMTMode(bool value);
+
+    /* Draw video frames time on the screen */
+    void setDrawDateTime(OnScreenDatePos value);
+
+    void setOnScreenDateOffset(int timeOffsetMs);
+
+    void setQuality(QnStreamQuality quality);
 private:
     int rescaleFrame();
+    void doDrawOnScreenTime(CLVideoDecoderOutput* frame);
+    void initTimeDrawing(CLVideoDecoderOutput* frame, const QString& timeStr);
 private:
     CLFFmpegVideoDecoder* m_videoDecoder;
-    CLVideoDecoderOutput m_decodedVideoFrame;
+    QSharedPointer<CLVideoDecoderOutput> m_decodedVideoFrame;
     CLVideoDecoderOutput m_scaledVideoFrame;
     quint8* m_videoEncodingBuffer;
     AVCodecContext* m_encoderCtx;
@@ -26,6 +40,19 @@ private:
     qint64 m_firstEncodedPts;
     int m_lastSrcWidth;
     int m_lastSrcHeight;
+    bool m_mtMode;
+    
+    OnScreenDatePos m_dateTextPos;
+    uchar* m_imageBuffer;
+    QImage* m_timeImg;
+    QFont m_timeFont;
+    int m_dateTimeXOffs;
+    int m_dateTimeYOffs;
+    QnStreamQuality m_quality;
+    int m_onscreenDateOffset;
+
+    int m_bufXOffs;
+    int m_bufYOffs;
 };
 
 typedef QSharedPointer<QnFfmpegVideoTranscoder> QnFfmpegVideoTranscoderPtr;

@@ -69,6 +69,8 @@ namespace {
 
     const QColor frameColor = qnGlobals->frameColor();
 
+    const QColor activeFrameColor = frameColor.lighter();
+
     class QnLoadingProgressPainterFactory {
     public:
         QnLoadingProgressPainter *operator()(const QGLContext *context) {
@@ -109,6 +111,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnWorkbenchContextAware(context),
     m_item(item),
     m_options(DisplaySelectionOverlay | DisplayButtons),
+    m_localActive(false),
     m_channelsLayout(NULL),
     m_aspectRatio(-1.0),
     m_enclosingAspectRatio(1.0),
@@ -120,7 +123,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_infoTextFormatHasPlaceholder(true),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
-    m_desiredRotation(0)
+    m_desiredRotation(Qn::Angle0)
 {
     setAcceptHoverEvents(true);
 
@@ -418,31 +421,12 @@ void QnResourceWidget::updateInfoText() {
 }
 
 void QnResourceWidget::updateOverlayRotation(qreal rotation) {
-    while (rotation < -180)
-        rotation += 360;
-    while (rotation > 180)
-        rotation -= 360;
 
-    Qn::FixedItemRotation fixed;
-    if (rotation >= -45 && rotation <= 45) {
-        fixed = Qn::Angle0;
-        m_desiredRotation = 0;
-    }
-    else if (rotation > 135 || rotation < -135) {
-        fixed = Qn::Angle180;
-        m_desiredRotation = 180;
-    }
-    else if (rotation > 0) {
-        fixed = Qn::Angle270;
-        m_desiredRotation = 270;
-    }
-    else {
-        fixed = Qn::Angle90;
-        m_desiredRotation = 90;
-    }
 
-    m_headerOverlayWidget->setDesiredRotation(fixed);
-    m_footerOverlayWidget->setDesiredRotation(fixed);
+    m_desiredRotation = fixedRotationFromDegrees(rotation);
+
+    m_headerOverlayWidget->setDesiredRotation(m_desiredRotation);
+    m_footerOverlayWidget->setDesiredRotation(m_desiredRotation);
 }
 
 
@@ -505,8 +489,12 @@ bool QnResourceWidget::isInfoVisible() const {
     return (options() & DisplayInfo);
 }
 
-bool QnResourceWidget::isInfoButtonVisible() const {
-    return calculateButtonsVisibility() & InfoButton;
+bool QnResourceWidget::isLocalActive() const {
+    return m_localActive;
+}
+
+void QnResourceWidget::setLocalActive(bool localActive) {
+    m_localActive = localActive;
 }
 
 void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
@@ -522,6 +510,18 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate) {
 
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
         infoButton->setChecked(visible);
+}
+
+QnResourceWidget::Buttons QnResourceWidget::checkedButtons() const {
+    return (QnResourceWidget::Buttons)buttonBar()->checkedButtons();
+}
+
+void QnResourceWidget::setCheckedButtons(Buttons checkedButtons) {
+    buttonBar()->setCheckedButtons(checkedButtons);
+}
+
+QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
+    return (QnResourceWidget::Buttons)buttonBar()->visibleButtons();
 }
 
 Qt::WindowFrameSection QnResourceWidget::windowFrameSectionAt(const QPointF &pos) const {
@@ -717,7 +717,7 @@ void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGra
     qreal w = size.width();
     qreal h = size.height();
     qreal fw = m_frameWidth;
-    QColor color = isSelected() ? selectedFrameColor : frameColor;
+    QColor color = isSelected() ? selectedFrameColor : isLocalActive() ? activeFrameColor : frameColor;
 
     QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     QnScopedPainterAntialiasingRollback antialiasingRollback(painter, true); /* Antialiasing is here for a reason. Without it border looks crappy. */
@@ -744,7 +744,7 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     painter->translate(rect().center());
     painter->rotate(m_desiredRotation);
     painter->translate(offset * unit);
-    if (m_desiredRotation % 180 != 0){
+    if (m_desiredRotation % 180 != 0) {
         qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
         painter->scale(ratio, ratio);
     }
@@ -863,14 +863,13 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
-    if (change == QGraphicsItem::ItemRotationHasChanged){
+    if (change == QGraphicsItem::ItemRotationHasChanged)
         updateOverlayRotation(value.toReal());
-    }
     return base_type::itemChange(change, value);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if((changedFlags & DisplayInfo) && (isInfoButtonVisible())) {
+    if((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton)) {
         bool visible = isInfoVisible();
         setInfoVisible(visible);
         setDecorationsVisible(visible || m_mouseInWidget);

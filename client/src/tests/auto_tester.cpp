@@ -1,11 +1,12 @@
 #include "auto_tester.h"
-#include <QDateTime>
-#include <QTextStream>
-#include <QTimer>
+
+#include <QtCore/QDateTime>
+#include <QtCore/QTextStream>
+#include <QtCore/QTimer>
+
 #include <core/resource_managment/resource_pool.h>
 #include <utils/common/warnings.h>
 #include <utils/common/command_line_parser.h>
-#include "utils/common/synctime.h"
 
 namespace {
     qint64 defaultAutoTesterTimeout = 20 * 1000; 
@@ -65,7 +66,7 @@ void QnAutoTester::start() {
     m_timer->setInterval(defaultTestPeriod);
     connect(m_timer, SIGNAL(timeout()), this, SLOT(at_timer_timeout()));
 
-    m_startTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_startTime = QDateTime::currentMSecsSinceEpoch();
 
     m_timer->start();
 }
@@ -80,7 +81,7 @@ void QnAutoTester::at_timer_timeout() {
 
     m_succeeded = m_successfulTests == m_allTests;
 
-    if(m_succeeded || qnSyncTime->currentMSecsSinceEpoch() - m_startTime > m_timeout) {
+    if(m_succeeded || QDateTime::currentMSecsSinceEpoch() - m_startTime > m_timeout) {
         if(m_succeeded) {
             m_message = tr("All tests completed successfully.\n");
         } else {

@@ -58,10 +58,13 @@ protected:
     * Some actions can be executed on media server only. In this case, function returns media server there action must be executed
     */
     QnMediaServerResourcePtr getDestMServer(QnAbstractBusinessActionPtr action);
+
 private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
+    bool triggerCameraOutput( const QnAbstractBusinessActionPtr& action );
+    bool sendMail( const QnAbstractBusinessActionPtr& action );
 };
 
 #define bRuleProcessor QnBusinessRuleProcessor::instance()

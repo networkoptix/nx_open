@@ -5,6 +5,8 @@
 #include "connectinfo.h"
 #include <utils/settings.h>
 #include "plugins/resources/archive/avi_files/avi_resource.h"
+#include <utils/network/networkoptixmodulefinder.h>
+#include <utils/network/foundenterprisecontrollersmodel.h>
 
 class QDataWidgetMapper;
 class QStandardItemModel;
@@ -53,6 +55,10 @@ private slots:
     void at_connectionsComboBox_currentIndexChanged(int index);
     void at_connectFinished(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
 
+    void at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
+        const QString& remoteHostAddress, bool isLocal, const QString& seed);
+    void at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed );
+
 private:
     Q_DISABLE_COPY(LoginDialog)
 
@@ -64,6 +70,12 @@ private:
     QnConnectInfoPtr m_connectInfo;
 
     QnRenderingWidget* m_renderingWidget;
+    NetworkOptixModuleFinder* m_entCtrlFinder;
+
+    /**
+     * @brief m_foundEcs    Hash list of automatically found Enterprise Controllers based on seed as key.
+     */
+    QMultiHash<QString, QUrl> m_foundEcs;
 };
 
 #endif // LOGINDIALOG_H

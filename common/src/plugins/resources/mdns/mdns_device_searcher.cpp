@@ -33,7 +33,7 @@ QnResourceList QnMdnsResourceSearcher::findResources()
 
         foreach(QnNetworkResourcePtr nresource, nresourceLst)
         {
-            nresource->setHostAddress(QHostAddress(removeAddress), QnDomainMemory);
+            nresource->setHostAddress(removeAddress, QnDomainMemory);
             nresource->setDiscoveryAddr(QHostAddress(localAddress));
             result.push_back(nresource);
         }

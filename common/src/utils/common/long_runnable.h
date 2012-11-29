@@ -1,7 +1,7 @@
 #ifndef QN_LONG_RUNNABLE_H
 #define QN_LONG_RUNNABLE_H
 
-#include "config.h"
+#include "config.h" 
 
 #include <cassert>
 #include <typeinfo>

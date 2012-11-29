@@ -13,7 +13,7 @@ static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality fo
 
 static const int MAX_VIDEO_JITTER = 2;
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 extern "C"
 {
@@ -183,15 +183,19 @@ QnDesktopFileEncoder::EncodedAudioInfo::~EncodedAudioInfo()
 int QnDesktopFileEncoder::EncodedAudioInfo::nameToWaveIndex()
 {
     int iNumDevs = waveInGetNumDevs();
-    QString name(m_audioDevice.deviceName());
+    QString name;
+    int devNum = 1;
+    m_audioDevice.splitFullName(name, devNum);
     for(int i = 0; i < iNumDevs; ++i)
     {
         WAVEINCAPS wic;
         if(waveInGetDevCaps(i, &wic, sizeof(WAVEINCAPS)) == MMSYSERR_NOERROR)
         {
             QString tmp = QString((const QChar *) wic.szPname);
-            if (name.startsWith(tmp))
-                return i;
+            if (name.startsWith(tmp)) {
+                if (--devNum == 0)
+                    return i;
+            }
         }
     }
     return WAVE_MAPPER;
@@ -360,8 +364,8 @@ bool QnDesktopFileEncoder::EncodedAudioInfo::setupPostProcess()
 QnDesktopFileEncoder::QnDesktopFileEncoder (
                    const QString& fileName,
                    int desktopNum,
-                   const QAudioDeviceInfo* audioDevice,
-                   const QAudioDeviceInfo* audioDevice2,
+                   const QnAudioDeviceInfo* audioDevice,
+                   const QnAudioDeviceInfo* audioDevice2,
                    QnScreenGrabber::CaptureMode captureMode,
                    bool captureCursor,
                    const QSize& captureResolution,
@@ -404,7 +408,7 @@ QnDesktopFileEncoder::QnDesktopFileEncoder (
         m_audioInfo[0]->m_audioDevice = audioDevice ? *audioDevice : *audioDevice2;
     }
 
-    if (audioDevice && audioDevice2 && audioDevice->deviceName() != audioDevice2->deviceName())
+    if (audioDevice && audioDevice2)
     {
         m_audioInfo << new EncodedAudioInfo(this); // second channel
         m_audioInfo[1]->m_audioDevice = *audioDevice2;
@@ -458,7 +462,7 @@ bool QnDesktopFileEncoder::init()
             m_widget);
     m_grabber->setLogo(m_logo);
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
@@ -640,8 +644,7 @@ bool QnDesktopFileEncoder::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                WinAudioExtendInfo extInfo(audioChannel->m_audioDevice.deviceName());
-                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + extInfo.fullName() + QLatin1Char('\'');
+                m_lastErrorStr = QLatin1String("Can't initialize audio device '") + audioChannel->m_audioDevice.fullName() + QLatin1Char('\'');
                 return false;
             }
         }
@@ -859,7 +862,7 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);

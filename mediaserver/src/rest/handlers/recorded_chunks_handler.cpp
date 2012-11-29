@@ -158,7 +158,7 @@ QString QnRecordedChunksHandler::description(TCPSocket* tcpSocket) const
     rez += "<BR>Param <b>physicalId</b> - camera physicalId. Param can be repeated several times for many cameras.";
     rez += "<BR>Param <b>startTime</b> - Time interval start. Microseconds since 1970 UTC or string in format 'YYYY-MM-DDThh24:mi:ss.zzz'. format is auto detected.";
     rez += "<BR>Param <b>endTime</b> - Time interval end (same format, see above).";
-    rez += "<BR>Param <b>motionRect</b> - Match motion on a video by specified rect. Params can be used several times.";
+    rez += "<BR>Param <b>motionRegions</b> - Match motion on a video by specified rect. Params can be used several times.";
     rez += "<BR>Param <b>format</b> - Optional. Data format. Allowed values: 'jason', 'xml', 'txt', 'bin'. Default value 'jason'";
     rez += "<BR>Param <b>detail</b> - Chunk detail level, in microseconds. Time periods/chunks that are shorter than the detail level are discarded. You can use detail level as amount of microseconds per screen pixel.";
 

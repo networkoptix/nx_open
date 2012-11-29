@@ -2,6 +2,7 @@
 #define __SIMPLE_HTTP_CLIENT__
 
 #include <QtCore/QHash>
+#include <QString>
 
 #include "socket.h"
 
@@ -16,12 +17,15 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
+QString toString( CLHttpStatus status );
+
 class CLSimpleHTTPClient
 {
     enum { Basic, Digestaccess };
 
 public:
     CLSimpleHTTPClient(const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    CLSimpleHTTPClient(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
     ~CLSimpleHTTPClient();
 
     CLHttpStatus doGET(const QString& request, bool recursive = true);
@@ -90,7 +94,7 @@ private:
     int m_dataRestLen;
 };
 
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
+QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
 
 bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
 

@@ -29,6 +29,8 @@ function read_config {
     STORAGE=$(cat $CONFIG_FILE | grep "^mediaDir=" | head -1 | sed 's/mediaDir=\(.*\)/\1/g')
     PORT=$(cat $CONFIG_FILE | grep "^port=" | head -1 | sed 's/port=\(.*\)/\1/g')
     TRANSPORT=$(cat $CONFIG_FILE | grep "^rtspTransport=" | head -1 | sed 's/rtspTransport=\(.*\)/\1/g')
+    PUBLIC_IP_ENABLED=$(cat $CONFIG_FILE | grep "^publicIPEnabled=" | head -1 | sed 's/publicIPEnabled=\(.*\)/\1/g')
+    STATIC_PUBLIC_IP=$(cat $CONFIG_FILE | grep "^staticPublicIP=" | head -1 | sed 's/staticPublicIP=\(.*\)/\1/g')
 
     # Compatibility option
     if [ -z "$PORT" ]
@@ -48,6 +50,8 @@ function write_config {
     [ -z "$STORAGE" ] || echo "mediaDir=$STORAGE" >> $CONFIG_FILE
     [ -z "$PORT" ] || echo "rtspPort=$PORT" >> $CONFIG_FILE
     [ -z "$TRANSPORT" ] || echo "rtspTransport=$TRANSPORT" >> $CONFIG_FILE
+    [ -z "$PUBLIC_IP_ENABLED" ] || echo "publicIPEnabled=$PUBLIC_IP_ENABLED" >> $CONFIG_FILE
+    [ -z "$STATIC_PUBLIC_IP" ] || echo "staticPublicIP=$STATIC_PUBLIC_IP" >> $CONFIG_FILE
 }
 
 function to_int {
@@ -136,6 +140,25 @@ case "$1" in
 
       PORT=$(ask_for_value port "$PORT")
       TRANSPORT=$(ask_for_value transport "$TRANSPORT")
+
+      PUBLIC_IP_ENABLED=$(ask_for_value publicIPEnabled "$PUBLIC_IP_ENABLED")
+
+      case $PUBLIC_IP_ENABLED in
+          auto)
+            PUBLIC_IP_ENABLED=1
+            ;;
+          disabled)
+            PUBLIC_IP_ENABLED=0
+            ;;
+          manual)
+            PUBLIC_IP_ENABLED=2
+            ;;
+      esac
+
+      if [ "$PUBLIC_IP_ENABLED" -eq 2 ]
+      then
+          STATIC_PUBLIC_IP=$(ask_for_value staticPublicIP "$STATIC_PUBLIC_IP")
+      fi
 
       write_config
   ;;

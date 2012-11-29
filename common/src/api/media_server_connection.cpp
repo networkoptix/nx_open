@@ -16,6 +16,10 @@
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
+/**
+ * Note that instance of this class will be used from several threads, and
+ * must therefore be thread-safe.
+ */
 class QnNetworkProxyFactory: public QObject, public QNetworkProxyFactory {
 public:
     QnNetworkProxyFactory()
@@ -28,16 +32,22 @@ public:
 
     void removeFromProxyList(const QUrl& url)
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.remove(url);
     }
 
     void addToProxyList(const QUrl& url, const QString& addr, int port)
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.insert(url, ProxyInfo(addr, port));
     }
 
     void clearProxyList()
     {
+        QMutexLocker locker(&m_mutex);
+
         m_proxyInfo.clear();
     }
 
@@ -56,6 +66,8 @@ protected:
         url.setPath(QString());
         url.setUserInfo(QString());
         url.setQueryItems(QList<QPair<QString, QString> >());
+
+        QMutexLocker locker(&m_mutex);
         QMap<QUrl, ProxyInfo>::const_iterator itr = m_proxyInfo.find(url);
         if (itr == m_proxyInfo.end())
             rez << QNetworkProxy(QNetworkProxy::NoProxy);
@@ -71,6 +83,7 @@ private:
         QString addr;
         int port;
     };
+    QMutex m_mutex;
     QMap<QUrl, ProxyInfo> m_proxyInfo;
 };
 
@@ -376,23 +389,25 @@ int QnMediaServerConnection::syncGetStatistics(QObject *target, const char *slot
     return status;
 }
 
-int QnMediaServerConnection::asyncGetManualCameraSearch(QObject *target, const char *slot,
-                                                    const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port){
+int QnMediaServerConnection::asyncGetManualCameraSearch(const QString &startAddr, const QString &endAddr, const QString& username, const QString &password, const int port,
+                                                        QObject *target, const char *slotSuccess, const char *slotError){
 
     QnRequestParamList params;
     params << QnRequestParam("start_ip", startAddr);
-    params << QnRequestParam("end_ip", endAddr);
+    if (!endAddr.isEmpty())
+        params << QnRequestParam("end_ip", endAddr);
     params << QnRequestParam("user", username);
     params << QnRequestParam("password", password);
     params << QnRequestParam("port" ,QString::number(port));
 
     detail::QnMediaServerManualCameraReplyProcessor *processor = new detail::QnMediaServerManualCameraReplyProcessor();
-    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slot, Qt::QueuedConnection);
+    connect(processor, SIGNAL(finishedSearch(const QnCamerasFoundInfoList &)), target, slotSuccess, Qt::QueuedConnection);
+    connect(processor, SIGNAL(searchError(int, const QString &)), target, slotError, Qt::QueuedConnection);
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("manualCamera/search"), params, processor, SLOT(at_searchReplyReceived(int, QByteArray, QByteArray, int)));
 }
 
-int QnMediaServerConnection::asyncGetManualCameraAdd(QObject *target, const char *slot,
-                                                     const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password){
+int QnMediaServerConnection::asyncGetManualCameraAdd(const QStringList &urls, const QStringList &manufacturers, const QString &username, const QString &password,
+                                                     QObject *target, const char *slot){
     QnRequestParamList params;
 
     for (int i = 0; i < qMin(urls.count(), manufacturers.count()); i++){
@@ -537,17 +552,16 @@ void detail::QnMediaServerStatisticsReplyProcessor::at_replyReceived(int status,
     deleteLater();
 }
 
-void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle ){
+void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
     Q_UNUSED(errorString)
     Q_UNUSED(handle)
 
     QnCamerasFoundInfoList result;
-    if (status == 0){
+    if (status == 0) {
         QByteArray root = extractXmlBody(reply, "reply");
         QByteArray resource;
         int from = 0;
-        do
-        {
+        do {
             resource = extractXmlBody(root, "resource", &from);
             if (resource.length() == 0)
                 break;
@@ -555,11 +569,12 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(int
             QString name = QLatin1String(extractXmlBody(resource, "name"));
             QString manufacture = QLatin1String(extractXmlBody(resource, "manufacturer"));
             result.append(QnCamerasFoundInfo(url, name, manufacture));
-
         } while (resource.length() > 0);
+        emit finishedSearch(result);
+    } else {
+        QString error = QLatin1String(extractXmlBody(reply, "root"));
+        emit searchError(status, error);
     }
-
-    emit finishedSearch(result);
     deleteLater();
 }
 
@@ -572,7 +587,7 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_addReplyReceived(int st
 }
 
 int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qreal xSpeed, qreal ySpeed, qreal zoomSpeed, QObject *target, const char *slot) {
-    detail::QnMediaServerSimpleReplyProcessor* processor = new detail::QnMediaServerSimpleReplyProcessor();
+    detail::QnMediaServerSimpleReplyProcessor *processor = new detail::QnMediaServerSimpleReplyProcessor();
     connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
@@ -585,7 +600,7 @@ int QnMediaServerConnection::asyncPtzMove(const QnNetworkResourcePtr &camera, qr
 }
 
 int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
-    detail::QnMediaServerSimpleReplyProcessor* processor = new detail::QnMediaServerSimpleReplyProcessor();
+    detail::QnMediaServerSimpleReplyProcessor *processor = new detail::QnMediaServerSimpleReplyProcessor();
     connect(processor, SIGNAL(finished(int, int)), target, slot, Qt::QueuedConnection);
 
     QnRequestParamList requestParams;
@@ -594,4 +609,27 @@ int QnMediaServerConnection::asyncPtzStop(const QnNetworkResourcePtr &camera, QO
     return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/stop"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
+int QnMediaServerConnection::asyncGetTime(QObject *target, const char *slot) {
+    detail::QnMediaServerGetTimeReplyProcessor *processor = new detail::QnMediaServerGetTimeReplyProcessor();
+    connect(processor, SIGNAL(finished(int, const QDateTime &, int, int)), target, slot, Qt::QueuedConnection);
+
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("gettime"), QnRequestParamList(), processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+}
+
+void detail::QnMediaServerGetTimeReplyProcessor::at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle) {
+    Q_UNUSED(errorString)
+
+    QDateTime dateTime;
+    int utcOffset = 0;
+
+    if (status == 0) {
+        dateTime = QDateTime::fromString(QString::fromLatin1(extractXmlBody(reply, "clock")), Qt::ISODate);
+        utcOffset = QString::fromLatin1(extractXmlBody(reply, "utcOffset")).toInt();
+    } else {
+        qnWarning("Could not get time from media server: %1.", errorString);
+    }
+
+    emit finished(status, dateTime, utcOffset, handle);
+    deleteLater();
+}
 

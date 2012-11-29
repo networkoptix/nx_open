@@ -81,8 +81,10 @@ void QnMulticodecRtpReader::processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer
 {
     bool gotValue = false;
     RtspStatistic stats = m_RtpSession.parseServerRTCPReport(buffer+4, bufferSize-4, &gotValue);
-    if (gotValue)
-        ioDevice->setStatistic(stats);
+    if (gotValue) {
+        if (ioDevice->getSSRC() == 0 || ioDevice->getSSRC() == stats.ssrc)
+            ioDevice->setStatistic(stats);
+    }
     int outBufSize = m_RtpSession.buildClientRTCPReport(buffer+4, bufferCapacity-4);
     if (outBufSize > 0)
     {
@@ -337,6 +339,8 @@ void QnMulticodecRtpReader::openStream()
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))
         transport = QLatin1String("AUTO");
     m_RtpSession.setTransport(transport);
+    if (transport != QLatin1String("UDP"))
+        m_RtpSession.setTCPReadBufferSize(1024*512);
 
 
     QnNetworkResourcePtr nres = getResource().dynamicCast<QnNetworkResource>();
@@ -349,14 +353,14 @@ void QnMulticodecRtpReader::openStream()
         }
         else 
         {
-            QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+            QTextStream(&url) << "rtsp://" << nres->getHostAddress();
             if (!m_request.startsWith(QLatin1Char('/')))
                 url += QLatin1Char('/');
             url += m_request;;
         }
     }
     else
-        QTextStream(&url) << "rtsp://" << nres->getHostAddress().toString();
+        QTextStream(&url) << "rtsp://" << nres->getHostAddress();
 
     m_RtpSession.setAuth(nres->getAuth());
 

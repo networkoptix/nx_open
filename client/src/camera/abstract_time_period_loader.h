@@ -25,16 +25,22 @@ public:
     virtual int load(const QnTimePeriod &period, const QList<QRegion> &motionRegions = QList<QRegion>()) = 0;
 
     /**
-     * \returns                         Network resource representing the camera that this
-     *                                  loader works with.
+     * \returns                         Resource that this loader works with.
      * 
      * \note                            This function is thread-safe.
      */
     QnResourcePtr resource() const { return m_resource; }
 
+    /**
+     * Discards cached data, if any.
+     * 
+     * \note                            This function is thread-safe.
+     */
+    Q_SLOT virtual void discardCachedData() {}
+
 signals:
     /**
-     * This signal is emitted whenever motion periods were successfully loaded from server.
+     * This signal is emitted whenever motion periods were successfully loaded.
      *
      * \param timePeriods               Loaded motion periods.
      * \param handle                    Request handle.
@@ -42,7 +48,7 @@ signals:
     void ready(const QnTimePeriodList &timePeriods, int handle);
 
     /**
-     * This signal is emitted whenever the reader was unable to load motion periods from server.
+     * This signal is emitted whenever the reader was unable to load motion periods.
      * 
      * \param status                    Error code.
      * \param handle                    Request handle.
@@ -50,8 +56,9 @@ signals:
     void failed(int status, int handle);
 
 protected:
-    /** Network resource that this loader gets chunks for. */
+    /** Resource that this loader gets chunks for. */
     QnResourcePtr m_resource;
+
 signals:
     void delayedReady(const QnTimePeriodList &timePeriods, int handle);
 };

@@ -4,7 +4,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include <utils/client_meta_types.h>
+#include <client/client_meta_types.h>
 
 #include "time_period_loader.h"
 #include "multi_camera_time_period_loader.h"
@@ -50,11 +50,15 @@ void QnCachingTimePeriodLoader::init() {
 
     m_loadingMargin = 1.0;
     m_updateInterval = defaultUpdateInterval;
+    m_resourceIsLocal = !m_resource.dynamicCast<QnNetworkResource>();
 
     for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
         m_handles[i] = -1;
         m_loaders[i] = NULL;
     }
+
+    if(!m_resourceIsLocal)
+        connect(qnSyncTime, SIGNAL(timeChanged()), this, SLOT(at_syncTime_timeChanged()));
 }
 
 void QnCachingTimePeriodLoader::initLoaders(QnAbstractTimePeriodLoader **loaders) {
@@ -245,4 +249,12 @@ void QnCachingTimePeriodLoader::at_loader_failed(int /*status*/, int handle) {
         }
     }
 }
+
+void QnCachingTimePeriodLoader::at_syncTime_timeChanged() {
+    for(int i = 0; i < Qn::TimePeriodRoleCount; i++) {
+        m_loaders[i]->discardCachedData();
+        load(static_cast<Qn::TimePeriodRole>(i));
+    }
+}
+
 

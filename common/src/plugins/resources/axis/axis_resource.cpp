@@ -1,16 +1,26 @@
+
 #include "axis_resource.h"
+
+#include <functional>
+
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
+#include "events/business_event_connector.h"
 #include "utils/common/synctime.h"
+
 
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
 static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
+static const quint16 DEFAULT_AXIS_API_PORT = 80;
 
 QnPlAxisResource::QnPlAxisResource()
 {
     setAuth(QLatin1String("root"), QLatin1String("root"));
     m_lastMotionReadTime = 0;
+    connect(
+        this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
 }
 
 bool QnPlAxisResource::isResourceAccessible()
@@ -113,7 +123,7 @@ bool QnPlAxisResource::readMotionInfo()
     
 
     // read motion windows coordinates
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Motion"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
@@ -175,7 +185,7 @@ bool QnPlAxisResource::initInternal()
 
     {
         // enable send motion into H.264 stream
-        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+        CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes")); 
         CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.TriggerDataEnabled=yes&Audio.A0.Enabled=").append(isAudioEnabled() ? "yes" : "no"));
         //CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=update&Image.I0.MPEG.UserDataEnabled=yes&Image.I1.MPEG.UserDataEnabled=yes&Image.I2.MPEG.UserDataEnabled=yes&Image.I3.MPEG.UserDataEnabled=yes"));
@@ -189,7 +199,7 @@ bool QnPlAxisResource::initInternal()
     readMotionInfo();
 
     // determin camera max resolution
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QByteArray("axis-cgi/param.cgi?action=list&group=Properties.Image.Resolution"));
     if (status != CL_HTTP_SUCCESS) {
         if (status == CL_HTTP_AUTH_REQUIRED)
@@ -250,14 +260,17 @@ bool QnPlAxisResource::initInternal()
             m_resolutionList[i] = "720x576";
             m_palntscRes = true;
         }
-
     }
 
-    
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
     //root.Properties.Motion.MaxNbrOfWindows=10
+
+    //TODO/IMPL check firmware version. it must be >= 5.0.0 to support I/O ports
+
+    initializeIOPorts( &http );
 
     return true;
 }
@@ -337,7 +350,7 @@ bool QnPlAxisResource::removeMotionWindow(int wndNum)
 {
     //QMutexLocker lock(&m_mutex);
 
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=remove&group=Motion.M%1")).arg(wndNum));
     return status == CL_HTTP_SUCCESS;
 }
@@ -346,7 +359,7 @@ int QnPlAxisResource::addMotionWindow()
 {
     //QMutexLocker lock(&m_mutex);
 
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QLatin1String("axis-cgi/param.cgi?action=add&group=Motion&template=motion&Motion.M.WindowType=include&Motion.M.ImageSource=0"));
     if (status != CL_HTTP_SUCCESS)
         return -1;
@@ -360,7 +373,7 @@ bool QnPlAxisResource::updateMotionWindow(int wndNum, int sensitivity, const QRe
 {
     //QMutexLocker lock(&m_mutex);
 
-    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(80), getNetworkTimeout(), getAuth());
+    CLSimpleHTTPClient http (getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth());
     CLHttpStatus status = http.doGET(QString(QLatin1String("axis-cgi/param.cgi?action=update&group=Motion&\
 Motion.M%1.Name=HDWitnessWindow%1&Motion.M%1.ImageSource=0&Motion.M%1.WindowType=include&\
 Motion.M%1.Left=%2&Motion.M%1.Right=%3&Motion.M%1.Top=%4&Motion.M%1.Bottom=%5&Motion.M%1.Sensitivity=%6"))
@@ -470,4 +483,380 @@ int QnPlAxisResource::getChannelNum() const
     int result = phId.mid(index).toInt();
 
     return result;
+}
+
+		// TEMPLATE STRUCT select1st
+template<class _Pair>
+	struct select1st
+        : public std::unary_function<_Pair, typename _Pair::first_type>
+	{	// functor for unary first of pair selector operator
+	const typename _Pair::first_type& operator()(const _Pair& _Left) const
+		{	// apply first selector operator to pair operand
+		return (_Left.first);
+		}
+	};
+
+//!Implementation of QnSecurityCamResource::getRelayOutputList
+QStringList QnPlAxisResource::getRelayOutputList() const
+{
+    QStringList idList;
+    std::transform(
+        m_outputPortNameToIndex.begin(),
+        m_outputPortNameToIndex.end(),
+        std::back_inserter(idList),
+        select1st<std::map<QString, unsigned int>::value_type>() );
+    return idList;
+}
+
+QStringList QnPlAxisResource::getInputPortList() const
+{
+    QStringList idList;
+    std::transform(
+        m_inputPortNameToIndex.begin(),
+        m_inputPortNameToIndex.end(),
+        std::back_inserter(idList),
+        select1st<std::map<QString, unsigned int>::value_type>() );
+    return idList;
+}
+
+//!Implementation of QnSecurityCamResource::setRelayOutputState
+bool QnPlAxisResource::setRelayOutputState(
+    const QString& outputID,
+    bool activate,
+    unsigned int autoResetTimeoutMS )
+{
+    std::map<QString, unsigned int>::const_iterator it = m_outputPortNameToIndex.find( outputID );
+    if( it == m_outputPortNameToIndex.end() )
+        return false;
+
+    QString cmd = QString::fromLatin1("axis-cgi/io/port.cgi?action=%1:%2").arg(it->second+1).arg(QLatin1String(activate ? "/" : "\\"));
+    if( autoResetTimeoutMS > 0 )
+    {
+        //adding auto-reset
+        cmd += QString::number(autoResetTimeoutMS)+QLatin1String(activate ? "\\" : "/");
+    }
+
+    CLSimpleHTTPClient httpClient( getHostAddress(), QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT), getNetworkTimeout(), getAuth() );
+
+    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I0.Configurable");
+    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1.Output.Name");
+    //cmd = QLatin1String("/axis-cgi/io/port.cgi?check=1,2");
+    //cmd = QLatin1String("/axis-cgi/io/port.cgi?checkactive=1,2");
+    //cmd = QLatin1String("/axis-cgi/io/port.cgi?action=2:/300\\500/300\\");
+    //cmd = QLatin1String("/axis-cgi/param.cgi?action=list&group=IOPort.I1");
+
+    CLHttpStatus status = httpClient.doGET( cmd );
+    if( status / 100 != 2 )
+    {
+        cl_log.log( QString::fromLatin1("Failed to set camera %1 port %2 output state to %3. Result: %4").
+            arg(getHostAddress()).arg(outputID).arg(activate).arg(::toString(status)), cl_logWARNING );
+        return false;
+    }
+
+    return true;
+}
+
+CLHttpStatus QnPlAxisResource::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QString& paramName,
+    QVariant* paramValue )
+{
+    CLHttpStatus status = httpClient->doGET( QString::fromLatin1("axis-cgi/param.cgi?action=list&group=%1").arg(paramName).toLatin1() );
+    if( status == CL_HTTP_SUCCESS )
+    {
+        QByteArray body;
+        httpClient->readAll( body );
+        const QStringList& paramItems = QString::fromLatin1(body.data()).split(QLatin1Char('='));
+        if( paramItems.size() == 2 && paramItems[0] == paramName )
+        {
+            *paramValue = paramItems[1];
+            return CL_HTTP_SUCCESS;
+        }
+        else
+        {
+            cl_log.log( QString::fromLatin1("Failed to read param %1 of camera %2. Unexpected response: %3").
+                arg(paramName).arg(getHostAddress()).arg(QLatin1String(body)), cl_logWARNING );
+            return CL_HTTP_BAD_REQUEST;
+        }
+    }
+    else
+    {
+        cl_log.log( QString::fromLatin1("Failed to param %1 of camera %2. Result: %3").
+            arg(paramName).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+        return status;
+    }
+}
+
+CLHttpStatus QnPlAxisResource::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QString& paramName,
+    QString* paramValue )
+{
+    QVariant val;
+    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toString().trimmed();
+    return status;
+}
+
+CLHttpStatus QnPlAxisResource::readAxisParameter(
+    CLSimpleHTTPClient* const httpClient,
+    const QString& paramName,
+    unsigned int* paramValue )
+{
+    QVariant val;
+    CLHttpStatus status = readAxisParameter( httpClient, paramName, &val );
+    *paramValue = val.toUInt();
+    return status;
+}
+
+void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClient* const httpClient )
+{
+    Q_ASSERT( httpClient );
+
+    if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
+    {
+        cl_log.log( QString::fromLatin1("Axis camera %1. Failed to subscribe to input %2 monitoring. %3").
+            arg(getUrl()).arg(QLatin1String("")).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
+        return;
+    }
+
+    static const char* multipartContentType = "multipart/x-mixed-replace";
+
+    //analyzing response headers (if needed)
+    const nx_http::StringType& contentType = httpClient->contentType();
+    const nx_http::StringType::value_type* sepPos = std::find( contentType.constData(), contentType.constData()+contentType.size(), ';' );
+    if( sepPos == contentType.constData()+contentType.size() ||
+        nx_http::ConstBufferRefType(contentType, 0, sepPos-contentType.constData()) != multipartContentType )
+    {
+        //unexpected content type
+        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Unexpected Content-Type (%2) in monitor response, Expected: %3").
+            arg(getUrl()).arg(QLatin1String(contentType)).arg(QLatin1String(multipartContentType)), cl_logWARNING );
+        //deleting httpClient
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
+        return;
+    }
+
+    const nx_http::StringType::value_type* boundaryStart = std::find_if(
+        sepPos+1,
+        contentType.constData()+contentType.size(),
+        std::not1( std::bind1st( std::equal_to<nx_http::StringType::value_type>(), ' ' ) ) );   //searching first non-space
+    if( boundaryStart == contentType.constData()+contentType.size() )
+    {
+        //failed to read boundary marker
+        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (1)").
+            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
+        //deleting httpClient
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
+        return;
+    }
+    if( !nx_http::ConstBufferRefType(contentType, boundaryStart-contentType.constData()).startsWith("boundary=") )
+    {
+        //failed to read boundary marker
+        cl_log.log( QString::fromLatin1("Error monitoring axis camera %1. Missing boundary marker in content-type %2 (2)").
+            arg(getUrl()).arg(QLatin1String(contentType)), cl_logWARNING );
+        //deleting httpClient
+        forgetHttpClient( httpClient );
+        httpClient->scheduleForRemoval();
+        return;
+    }
+    boundaryStart += sizeof("boundary=")-1;
+    m_multipartContentParser.setBoundary( contentType.mid( boundaryStart-contentType.constData() ) );
+
+    httpClient->startReadMessageBody();
+}
+
+void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* const httpClient )
+{
+    Q_ASSERT( httpClient );
+
+    const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
+    for( size_t offset = 0; offset < msgBodyBuf.size(); )
+    {
+        size_t bytesProcessed = 0;
+        nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
+            nx_http::ConstBufferRefType(msgBodyBuf, offset),
+            &bytesProcessed );
+        offset += bytesProcessed;
+        switch( resultCode )
+        {
+            case nx_http::MultipartContentParser::needMoreData:
+                continue;
+
+            case nx_http::MultipartContentParser::partDataDone:
+                if( m_currentMonitorData.isEmpty() )
+                {
+                    notificationReceived( m_multipartContentParser.prevFoundData() );
+                }
+                else
+                {
+                    m_currentMonitorData.append(
+                        m_multipartContentParser.prevFoundData().data(),
+                        m_multipartContentParser.prevFoundData().size() );
+                    notificationReceived( m_currentMonitorData );
+                    m_currentMonitorData.clear();
+                }
+                break;
+
+            case nx_http::MultipartContentParser::someDataAvailable:
+                m_currentMonitorData.append(
+                    m_multipartContentParser.prevFoundData().data(),
+                    m_multipartContentParser.prevFoundData().size() );
+                break;
+
+            case nx_http::MultipartContentParser::eof:
+                //TODO/IMPL reconnect
+                break;
+        }
+    }
+}
+
+void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClient* const httpClient )
+{
+    //TODO/IMPL reconnect
+}
+
+void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
+{
+    unsigned int inputPortCount = 0;
+    CLHttpStatus status = readAxisParameter( http, QLatin1String("Input.NbrOfInputs"), &inputPortCount );
+    if( status != CL_HTTP_SUCCESS )
+        cl_log.log( QString::fromLatin1("Failed to read number of input ports of camera %1. Result: %2").
+            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+    unsigned int outputPortCount = 0;
+    status = readAxisParameter( http, QLatin1String("Output.NbrOfOutputs"), &outputPortCount );
+    if( status != CL_HTTP_SUCCESS )
+        cl_log.log( QString::fromLatin1("Failed to read number of output ports of camera %1. Result: %2").
+            arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+
+    //reading port direction and names
+    for( unsigned int i = 0; i < inputPortCount+outputPortCount; ++i )
+    {
+        QString portDirection;
+        status = readAxisParameter( http, QString::fromLatin1("IOPort.I%1.Direction").arg(i), &portDirection );
+        if( status != CL_HTTP_SUCCESS )
+        {
+            cl_log.log( QString::fromLatin1("Failed to read name of port %1 of camera %2. Result: %3").
+                arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+            continue;
+        }
+
+        QString portName;
+        status = readAxisParameter( http, QString::fromLatin1("IOPort.I%1.%2.Name").arg(i).arg(portDirection), &portName );
+        if( status != CL_HTTP_SUCCESS )
+        {
+            cl_log.log( QString::fromLatin1("Failed to read name of input port %1 of camera %2. Result: %3").
+                arg(i).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
+            continue;
+        }
+
+        if( portDirection == QLatin1String("input") )
+            m_inputPortNameToIndex[portName] = i;
+        else if( portDirection == QLatin1String("output") )
+            m_outputPortNameToIndex[portName] = i;
+    }
+
+    //TODO/IMPL periodically update port names in case some one changes it
+
+    if( m_inputPortNameToIndex.size() > 0 )
+        registerInputPortEventHandler();
+    //if( m_outputPortNameToIndex.size() > 0 )
+    //    setRelayOutputState( m_outputPortNameToIndex.begin()->first, true, 5000 );
+}
+
+bool QnPlAxisResource::registerInputPortEventHandler()
+{
+    if( m_inputPortNameToIndex.empty() )
+        return false;
+
+    //based on VAPIX Version 3 I/O Port API
+
+    const QAuthenticator& auth = getAuth();
+    QUrl requestUrl;
+    requestUrl.setHost( getHostAddress() );
+    requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
+    //requestUrl.setUserName( auth.user() );
+    //requestUrl.setPassword( auth.password() );
+    for( std::map<QString, unsigned int>::const_iterator
+        it = m_inputPortNameToIndex.begin();
+        it != m_inputPortNameToIndex.end();
+        ++it )
+    {
+        requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
+        std::auto_ptr<nx_http::AsyncHttpClient> httpClient( new nx_http::AsyncHttpClient() );
+        connect( httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        connect( httpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
+        connect( httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
+        httpClient->setUserName( auth.user() );
+        httpClient->setUserPassword( auth.password() );
+        httpClient->doGet( requestUrl );
+        QMutexLocker lk( &m_inputPortMutex );
+        m_inputPortHttpMonitor.insert( std::make_pair( it->second, httpClient.release() ) );
+    }
+
+    return false;
+}
+
+void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )
+{
+    //1I:H, 1I:L, 1I:/, "1I:\"
+    if( notification.isEmpty() )
+        return;
+    cl_log.log( QString::fromLatin1("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
+
+    //notification
+    size_t sepPos = nx_http::find_first_of( notification, ":" );
+    if( sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size() )
+    {
+        cl_log.log( QString::fromLatin1("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        return;
+    }
+    const char eventType = notification[sepPos+1];
+    size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
+    if( portTypePos == nx_http::BufferNpos )
+    {
+        cl_log.log( QString::fromLatin1("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
+        return;
+    }
+    const unsigned int portNumber = notification.mid( 0, portTypePos ).toUInt();
+    const char portType = notification[portTypePos];
+    cl_log.log( QString::fromLatin1("%1 port %2 changed its state to %3. Camera %4").
+        arg(QLatin1String(portType == 'I' ? "Input" : "Output")).arg(portNumber).arg(QLatin1String(eventType == '/' ? "active" : "inactive")).arg(getUrl()), cl_logDEBUG1 );
+
+    if( portType != 'I' )
+        return;
+
+    switch( eventType )
+    {
+        case '/':
+        case '\\':
+            emit cameraInput(
+                toSharedPointer(),
+                QString::number(portNumber),
+                eventType == '/' ? true : false,
+                QDateTime::currentMSecsSinceEpoch() );
+            break;
+
+        default:
+            break;
+    }
+}
+
+void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpClient )
+{
+    QMutexLocker lk( &m_inputPortMutex );
+
+    for( std::map<unsigned int, nx_http::AsyncHttpClient*>::iterator
+        it = m_inputPortHttpMonitor.begin();
+        it != m_inputPortHttpMonitor.end();
+        ++it )
+    {
+        if( it->second == httpClient )
+        {
+            m_inputPortHttpMonitor.erase( it );
+            return;
+        }
+    }
 }

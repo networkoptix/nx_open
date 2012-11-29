@@ -10,11 +10,11 @@
 #endif
 #include "utils/common/math.h"
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 QnMediaContext::QnMediaContext(AVCodecContext* ctx)
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     m_ctx = avcodec_alloc_context3(NULL);
     avcodec_copy_context(m_ctx, ctx);
 }
@@ -23,7 +23,7 @@ QnMediaContext::QnMediaContext(CodecID codecId)
 {
     if (codecId != CODEC_ID_NONE)
     {
-        QMutexLocker mutex(&global_ffmpeg_mutex);
+        //QMutexLocker mutex(&global_ffmpeg_mutex);
         AVCodec* codec = avcodec_find_decoder(codecId);
         m_ctx = avcodec_alloc_context3(codec);
         avcodec_open2(m_ctx, codec, NULL);
@@ -45,7 +45,7 @@ QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
 
 QnMediaContext::~QnMediaContext()
 {
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
     if (m_ctx) {
         if (m_ctx->codec)
             avcodec_close(m_ctx);
@@ -408,4 +408,41 @@ QnCompressedAudioData* QnCompressedAudioData::clone()
     QnCompressedAudioData* rez = new QnCompressedAudioData(data.getAlignment(), data.size());
     rez->assign(this);
     return rez;
+}
+
+void CLDataQueue::getEdgePackets(qint64& firstVTime, qint64& lastVTime, bool checkLQ) const
+{
+    for (int i = 0; i < size(); ++i)
+    {
+        QnCompressedVideoDataPtr video = at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            firstVTime = video->timestamp;
+            break;
+        }
+    }
+
+    for (int i = size()-1; i >=0; --i)
+    {
+        QnCompressedVideoDataPtr video = at(i).dynamicCast<QnCompressedVideoData>();
+        if (video && video->isLQ() == checkLQ) {
+            lastVTime = video->timestamp;
+            break;
+        }
+    }
+}
+
+qint64 CLDataQueue::mediaLength() const
+{
+    QMutexLocker mutex(&m_cs);
+
+    qint64 firstVTime = AV_NOPTS_VALUE;
+    qint64 lastVTime = AV_NOPTS_VALUE;
+    getEdgePackets(firstVTime, lastVTime, false);
+    if (firstVTime == AV_NOPTS_VALUE || lastVTime == AV_NOPTS_VALUE)
+        getEdgePackets(firstVTime, lastVTime, true);
+
+    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
+        return lastVTime - firstVTime;
+    else
+        return 0;
 }

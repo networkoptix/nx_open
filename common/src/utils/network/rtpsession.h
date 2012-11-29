@@ -18,13 +18,14 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class RtspStatistic 
 {
 public:
-    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0) {}
+    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
     bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
 
     quint32 timestamp;
     double nptTime;
     qint64 receivedPackets;
     qint64 receivedOctets;
+    quint32 ssrc;
 };
 
 class QnRtspTimeHelper
@@ -38,6 +39,7 @@ private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
 private:
     double m_cameraClockToLocalDiff; // in secs
+    qint64 m_lastTime;
 };
 
 class RTPIODevice
@@ -52,6 +54,8 @@ public:
     CommunicatingSocket* getMediaSocket();
     UDPSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
+    void setSSRC(quint32 value) {ssrc = value; }
+    quint32 getSSRC() const { return ssrc; }
 private:
     void processRtcpData();
 private:
@@ -60,6 +64,7 @@ private:
     RtspStatistic m_statistic;
     UDPSocket* m_mediaSocket;
     UDPSocket* m_rtcpSocket;
+    quint32 ssrc;
 };
 
 class RTPSession: public QObject
@@ -93,6 +98,10 @@ public:
 
             ioDevice = new RTPIODevice(owner, useTCP);
         }
+
+        void setSSRC(quint32 value);
+        quint32 getSSRC() const;
+
         ~SDPTrackInfo() { delete ioDevice; }
 
         QString codecName;
@@ -204,6 +213,8 @@ public:
     void setUsePredefinedTracks(int numOfVideoChannel);
 
     static quint8* prepareDemuxedData(QVector<QnByteArray*>& demuxedData, int channel, int reserve);
+
+    bool setTCPReadBufferSize(int value);
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -239,6 +250,7 @@ private:
     TransportType m_transport;
     int m_selectedAudioChannel;
     qint64 m_startTime;
+    qint64 m_openedTime;
     qint64 m_endTime;
     float m_scale;
     int m_tcpTimeout;
@@ -276,7 +288,6 @@ private:
 
     QString m_realm;
     QString m_nonce;
-    qint64 m_openedTime;
 };
 
 #endif //rtp_session_h_1935_h

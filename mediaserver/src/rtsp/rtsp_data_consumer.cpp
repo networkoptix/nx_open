@@ -13,7 +13,7 @@
 #include "core/resource/security_cam_resource.h"
 
 static const int MAX_QUEUE_SIZE = 12;
-static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 1000ll * 1000ll; // 1 second
+static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
 //static const QString RTP_FFMPEG_GENERIC_STR("mpeg4-generic"); // this line for debugging purpose with VLC player
 
 static const int MAX_RTSP_WRITE_BUFFER = 1024*1024;
@@ -43,7 +43,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_currentDP(0),
   m_liveQuality(MEDIA_Quality_High),
   m_newLiveQuality(MEDIA_Quality_None),
-  m_hiQualityRetryCounter(0),
   m_realtimeMode(false),
   m_adaptiveSleep(MAX_FRAME_DURATION*1000),
   m_useUTCTime(true),
@@ -51,22 +50,11 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_firstLiveTime(AV_NOPTS_VALUE),
   m_lastLiveTime(AV_NOPTS_VALUE),
   m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
-  m_allowAdaptiveStreaming(true)
+  m_allowAdaptiveStreaming(true),
+  m_someDataIsDropped(false)
 {
     m_timer.start();
     QMutexLocker lock(&m_allConsumersMutex);
-    foreach(QnRtspDataConsumer* consumer, m_allConsumers)
-    {
-        if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
-        {
-            if (consumer->m_liveQuality == MEDIA_Quality_Low) {
-                setLiveQualityInternal(MEDIA_Quality_Low);
-                m_hiQualityRetryCounter = HIGH_QUALITY_RETRY_COUNTER;
-                break;
-            }
-        }
-    }
-
     m_allConsumers << this;
 }
 
@@ -75,23 +63,6 @@ QnRtspDataConsumer::~QnRtspDataConsumer()
     {
         QMutexLocker lock(&m_allConsumersMutex);
         m_allConsumers.remove(this);
-        if (m_firstLiveTime != AV_NOPTS_VALUE)
-        {
-            // If some data was transfered and camera is closing, some bandwidth appears.
-            // Try to switch some camera(s) to high quality
-            foreach(QnRtspDataConsumer* consumer, m_allConsumers)
-            {
-                if (m_owner->getPeerAddress() == consumer->m_owner->getPeerAddress())
-                {
-                    if (consumer->m_liveQuality == MEDIA_Quality_Low)
-                    {
-                        consumer->resetQualityStatistics();
-                        if (m_liveQuality == MEDIA_Quality_Low)
-                            break; // try only one camera is current quality is low
-                    }
-                }
-            }
-        }
     }
     stop();
 }
@@ -143,45 +114,6 @@ bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
     return !(qSharedPointerDynamicCast<QnAbstractMediaData>(data)->flags & AV_PKT_FLAG_KEY);
 }
 
-void QnRtspDataConsumer::resetQualityStatistics()
-{
-    m_hiQualityRetryCounter = 0;
-}
-
-bool QnRtspDataConsumer::canSwitchToLowQuality()
-{
-    if (!m_owner->isSecondaryLiveDPSupported())
-        return false;
-
-    return true;
-
-    QMutexLocker lock(&m_allConsumersMutex);
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
-        return false;
-
-    m_lastSwitchTime[clientAddress] = currentTime;
-    return true;
-}
-
-bool QnRtspDataConsumer::canSwitchToHiQuality()
-{
-    // RTSP queue is almost empty. But need some addition check to prevent quality change flood
-    QMutexLocker lock(&m_allConsumersMutex);
-    if (m_hiQualityRetryCounter >= HIGH_QUALITY_RETRY_COUNTER)
-        return false;
-
-    qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
-    QHostAddress clientAddress = m_owner->getPeerAddress();
-    if (currentTime - m_lastSwitchTime[clientAddress] < QUALITY_SWITCH_INTERVAL)
-        return false;
-
-    m_lastSwitchTime[clientAddress] = currentTime;
-    m_hiQualityRetryCounter++;
-    return true;
-}
-
 bool QnRtspDataConsumer::isMediaTimingsSlow() const
 {
     QMutexLocker lock(&m_liveTimingControlMtx);
@@ -196,35 +128,7 @@ bool QnRtspDataConsumer::isMediaTimingsSlow() const
 
 qint64 QnRtspDataConsumer::dataQueueDuration()
 {
-    qint64 firstVTime = AV_NOPTS_VALUE;
-    qint64 lastVTime = AV_NOPTS_VALUE;
-
-    m_dataQueue.lock();
-
-    for (int i = 0; i < m_dataQueue.size(); ++i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video) {
-           firstVTime = video->timestamp;
-           break;
-        }
-    }
-
-    for (int i = m_dataQueue.size()-1; i >=0; --i)
-    {
-        QnCompressedVideoDataPtr video = m_dataQueue.at(i).dynamicCast<QnCompressedVideoData>();
-        if (video) {
-            lastVTime = video->timestamp;
-            break;
-        }
-    }
-
-    m_dataQueue.unlock();
-
-    if (firstVTime != AV_NOPTS_VALUE && lastVTime != AV_NOPTS_VALUE)
-        return lastVTime - firstVTime;
-    else
-        return 0;
+    return m_dataQueue.mediaLength();
 }
 
 void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
@@ -240,67 +144,21 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
 
     // quality control
     bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
-    if (isLive)
-    {
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(data->dataProvider);
-        if (isSecondaryProvider)
-            media->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
-
-        if (m_allowAdaptiveStreaming && m_newLiveQuality == MEDIA_Quality_None && m_liveQuality != MEDIA_Quality_AlwaysHigh)
-        {
-            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High  && canSwitchToLowQuality())
-            //if (m_dataQueue.size() >= m_dataQueue.maxSize()-MAX_QUEUE_SIZE/4 && m_liveQuality == MEDIA_Quality_High && canSwitchToLowQuality() && isMediaTimingsSlow())
-            //    m_newLiveQuality = MEDIA_Quality_Low; // slow network. Reduce quality
-            if (m_dataQueue.size() <= 1 && m_liveQuality == MEDIA_Quality_Low && canSwitchToHiQuality()) 
-                m_newLiveQuality = MEDIA_Quality_High;
-        }
-    }
-
-    // overflow control
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
+    if (/*(media->flags & AV_PKT_FLAG_KEY) &&*/ m_dataQueue.size() > m_dataQueue.maxSize() && dataQueueDuration() > TO_LOWQ_SWITCH_MIN_QUEUE_DURATION)
     {
         m_dataQueue.lock();
-        QnSecurityCamResourcePtr camRes = m_owner->getResource().dynamicCast<QnSecurityCamResource>();
-        if (camRes && camRes->hasDualStreaming() && m_liveQuality != MEDIA_Quality_AlwaysHigh)
-        {
-            qint64 skipTime = m_dataQueue.front()->timestamp;
-            m_dataQueue.clear();
-            copyLastGopFromCamera(false, skipTime-1);
-            m_newLiveQuality = MEDIA_Quality_Low;
-        }
-        else {
-            for (int i = m_dataQueue.size()-1; i >=0; --i)
-            {
-                QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
-                if (media->flags & AV_PKT_FLAG_KEY) 
-                {
-                    m_dataQueue.removeFirst(i);
-                    break;
-                }
-            }
-        }
-        m_dataQueue.unlock();
-    }
+        bool clearHiQ = m_liveQuality != MEDIA_Quality_Low; // remove LQ packets, keep HQ
 
-/*
-    if ((media->flags & AV_PKT_FLAG_KEY) && m_dataQueue.size() > m_dataQueue.maxSize())
-    {
-        m_dataQueue.lock();
-        bool clearHiQ = false; // remove LQ packets, keep HQ
-        if (m_liveQuality != MEDIA_Quality_AlwaysHigh) {
-            m_newLiveQuality = MEDIA_Quality_Low;
-            clearHiQ = true; // remove HQ packets, keep LQ
-        }
-
+        // try to reduce queue by removed packets in specified quality
         bool somethingDeleted = false;
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
             QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData> (m_dataQueue.at(i));
             if (media->flags & AV_PKT_FLAG_KEY) 
             {
-                bool isLQ = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
-                if (isLQ && clearHiQ || !isLQ && !clearHiQ)
+                bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
+                if (isHiQ == clearHiQ)
                 {
                     m_dataQueue.removeFirst(i);
                     somethingDeleted = true;
@@ -308,6 +166,8 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
                 }
             }
         }
+
+        // try to reduce queue by removed video packets at any quality
         if (!somethingDeleted)
         {
             for (int i = m_dataQueue.size()-1; i >=0; --i)
@@ -316,14 +176,21 @@ void QnRtspDataConsumer::putData(QnAbstractDataPacketPtr data)
                 if (media->flags & AV_PKT_FLAG_KEY)
                 {
                     m_dataQueue.removeFirst(i);
+                    somethingDeleted = true;
                     break;
                 }
             }
         }
+        if (somethingDeleted) 
+        {
+            // clone packet. Put to queue new copy because data is modified
+            QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(m_dataQueue.front().dynamicCast<QnAbstractMediaData>()->clone());
+            media->flags |= QnAbstractMediaData::MediaFlags_AfterDrop;
+            m_dataQueue.setAt(media, 0);
+            m_someDataIsDropped = true;
+        }
         m_dataQueue.unlock();
     }
-
-*/
 
     while(m_dataQueue.size() > 120) // queue to large
     {
@@ -350,6 +217,7 @@ void QnRtspDataConsumer::setLiveMode(bool value)
 
 void QnRtspDataConsumer::setLiveQuality(MediaQuality liveQuality)
 {
+    QMutexLocker lock(&m_qualityChangeMutex);
     m_newLiveQuality = liveQuality;
 }
 
@@ -510,6 +378,32 @@ void QnRtspDataConsumer::doRealtimeDelay(QnAbstractMediaDataPtr media)
     m_lastRtTime = media->timestamp;
 }
 
+void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
+{
+    RtspServerTrackInfoPtr metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
+    if (metadataTrack && metadataTrack->clientPort != -1)
+    {
+        m_sendBuffer.resize(16);
+        buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        m_sendBuffer.write(metadata);
+
+        if (m_owner->isTcpMode()) {
+            m_sendBuffer.data()[0] = '$';
+            m_sendBuffer.data()[1] = metadataTrack->clientPort;
+            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
+            *lenPtr = htons(m_sendBuffer.size() - 4);
+            m_owner->sendBuffer(m_sendBuffer);
+        }
+        else  if (metadataTrack->mediaSocket) {
+            Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+            metadataTrack->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+        }
+
+        metadataTrack->sequence++;
+        m_sendBuffer.clear();
+    }
+}
+
 bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
 {
     if (m_pauseNetwork)
@@ -522,27 +416,31 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         return true;
 
     QnMetaDataV1Ptr metadata = qSharedPointerDynamicCast<QnMetaDataV1>(data);
-
+    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
     if (metadata == 0)
     {
         bool isKeyFrame = media->flags & AV_PKT_FLAG_KEY;
-        bool isSecondaryProvider = m_owner->isSecondaryLiveDP(media->dataProvider);
-        if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+        bool isSecondaryProvider = media->flags & QnAbstractMediaData::MediaFlags_LowQuality;
         {
-            if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
-                setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
-                m_newLiveQuality = MEDIA_Quality_None;
-            }
-            else if ((m_newLiveQuality == MEDIA_Quality_High || m_newLiveQuality == MEDIA_Quality_AlwaysHigh) && !isSecondaryProvider) {
-                setLiveQualityInternal(m_newLiveQuality);
-                m_newLiveQuality = MEDIA_Quality_None;
+            QMutexLocker lock(&m_qualityChangeMutex);
+            if (isKeyFrame && m_newLiveQuality != MEDIA_Quality_None)
+            {
+                if (m_newLiveQuality == MEDIA_Quality_Low && isSecondaryProvider) {
+                    setLiveQualityInternal(MEDIA_Quality_Low); // slow network. Reduce quality
+                    m_newLiveQuality = MEDIA_Quality_None;
+                }
+                else if (m_newLiveQuality == MEDIA_Quality_High && !isSecondaryProvider) {
+                    setLiveQualityInternal(m_newLiveQuality);
+                    m_newLiveQuality = MEDIA_Quality_None;
+                }
             }
         }
-
-        if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
-            return true; // data for other live quality stream
-        else if (m_liveQuality == MEDIA_Quality_Low && m_owner->isPrimaryLiveDP(media->dataProvider))
-            return true; // data for other live quality stream
+        if (isLive) {
+            if (m_liveQuality != MEDIA_Quality_Low && isSecondaryProvider)
+                return true; // data for other live quality stream
+            else if (m_liveQuality == MEDIA_Quality_Low && !isSecondaryProvider)
+                return true; // data for other live quality stream
+        }
     }
 
     RtspServerTrackInfoPtr trackInfo = m_owner->getTrackInfo(media->channelNumber);
@@ -570,7 +468,11 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         m_lastMediaTime = media->timestamp;
     }
 
-    bool isLive = media->flags & QnAbstractMediaData::MediaFlags_LIVE;
+    if (m_someDataIsDropped) {
+        sendMetadata("drop-report");
+        m_someDataIsDropped = false;
+    }
+
     if (m_realtimeMode && !isLive)
         doRealtimeDelay(media);
 
@@ -602,12 +504,6 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     static AVRational r = {1, 1000000};
     AVRational time_base = {1, codecEncoder->getFrequency() };
 
-    /*
-    qint64 timeDiff = media->timestamp;
-    if (!m_useUTCTime)
-        timeDiff -= trackInfo->firstRtpTime; // enumerate RTP time from 0 after seek
-    qint64 packetTime = av_rescale_q(timeDiff, r, time_base);
-    */
     qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
 
     m_sendBuffer.resize(4); // reserve space for RTP TCP header
@@ -623,6 +519,12 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         {
             RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
+            if (isRtcp && m_owner->getTracksCount() == 1) 
+            {
+                // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
+                m_sendBuffer.resize(4);
+                continue;
+            }
         }
         else {
             buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
@@ -645,35 +547,9 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     }
     m_sendBuffer.clear();
 
-
-    //m_owner->sendCurrentRangeIfUpdated();
     QByteArray newRange = m_owner->getRangeHeaderIfChanged().toUtf8();
     if (!newRange.isEmpty())
-    {
-        int sendLen = newRange.size();
-        trackInfo = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
-        if (trackInfo && trackInfo->clientPort != -1)
-        {
-            m_sendBuffer.resize(16);
-            buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, newRange.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, trackInfo->sequence);
-            m_sendBuffer.write(newRange);
-
-            if (m_owner->isTcpMode()) {
-                m_sendBuffer.data()[0] = '$';
-                m_sendBuffer.data()[1] = trackInfo->clientPort;
-                quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
-                *lenPtr = htons(m_sendBuffer.size() - 4);
-                m_owner->sendBuffer(m_sendBuffer);
-            }
-            else  if (trackInfo->mediaSocket) {
-                Q_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-                trackInfo->mediaSocket->sendTo(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
-            }
-
-            trackInfo->sequence++;
-            m_sendBuffer.clear();
-        }
-    }
+        sendMetadata(newRange);
 
     if (m_packetSended++ == MAX_PACKETS_AT_SINGLE_SHOT)
         m_singleShotMode = false;
@@ -747,7 +623,6 @@ void QnRtspDataConsumer::clearUnprocessedData()
     QnAbstractDataConsumer::clearUnprocessedData();
     m_newLiveQuality = MEDIA_Quality_None;
     m_dataQueue.setMaxSize(MAX_QUEUE_SIZE);
-    m_hiQualityRetryCounter = 0;
 }
 
 void QnRtspDataConsumer::setUseUTCTime(bool value)

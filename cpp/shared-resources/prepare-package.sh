@@ -3,7 +3,7 @@
 export buildlib=${buildLib}
 export QTDIR=`qmake -query QT_INSTALL_PREFIX`
 
-if [[ $buildlib != 'staticlib' ]]; then
+if [[ -z $buildlib ]]; then
 
   mkdir -p ${libdir}/qtlibs/build/bin/debug
   mkdir -p ${libdir}/qtlibs/build/bin/release

@@ -217,7 +217,7 @@ void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        cl_log.log(netRes->getHostAddress().toString() + QLatin1String(" "), netRes->getName(), cl_logINFO);
+        cl_log.log(netRes->getHostAddress() + QLatin1String(" "), netRes->getName(), cl_logINFO);
     }
 
 }
@@ -276,7 +276,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     if (processDiscoveredResources(resources, true)) 
     {
         dtsAssignment();
-        cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+        //cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
         return resources;
     }
     else {
@@ -330,11 +330,13 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
             {
                 if (!newNetRes->hasFlags(QnResource::server_live_cam)) // if this is not camera from mediaserver on the client stand alone
                 {
-                    quint32 ips = newNetRes->getHostAddress().toIPv4Address();
-                    if (ipsList.contains(ips))
-                        ipsList[ips]++;
-                    else
-                        ipsList[ips] = 1;
+                    quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+                    if (ips) {
+                        if (ipsList.contains(ips))
+                            ipsList[ips]++;
+                        else
+                            ipsList[ips] = 1;
+                    }
                 }
 
 
@@ -430,11 +432,11 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         QnNetworkResourcePtr netRes = res.dynamicCast<QnNetworkResource>();
         if (netRes && netRes->shoudResolveConflicts())
         {
-            quint32 ips = netRes->getHostAddress().toIPv4Address();
+            quint32 ips = resolveAddress(netRes->getHostAddress()).toIPv4Address();
             if (ipsList.count(ips) > 0 && ipsList[ips] > 1)
             {
                 netRes->setNetworkStatus(QnNetworkResource::BadHostAddr);
-                cl_log.log(netRes->getHostAddress().toString() , " conflicting. Has same IP as someone else.", cl_logINFO);
+                cl_log.log(netRes->getHostAddress() , " conflicting. Has same IP as someone else.", cl_logINFO);
             }
         }
     }
@@ -460,7 +462,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         else
         {
             if (netRes)
-                cl_log.log("Ready to go resource: ", netRes->getHostAddress().toString(), cl_logINFO);
+                cl_log.log("Ready to go resource: ", netRes->getHostAddress(), cl_logINFO);
 
             readyToGo.push_back(*it);
             it = resources.erase(it);
@@ -500,7 +502,7 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
         if (netRes && netRes->checkNetworkStatus(QnNetworkResource::BadHostAddr)) // if this is network resource and it has bad ip should stay
         {
             it = resources.erase(it);
-            cl_log.log("!!! Cannot resolve conflict for: ", netRes->getHostAddress().toString(), cl_logERROR);
+            cl_log.log("!!! Cannot resolve conflict for: ", netRes->getHostAddress(), cl_logERROR);
         }
         else
             ++it;
@@ -640,14 +642,14 @@ struct ManualSearcherHelper
 };
 
 
-QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr, QHostAddress endAddr, const QAuthenticator& auth, int port)
+QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port)
 {
     
     {
         QString str;
         QTextStream stream(&str);
 
-        stream << "Looking for cameras... StartAddr = " << startAddr.toString() << "  EndAddr = " << endAddr.toString() << "   login/pass = " << auth.user() << "/" << auth.password();
+        stream << "Looking for cameras... StartAddr = " << startAddr << "  EndAddr = " << endAddr << "   login/pass = " << auth.user() << "/" << auth.password();
         cl_log.log(str, cl_logINFO);
     }
     
@@ -656,14 +658,18 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
 
     cl_log.log("Checking for online addresses....", cl_logINFO);
 
-    QList<QHostAddress> online = ip_cheker.onlineHosts(startAddr, endAddr);
+    QList<QString> online;
+    if (endAddr.isNull())
+        online << startAddr;
+    else
+        online = ip_cheker.onlineHosts(QHostAddress(startAddr), QHostAddress(endAddr));
 
 
     cl_log.log("Found ", online.size(), " IPs:", cl_logINFO);
 
-    foreach(QHostAddress addr, online)
+    foreach(const QString& addr, online)
     {
-        cl_log.log(addr.toString(), cl_logINFO);
+        cl_log.log(addr, cl_logINFO);
     }
 
     //=======================================
@@ -671,10 +677,10 @@ QnResourceList QnResourceDiscoveryManager::findResources(QHostAddress startAddr,
     //now lets check each one of online machines...
 
     QList<ManualSearcherHelper> testList;
-    foreach(QHostAddress addr, online)
+    foreach(const QString& addr, online)
     {
         ManualSearcherHelper t;
-        t.url.setHost(addr.toString());
+        t.url.setHost(addr);
         if (port)
             t.url.setPort(port);
         t.auth = auth;
@@ -779,9 +785,9 @@ struct check_if_accessible_STRUCT
             resourceNet->addNetworkStatus(QnNetworkResource::BadHostAddr);
 
             if (m_isSameSubnet)
-                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(same subnet)", cl_logWARNING);
             else
-                cl_log.log(resourceNet->getHostAddress().toString() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
+                cl_log.log(resourceNet->getHostAddress() + QLatin1String("  name = ") +  resourceNet->getName(), " has bad IP(diff subnet)", cl_logWARNING);
         }
 
     }
@@ -893,7 +899,7 @@ void QnResourceDiscoveryManager::pingResources(QnResourcePtr res)
         if (!rpNetRes->hasRunningLiveProvider())
         {
             CLPing ping;
-            ping.ping(rpNetRes->getHostAddress().toString(), 1, 300);
+            ping.ping(rpNetRes->getHostAddress(), 1, 300);
         }
     }
 }
@@ -921,7 +927,7 @@ void QnResourceDiscoveryManager::check_if_accessible(QnResourceList& justfoundLi
     Q_UNUSED(threads);
     foreach(check_if_accessible_STRUCT t, checkLst)
     {
-        qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress().toString() << "  name = " << t.resourceNet->getName();
+        qDebug() << "Checking conflicts for " << t.resourceNet->getHostAddress() << "  name = " << t.resourceNet->getName();
         t.f();
     }
 #else
@@ -962,7 +968,7 @@ void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList,
             break;
         }
 
-        if (resource->setHostAddress(subnet.currHostAddress, QnDomainPhysical) && resource->isResourceAccessible())
+        if (resource->setHostAddress(subnet.currHostAddress.toString(), QnDomainPhysical) && resource->isResourceAccessible())
         {
             resource->removeNetworkStatus(QnNetworkResource::BadHostAddr);
         }

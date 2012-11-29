@@ -9,7 +9,7 @@ struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-extern QMutex global_ffmpeg_mutex; // TODO: evil externs, my god!
+//extern QMutex global_ffmpeg_mutex; // TODO: evil externs, my god!
 extern int MAX_AUDIO_FRAME_SIZE; // TODO: this is totally evil.
 
 bool CLFFmpegAudioDecoder::m_first_instance = true;
@@ -38,7 +38,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     m_codec(data->compressionType)
 {
 
-	QMutexLocker mutex(&global_ffmpeg_mutex);
+	//QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	if (m_first_instance)
 	{
@@ -93,7 +93,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
-	QMutexLocker mutex(&global_ffmpeg_mutex);
+	//QMutexLocker mutex(&global_ffmpeg_mutex);
 
 	if (c)
 	{
@@ -138,7 +138,7 @@ bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
         avpkt.data = (quint8*)inbuf_ptr;
         avpkt.size = size;
 
-        //TODO: use avcodec_decode_audio4 instead
+        // TODO: #vasilenko avoid using deprecated methods
         int len = avcodec_decode_audio3(c, (short *)outbuf, &out_size, &avpkt);
 
 		//cl_log.log("after dec",  cl_logALWAYS);

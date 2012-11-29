@@ -64,9 +64,6 @@ protected:
     void buildRTPHeader(char* buffer, quint32 ssrc, int markerBit, quint32 timestamp, quint8 payloadType, quint16 sequence);
     //QnMediaContextPtr getGeneratedContext(CodecID compressionType);
     virtual bool processData(QnAbstractDataPacketPtr data);
-    bool canSwitchToHiQuality();
-    bool canSwitchToLowQuality();
-    void resetQualityStatistics();
 
     void createDataPacketTCP(QnByteArray& sendBuffer, QnAbstractMediaDataPtr media, int rtpTcpChannel);
 
@@ -76,6 +73,7 @@ protected:
     bool isMediaTimingsSlow() const;
     void setLiveQualityInternal(MediaQuality quality);
     qint64 dataQueueDuration();
+    void sendMetadata(const QByteArray& metadata);
 private:
     //QMap<CodecID, QnMediaContextPtr> m_generatedContext;
     bool m_gotLivePacket;
@@ -89,6 +87,7 @@ private:
     qint64 m_lastMediaTime; // same as m_lastSendTime, but show real timestamp for LIVE video (m_lastSendTime always returns DATETIME_NOW for live)
     //char m_rtpHeader[RtpHeader::RTP_HEADER_SIZE];
     QMutex m_mutex;
+    QMutex m_qualityChangeMutex;
     int m_waitSCeq;
     bool m_liveMode;
     bool m_pauseNetwork;
@@ -100,7 +99,6 @@ private:
     int m_liveMarker;
     MediaQuality m_liveQuality;
     MediaQuality m_newLiveQuality;
-    int m_hiQualityRetryCounter;
 
     static QHash<QHostAddress, qint64> m_lastSwitchTime;
     static QSet<QnRtspDataConsumer*> m_allConsumers;
@@ -119,5 +117,6 @@ private:
     bool m_allowAdaptiveStreaming;
 
     QnByteArray m_sendBuffer;
+    bool m_someDataIsDropped;
 };
 #endif // __RTSP_DATA_CONSUMER_H__

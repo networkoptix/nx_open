@@ -1,6 +1,7 @@
 #include "iexplore_url_handler.h"
 
-#include <QDesktopServices>
+#include <QtCore/QSettings>
+#include <QtGui/QDesktopServices>
 
 QnIexploreUrlHandler::QnIexploreUrlHandler(QObject *parent): 
     QObject(parent)

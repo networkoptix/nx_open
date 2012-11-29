@@ -5,44 +5,6 @@
 
 #include "Utils.h"
 
-
-UINT CopyProfile(MSIHANDLE hInstall, const char* actionName) {
-    HRESULT hr = S_OK;
-    UINT er = ERROR_SUCCESS;
-
-    Wow64DisableWow64FsRedirection(0);
-
-    CAtlString foldersString, fromFolder, toFolder;
-
-    hr = WcaInitialize(hInstall, actionName);
-    ExitOnFailure(hr, "Failed to initialize");
-
-    WcaLog(LOGMSG_STANDARD, "Initialized.");
-
-    // Get "from" and "to" folders from msi property
-    foldersString = GetProperty(hInstall, L"CustomActionData");
-
-    // Extract "from" and "to" folders from foldersString
-    int curPos = 0;
-    fromFolder = foldersString.Tokenize(_T(";"), curPos);
-    toFolder = foldersString.Tokenize(_T(";"), curPos);
-
-    // Exit if "from" folder is not exists
-    if (GetFileAttributes(fromFolder) == INVALID_FILE_ATTRIBUTES)
-        goto LExit;
-
-    // Exit if "to" folder is already exists
-    if (GetFileAttributes(toFolder) != INVALID_FILE_ATTRIBUTES)
-        goto LExit;
-
-    CopyDirectory(fromFolder, toFolder);
-
-LExit:
-
-    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
-    return WcaFinalize(er);
-}
-
 UINT __stdcall CopyMediaServerProfile(MSIHANDLE hInstall) {
     return CopyProfile(hInstall, "CopyMediaServerProfile");
 }
@@ -162,6 +124,7 @@ LExit:
     er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
     return WcaFinalize(er);
 }
+
 /**
   * Check if drive which contains directory specified in SERVER_DIRECTORY installer property 
   * have space less than 10GB.
@@ -317,11 +280,6 @@ LExit:
     return WcaFinalize(er);
 }
 
-void fixPath(CString& path)
-{
-    path.Replace(L"/", L"\\");
-}
-
 UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;
@@ -336,6 +294,36 @@ UINT __stdcall FixServerFolder(MSIHANDLE hInstall)
         CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY");
         fixPath(serverFolder);
         MsiSetProperty(hInstall, L"SERVER_DIRECTORY", serverFolder);
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall AnalyzeServerDirectoryReg(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "AnalyzeServerDirectoryReg");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString serverFolder = GetProperty(hInstall, L"SERVER_DIRECTORY_REG");
+
+        if (CPath(serverFolder).IsDirectory())
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"IS_SERVER_DIRECTORY_REG", L"");
+
+        if (serverFolder.Find(L"coldstore://") == 0)
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"YEP");
+        else
+            MsiSetProperty(hInstall, L"SERVER_DIRECTORY_REG_IS_COLDSTORE", L"");
     }
 
 LExit:
@@ -380,6 +368,27 @@ UINT __stdcall IsClientFolderExists(MSIHANDLE hInstall)
         CString clientFolder = GetProperty(hInstall, L"CLIENT_DIRECTORY");
         if (GetFileAttributes(clientFolder) == INVALID_FILE_ATTRIBUTES)
             MsiSetProperty(hInstall, L"CLIENT_DIRECTORY", L"");
+    }
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
+UINT __stdcall DeleteDatabaseFile(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "DeleteFile");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CString fileToDelete = GetProperty(hInstall, L"CustomActionData");
+        DeleteFile(fileToDelete);
     }
 
 LExit:

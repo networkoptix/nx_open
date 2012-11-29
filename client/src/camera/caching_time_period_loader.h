@@ -46,6 +46,7 @@ signals:
 private slots:
     void at_loader_ready(const QnTimePeriodList &timePeriods, int handle);
     void at_loader_failed(int status, int handle);
+    void at_syncTime_timeChanged();
 
 protected:
     void load(Qn::TimePeriodRole type);
@@ -62,6 +63,7 @@ private:
 
 private:
     QnResourcePtr m_resource;
+    bool m_resourceIsLocal;
     QnTimePeriod m_loadedPeriod;
     QnAbstractTimePeriodLoader *m_loaders[Qn::TimePeriodRoleCount];
     int m_handles[Qn::TimePeriodRoleCount];

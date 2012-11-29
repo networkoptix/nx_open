@@ -11,6 +11,7 @@
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/forwarding_instrument.h>
 
+
 QnWorkbenchRenderWatcher::QnWorkbenchRenderWatcher(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)

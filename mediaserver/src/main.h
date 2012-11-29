@@ -6,9 +6,11 @@
 #include "http/progressive_downloading_server.h"
 #include "network/universal_tcp_listener.h"
 
+
 class QnAppserverResourceProcessor;
 class QnRtspListener;
 class QnRestServer;
+class QNetworkReply;
 
 class QnMain : public QnLongRunnable
 {
@@ -25,11 +27,14 @@ private slots:
     void loadResourcesFromECS();
     void at_localInterfacesChanged();
     void at_serverSaved(int, const QByteArray&, const QnResourceList&, int);
+
 private:
     void initTcpListener();
+    QHostAddress getPublicAddress();
 private:
     int m_argc;
     char** m_argv;
+    bool m_waitExtIpFinished;
 
     QnAppserverResourceProcessor* m_processor;
     QnRtspListener* m_rtspListener;

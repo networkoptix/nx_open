@@ -1,11 +1,16 @@
 #ifndef onvif_resource_h
 #define onvif_resource_h
 
+#include <list>
+#include <stack>
+
 #include <QDateTime>
 #include <QList>
 #include <QMap>
 #include <QPair>
 #include <QSharedPointer>
+#include <QXmlDefaultHandler>
+
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "utils/network/simple_http_client.h"
@@ -14,11 +19,16 @@
 #include "onvif_resource_settings.h"
 #include "core/resource/interface/abstract_ptz_controller.h"
 #include "onvif_ptz_controller.h"
+#include "utils/common/timermanager.h"
+#include "utils/common/systemtimer.h"
+
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
 class onvifXsd__VideoEncoderConfiguration;
+class onvifXsd__EventCapabilities;
+class oasisWsnB2__NotificationMessageHolderType;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
@@ -27,8 +37,8 @@ typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
-const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(320, 240);
-const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
+const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
 
 
 class QDomElement;
@@ -48,9 +58,31 @@ struct CameraPhysicalWindowSize
     }
 };
 
-class QnPlOnvifResource : public QnPhysicalCameraResource
+class QnPlOnvifResource
+:
+    public QnPhysicalCameraResource,
+    public TimerEventHandler
 {
+    Q_OBJECT
+
 public:
+    class RelayOutputInfo
+    {
+    public:
+        std::string token;
+        bool isBistable;
+        //!Valid only if \a isBistable is \a false
+        std::string delayTime;
+        bool activeByDefault;
+
+        RelayOutputInfo();
+        RelayOutputInfo(
+            const std::string& _token,
+            bool _isBistable,
+            const std::string& _delayTime,
+            bool _activeByDefault );
+    };
+
     enum CODECS
     {
         H264,
@@ -87,7 +119,7 @@ public:
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);
 
-    virtual bool setHostAddress(const QHostAddress &ip, QnDomain domain = QnDomainMemory) override;
+    virtual bool setHostAddress(const QString &ip, QnDomain domain = QnDomainMemory) override;
 
 
     virtual bool isResourceAccessible() override;
@@ -103,8 +135,18 @@ public:
 
     virtual int getMaxOnvifRequestTries() const { return 1; };
 
+    //!Implementation of QnSecurityCamResource::getRelayOutputList
+    virtual QStringList getRelayOutputList() const override;
+    //!Implementation of QnSecurityCamResource::getRelayOutputList
+    virtual QStringList getInputPortList() const override;
+    //!Implementation of QnSecurityCamResource::setRelayOutputState
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS ) override;
+
     int innerQualityToOnvif(QnStreamQuality quality) const;
-    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress().toString()); }
+    const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
 
     int getGovLength() const;
     int getAudioBitrate() const;
@@ -130,9 +172,10 @@ public:
     QString getImagingUrl() const;
     void setImagingUrl(const QString& src);
 
-    void setPtzfUrl(const QString& src);
     QString getPtzfUrl() const;
+    void setPtzfUrl(const QString& src);
 
+    QString getDeviceOnvifUrl() const;
     void setDeviceOnvifUrl(const QString& src);
 
     CODECS getCodec(bool isPrimary) const;
@@ -145,6 +188,21 @@ public:
 
     virtual QnOnvifPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
+
+    //!Relay input with token \a relayToken has changed its state to \a active
+    //void notificationReceived( const std::string& relayToken, bool active );
+    void notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification );
+    //!Implementation of TimerEventHandler::onTimer
+    virtual void onTimer( const quint64& timerID );
+    QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
+
+signals:
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
+
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -161,7 +219,6 @@ protected:
 
     virtual void fetchAndSetCameraSettings();
 
-    QString getDeviceOnvifUrl() const;
 private:
     void setMaxFps(int f);
 
@@ -193,7 +250,7 @@ private:
     int getH264StreamProfile(const VideoOptionsResp& response);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
-    void readPtzInfo();
+
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
@@ -202,7 +259,82 @@ protected:
     mutable QMutex m_physicalParamsMutex;
     QDateTime m_advSettingsLastUpdated;
 
+private slots:
+    void onRenewSubscriptionTimer();
+
 private:
+    enum EventMonitorType
+    {
+        emtNone,
+        emtNotification,
+        emtPullPoint
+    };
+
+    //!Parses <dom0:SubscriptionId xmlns:dom0=\"(null)\">1</dom0:SubscriptionId>
+    class SubscriptionReferenceParametersParseHandler
+    :
+        public QXmlDefaultHandler
+    {
+    public:
+        QString subscriptionID;
+
+        SubscriptionReferenceParametersParseHandler();
+
+        virtual bool characters( const QString& ch ) override;
+        virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
+        virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
+
+    private:
+        bool m_readingSubscriptionID;
+    };
+
+    //!Parses tt:Message element (onvif-core-specification, 9.11.6)
+    class NotificationMessageParseHandler
+    :
+        public QXmlDefaultHandler
+    {
+    public:
+        class SimpleItem
+        {
+        public:
+            QString name;
+            QString value;
+
+            SimpleItem()
+            {
+            }
+
+            SimpleItem( const QString& _name, const QString& _value )
+            :
+                name( _name ),
+                value( _value )
+            {
+            }
+        };
+
+        QDateTime utcTime;
+        std::list<SimpleItem> source;
+        SimpleItem data;
+
+        NotificationMessageParseHandler();
+
+        virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
+        virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
+
+    private:
+        enum State
+        {
+            init,
+            readingMessage,
+            readingSource,
+            readingSourceItem,
+            readingData,
+            readingDataItem
+        };
+
+        std::stack<State> m_parseStateStack;
+    };
+
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
     static const int DEFAULT_IFRAME_DISTANCE;
@@ -237,6 +369,26 @@ private:
     QString m_imagingUrl;
     QString m_ptzUrl;
     int m_timeDrift;
+    int m_prevSoapCallResult;
+    onvifXsd__EventCapabilities* m_eventCapabilities;
+    std::vector<RelayOutputInfo> m_relayOutputInfo;
+    std::map<QString, bool> m_relayInputStates;
+    std::string m_deviceIOUrl;
+    QString m_onvifNotificationSubscriptionID;
+    QMutex m_subscriptionMutex;
+    EventMonitorType m_eventMonitorType;
+    quint64 m_timerID;
+
+    bool registerNotificationConsumer();
+    bool createPullPointSubscription();
+    bool pullMessages();
+    //!Registeres local NotificationConsumer in resource's NotificationProducer
+    bool registerNotificationHandler();
+    //!Reads relay output list from resource
+    bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
+    bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );
+    bool fetchRelayInputInfo();
+    bool setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo );
 };
 
 #endif //onvif_resource_h

@@ -21,6 +21,7 @@ namespace Qn {
 #define SerializedResourcesParameter        fromLatin1("_qn_serializedResourcesParameter")
 #define TimePeriodParameter                 fromLatin1("_qn_timePeriodParameter")
 #define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
+#define AllTimePeriodsParameter             fromLatin1("_qn_allTimePeriodsParameter")
 #define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
 
     /**
@@ -442,6 +443,28 @@ namespace Qn {
          */
         ToggleInfoAction,
 
+        /**
+         * Changes RADASS mode to auto.
+         */
+        RadassAutoAction,
+
+        /**
+         * Changes RADASS mode to high resolution.
+         */
+        RadassHighAction,
+
+        /**
+         * Changes RADASS mode to low resolution.
+         */
+        RadassLowAction,
+
+        /**
+         * Toggles next RADASS state.
+         */
+        ToggleRadassAction,
+
+
+
         /* Layout actions. */
 
         /**
@@ -579,6 +602,11 @@ namespace Qn {
          * Shows/hides tree.
          */
         ToggleTreeAction,
+
+        /**
+         * Pins/unpins tree.
+         */
+        PinTreeAction,
 
         /**
          * Shows/hides slider.

@@ -212,3 +212,26 @@ void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
     int valueInt = (int) value;
     setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }
+
+QString QnVirtualCameraResource::getModel() const
+{
+    return m_model;
+}
+
+void QnVirtualCameraResource::setModel(QString model)
+{
+    QMutexLocker locker(&m_mutex);
+    m_model = model;
+}
+
+QString QnVirtualCameraResource::getFirmware() const
+{
+    QMutexLocker locker(&m_mutex);
+    return m_firmware;
+}
+
+void QnVirtualCameraResource::setFirmware(QString firmware)
+{
+    QMutexLocker locker(&m_mutex);
+    m_firmware = firmware;
+}

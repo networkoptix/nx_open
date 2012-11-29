@@ -18,9 +18,9 @@ signals:
 public:
     struct Chunk
     {
-        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0) {}
-        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration) : 
-            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex)
+        Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1) {}
+        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone) : 
+            startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(0), fileSizeLo(0)
         {
             Q_ASSERT_X(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
         }
@@ -29,13 +29,18 @@ public:
         qint64 endTimeMs() const;
         bool containsTime(qint64 timeMs) const;
         void truncate(qint64 timeMs);
+        qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
+        void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
 
 
         qint64 startTimeMs; // chunk startTime at ms
         int durationMs; // chunk duration at ms
-
         quint16 storageIndex;
         quint16 fileIndex;
+
+        qint16 timeZone;
+        quint16 fileSizeHi;
+        quint32 fileSizeLo;
     };
 
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
@@ -43,11 +48,10 @@ public:
     DeviceFileCatalog(const QString& macAddress, QnResource::ConnectionRole role);
     void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
-    void updateDuration(int durationMs);
-    bool deleteFirstRecord();
+    void updateDuration(int durationMs, qint64 fileSize);
+    qint64 deleteFirstRecord(); // return deleted file size
     void clear();
-    void deleteRecordsBefore(int idx);
-    void deleteRecordsBeforeTime(qint64 timeMs);
+    qint64 deleteRecordsBefore(int idx);
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
     void updateChunkDuration(Chunk& chunk);
@@ -71,7 +75,7 @@ public:
     static QnResource::ConnectionRole roleForPrefix(const QString& prefix);
 
 private:
-    bool fileExists(const Chunk& chunk);
+    bool fileExists(const Chunk& chunk, qint64& fileSize);
     void addChunk(const Chunk& chunk);
     qint64 recreateFile(const QString& fileName, qint64 startTimeMs, QnStorageResourcePtr storage);
     QList<QDate> recordedMonthList();
@@ -82,12 +86,23 @@ private:
     int m_firstDeleteCount;
     QString m_macAddress;
 
-    QPair<int, bool> m_prevParts[4];
-    QFileInfoList m_existFileList;
+    typedef QVector<QPair<int, bool> > CachedDirInfo;
+    struct IOCacheEntry
+    {
+        CachedDirInfo dirInfo;
+        QFileInfoList entryList;
+
+        IOCacheEntry() { dirInfo.resize(4); }
+    };
+
+    typedef QMap<int, IOCacheEntry > IOCacheMap;
+    IOCacheMap m_prevPartsMap[4];
+
     bool m_duplicateName;
-    QString m_prevFileName;
+    QMap<int,QString> m_prevFileNames;
     QnResource::ConnectionRole m_role;
     int m_lastAddIndex; // last added record index. In most cases it is last record
+    QMutex m_IOMutex;
 
 };
 

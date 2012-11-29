@@ -7,6 +7,8 @@
 #  include <iphlpapi.h>
 #endif
 
+#include "../common/systemerror.h"
+
 
 #ifdef Q_OS_WIN
 typedef int socklen_t;
@@ -27,8 +29,10 @@ typedef void raw_type;       // Type used for raw data on this platform
 #ifdef WIN32
 static bool initialized = false;
 static const int ERR_TIMEOUT = WSAETIMEDOUT;
+static const int ERR_WOULDBLOCK = WSAEWOULDBLOCK;
 #else
-static const int ERR_TIMEOUT = EAGAIN;
+static const int ERR_TIMEOUT = ETIMEDOUT;
+static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
 int getSystemErrCode()
@@ -110,7 +114,10 @@ bool Socket::fillAddr(const QString &address, unsigned short port,
 
 // Socket Code
 
-Socket::Socket(int type, int protocol)  {
+Socket::Socket(int type, int protocol)
+:
+    m_nonBlockingMode( false )
+{
     createSocket(type, protocol);
 }
 
@@ -135,7 +142,10 @@ void Socket::createSocket(int type, int protocol)
     }
 }
 
-Socket::Socket(int sockDesc) {
+Socket::Socket(int sockDesc)
+:
+    m_nonBlockingMode( false )
+{
     this->sockDesc = sockDesc;
 }
 
@@ -240,7 +250,8 @@ bool Socket::setLocalAddressAndPort(const QString &localAddress,
         return false;
 
     if (bind(sockDesc, (sockaddr *) &localAddr, sizeof(sockaddr_in)) < 0) {
-        m_lastError = tr("Set of local address and port failed (bind()).");
+        SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
+        m_lastError = tr("Set of local address and port failed (bind()). %1").arg(SystemError::toString(errorCode));
         return false;
     }
 
@@ -289,6 +300,8 @@ void CommunicatingSocket::close()
 bool CommunicatingSocket::connect(const QString &foreignAddress,
                                   unsigned short foreignPort)
 {
+    //TODO/IMPL non blocking connect
+
     m_lastError.clear();
 
     // Get the address of the requested host
@@ -298,26 +311,24 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
-#ifdef _WIN32
-    u_long iMode = 1;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, O_NONBLOCK);
-#endif
+    //switching to non-blocking mode to connect with timeout
+    const bool isNonBlockingModeBak = isNonBlockingMode();
+    if( !isNonBlockingModeBak && !setNonBlockingMode( true ) )
+        return false;
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
-#ifndef _WIN32
-    if (connectResult != 0)
+    if( connectResult != 0 )
     {
-        m_lastError = tr("Connect failed (connect()).");
-        return false;
+        if( SystemError::getLastOSErrorCode() != SystemError::wouldBlock )
+        {
+            m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
+            return false;
+        }
+        if( isNonBlockingModeBak )
+            return true;        //async connect started
     }
-#else
-    Q_UNUSED(connectResult);
-#endif
 
-#ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
     int iSelRet;
@@ -334,14 +345,9 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 
     if (iSelRet<=0)
         return false;
-#endif // _WIN32
 
-#ifdef _WIN32
-    iMode = 0;
-    ioctlsocket(sockDesc, FIONBIO, &iMode); // set sock in asynch mode
-#else
-    // fcntl(sockDesc, F_SETFL, 0);
-#endif
+    //restoring original mode
+    setNonBlockingMode( isNonBlockingModeBak );
 
     mConnected = true;
 
@@ -407,9 +413,9 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
-        //int errCode = getSystemErrCode();
-        //if (errCode != ERR_TIMEOUT)
-        mConnected = false;
+        int errCode = getSystemErrCode();
+        if (/*errCode != ERR_TIMEOUT &&*/ errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+            mConnected = false;
     }
     return sended;
 }
@@ -420,9 +426,8 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
     if (rtn < 0)
     {
         int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT)
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
-        return -1;
     }
     return rtn;
 }
@@ -551,12 +556,14 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
-void CommunicatingSocket::setSendBufferSize(int buff_size)
+bool CommunicatingSocket::setSendBufferSize(int buff_size)
 {
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size))<0)
-    {
-        //error
-    }
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
+}
+
+bool CommunicatingSocket::setReadBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
 }
 
 UDPSocket::UDPSocket(unsigned short localPort)   :
@@ -573,12 +580,13 @@ UDPSocket::UDPSocket(unsigned short localPort)   :
 }
 
 UDPSocket::UDPSocket(const QString &localAddress, unsigned short localPort)
-    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP)
+    : CommunicatingSocket(SOCK_DGRAM, IPPROTO_UDP),
+      m_destAddr( NULL )
 {
     if (!setLocalAddressAndPort(localAddress, localPort))
     {
         qnWarning("Can't create socket: %1.", m_lastError);
-        return;
+        throw SocketException( QString::fromAscii("Failed to bind socket to address %1:%2. %3").arg(localAddress).arg(localPort).arg(m_lastError) );
     }
 
     setBroadcast();
@@ -788,4 +796,53 @@ bool Socket::setReuseAddrFlag(bool reuseAddr)
         return false;
     }
     return true;
+}
+
+//!if, \a val is \a true, turns non-blocking mode on, else turns it off
+bool Socket::setNonBlockingMode(bool val)
+{
+    if( val == m_nonBlockingMode )
+        return true;
+
+#ifdef _WIN32
+    u_long _val = val ? 1 : 0;
+    if( ioctlsocket( sockDesc, FIONBIO, &_val ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#else
+    long currentFlags = fcntl( sockDesc, F_GETFL, 0 );
+    if( currentFlags == -1 )
+        return false;
+    if( val )
+        currentFlags |= O_NONBLOCK;
+    else
+        currentFlags &= ~O_NONBLOCK;
+    if( fcntl( sockDesc, F_SETFL, currentFlags ) == 0 )
+    {
+        m_nonBlockingMode = val;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+#endif
+}
+
+//!Returns true, if in non-blocking mode
+bool Socket::isNonBlockingMode() const
+{
+    return m_nonBlockingMode;
+}
+
+SystemError::ErrorCode Socket::prevErrorCode() const
+{
+    //TODO/IMPL
+    return 0;
 }

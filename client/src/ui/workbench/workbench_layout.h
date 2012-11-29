@@ -13,7 +13,7 @@
 
 #include <ui/common/magnitude.h>
 
-#include "workbench_globals.h"
+#include <client/client_globals.h>
 
 class QnWorkbenchItem;
 
