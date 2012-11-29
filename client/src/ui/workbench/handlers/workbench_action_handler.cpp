@@ -1420,6 +1420,7 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     QnSessionManager::instance()->start();
     QnClientMessageProcessor::instance()->run();
 
+    QnAppServerResourceSearcher::instance().setShouldBeUsed(true);
     QnResourceDiscoveryManager::instance().start();
     QnResourceDiscoveryManager::instance().setReady(true);
     QnResource::startCommandProc();
