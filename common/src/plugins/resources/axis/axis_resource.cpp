@@ -6,6 +6,8 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
 #include "events/business_event_connector.h"
+#include "events/business_event_rule.h"
+#include "events/business_rule_processor.h"
 #include "utils/common/synctime.h"
 
 
@@ -763,6 +765,19 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
         registerInputPortEventHandler();
     //if( m_outputPortNameToIndex.size() > 0 )
     //    setRelayOutputState( m_outputPortNameToIndex.begin()->first, true, 5000 );
+
+
+#ifdef _DEBUG
+    QnBusinessEventRulePtr eventRule( new QnBusinessEventRule() );
+    eventRule->setSrcResource( toSharedPointer() );
+    eventRule->setEventType( BusinessEventType::BE_Camera_Input );
+    eventRule->setActionType( BusinessActionType::BA_SendMail );
+    //eventRule->setDstResource(  );
+    QnBusinessParams emailSendParams;
+    emailSendParams[BusinessActionParamName::emailAddress] = QLatin1String("akolesnikov@networkoptix.com");
+    eventRule->setBusinessParams( emailSendParams );
+    QnBusinessRuleProcessor::instance()->addBusinessRule( eventRule );
+#endif
 }
 
 bool QnPlAxisResource::registerInputPortEventHandler()

@@ -12,13 +12,13 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessAct
 
     switch(action->actionType())
     {
-    case BA_CameraOutput:
+    case BusinessActionType::BA_CameraOutput:
         break;
-    case BA_Bookmark:
+    case BusinessActionType::BA_Bookmark:
         break;
-    case BA_CameraRecording:
+    case BusinessActionType::BA_CameraRecording:
         return executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>());
-    case BA_PanicRecording:
+    case BusinessActionType::BA_PanicRecording:
         break;
 
     default:

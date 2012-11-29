@@ -3,7 +3,7 @@
 QnMotionBusinessEvent::QnMotionBusinessEvent():
     QnAbstractBusinessEvent()
 {
-    setEventType(BE_Camera_Motion);
+    setEventType(BusinessEventType::BE_Camera_Motion);
 }
 
 /*

@@ -4,6 +4,7 @@
 #include "core/resource/media_server_resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "api/app_server_connection.h"
+#include "sendmail_business_action.h"
 
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
@@ -24,7 +25,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusinessActionPtr action)
 {
-    if (action->actionType() ==  BA_SendMail || action->actionType() ==  BA_Alert)
+    if (action->actionType() == BusinessActionType::BA_SendMail || action->actionType() == BusinessActionType::BA_Alert)
         return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
     if (!action->getResource())
         return QnMediaServerResourcePtr(); // can not find routeTo resource
@@ -49,16 +50,16 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
     switch( action->actionType() )
     {
-        case BA_SendMail:
+        case BusinessActionType::BA_SendMail:
             return sendMail( action );
 
-        case BA_Alert:
+        case BusinessActionType::BA_Alert:
             break;
 
-        case BA_ShowPopup:
+        case BusinessActionType::BA_ShowPopup:
             break;
 
-        case BA_TriggerOutput:
+        case BusinessActionType::BA_TriggerOutput:
             return triggerCameraOutput( action );
 
         default:
@@ -165,9 +166,10 @@ bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActio
 
 bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& action )
 {
-    cl_log.log( QString::fromLatin1("Sending mail to %1"), cl_logDEBUG1 );
+    QnSendMailBusinessActionPtr sendMailAction = action.dynamicCast<QnSendMailBusinessAction>();
+    Q_ASSERT( sendMailAction );
 
-    const QnBusinessParams& actionParams = action->getParams();
+    const QnBusinessParams& actionParams = sendMailAction->getParams();
     QnBusinessParams::const_iterator emailIter = actionParams.find( BusinessActionParamName::emailAddress );
     if( emailIter == actionParams.end() )
     {
@@ -176,11 +178,23 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
         return false;
     }
 
-    const QByteArray& serializedAction = action->serialize();
+    cl_log.log( QString::fromLatin1("Processing action SendMail from camera %1. Sending mail to %2").
+        arg(sendMailAction->getEvent()->getResource()->getName()).arg(emailIter.value().toString()), cl_logDEBUG1 );
+
+    const QByteArray& serializedAction = sendMailAction->serialize();
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
 
-    //appServerConnection->sendMail( emailIter->second.toString(), serializedAction);
-
-        //TODO/IMPL
-    return false;
+    QByteArray emailSendErrorText;
+    if( appServerConnection->sendEmail(
+            emailIter.value().toString(),
+            QString::fromLatin1("Event %1 occured on server %2").
+                arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).arg(QLatin1String("localhost")),   //TODO/IMPL get server ip or some name
+            QLatin1String(serializedAction),
+            emailSendErrorText ) )
+    {
+        cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
+            arg(emailIter.value().toString()).arg(QLatin1String(emailSendErrorText)), cl_logWARNING );
+        return false;
+    }
+    return true;
 }

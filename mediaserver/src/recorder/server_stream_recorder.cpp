@@ -166,7 +166,7 @@ void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timest
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
 {
     qint64 afterThreshold = 5 * 1000000ll;
-    if (m_currentScheduleTask.getRecordingType() == QnScheduleTask::RecordingType_MotionOnly)
+    if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionOnly)
         afterThreshold = m_currentScheduleTask.getAfterThreshold()*1000000ll;
     bool isMotionContinue = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + afterThreshold;
     if (!isMotionContinue)

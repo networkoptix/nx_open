@@ -6,8 +6,40 @@
 #include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
 
+
+namespace BusinessActionType
+{
+    QString toString( Value val )
+    {
+        switch( val )
+        {
+            case BA_NotDefined:
+                return QLatin1String("Not defined");
+            case BA_CameraOutput:
+                return QLatin1String("Camera output");
+            case BA_Bookmark:
+                return QLatin1String("Bookmark");
+            case BA_CameraRecording:
+                return QLatin1String("Camera recording");
+            case BA_PanicRecording:
+                return QLatin1String("Panic recording");
+            case BA_TriggerOutput:
+                return QLatin1String("Trigger output");
+            case BA_SendMail:
+                return QLatin1String("Send mail");
+            case BA_Alert:
+                return QLatin1String("Alert");
+            case BA_ShowPopup:
+                return QLatin1String("Show popup");
+            default:
+                return QString::fromLatin1("unknown (%1)").arg((int)val);
+        }
+    }
+}
+
+
 QnAbstractBusinessAction::QnAbstractBusinessAction(): 
-    m_actionType(BA_NotDefined),
+    m_actionType(BusinessActionType::BA_NotDefined),
     m_toggleState(ToggleState_NotDefined), 
     m_receivedFromRemoveHost(false) 
 {
@@ -19,7 +51,8 @@ QByteArray QnAbstractBusinessAction::serialize()
     pb::BusinessAction pb_businessAction;
 
     pb_businessAction.set_actiontype((pb::BusinessActionType)actionType());
-    pb_businessAction.set_actionresource(getResource()->getId());
+    if( getResource() )
+        pb_businessAction.set_actionresource(getResource()->getId());
     pb_businessAction.set_actionparams(serializeBusinessParams(getParams()));
     pb_businessAction.set_businessruleid(getBusinessRuleId().toInt());
 
@@ -53,7 +86,7 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
             businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction());
     }
 
-    businessAction->setActionType((BusinessActionType)pb_businessAction.actiontype());
+    businessAction->setActionType((BusinessActionType::Value)pb_businessAction.actiontype());
     businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
@@ -65,9 +98,9 @@ bool QnAbstractBusinessAction::isToggledAction() const
 {
     switch(m_actionType)
     {
-        case BA_CameraOutput:
-        case BA_CameraRecording:
-        case BA_PanicRecording:
+        case BusinessActionType::BA_CameraOutput:
+        case BusinessActionType::BA_CameraRecording:
+        case BusinessActionType::BA_PanicRecording:
             return true;
         default:
             return false;

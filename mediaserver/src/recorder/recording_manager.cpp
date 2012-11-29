@@ -192,7 +192,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline &&
-        recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
+        recorderHiRes->currentScheduleTask().getRecordingType() != Qn::RecordingType_Never)
     {
         if (providerHi)
         {
@@ -420,9 +420,9 @@ void QnRecordingManager::onTimer()
         QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
         if (srcCamera && dstCamera) {
             QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
-            bRule->setEventType(BE_Camera_Motion);
+            bRule->setEventType(BusinessEventType::BE_Camera_Motion);
             bRule->setSrcResource(srcCamera);
-            bRule->setActionType(BA_CameraRecording);
+            bRule->setActionType(BusinessActionType::BA_CameraRecording);
             bRule->setDstResource(dstCamera);
             bRuleProcessor->addBusinessRule(bRule);
         }

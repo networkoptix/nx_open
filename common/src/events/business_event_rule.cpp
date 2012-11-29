@@ -14,17 +14,17 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
     QnAbstractBusinessActionPtr result;
     switch (m_actionType)
     {
-        case BA_CameraRecording:
+        case BusinessActionType::BA_CameraRecording:
             result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
             break;
-        case BA_CameraOutput:
-        case BA_Bookmark:
-        case BA_PanicRecording:
-        case BA_SendMail:
-            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction);
+        case BusinessActionType::BA_CameraOutput:
+        case BusinessActionType::BA_Bookmark:
+        case BusinessActionType::BA_PanicRecording:
+        case BusinessActionType::BA_SendMail:
+            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent));
             break;
-        case BA_Alert:
-        case BA_ShowPopup:
+        case BusinessActionType::BA_Alert:
+        case BusinessActionType::BA_ShowPopup:
         default:
             return QnAbstractBusinessActionPtr(); // not implemented
     }

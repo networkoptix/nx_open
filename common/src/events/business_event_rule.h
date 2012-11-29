@@ -24,11 +24,11 @@ public:
     QnResourcePtr getSrcResource() const { return m_source; }
     void setSrcResource(QnResourcePtr value) { m_source = value; }
 
-    BusinessEventType getEventType() const { return m_eventType; }
-    void setEventType(BusinessEventType value) { m_eventType = value; }
+    BusinessEventType::Value getEventType() const { return m_eventType; }
+    void setEventType(BusinessEventType::Value value) { m_eventType = value; }
 
-    BusinessActionType getActionType() const { return m_actionType; }
-    void setActionType(BusinessActionType value) { m_actionType = value; }
+    BusinessActionType::Value getActionType() const { return m_actionType; }
+    void setActionType(BusinessActionType::Value value) { m_actionType = value; }
 
     QnResourcePtr getDstResource() const { return m_destination; }
     void setDstResource(QnResourcePtr value) { m_destination = value; }
@@ -41,11 +41,11 @@ public:
     */
     bool isActionInProgress() const;
 private:
-    BusinessEventType m_eventType;
+    BusinessEventType::Value m_eventType;
     QnResourcePtr m_source;
     QnBusinessParams m_eventCondition;
 
-    BusinessActionType m_actionType;
+    BusinessActionType::Value m_actionType;
     QnResourcePtr m_destination;
     QnBusinessParams m_actionParams;
 

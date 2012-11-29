@@ -2,7 +2,7 @@
 
 QnRecordingBusinessAction::QnRecordingBusinessAction()
 {
-    setActionType(BA_CameraRecording);
+    setActionType(BusinessActionType::BA_CameraRecording);
     setFps(10);
     setStreamQuality(QnQualityHighest);
 }

@@ -739,11 +739,11 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
         QnBusinessEventRulePtr businessRule(new QnBusinessEventRule());
 
         businessRule->setId(ci->id());
-        businessRule->setEventType((BusinessEventType)ci->eventtype());
+        businessRule->setEventType((BusinessEventType::Value)ci->eventtype());
         businessRule->setSrcResource(qnResPool->getResourceById(ci->eventresource()));
         // businessRule->setEventCondition();
 
-        businessRule->setActionType((BusinessActionType)ci->actiontype());
+        businessRule->setActionType((BusinessActionType::Value)ci->actiontype());
         businessRule->setDstResource(qnResPool->getResourceById(ci->actionresource()));
         businessRule->setBusinessParams(deserializeBusinessParams(ci->actionparams().c_str()));
 
