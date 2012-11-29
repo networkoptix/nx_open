@@ -458,9 +458,11 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
             if (magic == FileTypeSupport::NOV_EXE_MAGIC) 
             {
                 m_novFileOffset = novOffset;
-                //m_novFileLen = f.size() - m_novFileOffset - sizeof(qint64)*2;
             }
         }
+    }
+    else {
+        m_novFileOffset = 0;
     }
 }
 
