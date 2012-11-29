@@ -25,7 +25,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
     m_forcedRecordFps(0),
-    m_lastMotionState(false)
+    m_lastMotionState(false),
     m_queuedSize(0)
 {
     //m_skipDataToTime = AV_NOPTS_VALUE;
@@ -214,7 +214,7 @@ void QnServerStreamRecorder::startForcedRecording(QnStreamQuality quality, int f
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
         scheduleData.m_endTime = currentWeekSeconds + maxDuration;
     }
-    scheduleData.m_recordType = QnScheduleTask::RecordingType_Run;
+    scheduleData.m_recordType = Qn::RecordingType_Run;
     scheduleData.m_streamQuality = quality;
     
     m_forcedRecordFps = fps;
@@ -272,7 +272,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task, int f
 
 
     // If stream already recording, do not change params in panic mode because if ServerPush provider has some large reopening time
-    CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
+    //CLServerPushStreamreader* sPushProvider = dynamic_cast<CLServerPushStreamreader*> (m_mediaProvider);
     bool doNotChangeParams = false; //sPushProvider && sPushProvider->isStreamOpened() && m_currentScheduleTask->getFps() >= m_panicSchedileRecord.getFps()*0.75;
     updateRecordingType(m_panicSchedileRecord);
     if (!doNotChangeParams)
