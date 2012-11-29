@@ -19,6 +19,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/math.h"
 #include "utils/common/timermanager.h"
+#include "utils/common/stdext.h"
 #include "api/app_server_connection.h"
 #include "events/business_event_connector.h"
 #include "soap/soapserver.h"
@@ -147,6 +148,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_eventMonitorType( emtNone ),
     m_timerID( 0 )
 {
+    connect(
+        this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
+        QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
 }
 
 QnPlOnvifResource::~QnPlOnvifResource()
@@ -691,16 +695,6 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
     return true;
 }
 
-//void QnPlOnvifResource::notificationReceived( const std::string& relayToken, bool active )
-//{
-//    //firing signal
-//    QnBusinessEventConnector::instance()->at_cameraInput(
-//        QnResourcePtr(),   //this, //TODO/IMPL get shared pointer
-//        QString::fromStdString(relayToken),
-//        active,
-//        QDateTime::currentMSecsSinceEpoch() );
-//}
-
 void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
 {
     if( !notification.Message.__any )
@@ -709,13 +703,14 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
         return;
     }
 
-    //if( !notification.oasisWsnB2__Topic ||
-    //    notification.oasisWsnB2__Topic->Dialect != "tns1:Device/Trigger/Relay" )
-    //{
-    //    cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
-    //        arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : std::string())), cl_logDEBUG1 );
-    //    return;
-    //}
+    if( !notification.oasisWsnB2__Topic ||
+        !notification.oasisWsnB2__Topic->__item ||
+        strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/tnsw4n:IO/Port") != 0 )
+    {
+        cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
+            arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : std::string())), cl_logDEBUG1 );
+        return;
+    }
 
     //parsing Message
     QXmlSimpleReader reader;
@@ -729,6 +724,40 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     if( !reader.parse( &xmlSrc ) )
         return;
 
+    //checking that there is single source is a port
+    std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator portSourceIter = handler.source.end();
+    for( std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator
+        it = handler.source.begin();
+        it != handler.source.end();
+        ++it )
+    {
+        if( it->name == QLatin1String("port") )
+        {
+            portSourceIter = it;
+            break;
+        }
+    }
+
+    if( portSourceIter == handler.source.end()  //source is not port
+        || handler.data.name != QLatin1String("state") )       //monitoring only "state" parameter of input port
+    {
+        return;
+    }
+
+    //saving port state
+    const bool newPortState = handler.data.value == QLatin1String("true");
+    bool& currentPortState = m_relayInputStates[portSourceIter->value];
+    if( currentPortState != newPortState )
+        currentPortState = newPortState;
+        //m_relayInputStates[portSourceIter->value] = handler.data.value == QLatin1String("true");
+
+//    //firing signal
+    emit cameraInput(
+        toSharedPointer(),
+        portSourceIter->value,
+        newPortState,
+        handler.utcTime.toMSecsSinceEpoch() );
+
     /*
         Topic: tns1:Device/Trigger/DigitalInput
         <tt:MessageDescription IsProperty="true">
@@ -740,8 +769,6 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
             </tt:Data>
         </tt:MessageDescription>
     */
-
-    //TODO/IMPL processing notification
 }
 
 void QnPlOnvifResource::onTimer( const quint64& /*timerID*/ )
@@ -1157,11 +1184,17 @@ QStringList QnPlOnvifResource::getRelayOutputList() const
     return idList;
 }
 
+QStringList QnPlOnvifResource::getInputPortList() const
+{
+    //TODO/IMPL
+    return QStringList();
+}
+
 //!Implementation of QnSecurityCamResource::setRelayOutputState
 bool QnPlOnvifResource::setRelayOutputState(
     const QString& outputID,
     bool active,
-    unsigned int autoResetTimeout )
+    unsigned int autoResetTimeoutMS )
 {
     //retrieving output info to check mode
     RelayOutputInfo relayOutputInfo;
@@ -1171,12 +1204,12 @@ bool QnPlOnvifResource::setRelayOutputState(
         return false;
     }
 
-    const bool isBistableModeRequired = autoResetTimeout == 0;
+    const bool isBistableModeRequired = autoResetTimeoutMS == 0;
     std::string requiredDelayTime;
-    if( autoResetTimeout > 0 )
+    if( autoResetTimeoutMS > 0 )
     {
         std::ostringstream ss;
-        ss<<"PT"<<autoResetTimeout<<"S";
+        ss<<"PT"<<(autoResetTimeoutMS < 1000 ? 1 : autoResetTimeoutMS/1000)<<"S";
         requiredDelayTime = ss.str();
     }
     if( (relayOutputInfo.isBistable != isBistableModeRequired) || (!isBistableModeRequired && relayOutputInfo.delayTime != requiredDelayTime) )
@@ -1186,8 +1219,8 @@ bool QnPlOnvifResource::setRelayOutputState(
         relayOutputInfo.delayTime = requiredDelayTime;
         if( !setRelayOutputSettings( relayOutputInfo ) )
         {
-            cl_log.log( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 sec. Cannot set mode to %5. %6").
-                arg(QString()).arg(outputID).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeout).
+            cl_log.log( QString::fromAscii("Cannot set camera %1 output %2 to state %3 with timeout %4 msec. Cannot set mode to %5. %6").
+                arg(QString()).arg(outputID).arg(QLatin1String(active ? "active" : "inactive")).arg(autoResetTimeoutMS).
                 arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")).arg(m_prevSoapCallResult), cl_logWARNING );
             return false;
         }
@@ -1941,13 +1974,6 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
     renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
         ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
         : 0;
-    //QTimer::singleShot(
-    //    renewSubsciptionTimeoutSec*MS_PER_SECOND,
-    //    this,
-    //    SLOT(onRenewSubscriptionTimer()) );
-    //m_timer.start(
-    //    stdext::bind( std::mem_fun(&QnPlOnvifResource::onRenewSubscriptionTimer), this ),
-    //    renewSubsciptionTimeoutSec*MS_PER_SECOND );
     m_timerID = TimerManager::instance()->addTimer( this, renewSubsciptionTimeoutSec*MS_PER_SECOND );
 }
 
@@ -2168,36 +2194,6 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
     return true;
 }
 
-
-namespace stdext
-{
-    template<class Operation, class Param>
-    struct binder
-    {
-        Operation op;
-        Param param;
-
-        binder( const Operation& _op, const Param& _param )
-        :
-            op( _op ),
-            param( _param )
-        {
-        }
-
-        void operator()()
-        {
-            op( param );
-        }
-    };
-
-    template<class Operation, class Param>
-        binder<Operation, Param> bind( const Operation& _op, const Param& _param )
-    {
-        return typename binder<Operation, Param>( _op, _param );
-    }
-}
-
-
 //////////////////////////////////////////////////////////
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
@@ -2290,11 +2286,6 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
         : 0;
     //launching renew-subscription timer
-    //QTimer::singleShot( renewSubsciptionTimeoutSec*MS_PER_SECOND, this, SLOT(onRenewSubscriptionTimer()) );
-    //m_timer.start(
-    //    stdext::bind( std::mem_fun(&QnPlOnvifResource::onRenewSubscriptionTimer), this ),
-    //    renewSubsciptionTimeoutSec*MS_PER_SECOND );
-    //onRenewSubscriptionTimer();
     m_timerID = TimerManager::instance()->addTimer( this, renewSubsciptionTimeoutSec*MS_PER_SECOND );
 
     QnSoapServer::instance()->getService()->registerResource(

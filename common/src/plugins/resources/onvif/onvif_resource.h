@@ -136,12 +136,14 @@ public:
     virtual int getMaxOnvifRequestTries() const { return 1; };
 
     //!Implementation of QnSecurityCamResource::getRelayOutputList
-    virtual QStringList getRelayOutputList() const;
+    virtual QStringList getRelayOutputList() const override;
+    //!Implementation of QnSecurityCamResource::getRelayOutputList
+    virtual QStringList getInputPortList() const override;
     //!Implementation of QnSecurityCamResource::setRelayOutputState
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
-        unsigned int autoResetTimeout );
+        unsigned int autoResetTimeoutMS ) override;
 
     int innerQualityToOnvif(QnStreamQuality quality) const;
     const QString createOnvifEndpointUrl() const { return createOnvifEndpointUrl(getHostAddress()); }
@@ -193,6 +195,13 @@ public:
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
+
+signals:
+    void cameraInput(
+        QnResourcePtr resource,
+        const QString& inputPortID,
+        bool value,
+        qint64 timestamp );
 
 protected:
     void setCodec(CODECS c, bool isPrimary);
@@ -363,7 +372,7 @@ private:
     int m_prevSoapCallResult;
     onvifXsd__EventCapabilities* m_eventCapabilities;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
-    std::vector<std::string> m_relayInputs;
+    std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
     QMutex m_subscriptionMutex;

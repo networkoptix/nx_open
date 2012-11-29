@@ -29,8 +29,10 @@ typedef void raw_type;       // Type used for raw data on this platform
 #ifdef WIN32
 static bool initialized = false;
 static const int ERR_TIMEOUT = WSAETIMEDOUT;
+static const int ERR_WOULDBLOCK = WSAEWOULDBLOCK;
 #else
-static const int ERR_TIMEOUT = EAGAIN;
+static const int ERR_TIMEOUT = ETIMEDOUT;
+static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
 int getSystemErrCode()
@@ -298,6 +300,8 @@ void CommunicatingSocket::close()
 bool CommunicatingSocket::connect(const QString &foreignAddress,
                                   unsigned short foreignPort)
 {
+    //TODO/IMPL non blocking connect
+
     m_lastError.clear();
 
     // Get the address of the requested host
@@ -307,25 +311,24 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
-#ifdef _WIN32
+    //switching to non-blocking mode to connect with timeout
     const bool isNonBlockingModeBak = isNonBlockingMode();
-    if( !setNonBlockingMode( true ) )
+    if( !isNonBlockingModeBak && !setNonBlockingMode( true ) )
         return false;
-#endif
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
-#ifndef _WIN32
-    if (connectResult != 0)
+    if( connectResult != 0 )
     {
-        m_lastError = tr("Connect failed (connect()).");
-        return false;
+        if( SystemError::getLastOSErrorCode() != SystemError::wouldBlock )
+        {
+            m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
+            return false;
+        }
+        if( isNonBlockingModeBak )
+            return true;        //async connect started
     }
-#else
-    Q_UNUSED(connectResult);
-#endif
 
-#ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
     int iSelRet;
@@ -342,12 +345,9 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 
     if (iSelRet<=0)
         return false;
-#endif // _WIN32
 
-#ifdef _WIN32
     //restoring original mode
     setNonBlockingMode( isNonBlockingModeBak );
-#endif
 
     mConnected = true;
 
@@ -413,9 +413,9 @@ int CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
-        //int errCode = getSystemErrCode();
-        //if (errCode != ERR_TIMEOUT)
-        mConnected = false;
+        int errCode = getSystemErrCode();
+        if (/*errCode != ERR_TIMEOUT &&*/ errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+            mConnected = false;
     }
     return sended;
 }
@@ -426,9 +426,8 @@ int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
     if (rtn < 0)
     {
         int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT)
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
-        return -1;
     }
     return rtn;
 }
@@ -838,4 +837,10 @@ bool Socket::setNonBlockingMode(bool val)
 bool Socket::isNonBlockingMode() const
 {
     return m_nonBlockingMode;
+}
+
+SystemError::ErrorCode Socket::prevErrorCode() const
+{
+    //TODO/IMPL
+    return 0;
 }

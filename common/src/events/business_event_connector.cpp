@@ -24,14 +24,17 @@ void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool va
 
 void QnBusinessEventConnector::at_cameraInput(
     QnResourcePtr resource,
-    const QString& inputToken,
+    const QString& inputPortID,
     bool value,
     qint64 timestamp )
 {
+    if( !resource )
+        return;
+
     bRuleProcessor->processBusinessEvent(
         QnCameraInputEventPtr( new QnCameraInputEvent(
             resource->toSharedPointer(),
-            inputToken,
+            inputPortID,
             value ? ToggleState_On : ToggleState_Off,
             timestamp ) ) );
 }

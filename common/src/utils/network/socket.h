@@ -18,6 +18,7 @@
 
 #include "nettools.h"
 #include "utils/common/byte_array.h"
+#include "../common/systemerror.h"
 
 #define MAX_ERROR_MSG_LENGTH 1024
 
@@ -146,6 +147,7 @@ public:
     bool setNonBlockingMode(bool val);
     //!Returns true, if in non-blocking mode
     bool isNonBlockingMode() const;
+    SystemError::ErrorCode prevErrorCode() const;
 
 protected:
     int sockDesc;              // Socket descriptor
@@ -188,7 +190,8 @@ public:
      *   calling send()
      *   @param buffer buffer to be written
      *   @param bufferLen number of bytes from buffer to be written
-     *   @exception SocketException thrown if unable to send data
+     *   @return Number of bytes sent. -1 if failed to send something
+     *   If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to wouldBlock
      */
     int send(const void *buffer, int bufferLen) ;
     int send(const QnByteArray& data);

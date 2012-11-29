@@ -15,12 +15,12 @@ public:
 public slots:
     void at_motionDetected(QnResourcePtr resource, bool value, qint64 timestamp);
     /*!
-        \param inputToken device-specific description of input port
+        \param inputPortID device-specific ID of input port
         \param value true, if input activated. false, if deactivated
     */
     void at_cameraInput(
         QnResourcePtr resource,
-        const QString& inputToken,
+        const QString& inputPortID,
         bool value,
         qint64 timestamp );
 };

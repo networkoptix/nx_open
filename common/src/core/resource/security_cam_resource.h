@@ -79,15 +79,17 @@ public:
 
     //!Returns ids of camera's relay outputs
     virtual QStringList getRelayOutputList() const;
+    //!Returns ids of camera's input ports
+    virtual QStringList getInputPortList() const;
     /*!
         Change output with id \a ouputID state to \a activate
-        \param autoResetTimeout If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout seconds
+        \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
     */
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,
-        unsigned int autoResetTimeout = 0 );
+        unsigned int autoResetTimeoutMS = 0 );
 
 signals:
     /** 

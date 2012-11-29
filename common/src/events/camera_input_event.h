@@ -16,7 +16,7 @@ class QnCameraInputEvent
 public:
     QnCameraInputEvent(
         QnResourcePtr resource,
-        const QString& inputToken,
+        const QString& inputPortID,
         ToggleState toggleState,
         qint64 timestamp );
 
@@ -26,10 +26,10 @@ public:
     */
     virtual bool checkCondition( const QnBusinessParams& params ) const override;
 
-    const QString& inputToken() const;
+    const QString& inputPortID() const;
 
 private:
-    const QString m_inputToken;
+    const QString m_inputPortID;
 };
 
 typedef QSharedPointer<QnCameraInputEvent> QnCameraInputEventPtr;

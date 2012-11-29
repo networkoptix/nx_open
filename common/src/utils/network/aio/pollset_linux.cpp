@@ -13,7 +13,7 @@
 
 #include <map>
 
-#include "socket.h"
+#include "../socket.h"
 
 
 using namespace std;
@@ -38,6 +38,7 @@ public:
         epollSetFD( -1 ),
         signalledSockCount( 0 ),
         epollEventsArrayCapacity( 32 ),
+        epollEventsArray( new epoll_event[epollEventsArrayCapacity] ),
         epollEventsArray( new epoll_event[epollEventsArrayCapacity] ),
         eventFD( -1 )
     {

@@ -250,6 +250,11 @@ QStringList QnSecurityCamResource::getRelayOutputList() const
     return QStringList();
 }
 
+QStringList QnSecurityCamResource::getInputPortList() const
+{
+    return QStringList();
+}
+
 bool QnSecurityCamResource::setRelayOutputState(
     const QString& /*ouputID*/,
     bool /*activate*/,

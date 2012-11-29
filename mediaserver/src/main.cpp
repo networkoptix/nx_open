@@ -857,13 +857,17 @@ void stopServer(int signal)
     qApp->quit();
 }
 
-#include "api/session_manager.h"
+//#define TEST_HTTP
 
-//#include <onvif/soapH.h>
+#ifdef TEST_HTTP
+int testHttpClient();
+#endif
 
 int main(int argc, char* argv[])
 {
-    //soap_serve( soap_new() );
+#ifdef TEST_HTTP
+    return testHttpClient();
+#endif
 
 
     QN_INIT_MODULE_RESOURCES(common);
@@ -874,3 +878,32 @@ int main(int argc, char* argv[])
 
     return result;
 }
+
+#ifdef TEST_HTTP
+
+#include <fstream>
+#include <utils/network/http/httpclient.h>
+
+int testHttpClient()
+{
+    std::ofstream f( "F:\\temp\\Far30b2942.x86.20121110.msi", std::ios_base::out | std::ios_base::binary );
+    if( !f.is_open() )
+        return 2;
+
+    nx_http::HttpClient httpClient;
+    if( !httpClient.doGet( QUrl( QLatin1String("http://www.farmanager.com/files/Far30b2942.x86.20121110.msi") ) ) )
+    //if( !httpClient.doGet( QUrl( QLatin1String("http://192.168.0.31/HUY") ) ) )
+        return 1;
+
+    if( !httpClient.startReadMessageBody() )
+        return 3;
+    while( !httpClient.eof() )
+    {
+        const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
+        f.write( buf.data(), buf.size() );
+    }
+    f.close();
+
+    return 0;
+}
+#endif

@@ -14,7 +14,9 @@ class ConstIteratorImpl;
 //!Allows to wait for state change on mutiple sockets
 /*!
     If \a poll() returns positive value, then \a begin() returns iterator to first socket which state has been changed.
+    Every socket is always monitored for error and all errors are reported.
     \note This class is not thread-safe
+    \note If multiple event occured on same socket each event will be presented separately
 */
 class PollSet
 {
@@ -23,8 +25,11 @@ public:
 
     enum EventType
     {
+        etNone = 0,
         etRead = 1,
-        etWrite = 2
+        etWrite = 2,
+        //!Error occured on socket. Output only event
+        etError = 4
     };
 
     /*!
@@ -47,9 +52,10 @@ public:
 
         Socket* socket() const;
         /*!
-            \return bit mask of \a EventType
+            \return Triggered event
         */
-        unsigned int revents() const;
+        PollSet::EventType eventType() const;
+        void* userData() const;
 
         bool operator==( const const_iterator& right ) const;
         bool operator!=( const const_iterator& right ) const;
@@ -74,11 +80,12 @@ public:
     //!Add socket to set. Does not take socket ownership
     /*!
         \param eventType event to monitor on socket \a sock
+        \param userData 
         \return true, if socket added to set
         \note This method does not check, whether \a sock is already in pollset
         \note Ivalidates all iterators
     */
-    bool add( Socket* const sock, EventType eventType );
+    bool add( Socket* const sock, EventType eventType, void* userData = NULL );
     //!Do not monitor event \a eventType on socket \a sock anymore
     /*!
         \note Ivalidates all iterators
@@ -94,6 +101,7 @@ public:
         \param millisToWait if 0, method returns immediatly. If > 0, returns on event or after \a millisToWait milliseconds.
             If < 0, method blocks till event
         \return -1 on error, 0 if \a millisToWait timeout has expired, > 0 - number of socket whose state has been changed
+        \note If multiple event occured on same socket each event will be present as a single element
     */
     int poll( int millisToWait = INFINITE_TIMEOUT );
 

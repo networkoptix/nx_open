@@ -11,16 +11,49 @@
 #include <algorithm>
 #include <vector>
 
-#include "socket.h"
+#include "../socket.h"
 
+
+class SocketContext
+{
+public:
+    Socket* socket;
+    void* userData;
+
+    SocketContext()
+    :
+        socket( NULL ),
+        userData( NULL )
+    {
+    }
+
+    SocketContext(
+        Socket* _socket,
+        void* _userData = NULL )
+    :
+        socket( _socket ),
+        userData( _userData )
+    {
+    }
+
+    bool operator<( const SocketContext& right ) const
+    {
+        return socket < right.socket;
+    }
+
+    bool operator<=( const SocketContext& right ) const
+    {
+        return socket <= right.socket;
+    }
+};
 
 class PollSetImpl
 {
 public:
     //!Elements here are sorted by std::less<>
-    std::vector<Socket*> readSockets;
+    std::vector<SocketContext> readSockets;
     //!Elements here are sorted by std::less<>
-    std::vector<Socket*> writeSockets;
+    std::vector<SocketContext> writeSockets;
     fd_set readfds;
     fd_set writefds;
     fd_set exceptfds;
@@ -33,15 +66,15 @@ public:
         FD_ZERO( &exceptfds );
     }
 
-    void fillFDSet( fd_set* const dest, const std::vector<Socket*>& src )
+    void fillFDSet( fd_set* const dest, const std::vector<SocketContext>& src )
     {
         FD_ZERO( dest );
-        for( std::vector<Socket*>::size_type
+        for( std::vector<SocketContext>::size_type
             i = 0;
             i < src.size();
             ++i )
         {
-            FD_SET( src[i]->handle(), dest );
+            FD_SET( src[i].socket->handle(), dest );
         }
     }
 };
@@ -49,15 +82,14 @@ public:
 class ConstIteratorImpl
 {
 public:
-    Socket* currentSocket;
+    SocketContext currentSocket;
     //!bitmask of PollSet::EventType
-    unsigned int currentSocketREvents;
+    PollSet::EventType currentSocketREvent;
     PollSetImpl* pollSetImpl;
 
     ConstIteratorImpl()
     :
-        currentSocket( NULL ),
-        currentSocketREvents( 0 ),
+        currentSocketREvent( PollSet::etNone ),
         pollSetImpl( NULL ),
         m_nextReadSocketIndex( 0 ),
         m_nextWriteSocketIndex( 0 )
@@ -68,11 +100,14 @@ public:
     {
         for( ;; )
         {
-            currentSocket = NULL;
-            currentSocketREvents = 0;
+            currentSocket = SocketContext();
+            currentSocketREvent = PollSet::etNone;
+            std::vector<SocketContext>::size_type nextReadSocketIndexBak = m_nextReadSocketIndex;
+            //!current index in PollSetImpl::writeSockets
+            std::vector<SocketContext>::size_type nextWriteSocketIndexBak = m_nextWriteSocketIndex;
             if( (m_nextReadSocketIndex < pollSetImpl->readSockets.size()) && (m_nextWriteSocketIndex < pollSetImpl->writeSockets.size()) )
             {
-                if( pollSetImpl->readSockets[m_nextReadSocketIndex] < pollSetImpl->writeSockets[m_nextWriteSocketIndex] )
+                if( pollSetImpl->readSockets[m_nextReadSocketIndex] <= pollSetImpl->writeSockets[m_nextWriteSocketIndex] )
                 {
                     currentSocket = pollSetImpl->readSockets[m_nextReadSocketIndex];
                     ++m_nextReadSocketIndex;
@@ -82,12 +117,12 @@ public:
                     currentSocket = pollSetImpl->writeSockets[m_nextWriteSocketIndex];
                     ++m_nextWriteSocketIndex;
                 }
-                else    //pollSetImpl->readSockets[m_nextReadSocketIndex] == pollSetImpl->writeSockets[m_nextWriteSocketIndex]
-                {
-                    currentSocket = pollSetImpl->writeSockets[m_nextWriteSocketIndex];
-                    ++m_nextReadSocketIndex;
-                    ++m_nextWriteSocketIndex;
-                }
+                //else    //pollSetImpl->readSockets[m_nextReadSocketIndex] == pollSetImpl->writeSockets[m_nextWriteSocketIndex]
+                //{
+                //    currentSocket = pollSetImpl->writeSockets[m_nextWriteSocketIndex];
+                //    ++m_nextReadSocketIndex;
+                //    ++m_nextWriteSocketIndex;
+                //}
             }
             else if( m_nextReadSocketIndex < pollSetImpl->readSockets.size() )
             {
@@ -100,31 +135,37 @@ public:
                 ++m_nextWriteSocketIndex;
             }
 
-            if( currentSocket )
+            if( currentSocket.socket )
             {
-                if( FD_ISSET( currentSocket->handle(), &pollSetImpl->readfds ) )
-                    currentSocketREvents |= PollSet::etRead;
-                if( FD_ISSET( currentSocket->handle(), &pollSetImpl->writefds ) )
-                    currentSocketREvents |= PollSet::etWrite;
+                if( m_nextReadSocketIndex != nextReadSocketIndexBak &&
+                    FD_ISSET( currentSocket.socket->handle(), &pollSetImpl->readfds ) )
+                {
+                    currentSocketREvent = PollSet::etRead;
+                }
+                if( m_nextWriteSocketIndex != nextWriteSocketIndexBak &&
+                    FD_ISSET( currentSocket.socket->handle(), &pollSetImpl->writefds ) )
+                {
+                    currentSocketREvent = PollSet::etWrite;
+                }
             }
             else
             {
                 break;  //reached end()
             }
 
-            if( currentSocket == &pollSetImpl->dummySocket )
+            if( currentSocket.socket == &pollSetImpl->dummySocket )
                 continue;   //skipping dummy socket
 
-            if( currentSocketREvents )
+            if( currentSocketREvent )
                 break;  //found signalled socket
         }
     }
 
 private:
     //!current index in PollSetImpl::readSockets
-    std::vector<Socket*>::size_type m_nextReadSocketIndex;
+    std::vector<SocketContext>::size_type m_nextReadSocketIndex;
     //!current index in PollSetImpl::writeSockets
-    std::vector<Socket*>::size_type m_nextWriteSocketIndex;
+    std::vector<SocketContext>::size_type m_nextWriteSocketIndex;
 };
 
 //////////////////////////////////////////////////////////
@@ -171,20 +212,25 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
 
 Socket* PollSet::const_iterator::socket() const
 {
-    return m_impl->currentSocket;
+    return m_impl->currentSocket.socket;
 }
 
 /*!
     \return bit mask of \a EventType
 */
-unsigned int PollSet::const_iterator::revents() const
+PollSet::EventType PollSet::const_iterator::eventType() const
 {
-    return m_impl->currentSocketREvents;
+    return m_impl->currentSocketREvent;
+}
+
+void* PollSet::const_iterator::userData() const
+{
+    return m_impl->currentSocket.userData;
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
 {
-    return (m_impl->pollSetImpl == right.m_impl->pollSetImpl) && (m_impl->currentSocket == right.m_impl->currentSocket);
+    return (m_impl->pollSetImpl == right.m_impl->pollSetImpl) && (m_impl->currentSocket.socket == right.m_impl->currentSocket.socket);
 }
 
 bool PollSet::const_iterator::operator!=( const const_iterator& right ) const
@@ -228,9 +274,12 @@ void PollSet::interrupt()
 }
 
 //!Add socket to set. Does not take socket ownership
-bool PollSet::add( Socket* const sock, PollSet::EventType eventType )
+bool PollSet::add(
+    Socket* const sock,
+    PollSet::EventType eventType,
+    void* userData )
 {
-    std::vector<Socket*>* setToUse = NULL;
+    std::vector<SocketContext>* setToUse = NULL;
     if( eventType == etRead )
     {
         setToUse = &m_impl->readSockets;
@@ -245,21 +294,21 @@ bool PollSet::add( Socket* const sock, PollSet::EventType eventType )
         return false;
     }
 
-    std::vector<Socket*>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), sock, std::less<Socket*>() );
-    if( (it != setToUse->end()) && (*it == sock) )
+    std::vector<SocketContext>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), SocketContext(sock), std::less<SocketContext>() );
+    if( (it != setToUse->end()) && (it->socket == sock) )
         return true;    //already in set
 
     if( setToUse->size() == maxPollSetSize() )
         return false;   //no more space
 
-    setToUse->insert( it, sock );   //adding to position in set
+    setToUse->insert( it, SocketContext(sock, userData) );   //adding to position in set
     return true;
 }
 
 //!Remove socket from set
 void PollSet::remove( Socket* const sock, PollSet::EventType eventType )
 {
-    std::vector<Socket*>* setToUse = NULL;
+    std::vector<SocketContext>* setToUse = NULL;
     if( eventType == etRead )
     {
         setToUse = &m_impl->readSockets;
@@ -274,8 +323,8 @@ void PollSet::remove( Socket* const sock, PollSet::EventType eventType )
         return;
     }
 
-    std::vector<Socket*>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), sock, std::less<Socket*>() );
-    if( (it != setToUse->end()) && (*it == sock) )
+    std::vector<SocketContext>::iterator it = std::lower_bound( setToUse->begin(), setToUse->end(), SocketContext(sock), std::less<SocketContext>() );
+    if( (it != setToUse->end()) && (it->socket == sock) )
     {
         setToUse->erase( it );
         return;
@@ -320,7 +369,7 @@ int PollSet::poll( int millisToWait )
         //reading dummy socket
         quint8 buf[128];
         m_impl->dummySocket.recv( buf, sizeof(buf) );   //ignoring result and data...
-        --result;
+         --result;
     }
     return result;
 }
