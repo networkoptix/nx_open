@@ -994,16 +994,20 @@ QnActionManager::QnActionManager(QObject *parent):
 
 
 
-    factory(Qn::IncrementDebugCounterAction).
+    factory(Qn::DebugIncrementCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
         shortcut(tr("Ctrl+Alt+Shift++")).
         text(tr("Increment Debug Counter"));
 
-    factory(Qn::DecrementDebugCounterAction).
+    factory(Qn::DebugDecrementCounterAction).
         flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget).
         shortcut(tr("Ctrl+Alt+Shift+-")).
         text(tr("Decrement Debug Counter"));
 
+    factory(Qn::DebugShowResourcePoolAction).
+        flags(Qn::ScopelessHotkey | Qn::HotkeyOnly | Qn::NoTarget | Qn::DevMode).
+        shortcut(tr("Ctrl+Alt+Shift+R")).
+        text(tr("Show Resource Pool"));
 
 
     factory(Qn::PlayPauseAction).

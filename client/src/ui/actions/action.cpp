@@ -15,6 +15,8 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h> // TODO: this one does not belong here.
 
+#include <utils/settings.h>
+
 #include "action_manager.h"
 #include "action_target_provider.h"
 #include "action_conditions.h"
@@ -128,6 +130,9 @@ Qn::ActionVisibility QnAction::checkCondition(Qn::ActionScopes scope, const QnAc
         return Qn::InvisibleAction; // TODO: cheat!
 
     if(!(this->scope() & scope) && scope != this->scope())
+        return Qn::InvisibleAction;
+
+    if((m_flags & Qn::DevMode) && !qnSettings->isDevMode())
         return Qn::InvisibleAction;
 
     int size = parameters.size();

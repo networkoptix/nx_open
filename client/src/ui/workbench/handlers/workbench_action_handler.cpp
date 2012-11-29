@@ -185,8 +185,9 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 
     connect(action(Qn::MainMenuAction),                         SIGNAL(triggered()),    this,   SLOT(at_mainMenuAction_triggered()));
     connect(action(Qn::OpenCurrentUserLayoutMenu),              SIGNAL(triggered()),    this,   SLOT(at_openCurrentUserLayoutMenuAction_triggered()));
-    connect(action(Qn::IncrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_incrementDebugCounterAction_triggered()));
-    connect(action(Qn::DecrementDebugCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_decrementDebugCounterAction_triggered()));
+    connect(action(Qn::DebugIncrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugIncrementCounterAction_triggered()));
+    connect(action(Qn::DebugDecrementCounterAction),            SIGNAL(triggered()),    this,   SLOT(at_debugDecrementCounterAction_triggered()));
+    connect(action(Qn::DebugShowResourcePoolAction),            SIGNAL(triggered()),    this,   SLOT(at_debugShowResourcePoolAction_triggered()));
     connect(action(Qn::AboutAction),                            SIGNAL(triggered()),    this,   SLOT(at_aboutAction_triggered()));
     connect(action(Qn::SystemSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_systemSettingsAction_triggered()));
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
@@ -903,12 +904,18 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
     action(Qn::OpenCurrentUserLayoutMenu)->setEnabled(context()->instance<QnWorkbenchUserLayoutCountWatcher>()->layoutCount() > 0);
 }
 
-void QnWorkbenchActionHandler::at_incrementDebugCounterAction_triggered() {
+void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
 }
 
-void QnWorkbenchActionHandler::at_decrementDebugCounterAction_triggered() {
+void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() - 1);
+}
+
+void QnWorkbenchActionHandler::at_debugShowResourcePoolAction_triggered() {
+    QScopedPointer<QnResourceListDialog> dialog(new QnResourceListDialog(widget()));
+    dialog->setResources(resourcePool()->getResources());
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_nextLayoutAction_triggered() {
@@ -1402,6 +1409,10 @@ void QnWorkbenchActionHandler::at_reconnectAction_triggered() {
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
+    // Also remove layouts that were just added and have no 'remote' flag set. TODO: hack. 
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
+        if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
+            resourcePool()->removeResource(layout);
     resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();
@@ -1433,6 +1444,10 @@ void QnWorkbenchActionHandler::at_disconnectAction_triggered() {
     const QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(QnResource::remote);
     resourcePool()->setLayoutsUpdated(false);
     resourcePool()->removeResources(remoteResources);
+    // Also remove layouts that were just added and have no 'remote' flag set. TODO: hack. 
+    foreach(const QnLayoutResourcePtr &layout, resourcePool()->getResources().filtered<QnLayoutResource>())
+        if(!(snapshotManager()->flags(layout) & Qn::ResourceIsLocal))
+            resourcePool()->removeResource(layout);
     resourcePool()->setLayoutsUpdated(true);
 
     qnLicensePool->reset();

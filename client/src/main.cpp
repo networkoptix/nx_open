@@ -288,6 +288,7 @@ int qnMain(int argc, char *argv[])
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(devModeKey.toLatin1(), QnCryptographicHash::Md5) == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
+        qnSettings->setDevMode(true);
         qnSettings->setBackgroundEditable(devBackgroundEditable);
     } else {
         qnSettings->setBackgroundAnimated(true);
