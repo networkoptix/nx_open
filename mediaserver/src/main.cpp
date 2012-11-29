@@ -808,6 +808,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().setServer(true);
     QnResourceDiscoveryManager::instance().setResourceProcessor(m_processor);
 
+    QnResourceDiscoveryManager::instance().setDisabledVendors(qSettings.value("disabledVendors").toString().split(";"));
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlArecontResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDlinkResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
