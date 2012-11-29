@@ -353,14 +353,20 @@ bool QnLayoutFileStorageResource::isStorageAvailableForWriting()
     return false; // it is read only file system
 }
 
-void QnLayoutFileStorageResource::readIndexHeader()
+bool QnLayoutFileStorageResource::readIndexHeader()
 {
     QFile file(removeProtocolPrefix(getUrl()));
-    if (file.open(QIODevice::ReadOnly)) 
-    {
-        file.seek(m_novFileOffset);
-        file.read((char*) &m_index, sizeof(m_index));
+    if (!file.open(QIODevice::ReadOnly)) 
+        return false;
+    
+    file.seek(m_novFileOffset);
+    file.read((char*) &m_index, sizeof(m_index));
+    if (m_index.magic != MAGIC_STATIC) {
+        qWarning() << "Invalid Nov index detected! Disk write error or antivirus activty. Ignoring";
+        m_index = QnLayoutFileIndex();
+        return false;
     }
+    return true;
 }
 
 int QnLayoutFileStorageResource::getPostfixSize() const
