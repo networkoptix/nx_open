@@ -120,8 +120,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_timeSlider->setRulerHeight(70.0);
 
     m_timeScrollBar = new QnTimeScrollBar(this);
-    
-    setHelpTopic(m_timeSlider, m_timeScrollBar, Qn::MainWindow_Navigation_Help);
 
 
     /* Initialize navigator. */

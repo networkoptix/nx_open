@@ -15,6 +15,15 @@ namespace {
     const char *qn_helpTopicPropertyName = "_qn_contextHelpId";
 }
 
+int QnHelpTopicAccessor::helpTopic(QObject *object) {
+    if(!object) {
+        qnNullWarning(object);
+        return -1;
+    }
+
+    return qvariant_cast<int>(object->property(qn_helpTopicPropertyName), -1);
+}
+
 void QnHelpTopicAccessor::setHelpTopic(QObject *object, int helpTopic) {
     if(!object) {
         qnNullWarning(object);
@@ -32,8 +41,11 @@ int QnHelpTopicAccessor::helpTopicAt(QWidget *widget, const QPoint &pos, bool bu
         if(topicId != -1)
             return topicId;
 
-        if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(widget))
-            return queryable->helpTopicAt(widgetPos);
+        if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(widget)) {
+            topicId = queryable->helpTopicAt(widgetPos);
+            if(topicId != -1)
+                return topicId;
+        }
 
         if(QGraphicsView *view = dynamic_cast<QGraphicsView *>(widget)) {
             QPointF scenePos = view->mapToScene(widgetPos);
@@ -68,14 +80,19 @@ int QnHelpTopicAccessor::helpTopicAt(QGraphicsItem *item, const QPointF &pos, bo
     QPointF itemPos = pos;
 
     while(true) {
+        int topicId = -1;
+
         if(QGraphicsObject *object = item->toGraphicsObject()) {
-            int topicId = qvariant_cast<int>(object->property(qn_helpTopicPropertyName), -1);
+            topicId = qvariant_cast<int>(object->property(qn_helpTopicPropertyName), -1);
             if(topicId != -1)
                 return topicId;
         }
 
-        if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(item))
-            return queryable->helpTopicAt(itemPos);
+        if(HelpTopicQueryable *queryable = dynamic_cast<HelpTopicQueryable *>(item)) {
+            topicId = queryable->helpTopicAt(itemPos);
+            if(topicId != -1)
+                return topicId;
+        }
 
         if(QGraphicsProxyWidget *proxy = dynamic_cast<QGraphicsProxyWidget *>(item)) {
             if(proxy->widget()) {
@@ -84,7 +101,9 @@ int QnHelpTopicAccessor::helpTopicAt(QGraphicsItem *item, const QPointF &pos, bo
                 if(!child)
                     child = proxy->widget();
 
-                return helpTopicAt(child, widgetPos, true);
+                topicId = helpTopicAt(child, child->mapFrom(proxy->widget(), widgetPos), true);
+                if(topicId != -1)
+                    return topicId;
             }
         }
 

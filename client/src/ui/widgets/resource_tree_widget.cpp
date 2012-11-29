@@ -282,15 +282,18 @@ QnResourceTreeWidget::~QnResourceTreeWidget() {
     setWorkbench(NULL);
 }
 
+QAbstractItemModel *QnResourceTreeWidget::model() const {
+    return m_resourceProxyModel ? m_resourceProxyModel->sourceModel() : NULL;
+}
 
 void QnResourceTreeWidget::setModel(QAbstractItemModel *model) {
-    if (m_resourceProxyModel){
+    if (m_resourceProxyModel) {
         disconnect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
         delete m_resourceProxyModel;
         m_resourceProxyModel = NULL;
     }
 
-    if (model){
+    if (model) {
         m_resourceProxyModel = new QnResourceTreeSortProxyModel(this);
         m_resourceProxyModel->setSourceModel(model);
         m_resourceProxyModel->setSupportedDragActions(model->supportedDragActions());

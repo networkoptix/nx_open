@@ -25,7 +25,8 @@ class QnResourceTreeWidget : public QWidget {
 public:
     explicit QnResourceTreeWidget(QWidget *parent = 0);
     ~QnResourceTreeWidget();
-    
+
+    QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *model);
 
     QItemSelectionModel *selectionModel();

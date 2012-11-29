@@ -17,8 +17,8 @@
 #   error QN_HELP_TOPIC is not defined
 #endif
 
-QN_HELP_TOPIC(MainWindow_MainMenu_Help,                         "main_menu.htm")
-QN_HELP_TOPIC(MainWindow_TabNavigator_Help,                     "tabs.htm")
+QN_HELP_TOPIC(MainWindow_TitleBar_MainMenu_Help,                "main_menu.htm")
+QN_HELP_TOPIC(MainWindow_TitleBar_Tabs_Help,                    "tabs.htm")
 QN_HELP_TOPIC(MainWindow_Pin_Help,                              "showing_and_hiding_side_panels.htm")
 QN_HELP_TOPIC(MainWindow_Panic_Help,                            "panic_recording.htm")
 QN_HELP_TOPIC(MainWindow_ScreenRecording_Help,                  "performing_screen_recording.htm")
@@ -26,19 +26,29 @@ QN_HELP_TOPIC(MainWindow_Fullscreen_Help,                       "full_screen_and
 QN_HELP_TOPIC(MainWindow_Tree_Help,                             "working_with_a_resource_tree.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Servers_Help,                     "configuring_media_servers_additional_settings_(ad.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Search_Help,                      "search.htm")
-QN_HELP_TOPIC(MainWindow_Tree_Users_Help,                       "introducing_user_roles.htm")
+QN_HELP_TOPIC(MainWindow_Tree_Users_Help,                       "users_management.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Layouts_Help,                     "configuring_layouts.htm")
+QN_HELP_TOPIC(MainWindow_Tree_Exported_Help,                    "viewing_videos_exported_from_a.htm") // TODO
+QN_HELP_TOPIC(MainWindow_Tree_MultiVideo_Help,                  "viewing_multi-channel_videos.htm")
 QN_HELP_TOPIC(MainWindow_Tree_Local_Help,                       "playing_back_local_files_in_hd_witness.htm")
 QN_HELP_TOPIC(MainWindow_Scene_Help,                            "hd_witness_user_interface_overview.htm")
 QN_HELP_TOPIC(MainWindow_Playback_Help,                         "playback_panel.htm")
-QN_HELP_TOPIC(MainWindow_Navigation_Help,						"navigating_through_archive_and.htm")
+QN_HELP_TOPIC(MainWindow_Navigation_Help,                       "navigating_through_archive_and.htm")
 QN_HELP_TOPIC(MainWindow_Sync_Help,                             "navigating_through_several_cameras_synchronously.htm")
 QN_HELP_TOPIC(MainWindow_Calendar_Help,                         "using_calendar.htm")
 QN_HELP_TOPIC(MainWindow_Thumbnails_Help,                       "using_thumbnails_for_better_navigation.htm")
 QN_HELP_TOPIC(MainWindow_ThumbnailSearch_Help,                  "thumbnail_search.htm") // TODO
 QN_HELP_TOPIC(MainWindow_MediaItem_Help,                        "viewing_camera_stream_information.htm")
+QN_HELP_TOPIC(MainWindow_MediaItem_Local_Help,                  "playing_back_local_files_in_hd_witness.htm")
+QN_HELP_TOPIC(MainWindow_MediaItem_Ptz_Help,                    "setting_up_ptz.htm")
 QN_HELP_TOPIC(MainWindow_MediaItem_SmartSearch_Help,            "performing_smart_search.htm")
 QN_HELP_TOPIC(MainWindow_MonitoringItem_Help,                   "monitoring_media_servers.htm")
+
+QN_HELP_TOPIC(Login_Help,                                       "connecting_to_enterprise_contr.htm")
+
+QN_HELP_TOPIC(Watermark_Help,                                   "viewing_and_checking_the_validity_of_exported_vide.htm")
+
+QN_HELP_TOPIC(About_Help,                                       "troubleshooting_and_contacting_support.htm")
 
 QN_HELP_TOPIC(SystemSettings_General_MediaFolders_Help,         "configuring_media_folders.htm")
 QN_HELP_TOPIC(SystemSettings_General_TourCycleTime_Help,        "tours.htm")
@@ -57,13 +67,15 @@ QN_HELP_TOPIC(NewUser_Help,                                     "creating_a_new_
 
 QN_HELP_TOPIC(NewLayout_Help,                                   "creating_a_new_layout_(admin_only).htm") // TODO
 
-QN_HELP_TOPIC(ManualCameraAddition_Help,                        "") // TODO
+QN_HELP_TOPIC(ManualCameraAddition_Help,                        "adding_cameras_manually.htm") // TODO
 
+QN_HELP_TOPIC(CameraSettings_Multi_Help,                        "setting_same_parameters_for_multiple_cameras_(admi.htm") // TODO
 QN_HELP_TOPIC(CameraSettings_General_Name_Help,                 "renaming_a_camera.htm")
 QN_HELP_TOPIC(CameraSettings_General_Address_Help,              "obtaining_cameras_ip_and_mac.htm")
 QN_HELP_TOPIC(CameraSettings_General_Audio_Help,                "configuring_audio_for_the_camera_(admin_only).htm")
 QN_HELP_TOPIC(CameraSettings_General_Auth_Help,                 "configuring_camera_authentication_(admin_only).htm")
 QN_HELP_TOPIC(CameraSettings_Recording_Help,                    "editing_recording_schedule.htm")
+QN_HELP_TOPIC(CameraSettings_Recording_Export_Help,             "copying_recording_schedule_fro.htm")
 QN_HELP_TOPIC(CameraSettings_Motion_Help,                       "setting_up_motion_mask_and_motion_sensitivity_(adm.htm")
 QN_HELP_TOPIC(CameraSettings_Advanced_Help,                     "configuring_proprietary_camera_parameters.htm")
 
