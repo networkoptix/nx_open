@@ -6,6 +6,14 @@
 #include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
 
+QnAbstractBusinessAction::QnAbstractBusinessAction(): 
+    m_actionType(BA_NotDefined),
+    m_toggleState(ToggleState_NotDefined), 
+    m_receivedFromRemoveHost(false) 
+{
+
+}
+
 QByteArray QnAbstractBusinessAction::serialize()
 {
     pb::BusinessAction pb_businessAction;
@@ -51,4 +59,17 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
 
     return businessAction;
+}
+
+bool QnAbstractBusinessAction::isToggledAction() const
+{
+    switch(m_actionType)
+    {
+        case BA_CameraOutput:
+        case BA_CameraRecording:
+        case BA_PanicRecording:
+            return true;
+        default:
+            return false;
+    }
 }

@@ -30,7 +30,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
 
     if (bEvent->getToggleState() != ToggleState_NotDefined)
     {
-        if (result->getToggleState() != ToggleState_NotDefined){
+        if (result->isToggledAction()) {
             ToggleState value = tState != ToggleState_NotDefined ? tState : bEvent->getToggleState();
             result->setToggleState(value);
         }

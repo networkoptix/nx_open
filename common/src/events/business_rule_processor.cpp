@@ -10,6 +10,8 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
     connect(qnBusinessMessageBus, SIGNAL(actionDeliveryFail(QnAbstractBusinessActionPtr)), this, SLOT(at_actionDeliveryFailed(QnAbstractBusinessActionPtr)));
 
     connect(qnBusinessMessageBus, SIGNAL(actionReceived(QnAbstractBusinessActionPtr)), this, SLOT(executeAction(QnAbstractBusinessActionPtr)));
+
+    start();
 }
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
@@ -29,7 +31,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnMediaServerResourcePtr routeToServer = getDestMServer(action);
-    if (routeToServer && routeToServer->getGuid() != getGuid())
+    if (routeToServer && !action->isReceivedFromRemoveHost() /*&& routeToServer->getGuid() != getGuid()*/)
         qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
     else
         executeActionInternal(action);
@@ -91,16 +93,19 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
         if (typeOK && resOK)
         {
             bool condOK = bEvent->checkCondition(rule->getEventCondition());
+            QnAbstractBusinessActionPtr action;
             if (rule->isActionInProgress())
             {
                 // Toggle event repeated with some interval with state 'on'.
                 if (!condOK)
-                    result << rule->getAction(bEvent, ToggleState_Off); // if toggled action is used and condition is no longer valid - stop action
+                    action = rule->getAction(bEvent, ToggleState_Off); // if toggled action is used and condition is no longer valid - stop action
                 else if (bEvent->getToggleState() == ToggleState_Off)
-                    result << rule->getAction(bEvent); // Toggle event goes to 'off'. stop action
+                    action = rule->getAction(bEvent); // Toggle event goes to 'off'. stop action
             }
             else if (condOK)
-                result << rule->getAction(bEvent);
+                action = rule->getAction(bEvent);
+            if (action)
+                result << action;
         }
     }
     return result;

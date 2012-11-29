@@ -188,8 +188,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
-        recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline)
     {
         if (providerHi)
         {
@@ -404,17 +403,21 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 void QnRecordingManager::onTimer()
 {
     // for test purpose only
-    QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("urn_uuid_228e1c36-6128-d099-87b0-9a3d8a825e78");
-    QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-40-8C-BF-92-CE");
-    if (srcCamera && dstCamera) {
-        QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
-        bRule->setEventType(BE_Camera_Motion);
-        bRule->setSrcResource(srcCamera);
-        bRule->setActionType(BA_CameraRecording);
-        bRule->setDstResource(dstCamera);
-        bRuleProcessor->addBusinessRule(bRule);
+    static int gggTest = 0;
+    if (gggTest == 0) {
+        gggTest = 1;
+        QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
+        QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
+        if (srcCamera && dstCamera) {
+            QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
+            bRule->setEventType(BE_Camera_Motion);
+            bRule->setSrcResource(srcCamera);
+            bRule->setActionType(BA_CameraRecording);
+            bRule->setDstResource(dstCamera);
+            bRuleProcessor->addBusinessRule(bRule);
+        }
     }
-
+    // =======================================================
 
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)

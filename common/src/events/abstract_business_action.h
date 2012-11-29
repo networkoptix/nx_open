@@ -9,6 +9,7 @@
 enum BusinessActionType
 {
     // media server based actions
+    BA_NotDefined,
     BA_CameraOutput,       // set camera output signal
     BA_Bookmark,           // mark part of camera archive as undeleted
     BA_CameraRecording,    // start camera recording
@@ -30,7 +31,7 @@ typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 class QnAbstractBusinessAction
 {
 public:
-    QnAbstractBusinessAction() {}
+    QnAbstractBusinessAction();
     virtual ~QnAbstractBusinessAction() {}
     BusinessActionType actionType() const { return m_actionType; }
 
@@ -55,6 +56,10 @@ public:
     void setToggleState(ToggleState value) { m_toggleState = value; }
     ToggleState getToggleState() const { return m_toggleState; }
 
+    void setReceivedFromRemoveHost(bool value) { m_receivedFromRemoveHost = true; }
+    bool isReceivedFromRemoveHost() const { return m_receivedFromRemoveHost; }
+
+    bool isToggledAction() const;
 protected:
     void setActionType(BusinessActionType value) { m_actionType = value; }
 
@@ -65,6 +70,7 @@ protected:
 
 private:
     ToggleState m_toggleState;
+    bool m_receivedFromRemoveHost;
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)
