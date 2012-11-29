@@ -2313,14 +2313,11 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
 
     if (m_layoutFileName.endsWith(QLatin1String(".exe")))
     {
-        cl_log.log("======before::::createLaunchingFile", cl_logALWAYS); //brian
         if (QnNovLauncher::createLaunchingFile(fileName) != 0)
         {
-            cl_log.log("======after1::::createLaunchingFile", cl_logALWAYS); //brian
             at_layoutCamera_exportFailed(tr("File '%1' is used by another process. Please try another name.").arg(QFileInfo(fileName).baseName()));
             return;
         }
-        cl_log.log("======after2::::createLaunchingFile", cl_logALWAYS); //brian
     }
     else {
         QFile::remove(fileName);
@@ -2337,6 +2334,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items = layout->getItems();
+
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         (*itr).uuid = QUuid();
