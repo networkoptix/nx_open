@@ -2334,6 +2334,7 @@ void QnWorkbenchActionHandler::saveLayoutToLocalFile(const QnTimePeriod& exportP
     m_layoutExportResources.clear();
     QSet<QString> uniqIdList;
     QnLayoutItemDataMap items = layout->getItems();
+
     for (QnLayoutItemDataMap::Iterator itr = items.begin(); itr != items.end(); ++itr)
     {
         (*itr).uuid = QUuid();
