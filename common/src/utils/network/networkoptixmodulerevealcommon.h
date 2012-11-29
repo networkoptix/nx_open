@@ -18,15 +18,15 @@ static const char* NX_ENTERPISE_CONTROLLER_ID = "Enterprise Controller";
 static const char* NX_CLIENT_ID = "client.exe";
 static const char* NX_MEDIA_SERVER_ID = "mediaserver.exe";
 
-static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(QString::fromAscii("239.255.11.11"));
-static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
-
 // declaring here to avoid GCC 'unused constant' warning spam
 // also using them is much more convinient than call ::fromAscii every time
 // TODO: #elric Fix me if it is a bad idea
 static const QString nxEntControllerId = QLatin1String(NX_ENTERPISE_CONTROLLER_ID);
 static const QString nxClientId = QLatin1String(NX_CLIENT_ID);
 static const QString nxMediaServerId = QLatin1String(NX_MEDIA_SERVER_ID);
+
+static const QHostAddress defaultModuleRevealMulticastGroup = QHostAddress(QString::fromAscii("239.255.11.11"));
+static const unsigned int defaultModuleRevealMulticastGroupPort = 5007;
 
 //!Number of simple funtions to serialize simple types (local byte order is used)
 namespace Serialization

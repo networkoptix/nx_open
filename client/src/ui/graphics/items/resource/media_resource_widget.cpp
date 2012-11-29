@@ -32,11 +32,14 @@
 #include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
+#include "ui/workbench/workbench_navigator.h"
 
 
 // TODO: remove
 #include <core/resource/media_server_resource.h>
 #include <core/resource_managment/resource_pool.h>
+#include "plugins/resources/camera_settings/camera_settings.h"
+#include "camera/caching_time_period_loader.h"
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -618,25 +621,25 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = QnScheduleTask::RecordingType_Never;
+    int recordingMode = Qn::RecordingType_Never;
     if(m_camera->getStatus() == QnResource::Recording)
         recordingMode = currentRecordingMode();
     
     iconButton()->setVisible(true);
     switch(recordingMode) {
-    case QnScheduleTask::RecordingType_Never:
+    case Qn::RecordingType_Never:
         iconButton()->setIcon(qnSkin->icon("item/recording_off.png"));
         iconButton()->setToolTip(tr("Not recording."));
         break;
-    case QnScheduleTask::RecordingType_Run:
+    case Qn::RecordingType_Run:
         iconButton()->setIcon(qnSkin->icon("item/recording.png"));
         iconButton()->setToolTip(tr("Recording everything."));
         break;
-    case QnScheduleTask::RecordingType_MotionOnly:
+    case Qn::RecordingType_MotionOnly:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion.png"));
         iconButton()->setToolTip(tr("Recording motion only."));
         break;
-    case QnScheduleTask::RecordingType_MotionPlusLQ:
+    case Qn::RecordingType_MotionPlusLQ:
         iconButton()->setIcon(qnSkin->icon("item/recording_motion_lq.png"));
         iconButton()->setToolTip(tr("Recording motion and low quality."));
         break;
@@ -680,7 +683,7 @@ void QnMediaResourceWidget::updateServerResource() {
 
 int QnMediaResourceWidget::currentRecordingMode() {
     if(!m_camera)
-        return QnScheduleTask::RecordingType_Never;
+        return Qn::RecordingType_Never;
 
     // TODO: this should be a resource parameter that is update from the server.
 
@@ -692,7 +695,7 @@ int QnMediaResourceWidget::currentRecordingMode() {
         if(task.getDayOfWeek() == dayOfWeek && task.getStartTime() <= seconds && seconds <= task.getEndTime())
             return task.getRecordingType();
 
-    return QnScheduleTask::RecordingType_Never;
+    return Qn::RecordingType_Never;
 }
 
 
@@ -831,8 +834,13 @@ QnResourceWidget::Overlay QnMediaResourceWidget::calculateChannelOverlay(int cha
         return OfflineOverlay;
     } else if (m_display->camDisplay()->isRealTimeSource() && m_display->resource()->getStatus() == QnResource::Unauthorized) {
         return UnauthorizedOverlay;
-    } else if (m_display->camDisplay()->isNoData()) {
-        return NoDataOverlay;
+    } else if (m_display->camDisplay()->isLongWaiting()) 
+    {
+        QnCachingTimePeriodLoader* loader = context()->navigator()->loader(m_resource);
+        if (loader && loader->periods(Qn::RecordingRole).containTime(m_display->camDisplay()->getExternalTime()/1000))
+            return base_type::calculateChannelOverlay(channel, QnResource::Online);
+        else
+            return NoDataOverlay;
     } else if (m_display->isPaused()) {
         return EmptyOverlay;
     } else {

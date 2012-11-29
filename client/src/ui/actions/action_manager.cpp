@@ -642,14 +642,6 @@ QnActionManager::QnActionManager(QObject *parent):
         conditionalText(tr("Monitor in a New Window"), hasFlags(QnResource::server), Qn::All).
         condition(hasFlags(QnResource::media) || hasFlags(QnResource::server), Qn::Any);
 
-    factory(Qn::OpenInFolderAction).
-        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Open Containing Folder")).
-        shortcut(tr("Ctrl+Enter")).
-        shortcut(tr("Ctrl+Return")).
-        autoRepeat(false).
-        condition(new QnOpenInFolderActionCondition(this)); 
-
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Open Layout in a New Tab")).
@@ -670,6 +662,13 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Open Layout(s)")).
         condition(hasFlags(QnResource::layout));
 
+    factory(Qn::OpenInFolderAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
+        text(tr("Open Containing Folder")).
+        shortcut(tr("Ctrl+Enter")).
+        shortcut(tr("Ctrl+Return")).
+        autoRepeat(false).
+        condition(new QnOpenInFolderActionCondition(this));
 
     factory().
         flags(Qn::Scene | Qn::Tree).

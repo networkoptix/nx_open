@@ -19,6 +19,9 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
+//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+#include <core/dataprovider/live_stream_provider.h>
+
 
 QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -62,6 +65,7 @@ QnSingleCameraSettingsWidget::QnSingleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(at_cameraScheduleWidget_gridParamsChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
     connect(ui->cameraScheduleWidget,   SIGNAL(gridParamsChanged()),            this,   SLOT(updateMaxFPS()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_dbDataChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
@@ -353,6 +357,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
 
         QnVirtualCameraResourceList cameras;
         cameras.push_back(m_camera);
+
+        ui->cameraScheduleWidget->beginUpdate();
         ui->cameraScheduleWidget->setCameras(cameras);
 
         QList<QnScheduleTask::Data> scheduleTasks;
@@ -366,7 +372,8 @@ void QnSingleCameraSettingsWidget::updateFromResource() {
         if (currentCameraFps > 0)
             ui->cameraScheduleWidget->setFps(currentCameraFps);
         else
-            ui->cameraScheduleWidget->setFps(ui->cameraScheduleWidget->getMaxFps()/2);
+            ui->cameraScheduleWidget->setFps(m_camera->getMaxFps()/2);
+        ui->cameraScheduleWidget->endUpdate();
 
         updateMaxFPS();
 
@@ -625,21 +632,16 @@ void QnSingleCameraSettingsWidget::updateMaxFPS() {
         return; // TODO: investigate why we get here with null camera
 
     m_inUpdateMaxFps = true;
+    int maxFps = m_camera->getMaxFps();
+    int maxDualStreamingFps = maxFps;
+
     if (((ui->softwareMotionButton->isEnabled() &&  ui->softwareMotionButton->isChecked()) || 
         ui->cameraScheduleWidget->isSecondaryStreamReserver()) 
         && m_camera->streamFpsSharingMethod() == shareFps )
     {
-        float maxFps = m_camera->getMaxFps()-2;
-        float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
-        if (currentMaxFps > maxFps)
-        {
-            QMessageBox::warning(this, tr("Warning. FPS value is too high"), 
-                tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps dropped down to %2").arg(currentMaxFps).arg(maxFps));
-        }
-        ui->cameraScheduleWidget->setMaxFps(maxFps);
-    } else {
-        ui->cameraScheduleWidget->setMaxFps(m_camera->getMaxFps());
+        maxDualStreamingFps -= MIN_SECOND_STREAM_FPS;
     }
+    ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
 }
 
@@ -692,15 +694,19 @@ void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged(
     m_hasControlsChanges = false;
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged(){
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
     at_dbDataChanged();
     at_cameraDataChanged();
 
     m_hasScheduleChanges = true;
 }
 
-void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
     m_hasControlsChanges = true;
+}
+
+void QnSingleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
+    m_hasControlsChanges = false;
 }
 
 void QnSingleCameraSettingsWidget::setAdvancedParam(const CameraSetting& val)

@@ -8,6 +8,7 @@
 #include "cameraServerItem.pb.h"
 #include "connectinfo.pb.h"
 #include "businessRule.pb.h"
+#include "email.pb.h"
 
 #include "pb_serializer.h"
 
@@ -115,7 +116,7 @@ void parseCamera(QnVirtualCameraResourcePtr& camera, const pb::Resource& pb_came
                                         pb_scheduleTask.dayofweek(),
                                         pb_scheduleTask.starttime(),
                                         pb_scheduleTask.endtime(),
-                                        (QnScheduleTask::RecordingType) pb_scheduleTask.recordtype(),
+                                        (Qn::RecordingType) pb_scheduleTask.recordtype(),
                                         pb_scheduleTask.beforethreshold(),
                                         pb_scheduleTask.afterthreshold(),
                                         (QnStreamQuality) pb_scheduleTask.streamquality(),
@@ -900,6 +901,20 @@ void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRule &busines
 
     std::string str;
     pb_businessRules.SerializeToString(&str);
+    data = QByteArray(str.data(), str.length());
+}
+
+void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
+{
+    pb::Emails pb_emails;
+    pb::Email& email = *(pb_emails.add_email());
+
+    email.set_to(to.toUtf8().constData());
+    email.set_subject(subject.toUtf8().constData());
+    email.set_body(message.toUtf8().constData());
+
+    std::string str;
+    pb_emails.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 

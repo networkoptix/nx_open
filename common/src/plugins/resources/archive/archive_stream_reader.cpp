@@ -459,8 +459,13 @@ begin_label:
                     m_topIFrameTime = displayTime;
             }
             else
-                setSkipFramesToTime(displayTime, true);
+                setSkipFramesToTime(displayTime, false);
         }
+        else {
+            if (!reverseMode && displayTime != DATETIME_NOW && displayTime != AV_NOPTS_VALUE)
+                setSkipFramesToTime(displayTime, false);
+        }
+        
         m_lastGopSeekTime = -1;
         m_BOF = true;
         m_afterBOFCounter = 0;
@@ -690,7 +695,7 @@ begin_label:
     if (reverseMode && !delegateForNegativeSpeed)
         m_currentData->flags |= QnAbstractMediaData::MediaFlags_Reverse;
 
-    if (videoData && singleShotMode && m_skipFramesToTime == 0) {
+    if (videoData && singleShotMode && !(videoData->flags | QnAbstractMediaData::MediaFlags_Ignore)) {
         m_singleQuantProcessed = true;
         //m_currentData->flags |= QnAbstractMediaData::MediaFlags_SingleShot;
     }
@@ -1089,8 +1094,7 @@ void QnArchiveStreamReader::setSpeed(double value, qint64 currentTimeHint)
         QnAbstractDataConsumer* dp = m_dataprocessors.at(i);
         dp->setSpeed(value);
     }
-    if (value != 0)
-        setReverseMode(value < 0, currentTimeHint);
+    setReverseMode(value < 0, currentTimeHint);
 }
 
 double QnArchiveStreamReader::getSpeed() const

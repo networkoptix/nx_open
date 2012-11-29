@@ -556,12 +556,14 @@ UDPSocket::UDPSocket()  : CommunicatingSocket(SOCK_DGRAM,
     }
 }
 
-void CommunicatingSocket::setSendBufferSize(int buff_size)
+bool CommunicatingSocket::setSendBufferSize(int buff_size)
 {
-    if (::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size))<0)
-    {
-        //error
-    }
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
+}
+
+bool CommunicatingSocket::setReadBufferSize(int buff_size)
+{
+    return ::setsockopt(sockDesc, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) >= 0;
 }
 
 UDPSocket::UDPSocket(unsigned short localPort)   :

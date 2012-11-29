@@ -744,7 +744,7 @@ void QnResourceWidget::paintFlashingText(QPainter *painter, const QStaticText &t
     painter->translate(rect().center());
     painter->rotate(m_desiredRotation);
     painter->translate(offset * unit);
-    if (m_desiredRotation % 180 != 0){
+    if (m_desiredRotation % 180 != 0) {
         qreal ratio = 1 / ( m_aspectRatio > 0.0 ? m_aspectRatio : m_enclosingAspectRatio);
         painter->scale(ratio, ratio);
     }
@@ -863,9 +863,8 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 QVariant QnResourceWidget::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value){
-    if (change == QGraphicsItem::ItemRotationHasChanged){
+    if (change == QGraphicsItem::ItemRotationHasChanged)
         updateOverlayRotation(value.toReal());
-    }
     return base_type::itemChange(change, value);
 }
 

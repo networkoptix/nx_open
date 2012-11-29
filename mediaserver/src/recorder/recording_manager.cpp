@@ -192,7 +192,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
     if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
-        recorderHiRes->currentScheduleTask().getRecordingType() != QnScheduleTask::RecordingType_Never)
+        recorderHiRes->currentScheduleTask().getRecordingType() != Qn::RecordingType_Never)
     {
         if (providerHi)
         {

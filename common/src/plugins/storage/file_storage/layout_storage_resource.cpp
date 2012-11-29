@@ -1,5 +1,4 @@
 #include "layout_storage_resource.h"
-#include "recording/file_deletor.h"
 #include "utils/common/util.h"
 #include "plugins/resources/archive/filetypesupport.h"
 
@@ -224,8 +223,7 @@ bool QnLayoutFileStorageResource::isNeedControlFreeSpace()
 
 bool QnLayoutFileStorageResource::removeFile(const QString& url)
 {
-    qnFileDeletor->deleteFile(removeProtocolPrefix(url));
-    return true;
+    return QFile::remove(removeProtocolPrefix(url));
 }
 
 bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QString& newName)
@@ -272,7 +270,10 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
 
 bool QnLayoutFileStorageResource::removeDir(const QString& url)
 {
-    qnFileDeletor->deleteDir(removeProtocolPrefix(url));
+    QDir dir(removeProtocolPrefix(url));
+    QList<QFileInfo> list = dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot);
+    foreach(const QFileInfo& fi, list)
+        removeFile(fi.absoluteFilePath());
     return true;
 }
 

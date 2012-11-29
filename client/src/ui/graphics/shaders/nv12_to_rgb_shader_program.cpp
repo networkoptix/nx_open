@@ -2,6 +2,8 @@
 
 #include <utils/common/warnings.h>
 
+#include "shader_source.h"
+
 namespace {
     /** 
      * This is a matrix from Wikipedia, http://en.wikipedia.org/wiki/Yuv. 
@@ -52,33 +54,33 @@ namespace {
 QnNv12ToRgbShaderProgram::QnNv12ToRgbShaderProgram(const QGLContext *context, QObject *parent):
     QGLShaderProgram(context, parent) 
 {
-    addShaderFromSourceCode(QGLShader::Vertex, "                                \
-        void main() {                                                           \
-            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;             \
-            gl_TexCoord[0] = gl_MultiTexCoord0;                                 \
-            gl_TexCoord[1] = gl_MultiTexCoord1;                                 \
-        }                                                                       \
-    ");
-    addShaderFromSourceCode(QGLShader::Fragment, "                              \
-        uniform sampler2D yTexture;                                             \
-        uniform sampler2D uvTexture;                                            \
-        uniform mat4 colorTransform;                                            \
-        uniform float opacity;                                                  \
-                                                                                \
-        void main() {                                                           \
-            vec4 yuv, rgb;                                                      \
-            yuv.rgba = vec4(                                                    \
-                texture2D(yTexture, gl_TexCoord[0].st).r,                       \
-                texture2D(uvTexture, gl_TexCoord[1].st).r,                      \
-                texture2D(uvTexture, gl_TexCoord[1].st).a,                      \
-                1.0                                                             \
-            );                                                                  \
-                                                                                \
-            rgb = colorTransform * yuv;                                         \
-            rgb.a = opacity;                                                    \
-            gl_FragColor = rgb;                                                 \
-        }                                                                       \
-    ");
+    addShaderFromSourceCode(QGLShader::Vertex, QN_SHADER_SOURCE(
+        void main() {
+            gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+            gl_TexCoord[0] = gl_MultiTexCoord0;
+            gl_TexCoord[1] = gl_MultiTexCoord1;
+        }
+    ));
+    addShaderFromSourceCode(QGLShader::Fragment, QN_SHADER_SOURCE(
+        uniform sampler2D yTexture;
+        uniform sampler2D uvTexture;
+        uniform mat4 colorTransform;
+        uniform float opacity;
+                                                                                
+        void main() {
+            vec4 yuv, rgb;
+            yuv.rgba = vec4(
+                texture2D(yTexture, gl_TexCoord[0].st).r,
+                texture2D(uvTexture, gl_TexCoord[1].st).r,
+                texture2D(uvTexture, gl_TexCoord[1].st).a,
+                1.0
+            );
+              
+            rgb = colorTransform * yuv;
+            rgb.a = opacity;
+            gl_FragColor = rgb;
+        }
+    ));
     link();
 
     m_yTextureLocation = uniformLocation("yTexture");

@@ -190,7 +190,7 @@ void QnUserSettingsDialog::updateFromResource() {
         ui->confirmPasswordEdit->setPlaceholderText(QString());
         ui->accessRightsComboBox->setCurrentIndex(-1);
     } else {
-        QString placeholder(m_user->getPassword().size(), QLatin1Char('*'));
+        QString placeholder(6, QLatin1Char('*'));
 
         ui->loginEdit->setText(m_user->getName());
         ui->currentPasswordEdit->clear();
@@ -287,7 +287,7 @@ void QnUserSettingsDialog::updateElement(Element element) {
     case CurrentPassword:
         if((!ui->passwordEdit->text().isEmpty() || !ui->confirmPasswordEdit->text().isEmpty()) && !m_currentPassword.isEmpty() && ui->currentPasswordEdit->text() != m_currentPassword) {
             if(ui->currentPasswordEdit->text().isEmpty()) {
-                hint = tr("To change your password, please enter your current password.");
+                hint = tr("To change your password, please\n enter your current password.");
                 valid = false;
             } else {
                 hint = tr("Invalid current password.");

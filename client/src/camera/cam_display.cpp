@@ -116,7 +116,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 	m_firstAfterJumpTime(AV_NOPTS_VALUE),
 	m_receivedInterval(0),
     m_fullScreen(false),
-    m_archiveReader(reader)
+    m_archiveReader(reader),
+    m_prevLQ(-1)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -226,7 +227,7 @@ void QnCamDisplay::hurryUpCkeckForCamera2(QnAbstractMediaDataPtr media)
 		}
 
 		m_receivedInterval = qMax(m_receivedInterval, media->timestamp - m_firstAfterJumpTime);
-		if (m_afterJumpTimer.elapsed() > 1000)
+		if (m_afterJumpTimer.elapsed()*1000 > REDASS_DELAY_INTERVAL)
 		{
 			if (m_receivedInterval/1000 < m_afterJumpTimer.elapsed()/2) 
 			{
@@ -356,7 +357,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
                 //if (needToSleep >= m_display[0]->getAvgDecodingTime())
                 //    setMTDecoding(true);                     
-                if (m_totalFrames > m_fczFrames*2 && !m_useMTRealTimeDecode) {
+                if (m_totalFrames > m_fczFrames*3 && !m_useMTRealTimeDecode) {
                     m_useMTRealTimeDecode = true;
                     setMTDecoding(true); 
                 }
@@ -468,47 +469,40 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         scaleFactor = QnFrameScaler::factor_1; // do not downscale still images
 
 
+    bool doProcessPacket = true;
     if (m_display[channel])
     {
         // sometimes draw + decoding takes a lot of time. so to be able always sync video and audio we MUST not draw
         QTime displayTime;
         displayTime.restart();
 
-        bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
-        bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
-
-        // If there are multiple channels for this timestamp use only one of them
-        //if (channel == 0 && draw)
-        //    m_previousVideoDisplayedTime = currentTime;
-
-        CL_LOG(cl_logDEBUG2)
+        int isLQ = vd->flags & QnAbstractMediaData::MediaFlags_LowQuality;
+        bool qualityChanged = m_prevLQ != -1 && isLQ != m_prevLQ;
+        if (qualityChanged && m_speed >= 0)
         {
-            if (vd->flags & QnAbstractMediaData::MediaFlags_Ignore)
-                cl_log.log(QLatin1String("Ignoring frame "), (int)vd->timestamp, cl_logDEBUG2);
-            else
-                cl_log.log(QLatin1String("Playing frame "), (int)vd->timestamp, cl_logDEBUG2);
-
-            if (!draw)
-                cl_log.log(QLatin1String("skip drawing frame!!"), displayTime.elapsed(), cl_logDEBUG2);
-
+            m_lastFrameDisplayed = m_display[channel]->flushFrame(vd->channelNumber, scaleFactor);
+            if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
+                doProcessPacket = false;
         }
-
-        if (draw) {
-            /*
-            if (m_lastDisplayTimer.elapsed() < 1000)
-                draw = false;
-            else
-                m_lastDisplayTimer.restart();
-            */
-            updateActivity();
-        }
-        if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore)) 
+        
+        if (doProcessPacket) 
         {
-            QMutexLocker lock(&m_timeMutex);
-            m_lastDecodedTime = vd->timestamp;
-        }
+            m_prevLQ = isLQ;
 
-        m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
+            bool ignoreVideo = vd->flags & QnAbstractMediaData::MediaFlags_Ignore;
+            bool draw = !ignoreVideo && (sleep || (m_displayLasts * 1000 < needToSleep)); // do not draw if computer is very slow and we still wanna sync with audio
+
+            if (draw) 
+                updateActivity();
+            
+            if (!(vd->flags & QnAbstractMediaData::MediaFlags_Ignore)) 
+            {
+                QMutexLocker lock(&m_timeMutex);
+                m_lastDecodedTime = vd->timestamp;
+            }
+
+            m_lastFrameDisplayed = m_display[channel]->display(vd, draw, scaleFactor);
+        }
 
         if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed)
         {
@@ -527,7 +521,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 m_timeMutex.unlock();
         }
 
-        if (!ignoreVideo && m_buffering)
+        //if (!ignoreVideo && m_buffering)
+        if (m_buffering)
         {
             // Frame does not displayed for some reason (and it is not ignored frames)
             QnArchiveStreamReader* archive = dynamic_cast<QnArchiveStreamReader*>(vd->dataProvider);
@@ -538,10 +533,10 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
         if (!sleep)
             m_displayLasts = displayTime.elapsed(); // this is how long would i take to draw frame.
 
-        //m_display[channel]->display(vd, sleep, scale_factor);
+        //m_display[channel]->dispay(vd, sleep, scale_factor);
         //cl_log.log(" video queue size = ", m_videoQueue[0].size(),  cl_logALWAYS);
     }
-    return true;
+    return doProcessPacket;
 }
 
 void QnCamDisplay::onBeforeJump(qint64 time)
@@ -654,6 +649,7 @@ void QnCamDisplay::afterJump(QnAbstractMediaDataPtr media)
     }
     m_audioDisplay->clearAudioBuffer();
 	m_firstAfterJumpTime = AV_NOPTS_VALUE;
+    m_prevLQ = -1;
 }
 
 void QnCamDisplay::onReaderPaused()
@@ -698,13 +694,10 @@ float QnCamDisplay::getSpeed() const
 
 void QnCamDisplay::setSpeed(float speed)
 {
-    if (speed == 0)
-        return;
-
     QMutexLocker lock(&m_timeMutex);
     if (qAbs(speed-m_speed) > FPS_EPS)
     {
-        if (sign(m_speed) != sign(speed)) {
+        if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0)) {
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             if (m_extTimeSrc) {
                 qint64 time = m_extTimeSrc->getCurrentTime();
@@ -736,7 +729,7 @@ void QnCamDisplay::processNewSpeed(float speed)
         for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; i++)
             m_display[i]->setMTDecoding(true);
     }
-    else {
+    else if (speed != 0) {
         setMTDecoding(m_useMtDecoding);
     }
 
@@ -745,7 +738,7 @@ void QnCamDisplay::processNewSpeed(float speed)
 
     if ((speed >= 0 && m_prevSpeed < 0) || (speed < 0 && m_prevSpeed >= 0))
     {
-        m_dataQueue.clear();
+        //m_dataQueue.clear();
         clearVideoQueue();
         QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
@@ -1408,7 +1401,7 @@ bool QnCamDisplay::isStillImage() const
     return m_isStillImage;
 }
 
-bool QnCamDisplay::isNoData() const
+bool QnCamDisplay::isLongWaiting() const
 {
     if (isRealTimeSource())
         return false;

@@ -519,6 +519,12 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
         {
             RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
+            if (isRtcp && m_owner->getTracksCount() == 1) 
+            {
+                // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
+                m_sendBuffer.resize(4);
+                continue;
+            }
         }
         else {
             buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 

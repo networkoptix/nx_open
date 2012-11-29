@@ -276,7 +276,7 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     if (processDiscoveredResources(resources, true)) 
     {
         dtsAssignment();
-        cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
+        //cl_log.log("Discovery---- Done. Time elapsed: ", time.elapsed(), cl_logDEBUG1);
         return resources;
     }
     else {

@@ -12,8 +12,8 @@ namespace Ui {
 }
 
 class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
 public:
     explicit QnMultipleCameraSettingsWidget(QWidget *parent);
@@ -67,13 +67,14 @@ private slots:
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_scheduleEnabledChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
+    void at_cameraScheduleWidget_controlsChangesApplied();
     void at_enableAudioCheckBox_clicked();
     void updateMaxFPS();
 private:
     void setHasDbChanges(bool hasChanges);
 
 private:
-    Q_DISABLE_COPY(QnMultipleCameraSettingsWidget);
+    Q_DISABLE_COPY(QnMultipleCameraSettingsWidget)
 
     QScopedPointer<Ui::MultipleCameraSettingsWidget> ui;
     QnVirtualCameraResourceList m_cameras;

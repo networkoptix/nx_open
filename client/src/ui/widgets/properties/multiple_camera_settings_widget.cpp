@@ -13,6 +13,9 @@
 #include "ui/widgets/properties/camera_motion_mask_widget.h"
 #include "ui/graphics/items/resource/resource_widget.h"
 
+//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+#include <core/dataprovider/live_stream_provider.h>
+
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent): 
     QWidget(parent),
     QnWorkbenchContextAware(parent),
@@ -36,6 +39,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleTasksChanged()),         this,   SLOT(at_cameraScheduleWidget_scheduleTasksChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(recordingSettingsChanged()),     this,   SLOT(at_cameraScheduleWidget_recordingSettingsChanged()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleEnabledChanged()),       this,   SLOT(at_cameraScheduleWidget_scheduleEnabledChanged()));
+    connect(ui->cameraScheduleWidget,   SIGNAL(controlsChangesApplied()),       this,   SLOT(at_cameraScheduleWidget_controlsChangesApplied()));
     connect(ui->cameraScheduleWidget,   SIGNAL(moreLicensesRequested()),        this,   SIGNAL(moreLicensesRequested()));
     connect(ui->cameraScheduleWidget,   SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)), this, SIGNAL(scheduleExported(const QnVirtualCameraResourceList &)));
 
@@ -271,7 +275,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
     m_hasControlsChanges = false;
 }
 
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged(){
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_recordingSettingsChanged() {
     at_dbDataChanged();
 
     m_hasScheduleChanges = true;
@@ -283,8 +287,12 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChan
     m_hasScheduleEnabledChanges = true;
 }
 
-void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged(){
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_gridParamsChanged() {
     m_hasControlsChanges = true;
+}
+
+void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_controlsChangesApplied() {
+    m_hasControlsChanges = false;
 }
 
 void QnMultipleCameraSettingsWidget::at_enableAudioCheckBox_clicked()
@@ -306,21 +314,19 @@ void QnMultipleCameraSettingsWidget::updateMaxFPS(){
     m_inUpdateMaxFps = true;
 
     int maxFps = std::numeric_limits<int>::max();
+    int maxDualStreamingFps  = maxFps;
+
     foreach (QnVirtualCameraResourcePtr camera, m_cameras) 
     {
-        int cameraFps =camera->getMaxFps();
+        int cameraFps = camera->getMaxFps();
+        int cameraDualStreamingFps = cameraFps;
         if ((((camera->supportedMotionType() & MT_SoftwareGrid))
             || ui->cameraScheduleWidget->isSecondaryStreamReserver()) &&  camera->streamFpsSharingMethod() == shareFps )
-            cameraFps -= 2;
+            cameraDualStreamingFps -= MIN_SECOND_STREAM_FPS;
         maxFps = qMin(maxFps, cameraFps);
+        maxDualStreamingFps = qMin(maxFps, cameraDualStreamingFps);
     }
-    float currentMaxFps = ui->cameraScheduleWidget->getGridMaxFps();
-    if (currentMaxFps > maxFps)
-    {
-        QMessageBox::warning(this, tr("FPS value is too high"), 
-            tr("For software motion 2 fps is reserved for secondary stream. Current fps in schedule grid is %1. Fps was dropped down to %2").arg(currentMaxFps).arg(maxFps));
-    }
-    ui->cameraScheduleWidget->setMaxFps(maxFps);
 
+    ui->cameraScheduleWidget->setMaxFps(maxFps, maxDualStreamingFps);
     m_inUpdateMaxFps = false;
 }

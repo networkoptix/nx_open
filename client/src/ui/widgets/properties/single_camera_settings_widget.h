@@ -18,8 +18,8 @@ class QVBoxLayout;
 class QnCameraMotionMaskWidget;
 
 class QnSingleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly);
+    Q_OBJECT
+    Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
     typedef QWidget base_type;
 
@@ -90,6 +90,7 @@ private slots:
     void at_cameraScheduleWidget_scheduleTasksChanged();
     void at_cameraScheduleWidget_recordingSettingsChanged();
     void at_cameraScheduleWidget_gridParamsChanged();
+    void at_cameraScheduleWidget_controlsChangesApplied();
     void at_linkActivated(const QString &urlString);
     void at_motionTypeChanged();
     void at_motionSelectionCleared();

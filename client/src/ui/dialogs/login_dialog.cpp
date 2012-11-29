@@ -39,18 +39,17 @@ namespace {
                     widget->setEnabled(enabled);
     }
 
+    static QString space = QLatin1String ("    ");
+
 } // anonymous namespace
 
 
 LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::LoginDialog),
-    m_findAppServerDialog(new QDialog),
-    m_findAppServerDialogUI( new Ui::FindAppServerDialog ),
     m_context(context),
     m_requestHandle(-1),
-    m_renderingWidget(NULL),
-    m_foundEntCtrlModel( &m_entCtrlFinder )
+    m_renderingWidget(NULL)
 {
     if(!context)
         qnNullWarning(context);
@@ -103,20 +102,16 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
     resetConnectionsModel();
     updateFocus();
 
-    m_entCtrlFinder.start();
-    m_findAppServerDialogUI->setupUi(m_findAppServerDialog.data());
-    m_findAppServerDialogUI->foundEnterpriseControllersView->setModel( &m_foundEntCtrlModel );
-
-    connect(
-        m_findAppServerDialogUI->foundEnterpriseControllersView,
-        SIGNAL(doubleClicked(const QModelIndex&)),
-        m_findAppServerDialog.data(),
-        SLOT(accept()) );
-
-    connect( ui->selectEntCtrlButton, SIGNAL(clicked()), this, SLOT(onSelectEntCtrlButtonClicked()) );
+    m_entCtrlFinder = new NetworkOptixModuleFinder();
+    connect(m_entCtrlFinder,    SIGNAL(moduleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)),
+            this,               SLOT(at_entCtrlFinder_remoteModuleFound(const QString&, const QString&, const TypeSpecificParamMap&, const QString&, const QString&, bool, const QString&)));
+    connect(m_entCtrlFinder,    SIGNAL(moduleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)),
+            this,               SLOT(at_entCtrlFinder_remoteModuleLost(const QString&, const TypeSpecificParamMap&, const QString&, bool, const QString&)));
+    m_entCtrlFinder->start();
 }
 
 LoginDialog::~LoginDialog() {
+    delete m_entCtrlFinder;
     return;
 }
 
@@ -136,7 +131,10 @@ QUrl LoginDialog::currentUrl() const {
 }
 
 QString LoginDialog::currentName() const {
-    return ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    QString itemText = ui->connectionsComboBox->itemText(ui->connectionsComboBox->currentIndex());
+    if (itemText.startsWith(space))
+        return itemText.remove(0, space.length());
+    return itemText;
 }
 
 QnConnectInfoPtr LoginDialog::currentInfo() const {
@@ -185,16 +183,56 @@ void LoginDialog::resetConnectionsModel() {
     if (connections.isEmpty())
         connections.append(qnSettings->defaultConnection());
 
-    foreach (const QnConnectionData &connection, connections) {
+    int selectedIndex = -1;
+
+    QnConnectionData lastUsed = connections.getByName(QnConnectionDataList::defaultLastUsedName());
+    if (lastUsed != QnConnectionData()) {
         QList<QStandardItem *> row;
-        row << new QStandardItem(connection.name)
+        row << new QStandardItem(lastUsed.name)
+            << new QStandardItem(lastUsed.url.host())
+            << new QStandardItem(QString::number(lastUsed.url.port()))
+            << new QStandardItem(lastUsed.url.userName());
+        m_connectionsModel->appendRow(row);
+        selectedIndex = 0;
+    }
+
+    QStandardItem *headerSavedItem = new QStandardItem(tr("Saved Sessions"));
+    headerSavedItem->setFlags(Qt::ItemIsEnabled);
+    m_connectionsModel->appendRow(headerSavedItem);
+
+    foreach (const QnConnectionData &connection, connections) {
+        if (connection.name == QnConnectionDataList::defaultLastUsedName())
+            continue;
+
+        QList<QStandardItem *> row;
+        row << new QStandardItem(space + connection.name)
             << new QStandardItem(connection.url.host())
             << new QStandardItem(QString::number(connection.url.port()))
             << new QStandardItem(connection.url.userName());
         m_connectionsModel->appendRow(row);
+        if (selectedIndex < 0)
+            selectedIndex = 1; // skip header row
     }
 
-    ui->connectionsComboBox->setCurrentIndex(0); /* At last used connection. */
+    QStandardItem* headerFoundItem = new QStandardItem(tr("Local Area ECs"));
+    headerFoundItem->setFlags(Qt::ItemIsEnabled);
+    m_connectionsModel->appendRow(headerFoundItem);
+
+    if (m_foundEcs.size() == 0) {
+        QStandardItem* noLocalEcs = new QStandardItem(space + tr("<none>"));
+        noLocalEcs->setFlags(Qt::ItemIsEnabled);
+        m_connectionsModel->appendRow(noLocalEcs);
+    } else {
+        foreach (QUrl url, m_foundEcs) {
+            QList<QStandardItem *> row;
+            row << new QStandardItem(space + url.host() + QLatin1Char(':') + QString::number(url.port()))
+                << new QStandardItem(url.host())
+                << new QStandardItem(QString::number(url.port()))
+                << new QStandardItem(QString());
+            m_connectionsModel->appendRow(row);
+        }
+    }
+    ui->connectionsComboBox->setCurrentIndex(selectedIndex); /* Last used connection if exists, else last saved connection. */
     ui->passwordLineEdit->clear();
 }
 
@@ -272,7 +310,8 @@ void LoginDialog::at_connectFinished(int status, const QByteArray &/*errorString
 }
 
 void LoginDialog::at_connectionsComboBox_currentIndexChanged(int index) {
-    m_dataWidgetMapper->setCurrentModelIndex(m_connectionsModel->index(index, 0));
+    QModelIndex idx = m_connectionsModel->index(index, 0);
+    m_dataWidgetMapper->setCurrentModelIndex(idx);
     ui->passwordLineEdit->clear();
     updateFocus();
 }
@@ -328,6 +367,10 @@ void LoginDialog::at_saveButton_clicked() {
 
     resetConnectionsModel();
 
+    int idx = 1;
+    if (connections.contains(QnConnectionDataList::defaultLastUsedName()))
+        idx++;
+    ui->connectionsComboBox->setCurrentIndex(idx);
     ui->passwordLineEdit->setText(password);
 
 }
@@ -346,14 +389,42 @@ void LoginDialog::at_deleteButton_clicked() {
     resetConnectionsModel();
 }
 
-void LoginDialog::onSelectEntCtrlButtonClicked()
-{
-    if( !m_findAppServerDialog->exec() )
-        return; //cancel pressed
-    const QModelIndex& selectedSrvIndex = m_findAppServerDialogUI->foundEnterpriseControllersView->currentIndex();
-    if( !selectedSrvIndex.isValid() )
+void LoginDialog::at_entCtrlFinder_remoteModuleFound(const QString& moduleID, const QString& moduleVersion, const TypeSpecificParamMap& moduleParameters, const QString& localInterfaceAddress,
+    const QString& remoteHostAddress, bool isLocal, const QString& seed) {
+    Q_UNUSED(moduleVersion)
+    Q_UNUSED(localInterfaceAddress)
+
+    QString portId = QLatin1String("port");
+
+    if (moduleID != nxEntControllerId ||  !moduleParameters.contains(portId))
         return;
 
-    ui->hostnameLineEdit->setText( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerIPRole).toString() );
-    ui->portSpinBox->setValue( m_foundEntCtrlModel.data(selectedSrvIndex, FoundEnterpriseControllersModel::appServerPortRole).toInt() );
+    QString host = isLocal ? QString::fromAscii("127.0.0.1") : remoteHostAddress;
+    QUrl url;
+    url.setHost(host);
+
+    QString port = moduleParameters[portId];
+    url.setPort(port.toInt());
+
+    QMultiHash<QString, QUrl>::iterator i = m_foundEcs.find(seed);
+    while (i != m_foundEcs.end() && i.key() == seed) {
+        QUrl found = i.value();
+        if (found.host() == url.host() && found.port() == url.port())
+            return; // found the same host, e.g. two interfaces on local controller
+        ++i;
+    }
+    m_foundEcs.insert(seed, url);
+    resetConnectionsModel();
+}
+
+void LoginDialog::at_entCtrlFinder_remoteModuleLost(const QString& moduleID, const TypeSpecificParamMap& moduleParameters, const QString& remoteHostAddress, bool isLocal, const QString& seed ) {
+    Q_UNUSED(moduleParameters)
+    Q_UNUSED(remoteHostAddress)
+    Q_UNUSED(isLocal)
+
+    if( moduleID != nxEntControllerId )
+        return;
+    m_foundEcs.remove(seed);
+
+    resetConnectionsModel();
 }

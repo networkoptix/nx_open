@@ -21,6 +21,7 @@ namespace Qn {
 #define SerializedResourcesParameter        fromLatin1("_qn_serializedResourcesParameter")
 #define TimePeriodParameter                 fromLatin1("_qn_timePeriodParameter")
 #define TimePeriodsParameter                fromLatin1("_qn_timePeriodsParameter")
+#define AllTimePeriodsParameter             fromLatin1("_qn_allTimePeriodsParameter")
 #define ConnectInfoParameter                fromLatin1("_qn_connectInfoParameter")
 
     /**

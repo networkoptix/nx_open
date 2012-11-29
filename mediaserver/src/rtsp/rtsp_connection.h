@@ -36,6 +36,10 @@ struct RtspServerTrackInfo
         return false;
     }
 
+    quint32 getSSRC() const {
+        return encoder ? encoder->getSSRC() : 0;
+    }
+
     int clientPort;
     int clientRtcpPort;
     quint16 sequence;
@@ -69,6 +73,7 @@ public:
     //QnRtspEncoderPtr getCodecEncoder(int trackNum) const;
     //UDPSocket* getMediaSocket(int trackNum) const;
     RtspServerTrackInfoPtr getTrackInfo(int trackNum) const;
+    int getTracksCount() const;
 protected:
     virtual void run();
     void addResponseRangeHeader();

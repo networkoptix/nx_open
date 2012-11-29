@@ -38,7 +38,7 @@ typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef QPair<int, int> ResolutionPair;
 const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
 const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(640, 480);
+const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
 
 
 class QDomElement;

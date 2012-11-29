@@ -13,7 +13,7 @@ static const int BASE_BITRATE = 1000 * 1000 * 10; // bitrate for best quality fo
 
 static const int MAX_VIDEO_JITTER = 2;
 
-extern QMutex global_ffmpeg_mutex;
+//extern QMutex global_ffmpeg_mutex;
 
 extern "C"
 {
@@ -462,7 +462,7 @@ bool QnDesktopFileEncoder::init()
             m_widget);
     m_grabber->setLogo(m_logo);
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     //av_log_set_callback(FffmpegLog::av_log_default_callback_impl);
 
@@ -862,7 +862,7 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    QMutexLocker mutex(&global_ffmpeg_mutex);
+    //QMutexLocker mutex(&global_ffmpeg_mutex);
 
     if (m_videoCodecCtx)
         avcodec_close(m_videoCodecCtx);

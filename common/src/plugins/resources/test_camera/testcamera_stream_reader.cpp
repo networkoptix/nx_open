@@ -2,7 +2,7 @@
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
-static const int TESTCAM_TIMEOUT = 1 * 1000;
+static const int TESTCAM_TIMEOUT = 5 * 1000;
 
 QnTestCameraStreamReader::QnTestCameraStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -106,11 +106,12 @@ void QnTestCameraStreamReader::openStream()
     if (isStreamOpened())
         return;
     
-    QString ggg = m_resource->getUrl();
-
-    QUrl url(m_resource->getUrl());
-
+    QString urlStr = m_resource->getUrl();
     QnNetworkResourcePtr res = qSharedPointerDynamicCast<QnNetworkResource>(m_resource);
+
+    urlStr += QString(QLatin1String("?primary=%1&fps=%2")).arg(getRole() == QnResource::Role_LiveVideo).arg(getFps());
+    QUrl url(urlStr);
+
 
     if (m_tcpSock.isClosed())
         m_tcpSock.reopen();
@@ -123,7 +124,7 @@ void QnTestCameraStreamReader::openStream()
         closeStream();
         return;
     }
-    QByteArray path = url.path().toLocal8Bit();
+    QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
     m_tcpSock.send(path.data(), path.size());
 }
 

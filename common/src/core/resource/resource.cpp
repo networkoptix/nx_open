@@ -354,7 +354,6 @@ bool QnResource::getParam(const QString &name, QVariant &val, QnDomain domain)
         if (!name.contains(QLatin1String("VideoLayout")))
             qWarning() << "Can't get parameter. Parameter" << name << "does not exists for resource" << getName();
 
-        QMetaObject::invokeMethod( this, "asyncParamGetDone", Qt::DirectConnection, Q_ARG(QString, name), Q_ARG(QVariant, QVariant()), Q_ARG(bool, false) );
         emit asyncParamGetDone( name, QVariant(), false );
         return false;
     }

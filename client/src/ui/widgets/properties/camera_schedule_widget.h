@@ -21,6 +21,16 @@ public:
     QnCameraScheduleWidget(QWidget *parent = 0);
     virtual ~QnCameraScheduleWidget();
 
+    /**
+     * @brief beginUpdate           Begin component update process. Inner update signals are not called while in update.
+     */
+    void beginUpdate();
+
+    /**
+     * @brief endUpdate             End component update process.
+     */
+    void endUpdate();
+
     void setChangesDisabled(bool);
     bool isChangesDisabled() const;
 
@@ -28,9 +38,22 @@ public:
     void setScheduleTasks(const QnScheduleTaskList taskFrom);
     void setScheduleTasks(const QList<QnScheduleTask::Data> &tasks);
     void setScheduleEnabled(bool enabled);
-    void setMaxFps(int value);
-    int getMaxFps() const;
+
+    /**
+     * @brief setMaxFps             Set maximum fps value that can be placed on the grid.
+     * @param value                 Maximum allowed fps value for record types "always" and "motion only".
+     * @param dualStreamValue       Maximum allowed fps value for record type "motion-plus-lq".
+     */
+    void setMaxFps(int value, int dualStreamValue);
     void setFps(int value);
+
+    /**
+     * @brief getGridMaxFps         Get maximum fps value placed on a grid. If parameter motionPlusLqOnly set, then
+     *                              only cells with recording type RecordingType_MotionPlusLQ will be taken into account.
+     * @param motionPlusLqOnly      Whether we should check only cells with recording type RecordingType_MotionPlusLQ.
+     * @return                      Maximum fps value.
+     */
+    int getGridMaxFps(bool motionPlusLqOnly = false);
 
     int activeCameraCount() const;
 
@@ -42,7 +65,6 @@ public:
 
     const QnVirtualCameraResourceList &cameras() const;
     void setCameras(const QnVirtualCameraResourceList &cameras);
-    int getGridMaxFps();
     bool isSecondaryStreamReserver() const;
 
     /** Returns true if there is at least one "record-motion" square on the grid */
@@ -63,6 +85,7 @@ signals:
     void moreLicensesRequested();
     void gridParamsChanged();
     void scheduleExported(const QnVirtualCameraResourceList &);
+    void controlsChangesApplied();
 
 private slots:
     void updateGridParams(bool fromUserInput = false);
@@ -72,6 +95,7 @@ private slots:
     void updatePanicLabelText();
     void updateLicensesButtonVisible();
     void updateRecordSpinboxes();
+    void updateMaxFpsValue(bool motionPlusLqToggled);
 
     void at_gridWidget_cellActivated(const QPoint &cell);
     void at_enableRecordingCheckBox_clicked();
@@ -98,6 +122,21 @@ private:
     bool m_motionAvailable;
     bool m_changesDisabled;
     bool m_readOnly;
+
+    /**
+     * @brief m_maxFps                  Maximum fps value for record types "always" and "motion only"
+     */
+    int m_maxFps;
+
+    /**
+     * @brief m_maxDualStreamingFps     Maximum fps value for record types "motion-plus-lq"
+     */
+    int m_maxDualStreamingFps;
+
+    /**
+     * @brief m_inUpdate                Counter that will prevent unnessesary calls when component update is in progress.
+     */
+    int m_inUpdate;
 };
 
 

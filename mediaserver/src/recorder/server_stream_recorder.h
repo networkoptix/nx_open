@@ -54,7 +54,7 @@ protected:
 private:
     void updateRecordingType(const QnScheduleTask& scheduleTask);
     void updateStreamParams();
-    bool isMotionRec(QnScheduleTask::RecordingType recType) const;
+    bool isMotionRec(Qn::RecordingType recType) const;
     void updateMotionStateInternal(bool value, qint64 timestamp);
     void setSpecialRecordingMode(QnScheduleTask& task, int fps);
 private:
@@ -77,6 +77,8 @@ private:
     bool m_usedSpecialRecordingMode;
     int m_forcedRecordFps;  // fps for special recording mode
     bool m_lastMotionState; // true if motion in progress
+    qint64 m_queuedSize;
+    QMutex m_queueSizeMutex;
 };
 
 #endif // __SERVER_STREAM_RECORDER_H__

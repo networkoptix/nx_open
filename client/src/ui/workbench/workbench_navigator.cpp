@@ -814,15 +814,13 @@ void QnWorkbenchNavigator::updateTargetPeriod() {
      * If playback is synchronized, do it for all cameras. */
     QnTimePeriod targetPeriod(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     QnTimePeriod boundingPeriod(m_timeSlider->minimum(), m_timeSlider->maximum() - m_timeSlider->minimum());
-    // todo: #Sasha. Invalid boundingPeriod near daylight time
+    // todo: #ELRIC. Invalid boundingPeriod near daylight time
     boundingPeriod = boundingPeriod.intersected(QnTimePeriod(0, qnSyncTime->currentMSecsSinceEpoch()));
 
     if (m_calendar) {
         QDate date(m_calendar->yearShown(), m_calendar->monthShown(), 1);
         QnTimePeriod calendarPeriod(QDateTime(date).toMSecsSinceEpoch(), QDateTime(date.addMonths(1)).toMSecsSinceEpoch() - QDateTime(date).toMSecsSinceEpoch());
-        // todo: signal deadlock here!
-        // #GDM, fix it!
-        //period.addPeriod(calendarPeriod);
+        targetPeriod.addPeriod(boundingPeriod.intersected(calendarPeriod));
     }
 
     // TODO: 'All cameras' line is shown even when SYNC is off, so this condition is not valid.
@@ -1059,7 +1057,8 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
         Qn::SliderScope, 
         QnActionParameters(currentTarget(Qn::SliderScope)).
             withArgument(Qn::TimePeriodParameter, selection).
-            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)) // TODO: move this out into global scope!
+            withArgument(Qn::TimePeriodsParameter, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingRole)). // TODO: move this out into global scope!
+            withArgument(Qn::AllTimePeriodsParameter, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingRole))
     ));
     if(menu->isEmpty())
         return;
@@ -1132,12 +1131,13 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
             if (value == DATETIME_NOW) {
                 reader->jumpToPreviousFrame(DATETIME_NOW);
             } else {
-                if (m_timeSlider->isSliderDown() && !m_preciseNextSeek) {
-                    reader->jumpTo(value * 1000, 0);
-                } else {
+                if (m_preciseNextSeek)
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
-                    m_preciseNextSeek = false;
-                }
+                else if (m_timeSlider->isSliderDown())
+                    reader->jumpTo(value * 1000, 0);
+                else if (reader->getQuality() != MEDIA_Quality_Low)
+                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                m_preciseNextSeek = false;
             }
         }
 
