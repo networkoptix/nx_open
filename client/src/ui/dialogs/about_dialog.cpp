@@ -13,6 +13,8 @@
 #include <QtGui/QTextDocumentFragment>
 
 #include <ui/graphics/opengl/gl_functions.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include "api/app_server_connection.h"
 #include "core/resource/resource_type.h"
@@ -31,10 +33,12 @@ namespace {
 } // anonymous namespace
 
 QnAboutDialog::QnAboutDialog(QWidget *parent): 
-    QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint | Qt::MSWindowsFixedSizeDialogHint),
+    QDialog(parent, Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::AboutDialog())
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::About_Help);
 
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);

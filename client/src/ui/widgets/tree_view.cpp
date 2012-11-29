@@ -3,7 +3,10 @@
 #include <QtCore/QTimerEvent>
 #include <QtGui/QDragMoveEvent>
 
+#include <utils/common/variant.h>
+
 #include <client/client_globals.h>
+#include <ui/help/help_topic_accessor.h>
 
 QnTreeView::QnTreeView(QWidget *parent): 
     QTreeView(parent)
@@ -66,10 +69,15 @@ QString QnTreeView::toolTipAt(const QPointF &pos) const {
 }
 
 int QnTreeView::helpTopicAt(const QPointF &pos) const {
-    QVariant topicId = indexAt(pos.toPoint()).data(Qn::HelpTopicIdRole);
-    if(topicId.convert(QVariant::Int)) {
-        return topicId.toInt();
-    } else {
-        return -1;
-    }
+    int result = -1;
+
+    QModelIndex index = indexAt(pos.toPoint());
+    if(index.isValid())
+        result = qvariant_cast<int>(index.data(Qn::HelpTopicIdRole), -1);
+
+    /* Get model's help topic if it is not set on the item. */
+    if(result == -1 && model())
+        result = helpTopic(model());
+
+    return result;
 }

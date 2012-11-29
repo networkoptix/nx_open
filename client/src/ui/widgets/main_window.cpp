@@ -236,7 +236,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     /* Title layout. We cannot create a widget for title bar since there appears to be
      * no way to make it transparent for non-client area windows messages. */
-    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_MainMenu_Help);
+    m_mainMenuButton = newActionButton(action(Qn::MainMenuAction), true, 1.5, Qn::MainWindow_TitleBar_MainMenu_Help);
 
     m_titleLayout = new QHBoxLayout();
     m_titleLayout->setContentsMargins(0, 0, 0, 0);
@@ -249,7 +249,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     m_titleLayout->addWidget(newActionButton(action(Qn::TogglePanicModeAction), false, 1.0, Qn::MainWindow_Panic_Help));
     if (QnScreenRecorder::isSupported())
         m_titleLayout->addWidget(newActionButton(action(Qn::ToggleScreenRecordingAction), false, 1.0, Qn::MainWindow_ScreenRecording_Help));
-    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction)));
+    m_titleLayout->addWidget(newActionButton(action(Qn::ConnectToServerAction), false, 1.0, Qn::Login_Help));
     m_titleLayout->addLayout(m_windowButtonsLayout);
 
     /* Layouts. */

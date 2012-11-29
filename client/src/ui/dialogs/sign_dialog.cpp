@@ -10,6 +10,8 @@
 #include "camera/sync_dialog_display.h"
 
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
+#include "ui/help/help_topic_accessor.h"
+#include "ui/help/help_topics.h"
 
 #include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
@@ -79,6 +81,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_requestHandle(-1)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Watermark_Help);
 
     m_layout = new QVBoxLayout(ui->videoSpacer);
     m_layout->setSpacing(0);

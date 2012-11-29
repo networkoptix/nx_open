@@ -16,6 +16,8 @@
 #include <ui/widgets/rendering_widget.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include "plugins/resources/archive/avi_files/avi_resource.h"
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
@@ -50,6 +52,8 @@ LoginDialog::LoginDialog(QnWorkbenchContext *context, QWidget *parent) :
         qnNullWarning(context);
 
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::Login_Help);
 
     /* Don't allow to save passwords, at least for now. */
     //ui->savePasswordCheckBox->hide();
