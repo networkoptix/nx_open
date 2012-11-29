@@ -37,7 +37,7 @@ QnResourceList QnAppServerResourceSearcher::findResources()
     {
         if (!errorString.isEmpty())
             qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
-        //setShouldBeUsed(false); // TODO: #MEDVED Why? Disabling the only one appserver resource searcher is a very bad idea!
+        setShouldBeUsed(false);
     }
 
     return resources;
