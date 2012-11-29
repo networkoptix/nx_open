@@ -92,13 +92,8 @@ void QnAboutDialog::retranslateUi()
             arg(ecsUrl.port());
     }
 
-    QnId serverTypeId = qnResTypePool->getResourceTypeByName(QLatin1String("Server"))->getId();
-    QnResourceList serverResources = qnResPool->getResourcesWithTypeId(serverTypeId);
-
     QStringList serverVersions;
-    foreach (QnResourcePtr resource, serverResources) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-
+    foreach (QnMediaServerResourcePtr server, qnResPool->getResources().filtered<QnMediaServerResource>()) {
         if (server->getStatus() != QnResource::Online)
             continue;
 
