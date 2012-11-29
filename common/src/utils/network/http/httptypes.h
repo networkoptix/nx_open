@@ -288,6 +288,7 @@ namespace nx_http
 			const Authorization& operator=( const Authorization& );
 		};
 
+        //!Convient class for generating Authorization header with Basic authentication method
         class BasicAuthorization
         :
             public Authorization

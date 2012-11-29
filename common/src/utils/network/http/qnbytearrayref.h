@@ -44,7 +44,7 @@ public:
     operator QByteArray() const;
 
 private:
-    //!Using pointer here to allow operator= o be implemented
+    //!Using pointer here to allow operator= to be implemented
     const QByteArray* m_src;
     size_type m_offset;
     size_type m_count;
