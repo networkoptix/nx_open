@@ -676,6 +676,8 @@ begin_label:
                 else {
                     if (!m_keepLastSkkipingFrame)
                         videoData->flags |= QnAbstractMediaData::MediaFlags_Ignore; // do not repeat last frame in such mode
+                    else
+                        videoData->flags &= ~(QnAbstractMediaData::MediaFlags_Ignore);
                     setSkipFramesToTime(0, true);
                 }
             }
