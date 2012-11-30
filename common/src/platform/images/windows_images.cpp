@@ -12,7 +12,9 @@ QnWindowsImages::~QnWindowsImages() {
 }
 
 QPixmap QnWindowsImages::cursorImage(Qt::CursorShape shape) const {
-    return QPixmap();
+    QCursor cursor(shape);
+    return cursor.pixmap();
 }
+
 
 #endif
