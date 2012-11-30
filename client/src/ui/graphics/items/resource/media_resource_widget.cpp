@@ -24,6 +24,8 @@
 #include <ui/common/color_transformations.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
@@ -32,7 +34,7 @@
 #include "plugins/resources/camera_settings/camera_settings.h"
 #include "resource_widget_renderer.h"
 #include "resource_widget.h"
-#include "ui/workbench/workbench_navigator.h"
+#include "ui/workbench/workbench_navigator.h" // TODO: this does not belong here
 
 
 // TODO: remove
@@ -104,6 +106,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     searchButton->setCheckable(true);
     searchButton->setProperty(Qn::NoBlockMotionSelection, true);
     searchButton->setToolTip(tr("Smart Search"));
+    setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
     connect(searchButton, SIGNAL(toggled(bool)), this, SLOT(at_searchButton_toggled(bool)));
 
     QnImageButtonWidget *ptzButton = new QnImageButtonWidget();
@@ -111,6 +114,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     ptzButton->setCheckable(true);
     ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
     ptzButton->setToolTip(tr("PTZ"));
+    setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(at_ptzButton_toggled(bool)));
     connect(ptzButton, SIGNAL(toggled(bool)), this, SLOT(updateButtonsVisibility()));
 
@@ -712,8 +716,12 @@ Qn::WindowFrameSections QnMediaResourceWidget::windowFrameSectionsAt(const QRect
 
 int QnMediaResourceWidget::helpTopicAt(const QPointF &pos) const {
     Q_UNUSED(pos)
-    if(options() & DisplayMotion) {
+    if(options() & DisplayMotionSensitivity) {
+        return Qn::CameraSettings_Motion_Help;
+    } else if(options() & DisplayMotion) {
         return Qn::MainWindow_MediaItem_SmartSearch_Help;
+    } else if(m_resource->flags() & QnResource::local) {
+        return Qn::MainWindow_MediaItem_Local_Help;
     } else {
         return Qn::MainWindow_MediaItem_Help;
     }

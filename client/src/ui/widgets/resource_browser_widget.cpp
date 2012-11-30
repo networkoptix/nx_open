@@ -80,8 +80,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
 
     m_renameAction = new QAction(this);
 
-    setHelpTopic(this,            Qn::MainWindow_Tree_Help);
-    setHelpTopic(ui->searchTab,   Qn::MainWindow_Tree_Search_Help);
+    setHelpTopic(this,                              Qn::MainWindow_Tree_Help);
+    setHelpTopic(ui->resourceTreeWidget->model(),   Qn::MainWindow_Tree_Help);
+    setHelpTopic(ui->searchTab,                     Qn::MainWindow_Tree_Search_Help);
+    setHelpTopic(ui->searchTreeWidget->model(),     Qn::MainWindow_Tree_Search_Help);
 
     connect(ui->typeComboBox,       SIGNAL(currentIndexChanged(int)),   this,               SLOT(updateFilter()));
     connect(ui->filterLineEdit,     SIGNAL(textChanged(QString)),       this,               SLOT(updateFilter()));

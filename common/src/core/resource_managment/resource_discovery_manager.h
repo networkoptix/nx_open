@@ -58,6 +58,7 @@ public:
     QnResourceList findResources(QString startAddr, QString endAddr, const QAuthenticator& auth, int port);
     bool registerManualCameras(const QnManualCamerasMap& cameras);
     QnResourceList processManualAddedResources();
+    void setDisabledVendors(const QStringList& vendors);
 protected:
     QnResourceDiscoveryManager();
 
@@ -109,6 +110,7 @@ private:
     QVector<QnAbstractDTSSearcher*> m_dstList;
 	CLNetState netState;
     QTime netStateTime;
+    QSet<QString> m_disabledVendorsForAutoSearch;
 };
 
 #endif //QN_RESOURCE_DISCOVERY_MANAGER_H

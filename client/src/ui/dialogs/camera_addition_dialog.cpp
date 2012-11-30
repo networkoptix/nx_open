@@ -3,11 +3,13 @@
 
 #include <QtGui/QMessageBox>
 #include <QtGui/QStandardItemModel>
-#include <QDesktopServices>
-
-#include <ui/style/globals.h>
+#include <QtGui/QDesktopServices>
 
 #include <core/resource/media_server_resource.h>
+
+#include <ui/style/globals.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #define PORT_AUTO 0
 
@@ -19,6 +21,8 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(const QnMediaServerResourcePtr &s
     m_subnetMode(false)
 {
     ui->setupUi(this);
+
+    setHelpTopic(this, Qn::ManualCameraAddition_Help);
 
     ui->camerasTable->horizontalHeader()->setVisible(true);
     ui->camerasTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);

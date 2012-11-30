@@ -78,6 +78,7 @@ bool QnResourceDiscoveryManager::isServer() const
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
+    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()));
     m_searchersList.push_back(serv);
 }
 
@@ -148,9 +149,7 @@ void QnResourceDiscoveryManager::run()
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
-        searcher->setShouldBeUsed(true);
-
-        if (dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+        if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
@@ -999,4 +998,9 @@ void QnResourceDiscoveryManager::dtsAssignment()
             vcRes->unLockDTSFactory();
         }
     }
+}
+
+void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
+{
+    m_disabledVendorsForAutoSearch = vendors.toSet();
 }

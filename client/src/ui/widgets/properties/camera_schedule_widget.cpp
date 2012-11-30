@@ -16,11 +16,10 @@
 
 #include <ui/common/color_transformations.h>
 #include <ui/common/read_only.h>
-
 #include <ui/dialogs/export_camera_settings_dialog.h>
-
 #include <ui/style/globals.h>
-
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/workbench/watchers/workbench_panic_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -37,6 +36,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     m_inUpdate(0)
 {
     ui->setupUi(this);
+
+    setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 
     // init buttons
     ui->recordAlwaysButton->setColor(qnGlobals->recordAlwaysColor());
