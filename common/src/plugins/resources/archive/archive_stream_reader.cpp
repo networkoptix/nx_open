@@ -877,7 +877,7 @@ void QnArchiveStreamReader::setReverseMode(bool value, qint64 currentTimeHint)
 
 bool QnArchiveStreamReader::isNegativeSpeedSupported() const
 {
-    return !m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
+    return true; //!m_delegate->getVideoLayout() || m_delegate->getVideoLayout()->numberOfChannels() == 1;
 }
 
 bool QnArchiveStreamReader::isSingleShotMode() const
