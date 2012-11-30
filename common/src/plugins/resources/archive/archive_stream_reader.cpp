@@ -39,7 +39,6 @@ QnArchiveStreamReader::QnArchiveStreamReader(QnResourcePtr dev ) :
     m_newDataMarker(0),
     m_currentTimeHint(AV_NOPTS_VALUE),
 //private section 2
-    m_jumpInSilenceMode(false),
     m_bofReached(false),
     m_externalLocked(false),
     m_exactJumpToSpecifiedFrame(false),
@@ -112,9 +111,7 @@ void QnArchiveStreamReader::previousFrame(qint64 mksec)
         return;
     }
     emit prevFrameOccured();
-    m_jumpInSilenceMode = true;
     jumpToPreviousFrame(mksec);
-    m_jumpInSilenceMode = false;
 }
 
 void QnArchiveStreamReader::resumeMedia()
@@ -998,8 +995,7 @@ void QnArchiveStreamReader::beforeJumpInternal(qint64 mksec)
 {
     if (m_requiredJumpTime != qint64(AV_NOPTS_VALUE))
         emit jumpCanceled(m_requiredJumpTime);
-    if (!m_jumpInSilenceMode)
-        emit beforeJump(mksec);
+    emit beforeJump(mksec);
     m_delegate->beforeSeek(mksec);
 }
 

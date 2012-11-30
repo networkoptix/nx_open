@@ -117,7 +117,8 @@ QnCamDisplay::QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* r
 	m_receivedInterval(0),
     m_fullScreen(false),
     m_archiveReader(reader),
-    m_prevLQ(-1)
+    m_prevLQ(-1),
+    m_doNotChangeDisplayTime(false)
 {
     if (resource.dynamicCast<QnVirtualCameraResource>())
         m_isRealTimeSource = true;
@@ -553,10 +554,13 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-        m_nextReverseTime[i] = AV_NOPTS_VALUE;
-        m_display[i]->blockTimeValue(time);
+    if (!m_doNotChangeDisplayTime) {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->blockTimeValue(time);
+        }
     }
+    m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended) {
@@ -665,7 +669,7 @@ void QnCamDisplay::onReaderResumed()
 void QnCamDisplay::onPrevFrameOccured()
 {
     m_ignoreTime = m_lastVideoPacketTime; // prevent 2 frames displaying if direction changed from forward to backward
-    m_singleShotQuantProcessed = false;
+    m_doNotChangeDisplayTime = true; // do not move display time to jump position because jump pos given approximatly
     QMutexLocker lock(&m_audioChangeMutex);
     m_audioDisplay->clearDeviceBuffer();
 }

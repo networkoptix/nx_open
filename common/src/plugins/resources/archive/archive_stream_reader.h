@@ -126,7 +126,6 @@ private:
     qint64 m_currentTimeHint;
 
 private:
-    bool m_jumpInSilenceMode;
     bool m_bofReached;
     bool m_externalLocked;
     bool m_exactJumpToSpecifiedFrame;
