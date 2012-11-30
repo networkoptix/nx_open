@@ -833,7 +833,7 @@ void QnApiPbSerializer::serializeCameraServerItem(const QnCameraHistoryItem& cam
     data = QByteArray(str.data(), str.length());
 }
 
-void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
+void QnApiPbSerializer::serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data)
 {
     pb::Emails pb_emails;
     pb::Email& email = *(pb_emails.add_email());
