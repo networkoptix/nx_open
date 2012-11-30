@@ -498,7 +498,8 @@ void QnWorkbenchNavigator::jumpBackward() {
 
     qint64 pos = reader->startTime();
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget)) {
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingRole : Qn::MotionRole);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
         
@@ -534,7 +535,8 @@ void QnWorkbenchNavigator::jumpForward() {
         pos = reader->endTime();
     } else {
         QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget);
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingRole : Qn::MotionRole);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
@@ -861,8 +863,7 @@ void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
         if(type == Qn::MotionRole && !(widget->options() & QnResourceWidget::DisplayMotion)) 
         {
-            if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
-                loader->setMotionRegions(QList<QRegion>());
+            /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
             periodsList.push_back(loader->periods(type));
         }
