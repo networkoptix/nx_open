@@ -859,8 +859,10 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     QVector<QnTimePeriodList> periodsList;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionRole && !(widget->options() & QnResourceWidget::DisplayMotion)) {
-            /* Ignore it. */
+        if(type == Qn::MotionRole && !(widget->options() & QnResourceWidget::DisplayMotion)) 
+        {
+            if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource()))
+                loader->setMotionRegions(QList<QRegion>());
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
             periodsList.push_back(loader->periods(type));
         }
