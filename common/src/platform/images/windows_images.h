@@ -15,6 +15,8 @@ class QnWindowsImages: public QnPlatformImages {
 public:
     QnWindowsImages(QObject *parent = NULL);
     virtual ~QnWindowsImages();
+
+    virtual QPixmap cursorImage(Qt::CursorShape shape) const;
 };
 
 #endif // Q_OS_WIN
