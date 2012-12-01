@@ -11,11 +11,12 @@
 
 #include "drag_processing_instrument.h"
 
-class QnMediaResourceWidget;
-
 class SelectionItem;
 class PtzSplashItem;
 class PtzSelectionItem;
+
+class QnMediaResourceWidget;
+class QnVectorSpaceMapper;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -83,6 +84,8 @@ private:
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
 
 private:
+    QHash<QString, const QnVectorSpaceMapper *> m_mapperByModel;
+
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 

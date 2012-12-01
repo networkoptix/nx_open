@@ -3,6 +3,8 @@
 
 #include <cassert>
 
+#include <functional>
+
 #include <QtCore/QVector>
 
 #include "math.h"
@@ -16,8 +18,14 @@ namespace Qn {
 }
 
 template<class T>
-class QnInterpolator {
+class QnInterpolator: public std::unary_function<T, T> {
 public:
+    struct Point {
+        Point() {}
+        Point(const T &x, const T &y): x(x), y(y) {}
+        T x, y;
+    };
+
     QnInterpolator(): m_extrapolationMode(Qn::ConstantExtrapolation), m_ready(false) {}
 
     void addPoint(const T &x, const T &y) {
@@ -28,6 +36,16 @@ public:
     void clear() {
         m_points.clear();
         m_ready = false;
+    }
+
+    const QVector<Point> &points() {
+        ensureReady();
+
+        return m_points;
+    }
+
+    const Point &point(int index) {
+        return m_points[index];
     }
 
     T operator()(const T &x) const{
@@ -55,23 +73,15 @@ public:
     }
 
 protected:
-    struct Point {
-        Point() {}
-        Point(const T &x, const T &y): x(x), y(y) {}
-        T x, y;
-    };
-
     struct PointLess {
         bool operator()(const Point &l, const Point &r) {
             return l.x < r.x;
         }
-    }
+    };
 
     void ensureReady() const {
         if(m_ready)
             return;
-
-        assert(m_points.size() >= 2);
 
         qSort(m_points.begin(), m_points.end(), PointLess());
         m_ready = true;
@@ -82,6 +92,9 @@ protected:
     }
 
     T extrapolateStart(const T &x) const {
+        if(m_points.size() < 2)
+            return extrapolateNoData();
+
         switch(m_extrapolationMode) {
         case Qn::ConstantExtrapolation:
             return m_points.front().y;
@@ -96,6 +109,9 @@ protected:
     }
 
     T extrapolateEnd(const T &x) const {
+        if(m_points.size() < 2)
+            return extrapolateNoData();
+
         switch(m_extrapolationMode) {
         case Qn::ConstantExtrapolation:
             return m_points.back().y;
@@ -114,6 +130,14 @@ protected:
         T end = m_points.back().x;
 
         return operator()(start + qMod(x - start, end - start));
+    }
+
+    T extrapolateNoData() const {
+        if(m_points.isEmpty()) {
+            return T();
+        } else {
+            return m_points.front().y;
+        }
     }
 
 private:

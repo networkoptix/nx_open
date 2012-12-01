@@ -30,14 +30,16 @@
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
+    /* 
+     Get width from here:
+     http://en.wikipedia.org/wiki/Image_sensor_format
+     Note: 1/2.8" is 5.2mm x 3.9mm, D=6.5mm.
 
-    QnVectorSpaceMapper currentMapper() {
-        return QnVectorSpaceMapper(
-            QnScalarSpaceMapper(-1, 1, 0, 360),
-            QnScalarSpaceMapper(0, 1, 0, -90),
-            QnScalarSpaceMapper(0, 1, 34, 678)
-        );
-    }
+     Calculate width-based crop factor C = 36/W.
+
+     Multiply focal lengths by width-based crop factor to get width-based equivalent focal length.
+    */
+
 
 } // anonymous namespace
 
@@ -235,10 +237,19 @@ PtzInstrument::PtzInstrument(QObject *parent):
     connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraAdded(camera);
+
+    // TODO: make configurable.
+    m_mapperByModel[QLatin1String("AXIS Q6035-E")] = new QnVectorSpaceMapper(
+        QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
+        QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
+        QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+    );
 }
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
+
+    qDeleteAll(m_mapperByModel);
 }
 
 void PtzInstrument::setPtzItemZValue(qreal ptzItemZValue) {
@@ -285,10 +296,15 @@ void PtzInstrument::ensureSelectionItem() {
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-    QVector3D oldPosition = currentMapper().logicalToPhysical(m_ptzPositionByCamera.value(camera));
+
+    const QnVectorSpaceMapper *mapper = m_mapperByModel[camera->getModel()];
+    if(!mapper)
+        return;
+
+    QVector3D oldPosition = mapper->logicalToPhysical(m_ptzPositionByCamera.value(camera));
 
     qreal focalLength = oldPosition.z();
-    qreal sideSize = 1.0 / focalLength * 35;
+    qreal sideSize = 1.0 / focalLength * 36;
 
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPosition.x() / 180 * M_PI, oldPosition.y() / 180 * M_PI);
     QVector3D x = QVector3D::crossProduct(QVector3D(0, 0, 1), r).normalized() * sideSize;
@@ -300,15 +316,18 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(spherical.phi < 0)
         spherical.phi += M_PI * 2.0;
 
-    QVector3D newPosition = currentMapper().physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
+    QVector3D newPosition = mapper->physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
+
+    qDebug() << "PTZ MOVETO" << newPosition << "FROM" << m_ptzPositionByCamera[camera];
 
     m_ptzPositionByCamera[camera] = newPosition;
-
-    qDebug() << "PTZ MOVETO" << newPosition;
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     int handle = server->apiConnection()->asyncPtzMoveTo(camera, newPosition.x(), newPosition.y(), newPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
     m_cameraByHandle[handle] = camera;
+
+    //int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
+    //m_cameraByHandle[handle] = camera;
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
@@ -546,6 +565,9 @@ void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPo
 
     m_cameraByHandle.remove(handle);
     m_ptzPositionByCamera[camera] = QVector3D(xPos, yPox, zoomPos);
+
+
+    qDebug() << "PTZ POS" << camera->getName() << "=" << QVector3D(xPos, yPox, zoomPos);
 }
 
 void PtzInstrument::at_ptzMoveTo_replyReceived(int status, int handle) {
