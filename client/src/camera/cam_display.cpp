@@ -349,20 +349,27 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
     if (m_isRealTimeSource)
     {
-        if (m_dataQueue.size() > 0 && m_dataQueue.mediaLength() > LIVE_MEDIA_LEN_THRESHOLD) {
-            sleep = false;
-            m_realTimeHurryUp = 5;
-            if (m_dataQueue.size() > m_dataQueue.maxSize()/2 && m_playAudio && needToSleep < 1000000ll / 15) 
+
+        if (isFullScreen()) {
+            if (m_dataQueue.size() >= m_dataQueue.maxSize()-1)
             {
-                // bool isFCZ = vd->flags & QnAbstractMediaData::MediaFlags_FCZ;
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
-                //if (needToSleep >= m_display[0]->getAvgDecodingTime())
-                //    setMTDecoding(true);                     
-                if (m_totalFrames > m_fczFrames*3 && !m_useMTRealTimeDecode) {
+                if (m_totalFrames > 100 && !m_useMTRealTimeDecode) {
                     m_useMTRealTimeDecode = true;
                     setMTDecoding(true); 
                 }
             }
+        }
+        else if (m_useMTRealTimeDecode) {
+            m_useMTRealTimeDecode = false;
+            setMTDecoding(false); 
+        }
+
+
+        QnAbstractMediaDataPtr lastFrame = m_dataQueue.last().dynamicCast<QnAbstractMediaData>();
+        if (lastFrame && lastFrame->dataType == QnAbstractMediaData::VIDEO && lastFrame->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD) {
+            sleep = false;
+            m_realTimeHurryUp = 5;
         }
         else if (m_realTimeHurryUp)
         {
@@ -783,14 +790,14 @@ bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
 
 void QnCamDisplay::putData(QnAbstractDataPacketPtr data)
 {
-    QnAbstractMediaDataPtr media = qSharedPointerDynamicCast<QnAbstractMediaData>(data);
-    if (media && (media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && m_dataQueue.mediaLength() > LIVE_MEDIA_LEN_THRESHOLD)
+    QnCompressedVideoDataPtr video = qSharedPointerDynamicCast<QnCompressedVideoData>(data);
+    if (video && (video->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_dataQueue.size() > 0 && video->timestamp - m_lastVideoPacketTime > LIVE_MEDIA_LEN_THRESHOLD)
     {
         m_delay.breakSleep();
     }
     QnAbstractDataConsumer::putData(data);
-	if (media && m_dataQueue.size() < 2)
-		hurryUpCkeckForCamera2(media); // check if slow network
+	if (video && m_dataQueue.size() < 2)
+		hurryUpCkeckForCamera2(video); // check if slow network
 }
 
 bool QnCamDisplay::canAcceptData() const

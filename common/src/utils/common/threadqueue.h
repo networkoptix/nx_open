@@ -83,7 +83,7 @@ public:
     {
         QMutexLocker mutex(&m_cs);
         int index = m_headIndex + m_bufferLen - 1;
-        return m_buffer[index % m_buffer.size()];
+        return m_bufferLen > 0 ? m_buffer[index % m_buffer.size()]: T();
     }
 
 
