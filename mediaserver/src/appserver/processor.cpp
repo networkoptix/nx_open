@@ -2,6 +2,7 @@
 
 #include "processor.h"
 #include "core/resource_managment/resource_pool.h"
+#include "core/resource_managment/resource_discovery_manager.h"
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(QnId serverId)
     : m_serverId(serverId)
@@ -41,6 +42,11 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         QByteArray errorString;
         QnVirtualCameraResourceList cameras;
         QString password = cameraResource->getAuth().password();
+
+
+        if (cameraResource->isManuallyAdded() && !QnResourceDiscoveryManager::instance().containManualCamera(cameraResource->getUrl()))
+            continue; //race condition. manual camera just deleted
+
         if (m_appServer->addCamera(cameraResource, cameras, errorString) != 0)
         {
             qCritical() << "QnAppserverResourceProcessor::processResources(): Call to addCamera failed. Reason: " << errorString;

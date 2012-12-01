@@ -939,6 +939,12 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
         m_manualCameraMap.erase(itr);
 }
 
+bool QnResourceDiscoveryManager::containManualCamera(const QString& uniqId)
+{
+    QMutexLocker lock(&m_searchersListMutex);
+    return m_manualCameraMap.contains(uniqId);
+}
+
 //====================================================================================
 
 void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState)
