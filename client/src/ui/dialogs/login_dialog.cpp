@@ -213,7 +213,7 @@ void LoginDialog::resetConnectionsModel() {
             selectedIndex = 1; // skip header row
     }
 
-    QStandardItem* headerFoundItem = new QStandardItem(tr("Local Area ECs"));
+    QStandardItem* headerFoundItem = new QStandardItem(tr("Auto-Discovered ECs"));
     headerFoundItem->setFlags(Qt::ItemIsEnabled);
     m_connectionsModel->appendRow(headerFoundItem);
 

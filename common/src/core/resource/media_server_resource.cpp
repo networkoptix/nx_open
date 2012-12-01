@@ -224,12 +224,14 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
     QMutexLocker lock(&m_mutex);
 
     QnResource::updateInner(other);
+    bool netAddrListChanged = false;
 
     QnMediaServerResourcePtr localOther = other.dynamicCast<QnMediaServerResource>();
     if(localOther) {
         setPanicMode(localOther->isPanicMode());
 
         m_reserve = localOther->m_reserve;
+        netAddrListChanged = m_netAddrList != localOther->m_netAddrList;
         m_netAddrList = localOther->m_netAddrList;
         setApiUrl(localOther->m_apiUrl);
         m_streamingUrl = localOther->getStreamingUrl();
@@ -250,7 +252,8 @@ void QnMediaServerResource::updateInner(QnResourcePtr other)
 
         setStorages(otherStorages);
     }
-    determineOptimalNetIF();
+    if (netAddrListChanged)
+        determineOptimalNetIF();
 }
 
 QString QnMediaServerResource::getProxyHost() const
