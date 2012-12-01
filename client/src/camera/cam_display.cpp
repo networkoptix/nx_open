@@ -350,7 +350,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     if (m_isRealTimeSource)
     {
 
-        if (isFullScreen()) {
+        if (isFullScreen() || qnRedAssController->counsumerCount() == 1) {
             if (m_dataQueue.size() >= m_dataQueue.maxSize()-1)
             {
                 // looks like not enought CPU for camera with high FPS value. I've add fps to switch logic to reduce real-time lag (MT decoding has addition 2-th frame delay)
@@ -360,9 +360,12 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 }
             }
         }
-        else if (m_useMTRealTimeDecode) {
-            m_useMTRealTimeDecode = false;
-            setMTDecoding(false); 
+        else {
+            m_totalFrames = 0;
+            if (m_useMTRealTimeDecode) {
+                m_useMTRealTimeDecode = false;
+                setMTDecoding(false); 
+            }
         }
 
 

@@ -255,6 +255,12 @@ void QnRedAssController::optimizeItemsQualityBySize()
     }
 }
 
+int QnRedAssController::counsumerCount() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_redAssInfo.size();
+}
+
 void QnRedAssController::registerConsumer(QnCamDisplay* display)
 {
     QMutexLocker lock(&m_mutex);
