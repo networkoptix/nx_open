@@ -260,7 +260,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     if(!isLiveSupported())
         return false;
 
-    if (live){
+    if (live) {
         m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
         m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
