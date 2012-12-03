@@ -35,7 +35,13 @@ int QnNovLauncher::appendFile(QFile& dstFile, const QString& srcFileName)
         int readed = srcFile.read(buffer, IO_BUFFER_SIZE);
         while (readed > 0)
         {
-            dstFile.write(buffer, readed);
+            if (dstFile.write(buffer, readed) != readed)
+            {
+                srcFile.close();
+                delete [] buffer;
+                return -2;
+            }
+
             readed = srcFile.read(buffer, IO_BUFFER_SIZE);
         }
         srcFile.close();
@@ -113,9 +119,11 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
                 filePosList.push_back(dstFile.pos());
                 fileNameList.push_back(srcMediaFiles[i]);
             }
+            else
+                return -2;
         }
     }
-    
+
     filePosList.push_back(dstFile.pos());
     fileNameList.push_back(novFileName);
 
@@ -136,5 +144,6 @@ int QnNovLauncher::createLaunchingFile(const QString& dstName, const QString& no
     dstFile.write((const char*) &MAGIC, sizeof(qint64)); // magic
 
     dstFile.close();
+
     return 0;
 }

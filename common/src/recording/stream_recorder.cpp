@@ -190,7 +190,7 @@ bool QnStreamRecorder::processData(QnAbstractDataPacketPtr data)
             m_endOfData = true;
         }
 
-        stop();
+        pleaseStop();
         return true;
     }
 

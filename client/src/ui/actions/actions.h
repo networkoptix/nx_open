@@ -634,12 +634,17 @@ namespace Qn {
         /**
          * Increments debug counter.
          */
-        IncrementDebugCounterAction,
+        DebugIncrementCounterAction,
 
         /**
          * Decrements debug counter.
          */
-        DecrementDebugCounterAction,
+        DebugDecrementCounterAction,
+
+        /**
+         * Show resource pool.
+         */
+        DebugShowResourcePoolAction,
 
 
         ActionCount,
@@ -721,6 +726,9 @@ namespace Qn {
 
         /** Action must have at least one child to appear in menu. */
         RequiresChildren        = 0x01000000,
+
+        /** Action can be executed only in dev-mode. */
+        DevMode                 = 0x02000000,
 
 
         /** Action can appear in main menu. */

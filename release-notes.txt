@@ -1,3 +1,6 @@
+Calendar shading is not working if chunks are not loaded
+Add a warning when changing admin password
+
 ----------------------------------------------- 1.4-Release-Candidate #2 -----------------------------------------------
 Features:
  - Ability to use Public IP for EC

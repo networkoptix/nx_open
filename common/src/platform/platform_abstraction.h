@@ -5,9 +5,10 @@
 
 #include "monitoring/global_monitor.h"
 #include "notification/platform_notifier.h"
+#include "images/platform_images.h"
 
 class QnPlatformAbstraction: public QObject {
-    Q_OBJECT;
+    Q_OBJECT
 public:
     QnPlatformAbstraction(QObject *parent = NULL);
     virtual ~QnPlatformAbstraction();
@@ -28,10 +29,15 @@ public:
         return m_notifier;
     }
 
+    QnPlatformImages *images() const {
+        return m_images;
+    }
+
 private:
     static QnPlatformAbstraction *s_instance;
     QnGlobalMonitor *m_monitor;
     QnPlatformNotifier *m_notifier;
+    QnPlatformImages *m_images;
 };
 
 #define qnPlatform (QnPlatformAbstraction::instance())

@@ -260,7 +260,7 @@ bool QnWorkbenchNavigator::setLive(bool live) {
     if(!isLiveSupported())
         return false;
 
-    if (live){
+    if (live) {
         m_timeSlider->setValue(m_timeSlider->maximum(), true);
     } else {
         m_timeSlider->setValue(m_timeSlider->minimum(), true); // TODO: need to save position here.
@@ -498,7 +498,8 @@ void QnWorkbenchNavigator::jumpBackward() {
 
     qint64 pos = reader->startTime();
     if(QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget)) {
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingRole : Qn::MotionRole);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
         
@@ -534,7 +535,8 @@ void QnWorkbenchNavigator::jumpForward() {
         pos = reader->endTime();
     } else {
         QnCachingTimePeriodLoader *loader = this->loader(m_currentMediaWidget);
-        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() ? Qn::RecordingRole : Qn::MotionRole);
+        bool canUseMotion = m_currentWidget->options() & QnResourceWidget::DisplayMotion;
+        QnTimePeriodList periods = loader->periods(loader->isMotionRegionsEmpty() || !canUseMotion ? Qn::RecordingRole : Qn::MotionRole);
         if (loader->isMotionRegionsEmpty())
             periods = QnTimePeriod::aggregateTimePeriods(periods, MAX_FRAME_DURATION);
 
@@ -862,7 +864,8 @@ void QnWorkbenchNavigator::updateSyncedPeriods() {
 void QnWorkbenchNavigator::updateSyncedPeriods(Qn::TimePeriodRole type) {
     QVector<QnTimePeriodList> periodsList;
     foreach(const QnResourceWidget *widget, m_syncedWidgets) {
-        if(type == Qn::MotionRole && !(widget->options() & QnResourceWidget::DisplayMotion)) {
+        if(type == Qn::MotionRole && !(widget->options() & QnResourceWidget::DisplayMotion)) 
+        {
             /* Ignore it. */
         } else if(QnCachingTimePeriodLoader *loader = this->loader(widget->resource())) {
             periodsList.push_back(loader->periods(type));
@@ -1295,6 +1298,13 @@ void QnWorkbenchNavigator::at_calendar_dateChanged(const QDate &date){
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
     m_timeSlider->finishAnimations();
-    m_timeSlider->setWindow(startMSec, endMSec, true);
+    if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
+        m_timeSlider->setWindow(
+                    qMin(startMSec, m_timeSlider->windowStart()),
+                    qMax(endMSec, m_timeSlider->windowEnd()),
+                    true);
+    } else {
+        m_timeSlider->setWindow(startMSec, endMSec, true);
+    }
 }
 

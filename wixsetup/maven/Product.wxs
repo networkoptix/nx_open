@@ -118,7 +118,7 @@
 		<!-- Properties -->
 		<Property Id="WelcomeDlg_Title" Value="${product.name} Installer Setup" />
 
-		<Property Id="INSTALLTYPE" Value="0"/>
+		<Property Id="INSTALLTYPE" Secure="yes"/>
 		<Property Id="SERVER_DIRECTORY_REG_IS_COLDSTORE" Secure="yes"/>
 
 		<Property Id="BUSYPORT" Secure="yes"/>

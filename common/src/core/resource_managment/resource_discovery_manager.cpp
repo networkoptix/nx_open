@@ -78,6 +78,7 @@ bool QnResourceDiscoveryManager::isServer() const
 void QnResourceDiscoveryManager::addDeviceServer(QnAbstractResourceSearcher* serv)
 {
     QMutexLocker locker(&m_searchersListMutex);
+    serv->setShouldBeUsed(!m_disabledVendorsForAutoSearch.contains(serv->manufacture()));
     m_searchersList.push_back(serv);
 }
 
@@ -148,9 +149,7 @@ void QnResourceDiscoveryManager::run()
 
     foreach (QnAbstractResourceSearcher *searcher, searchersList)
     {
-        searcher->setShouldBeUsed(true);
-
-        if (dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
+        if (searcher->shouldBeUsed() && dynamic_cast<QnAbstractFileResourceSearcher*>(searcher))
         {
             QnResourceList lst = searcher->search();
             m_resourceProcessor->processResources(lst);
@@ -946,6 +945,12 @@ void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resourc
         m_manualCameraMap.erase(itr);
 }
 
+bool QnResourceDiscoveryManager::containManualCamera(const QString& uniqId)
+{
+    QMutexLocker lock(&m_searchersListMutex);
+    return m_manualCameraMap.contains(uniqId);
+}
+
 //====================================================================================
 
 void QnResourceDiscoveryManager::resovle_conflicts(QnResourceList& resourceList, const CLIPList& busy_list, bool *ip_finished, CLNetState& netState)
@@ -999,4 +1004,9 @@ void QnResourceDiscoveryManager::dtsAssignment()
             vcRes->unLockDTSFactory();
         }
     }
+}
+
+void QnResourceDiscoveryManager::setDisabledVendors(const QStringList& vendors)
+{
+    m_disabledVendorsForAutoSearch = vendors.toSet();
 }

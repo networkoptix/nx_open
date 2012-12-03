@@ -352,10 +352,6 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
                       (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
-        qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
-                    "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
-                    QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
-
         if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         QnResourcePtr newResource = getNextMediaServerFromTime(m_resource, m_lastSeekTime/1000);

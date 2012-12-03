@@ -7,7 +7,8 @@ Q_GLOBAL_STATIC(QnRedAssController, inst);
 
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts
 static const int HIGH_QUALITY_RETRY_COUNTER = 1;
-static const QSize TO_LOWQ_SCREEN_SIZE(320,240);      // put item to LQ if visual size is small
+static const QSize TO_LOWQ_SCREEN_SIZE(320/1.4,240/1.4);      // put item to LQ if visual size is small
+
 
 static const int TIMER_TICK_INTERVAL = 500; // at ms
 static const int TOHQ_ADDITIONAL_TRY = 10*60*1000 / TIMER_TICK_INTERVAL; // every 10 min
@@ -252,6 +253,12 @@ void QnRedAssController::optimizeItemsQualityBySize()
         largeDisplay->getArchiveReader()->setQuality(MEDIA_Quality_High, true);
         m_lastSwitchTimer.restart();
     }
+}
+
+int QnRedAssController::counsumerCount() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_redAssInfo.size();
 }
 
 void QnRedAssController::registerConsumer(QnCamDisplay* display)

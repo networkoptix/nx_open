@@ -46,6 +46,44 @@ static const int MAX_CAMERA_OPEN_TIME = 1000 * 5;
 static const int DEFAULT_RTSP_TIMEOUT = 60; // in seconds
 const QString RTSP_CLOCK_FORMAT(QLatin1String("yyyyMMddThhmmssZ"));
 
+QMutex RtspServerTrackInfo::m_createSocketMutex;
+
+bool updatePort(UDPSocket* &socket, int port)
+{
+    delete socket;
+    socket = new UDPSocket();
+    return socket->setLocalPort(port);
+}
+
+bool RtspServerTrackInfo::openServerSocket(const QString& peerAddress)
+{
+    // try to find a couple of port, even for RTP, odd for RTCP
+    QMutexLocker lock(&m_createSocketMutex);
+    mediaSocket = new UDPSocket();
+    rtcpSocket = new UDPSocket();
+
+    bool opened = mediaSocket->setLocalPort(0);
+    if (!opened)
+        return false;
+    int startPort = mediaSocket->getLocalPort();
+    if(startPort&1) 
+        opened = updatePort(mediaSocket, ++startPort);
+    if (opened)
+        opened = rtcpSocket->setLocalPort(startPort+1);
+
+    while (!opened && startPort < 65534) {
+        startPort+=2;
+        opened = updatePort(mediaSocket,startPort) && updatePort(rtcpSocket,startPort+1);
+    }
+
+    if (opened)
+    {
+        mediaSocket->setDestAddr(peerAddress, clientPort);
+        rtcpSocket->setDestAddr(peerAddress, clientRtcpPort);
+    }
+    return opened;
+}
+
 class QnRtspConnectionProcessor::QnRtspConnectionProcessorPrivate: public QnTCPConnectionProcessor::QnTCPConnectionProcessorPrivate
 {
 public:

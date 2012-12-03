@@ -5,6 +5,8 @@
 #include "utils/common/util.h"
 #include "../resource/camera_resource.h"
 
+static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
+
 QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(QnResourcePtr res):
 QnAbstractStreamDataProvider(res),
 m_numberOfchannels(0)
@@ -169,7 +171,7 @@ void QnAbstractMediaStreamDataProvider::checkTime(QnAbstractMediaDataPtr media)
         else if ((quint64)m_lastMediaTime[media->channelNumber] != AV_NOPTS_VALUE) {
             qint64 timeDiff = media->timestamp - m_lastMediaTime[media->channelNumber];
         	// if timeDiff < -N it may be time correction or dayling time change
-            if (timeDiff >=-1000ll*1000  && timeDiff < MIN_FRAME_DURATION)
+            if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
                 media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
             }

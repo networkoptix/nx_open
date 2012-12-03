@@ -54,6 +54,8 @@ public:
         USE_HARDWARE_DECODING,
         TIME_MODE,
 
+        DEV_MODE,
+
         VARIABLE_COUNT
     };
     
@@ -97,6 +99,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool,                    isIpShownInTree,        setIpShownInTree,           IP_SHOWN_IN_TREE,           true)
         QN_DECLARE_RW_PROPERTY(bool,                    isHardwareDecodingUsed, setUseHardwareDecoding,     USE_HARDWARE_DECODING,      false)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,            timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
+        QN_DECLARE_RW_PROPERTY(bool,                    isDevMode,              setDevMode,                 DEV_MODE,                   false)
     QN_END_PROPERTY_STORAGE()
 
 private:
