@@ -37,9 +37,13 @@ public:
     void reset();
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    bool isLocalTimeChanged();
 private:
     double m_cameraClockToLocalDiff; // in secs
     qint64 m_lastTime;
+    double m_lastResultInSec;
+    QTime m_timer;
+    qint64 m_localStartTime;
 };
 
 class RTPIODevice

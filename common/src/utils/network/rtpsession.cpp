@@ -24,6 +24,7 @@ static const int TCP_CONNECT_TIMEOUT = 1000*2;
 static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
+static const int TIME_RESYNC_THRESHOLD = 15;
 
 //#define DEBUG_RTSP
 
@@ -146,9 +147,11 @@ quint32 RTPSession::SDPTrackInfo::getSSRC() const
 
 QnRtspTimeHelper::QnRtspTimeHelper():
     m_cameraClockToLocalDiff(INT_MAX),
-    m_lastTime(AV_NOPTS_VALUE)
+    m_lastTime(AV_NOPTS_VALUE),
+    m_lastResultInSec(0),
+    m_localStartTime(0)
 {
-
+    reset();
 }
 
 double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
@@ -162,6 +165,26 @@ void QnRtspTimeHelper::reset()
 {
     m_cameraClockToLocalDiff = INT_MAX;
     m_lastTime = AV_NOPTS_VALUE;
+    m_lastResultInSec = 0;
+    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_timer.restart();
+}
+
+bool QnRtspTimeHelper::isLocalTimeChanged()
+{
+    int elapsed;
+    qint64 ct;
+    do {
+        elapsed = m_timer.elapsed();
+        ct = qnSyncTime->currentMSecsSinceEpoch();
+    } while (m_timer.elapsed() != elapsed);
+    qint64 expectedLocalTime = elapsed + m_localStartTime;
+    bool timeChanged = qAbs(expectedLocalTime - ct) > TIME_RESYNC_THRESHOLD*1000;
+    if (!timeChanged && elapsed > 3600) {
+        m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+        m_timer.restart();
+    }
+    return timeChanged;
 }
 
 qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int frequency, bool recursiveAllowed)
@@ -176,17 +199,25 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
         // So, I've increased jitter threshold just in case (very slow mediaServer work e.t.c)
         // In any way, valid threshold behaviour if camera time is changed.
-        if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) {
+        //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
+        bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
+        if ((cameraTimeChanged || isLocalTimeChanged()) && recursiveAllowed)
+        {
+            //qDebug() << "reset time";
+            reset();
+            return getUsecTime(rtpTime, statistics, frequency, false);
+        }
+        else {
+            m_lastResultInSec = resultInSecs;
             qint64 rez = resultInSecs * 1000000ll;
             // check for negative time if camera timings is inaccurate
             if (m_lastTime != AV_NOPTS_VALUE && rez <= m_lastTime)
                 rez = m_lastTime + MIN_FRAME_DURATION;
             m_lastTime = rez;
+
+            //qDebug() << "rtspTime=" << QDateTime::fromMSecsSinceEpoch(rez/1000).toString(QLatin1String("hh:mm:ss.zzz")) << "stat.npt=" << statistics.nptTime << "stat.rtsp=" << statistics.timestamp;
+
             return rez;
-        }
-        else {
-            reset();
-            return getUsecTime(rtpTime, statistics, frequency, false);
         }
     }
 }
