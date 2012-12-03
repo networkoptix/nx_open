@@ -76,8 +76,8 @@ public:
     void setBusinessRuleId(const QnId& value) {m_businessRuleId = value; }
     QnId getBusinessRuleId() const             { return m_businessRuleId; }
 
-    void setToggleState(ToggleState value) { m_toggleState = value; }
-    ToggleState getToggleState() const { return m_toggleState; }
+    void setToggleState(ToggleState::Value value) { m_toggleState = value; }
+    ToggleState::Value getToggleState() const { return m_toggleState; }
 
     void setReceivedFromRemoveHost(bool value) { m_receivedFromRemoveHost = value; }
     bool isReceivedFromRemoveHost() const { return m_receivedFromRemoveHost; }
@@ -92,7 +92,7 @@ protected:
     QnId m_businessRuleId; // business rule, that generated this action
 
 private:
-    ToggleState m_toggleState;
+    ToggleState::Value m_toggleState;
     bool m_receivedFromRemoveHost;
 };
 

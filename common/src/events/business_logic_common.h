@@ -4,7 +4,20 @@
 #include <QString>
 #include <QVariant>
 
-enum ToggleState {ToggleState_Off = 0, ToggleState_On = 1, ToggleState_NotDefined};
+
+namespace ToggleState
+{
+    enum Value
+    {
+        Off = 0,
+        On = 1,
+        //!Used in event rule to associate non-toggle action with event with any toggle state
+        Any,
+        NotDefined
+    };
+
+    QString toString( Value val );
+}
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 
 QByteArray serializeBusinessParams(const QnBusinessParams& value);

@@ -17,8 +17,10 @@ public:
     QnCameraInputEvent(
         QnResourcePtr resource,
         const QString& inputPortID,
-        ToggleState toggleState,
+        ToggleState::Value toggleState,
         qint64 timestamp );
+
+    virtual QString toString() const;
 
     //!Implementation of QnAbstractBusinessEvent::checkCondition
     /*!

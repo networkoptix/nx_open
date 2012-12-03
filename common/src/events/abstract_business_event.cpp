@@ -1,5 +1,7 @@
+
 #include "abstract_business_event.h"
 #include "utils/common/synctime.h"
+
 
 namespace BusinessEventType
 {
@@ -25,9 +27,15 @@ namespace BusinessEventType
 
 
 QnAbstractBusinessEvent::QnAbstractBusinessEvent():
-    m_toggleState(ToggleState_NotDefined),
+    m_toggleState(ToggleState::NotDefined),
     m_eventType(BusinessEventType::BE_NotDefined),
     m_dateTime(qnSyncTime->currentUSecsSinceEpoch())
 {
+}
 
+QString QnAbstractBusinessEvent::toString() const
+{   //Input event (input 1, on)
+    QString text = BusinessEventType::toString(m_eventType) + QLatin1String(" event\n");
+    text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_dateTime).toString());
+    return text;
 }

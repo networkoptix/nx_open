@@ -15,7 +15,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timestamp)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent());
-    motionEvent->setToggleState(value ? ToggleState_On : ToggleState_Off);
+    motionEvent->setToggleState(value ? ToggleState::On : ToggleState::Off);
     motionEvent->setDateTime(timestamp);
     motionEvent->setResource(resource->toSharedPointer());
 
@@ -35,6 +35,6 @@ void QnBusinessEventConnector::at_cameraInput(
         QnCameraInputEventPtr( new QnCameraInputEvent(
             resource->toSharedPointer(),
             inputPortID,
-            value ? ToggleState_On : ToggleState_Off,
+            value ? ToggleState::On : ToggleState::Off,
             timestamp ) ) );
 }

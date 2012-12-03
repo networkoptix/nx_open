@@ -40,7 +40,7 @@ namespace BusinessActionType
 
 QnAbstractBusinessAction::QnAbstractBusinessAction(): 
     m_actionType(BusinessActionType::BA_NotDefined),
-    m_toggleState(ToggleState_NotDefined), 
+    m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoveHost(false) 
 {
 
@@ -76,13 +76,13 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteA
 
     switch(pb_businessAction.actiontype())
     {
-        case pb::BusinessActionType::CameraOutput:
-        case pb::BusinessActionType::Bookmark:
-        case pb::BusinessActionType::CameraRecording:
-        case pb::BusinessActionType::PanicRecording:
-        case pb::BusinessActionType::SendMail:
-        case pb::BusinessActionType::Alert:
-        case pb::BusinessActionType::ShowPopup:
+        case pb::CameraOutput:
+        case pb::Bookmark:
+        case pb::CameraRecording:
+        case pb::PanicRecording:
+        case pb::SendMail:
+        case pb::Alert:
+        case pb::ShowPopup:
             businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction());
     }
 

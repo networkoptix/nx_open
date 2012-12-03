@@ -772,6 +772,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     eventRule->setSrcResource( toSharedPointer() );
     eventRule->setEventType( BusinessEventType::BE_Camera_Input );
     eventRule->setActionType( BusinessActionType::BA_SendMail );
+    eventRule->setToggleStateFilter( ToggleState::Any );
     //eventRule->setDstResource(  );
     QnBusinessParams emailSendParams;
     emailSendParams[BusinessActionParamName::emailAddress] = QLatin1String("akolesnikov@networkoptix.com");
@@ -791,8 +792,6 @@ bool QnPlAxisResource::registerInputPortEventHandler()
     QUrl requestUrl;
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
-    //requestUrl.setUserName( auth.user() );
-    //requestUrl.setPassword( auth.password() );
     for( std::map<QString, unsigned int>::const_iterator
         it = m_inputPortNameToIndex.begin();
         it != m_inputPortNameToIndex.end();

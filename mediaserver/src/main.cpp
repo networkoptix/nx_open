@@ -973,6 +973,28 @@ int main(int argc, char* argv[])
 
 int testHttpClient()
 {
+#if 0
+    static const size_t BUF_SIZE = 1*1024*1024;
+    static const size_t TEST_TIME_MS = 5000;
+
+    char* srcBuf = new char[BUF_SIZE];
+    char* dstBuf = new char[BUF_SIZE];
+
+    DWORD t1 = GetTickCount();
+    uint64_t totalBytesCopied = 0;
+    do
+    {
+        memcpy( dstBuf, srcBuf, BUF_SIZE );
+        totalBytesCopied += BUF_SIZE;
+    }
+    while( GetTickCount() - t1 < TEST_TIME_MS );
+    std::cout<<"RAM Bus speed: "<<((totalBytesCopied * 1000 / TEST_TIME_MS) / (1024*1024*1024))<<"GBs\n";
+    return 0;
+#endif
+
+
+
+
     std::ofstream f( "F:\\temp\\Far30b2942.x86.20121110.msi", std::ios_base::out | std::ios_base::binary );
     if( !f.is_open() )
         return 2;

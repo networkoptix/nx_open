@@ -9,7 +9,7 @@
 QnCameraInputEvent::QnCameraInputEvent(
     QnResourcePtr resource,
     const QString& inputPortID,
-    ToggleState toggleState,
+    ToggleState::Value toggleState,
     qint64 timestamp )
 :
     m_inputPortID( inputPortID )
@@ -18,6 +18,13 @@ QnCameraInputEvent::QnCameraInputEvent(
     setResource( resource );
     setToggleState( toggleState );
     setDateTime( timestamp );
+}
+
+QString QnCameraInputEvent::toString() const
+{
+    QString text = QnAbstractBusinessEvent::toString();
+    text += QString::fromLatin1("Input port %1, state %2\n").arg(m_inputPortID).arg(ToggleState::toString(getToggleState()));
+    return text;
 }
 
 bool QnCameraInputEvent::checkCondition( const QnBusinessParams& /*params*/ ) const

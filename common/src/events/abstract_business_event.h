@@ -34,6 +34,9 @@ public:
     //virtual QByteArray serialize() = 0;
     //virtual bool deserialize(const QByteArray& data) = 0;
 
+    //!Convert to printable string
+    virtual QString toString() const;
+
     void setDateTime(qint64 value)             { m_dateTime = value;    }
     void setResource(QnResourcePtr resource)   { m_resource = resource; }
     QnResourcePtr getResource()                { return m_resource;     }
@@ -42,8 +45,8 @@ public:
 
     BusinessEventType::Value getEventType() const { return m_eventType; }
 
-    void setToggleState(ToggleState value) { m_toggleState = value; }
-    ToggleState getToggleState() const { return m_toggleState; }
+    void setToggleState(ToggleState::Value value) { m_toggleState = value; }
+    ToggleState::Value getToggleState() const { return m_toggleState; }
 
 protected:
     void setEventType(BusinessEventType::Value value) { m_eventType = value;   }
@@ -52,7 +55,7 @@ private:
     BusinessEventType::Value m_eventType;
     qint64 m_dateTime; // event date and time in usec from UTC
     QnResourcePtr m_resource; // resource that provide this event
-    ToggleState m_toggleState;
+    ToggleState::Value m_toggleState;
 };
 
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;

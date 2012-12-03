@@ -112,8 +112,8 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
             {
                 // Toggle event repeated with some interval with state 'on'.
                 if (!condOK)
-                    action = rule->getAction(bEvent, ToggleState_Off); // if toggled action is used and condition is no longer valid - stop action
-                else if (bEvent->getToggleState() == ToggleState_Off)
+                    action = rule->getAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
+                else if (bEvent->getToggleState() == ToggleState::Off)
                     action = rule->getAction(bEvent); // Toggle event goes to 'off'. stop action
             }
             else if (condOK)
@@ -160,7 +160,7 @@ bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActio
     QnBusinessParams::const_iterator autoResetTimeoutIter = action->getParams().find( RELAY_AUTO_RESET_TIMEOUT );
     return securityCam->setRelayOutputState(
         relayOutputIDIter->toString(),
-        action->getToggleState() == ToggleState_On,
+        action->getToggleState() == ToggleState::On,
         autoResetTimeoutIter == action->getParams().end() ? 0 : autoResetTimeoutIter->toUInt() );
 }
 
@@ -181,15 +181,14 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
     cl_log.log( QString::fromLatin1("Processing action SendMail from camera %1. Sending mail to %2").
         arg(sendMailAction->getEvent()->getResource()->getName()).arg(emailIter.value().toString()), cl_logDEBUG1 );
 
-    const QByteArray& serializedAction = sendMailAction->serialize();
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
-
     QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
             emailIter.value().toString(),
-            QString::fromLatin1("Event %1 occured on server %2").
-                arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).arg(QLatin1String("localhost")),   //TODO/IMPL get server ip or some name
-            QLatin1String(serializedAction),
+            QString::fromLatin1("Event %1 received from resource %2").
+                arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).
+                arg(sendMailAction->getEvent()->getResource() ? sendMailAction->getEvent()->getResource()->getName() : QString::fromLatin1("UNKNOWN")),
+            sendMailAction->toString(),
             emailSendErrorText ) )
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").

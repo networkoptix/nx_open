@@ -18,7 +18,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    QnAbstractBusinessActionPtr getAction(QnAbstractBusinessEventPtr bEvent, ToggleState tstate = ToggleState_NotDefined);
+    QnAbstractBusinessActionPtr getAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined);
     QnBusinessParams getEventCondition() const { return m_eventCondition; }
 
     QnResourcePtr getSrcResource() const { return m_source; }
@@ -36,8 +36,15 @@ public:
     QnBusinessParams getBusinessParams() const;
     void setBusinessParams(const QnBusinessParams& params);
 
+    /*!
+        Used to connect toggle events with non-toggle actions. Determines on which toggle state to trigger action.
+        \a On by default
+    */
+    ToggleState::Value getToggleStateFilter() const;
+    void setToggleStateFilter( ToggleState::Value _filter );
+
     /*
-    * Return true if last returned action is toggledAction and action has ToggleState_On
+    * Return true if last returned action is toggledAction and action has On
     */
     bool isActionInProgress() const;
 private:
@@ -50,6 +57,7 @@ private:
     QnBusinessParams m_actionParams;
 
     bool m_actionInProgress;
+    ToggleState::Value m_toggleStateFilter;
 };
 
 typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
