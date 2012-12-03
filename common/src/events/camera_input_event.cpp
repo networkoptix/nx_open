@@ -23,7 +23,7 @@ QnCameraInputEvent::QnCameraInputEvent(
 QString QnCameraInputEvent::toString() const
 {
     QString text = QnAbstractBusinessEvent::toString();
-    text += QString::fromLatin1("Input port %1, state %2\n").arg(m_inputPortID).arg(ToggleState::toString(getToggleState()));
+    text += QString::fromLatin1("  input port %1, state %2\n").arg(m_inputPortID).arg(ToggleState::toString(getToggleState()));
     return text;
 }
 

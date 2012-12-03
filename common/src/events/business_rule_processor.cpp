@@ -185,9 +185,13 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
     QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
             emailIter.value().toString(),
-            QString::fromLatin1("Event %1 received from resource %2").
-                arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).
-                arg(sendMailAction->getEvent()->getResource() ? sendMailAction->getEvent()->getResource()->getName() : QString::fromLatin1("UNKNOWN")),
+            sendMailAction->getEvent()->getResource()
+                ? QString::fromLatin1("Event %1 received from resource %2 (%3)").
+                    arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).
+                    arg(sendMailAction->getEvent()->getResource()->getName()).
+                    arg(sendMailAction->getEvent()->getResource()->getUrl())
+                : QString::fromLatin1("Event %1 received from resource UNKNOWN").
+                    arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())),
             sendMailAction->toString(),
             emailSendErrorText ) )
     {

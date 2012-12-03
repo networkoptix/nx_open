@@ -35,7 +35,7 @@ QnAbstractBusinessEvent::QnAbstractBusinessEvent():
 
 QString QnAbstractBusinessEvent::toString() const
 {   //Input event (input 1, on)
-    QString text = BusinessEventType::toString(m_eventType) + QLatin1String(" event\n");
+    QString text = QString::fromLatin1("  event type: %1\n").arg(BusinessEventType::toString(m_eventType));
     text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_dateTime).toString());
     return text;
 }
