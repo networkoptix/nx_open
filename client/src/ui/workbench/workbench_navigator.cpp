@@ -1298,6 +1298,13 @@ void QnWorkbenchNavigator::at_calendar_dateChanged(const QDate &date){
     qint64 startMSec = dt.toMSecsSinceEpoch();
     qint64 endMSec = dt.addDays(1).toMSecsSinceEpoch();
     m_timeSlider->finishAnimations();
-    m_timeSlider->setWindow(startMSec, endMSec, true);
+    if (QApplication::keyboardModifiers() == Qt::ControlModifier) {
+        m_timeSlider->setWindow(
+                    qMin(startMSec, m_timeSlider->windowStart()),
+                    qMax(endMSec, m_timeSlider->windowEnd()),
+                    true);
+    } else {
+        m_timeSlider->setWindow(startMSec, endMSec, true);
+    }
 }
 
