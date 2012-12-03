@@ -106,17 +106,6 @@ void QnClientMessageProcessor::at_licensesReceived(int status, const QByteArray 
 
 void QnClientMessageProcessor::at_messageReceived(QnMessage message)
 {
-    QByteArray debugStr;
-    QTextStream stream(&debugStr);
-
-    if (message.eventType == Qn::Message_Type_ResourceDisabledChange)
-        stream << "disabled: " << message.resourceDisabled;
-
-    if(message.eventType == Qn::Message_Type_ResourceStatusChange)
-        stream << "status: " << (int)message.resourceStatus;
-
-    qDebug() << debugStr;
-
     if (message.eventType == Qn::Message_Type_License)
     {
         if (message.license->isValid())
