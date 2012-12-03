@@ -26,6 +26,7 @@
 #include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
 
 #include "selection_item.h"
+#include "utils/settings.h"
 
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
@@ -239,6 +240,8 @@ PtzInstrument::PtzInstrument(QObject *parent):
         at_ptzCameraWatcher_ptzCameraAdded(camera);
 
     // TODO: make configurable.
+    QVector<QPair<qreal, qreal> > tilt;
+
     m_mapperByModel[QLatin1String("AXIS Q6035-E")] = new QnVectorSpaceMapper(
         QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
         QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
@@ -301,12 +304,13 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(!mapper)
         return;
 
-    QVector3D oldPosition = mapper->logicalToPhysical(m_ptzPositionByCamera.value(camera));
+    QVector3D oldLogicalPosition = m_ptzPositionByCamera.value(camera);
+    QVector3D oldPhysicalPosition = mapper->logicalToPhysical(oldLogicalPosition);
 
-    qreal focalLength = oldPosition.z();
-    qreal sideSize = 1.0 / focalLength * 36;
+    qreal focalLength = oldPhysicalPosition.z();
+    qreal sideSize = 36.0 / focalLength;
 
-    QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPosition.x() / 180 * M_PI, oldPosition.y() / 180 * M_PI);
+    QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
     QVector3D x = QVector3D::crossProduct(QVector3D(0, 0, 1), r).normalized() * sideSize;
     QVector3D y = QVector3D::crossProduct(x, r).normalized() * sideSize;
     
@@ -316,19 +320,27 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(spherical.phi < 0)
         spherical.phi += M_PI * 2.0;
 
-    QVector3D newPosition = mapper->physicalToLogical(QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPosition.z()));
+    QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPhysicalPosition.z());
+    QVector3D newLogicalPosition = mapper->physicalToLogical(newPhysicalPosition);
 
-    qDebug() << "PTZ MOVETO" << newPosition << "FROM" << m_ptzPositionByCamera[camera];
+    //newLogicalPosition.setY(1.0);
 
-    m_ptzPositionByCamera[camera] = newPosition;
+    qDebug() << "PTZ MOVETO(" << newLogicalPosition << ")";
+    qDebug() << "PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")";
+
+    m_ptzPositionByCamera[camera] = newLogicalPosition;
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    int handle = server->apiConnection()->asyncPtzMoveTo(camera, newPosition.x(), newPosition.y(), newPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
-    m_cameraByHandle[handle] = camera;
-
-    //int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
-    //m_cameraByHandle[handle] = camera;
+    
+    if(qnSettings->debugCounter() % 2) {
+        int handle = server->apiConnection()->asyncPtzMoveTo(camera, newLogicalPosition.x(), newLogicalPosition.y(), newLogicalPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
+        m_cameraByHandle[handle] = camera;
+    } else {
+        int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
+        m_cameraByHandle[handle] = camera;
+    }
 }
+
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
 
