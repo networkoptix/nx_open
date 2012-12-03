@@ -11,6 +11,8 @@
                     </RadioButtonGroup>
                 </Control>
                 <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)">
+                    <Condition Action="disable">NOT INSTALLTYPE</Condition>
+                    <Condition Action="enable">INSTALLTYPE</Condition>
                     <!--
                                                                     <Publish Event="NewDialog" Value="ViewLicenseAgreement">1</Publish>
                                                                     -->

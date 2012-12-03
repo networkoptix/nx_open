@@ -59,6 +59,7 @@ public:
     bool registerManualCameras(const QnManualCamerasMap& cameras);
     QnResourceList processManualAddedResources();
     void setDisabledVendors(const QStringList& vendors);
+    bool containManualCamera(const QString& uniqId);
 protected:
     QnResourceDiscoveryManager();
 

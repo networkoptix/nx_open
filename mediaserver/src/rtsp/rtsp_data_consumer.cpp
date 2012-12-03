@@ -34,7 +34,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
   m_rtStartTime(AV_NOPTS_VALUE),
   m_lastRtTime(0),
   m_lastMediaTime(0),
-  m_waitSCeq(0),
+  m_waitSCeq(-1),
   m_liveMode(false),
   m_pauseNetwork(false),
   m_singleShotMode(false),
@@ -450,13 +450,13 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     {
         QMutexLocker lock(&m_mutex);
         int cseq = media->opaque;
-        if (m_waitSCeq) {
+        if (m_waitSCeq != -1) {
             if (cseq != m_waitSCeq)
                 return true; // ignore data
             else if (m_pauseNetwork)
                 return false; // wait
 
-            m_waitSCeq = 0;
+            m_waitSCeq = -1;
             m_rtStartTime = AV_NOPTS_VALUE;
             m_adaptiveSleep.afterdelay(); // same as reset call
             m_adaptiveSleep.addQuant(MAX_CLIENT_BUFFER_SIZE_MS); // allow to stream data faster at start streaming for some client prebuffer. value in ms
@@ -511,7 +511,7 @@ bool QnRtspDataConsumer::processData(QnAbstractDataPacketPtr data)
     {
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
-        if (m_waitSCeq)
+        if (m_waitSCeq != -1)
             break;
 
         bool isRtcp = false;

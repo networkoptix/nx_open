@@ -16,7 +16,7 @@ public:
         ctx = 0;
     }
     TCPServerSocket* serverSocket;
-    QMap<TCPSocket*, QnLongRunnable*> connections;
+    QList<QnLongRunnable*> connections;
     QByteArray authDigest;
     QMutex portMutex;
     int newPort;
@@ -80,9 +80,9 @@ QnTcpListener::~QnTcpListener()
 void QnTcpListener::removeDisconnectedConnections()
 {
     Q_D(QnTcpListener);
-    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
+    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
     {
-        QnLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = *itr;
         if (!processor->isRunning()) {
             delete processor;
             itr = d->connections.erase(itr);
@@ -90,21 +90,22 @@ void QnTcpListener::removeDisconnectedConnections()
         else 
             ++itr;
     }
+    //qWarning() << "after erase connections size=" << d->connections.size();
 }
 
 void QnTcpListener::removeAllConnections()
 {
     Q_D(QnTcpListener);
 
-    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        QnLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = *itr;
         processor->pleaseStop();
     }
 
-    for (QMap<TCPSocket*, QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
+    for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
-        QnLongRunnable* processor = itr.value();
+        QnLongRunnable* processor = *itr;
         delete processor;
     }
     d->connections.clear();
@@ -181,7 +182,7 @@ void QnTcpListener::run()
             clientSocket->setReadTimeOut(processor->getSocketTimeout());
             clientSocket->setWriteTimeOut(processor->getSocketTimeout());
 
-            d->connections[clientSocket] = processor;
+            d->connections << processor;
             processor->start();
         }
         removeDisconnectedConnections();

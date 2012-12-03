@@ -8,6 +8,7 @@
 #ifdef Q_OS_WIN
 #include "windows.h"
 #endif
+#include "settings.h"
 
 static const int FFMPEG_BUFFER_SIZE = 1024*1024*2;
 
@@ -22,7 +23,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         ioBlockSize = IO_BLOCK_SIZE;
         ffmpegBufferSize = FFMPEG_BUFFER_SIZE;
 #ifdef Q_OS_WIN
-        systemFlags = FILE_FLAG_NO_BUFFERING;
+        if (qSettings.value("disableDirectIO").toInt() != 1)
+            systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
     QBufferedFile* rez = new QBufferedFile(fileName, ioBlockSize, ffmpegBufferSize);

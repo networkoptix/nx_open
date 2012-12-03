@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 #include <QtGui/QPainter>
+#include <QtGui/QAction>
 
 #include <plugins/resources/archive/abstract_archive_stream_reader.h>
 
@@ -869,7 +870,6 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
 
     if(!isLive)
         buttonBar()->setButtonsChecked(PtzButton | ZoomInButton | ZoomOutButton, false);
-    buttonBar()->setButtonsEnabled(PtzButton | ZoomInButton | ZoomOutButton, isLive);
 }
 
 void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
@@ -882,8 +882,10 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
     setOption(ControlPtz, checked && (m_camera->getCameraCapabilities() & QnVirtualCameraResource::HasPtz));
 
-    if(checked)
+    if(checked) {
         buttonBar()->setButtonsChecked(MotionSearchButton, false);
+        action(Qn::JumpToLiveAction)->trigger(); // TODO: evil hack! Won't work if SYNC is off and this item is not selected?
+    }
 }
 
 void QnMediaResourceWidget::at_zoomInButton_pressed() {

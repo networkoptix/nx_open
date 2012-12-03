@@ -17,6 +17,7 @@ public:
 
     void registerConsumer(QnCamDisplay* display);
     void unregisterConsumer(QnCamDisplay* display);
+    int counsumerCount() const;
 public slots:
     /* Inform controller that not enough data or CPU for stream */
     void onSlowStream(QnArchiveStreamReader* reader);
@@ -48,7 +49,7 @@ private:
 
     typedef bool (QnRedAssController::*SearchCondition)(QnCamDisplay*);
 
-    QMutex m_mutex;
+    mutable QMutex m_mutex;
     typedef QMap<QnCamDisplay*, RedAssInfo> ConsumersMap;
     ConsumersMap m_redAssInfo;
     QTimer m_timer;
