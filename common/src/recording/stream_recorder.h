@@ -111,10 +111,10 @@ protected:
     virtual QString fillFileName(QnAbstractMediaStreamDataProvider*);
 
     bool addSignatureFrame(QString& errorString);
+    void markNeedKeyData();
 private:
     bool saveData(QnAbstractMediaDataPtr md);
 private:
-    void markNeedKeyData();
     void writeData(QnAbstractMediaDataPtr md, int streamIndex);
     void updateSignatureAttr();
     qint64 findNextIFrame(qint64 baseTime);

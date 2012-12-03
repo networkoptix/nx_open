@@ -46,6 +46,8 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 
 bool QnServerStreamRecorder::canAcceptData() const
 {
+    return true;
+    /*
     if (!isRunning())
         return true;
 
@@ -62,12 +64,26 @@ bool QnServerStreamRecorder::canAcceptData() const
         }
     }
     return rez;
+    */
 }
 
 void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 {
     if (!isRunning()) 
         return;
+
+    bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
+    if (!rez) {
+        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
+        if (currentTime - m_lastWarningTime > 1000)
+        {
+            qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "frame rate decreased!";
+            m_lastWarningTime = currentTime;
+        }
+        markNeedKeyData();
+        return;
+    }
+
     
     QnAbstractMediaDataPtr media = data.dynamicCast<QnAbstractMediaData>();
     if (media) {
