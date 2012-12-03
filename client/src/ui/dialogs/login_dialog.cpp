@@ -334,7 +334,14 @@ void LoginDialog::at_saveButton_clicked() {
     QUrl url = currentUrl();
 
     if (!url.isValid()) {
-        QMessageBox::warning(this, tr("Invalid parameters"), tr("The information you have entered is not valid."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("Entered hostname is not valid."));
+        ui->hostnameLineEdit->setFocus();
+        return;
+    }
+
+    if (url.host().length() == 0) {
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("Host field cannot be empty."));
+        ui->hostnameLineEdit->setFocus();
         return;
     }
 
@@ -351,12 +358,22 @@ void LoginDialog::at_saveButton_clicked() {
     QString password = ui->passwordLineEdit->text();
 
     if (connections.contains(name)){
-       if (QMessageBox::warning(this, tr("Connection already exists"),
-                                      tr("Connection with the same name already exists. Overwrite it?"), QMessageBox::Yes, QMessageBox::No) == QMessageBox::No){
-           name = connections.generateUniqueName(name);
-       } else {
-           connections.removeOne(name);
-       }
+        QMessageBox::StandardButton button = QMessageBox::warning(this, tr("Connection already exists"),
+                                                                  tr("Connection with the same name already exists. Overwrite it?"),
+                                                                  QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                                                  QMessageBox::Yes);
+        switch(button) {
+        case QMessageBox::Cancel:
+            return;
+        case QMessageBox::No:
+            name = connections.generateUniqueName(name);
+            break;
+        case QMessageBox::Yes:
+            connections.removeOne(name);
+            break;
+        default:
+            break;
+        }
     }
 
     QnConnectionData connectionData(name, currentUrl());
