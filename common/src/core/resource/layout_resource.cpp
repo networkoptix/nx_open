@@ -172,7 +172,11 @@ void QnLayoutResource::updateItemUnderLock(const QUuid &itemUuid, const QnLayout
     }
 
     if(*pos == item) {
-        pos->dataByRole = item.dataByRole; // TODO: hack hack hack
+        QHash<int, QVariant>::const_iterator i = item.dataByRole.constBegin();
+        while (i != item.dataByRole.constEnd()) {
+            pos->dataByRole[i.key()] = i.value();
+            ++i;
+        }
         return;
     }
 
