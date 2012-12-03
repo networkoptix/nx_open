@@ -41,8 +41,21 @@ namespace {
      Multiply focal lengths by width-based crop factor to get width-based equivalent focal length.
     */
 
-
 } // anonymous namespace
+
+
+// -------------------------------------------------------------------------- //
+// QnPtzInformation
+// -------------------------------------------------------------------------- //
+class QnPtzInformation {
+public:
+    QnPtzInformation() {}
+    QnPtzInformation(const QnVectorSpaceMapper &mapper): fromCameraMapper(mapper), toCameraMapper(mapper) {}
+    QnPtzInformation(const QnVectorSpaceMapper &fromCameraMapper, const QnVectorSpaceMapper &toCameraMapper): fromCameraMapper(fromCameraMapper), toCameraMapper(toCameraMapper) {}
+
+    QnVectorSpaceMapper fromCameraMapper;
+    QnVectorSpaceMapper toCameraMapper;
+};
 
 
 // -------------------------------------------------------------------------- //
@@ -240,19 +253,28 @@ PtzInstrument::PtzInstrument(QObject *parent):
         at_ptzCameraWatcher_ptzCameraAdded(camera);
 
     // TODO: make configurable.
-    QVector<QPair<qreal, qreal> > tilt;
+    //QVector<QPair<qreal, qreal> > toCameraTilt;
+    //fromCameraTilt.push_back(qMakePair(-0.5, 90.0));
+    //fromCameraTilt.push_back(qMakePair(1.0, )
 
-    m_mapperByModel[QLatin1String("AXIS Q6035-E")] = new QnVectorSpaceMapper(
-        QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
-        QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
-        QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+    m_infoByModel[QLatin1String("AXIS Q6035-E")] = new QnPtzInformation(
+        QnVectorSpaceMapper(
+            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
+            QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
+            QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+        ),
+        QnVectorSpaceMapper(
+            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
+            QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
+            QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+        )
     );
 }
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
 
-    qDeleteAll(m_mapperByModel);
+    qDeleteAll(m_infoByModel);
 }
 
 void PtzInstrument::setPtzItemZValue(qreal ptzItemZValue) {
@@ -300,12 +322,12 @@ void PtzInstrument::ensureSelectionItem() {
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
-    const QnVectorSpaceMapper *mapper = m_mapperByModel[camera->getModel()];
-    if(!mapper)
+    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
+    if(!info)
         return;
 
     QVector3D oldLogicalPosition = m_ptzPositionByCamera.value(camera);
-    QVector3D oldPhysicalPosition = mapper->logicalToPhysical(oldLogicalPosition);
+    QVector3D oldPhysicalPosition = info->toCameraMapper.logicalToPhysical(oldLogicalPosition);
 
     qreal focalLength = oldPhysicalPosition.z();
     qreal sideSize = 36.0 / focalLength;
@@ -321,9 +343,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
         spherical.phi += M_PI * 2.0;
 
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPhysicalPosition.z());
-    QVector3D newLogicalPosition = mapper->physicalToLogical(newPhysicalPosition);
+    QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
 
-    //newLogicalPosition.setY(1.0);
+    newLogicalPosition.setY(0.5);
 
     qDebug() << "PTZ MOVETO(" << newLogicalPosition << ")";
     qDebug() << "PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")";

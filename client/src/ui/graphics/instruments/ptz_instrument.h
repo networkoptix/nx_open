@@ -16,7 +16,7 @@ class PtzSplashItem;
 class PtzSelectionItem;
 
 class QnMediaResourceWidget;
-class QnVectorSpaceMapper;
+class QnPtzInformation;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -84,7 +84,7 @@ private:
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
 
 private:
-    QHash<QString, const QnVectorSpaceMapper *> m_mapperByModel;
+    QHash<QString, const QnPtzInformation *> m_infoByModel;
 
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
