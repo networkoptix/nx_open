@@ -127,7 +127,9 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isUnsupported = widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server);
+        bool isUnsupported = 
+            (widget->resource()->flags() & (QnResource::network | QnResource::still_image | QnResource::server)) ||
+            !(widget->resource()->flags() & QnResource::utc); // TODO: this is wrong, we need a flag for exported files.
         if(isUnsupported)
             return Qn::InvisibleAction;
     }

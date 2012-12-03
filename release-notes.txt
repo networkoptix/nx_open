@@ -1,5 +1,10 @@
 Calendar shading is not working if chunks are not loaded
 Add a warning when changing admin password
+Distance is not saved if try to save layout as
+Invalid error message when manual camera addition fails
+Ping doesn't work for manually added cameras
+If do not login and go to About client crashes
+If quickly hit pause 4 times on live all videos display NO DATA
 
 ----------------------------------------------- 1.4-Release-Candidate #2 -----------------------------------------------
 Features:
