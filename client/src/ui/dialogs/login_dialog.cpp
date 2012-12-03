@@ -27,7 +27,6 @@
 
 #include <utils/settings.h>
 
-#include "ui_findappserverdialog.h"
 #include "connection_testing_dialog.h"
 
 #include "connectinfo.h"
