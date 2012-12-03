@@ -37,6 +37,11 @@ QString QnEnvironment::searchInPath(QString executable) {
 }
 
 void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
+    QString layoutPrefix = QLatin1String("layout://"); //hack
+    QString checkedPath(path);
+    if (checkedPath.startsWith(layoutPrefix))
+        checkedPath = checkedPath.remove(1, layoutPrefix.length());
+
 #if defined(Q_OS_WIN)
     const QString explorer = searchInPath(QLatin1String("explorer.exe"));
     if (explorer.isEmpty()) {
@@ -47,9 +52,9 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     }
     
     QStringList params;
-    if (!QFileInfo(path).isDir())
+    if (!QFileInfo(checkedPath).isDir())
         params << QLatin1String("/select,");
-    params << QDir::toNativeSeparators(path);
+    params << QDir::toNativeSeparators(checkedPath);
     QProcess::startDetached(explorer, params);
 #elif defined(Q_OS_MAC)
     Q_UNUSED(parent);
@@ -57,7 +62,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     QStringList scriptArgs;
     scriptArgs 
         << QLatin1String("-e")
-        << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(path);
+        << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"").arg(checkedPath);
     QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
     
     scriptArgs.clear();
