@@ -5,6 +5,7 @@
 #include "socket.h"
 
 #include <QtCore/QDateTime>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
 
 class RTPSession;
@@ -42,7 +43,7 @@ private:
     double m_cameraClockToLocalDiff; // in secs
     qint64 m_lastTime;
     double m_lastResultInSec;
-    QTime m_timer;
+    QElapsedTimer m_timer;
     qint64 m_localStartTime;
 };
 
