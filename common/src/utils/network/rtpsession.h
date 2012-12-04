@@ -19,11 +19,12 @@ static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 class RtspStatistic 
 {
 public:
-    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
+    RtspStatistic(): timestamp(0), nptTime(0), receivedPackets(0), receivedOctets(0), ssrc(0), localtime(0) {}
     bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
 
     quint32 timestamp;
     double nptTime;
+    double localtime;
     qint64 receivedPackets;
     qint64 receivedOctets;
     quint32 ssrc;
@@ -37,7 +38,7 @@ public:
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     void reset();
 private:
-    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    double cameraTimeToLocalTime(double cameraTime, double localTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
 private:
     double m_cameraClockToLocalDiff; // in secs

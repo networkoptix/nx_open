@@ -154,10 +154,11 @@ QnRtspTimeHelper::QnRtspTimeHelper():
     reset();
 }
 
-double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
+double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime, double localTime)
 {
     if (m_cameraClockToLocalDiff == INT_MAX)  
-        m_cameraClockToLocalDiff = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
+        m_cameraClockToLocalDiff = localTime - cameraTime;
+    //qDebug() << "diff=" << QString::number(m_cameraClockToLocalDiff - 2000000.0 - 340000.0);
     return cameraTime + m_cameraClockToLocalDiff;
 }
 
@@ -193,7 +194,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
+        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency), statistics.localtime);
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
@@ -1057,6 +1058,7 @@ RtspStatistic RTPSession::parseServerRTCPReport(quint8* srcBuffer, int srcBuffer
                 quint32 intTime = reader.getBits(32);
                 quint32 fracTime = reader.getBits(32);
                 stats.nptTime = intTime + (double) fracTime / UINT_MAX - rtspTimeDiff;
+                stats.localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
                 stats.timestamp = reader.getBits(32);
                 stats.receivedPackets = reader.getBits(32);
                 stats.receivedOctets = reader.getBits(32);
