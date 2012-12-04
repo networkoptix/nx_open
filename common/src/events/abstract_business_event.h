@@ -25,6 +25,11 @@ namespace BusinessEventType
     QString toString( Value val );
 }
 
+namespace BusinessEventParameters
+{
+    static QLatin1String toggleState( "toggleState" );
+}
+
 
 class QnAbstractBusinessEvent
 {
@@ -41,7 +46,11 @@ public:
     void setResource(QnResourcePtr resource)   { m_resource = resource; }
     QnResourcePtr getResource()                { return m_resource;     }
 
-    virtual bool checkCondition(const QnBusinessParams& params) const = 0;
+    /*!
+        Checks parameter \a BusinessEventParameters::toggleState.
+        \note Overrided method should call this implementation first
+    */
+    virtual bool checkCondition(const QnBusinessParams& params) const;
 
     BusinessEventType::Value getEventType() const { return m_eventType; }
 

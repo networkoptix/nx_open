@@ -22,12 +22,6 @@ public:
 
     virtual QString toString() const;
 
-    //!Implementation of QnAbstractBusinessEvent::checkCondition
-    /*!
-        Always returns true
-    */
-    virtual bool checkCondition( const QnBusinessParams& params ) const override;
-
     const QString& inputPortID() const;
 
 private:

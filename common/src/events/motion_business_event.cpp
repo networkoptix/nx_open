@@ -19,8 +19,3 @@ bool QnMotionBusinessEvent::deserialize(const QByteArray& data)
     return true;
 }
 */
-
-bool QnMotionBusinessEvent::checkCondition(const QnBusinessParams& params) const
-{
-    return true;
-}

@@ -8,7 +8,6 @@ class QnMotionBusinessEvent: public QnAbstractBusinessEvent
 public:
     QnMotionBusinessEvent();
 
-    virtual bool checkCondition(const QnBusinessParams& params) const override;
 protected:
     //virtual QByteArray serialize() override;
     //virtual bool deserialize(const QByteArray& data) override;

@@ -8,9 +8,10 @@ QnBusinessEventRule::QnBusinessEventRule()
 :
     m_eventType( BusinessEventType::BE_NotDefined ),
     m_actionType( BusinessActionType::BA_NotDefined ),
-    m_actionInProgress( false ),
-    m_toggleStateFilter( ToggleState::On )   //for example: if motion start/stop, send alert on start only
+    m_actionInProgress( false )
 {
+    //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_eventCondition[BusinessEventParameters::toggleState] = QLatin1String(ToggleState::toString(ToggleState::On));
 }
 
 QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tState)
@@ -43,9 +44,6 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
             ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
             result->setToggleState(value);
         }
-        else if ((m_toggleStateFilter != ToggleState::Any) && (bEvent->getToggleState()) != m_toggleStateFilter) {
-            return QnAbstractBusinessActionPtr(); // do not generate action (for example: if motion start/stop, send alert on start only)
-        }
     }
     else if (result->getToggleState() != ToggleState::NotDefined)
     {
@@ -68,15 +66,15 @@ void QnBusinessEventRule::setBusinessParams(const QnBusinessParams &params)
     m_actionParams = params;
 }
 
-ToggleState::Value QnBusinessEventRule::getToggleStateFilter() const
-{
-    return m_toggleStateFilter;
-}
-
-void QnBusinessEventRule::setToggleStateFilter( ToggleState::Value _filter )
-{
-    m_toggleStateFilter = _filter;
-}
+//ToggleState::Value QnBusinessEventRule::getToggleStateFilter() const
+//{
+//    return m_toggleStateFilter;
+//}
+//
+//void QnBusinessEventRule::setToggleStateFilter( ToggleState::Value _filter )
+//{
+//    m_toggleStateFilter = _filter;
+//}
 
 bool QnBusinessEventRule::isActionInProgress() const
 {

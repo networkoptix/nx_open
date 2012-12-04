@@ -16,7 +16,8 @@ namespace ToggleState
         NotDefined
     };
 
-    QString toString( Value val );
+    const char* toString( Value val );
+    Value fromString( const char* str );
 }
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 

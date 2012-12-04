@@ -39,3 +39,13 @@ QString QnAbstractBusinessEvent::toString() const
     text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_dateTime).toString());
     return text;
 }
+
+bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const
+{
+    QnBusinessParams::const_iterator toggleStateParamIter = params.find(BusinessEventParameters::toggleState);
+    if( toggleStateParamIter == params.end() )
+        return true;
+
+    ToggleState::Value requiredToggleState = ToggleState::fromString(toggleStateParamIter.value().toString().toLatin1().data());
+    return requiredToggleState == ToggleState::Any || requiredToggleState == m_toggleState;
+}
