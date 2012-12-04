@@ -714,7 +714,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
     }
 }
 
-void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClient* const httpClient )
+void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClient* const /*httpClient*/ )
 {
     //TODO/IMPL reconnect
 }
@@ -763,22 +763,6 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 
     if( m_inputPortNameToIndex.size() > 0 )
         registerInputPortEventHandler();
-    //if( m_outputPortNameToIndex.size() > 0 )
-    //    setRelayOutputState( m_outputPortNameToIndex.begin()->first, true, 5000 );
-
-
-#ifdef _DEBUG
-    QnBusinessEventRulePtr eventRule( new QnBusinessEventRule() );
-    eventRule->setSrcResource( toSharedPointer() );
-    eventRule->setEventType( BusinessEventType::BE_Camera_Input );
-    eventRule->setActionType( BusinessActionType::BA_SendMail );
-    eventRule->setToggleStateFilter( ToggleState::Any );
-    //eventRule->setDstResource(  );
-    QnBusinessParams emailSendParams;
-    emailSendParams[BusinessActionParamName::emailAddress] = QLatin1String("akolesnikov@networkoptix.com");
-    eventRule->setBusinessParams( emailSendParams );
-    QnBusinessRuleProcessor::instance()->addBusinessRule( eventRule );
-#endif
 }
 
 bool QnPlAxisResource::registerInputPortEventHandler()
