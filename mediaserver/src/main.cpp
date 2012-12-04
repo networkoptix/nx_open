@@ -568,6 +568,17 @@ void QnMain::loadResourcesFromECS()
     {
         QnCameraHistoryPool::instance()->addCameraHistory(history);
     }
+
+    //loading business rules
+    QnBusinessEventRules rules;
+    while( appServerConnection->getBusinessRules( rules, errorString ) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << errorString;
+        QnSleep::msleep(1000);
+    }
+
+    foreach(QnBusinessEventRulePtr rule, rules)
+        QnBusinessRuleProcessor::instance()->addBusinessRule( rule );
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -945,19 +956,8 @@ void stopServer(int signal)
     qApp->quit();
 }
 
-//#define TEST_HTTP
-
-#ifdef TEST_HTTP
-int testHttpClient();
-#endif
-
 int main(int argc, char* argv[])
 {
-#ifdef TEST_HTTP
-    return testHttpClient();
-#endif
-
-
     QN_INIT_MODULE_RESOURCES(common);
 
     QnVideoService service(argc, argv);
@@ -966,54 +966,3 @@ int main(int argc, char* argv[])
 
     return result;
 }
-
-#ifdef TEST_HTTP
-
-#include <fstream>
-#include <utils/network/http/httpclient.h>
-
-int testHttpClient()
-{
-#if 0
-    static const size_t BUF_SIZE = 1*1024*1024;
-    static const size_t TEST_TIME_MS = 5000;
-
-    char* srcBuf = new char[BUF_SIZE];
-    char* dstBuf = new char[BUF_SIZE];
-
-    DWORD t1 = GetTickCount();
-    uint64_t totalBytesCopied = 0;
-    do
-    {
-        memcpy( dstBuf, srcBuf, BUF_SIZE );
-        totalBytesCopied += BUF_SIZE;
-    }
-    while( GetTickCount() - t1 < TEST_TIME_MS );
-    std::cout<<"RAM Bus speed: "<<((totalBytesCopied * 1000 / TEST_TIME_MS) / (1024*1024*1024))<<"GBs\n";
-    return 0;
-#endif
-
-
-
-
-    std::ofstream f( "F:\\temp\\Far30b2942.x86.20121110.msi", std::ios_base::out | std::ios_base::binary );
-    if( !f.is_open() )
-        return 2;
-
-    nx_http::HttpClient httpClient;
-    if( !httpClient.doGet( QUrl( QLatin1String("http://www.farmanager.com/files/Far30b2942.x86.20121110.msi") ) ) )
-    //if( !httpClient.doGet( QUrl( QLatin1String("http://192.168.0.31/HUY") ) ) )
-        return 1;
-
-    if( !httpClient.startReadMessageBody() )
-        return 3;
-    while( !httpClient.eof() )
-    {
-        const nx_http::BufferType& buf = httpClient.fetchMessageBodyBuffer();
-        f.write( buf.data(), buf.size() );
-    }
-    f.close();
-
-    return 0;
-}
-#endif
