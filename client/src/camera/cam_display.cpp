@@ -1423,6 +1423,11 @@ bool QnCamDisplay::isStillImage() const
     return m_isStillImage;
 }
 
+bool QnCamDisplay::isEOFReached() const
+{
+    return m_eofSignalSended == true;
+}
+
 bool QnCamDisplay::isLongWaiting() const
 {
     if (isRealTimeSource())

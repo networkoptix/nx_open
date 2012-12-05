@@ -80,6 +80,7 @@ public:
 
     bool canAcceptData() const;
     bool isLongWaiting() const;
+    bool isEOFReached() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
