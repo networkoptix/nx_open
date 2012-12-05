@@ -244,7 +244,11 @@ namespace nx_http
         *dstBuffer += version;
         *dstBuffer += " ";
         char buf[11];
+#ifdef _WIN32
         _snprintf( buf, sizeof(buf), "%d", statusCode );
+#else
+        snprintf( buf, sizeof(buf), "%d", statusCode );
+#endif
         *dstBuffer += buf;
         *dstBuffer += " ";
         *dstBuffer += reasonPhrase;

@@ -10,7 +10,7 @@ namespace
     template<class T>
         bool serialize( const T val, quint8** const bufStart, const quint8* const bufEnd )
     {
-        if( bufEnd - *bufStart < sizeof(val) )
+        if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(val) )
             return false;
         memcpy( *bufStart, &val, sizeof(val) );
         *bufStart += sizeof(val);
@@ -20,7 +20,7 @@ namespace
     template<class T>
         bool deserialize( T* const val, const quint8** const bufStart, const quint8* const bufEnd )
     {
-        if( bufEnd - *bufStart < sizeof(*val) )
+        if( bufEnd <= *bufStart || (size_t)(bufEnd - *bufStart) < sizeof(*val) )
             return false;
         memcpy( val, *bufStart, sizeof(*val) );
         *bufStart += sizeof(*val);

@@ -45,10 +45,10 @@ public:
         if( it == taskToTime.end() )
             return;
 
-        size_t ret = timeToTask.erase( make_pair( it->second, it->first ) );
+        /*size_t ret =*/ timeToTask.erase( make_pair( it->second, it->first ) );
         //ASSERT2( ret == 1, "deleteTimer", "ret = "<<ret<<", task time (UTC) "<<it->second<<", current UTC time "<<QDateTime::currentMSecsSinceEpoch() );
 
-        map<quint64, qint64>::size_type s1 = taskToTime.size();
+        /*map<quint64, qint64>::size_type s1 =*/ taskToTime.size();
         taskToTime.erase( it );
         //ASSERT2( taskToTime.size() == s1-1, "s1 = "<<s1<<", taskToTime.size() = "<<taskToTime.size() );
     }
@@ -163,9 +163,9 @@ void TimerManager::run()
                 TimerEventHandler* const taskManager = taskIter->second;
                 const quint64 timerID = taskIter->first.second;
 
-                std::map<quint64, qint64>::size_type erasedCnt = m_impl->taskToTime.erase( timerID );
+                /*std::map<quint64, qint64>::size_type erasedCnt =*/ m_impl->taskToTime.erase( timerID );
                 //ASSERT2( erasedCnt == 1, "erasedCnt = "<<erasedCnt<<", timerID = "<<timerID<<", task time (UTC) = "<<taskIter->first.first );
-                map<pair<qint64, quint64>, TimerEventHandler* const>::size_type s1 = m_impl->timeToTask.size();
+                /*map<pair<qint64, quint64>, TimerEventHandler* const>::size_type s1 =*/ m_impl->timeToTask.size();
                 m_impl->timeToTask.erase( taskIter );
                 //ASSERT2( m_impl->timeToTask.size() == s1-1, "s1 = "<<s1<<", m_impl->timeToTask.size() = "<<m_timeToTask.size() );
                 try

@@ -1969,7 +1969,7 @@ void QnPlOnvifResource::onRenewSubscriptionTimer()
         return;
     }
 
-    int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
+    unsigned int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
     renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
         ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
         : 0;
@@ -2280,7 +2280,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
             m_onvifNotificationSubscriptionID = handler.subscriptionID;
     }
 
-    int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
+    unsigned int renewSubsciptionTimeoutSec = utcTerminationTime - ::time(NULL);
     renewSubsciptionTimeoutSec = renewSubsciptionTimeoutSec > RENEW_NOTIFICATION_FORWARDING_SECS
         ? renewSubsciptionTimeoutSec - RENEW_NOTIFICATION_FORWARDING_SECS
         : 0;

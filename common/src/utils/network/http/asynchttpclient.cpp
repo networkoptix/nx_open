@@ -60,6 +60,9 @@ namespace nx_http
                             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
                             emit done( this );
                             break;
+
+                       default:
+                            break;
                     }
                     break;
 

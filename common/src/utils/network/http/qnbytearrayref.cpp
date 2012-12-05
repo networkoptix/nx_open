@@ -25,8 +25,8 @@ QnByteArrayConstRef::QnByteArrayConstRef(
     m_offset( offset ),
     m_count( count == npos ? src.size()-offset : count )
 {
-    Q_ASSERT( m_offset <= src.size() );
-    Q_ASSERT( m_count <= src.size() );
+    Q_ASSERT( m_offset <= (size_type)src.size() );
+    Q_ASSERT( m_count <= (size_type)src.size() );
 }
 
 const QnByteArrayConstRef::value_type* QnByteArrayConstRef::data() const
@@ -90,7 +90,7 @@ QnByteArrayConstRef::operator QByteArray() const
 
 bool operator==( const QnByteArrayConstRef& left, const QByteArray& right )
 {
-    if( left.size() != right.size() )
+    if( left.size() != (QnByteArrayConstRef::size_type)right.size() )
         return false;
     return memcmp( left.constData(), right.constData(), left.size() ) == 0;
 }

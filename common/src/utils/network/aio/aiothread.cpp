@@ -80,7 +80,7 @@ namespace aio
 
                 if( task.type == SocketAddRemoveTask::tAdding )
                 {
-                    if( !pollSet.add( task.socket.value, task.eventType, task.eventHandler ) )
+                    if( !pollSet.add( task.socket.data(), task.eventType, task.eventHandler ) )
                         cl_log.log( QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logWARNING );
                     if( task.eventType == PollSet::etRead )
                         --newReadMonitorTaskCount;
@@ -91,7 +91,7 @@ namespace aio
                 }
                 else    //task.type == SocketAddRemoveTask::tRemoving
                 {
-                    pollSet.remove( task.socket.value, task.eventType );
+                    pollSet.remove( task.socket.data(), task.eventType );
                 }
                 it = pollSetModificationQueue.erase( it );
             }

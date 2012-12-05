@@ -42,6 +42,8 @@ namespace nx_http
     typedef std::map<StringType, StringType> HttpHeaders;
     typedef HttpHeaders::value_type HttpHeader;
 
+    static const size_t BufferNpos = size_t(-1);
+
 
     //following algorithms differ from stl analogue in following: they limit number of characters checked during search 
         //(last argument is the number of characters to check (str) but not length of searchable characters string (toSearch))
@@ -108,8 +110,6 @@ namespace nx_http
         return BufferNpos;
     }
 
-
-    static const size_t BufferNpos = size_t(-1);
 
     bool parseHeader(
         StringType* const headerName,

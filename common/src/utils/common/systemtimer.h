@@ -68,9 +68,11 @@ public:
     template<class Func>
         bool start( Func func, unsigned int timeoutMillis )
     {
+        typedef TimerHandler<Func> NewHandlerType;
+
         cancel();
         delete m_handler;
-        m_handler = new typename TimerHandler<Func>( func );
+        m_handler = new NewHandlerType( func );
         return AbstractSystemTimer::start( timeoutMillis );
     }
 

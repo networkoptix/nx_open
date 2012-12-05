@@ -4,7 +4,7 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-#ifdef Q_OS_LINUX
+//#ifdef Q_OS_LINUX
 
 #include "pollset.h"
 
@@ -24,9 +24,11 @@ using namespace std;
 class PollSetImpl
 {
 public:
+    //!map<fd, pair<events mask, user data> >
+    typedef std::map<Socket*, std::pair<int, void*> > MonitoredEventMap;
+
     int epollSetFD;
-    //!map<fd, events mask>
-    std::map<Socket*, int> monitoredEvents;
+    MonitoredEventMap monitoredEvents;
     int signalledSockCount;
     size_t epollEventsArrayCapacity;
     epoll_event* epollEventsArray;
@@ -38,7 +40,6 @@ public:
         epollSetFD( -1 ),
         signalledSockCount( 0 ),
         epollEventsArrayCapacity( 32 ),
-        epollEventsArray( new epoll_event[epollEventsArrayCapacity] ),
         epollEventsArray( new epoll_event[epollEventsArrayCapacity] ),
         eventFD( -1 )
     {
@@ -144,13 +145,13 @@ PollSet::const_iterator& PollSet::const_iterator::operator++()       //++it
 
 Socket* PollSet::const_iterator::socket() const
 {
-    return static_cast<Socket*>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr);
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->first;
 }
 
 /*!
     \return bit mask of \a EventType
 */
-unsigned int PollSet::const_iterator::revents() const
+PollSet::EventType PollSet::const_iterator::eventType() const
 {
     const uint32_t epollREvents = m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].events;
     unsigned int revents = 0;
@@ -158,7 +159,12 @@ unsigned int PollSet::const_iterator::revents() const
         revents |= etRead;
     if( epollREvents & EPOLLOUT )
         revents |= etWrite;
-    return revents;
+    return (PollSet::EventType)revents;
+}
+
+void* PollSet::const_iterator::userData() const
+{
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.second;
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -232,21 +238,21 @@ void PollSet::interrupt()
 }
 
 //!Add socket to set. Does not take socket ownership
-bool PollSet::add( Socket* const sock, EventType eventType )
+bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
 
-    pair<map<Socket*, int>::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, 0 ) );
+    pair<PollSetImpl::MonitoredEventMap::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, make_pair(0, userData) ) );
     if( p.second )
     {
         //adding new fd to set
         epoll_event _event;
         memset( &_event, 0, sizeof(_event) );
-        _event.data.ptr = sock;
+        _event.data.ptr = &*p.first;
         _event.events = epollEventType | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_ADD, sock->handle(), &_event ) == 0 )
         {
-            p.first->second = epollEventType;
+            p.first->second.first = epollEventType;
             return true;
         }
         else
@@ -257,16 +263,16 @@ bool PollSet::add( Socket* const sock, EventType eventType )
     }
     else
     {
-        if( p.first->second & epollEventType )
+        if( p.first->second.first & epollEventType )
             return true;    //event evenType is already listened on socket
 
         epoll_event _event;
         memset( &_event, 0, sizeof(_event) );
-        _event.data.ptr = sock;
-        _event.events = epollEventType | p.first->second | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
+        _event.data.ptr = &*p.first;
+        _event.events = epollEventType | p.first->second.first | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
         {
-            p.first->second |= epollEventType;
+            p.first->second.first |= epollEventType;
             return true;
         }
         else
@@ -280,20 +286,20 @@ bool PollSet::add( Socket* const sock, EventType eventType )
 void PollSet::remove( Socket* const sock, EventType eventType )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
-    map<Socket*, int>::iterator it = m_impl->monitoredEvents.find( sock );
-    if( (it == m_impl->monitoredEvents.end()) || !(it->second & epollEventType) )
+    PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
+    if( (it == m_impl->monitoredEvents.end()) || !(it->second.first & epollEventType) )
         return;
 
-    const int eventsBesidesRemovedOne = it->second & (~epollEventType);
+    const int eventsBesidesRemovedOne = it->second.first & (~epollEventType);
     if( eventsBesidesRemovedOne )
     {
         //socket is being listened for multiple events, modifying event set
         epoll_event _event;
         memset( &_event, 0, sizeof(_event) );
-        _event.data.ptr = sock;
+        _event.data.ptr = &*it;
         _event.events = eventsBesidesRemovedOne | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
-            it->second = eventsBesidesRemovedOne;
+            it->second.first = eventsBesidesRemovedOne;
     }
     else
     {
@@ -352,4 +358,4 @@ unsigned int PollSet::maxPollSetSize()
     return 128;
 }
 
-#endif
+//#endif

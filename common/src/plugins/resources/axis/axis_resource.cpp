@@ -2,6 +2,7 @@
 #include "axis_resource.h"
 
 #include <functional>
+#include <memory>
 
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "axis_stream_reader.h"
@@ -674,7 +675,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
     Q_ASSERT( httpClient );
 
     const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
-    for( size_t offset = 0; offset < msgBodyBuf.size(); )
+    for( int offset = 0; offset < msgBodyBuf.size(); )
     {
         size_t bytesProcessed = 0;
         nx_http::MultipartContentParser::ResultCode resultCode = m_multipartContentParser.parseBytes(
@@ -683,9 +684,6 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
         offset += bytesProcessed;
         switch( resultCode )
         {
-            case nx_http::MultipartContentParser::needMoreData:
-                continue;
-
             case nx_http::MultipartContentParser::partDataDone:
                 if( m_currentMonitorData.isEmpty() )
                 {
@@ -710,6 +708,9 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClient* 
             case nx_http::MultipartContentParser::eof:
                 //TODO/IMPL reconnect
                 break;
+
+            default:
+                continue;
         }
     }
 }
