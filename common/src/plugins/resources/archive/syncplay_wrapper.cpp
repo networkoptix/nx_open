@@ -490,6 +490,7 @@ qint64 QnArchiveSyncPlayWrapper::endTime() const
 void QnArchiveSyncPlayWrapper::removeArchiveReader(QnAbstractArchiveReader* reader)
 {
     erase(reader->getArchiveDelegate());
+    onEofReached(0, true);
 }
 
 void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
