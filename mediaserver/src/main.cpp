@@ -920,12 +920,12 @@ void stopServer(int signal)
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
     QnRecordingManager::instance()->stop();
-    QnVideoCameraPool::instance()->stop();
     if (serviceMainInstance)
     {
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
+    QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
 }
