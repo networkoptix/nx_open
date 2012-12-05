@@ -145,6 +145,7 @@ private:
 private:
     QUrl m_url;
     QnRequestParamList m_requestParams;
+    QnRequestHeaderList m_requestHeaders;
 
     QnResourceFactory& m_resourceFactory;
     QnMediaServerResourceFactory m_serverFactory;
@@ -157,12 +158,14 @@ private:
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
+    static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
     static QString currentVersion();
 	static QnResourceFactory* defaultFactory();
 
+    static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
@@ -175,6 +178,7 @@ public:
 private:
     QMutex m_mutex;
     QString m_clientGuid;
+    QString m_authKey;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
     QString m_currentVersion;
