@@ -253,20 +253,23 @@ PtzInstrument::PtzInstrument(QObject *parent):
         at_ptzCameraWatcher_ptzCameraAdded(camera);
 
     // TODO: make configurable.
-    //QVector<QPair<qreal, qreal> > toCameraTilt;
-    //fromCameraTilt.push_back(qMakePair(-0.5, 90.0));
-    //fromCameraTilt.push_back(qMakePair(1.0, )
+    QVector<QPair<qreal, qreal> > toCameraY;
+    toCameraY.push_back(qMakePair(-0.5, -90.0));
+    toCameraY.push_back(qMakePair(0.0, 0.0));
+    toCameraY.push_back(qMakePair(1.0, 20.0));
 
-    m_infoByModel[QLatin1String("AXIS Q6035-E")] = new QnPtzInformation(
+
+    const qreal cropFactor = 7.92;//6.92;
+    m_infoByModel[QLatin1String("Q6035-E")] = new QnPtzInformation(
         QnVectorSpaceMapper(
             QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
             QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
-            QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
         ),
         QnVectorSpaceMapper(
             QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
-            QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
-            QnScalarSpaceMapper(0, 1, 4.7 * 6.92, 94 * 6.92, Qn::ConstantExtrapolation)
+            QnScalarSpaceMapper(toCameraY, Qn::ConstantExtrapolation),
+            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
         )
     );
 }
@@ -344,8 +347,6 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPhysicalPosition.z());
     QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
-
-    newLogicalPosition.setY(0.5);
 
     qDebug() << "PTZ MOVETO(" << newLogicalPosition << ")";
     qDebug() << "PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")";
