@@ -28,6 +28,14 @@
 #include "selection_item.h"
 #include "utils/settings.h"
 
+#define QN_PTZ_INSTRUMENT_DEBUG
+
+#ifdef QN_PTZ_INSTRUMENT_DEBUG
+#   define TRACE(...) qDebug() << __VA_ARGS__;
+#else
+#   define TRACE(...)
+#endif
+
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
@@ -258,7 +266,6 @@ PtzInstrument::PtzInstrument(QObject *parent):
     toCameraY.push_back(qMakePair(0.0, 0.0));
     toCameraY.push_back(qMakePair(1.0, 20.0));
 
-
     const qreal cropFactor = 7.92;//6.92;
     m_infoByModel[QLatin1String("Q6035-E")] = new QnPtzInformation(
         QnVectorSpaceMapper(
@@ -329,15 +336,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(!info)
         return;
 
-    QVector3D oldLogicalPosition = m_ptzPositionByCamera.value(camera);
-    QVector3D oldPhysicalPosition = info->toCameraMapper.logicalToPhysical(oldLogicalPosition);
+    QVector3D oldPhysicalPosition = m_physicalPositionByCamera.value(camera);
 
-    qreal focalLength = oldPhysicalPosition.z();
-    qreal sideSize = 36.0 / focalLength;
-
+    qreal sideSize = 36.0 / oldPhysicalPosition.z();
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
-    QVector3D x = QVector3D::crossProduct(QVector3D(0, 0, 1), r).normalized() * sideSize;
-    QVector3D y = QVector3D::crossProduct(x, r).normalized() * sideSize;
+    QVector3D x = sphericalToCartesian<QVector3D>(1.0, (oldPhysicalPosition.x() + 90) / 180 * M_PI, 0.0) * sideSize;
+    QVector3D y = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, (oldPhysicalPosition.y() - 90) / 180 * M_PI) * sideSize;
     
     QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
     QVector3D r1 = r + x * delta.x() + y * delta.y();
@@ -345,13 +349,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
     if(spherical.phi < 0)
         spherical.phi += M_PI * 2.0;
 
-    QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180,  oldPhysicalPosition.z());
+    QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z());
     QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
 
-    qDebug() << "PTZ MOVETO(" << newLogicalPosition << ")";
-    qDebug() << "PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")";
+    TRACE("PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")");
 
-    m_ptzPositionByCamera[camera] = newLogicalPosition;
+    m_physicalPositionByCamera[camera] = newPhysicalPosition;
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
     
@@ -577,7 +580,7 @@ void PtzInstrument::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraReso
 }
 
 void PtzInstrument::at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera) {
-    m_ptzPositionByCamera.remove(camera);
+    m_physicalPositionByCamera.remove(camera);
 
     for(QHash<int, QnVirtualCameraResourcePtr>::iterator pos = m_cameraByHandle.begin(); pos != m_cameraByHandle.end();) {
         if(pos.value() == camera) {
@@ -597,12 +600,16 @@ void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPo
     QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
     if(!camera)
         return;
-
     m_cameraByHandle.remove(handle);
-    m_ptzPositionByCamera[camera] = QVector3D(xPos, yPox, zoomPos);
 
+    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
+    if(!info)
+        return;
 
-    qDebug() << "PTZ POS" << camera->getName() << "=" << QVector3D(xPos, yPox, zoomPos);
+    QVector3D physicalPos = info->fromCameraMapper.logicalToPhysical(QVector3D(xPos, yPox, zoomPos));
+    m_physicalPositionByCamera[camera] = physicalPos;
+
+    TRACE("PTZ POS" << camera->getName() << "=" << physicalPos);
 }
 
 void PtzInstrument::at_ptzMoveTo_replyReceived(int status, int handle) {

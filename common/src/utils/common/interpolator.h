@@ -51,15 +51,7 @@ public:
     T operator()(const T &x) const{
         ensureReady();
 
-        typename QVector<Point>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), Point(x, T()), PointLess());
-
-        if(pos == m_points.begin()) {
-            return extrapolateStart(x);
-        } else if(pos == m_points.end()) {
-            return extrapolateEnd(x);
-        } else {
-            return interpolate(*(pos - 1), *pos, x);
-        }
+        return valueInternal(x, m_extrapolationMode);
     }
 
     Qn::ExtrapolationMode extrapolationMode() const {
@@ -87,15 +79,27 @@ protected:
         m_ready = true;
     }
 
+    T valueInternal(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
+        typename QVector<Point>::const_iterator pos = qLowerBound(m_points.begin(), m_points.end(), Point(x, T()), PointLess());
+
+        if(pos == m_points.begin()) {
+            return extrapolateStart(x, extrapolationMode);
+        } else if(pos == m_points.end()) {
+            return extrapolateEnd(x, extrapolationMode);
+        } else {
+            return interpolate(*(pos - 1), *pos, x);
+        }
+    }
+
     T interpolate(const Point &a, const Point &b, const T &x) const {
         return (a.y * (b.x - x) + b.y * (x - a.x)) / (b.x - a.x);
     }
 
-    T extrapolateStart(const T &x) const {
+    T extrapolateStart(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
         if(m_points.size() < 2)
             return extrapolateNoData();
 
-        switch(m_extrapolationMode) {
+        switch(extrapolationMode) {
         case Qn::ConstantExtrapolation:
             return m_points.front().y;
         case Qn::LinearExtrapolation:
@@ -108,11 +112,11 @@ protected:
         }
     }
 
-    T extrapolateEnd(const T &x) const {
+    T extrapolateEnd(const T &x, Qn::ExtrapolationMode extrapolationMode) const {
         if(m_points.size() < 2)
             return extrapolateNoData();
 
-        switch(m_extrapolationMode) {
+        switch(extrapolationMode) {
         case Qn::ConstantExtrapolation:
             return m_points.back().y;
         case Qn::LinearExtrapolation:
@@ -129,7 +133,9 @@ protected:
         T start = m_points.front().x;
         T end = m_points.back().x;
 
-        return operator()(start + qMod(x - start, end - start));
+        /* Pass linear extrapolation here so that we don't end up in 
+         * infinite recursion due to FP precision errors. */
+        return valueInternal(start + qMod(x - start, end - start), Qn::LinearExtrapolation);
     }
 
     T extrapolateNoData() const {

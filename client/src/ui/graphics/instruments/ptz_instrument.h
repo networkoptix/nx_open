@@ -89,7 +89,7 @@ private:
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
-    QHash<QnVirtualCameraResourcePtr, QVector3D> m_ptzPositionByCamera;
+    QHash<QnVirtualCameraResourcePtr, QVector3D> m_physicalPositionByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
