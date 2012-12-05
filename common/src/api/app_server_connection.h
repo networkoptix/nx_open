@@ -4,6 +4,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
 
+#include <QtNetwork/QNetworkReply>
+
 #include "utils/common/request_param.h"
 
 #include "core/resource/resource_type.h"
@@ -87,7 +89,7 @@ public:
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& errorString);
+    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
@@ -129,15 +131,15 @@ public:
     static int getMediaProxyPort();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 
-    int connectAsync_i(const QnRequestParamList& params, QObject* target, const char *slot);
+    int connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
     int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
 
     int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
-    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+    int addObject(const QString& objectName, const QByteArray& body, QnReplyHeaderList& replyHeaders, QByteArray& response, QByteArray& errorString);
 
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 

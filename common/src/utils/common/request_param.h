@@ -5,6 +5,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtNetwork/QNetworkReply>
 
 class QnRequestParam: public QPair<QString, QString> {
     typedef QPair<QString, QString> base_type;
@@ -15,11 +16,13 @@ public:
     QnRequestParam(const QString &first, const char *second): base_type(first, QLatin1String(second)) {}
 };
 
-typedef QnRequestParam QnRequestHeader;
+typedef QPair<QString, QString> QnRequestHeader;
 
 typedef QList<QPair<QString, QString> > QnRequestParamList;
 typedef QList<QPair<QString, QString> > QnRequestHeaderList;
+typedef QList<QNetworkReply::RawHeaderPair> QnReplyHeaderList;
 
 Q_DECLARE_METATYPE(QnRequestParamList);
+Q_DECLARE_METATYPE(QnReplyHeaderList);
 
 #endif // QN_REQUEST_PARAM_H
