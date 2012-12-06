@@ -369,7 +369,44 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
 
+    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
+    if(!info)
+        return;
+
+    QVector3D oldPhysicalPosition = m_physicalPositionByCamera.value(camera);
+
+    qreal sideSize = 36.0 / oldPhysicalPosition.z();
+    QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
+    QVector3D x = sphericalToCartesian<QVector3D>(1.0, (oldPhysicalPosition.x() + 90) / 180 * M_PI, 0.0) * sideSize;
+    QVector3D y = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, (oldPhysicalPosition.y() - 90) / 180 * M_PI) * sideSize;
+
+    QPointF pos = rect.center();
+    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
+    QVector3D r1 = r + x * delta.x() + y * delta.y();
+    QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
+    if(spherical.phi < 0)
+        spherical.phi += M_PI * 2.0;
+
+    qreal zoom = widget->rect().width() / rect.width(); /* For 2x zoom we'll get 2.0 here. */
+    
+    QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);
+    QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
+
+    TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
+
+    m_physicalPositionByCamera[camera] = newPhysicalPosition;
+
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    if(qnSettings->debugCounter() % 2) {
+        int handle = server->apiConnection()->asyncPtzMoveTo(camera, newLogicalPosition.x(), newLogicalPosition.y(), newLogicalPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
+        m_cameraByHandle[handle] = camera;
+    } else {
+        int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
+        m_cameraByHandle[handle] = camera;
+    }
 }
 
 
