@@ -752,7 +752,7 @@ void QnCamDisplay::processNewSpeed(float speed)
     if (speed < 0 && m_prevSpeed >= 0)
         m_buffering = getBufferingMask(); // decode first gop is required some time
 
-    if (speed == 0 && m_extTimeSrc && m_eofSignalSended)
+    if (m_prevSpeed == 0 && m_extTimeSrc && m_eofSignalSended)
     {
         m_extTimeSrc->onEofReached(this, false);
         m_eofSignalSended = false;
