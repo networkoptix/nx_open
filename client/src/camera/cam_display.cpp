@@ -552,6 +552,8 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
 
 void QnCamDisplay::onBeforeJump(qint64 time)
 {
+    if (m_extTimeSrc)
+        m_extTimeSrc->onBufferingStarted(this, time);
 
     /*
     if (time < 1000000ll * 100000)
@@ -603,8 +605,8 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     else
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */       
-    if (m_extTimeSrc)
-        m_extTimeSrc->onBufferingStarted(this, time);
+    //if (m_extTimeSrc)
+    //    m_extTimeSrc->onBufferingStarted(this, time);
 
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
@@ -783,6 +785,11 @@ void QnCamDisplay::processNewSpeed(float speed)
     }
     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Full);
     m_executingChangeSpeed = false;
+}
+
+bool QnCamDisplay::isSyncAllowed() const
+{
+    return m_extTimeSrc && m_extTimeSrc->isEnabled();
 }
 
 bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
