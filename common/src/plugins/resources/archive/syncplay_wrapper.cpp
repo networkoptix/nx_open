@@ -51,6 +51,8 @@ public:
         enabled = true;
         bufferingTime = AV_NOPTS_VALUE;
         paused = false;
+        cachedTime = 0;
+        gotCacheTime = 0;
     }
 
 
@@ -74,6 +76,8 @@ public:
     qint64 bufferingTime;
     bool paused;
     bool liveModeEnabled;
+    mutable qint64 cachedTime;
+    mutable qint64 gotCacheTime;
     //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
@@ -616,22 +620,42 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    if (d->lastJumpTime == DATETIME_NOW)
+    if (d->lastJumpTime == DATETIME_NOW) {
+        d->gotCacheTime = 0;
         return DATETIME_NOW;
-
-    if (d->inJumpCount > 0)
-        return d->lastJumpTime;
-
-    if (d->bufferingTime != qint64(AV_NOPTS_VALUE))
-        return d->bufferingTime; // same as last jump time
-
-    foreach(const ReaderInfo& info, d->readers) {
-        if (info.enabled && info.buffering) 
-            return d->lastJumpTime;
     }
 
-    qint64 expectTime = expectedTime();
+    if (d->inJumpCount > 0) {
+        d->gotCacheTime = 0;
+        return d->lastJumpTime;
+    }
 
+    if (d->bufferingTime != qint64(AV_NOPTS_VALUE)) {
+        d->gotCacheTime = 0;
+        return d->bufferingTime; // same as last jump time
+    }
+
+    foreach(const ReaderInfo& info, d->readers) {
+        if (info.enabled && info.buffering) {
+            d->gotCacheTime = 0;
+            return d->lastJumpTime;
+        }
+    }
+    
+
+    qint64 usecTimer = getUsecTimer();
+    if (usecTimer - d->gotCacheTime < 1000ll)
+        return d->cachedTime;
+    d->gotCacheTime = usecTimer;
+
+    d->cachedTime = getCurrentTimeInternal();
+    return d->cachedTime;
+}
+
+
+qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
     /*
     QString s;
     QTextStream str(&s);
@@ -641,6 +665,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     */
 
 
+    qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();
     if (d->speed >= 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime > expectTime + MAX_FRAME_DURATION*1000)
     {
