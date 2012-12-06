@@ -177,6 +177,7 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         m_lastMotionTimeUsec = motionTime;
         setPrebufferingUsec(0); // motion in progress, flush prebuffer
     }
+}
 
 void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp)
 {
