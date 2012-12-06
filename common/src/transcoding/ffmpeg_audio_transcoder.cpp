@@ -57,7 +57,10 @@ bool QnFfmpegAudioTranscoder::open(QnMediaContextPtr codecCtx)
     m_encoderCtx = avcodec_alloc_context3(avCodec);
     //m_encoderCtx->codec_id = m_codecId;
     //m_encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_S16; //avCodec->sample_fmts[0];
+    if (m_codecId == CODEC_ID_VORBIS)
+        m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_FLT;
+    else
+        m_encoderCtx->sample_fmt = AV_SAMPLE_FMT_S16; //avCodec->sample_fmts[0];
     m_encoderCtx->channels = codecCtx->ctx()->channels;
     m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
 
