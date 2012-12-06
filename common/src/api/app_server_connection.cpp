@@ -8,7 +8,7 @@
 #include "utils/common/synctime.h"
 
 
-void conn_detail::ReplyProcessor::finished(int status, const QByteArray &result, const QByteArray &errorStringIn, int handle)
+void conn_detail::ReplyProcessor::finished(int status, const QnReplyHeaderList& headers, const QByteArray &result, const QByteArray &errorStringIn, int handle)
 {
     QByteArray errorString = errorStringIn;
 
@@ -181,7 +181,7 @@ int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList& headers, co
     QObject::connect(processor, SIGNAL(finishedConnect(int, const QByteArray&, QnConnectInfoPtr, int)), target, slot);
 
     QByteArray data;
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("connect"), headers, params, data, processor, SLOT(finished(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("connect"), headers, params, data, processor, SLOT(finished(int, QnReplyHeaderList, QByteArray, QByteArray, int)));
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
