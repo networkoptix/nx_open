@@ -40,7 +40,7 @@ void QnEnvironment::showInGraphicalShell(QWidget *parent, const QString &path) {
     QString layoutPrefix = QLatin1String("layout://"); //hack
     QString checkedPath(path);
     if (checkedPath.startsWith(layoutPrefix))
-        checkedPath = checkedPath.remove(1, layoutPrefix.length());
+        checkedPath = checkedPath.remove(0, layoutPrefix.length());
 
 #if defined(Q_OS_WIN)
     const QString explorer = searchInPath(QLatin1String("explorer.exe"));
