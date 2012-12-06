@@ -230,9 +230,9 @@ void QnProgressiveDownloadingConsumer::run()
         bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
 
-        QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
-        if (camRes && camRes->isAudioEnabled())
-            d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
+        //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+        //if (camRes && camRes->isAudioEnabled())
+        //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         if (position.isEmpty() || position == "now")
         {
             if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)
