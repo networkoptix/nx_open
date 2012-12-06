@@ -121,6 +121,12 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         {
             qnResPool->removeResource(resource);
         }
+    } else if (event.eventType == Qn::Message_Type_BusinessRuleInsertOrUpdate)
+    {
+        //TODO/IMPL
+    } else if (event.eventType == Qn::Message_Type_BusinessRuleDelete)
+    {
+        //TODO/IMPL
     }
 }
 
