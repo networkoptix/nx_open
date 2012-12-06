@@ -620,24 +620,16 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
     }
     else // storages will not be validated if recording is not enabled
     if (cameraSettingsDialog()->widget()->activeCameraCount() > 0) {
-        bool critical;
-        QnMediaServerResourceList servers = validateStorages(cameras, critical);
+        QnMediaServerResourceList servers = validateStorages(cameras);
         if (!servers.isEmpty()) {
             QStringList srvNames;
             foreach (QnMediaServerResourcePtr server, servers)
                 srvNames << server->getName();
 
-            if (critical) {
-                QMessageBox::warning(widget(), tr("Could not Enable Recording"),
-                    tr("Some of your servers (%1) have not enough disk space to enable recording. Your schedule will be saved, but will not take effect.")
-                                     .arg(srvNames.join(QLatin1String(", "))));
-                cameraSettingsDialog()->widget()->setCamerasActive(false);
-            } else {
-                //TODO: #gdm implement "Do not show this warning anymore" checkbox
-                QMessageBox::warning(widget(), tr("Low space for archive"),
-                    tr("Some of your servers (%1) have low disk space for archive.")
-                                    .arg(srvNames.join(QLatin1String(", "))));
-            }
+            QMessageBox::warning(widget(), tr("Could not Enable Recording"),
+                tr("Some of your servers (%1) have not enough disk space to enable recording. Your schedule will be saved, but will not take effect.")
+                                 .arg(srvNames.join(QLatin1String(", "))));
+            cameraSettingsDialog()->widget()->setCamerasActive(false);
         }
     }
 
@@ -695,9 +687,10 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
 }
 
-QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCameraResourceList cameras, bool &critical) {
-
+QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCameraResourceList cameras) {
     QnMediaServerResourceList servers;
+    QnMediaServerResourceList result;
+
     foreach (QnVirtualCameraResourcePtr camera, cameras) {
         QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resourcePool()->
                 getResourceById(camera->getParentId()));
@@ -705,8 +698,6 @@ QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCa
             servers.append(server);
     }
 
-    QnMediaServerResourceList lowServers;       // Servers with low disk space
-    QnMediaServerResourceList emptyServers;     // Servers with no disk space at all
     foreach (QnMediaServerResourcePtr server, servers) {
         QnAbstractStorageResourceList storages = server->getStorages();
         QnMediaServerConnectionPtr serverConnection = server->apiConnection();
@@ -727,8 +718,8 @@ QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCa
         eventLoop->exec();
 
         FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
+        bool existsAtLeastOneGoodStorage = false;
         bool serverError = false;
-        qint64 totalAvailableSpace = 0;
         for (FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
         {
             QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
@@ -743,26 +734,15 @@ QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCa
             qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
             if (itr.value().errorCode != 0 || availableSpace < 0)
                 continue;
-            totalAvailableSpace += availableSpace;
+            existsAtLeastOneGoodStorage = true;
+            break;
         }
 
         /* We could not validate inaccessible server storages so do not show warning for them */
-        if (serverError)
-            continue;
-
-        if (totalAvailableSpace == 0)
-            emptyServers.append(server);
-        else if (totalAvailableSpace < CheckFreeSpaceReplyProcessor::MIN_RECORD_FREE_SPACE)
-            lowServers.append(server);
+        if (!serverError && !existsAtLeastOneGoodStorage)
+            result.append(server);
     }
-
-    if (!emptyServers.isEmpty()) {
-        critical = true;
-        return emptyServers;
-    }
-
-    critical = false;
-    return lowServers;
+    return result;
 
 }
 
