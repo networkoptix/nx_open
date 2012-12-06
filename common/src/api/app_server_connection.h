@@ -44,7 +44,7 @@ namespace conn_detail
         }
 
     public slots:
-        void finished(int status, const QnReplyHeaderList& headers, const QByteArray &result, const QByteArray &errorString, int handle);
+        void finished(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
@@ -136,10 +136,10 @@ private:
     int connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
-    int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
+    int getObjects(const QString& objectName, const QString& args, QnHTTPRawResponse& response);
 
     int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
-    int addObject(const QString& objectName, const QByteArray& body, QnReplyHeaderList& replyHeaders, QByteArray& response, QByteArray& errorString);
+    int addObject(const QString& objectName, const QByteArray& body, QnHTTPRawResponse &response);
 
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 

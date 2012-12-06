@@ -56,6 +56,7 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
     qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
     qRegisterMetaType<QnReplyHeaderList>("QnReplyHeaderList");
+    qRegisterMetaType<QnHTTPRawResponse>();
 
     qRegisterMetaType<QnMessage>();
 

@@ -66,13 +66,11 @@ void QnConnectionTestingDialog::timeout()
     updateUi(false);
 }
 
-void QnConnectionTestingDialog::oldHttpTestResults(int status, const QnReplyHeaderList& replyHeaders, QByteArray errorString, QByteArray data, int handle)
+void QnConnectionTestingDialog::oldHttpTestResults(const QnHTTPRawResponse& response, int handle)
 {
-    Q_UNUSED(errorString)
-    Q_UNUSED(data)
     Q_UNUSED(handle)
 
-    if (status == 204 && m_timeoutTimer.isActive())
+    if (response.status == 204 && m_timeoutTimer.isActive())
     {
         m_timeoutTimer.stop();
         updateUi(false);
@@ -113,7 +111,7 @@ void QnConnectionTestingDialog::testSettings()
     httpUrl.setScheme(QLatin1String("http"));
     httpUrl.setUserName(QString());
     httpUrl.setPassword(QString());
-    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(int,QnReplyHeaderList,QByteArray,QByteArray,int)));
+    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse& response, QByteArray,int)));
 }
 
 void QnConnectionTestingDialog::updateUi(bool success){

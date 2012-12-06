@@ -139,11 +139,9 @@ public:
 
     void run()
     {
-        QList<QNetworkReply::RawHeaderPair> replyHeaders;
-        QByteArray reply;
-        QByteArray errorString;
-        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), replyHeaders, reply, errorString);
-        if (reply.contains("Requested method is absent"))
+        QnHTTPRawResponse response;
+        QnSessionManager::instance()->sendGetRequest(m_url.toString(), QLatin1String("ping"), QnRequestHeaderList(), QnRequestParamList(), response);
+        if (response.data.contains("Requested method is absent"))
         {
             // server OK
             m_owner->setPrimaryIF(m_url.host());

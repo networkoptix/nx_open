@@ -459,9 +459,8 @@ bool checkIfAppServerIsOld()
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 
-    QnReplyHeaderList replyHeaders;
-    QByteArray reply, errorString;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", replyHeaders, reply, errorString) == 204)
+    QnHTTPRawResponse response;
+    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", response) == 204)
     {
         cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
         return true;

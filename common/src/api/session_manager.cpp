@@ -15,37 +15,32 @@ void SessionManagerReplyProcessor::at_replyReceived()
 {
     QNetworkReply *reply = (QNetworkReply *)sender();
 
-    emit finished(reply->error(), reply->rawHeaderPairs(), reply->readAll(), reply->errorString().toAscii(), m_handle);
+    emit finished(QnHTTPRawResponse(reply->error(), reply->rawHeaderPairs(), reply->readAll(), reply->errorString().toAscii()), m_handle);
 
     reply->deleteLater();
     deleteLater();
 }
 
-void SyncRequestProcessor::at_finished(int status, const QnReplyHeaderList& replyHeaders, const QByteArray &reply, const QByteArray &errorString, int handle)
+void SyncRequestProcessor::at_finished(const QnHTTPRawResponse& response, int handle)
 {
     Q_UNUSED(handle)
 
-    m_status = status;
-    m_replyHeaders = replyHeaders;
-    m_reply = reply;
-    m_errorString = errorString;
+    m_response = response;
 
     QMutexLocker locker(&m_mutex);
     m_finished = true;
     m_condition.wakeOne();
 }
 
-int SyncRequestProcessor::wait(QnReplyHeaderList& headers, QByteArray &reply, QByteArray &errorString)
+int SyncRequestProcessor::wait(QnHTTPRawResponse& response)
 {
     QMutexLocker locker(&m_mutex);
     while (!m_finished) {
         m_condition.wait(&m_mutex);
     }
 
-    headers = m_replyHeaders;
-    reply = m_reply;
-    errorString = m_errorString;
-    return m_status;
+    response = m_response;
+    return m_response.status;
 }
 
 void SyncRequestProcessor::at_destroy()
@@ -130,13 +125,13 @@ QUrl QnSessionManager::createApiUrl(const QUrl& baseUrl, const QString &objectNa
 }
 
 int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QByteArray& data,
-                                      QnReplyHeaderList& replyHeaders, QByteArray &reply, QByteArray& errorString)
+                                      QnHTTPRawResponse& response)
 {
-    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, replyHeaders, reply, errorString);
+    return sendPostRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), data, response);
 }
 
 int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params, 
-                                      const QByteArray& data, QnReplyHeaderList& replyHeaders, QByteArray &reply, QByteArray& errorString)
+                                      const QByteArray& data, QnHTTPRawResponse& response)
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
@@ -146,20 +141,20 @@ int QnSessionManager::sendPostRequest(const QUrl& url, const QString &objectName
 
         if (!m_accessManager)
         {
-            errorString = "Network client is not ready yet.";
+            response.errorString = "Network client is not ready yet.";
             return -1;
         }
 
         connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     }
 
-    sendAsyncPostRequest(url, objectName, headers, params, data, &syncProcessor, SLOT(at_finished(int,QnReplyHeaderList,QByteArray,QByteArray,int)));
-    return syncProcessor.wait(replyHeaders, reply, errorString);
+    sendAsyncPostRequest(url, objectName, headers, params, data, &syncProcessor, SLOT(at_finished(QnHTTPRawResponse,int)));
+    return syncProcessor.wait(response);
 }
 
-int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnReplyHeaderList& replyHeaders, QByteArray& reply, QByteArray& errorString)
+int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, QnHTTPRawResponse& response)
 {
-    return sendGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), replyHeaders, reply, errorString);
+    return sendGetRequest(url, objectName, QnRequestHeaderList(), QnRequestParamList(), response);
 }
 
 bool QnSessionManager::isReady() const
@@ -169,7 +164,7 @@ bool QnSessionManager::isReady() const
 }
 
 int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName, const QnRequestHeaderList &headers, const QnRequestParamList &params,
-                                     QnReplyHeaderList& replyHeaders, QByteArray& reply, QByteArray& errorString)
+                                     QnHTTPRawResponse& response)
 {
     SyncRequestProcessor syncProcessor;
     syncProcessor.moveToThread(this->thread());
@@ -179,15 +174,15 @@ int QnSessionManager::sendGetRequest(const QUrl& url, const QString &objectName,
 
         if (!m_accessManager)
         {
-            errorString = "Network client is not ready yet";
+            response.errorString = "Network client is not ready yet";
             return -1;
         }
 
         connect(m_accessManager, SIGNAL(destroyed()), &syncProcessor, SLOT(at_destroy()));
     }
 
-    sendAsyncGetRequest(url, objectName, headers, params, &syncProcessor, SLOT(at_finished(int,QnReplyHeaderList,QByteArray,QByteArray,int)));
-    return syncProcessor.wait(replyHeaders, reply, errorString);
+    sendAsyncGetRequest(url, objectName, headers, params, &syncProcessor, SLOT(at_finished(QnHTTPRawResponse,int)));
+    return syncProcessor.wait(response);
 }
 
 int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, QObject *target, const char *slot)
@@ -252,8 +247,8 @@ int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &object
     // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(replyProcessor, SIGNAL(finished(int, QnReplyHeaderList, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
-    connect(replyProcessor, SIGNAL(finished(int, QnReplyHeaderList, QByteArray, QByteArray, int)), this, SLOT(processReply(int, QnReplyHeaderList, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
 
     emit asyncGetRequest(replyProcessor, url, objectName, headers, params, target, slot, handle);
 
@@ -272,8 +267,8 @@ int QnSessionManager::sendAsyncDeleteRequest(const QUrl& url, const QString &obj
     // We need to create reply processor here as target could not exist when doAsyncDeleteRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(replyProcessor, SIGNAL(finished(int, const QnReplyHeaderList& headers, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
-    connect(replyProcessor, SIGNAL(finished(int, const QnReplyHeaderList& headers, QByteArray, QByteArray, int)), this, SLOT(processReply(int, const QnReplyHeaderList& headers, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
 
     emit asyncDeleteRequest(replyProcessor, url, objectName, id, target, slot, handle);
 
@@ -314,8 +309,8 @@ int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objec
     // We need to create reply processor here as target could not exist when doAsyncGetRequest gets called
     SessionManagerReplyProcessor* replyProcessor = new SessionManagerReplyProcessor(0, target, slot, handle);
     replyProcessor->moveToThread(thread());
-    connect(replyProcessor, SIGNAL(finished(int, QnReplyHeaderList, QByteArray, QByteArray, int)), target, slot, Qt::QueuedConnection);
-    connect(replyProcessor, SIGNAL(finished(int, QnReplyHeaderList, QByteArray, QByteArray, int)), this, SLOT(processReply(int, QnReplyHeaderList, const QByteArray &, const QByteArray &, int)), Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), target, slot, Qt::QueuedConnection);
+    connect(replyProcessor, SIGNAL(finished(QnHTTPRawResponse, int)), this, SLOT(processReply(QnHTTPRawResponse, int)), Qt::QueuedConnection);
 
     emit asyncPostRequest(replyProcessor, url, objectName, headers, params, data, target, slot, handle);
 
@@ -334,7 +329,7 @@ QByteArray QnSessionManager::formatNetworkError(int error)
     return errorValue;
 }
 
-void QnSessionManager::processReply(int status, const QnReplyHeaderList&, const QByteArray &, const QByteArray &, int) {
-    emit replyReceived(status);
+void QnSessionManager::processReply(const QnHTTPRawResponse& response, int) {
+    emit replyReceived(response.status);
 }
 
