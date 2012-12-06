@@ -235,7 +235,7 @@ void QnStorageManager::clearSpace()
 {
     if (!m_catalogLoaded)
         return;
-    StorageMap storages = getAllStorages();
+    const StorageMap storages = getAllStorages();
     foreach(QnStorageResourcePtr storage, storages)
         clearSpace(storage);
 }
