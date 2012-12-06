@@ -45,6 +45,7 @@
 #include "plugins/resources/archive/abstract_archive_stream_reader.h"
 #include "libavutil/avutil.h" // TODO: remove
 #include "handlers/workbench_action_handler.h"
+#include "redass/redass_controller.h"
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     QObject(parent),
@@ -1138,7 +1139,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else if (m_timeSlider->isSliderDown())
                     reader->jumpTo(value * 1000, 0);
-                else if (reader->getQuality() != MEDIA_Quality_Low)
+                else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 m_preciseNextSeek = false;
             }

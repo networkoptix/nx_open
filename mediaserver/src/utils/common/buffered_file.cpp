@@ -295,7 +295,7 @@ bool QBufferedFile::prepareBuffer(int bufOffset)
     else {
         qint64 toRead = qPower2Ceil((quint32) bufOffset, SECTOR_SIZE);
         int readed = m_fileEngine.read((char*) m_buffer, toRead);
-        if (readed != toRead)
+        if (readed == -1)
             return false;
         m_bufferLen = qMin((qint64) readed, m_actualFileSize - m_filePos);
         m_fileEngine.seek(m_filePos);

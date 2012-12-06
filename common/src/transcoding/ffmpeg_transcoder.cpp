@@ -262,6 +262,9 @@ int QnFfmpegTranscoder::transcodePacketInternal(QnAbstractMediaDataPtr media, Qn
     if ((quint64)m_baseTime == AV_NOPTS_VALUE)
         m_baseTime = media->timestamp - 1000*100;
 
+    if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
+        return 0;
+
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;
     if (m_vTranscoder && m_aTranscoder && media->dataType == QnAbstractMediaData::AUDIO)

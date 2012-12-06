@@ -57,21 +57,18 @@ public:
         if (logLevel > m_logLevel)
             return;
 
-        QMutexLocker mutx(&m_mutex);
+        QByteArray th;
+        QTextStream textStream(&th);
+        textStream << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
+            << QLatin1String(" Thread ") << QString::number((qint64)QThread::currentThread()->currentThreadId(), 16)
+            << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
+        textStream.flush();
 
+        QMutexLocker mutx(&m_mutex);
         if (!m_file.isOpen())
             return;
-
-        QString th;
-        QTextStream textStream(&th);
-        hex(textStream) << (quint64)QThread::currentThread()->currentThreadId();
-
-        QTextStream fstr(&m_file);
-        fstr << QDateTime::currentDateTime().toString(QLatin1String("ddd MMM d yy  hh:mm:ss.zzz"))
-            << QLatin1String(" Thread ") << th
-            << QLatin1String(" (") << QString::fromAscii(qn_logLevelNames[logLevel]) << QLatin1String("): ") << msg << QLatin1String("\r\n");
-        fstr.flush();
-
+        m_file.write(th);
+        m_file.flush();
         if (m_file.size() >= m_maxFileSize)
             openNextFile();
     }

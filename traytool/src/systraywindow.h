@@ -47,6 +47,40 @@ private:
     bool m_rightWarnShowed;
 };
 
+class StopServiceAsyncTask: public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    StopServiceAsyncTask(SC_HANDLE handle): m_handle(handle) {}
+    void run()
+    {
+        SERVICE_STATUS serviceStatus;
+        ControlService(m_handle, SERVICE_CONTROL_STOP, &serviceStatus);
+        emit finished();
+    }
+signals:
+    void finished();
+private:
+    SC_HANDLE m_handle;
+};
+
+class GetServiceInfoAsyncTask: public QObject, public QRunnable
+{
+    Q_OBJECT
+public:
+    GetServiceInfoAsyncTask(SC_HANDLE handle): m_handle(handle) {}
+    void run()
+    {
+        SERVICE_STATUS serviceStatus;
+        if (QueryServiceStatus(m_handle, &serviceStatus))
+            emit finished((quint64)serviceStatus.dwCurrentState);
+    }
+signals:
+    void finished(quint64);
+private:
+    SC_HANDLE m_handle;
+};
+
 class QnSystrayWindow : public QDialog
 {
     Q_OBJECT
@@ -79,6 +113,8 @@ private slots:
 
     void findServiceInfo();
     void updateServiceInfo();
+    void appServerInfoUpdated(quint64 status);
+    void mediaServerInfoUpdated(quint64 status);
 
     void buttonClicked(QAbstractButton * button);
     void onSettingsAction();
@@ -99,7 +135,7 @@ private:
     void createActions();
     void createTrayIcon();
 
-    int updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
+    void updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction);
     bool validateData();
     void saveData();
     bool checkPortNum(int port, const QString& message);

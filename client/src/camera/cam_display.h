@@ -55,6 +55,7 @@ public:
     void playAudio(bool play);
     void setSpeed(float speed);
     float getSpeed() const;
+    bool isSyncAllowed() const;
 
     // schedule to clean up buffers all; 
     // schedule - coz I do not want to introduce mutexes
@@ -80,6 +81,7 @@ public:
 
     bool canAcceptData() const;
     bool isLongWaiting() const;
+    bool isEOFReached() const;
     bool isStillImage() const;
     virtual void putData(QnAbstractDataPacketPtr data) override;
     QSize getScreenSize() const;
