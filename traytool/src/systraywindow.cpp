@@ -23,6 +23,20 @@ static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
 
+
+class StopServiceAsyncTask: public QRunnable
+{
+public:
+    StopServiceAsyncTask(SC_HANDLE handle): m_handle(handle) {}
+    void run()
+    {
+        SERVICE_STATUS serviceStatus;
+        ControlService(m_handle, SERVICE_CONTROL_STOP, &serviceStatus);
+    }
+private:
+    SC_HANDLE m_handle;
+};
+
 bool MyIsUserAnAdmin()
 {
    bool isAdmin = false;
@@ -432,12 +446,13 @@ void QnSystrayWindow::at_mediaServerStartAction()
 
 void QnSystrayWindow::at_mediaServerStopAction()
 {
-    SERVICE_STATUS serviceStatus;
+    //SERVICE_STATUS serviceStatus;
     if (m_mediaServerHandle) 
     {
         if (QMessageBox::question(0, tr("Systray"), MEDIA_SERVER_NAME + " is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_mediaServerHandle));
             updateServiceInfo();
         }
     }
@@ -457,7 +472,8 @@ void QnSystrayWindow::at_appServerStopAction()
     {
         if (QMessageBox::question(0, tr("Systray"), APP_SERVER_NAME + QString(" is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            //ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_appServerHandle));
             updateServiceInfo();
         }
     }
@@ -750,15 +766,19 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                 requestStr += tr(" to be restarted. Would you like to restart now?");
                 if (QMessageBox::question(this, tr("Systray"), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
                 {
-                    SERVICE_STATUS serviceStatus;
+                    //SERVICE_STATUS serviceStatus;
                     if (appServerParamChanged) {
-                        ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        //ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_appServerHandle));
+
                         m_needStartAppServer = true;
                         m_prevAppServerStatus = SERVICE_STOPPED;
 
                     }
                     if (mediaServerParamChanged) {
-                        ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_mediaServerHandle));
+
                         m_needStartMediaServer = true;
                         m_prevMediaServerStatus = SERVICE_STOPPED;
                     }
