@@ -320,7 +320,7 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
 
     if( connectResult != 0 )
     {
-        if( SystemError::getLastOSErrorCode() != SystemError::wouldBlock )
+        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
         {
             m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
             return false;

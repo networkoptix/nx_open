@@ -4,7 +4,7 @@
 * PollSet class implementation for linux
 ***********************************************************/
 
-//#ifdef Q_OS_LINUX
+#ifdef Q_OS_LINUX
 
 #include "pollset.h"
 
@@ -24,8 +24,36 @@ using namespace std;
 class PollSetImpl
 {
 public:
+    struct SockData
+    {
+        int eventsMask;
+        void* userData;
+        bool markedForRemoval;
+
+        SockData()
+        :
+            eventsMask( 0 ),
+            userData( NULL ),
+            markedForRemoval( false )
+        {
+        }
+
+        SockData(
+            int _eventsMask,
+            void* _userData,
+            bool _markedForRemoval )
+        :
+            eventsMask( _eventsMask ),
+            userData( _userData ),
+            markedForRemoval( _markedForRemoval )
+        {
+        }
+    };
+
+    //TODO/IMPL there MUST be different userData for each event type
+
     //!map<fd, pair<events mask, user data> >
-    typedef std::map<Socket*, std::pair<int, void*> > MonitoredEventMap;
+    typedef std::map<Socket*, SockData> MonitoredEventMap;
 
     int epollSetFD;
     MonitoredEventMap monitoredEvents;
@@ -62,11 +90,13 @@ class ConstIteratorImpl
 public:
     int currentIndex;
     PollSetImpl* pollSetImpl;
+    int currentTriggeredEvent;
 
     ConstIteratorImpl()
     :
         currentIndex( 0 ),
-        pollSetImpl( NULL )
+        pollSetImpl( NULL ),
+        currentTriggeredEvent( -1 )
     {
     }
 
@@ -86,16 +116,49 @@ public:
 
     void selectNextSocket()
     {
-        ++currentIndex;
-        if( (currentIndex < pollSetImpl->signalledSockCount) && (pollSetImpl->epollEventsArray[currentIndex].data.ptr == NULL) )
+        for( ; currentIndex < pollSetImpl->signalledSockCount; )
         {
-            //reading eventfd and selecting next socket
-            uint64_t val = 0;
-            if( read( pollSetImpl->eventFD, &val, sizeof(val) ) == -1 )
+            //TODO/IMPL this method needs refactoring
+
+            PollSetImpl::MonitoredEventMap::const_pointer socketData = NULL;
+            if( currentIndex >= 0 )
             {
-                //TODO ???
+                socketData = static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(pollSetImpl->epollEventsArray[currentIndex].data.ptr);
+                if( socketData != NULL &&
+                    !socketData->second.markedForRemoval &&
+                    currentTriggeredEvent == EPOLLIN &&
+                    (pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT) )
+                {
+                    currentTriggeredEvent = EPOLLOUT;
+                    return;
+                }
             }
+
             ++currentIndex;
+            if( currentIndex >= pollSetImpl->signalledSockCount ) 
+                return; //reached end
+
+            if( pollSetImpl->epollEventsArray[currentIndex].data.ptr == NULL )
+            {
+                //reading eventfd and selecting next socket
+                uint64_t val = 0;
+                if( read( pollSetImpl->eventFD, &val, sizeof(val) ) == -1 )
+                {
+                    //TODO ???
+                }
+                continue;
+            }
+
+            socketData = static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(pollSetImpl->epollEventsArray[currentIndex].data.ptr);
+            if( socketData->second.markedForRemoval )
+                continue;   //skipping socket
+
+            //processing all triggered events one by one
+            if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLIN )
+                currentTriggeredEvent = EPOLLIN;
+            else if( pollSetImpl->epollEventsArray[currentIndex].events & EPOLLOUT )
+                currentTriggeredEvent = EPOLLOUT;
+            return;
         }
     }
 };
@@ -153,7 +216,8 @@ Socket* PollSet::const_iterator::socket() const
 */
 PollSet::EventType PollSet::const_iterator::eventType() const
 {
-    const uint32_t epollREvents = m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].events;
+    //const uint32_t epollREvents = m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].events;
+    const uint32_t epollREvents = m_impl->currentTriggeredEvent;
     unsigned int revents = 0;
     if( epollREvents & EPOLLIN )
         revents |= etRead;
@@ -164,7 +228,7 @@ PollSet::EventType PollSet::const_iterator::eventType() const
 
 void* PollSet::const_iterator::userData() const
 {
-    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.second;
+    return static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->pollSetImpl->epollEventsArray[m_impl->currentIndex].data.ptr)->second.userData;
 }
 
 bool PollSet::const_iterator::operator==( const const_iterator& right ) const
@@ -224,6 +288,7 @@ bool PollSet::isValid() const
     return (m_impl->epollSetFD > 0) && (m_impl->eventFD > 0);
 }
 
+
 //!Interrupts \a poll method, blocked in other thread
 /*!
     This is the only method which is allowed to be called from different thread
@@ -242,7 +307,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
 
-    pair<PollSetImpl::MonitoredEventMap::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, make_pair(0, userData) ) );
+    pair<PollSetImpl::MonitoredEventMap::iterator, bool> p = m_impl->monitoredEvents.insert( make_pair( sock, PollSetImpl::SockData(0, userData, false) ) );
     if( p.second )
     {
         //adding new fd to set
@@ -252,7 +317,7 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
         _event.events = epollEventType | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_ADD, sock->handle(), &_event ) == 0 )
         {
-            p.first->second.first = epollEventType;
+            p.first->second.eventsMask = epollEventType;
             return true;
         }
         else
@@ -263,16 +328,16 @@ bool PollSet::add( Socket* const sock, EventType eventType, void* userData )
     }
     else
     {
-        if( p.first->second.first & epollEventType )
+        if( p.first->second.eventsMask & epollEventType )
             return true;    //event evenType is already listened on socket
 
         epoll_event _event;
         memset( &_event, 0, sizeof(_event) );
         _event.data.ptr = &*p.first;
-        _event.events = epollEventType | p.first->second.first | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
+        _event.events = epollEventType | p.first->second.eventsMask | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
         {
-            p.first->second.first |= epollEventType;
+            p.first->second.eventsMask |= epollEventType;
             return true;
         }
         else
@@ -287,10 +352,10 @@ void PollSet::remove( Socket* const sock, EventType eventType )
 {
     const int epollEventType = eventType == etRead ? EPOLLIN : EPOLLOUT;
     PollSetImpl::MonitoredEventMap::iterator it = m_impl->monitoredEvents.find( sock );
-    if( (it == m_impl->monitoredEvents.end()) || !(it->second.first & epollEventType) )
+    if( (it == m_impl->monitoredEvents.end()) || !(it->second.eventsMask & epollEventType) )
         return;
 
-    const int eventsBesidesRemovedOne = it->second.first & (~epollEventType);
+    const int eventsBesidesRemovedOne = it->second.eventsMask & (~epollEventType);
     if( eventsBesidesRemovedOne )
     {
         //socket is being listened for multiple events, modifying event set
@@ -299,12 +364,22 @@ void PollSet::remove( Socket* const sock, EventType eventType )
         _event.data.ptr = &*it;
         _event.events = eventsBesidesRemovedOne | EPOLLRDHUP | EPOLLERR | EPOLLHUP;
         if( epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_MOD, sock->handle(), &_event ) == 0 )
-            it->second.first = eventsBesidesRemovedOne;
+            it->second.eventsMask = eventsBesidesRemovedOne;
     }
     else
     {
         //socket is being listened for epollEventType only, removing socket...
         epoll_ctl( m_impl->epollSetFD, EPOLL_CTL_DEL, sock->handle(), NULL );
+        it->second.markedForRemoval = true;
+        for( int i = 0; i < m_impl->signalledSockCount; ++i )
+        {
+            if( m_impl->epollEventsArray[i].data.ptr != NULL &&
+                static_cast<PollSetImpl::MonitoredEventMap::const_pointer>(m_impl->epollEventsArray[i].data.ptr)->first == sock )
+            {
+                m_impl->epollEventsArray[i].data.ptr = NULL;
+                break;
+            }
+        }
         m_impl->monitoredEvents.erase( it );
     }
 }
@@ -358,4 +433,4 @@ unsigned int PollSet::maxPollSetSize()
     return 128;
 }
 
-//#endif
+#endif

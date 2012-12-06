@@ -21,14 +21,13 @@ namespace SystemError
     typedef int ErrorCode;
 #endif
 
-    enum ErrorCodes
-    {
 #ifdef _WIN32
-        wouldBlock = WSAEWOULDBLOCK
+    static const ErrorCode wouldBlock = WSAEWOULDBLOCK;
+    static const ErrorCode inProgress = WSAEWOULDBLOCK;
 #else
-        wouldBlock = EWOULDBLOCK
+    static const ErrorCode wouldBlock = EWOULDBLOCK;
+    static const ErrorCode inProgress = EINPROGRESS;
 #endif
-    };
 
     //!Returns error code of previous system call
     ErrorCode getLastOSErrorCode();
