@@ -53,7 +53,6 @@ namespace nx_http
         static const int UNLIMITED_RECONNECT_TRIES = -1;
 
         AsyncHttpClient();
-        virtual ~AsyncHttpClient();
 
         State state() const;
         //!Start request to \a url
@@ -102,6 +101,8 @@ namespace nx_http
         void reconnected( nx_http::AsyncHttpClient* );
 
     protected:
+        virtual ~AsyncHttpClient();
+
         //!Implementation of aio::AIOEventHandler::eventTriggered
         virtual void eventTriggered( Socket* sock, PollSet::EventType eventType ) override;
 

@@ -26,6 +26,7 @@ namespace nx_http
 
     public:
         HttpClient();
+        ~HttpClient();
 
         /*!
             Returns on receiving response
@@ -49,7 +50,7 @@ namespace nx_http
         void setUserPassword( const QString& userAgent );
 
     private:
-        AsyncHttpClient m_asyncHttpClient;
+        AsyncHttpClient* m_asyncHttpClient;
         QWaitCondition m_cond;
         mutable QMutex m_mutex;
         bool m_done;

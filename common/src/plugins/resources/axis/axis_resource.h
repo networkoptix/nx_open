@@ -20,6 +20,7 @@ public:
     static const char* MANUFACTURE;
 
     QnPlAxisResource();
+    ~QnPlAxisResource();
 
     virtual bool isResourceAccessible();
 

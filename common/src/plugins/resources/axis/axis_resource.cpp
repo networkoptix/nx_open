@@ -26,6 +26,18 @@ QnPlAxisResource::QnPlAxisResource()
         QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
 }
 
+QnPlAxisResource::~QnPlAxisResource()
+{
+    for( std::map<unsigned int, nx_http::AsyncHttpClient*>::iterator
+        it = m_inputPortHttpMonitor.begin();
+        it != m_inputPortHttpMonitor.end();
+        )
+    {
+        it->second->scheduleForRemoval();
+        m_inputPortHttpMonitor.erase( it++ );
+    }
+}
+
 bool QnPlAxisResource::isResourceAccessible()
 {
     return updateMACAddress();
@@ -783,16 +795,16 @@ bool QnPlAxisResource::registerInputPortEventHandler()
         ++it )
     {
         requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
-        std::auto_ptr<nx_http::AsyncHttpClient> httpClient( new nx_http::AsyncHttpClient() );
-        connect( httpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
-        connect( httpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
-        connect( httpClient.get(), SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
+        connect( httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        connect( httpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
+        connect( httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
         httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
         httpClient->setUserName( auth.user() );
         httpClient->setUserPassword( auth.password() );
         httpClient->doGet( requestUrl );
         QMutexLocker lk( &m_inputPortMutex );
-        m_inputPortHttpMonitor.insert( std::make_pair( it->second, httpClient.release() ) );
+        m_inputPortHttpMonitor.insert( std::make_pair( it->second, httpClient ) );
     }
 
     return false;

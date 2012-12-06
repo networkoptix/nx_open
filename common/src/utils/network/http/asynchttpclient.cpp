@@ -11,6 +11,7 @@
 
 
 //TODO/IMPL add Digit authentication
+//TODO/IMPL reconnect
 
 namespace nx_http
 {
@@ -26,11 +27,18 @@ namespace nx_http
 
     AsyncHttpClient::~AsyncHttpClient()
     {
+        if( m_socket )
+        {
+            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
+            aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
+        }
     }
 
     //!Implementation of aio::AIOEventHandler::eventTriggered
     void AsyncHttpClient::eventTriggered( Socket* sock, PollSet::EventType eventType )
     {
+        ScopedDestructionProhibition undestructable( this );
+
         Q_ASSERT( sock == m_socket.data() );
         for( ;; )
         {
@@ -184,12 +192,10 @@ namespace nx_http
             break;
         }
 
-        if( isScheduledForRemoval() )
+        if( m_state == sFailed || m_state == sDone )
         {
-            //removing this
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etRead );
             aio::AIOService::instance()->removeFromWatch( m_socket, PollSet::etWrite );
-            delete this;
         }
     }
 

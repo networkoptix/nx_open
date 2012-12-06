@@ -12,28 +12,34 @@ namespace nx_http
 {
     HttpClient::HttpClient()
     :
+        m_asyncHttpClient( new AsyncHttpClient() ),
         m_done( false )
     {
-        connect( &m_asyncHttpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
-        connect( &m_asyncHttpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
-        connect( &m_asyncHttpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onDone()), Qt::DirectConnection );
+        connect( m_asyncHttpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)), this, SLOT(onResponseReceived()), Qt::DirectConnection );
+        connect( m_asyncHttpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)), this, SLOT(onSomeMessageBodyAvailable()), Qt::DirectConnection );
+        connect( m_asyncHttpClient, SIGNAL(done(nx_http::AsyncHttpClient*)), this, SLOT(onDone()), Qt::DirectConnection );
+    }
+
+    HttpClient::~HttpClient()
+    {
+        m_asyncHttpClient->scheduleForRemoval();
     }
 
     bool HttpClient::doGet( const QUrl& url )
     {
-        if( !m_asyncHttpClient.doGet( url ) )
+        if( !m_asyncHttpClient->doGet( url ) )
             return false;
 
         QMutexLocker lk( &m_mutex );
-        while( m_asyncHttpClient.state() < AsyncHttpClient::sResponseReceived )
+        while( m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived )
             m_cond.wait( lk.mutex() );
 
-        return m_asyncHttpClient.state() != AsyncHttpClient::sFailed;
+        return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
     }
 
     const HttpResponse* HttpClient::response() const
     {
-        return m_asyncHttpClient.response();
+        return m_asyncHttpClient->response();
     }
 
     //!
@@ -59,51 +65,51 @@ namespace nx_http
 
     const QUrl& HttpClient::url() const
     {
-        return m_asyncHttpClient.url();
+        return m_asyncHttpClient->url();
     }
 
     bool HttpClient::startReadMessageBody()
     {
-        return m_asyncHttpClient.startReadMessageBody();
+        return m_asyncHttpClient->startReadMessageBody();
     }
 
     void HttpClient::setSubsequentReconnectTries( int reconnectTries )
     {
-        m_asyncHttpClient.setSubsequentReconnectTries( reconnectTries );
+        m_asyncHttpClient->setSubsequentReconnectTries( reconnectTries );
     }
 
     void HttpClient::setTotalReconnectTries( int reconnectTries )
     {
-        m_asyncHttpClient.setTotalReconnectTries( reconnectTries );
+        m_asyncHttpClient->setTotalReconnectTries( reconnectTries );
     }
 
     void HttpClient::setUserAgent( const QString& userAgent )
     {
-        m_asyncHttpClient.setUserAgent( userAgent );
+        m_asyncHttpClient->setUserAgent( userAgent );
     }
 
     void HttpClient::setUserName( const QString& userName )
     {
-        m_asyncHttpClient.setUserName( userName );
+        m_asyncHttpClient->setUserName( userName );
     }
 
     void HttpClient::setUserPassword( const QString& userPassword )
     {
-        m_asyncHttpClient.setUserPassword( userPassword );
+        m_asyncHttpClient->setUserPassword( userPassword );
     }
 
     void HttpClient::onResponseReceived()
     {
         QMutexLocker lk( &m_mutex );
         //message body buffer can be non-empty
-        m_msgBodyBuffer += m_asyncHttpClient.fetchMessageBodyBuffer();
+        m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
     }
 
     void HttpClient::onSomeMessageBodyAvailable()
     {
         QMutexLocker lk( &m_mutex );
-        m_msgBodyBuffer += m_asyncHttpClient.fetchMessageBodyBuffer();
+        m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
         m_cond.wakeAll();
     }
 
