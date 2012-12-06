@@ -324,9 +324,10 @@ private:
      * @brief validateStorages              Check if all servers have enough space on at least
      *                                      one storage to enable recording.
      * @param cameras                       List of cameras where recording will be enabled
+     * @param critical                      Returned value, contatins true if there is no space at all.
      * @return                              List of servers which has not enough space on all storages.
      */
-    QnMediaServerResourceList validateStorages(QnVirtualCameraResourceList cameras);
+    QnMediaServerResourceList validateStorages(QnVirtualCameraResourceList cameras, bool &critical);
 private:
     friend class detail::QnResourceStatusReplyProcessor;
 
