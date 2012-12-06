@@ -12,13 +12,14 @@
 #include <QtGui/QSpinBox>
 
 #include <utils/common/counter.h>
-#include <ui/processors/free_space_processor.h>
 
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+static const qint64 MIN_RECORD_FREE_SPACE = 1000ll * 1000ll * 1000ll * 5;
 
 namespace {
     const int defaultSpaceLimitGb = 5;
@@ -192,7 +193,7 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
     QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
     connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
 
-    QScopedPointer<CheckFreeSpaceReplyProcessor> processor(new CheckFreeSpaceReplyProcessor());
+    QScopedPointer<detail::CheckFreeSpaceReplyProcessor> processor(new detail::CheckFreeSpaceReplyProcessor());
     connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
 
     QnMediaServerConnectionPtr serverConnection = m_server->apiConnection();
@@ -204,20 +205,20 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
 
     eventLoop->exec();
 
-    FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
-    for (FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
+    detail::FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
+    for (detail::FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
     {
         QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
         if (!storage)
             continue;
 
         qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
-        if (itr.value().errorCode == CheckFreeSpaceReplyProcessor::INVALID_PATH)
+        if (itr.value().errorCode == detail::INVALID_PATH)
         {
             QMessageBox::critical(this, tr("Invalid storage path"), tr("Storage path '%1' is invalid or is not accessible for writing.").arg(storage->getUrl()));
             return false;
         }
-        if (itr.value().errorCode == CheckFreeSpaceReplyProcessor::SERVER_ERROR)
+        if (itr.value().errorCode == detail::SERVER_ERROR)
         {
             QMessageBox::critical(this, tr("Can't verify storage path"), tr("Cannot verify storage path '%1'. Cannot establish connection to the media server.").arg(storage->getUrl()));
             return false;
@@ -227,10 +228,10 @@ bool QnServerSettingsDialog::validateStorages(const QnAbstractStorageResourceLis
             QMessageBox::critical(this, tr("Not enough disk space"),
                 tr("Storage '%1'\nYou have less storage space available than reserved free space value. Additional %2Gb are required.")
                 .arg(storage->getUrl())
-                .arg(formatGbStr(CheckFreeSpaceReplyProcessor::MIN_RECORD_FREE_SPACE - availableSpace)));
+                .arg(formatGbStr(MIN_RECORD_FREE_SPACE - availableSpace)));
             return false;
         }
-        else if (availableSpace < CheckFreeSpaceReplyProcessor::MIN_RECORD_FREE_SPACE)
+        else if (availableSpace < MIN_RECORD_FREE_SPACE)
         {
             QMessageBox::warning(this, tr("Low space for archive"),
                 tr("Storage '%1'\nYou have only %2Gb left for video archive.")

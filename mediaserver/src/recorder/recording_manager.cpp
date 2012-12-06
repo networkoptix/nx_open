@@ -265,7 +265,6 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
 
 void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
 {
-    QMutexLocker lock(&m_mutex);
     QnVideoCamera* camera = qnCameraPool->getVideoCamera(res);
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
@@ -279,8 +278,8 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
         cameraRes->setDataProviderFactory(QnServerDataProviderFactory::instance());
 
 
-        QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(res);
-        if (itrRec != m_recordMap.end())
+        QMap<QnResourcePtr, Recorders>::const_iterator itrRec = m_recordMap.find(res);
+        if (itrRec != m_recordMap.constEnd())
         {
             const Recorders& recorders = itrRec.value();
             if (recorders.recorderHiRes)
@@ -304,7 +303,9 @@ void QnRecordingManager::updateCamera(QnSecurityCamResourcePtr res)
             if (recorderLowRes)
                 recorderLowRes->setDualStreamingHelper(dialStreamingHelper);
 
+            m_mutex.lock();
             m_recordMap.insert(res, Recorders(recorderHiRes, recorderLowRes));
+            m_mutex.unlock();
 
             if (recorderHiRes)
                 recorderHiRes->updateCamera(cameraRes);
@@ -385,23 +386,25 @@ void QnRecordingManager::at_updateStorage()
 
 void QnRecordingManager::onRemoveResource(QnResourcePtr res)
 {
-    QMutexLocker lock(&m_mutex);
-
     QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(res);
     if (physicalStorage) {
         qnStorageMan->removeStorage(physicalStorage);
         return;
     }
 
-    QMap<QnResourcePtr, Recorders>::iterator itr = m_recordMap.find(res);
-    if (itr == m_recordMap.end())
-        return;
+    Recorders recorders;
+    {
+        QMutexLocker lock(&m_mutex);
+        QMap<QnResourcePtr, Recorders>::const_iterator itr = m_recordMap.find(res);
+        if (itr == m_recordMap.constEnd())
+            return;
+        recorders = itr.value();
+        m_recordMap.remove(res);
+    }
+    qnCameraPool->removeVideoCamera(res);
 
-    qnCameraPool->removeVideoCamera(itr.key());
-
-    beforeDeleteRecorder(itr.value());
-    deleteRecorder(itr.value());
-    m_recordMap.erase(itr);
+    beforeDeleteRecorder(recorders);
+    deleteRecorder(recorders);
 }
 
 bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)

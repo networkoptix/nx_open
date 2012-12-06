@@ -151,7 +151,8 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         return;
     }
 
-    bool isRecording = m_currentScheduleTask.getRecordingType() != Qn::RecordingType_Never;
+	const QnScheduleTask task = currentScheduleTask();
+    bool isRecording = task.getRecordingType() != Qn::RecordingType_Never;
     if (!m_device->isDisabled()) {
         if (isRecording) {
             if(m_device->getStatus() == QnResource::Online)
@@ -163,13 +164,19 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
         }
     }
 
-    if (isMotionRec(m_currentScheduleTask.getRecordingType())) {
-        if (m_dualStreamingHelper->getLastMotionTime() == AV_NOPTS_VALUE) 
-            setPrebufferingUsec(m_currentScheduleTask.getBeforeThreshold()*1000000ll); // no more motion, set prebuffer again
-        else
-            setPrebufferingUsec(0); // motion in progress, flush prebuffer
+    if (!isMotionRec(task.getRecordingType()))
+        return;
+
+    qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
+    if (motionTime == AV_NOPTS_VALUE) 
+    {
+        setPrebufferingUsec(task.getBeforeThreshold()*1000000ll); // no more motion, set prebuffer again
     }
-}
+    else
+    {
+        m_lastMotionTimeUsec = motionTime;
+        setPrebufferingUsec(0); // motion in progress, flush prebuffer
+    }
 
 void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp)
 {
@@ -192,12 +199,13 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
         else
             updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION);
     }
+	QnScheduleTask task = currentScheduleTask();
 
-    if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_Run)
+    if (task.getRecordingType() == Qn::RecordingType_Run)
         return true;
-    else if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_MotionPlusLQ && m_role == QnResource::Role_SecondaryLiveVideo)
+    else if (task.getRecordingType() == Qn::RecordingType_MotionPlusLQ && m_role == QnResource::Role_SecondaryLiveVideo)
         return true;
-    else if (m_currentScheduleTask.getRecordingType() == Qn::RecordingType_Never)
+    else if (task.getRecordingType() == Qn::RecordingType_Never)
     {
         close();
         return false;
@@ -210,7 +218,8 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     // write motion only
     // if prebuffering mode and all buffer is full - drop data
 
-    //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + m_currentScheduleTask.getAfterThreshold()*1000000ll))/1000000.0;
+    bool rez = m_lastMotionTimeUsec != AV_NOPTS_VALUE && media->timestamp < m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll;
+    //qDebug() << "needSaveData=" << rez << "df=" << (media->timestamp - (m_lastMotionTimeUsec + task.getAfterThreshold()*1000000ll))/1000000.0;
     if (!isMotionContinue && m_endDateTime != AV_NOPTS_VALUE) 
     {
         if (media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
@@ -368,7 +377,6 @@ bool QnServerStreamRecorder::processData(QnAbstractDataPacketPtr data)
     }
 
     // for empty schedule we record all time
-    QMutexLocker lock(&m_scheduleMutex);
     beforeProcessData(media);
     return QnStreamRecorder::processData(data);
 }

@@ -75,6 +75,7 @@ private:
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);
     qint64 maxArchiveTime() const;
+    qint64 getCurrentTimeInternal() const;
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

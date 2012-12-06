@@ -11,6 +11,7 @@
 #include "plugins/resources/archive/archive_stream_reader.h"
 #include "device_plugins/server_archive/server_archive_delegate.h"
 #include "utils/common/util.h"
+#include "core/resource/camera_resource.h"
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 10;
@@ -228,6 +229,10 @@ void QnProgressiveDownloadingConsumer::run()
         QByteArray position = getDecodedUrl().queryItemValue("pos").toLocal8Bit();
         bool isUTCRequest = !getDecodedUrl().queryItemValue("posonly").isNull();
         QnVideoCamera* camera = qnCameraPool->getVideoCamera(resource);
+
+        //QnVirtualCameraResourcePtr camRes = resource.dynamicCast<QnVirtualCameraResource>();
+        //if (camRes && camRes->isAudioEnabled())
+        //    d->transcoder.setAudioCodec(CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
         if (position.isEmpty() || position == "now")
         {
             if (resource->getStatus() != QnResource::Online && resource->getStatus() != QnResource::Recording)

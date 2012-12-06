@@ -836,7 +836,7 @@ void QnMain::run()
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIpWebCamResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlDroidResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnTestCameraResourceSearcher::instance());
-    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance());
+    //QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlPulseSearcher::instance()); native driver does not support dual streaming! new pulse cameras works via onvif
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlAxisResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlIqResourceSearcher::instance());
     QnResourceDiscoveryManager::instance().addDeviceServer(&QnPlISDResourceSearcher::instance());
@@ -946,12 +946,12 @@ void stopServer(int signal)
     QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance().stop();
     QnRecordingManager::instance()->stop();
-    QnVideoCameraPool::instance()->stop();
     if (serviceMainInstance)
     {
         serviceMainInstance->stopObjects();
         serviceMainInstance = 0;
     }
+    QnVideoCameraPool::instance()->stop();
     av_lockmgr_register(NULL);
     qApp->quit();
 }
