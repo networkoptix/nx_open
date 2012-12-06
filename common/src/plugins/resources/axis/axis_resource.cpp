@@ -24,18 +24,13 @@ QnPlAxisResource::QnPlAxisResource()
     connect(
         this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
         QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
+
+    connect( this, SIGNAL(disabledChanged(bool, bool)), this, SLOT(onDisabledChanged(bool, bool)), Qt::DirectConnection );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
 {
-    for( std::map<unsigned int, nx_http::AsyncHttpClient*>::iterator
-        it = m_inputPortHttpMonitor.begin();
-        it != m_inputPortHttpMonitor.end();
-        )
-    {
-        it->second->scheduleForRemoval();
-        m_inputPortHttpMonitor.erase( it++ );
-    }
+    stopInputMonitoring();
 }
 
 bool QnPlAxisResource::isResourceAccessible()
@@ -774,7 +769,7 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 
     //TODO/IMPL periodically update port names in case some one changes it
 
-    if( m_inputPortNameToIndex.size() > 0 )
+    if( !isDisabled() && m_inputPortNameToIndex.size() > 0 )
         registerInputPortEventHandler();
 }
 
@@ -807,7 +802,7 @@ bool QnPlAxisResource::registerInputPortEventHandler()
         m_inputPortHttpMonitor.insert( std::make_pair( it->second, httpClient ) );
     }
 
-    return false;
+    return true;
 }
 
 void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )
@@ -870,4 +865,30 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
             return;
         }
     }
+}
+
+void QnPlAxisResource::stopInputMonitoring()
+{
+    QMutexLocker lk( &m_inputPortMutex );
+
+    nx_http::AsyncHttpClient* httpClient = NULL;
+    while( !m_inputPortHttpMonitor.empty() )
+    {
+        httpClient = m_inputPortHttpMonitor.begin()->second;
+        m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
+        lk.unlock();
+        httpClient->scheduleForRemoval();
+        lk.relock();
+    }
+}
+
+void QnPlAxisResource::onDisabledChanged( bool oldValue, bool newValue )
+{
+    if( oldValue == newValue )
+        return;
+
+    if( newValue )
+        stopInputMonitoring();  //stopping camera input monitoring
+    else
+        registerInputPortEventHandler();//starting camera input monitoring
 }

@@ -117,6 +117,10 @@ private:
     bool registerInputPortEventHandler();
     void notificationReceived( const nx_http::ConstBufferRefType& notification );
     void forgetHttpClient( nx_http::AsyncHttpClient* const httpClient );
+    void stopInputMonitoring();
+
+private slots:
+    void onDisabledChanged( bool oldValue, bool newValue );
 };
 
 #endif //axis_resource_h_2215
