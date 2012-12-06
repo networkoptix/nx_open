@@ -23,20 +23,6 @@ static const int DEFAULT_APP_SERVER_PORT = 8000;
 static const int MESSAGE_DURATION = 3 * 1000;
 static const int DEFAUT_PROXY_PORT = 7009;
 
-
-class StopServiceAsyncTask: public QRunnable
-{
-public:
-    StopServiceAsyncTask(SC_HANDLE handle): m_handle(handle) {}
-    void run()
-    {
-        SERVICE_STATUS serviceStatus;
-        ControlService(m_handle, SERVICE_CONTROL_STOP, &serviceStatus);
-    }
-private:
-    SC_HANDLE m_handle;
-};
-
 bool MyIsUserAnAdmin()
 {
    bool isAdmin = false;
@@ -317,12 +303,19 @@ void QnSystrayWindow::updateServiceInfo()
         return;
     }
 
-    int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
-    int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
+    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+    QThreadPool::globalInstance()->start(mediaServerTask);
+   
+    GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
+    connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
+    QThreadPool::globalInstance()->start(appServerTask);
+}
 
-    settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
-
-    if (appServerStatus == SERVICE_STOPPED) 
+void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
+    updateServiceInfoInternal(m_appServerHandle, status,  APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
+    settingsAction->setVisible(true);
+    if (status == SERVICE_STOPPED) 
     {
         if (m_needStartAppServer)
         {
@@ -335,15 +328,20 @@ void QnSystrayWindow::updateServiceInfo()
             showMessage(APP_SERVER_NAME + QString(" has been stopped"));
         }
     }
-    else if (appServerStatus == SERVICE_RUNNING)
+    else if (status == SERVICE_RUNNING)
     {
         if (m_prevAppServerStatus >= 0 && m_prevAppServerStatus != SERVICE_RUNNING)
         {
             showMessage(APP_SERVER_NAME + QString(" has been started"));
         }
     }
+    m_prevAppServerStatus = status;
+}
 
-    if (mediaServerStatus == SERVICE_STOPPED)
+void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
+    updateServiceInfoInternal(m_mediaServerHandle, status, MEDIA_SERVER_NAME, m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
+    settingsAction->setVisible(true);
+    if (status == SERVICE_STOPPED)
     {
         if (m_needStartMediaServer) 
         {
@@ -356,37 +354,28 @@ void QnSystrayWindow::updateServiceInfo()
             showMessage(MEDIA_SERVER_NAME + QString(" has been stopped"));
         }
     }
-    else if (mediaServerStatus == SERVICE_RUNNING)
+    else if (status == SERVICE_RUNNING)
     {
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING)
         {
             showMessage(MEDIA_SERVER_NAME + QString(" has been started"));
         }
     }
-
-    m_prevMediaServerStatus = mediaServerStatus;
-    m_prevAppServerStatus = appServerStatus;
+    m_prevMediaServerStatus = status;
 }
 
-int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction)
+void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction)
 {
-    SERVICE_STATUS serviceStatus;
-
     if (!service)
     {
         stopAction->setVisible(false);
         startAction->setVisible(false);
         logAction->setVisible(false);
-        return -1;
+        return;
     }
     logAction->setVisible(true);
 
-    QString str;
-
-    if (QueryServiceStatus(service, &serviceStatus))
-    {
-        switch(serviceStatus.dwCurrentState)
-        {
+    switch(status) {
         case SERVICE_STOPPED:
             stopAction->setVisible(false);
             startAction->setVisible(true);
@@ -431,9 +420,7 @@ int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString&
             startAction->setEnabled(false);
             startAction->setText(tr("Start ") + serviceName + tr(" (pausing)"));
             break;
-        }
     }
-    return serviceStatus.dwCurrentState;
 }
 
 void QnSystrayWindow::at_mediaServerStartAction()
@@ -452,8 +439,10 @@ void QnSystrayWindow::at_mediaServerStopAction()
         if (QMessageBox::question(0, tr("Systray"), MEDIA_SERVER_NAME + " is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
             //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-            QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_mediaServerHandle));
-            updateServiceInfo();
+            StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
+            connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
+            QThreadPool::globalInstance()->start(stopTask);
+            m_mediaServerStopAction->setEnabled(false);
         }
     }
 }
@@ -467,14 +456,14 @@ void QnSystrayWindow::at_appServerStartAction()
 
 void QnSystrayWindow::at_appServerStopAction()
 {
-    SERVICE_STATUS serviceStatus;
     if (m_appServerHandle) 
     {
         if (QMessageBox::question(0, tr("Systray"), APP_SERVER_NAME + QString(" is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            //ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-            QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_appServerHandle));
-            updateServiceInfo();
+            StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_appServerHandle);
+            connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
+            QThreadPool::globalInstance()->start(stopTask);
+            m_appServerStartAction->setEnabled(false);
         }
     }
 }
