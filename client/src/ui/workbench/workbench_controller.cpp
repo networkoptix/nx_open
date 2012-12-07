@@ -1113,6 +1113,9 @@ void QnWorkbenchController::at_item_doubleClicked(QGraphicsView *, QGraphicsItem
     if(widget == NULL)
         return;
 
+    if(widget->options() & QnResourceWidget::ControlPtz)
+        return; /* (Un)zooming shouldn't work when PTZ is on as it's confusing. */
+
     display()->scene()->clearSelection();
     widget->setSelected(true);
 

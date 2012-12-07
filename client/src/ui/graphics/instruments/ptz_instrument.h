@@ -2,6 +2,8 @@
 #define QN_PTZ_INSTRUMENT_H
 
 #include <QtCore/QWeakPointer>
+#include <QtCore/QBasicTimer>
+#include <QtCore/QVector>
 #include <QtGui/QVector3D>
 
 #include <core/resource/resource_fwd.h>
@@ -40,13 +42,17 @@ signals:
 
 protected:
     virtual void installedNotify() override;
+    virtual void aboutToBeDisabledNotify() override;
     virtual void aboutToBeUninstalledNotify() override;
     virtual bool registeredNotify(QGraphicsItem *item) override;
     virtual void unregisteredNotify(QGraphicsItem *item) override;
 
+    virtual void timerEvent(QTimerEvent *event) override;
+
     virtual bool animationEvent(AnimationEvent *event) override;
 
     virtual bool mousePressEvent(QWidget *viewport, QMouseEvent *event) override;
+    virtual bool mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
     virtual bool mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
@@ -82,10 +88,12 @@ private:
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
+    void ptzUnzoom(QnMediaResourceWidget *widget);
 
 private:
     QHash<QString, const QnPtzInformation *> m_infoByModel;
 
+    int m_clickDelayMSec;
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
@@ -97,12 +105,26 @@ private:
     QWeakPointer<QnMediaResourceWidget> m_target;
 
     bool m_isClick;
+    bool m_isDoubleClick;
     bool m_ptzStartedEmitted;
 
-    QList<PtzSplashItem *> m_freeSplashItems, m_activeSplashItems;
+    QBasicTimer m_clickTimer;
+    QPointF m_clickPos;
 
-    //QnNetworkResourcePtr m_camera;
-    //QnMediaServerConnectionPtr m_connection;
+    struct SplashItemAnimation {
+        SplashItemAnimation(): item(NULL), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
+        SplashItemAnimation(PtzSplashItem *item): item(item), fadingIn(true), expansionMultiplier(0.0), opacityMultiplier(0.0) {}
+        SplashItemAnimation(PtzSplashItem *item, qreal expansionMultiplier, qreal opacityMultiplier): item(item), fadingIn(true), expansionMultiplier(expansionMultiplier), opacityMultiplier(opacityMultiplier) {}
+
+        PtzSplashItem *item;
+        bool fadingIn;
+        qreal expansionMultiplier; /**< Expansion speed relative to standard expansion speed. */
+        qreal opacityMultiplier;
+
+        friend bool operator==(const SplashItemAnimation &l, const SplashItemAnimation &r) { return l.item == r.item; }
+    };
+
+    QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };
 
 

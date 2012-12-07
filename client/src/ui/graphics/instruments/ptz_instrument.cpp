@@ -28,7 +28,7 @@
 #include "selection_item.h"
 #include "utils/settings.h"
 
-#define QN_PTZ_INSTRUMENT_DEBUG
+//#define QN_PTZ_INSTRUMENT_DEBUG
 
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -247,10 +247,11 @@ PtzInstrument::PtzInstrument(QObject *parent):
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
         makeSet(),
-        makeSet(QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
+        makeSet(QEvent::GraphicsSceneMouseDoubleClick, QEvent::GraphicsSceneMousePress, QEvent::GraphicsSceneMouseMove, QEvent::GraphicsSceneMouseRelease), 
         parent
     ),
     QnWorkbenchContextAware(parent),
+    m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {
@@ -260,7 +261,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraAdded(camera);
 
-    // TODO: make configurable.
+    // TODO: make externally configurable.
     QVector<QPair<qreal, qreal> > toCameraY;
     toCameraY.push_back(qMakePair(-0.5, -90.0));
     toCameraY.push_back(qMakePair(0.0, 0.0));
@@ -300,18 +301,17 @@ void PtzInstrument::setTarget(QnMediaResourceWidget *target) {
 
 PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     PtzSplashItem *result;
-    if(!m_freeSplashItems.empty()) {
-        result = m_freeSplashItems.back();
-        m_freeSplashItems.pop_back();
+    if(!m_freeAnimations.empty()) {
+        result = m_freeAnimations.back().item;
+        m_freeAnimations.pop_back();
         result->setParentItem(parentItem);
     } else {
         result = new PtzSplashItem(parentItem);
         connect(result, SIGNAL(destroyed()), this, SLOT(at_splashItem_destroyed()));
     }
 
-    result->setOpacity(1.0);
+    result->setOpacity(0.0);
     result->show();
-    m_activeSplashItems.push_back(result);
     return result;
 }
 
@@ -330,41 +330,7 @@ void PtzInstrument::ensureSelectionItem() {
 }
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
-    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-
-    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
-    if(!info)
-        return;
-
-    QVector3D oldPhysicalPosition = m_physicalPositionByCamera.value(camera);
-
-    qreal sideSize = 36.0 / oldPhysicalPosition.z();
-    QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
-    QVector3D x = sphericalToCartesian<QVector3D>(1.0, (oldPhysicalPosition.x() + 90) / 180 * M_PI, 0.0) * sideSize;
-    QVector3D y = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, (oldPhysicalPosition.y() - 90) / 180 * M_PI) * sideSize;
-    
-    QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
-    QVector3D r1 = r + x * delta.x() + y * delta.y();
-    QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
-    if(spherical.phi < 0)
-        spherical.phi += M_PI * 2.0;
-
-    QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z());
-    QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
-
-    TRACE("PTZ ROTATE(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ")");
-
-    m_physicalPositionByCamera[camera] = newPhysicalPosition;
-
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-    
-    if(qnSettings->debugCounter() % 2) {
-        int handle = server->apiConnection()->asyncPtzMoveTo(camera, newLogicalPosition.x(), newLogicalPosition.y(), newLogicalPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
-        m_cameraByHandle[handle] = camera;
-    } else {
-        int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
-        m_cameraByHandle[handle] = camera;
-    }
+    ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
 
 
@@ -386,13 +352,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     QVector2D delta = QVector2D(pos - widget->rect().center()) / widget->size().width();
     QVector3D r1 = r + x * delta.x() + y * delta.y();
     QnSphericalPoint<float> spherical = cartesianToSpherical<QVector3D>(r1);
-    if(spherical.phi < 0)
-        spherical.phi += M_PI * 2.0;
 
     qreal zoom = widget->rect().width() / rect.width(); /* For 2x zoom we'll get 2.0 here. */
     
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);
     QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
+    newPhysicalPosition = info->toCameraMapper.logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
 
     TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
 
@@ -409,6 +374,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     }
 }
 
+void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
+    QSizeF size = widget->size() * 100;
+
+    ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -417,6 +388,12 @@ void PtzInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
     base_type::installedNotify();
+}
+
+void PtzInstrument::aboutToBeDisabledNotify() {
+    m_clickTimer.stop();
+
+    base_type::aboutToBeDisabledNotify();
 }
 
 void PtzInstrument::aboutToBeUninstalledNotify() {
@@ -446,27 +423,48 @@ void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     disconnect(object, NULL, this, NULL);
 }
 
+void PtzInstrument::timerEvent(QTimerEvent *event) {
+    if(event->timerId() == m_clickTimer.timerId()) {
+        m_clickTimer.stop();
+
+        PtzSplashItem *splashItem = newSplashItem(target());
+        splashItem->setSplashType(PtzSplashItem::Circular);
+        splashItem->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
+        splashItem->setPos(m_clickPos);
+        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+
+        ptzMoveTo(target(), m_clickPos);
+    } else {
+        base_type::timerEvent(event);
+    }
+}
+
 bool PtzInstrument::animationEvent(AnimationEvent *event) {
     qreal dt = event->deltaTime() / 1000.0;
     
-    for(int i = m_activeSplashItems.size() - 1; i >= 0; i--) {
-        PtzSplashItem *item = m_activeSplashItems[i];
+    for(int i = m_activeAnimations.size() - 1; i >= 0; i--) {
+        SplashItemAnimation &animation = m_activeAnimations[i];
 
-        qreal opacity = item->opacity();
-        QRectF rect = item->boundingRect();
+        qreal opacity = animation.item->opacity();
+        QRectF rect = animation.item->boundingRect();
 
-        opacity -= dt * 1.0;
-        if(opacity <= 0.0) {
-            item->hide();
-            m_activeSplashItems.removeAt(i);
-            m_freeSplashItems.push_back(item);
+        qreal opacitySpeed = animation.fadingIn ? 8.0 : -1.0;
+
+        opacity += dt * opacitySpeed * animation.opacityMultiplier;
+        if(opacity >= 1.0) {
+            animation.fadingIn = false;
+            opacity = 1.0;
+        } else if(opacity <= 0.0) {
+            animation.item->hide();
+            m_freeAnimations.push_back(animation);
+            m_activeAnimations.removeAt(i);
             continue;
         }
-        qreal ds = dt * m_expansionSpeed;
+        qreal ds = dt * m_expansionSpeed * animation.expansionMultiplier;
         rect = rect.adjusted(-ds, -ds, ds, ds);
 
-        item->setOpacity(opacity);
-        item->setRect(rect);
+        animation.item->setOpacity(opacity);
+        animation.item->setRect(rect);
     }
     
     return false;
@@ -478,7 +476,14 @@ bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
     return false;
 }
 
+bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    return mousePressEvent(item, event);
+}
+
 bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    bool clickTimerWasActive = m_clickTimer.isActive();
+    m_clickTimer.stop();
+
     if(event->button() != Qt::LeftButton)
         return false;
 
@@ -489,23 +494,13 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     if(!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
+    m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
     m_target = target;
+
     dragProcessor()->mousePressEvent(item, event);
     
     event->accept();
     return false;
-
-    /*if(QnNetworkResourcePtr camera = target->resource().dynamicCast<QnNetworkResource>()) {
-        if(QnMediaServerResourcePtr server = camera->resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>()) {
-            setServerSpeed(QVector3D(), true);
-
-            m_camera = camera;
-            m_connection = server->apiConnection();
-            
-            dragProcessor()->mousePressEvent(item, event);
-        }
-    }
-    */
 }
 
 void PtzInstrument::startDragProcess(DragInfo *) {
@@ -567,10 +562,11 @@ void PtzInstrument::finishDrag(DragInfo *) {
 
         QRectF selectionRect = selectionItem()->boundingRect();
 
-        PtzSplashItem *splash = newSplashItem(target());
-        splash->setSplashType(PtzSplashItem::Rectangular);
-        splash->setPos(selectionRect.center());
-        splash->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
+        PtzSplashItem *splashItem = newSplashItem(target());
+        splashItem->setSplashType(PtzSplashItem::Rectangular);
+        splashItem->setPos(selectionRect.center());
+        splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
+        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
         ptzMoveTo(target(), selectionRect);
     }
@@ -581,12 +577,19 @@ void PtzInstrument::finishDrag(DragInfo *) {
 
 void PtzInstrument::finishDragProcess(DragInfo *info) {
     if(target() && m_isClick) {
-        PtzSplashItem *splash = newSplashItem(target());
-        splash->setSplashType(PtzSplashItem::Circular);
-        splash->setRect(QRectF(0.0, 0.0, 0.0, 0.0));
-        splash->setPos(info->mousePressItemPos());
+        if(m_isDoubleClick) {
+            PtzSplashItem *splashItem = newSplashItem(target());
+            splashItem->setSplashType(PtzSplashItem::Rectangular);
+            splashItem->setPos(target()->rect().center());
+            QSizeF size = target()->size() * 1.1;
+            splashItem->setRect(QRectF(-toPoint(size) / 2, size));
+            m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
 
-        ptzMoveTo(target(), info->mousePressItemPos());
+            ptzUnzoom(target());
+        } else {
+            m_clickTimer.start(m_clickDelayMSec, this);
+            m_clickPos = info->mousePressItemPos();
+        }
     }
 
     emit ptzProcessFinished(target());
@@ -605,8 +608,8 @@ void PtzInstrument::at_target_optionsChanged() {
 void PtzInstrument::at_splashItem_destroyed() {
     PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
 
-    m_freeSplashItems.removeAll(item);
-    m_activeSplashItems.removeAll(item);
+    m_freeAnimations.removeAll(item);
+    m_activeAnimations.removeAll(item);
 }
 
 void PtzInstrument::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera) {
