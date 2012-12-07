@@ -778,8 +778,6 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
 
 qint64 QnAppServerConnection::getCurrentTime()
 {
-    QByteArray data;
-
     QnHTTPRawResponse response;
     int rez = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("time"), response);
     if (rez != 0) {
@@ -787,7 +785,7 @@ qint64 QnAppServerConnection::getCurrentTime()
         return QDateTime::currentMSecsSinceEpoch();
     }
 
-    return data.toLongLong();
+    return response.data.toLongLong();
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)

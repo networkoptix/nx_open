@@ -16,10 +16,14 @@ public:
 private:
     QnAppServerConnectionPtr m_appServer;
     QnId m_serverId;
-
+    QSet<QnResourcePtr> m_awaitingSetStatus;
+    QMap<int, QnResourcePtr> m_handleToResource;
+private:
+    void updateResourceStatusAsync(const QnResourcePtr &resource);
+    bool isSetStatusInProgress(const QnResourcePtr &resource);
 private slots:
     void onResourceStatusChanged(const QnResourcePtr& resource);
-    void requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle);
+    void requestFinished(const QnHTTPRawResponse& response, int handle);
 };
 
 #endif //_server_appserver_processor_h_
