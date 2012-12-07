@@ -5,8 +5,8 @@
             <Dialog Id="InstallTypeDlg" Width="370" Height="270" Title="!(loc.InstallDirDlg_Title)">
                 <Control Id="radioButtonGroupBox1" Type="RadioButtonGroup" Height="96" Width="272" X="15" Y="49" Property="INSTALLTYPE">
                     <RadioButtonGroup Property="INSTALLTYPE">
-                        <RadioButton X="19" Y="14" Height="18" Width="201" Text="Quick Full (install with all defaults)" Value="0"/>
-                        <RadioButton X="19" Y="38" Height="18" Width="78" Text="GUI Client Only" Value="2" />
+                        <RadioButton X="19" Y="14" Height="18" Width="201" Text="Quick Full (Installing ALL Components)" Value="0"/>
+                        <RadioButton X="19" Y="38" Height="18" Width="78" Text="Client Only (I want to view video recorded elsewhere)" Value="2" />
                         <RadioButton X="19" Y="60" Height="18" Width="78" Text="Advanced" Value="1" />
                     </RadioButtonGroup>
                 </Control>
