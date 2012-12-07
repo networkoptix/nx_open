@@ -20,7 +20,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(QnResourcePtr res):
     m_audioIO(0),
     m_videoParser(0),
     m_audioParser(0),
-    m_pleaseStop(false)
+    m_pleaseStop(false),
+    m_timeHelper(res->getUniqueId())
 {
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -333,7 +334,7 @@ void QnMulticodecRtpReader::openStream()
     m_pleaseStop = false;
     if (isStreamOpened())
         return;
-    m_timeHelper.reset();
+    //m_timeHelper.reset();
 
     QString transport = qSettings.value(QLatin1String("rtspTransport"), QLatin1String("AUTO")).toString().toUpper();
     if (transport != QLatin1String("AUTO") && transport != QLatin1String("UDP") && transport != QLatin1String("TCP"))

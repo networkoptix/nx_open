@@ -25,6 +25,7 @@ static const int SDP_TRACK_STEP = 2;
 static const int METADATA_TRACK_NUM = 7;
 static const char USER_AGENT_STR[] = "User-Agent: Network Optix\r\n";
 static const int TIME_RESYNC_THRESHOLD = 15;
+static const int TIME_FUTURE_THRESHOLD = 4;
 
 //#define DEBUG_RTSP
 
@@ -145,26 +146,41 @@ quint32 RTPSession::SDPTrackInfo::getSSRC() const
 
 // ================================================== QnRtspTimeHelper ==========================================
 
-QnRtspTimeHelper::QnRtspTimeHelper():
-    m_cameraClockToLocalDiff(INT_MAX),
+QMutex QnRtspTimeHelper::m_camClockMutex;
+QMap<QString, QnRtspTimeHelper::CamSyncInfo*> QnRtspTimeHelper::m_camClock;
+
+
+QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId):
     m_lastTime(AV_NOPTS_VALUE),
     m_lastResultInSec(0),
     m_localStartTime(0)
 {
-    reset();
+    {
+        QMutexLocker lock(&m_camClockMutex);
+        QMap<QString, CamSyncInfo*>::iterator itr = m_camClock.find(resId);
+        if (itr == m_camClock.end())
+            itr = m_camClock.insert(resId, new CamSyncInfo());
+        m_cameraClockToLocalDiff = itr.value();
+    }
+    
+    m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
+    m_timer.restart();
 }
 
-double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime, double localTime)
+double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
-    if (m_cameraClockToLocalDiff == INT_MAX)  
-        m_cameraClockToLocalDiff = localTime - cameraTime;
+    QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
+    if (m_cameraClockToLocalDiff->value == INT_MAX)  
+        m_cameraClockToLocalDiff->value = qnSyncTime->currentMSecsSinceEpoch()/1000.0 - cameraTime;
     //qDebug() << "diff=" << QString::number(m_cameraClockToLocalDiff - 2000000.0 - 340000.0);
-    return cameraTime + m_cameraClockToLocalDiff;
+    return cameraTime + m_cameraClockToLocalDiff->value;
 }
 
 void QnRtspTimeHelper::reset()
 {
-    m_cameraClockToLocalDiff = INT_MAX;
+    QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
+    
+    m_cameraClockToLocalDiff->value = INT_MAX;
     m_lastTime = AV_NOPTS_VALUE;
     m_lastResultInSec = 0;
     m_localStartTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -194,7 +210,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         return qnSyncTime->currentMSecsSinceEpoch() * 1000;
     else {
         int rtpTimeDiff = rtpTime - statistics.timestamp;
-        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency), statistics.localtime);
+        double resultInSecs = cameraTimeToLocalTime(statistics.nptTime + rtpTimeDiff / double(frequency));
         double localTimeInSecs = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
         // If data is delayed for some reason > than jitter, but not lost, some next data can have timing less then previous data (after reinit).
         // Such data can not be recorded to archive. I ofter got that situation if media server under debug
@@ -202,7 +218,8 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
         // In any way, valid threshold behaviour if camera time is changed.
         //if (qAbs(localTimeInSecs - resultInSecs) < 15 || !recursiveAllowed) 
         bool cameraTimeChanged = m_lastResultInSec != 0 && qAbs(resultInSecs - m_lastResultInSec) > TIME_RESYNC_THRESHOLD;
-        if ((cameraTimeChanged || isLocalTimeChanged()) && recursiveAllowed)
+        bool gotInvalidTime = resultInSecs - localTimeInSecs > TIME_FUTURE_THRESHOLD;
+        if ((cameraTimeChanged || isLocalTimeChanged() || gotInvalidTime) && recursiveAllowed)
         {
             //qDebug() << "reset time";
             reset();
@@ -216,7 +233,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const RtspStatistic& stati
                 rez = m_lastTime + MIN_FRAME_DURATION;
             m_lastTime = rez;
 
-            //qDebug() << "rtspTime=" << QDateTime::fromMSecsSinceEpoch(rez/1000).toString(QLatin1String("hh:mm:ss.zzz")) << "stat.npt=" << statistics.nptTime << "stat.rtsp=" << statistics.timestamp;
+            //qDebug() << "rtspTime=" << QDateTime::fromMSecsSinceEpoch(rez/1000).toString(QLatin1String("hh:mm:ss.zzz")) << "localtime=" << QDateTime::currentDateTime().toString(QLatin1String("hh:mm:ss.zzz"));
 
             return rez;
         }
