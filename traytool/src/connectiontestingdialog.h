@@ -4,6 +4,8 @@
 #include <QtGui/QDialog>
 #include <QtCore/QTimer>
 
+#include "utils/common/request_param.h"
+
 class QDataWidgetMapper;
 class QStandardItemModel;
 
@@ -24,7 +26,7 @@ public slots:
     virtual void reject() override;
 
     void timeout();
-    void testResults(int status, const QByteArray &data, const QByteArray &errorString, int requestHandle);
+    void testResults(int status, const QnReplyHeaderList&, const QByteArray &data, const QByteArray &errorString, int requestHandle);
 
 private:
     void testSettings();

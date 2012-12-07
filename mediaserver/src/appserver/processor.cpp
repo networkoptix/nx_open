@@ -58,21 +58,40 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
     }
 }
 
-void QnAppserverResourceProcessor::requestFinished(int status, const QByteArray &data, const QByteArray& errorString, int handle)
+void QnAppserverResourceProcessor::updateResourceStatusAsync(const QnResourcePtr &resource)
 {
-    Q_UNUSED(handle)
-    Q_UNUSED(errorString)
-    if (status == 0)
-    {
-        qDebug() << "Successfully updated resource status" << data;
-    } else
-    {
-        qCritical() << "Failed to update resource status";
-    }
+    int handle = m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(QnHTTPRawResponse, int)));
+    m_handleToResource.insert(handle, resource);
+}
 
+void QnAppserverResourceProcessor::requestFinished(const QnHTTPRawResponse& response, int handle)
+{
+    QnResourcePtr resource = m_handleToResource.value(handle);
+    if (resource && response.status != 0)
+        qCritical() << "Failed to update resource status" << resource->getId();
+
+    m_handleToResource.remove(handle);
+
+    if (m_awaitingSetStatus.contains(resource)) {
+        updateResourceStatusAsync(resource);
+        m_awaitingSetStatus.remove(resource);
+    }
+}
+
+bool QnAppserverResourceProcessor::isSetStatusInProgress(const QnResourcePtr &resource)
+{
+    foreach(const QnResourcePtr& res, m_handleToResource.values())
+    {
+        if (res == resource)
+            return true;
+    }
+    return false;
 }
 
 void QnAppserverResourceProcessor::onResourceStatusChanged(const QnResourcePtr &resource)
 {
-    m_appServer->setResourceStatusAsync(resource->getId(), resource->getStatus(), this, SLOT(requestFinished(int,const QByteArray&,const QByteArray&, int)));
+    if (!isSetStatusInProgress(resource))
+        updateResourceStatusAsync(resource);
+    else
+        m_awaitingSetStatus << resource;
 }

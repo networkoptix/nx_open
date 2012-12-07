@@ -35,6 +35,11 @@ void syncStoragesToSettings(QnMediaServerResourcePtr server)
     }
 }
 
+QString authKey()
+{
+    return qSettings.value("authKey").toString();
+}
+
 QString serverGuid()
 {
     QString guid = qSettings.value("serverGuid").toString();
