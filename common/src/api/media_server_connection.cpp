@@ -4,6 +4,7 @@
 #include <QSharedPointer>
 
 #include "utils/common/util.h"
+#include "utils/common/request_param.h"
 #include "common/common_meta_types.h"
 
 #include "media_server_connection.h"
