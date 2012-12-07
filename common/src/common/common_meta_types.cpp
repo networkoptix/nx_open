@@ -53,7 +53,11 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<QnRequestParamList>();
+    qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
+    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
+    qRegisterMetaType<QnReplyHeaderList>("QnReplyHeaderList");
+    qRegisterMetaType<QnHTTPRawResponse>();
+
     qRegisterMetaType<QnMessage>();
 
     qRegisterMetaType<QnCamerasFoundInfoList>();

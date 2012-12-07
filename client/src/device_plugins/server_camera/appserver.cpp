@@ -35,8 +35,6 @@ QnResourceList QnAppServerResourceSearcher::findResources()
         qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
     } else
     {
-        if (!errorString.isEmpty())
-            qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
         setShouldBeUsed(false);
     }
 
