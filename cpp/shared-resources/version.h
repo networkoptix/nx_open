@@ -20,7 +20,8 @@
 #define QN_BOOST_VERSION            "${boost.version}"
 #define QN_CUSTOMIZATION_NAME       "${installer.customization}"
 #define QN_CUSTOMIZED_FILENAME      "${product.name}.exe"
-#define QN_LICENSING_MAIL_ADDRESS   "${company.support.address}"
+#define QN_LICENSING_MAIL_ADDRESS   "${company.license.address}"
+#define QN_SUPPORT_MAIL_ADDRESS     "${company.support.address}"
 #define QN_HAS_FREE_LICENSES        ${freeLicenses}
 
 /* 

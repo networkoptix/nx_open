@@ -14,7 +14,7 @@
 #include <utils/common/request_param.h>
 #include <api/media_server_statistics_data.h>
 #include <api/media_server_cameras_data.h>
-
+    
 #include "api_fwd.h"
 
 namespace detail {
@@ -25,7 +25,7 @@ namespace detail {
         QnMediaServerSimpleReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, int handle);
@@ -38,7 +38,7 @@ namespace detail {
         QnMediaServerTimePeriodsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, const QnTimePeriodList& timePeriods, int handle);
@@ -51,7 +51,7 @@ namespace detail {
         QnMediaServerFreeSpaceReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString,int handle);
+        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, qint64 freeSpace, qint64 usedSpace, int handle);
@@ -64,7 +64,7 @@ namespace detail {
         QnMediaServerStatisticsReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &/*errorString */ , int /*handle*/);
+        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
 
     signals:
         void finished(const QnStatisticsDataList &/* usage data */);
@@ -77,8 +77,8 @@ namespace detail {
         QnMediaServerManualCameraReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_searchReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
-        void at_addReplyReceived(int status, const QByteArray &reply, const QByteArray &errorString , int handle);
+        void at_searchReplyReceived(const QnHTTPRawResponse& response, int handle);
+        void at_addReplyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finishedSearch(const QnCamerasFoundInfoList &);
@@ -93,7 +93,7 @@ namespace detail {
         QnMediaServerGetTimeReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, const QDateTime &dateTime, int utcOffset, int handle);
@@ -115,7 +115,7 @@ namespace detail {
         /*!
             \note calls \a deleteLater after parsing response response
         */
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
 
     signals:
         void finished(int status, const QList< QPair< QString, QVariant> > &params);
@@ -139,7 +139,7 @@ namespace detail {
         /*!
             \note calls \a deleteLater after handling response
         */
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray /* &errorString */ , int /*handle*/);
+        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
 
     signals:
         void finished(int status, const QList<QPair<QString, bool> > &operationResult);
@@ -223,6 +223,7 @@ public:
 
     int asyncGetTime(QObject *target, const char *slot);
 
+    QString getUrl() const { return m_url.toString(); }
 protected:
     QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
 

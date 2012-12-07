@@ -3,6 +3,7 @@
 
 #include "core/resource/media_server_resource.h"
 
+QString authKey();
 QString serverGuid();
 QString getDataDirectory();
 QString defaultStoragePath();

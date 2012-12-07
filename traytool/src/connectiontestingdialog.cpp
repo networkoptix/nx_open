@@ -48,7 +48,7 @@ void ConnectionTestingDialog::timeout()
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
-void ConnectionTestingDialog::testResults(int status, const QByteArray &data, const QByteArray& errorString, int requestHandle)
+void ConnectionTestingDialog::testResults(int status, const QnReplyHeaderList& replyHeaders, const QByteArray &data, const QByteArray& errorString, int requestHandle)
 {
     Q_UNUSED(data)
     Q_UNUSED(requestHandle)
@@ -75,10 +75,11 @@ void ConnectionTestingDialog::testSettings()
 {
     qDebug() << m_url;
 
+    QnRequestHeaderList headers;
 	QByteArray data;
     QnRequestParamList params;
     params.append(QnRequestParam("ping", "1"));
-    QnSessionManager::instance()->sendAsyncPostRequest(m_url, "connect", params, data, this, SLOT(testResults(int,QByteArray,QByteArray,int)));
+    QnSessionManager::instance()->sendAsyncPostRequest(m_url, "connect", headers, params, data, this, SLOT(testResults(int,QnReplyHeaderList,QByteArray,QByteArray,int)));
 }
 
 void ConnectionTestingDialog::accept()

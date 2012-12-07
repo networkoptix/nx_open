@@ -1,3 +1,6 @@
+ptz is enabled in archive. If pressed switches item to live
+playback near live fixed
+'Cancel' button is added to 'Connection already exists' dialog
 Calendar shading is not working if chunks are not loaded
 Add a warning when changing admin password
 Distance is not saved if try to save layout as
