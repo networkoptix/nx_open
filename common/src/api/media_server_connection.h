@@ -224,6 +224,7 @@ public:
 
     int asyncGetTime(QObject *target, const char *slot);
 
+    QString getUrl() const { return m_url.toString(); }
 protected:
     QnRequestParamList createParamList(const QnNetworkResourceList &list, qint64 startTimeUSec, qint64 endTimeUSec, qint64 detail, const QList<QRegion> &motionRegions);
 

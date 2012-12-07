@@ -19,21 +19,21 @@ QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
 }
 
 void QnMediaServerStatisticsManager::registerServerWidget(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot){
-    QString id = resource->getUniqueId();
+    QString id = resource->apiConnection()->getUrl();
     if (!m_statistics.contains(id))
         m_statistics[id] = new QnMediaServerStatisticsStorage(resource->apiConnection(), this);
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
 void QnMediaServerStatisticsManager::unregisterServerWidget(const QnMediaServerResourcePtr &resource, QObject *target){
-    QString id = resource->getUniqueId();
+    QString id = resource->apiConnection()->getUrl();
     if (!m_statistics.contains(id))
         return;
     m_statistics[id]->unregisterServerWidget(target);
 }
 
 qint64 QnMediaServerStatisticsManager::getHistory(const QnMediaServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history){
-    QString id = resource->getUniqueId();
+    QString id = resource->apiConnection()->getUrl();
     if (!m_statistics.contains(id))
         return -1;
     return m_statistics[id]->getHistory(lastId, history);
