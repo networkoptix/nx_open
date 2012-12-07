@@ -21,8 +21,6 @@
 
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource.h>
 
 #include <api/session_manager.h>
 
@@ -65,8 +63,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/processors/free_space_processor.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -90,7 +86,6 @@
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
-#include <utils/common/counter.h>
 #include "camera/caching_time_period_loader.h"
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -618,28 +613,6 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-    else // storages will not be validated if recording is not enabled
-    if (cameraSettingsDialog()->widget()->activeCameraCount() > 0) {
-        bool critical;
-        QnMediaServerResourceList servers = validateStorages(cameras, critical);
-        if (!servers.isEmpty()) {
-            QStringList srvNames;
-            foreach (QnMediaServerResourcePtr server, servers)
-                srvNames << server->getName();
-
-            if (critical) {
-                QMessageBox::warning(widget(), tr("Could not Enable Recording"),
-                    tr("Some of your servers (%1) have not enough disk space to enable recording. Your schedule will be saved, but will not take effect.")
-                                     .arg(srvNames.join(QLatin1String(", "))));
-                cameraSettingsDialog()->widget()->setCamerasActive(false);
-            } else {
-                //TODO: #gdm implement "Do not show this warning anymore" checkbox
-                QMessageBox::warning(widget(), tr("Low space for archive"),
-                    tr("Some of your servers (%1) have low disk space for archive.")
-                                    .arg(srvNames.join(QLatin1String(", "))));
-            }
-        }
-    }
 
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
@@ -693,77 +666,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: evil!
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
-}
-
-QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCameraResourceList cameras, bool &critical) {
-
-    QnMediaServerResourceList servers;
-    foreach (QnVirtualCameraResourcePtr camera, cameras) {
-        QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resourcePool()->
-                getResourceById(camera->getParentId()));
-        if (servers.indexOf(server) < 0)
-            servers.append(server);
-    }
-
-    QnMediaServerResourceList lowServers;       // Servers with low disk space
-    QnMediaServerResourceList emptyServers;     // Servers with no disk space at all
-    foreach (QnMediaServerResourcePtr server, servers) {
-        QnAbstractStorageResourceList storages = server->getStorages();
-        QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-
-        QScopedPointer<QnCounter> counter(new QnCounter(storages.size()));
-        QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
-        connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
-
-        QScopedPointer<CheckFreeSpaceReplyProcessor> processor(new CheckFreeSpaceReplyProcessor());
-        connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
-
-        QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
-        foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-            int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
-            storageByHandle[handle] = storage;
-        }
-
-        eventLoop->exec();
-
-        FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
-        bool serverError = false;
-        qint64 totalAvailableSpace = 0;
-        for (FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
-        {
-            QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
-            if (!storage)
-                continue;
-
-            if (itr.value().errorCode == CheckFreeSpaceReplyProcessor::SERVER_ERROR) {
-                serverError = true;
-                break;
-            }
-
-            qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
-            if (itr.value().errorCode != 0 || availableSpace < 0)
-                continue;
-            totalAvailableSpace += availableSpace;
-        }
-
-        /* We could not validate inaccessible server storages so do not show warning for them */
-        if (serverError)
-            continue;
-
-        if (totalAvailableSpace == 0)
-            emptyServers.append(server);
-        else if (totalAvailableSpace < CheckFreeSpaceReplyProcessor::MIN_RECORD_FREE_SPACE)
-            lowServers.append(server);
-    }
-
-    if (!emptyServers.isEmpty()) {
-        critical = true;
-        return emptyServers;
-    }
-
-    critical = false;
-    return lowServers;
-
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
