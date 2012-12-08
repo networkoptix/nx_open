@@ -479,7 +479,6 @@ QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIn
         {
             int qualityLen = fileName.indexOf('/', root.length()+1) - root.length();
             quality = fileName.mid(root.length(), qualityLen);
-            quality = QFileInfo(quality).baseName();
             int macPos = root.length() + qualityLen;
             mac = fileName.mid(macPos+1, fileName.indexOf('/', macPos+1) - macPos-1);
             storageIndex = itr.value()->getIndex();

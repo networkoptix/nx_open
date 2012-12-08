@@ -74,13 +74,11 @@ void QnServerStreamRecorder::putData(QnAbstractDataPacketPtr data)
 
     bool rez = m_queuedSize <= MAX_BUFFERED_SIZE && m_dataQueue.size() < 1000;
     if (!rez) {
-        qint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch();
-        if (currentTime - m_lastWarningTime > 1000)
-        {
-            qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "frame rate decreased!";
-            m_lastWarningTime = currentTime;
-        }
+		qWarning() << "HDD/SSD is slow down recording for camera " << m_device->getUniqueId() << "some frames are dropped!";
         markNeedKeyData();
+		m_dataQueue.clear();
+		QMutexLocker lock(&m_queueSizeMutex);
+		m_queuedSize = 0;
         return;
     }
 
