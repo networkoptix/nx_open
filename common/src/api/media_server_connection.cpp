@@ -584,7 +584,7 @@ void detail::QnMediaServerManualCameraReplyProcessor::at_searchReplyReceived(con
         emit finishedSearch(result);
     } else {
         QString error = QLatin1String(extractXmlBody(reply, "root"));
-        emit searchError(status, error);
+        emit searchError(response.status, error);
     }
     deleteLater();
 }

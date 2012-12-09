@@ -483,8 +483,10 @@ int QnAppServerConnection::addBusinessRule(const QnBusinessEventRule &businessRu
     QByteArray data;
     m_serializer.serializeBusinessRule(businessRule, data);
 
-    QByteArray reply;
-    return addObject(QLatin1String("businessRule"), data, reply, errorString);
+    QnHTTPRawResponse reply;
+    const int result = addObject(QLatin1String("businessRule"), data, reply);
+    errorString = reply.errorString;
+    return result;
 }
 
 
@@ -596,12 +598,12 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 
 int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules, QByteArray &errorString)
 {
-    QByteArray data;
+    QnHTTPRawResponse response;
+    int status = getObjects(QLatin1String("businessRule"), QString(), response);
 
-    int status = getObjects(QLatin1String("businessRule"), QString(), data, errorString);
-
+    errorString = response.errorString;
     try {
-        m_serializer.deserializeBusinessRules(businessRules, data);
+        m_serializer.deserializeBusinessRules(businessRules, response.data);
     } catch (const QnSerializeException& e) {
         errorString += e.errorString();
     }
@@ -815,18 +817,19 @@ qint64 QnAppServerConnection::getCurrentTime()
 int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString)
 {
     QnRequestParamList requestParams(m_requestParams);
-    QByteArray reply;
 
+    QnHTTPRawResponse response;
     QByteArray body;
     m_serializer.serializeEmail(to, subject, message, body);
-    int status = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("email"), requestParams, body, reply, errorString);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("email"), QnRequestHeaderList(), requestParams, body, response);
+    errorString = response.errorString;
     if (status != 0) {
         qWarning() << "Can't send email " << errorString;
         return status;
     }
 
-    if (reply != "OK") {
-        errorString = reply;
+    if (response.status != 200) {
+        //errorString = reply;
         return -1;
     }
 
@@ -881,8 +884,10 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
     QnHTTPRawResponse response;
-    return QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("status"), requestHeaders, requestParams, "",
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("status"), requestHeaders, requestParams, "",
         response);
+    errorString = response.errorString;
+    return result;
 }
 
 int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resources, QObject *target, const char *slot)
