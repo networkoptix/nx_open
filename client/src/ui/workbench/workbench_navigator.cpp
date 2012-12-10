@@ -1116,12 +1116,12 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
         m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss", "CAMERA_TOOL_TIP_FORMAT"));
+            m_timeSlider->setToolTipFormat(lit("yyyy MMM dd\nhh:mm:ss"));
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                m_timeSlider->setToolTipFormat(tr("hh:mm:ss", "LONG_TOOL_TIP_FORMAT"));
+                m_timeSlider->setToolTipFormat(lit("hh:mm:ss"));
             } else {
-                m_timeSlider->setToolTipFormat(tr("mm:ss", "SHORT_TOOL_TIP_FORMAT"));
+                m_timeSlider->setToolTipFormat(lit("mm:ss"));
             }
         }
     }

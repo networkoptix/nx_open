@@ -14,17 +14,17 @@
     <message>
         <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="109"/>
         <source>Enterprise Controller addresses</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">系统控制器地址</translation>
     </message>
     <message>
         <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="234"/>
         <source>Port </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">端口</translation>
     </message>
     <message>
         <location filename="../src/utils/network/foundenterprisecontrollersmodel.cpp" line="236"/>
         <source>, Ip: </source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">，IP地址：</translation>
     </message>
 </context>
 <context>
@@ -40,33 +40,33 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="39"/>
         <source>Audio context must be specified</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">需要指定音频内容</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="53"/>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="90"/>
         <source>Transcoder error: can&apos;t find encoder for codec %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">编码转换错误：无法找到编码器 %1</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="77"/>
         <source>Can&apos;t initialize audio encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化音频编码器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_audio_transcoder.cpp" line="86"/>
         <source>Can&apos;t initialize audio decoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化音频解码器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="65"/>
         <source>Can&apos;t allocate scaler context for resolution %1x%2</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法分配分辨率 %1x%2</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_video_transcoder.cpp" line="113"/>
         <source>Can&apos;t initialize video encoder</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法初始化视频编码器</translation>
     </message>
 </context>
 <context>
@@ -105,7 +105,7 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="110"/>
         <source>Can&apos;t create output context for format %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">无法创建格式 %1输出</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="130"/>
@@ -116,12 +116,12 @@
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="169"/>
         <source>Transcoder error: for direct stream copy video frame size must exists</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">编码转换错误：对于直接视频拷贝，必须有视频帧数</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="214"/>
         <source>Transcoder error: can&apos;t find codec</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">编码转换错误：无法找到编解码器</translation>
     </message>
     <message>
         <location filename="../src/transcoding/ffmpeg_transcoder.cpp" line="249"/>
@@ -134,7 +134,7 @@
     <message>
         <location filename="../src/core/resource/media_server_resource.cpp" line="32"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">服务器</translation>
     </message>
 </context>
 <context>
@@ -240,7 +240,7 @@
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="270"/>
         <source>Unsupported Transport</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">不支持的转换</translation>
     </message>
     <message>
         <location filename="../src/utils/network/tcp_connection_processor.cpp" line="272"/>
@@ -267,7 +267,7 @@
         <location filename="../src/transcoding/transcoder.cpp" line="156"/>
         <location filename="../src/transcoding/transcoder.cpp" line="185"/>
         <source>OpenCLTranscode is not implemented</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">OpenCLTranscode未应用</translation>
     </message>
 </context>
 <context>
@@ -356,7 +356,7 @@
     <message>
         <location filename="../src/utils/network/socket.cpp" line="252"/>
         <source>Set of local address and port failed (bind()). %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">本地地址和端口设置失败(bind()). %1</translation>
     </message>
     <message>
         <source>Set of local address and port failed (bind()).</source>
