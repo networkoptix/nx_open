@@ -1151,6 +1151,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
         {
             QByteArray value = vals[1].trimmed();
             d->archiveDP->setSendMotion(value == "1" || value == "true");
+            return CODE_OK;
         }
     }
 
@@ -1277,8 +1278,8 @@ void QnRtspConnectionProcessor::run()
             }
             else {
                 // text request
-                int msgLen = isFullMessage(d->receiveBuffer);
-                if (msgLen)
+                int msgLen;
+                while (msgLen = isFullMessage(d->receiveBuffer))
                 {
                     d->clientRequest = d->receiveBuffer.left(msgLen);
                     d->receiveBuffer.remove(0, msgLen);
