@@ -81,8 +81,17 @@ namespace Qn {
 }
 #endif
 
-// TODO: move to client_globals?
+// TODO: move to client_globals
 #define InvalidUtcOffset _id(INT64_MAX)
+
+// TODO: move out
+#include <QtCore/QString>
+
+/** Helper function to mark strings that are not to be translated. */
+QString lit(const char *s) {
+    return QLatin1String(s);
+}
+
 
 
 #endif // QN_COMMON_CONFIG_H
