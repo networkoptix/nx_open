@@ -1895,9 +1895,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime() / 1000;
     if(widget->resource()->flags() & QnResource::utc) {
-        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
     } else {
-        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
+        timeString = QTime().addMSecs(time).toString(lit("hh.mm.ss"));
     }
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
@@ -2552,8 +2552,7 @@ Do you want to continue?"),
         previousDir = qnSettings->mediaFolder();
     }
 
-    QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+    QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;

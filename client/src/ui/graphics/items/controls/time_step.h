@@ -15,7 +15,7 @@ public:
 
     QnTimeStep(): type(Milliseconds), unitMSecs(0), stepMSecs(0), stepUnits(0), wrapUnits(0), isRelative(true), index(0) {}
 
-    QnTimeStep(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longestString, const QString &longFormat, bool isRelative = true):
+    QnTimeStep(Type type, qint64 unitMSecs, int stepUnits, int wrapUnits, const QString &format, const QString &longFormat, bool isRelative = true):
         type(type),
         unitMSecs(unitMSecs),
         stepMSecs(unitMSecs * stepUnits),
@@ -23,7 +23,6 @@ public:
         wrapUnits(wrapUnits),
         format(format),
         longFormat(longFormat),
-        longestString(longestString),
         isRelative(isRelative),
         index(0)
     {}
@@ -48,9 +47,6 @@ public:
 
     /** Format string for the interval comment. */
     QString longFormat;
-
-    /** Longest possible string representation of the step value. */
-    QString longestString;
 
     /** Whether this time step is to be used for relative times (e.g. time intervals), 
      * or for absolute times (i.e. obtained via <tt>QDateTime::toMSecsSinceEpoch</tt>). */
