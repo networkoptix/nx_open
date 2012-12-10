@@ -561,8 +561,12 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_dataQueue.lock();
     for (int i = 0; i < m_dataQueue.size(); ++i) {
         QnAbstractMediaDataPtr media = m_dataQueue.at(i).dynamicCast<QnAbstractMediaData>();
-        if (media && media->timestamp < time)
-            media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+        if (media) {
+            if (m_speed >= 0 && media->timestamp < time)
+                media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            else if (m_speed < 0 && media->timestamp > time)
+                media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+        }
     }
     m_dataQueue.unlock();
 
