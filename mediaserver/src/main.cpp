@@ -65,6 +65,7 @@
 #include "rest/handlers/gettime_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
+#include "rest/handlers/ping_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -599,6 +600,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
