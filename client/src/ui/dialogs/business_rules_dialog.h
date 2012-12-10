@@ -18,7 +18,6 @@ public:
 
 private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
-    QPushButton *m_copyButton;
 };
 
 #endif // QN_BUSINESS_RULES_DIALOG_H
