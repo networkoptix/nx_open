@@ -44,6 +44,8 @@ public:
     */
     bool isActionInProgress() const;
 private:
+    //TODO: instant action + prolonged event: expose action when event starts or finishes
+    //TODO: schedule
     BusinessEventType::Value m_eventType;
     QnResourcePtr m_source;
     QnBusinessParams m_eventCondition;

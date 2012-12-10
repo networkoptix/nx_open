@@ -1,5 +1,6 @@
 #include "business_logic_common.h"
 
+/** This modules are part of QJson package */
 #include <serializer.h>
 #include <parser.h>
 
