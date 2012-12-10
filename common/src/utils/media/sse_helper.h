@@ -98,6 +98,11 @@ static inline bool useSSE42()
 #endif
 }
 
+#ifdef Q_OS_LINUX
+#define __cpuid(out, infoType)\
+    asm("cpuid": "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]): "a" (infoType));
+#endif
+
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40];
