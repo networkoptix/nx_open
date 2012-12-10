@@ -63,12 +63,9 @@
 							<excludeDefaultDirectories>true</excludeDefaultDirectories>
 							<filesets>
 								<fileset>
-									<directory>${libdir}</directory>
+									<directory>${ClientHelpSourceDir}</directory>
 									<followSymlinks>false</followSymlinks>
 									<useDefaultExcludes>true</useDefaultExcludes>
-									<includes>
-										<include>${ClientHelpSourceDir}</include>
-									</includes>
 								</fileset>								
 								<fileset>
 									<directory>${project.build.directory}</directory>
@@ -95,18 +92,6 @@
 							<workingDirectory>${project.build.directory}</workingDirectory>		
 						</configuration>
 					</execution>							
-
-					<execution>
-						<id>deploy</id>
-						<phase>package</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>deploy.bat</executable>
-							<workingDirectory>${project.build.directory}</workingDirectory>		
-						</configuration>
-					</execution>	
 				</executions>
 			</plugin>	
 			<plugin>
