@@ -575,6 +575,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
 
     blockTimeValue(time);
 
+    m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended) {
         m_extTimeSrc->onEofReached(this, false);
         m_eofSignalSended = false;
