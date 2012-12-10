@@ -556,7 +556,6 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
 {
     if (m_extTimeSrc)
         m_extTimeSrc->onBufferingStarted(this, time);
-    m_buffering = getBufferingMask();
 
     m_dataQueue.lock();
     for (int i = 0; i < m_dataQueue.size(); ++i) {
@@ -572,6 +571,7 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
 
     QMutexLocker lock(&m_timeMutex);
     m_singleShotQuantProcessed = false;
+    m_buffering = getBufferingMask();
 
     blockTimeValue(time);
 }
