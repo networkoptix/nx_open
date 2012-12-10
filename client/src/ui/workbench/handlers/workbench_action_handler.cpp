@@ -55,6 +55,7 @@
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/business_rules_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -1243,6 +1244,10 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
+        return;
+
+    QScopedPointer<QnBusinessRulesDialog> dialog2(new QnBusinessRulesDialog(widget()));
+    if (!dialog2->exec())
         return;
 
     QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));

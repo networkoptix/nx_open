@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>BusinessRulesDialog</class>
+ <widget class="QDialog" name="BusinessRulesDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>954</width>
+    <height>606</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Server Management Rules</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QGroupBox" name="creditsGroupBox_2">
+     <property name="title">
+      <string>Motion rules</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>892</width>
+           <height>612</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_12">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <widget class="QLabel" name="creditsLabel_5">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_16">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_17">
+             <item>
+              <widget class="QLabel" name="creditsLabel_9">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_17">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_18">
+             <item>
+              <widget class="QLabel" name="creditsLabel_11">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_18">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_19">
+             <item>
+              <widget class="QLabel" name="creditsLabel_12">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_14">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QLabel" name="creditsLabel_7">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_10">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <widget class="QLabel" name="creditsLabel_10">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Low Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_15">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <widget class="QLabel" name="creditsLabel_8">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_9">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_10">
+             <item>
+              <widget class="QLabel" name="creditsLabel_2">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_11">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <widget class="QLabel" name="creditsLabel_4">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="creditsGroupBox_13">
+            <property name="flat">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <widget class="QLabel" name="creditsLabel_6">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;) &lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="creditsGroupBox_3">
+     <property name="title">
+      <string>Generic rules</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <item>
+       <widget class="QLabel" name="creditsLabel_3">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On &lt;span style=&quot; font-weight:600;&quot;&gt;Input #1&lt;/span&gt; at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;: &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;record &lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;at&lt;/span&gt;&lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1032ax&lt;/span&gt; (&lt;span style=&quot; text-decoration: underline;&quot;&gt;High Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;max 5 minutes&lt;/span&gt;) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>156</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Close</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
