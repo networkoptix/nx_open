@@ -299,6 +299,7 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
 
+/*
 bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
 {
     if (currentDisplay->isFullScreen() || !currentDisplay->isSyncAllowed())
@@ -315,3 +316,4 @@ bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
     }
     return true;
 }
+*/

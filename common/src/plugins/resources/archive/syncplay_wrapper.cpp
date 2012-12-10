@@ -202,6 +202,22 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
     d->timer.restart();
 }
 
+void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    setJumpTime(skipTime);
+    foreach(const ReaderInfo& info, d->readers)
+    {
+        if (info.enabled)
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->setSkipFramesToTime(skipTime);
+            info.reader->setNavDelegate(this);
+        }
+    }
+}
+
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
