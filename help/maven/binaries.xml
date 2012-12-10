@@ -1,0 +1,18 @@
+ <assembly>
+	<id>${customization}</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<dependencySets>
+		<dependencySet>
+			<useTransitiveDependencies>false</useTransitiveDependencies>
+		</dependencySet>
+	</dependencySets>	
+	<includeBaseDirectory>false</includeBaseDirectory>
+	<fileSets>
+		<fileSet>
+			<directory>${ClientHelpSourceDir}</directory>
+			<outputDirectory>help</outputDirectory>
+		</fileSet>
+	</fileSets>
+</assembly>
