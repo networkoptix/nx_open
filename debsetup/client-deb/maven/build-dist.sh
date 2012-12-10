@@ -21,6 +21,7 @@ LIBSTAGE=$STAGE$LIBTARGET
 CLIENT_BIN_PATH=${libdir}/bin/${build.configuration}
 CLIENT_STYLES_PATH=$CLIENT_BIN_PATH/styles
 CLIENT_LIB_PATH=${libdir}/build/bin/${build.configuration}
+CLIENT_HELP_PATH=${libdir}/build/bin/${build.configuration}/help
 	
 . $CLIENT_BIN_PATH/env.sh
 
@@ -39,6 +40,9 @@ cp bin/client $BINSTAGE
 
 # Copy icons
 cp -P -Rf usr $STAGE
+
+# Copy help
+p -r $CLIENT_HELP_PATH/*.* $BINSTAGE/help
 
 # Copy libraries
 cp -r $CLIENT_LIB_PATH/*.so* $LIBSTAGE

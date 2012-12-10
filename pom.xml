@@ -12,9 +12,17 @@
 		<developerConnection>scm:hg:file:///${basedir}</developerConnection>
 	</scm>	
 
+	<distributionManagement>
+		<repository>
+			<id>nexus-snapshots</id>
+			<url>https://noptix.enk.me/nexus/content/repositories/snapshots/</url>
+		</repository>
+	</distributionManagement>	
+	
 	<properties>
         <ClientHelpSourceDir>${libdir}/bin/${build.configuration}/help</ClientHelpSourceDir>		                                  	
 		<unpack.skip>false</unpack.skip>
+		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<ffmpeg.version>N-39672-g40b7a27-faac-SNAPSHOT</ffmpeg.version>
 		<openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
 		<onvif.version>2.1.1-ptz-SNAPSHOT</onvif.version>
@@ -135,7 +143,7 @@
 				</os>
 			</activation>
 			<modules>
-				<module>help</module>	
+	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
