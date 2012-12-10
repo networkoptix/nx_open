@@ -88,7 +88,7 @@ namespace Qn {
 #include <QtCore/QString>
 
 /** Helper function to mark strings that are not to be translated. */
-QString lit(const char *s) {
+inline QString lit(const char *s) {
     return QLatin1String(s);
 }
 
