@@ -574,6 +574,11 @@ void QnCamDisplay::onSkippingFrames(qint64 time)
     m_buffering = getBufferingMask();
 
     blockTimeValue(time);
+
+    if (m_extTimeSrc && m_eofSignalSended) {
+        m_extTimeSrc->onEofReached(this, false);
+        m_eofSignalSended = false;
+    }
 }
 
 void QnCamDisplay::blockTimeValue(qint64 time)
