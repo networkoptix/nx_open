@@ -94,7 +94,7 @@ namespace nx_http
                         emit done( this );
                         break;
                     }
-                    if( m_requestBytesSent == m_requestBuffer.size() )
+                    if( (int)m_requestBytesSent == m_requestBuffer.size() )
                     {
                         cl_log.log( QString::fromLatin1("Http request has been successfully sent to %1").arg(m_url.toString()), cl_logDEBUG1 );
                         m_state = sReceivingResponse;
@@ -309,12 +309,12 @@ namespace nx_http
         return m_url;
     }
 
-    void AsyncHttpClient::setSubsequentReconnectTries( int reconnectTries )
+    void AsyncHttpClient::setSubsequentReconnectTries( int /*reconnectTries*/ )
     {
         //TODO/IMPL
     }
 
-    void AsyncHttpClient::setTotalReconnectTries( int reconnectTries )
+    void AsyncHttpClient::setTotalReconnectTries( int /*reconnectTries*/ )
     {
         //TODO/IMPL
     }
@@ -401,7 +401,7 @@ namespace nx_http
 
     bool AsyncHttpClient::sendRequest()
     {
-        Q_ASSERT( m_requestBytesSent < m_requestBuffer.size() );
+        Q_ASSERT( (int)m_requestBytesSent < m_requestBuffer.size() );
         int bytesSent = m_socket->send( m_requestBuffer.data()+m_requestBytesSent, m_requestBuffer.size()-m_requestBytesSent );
         if( (bytesSent == -1) && (SystemError::getLastOSErrorCode() != SystemError::wouldBlock) )
             return false;
