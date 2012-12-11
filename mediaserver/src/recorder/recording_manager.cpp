@@ -427,7 +427,7 @@ void QnRecordingManager::onTimer()
             bRule->setSrcResource(srcCamera);
             bRule->setActionType(BusinessActionType::BA_CameraRecording);
             bRule->setDstResource(dstCamera);
-            bRuleProcessor->addBusinessRule(bRule);
+            qnBusinessRuleProcessor->addBusinessRule(bRule);
         }
     }
     // =======================================================

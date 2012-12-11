@@ -18,7 +18,7 @@ void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool va
                                              resource->toSharedPointer(),
                                              value ? ToggleState::On : ToggleState::Off,
                                              timeStamp));
-    bRuleProcessor->processBusinessEvent(motionEvent);
+    qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
 void QnBusinessEventConnector::at_cameraInput(
@@ -30,7 +30,7 @@ void QnBusinessEventConnector::at_cameraInput(
     if( !resource )
         return;
 
-    bRuleProcessor->processBusinessEvent(
+    qnBusinessRuleProcessor->processBusinessEvent(
         QnCameraInputEventPtr( new QnCameraInputEvent(
                                    resource->toSharedPointer(),
                                    value ? ToggleState::On : ToggleState::Off,

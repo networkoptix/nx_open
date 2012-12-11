@@ -586,7 +586,7 @@ void QnMain::loadResourcesFromECS()
     }
 
     foreach(QnBusinessEventRulePtr rule, rules)
-        QnBusinessRuleProcessor::instance()->addBusinessRule( rule );
+        qnBusinessRuleProcessor->addBusinessRule( rule );
 }
 
 void QnMain::at_localInterfacesChanged()

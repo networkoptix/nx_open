@@ -68,6 +68,6 @@ private:
     bool sendMail( const QnAbstractBusinessActionPtr& action );
 };
 
-#define bRuleProcessor QnBusinessRuleProcessor::instance()
+#define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()
 
 #endif // __BUSINESS_RULE_PROCESSOR_H_

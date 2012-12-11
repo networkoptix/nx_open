@@ -19,7 +19,7 @@ int QnExecActionHandler::executePost(const QString& path, const QnRequestParamLi
 {
     QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray2(body);
     if (action) {
-        action->setDebugFlag(true);
+        action->setReceivedFromRemoteHost(true);
         qnBusinessMessageBus->at_actionReceived(action);
     }
 
