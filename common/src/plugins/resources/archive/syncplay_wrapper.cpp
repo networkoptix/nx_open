@@ -271,9 +271,11 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        info.reader->setNavDelegate(0);
-        info.reader->previousFrame(mksec);
-        info.reader->setNavDelegate(this);
+        if (info.enabled) {
+            info.reader->setNavDelegate(0);
+            info.reader->previousFrame(mksec);
+            info.reader->setNavDelegate(this);
+        }
     }
 }
 
