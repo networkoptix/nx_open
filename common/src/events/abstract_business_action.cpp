@@ -23,8 +23,6 @@ namespace BusinessActionType
                 return QLatin1String("Camera recording");
             case BA_PanicRecording:
                 return QLatin1String("Panic recording");
-            case BA_TriggerOutput:
-                return QLatin1String("Trigger output");
             case BA_SendMail:
                 return QLatin1String("Send mail");
             case BA_Alert:

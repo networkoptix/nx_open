@@ -49,6 +49,9 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 {
     switch( action->actionType() )
     {
+        case BusinessActionType::BA_CameraOutput:
+            return triggerCameraOutput( action );
+
         case BusinessActionType::BA_SendMail:
             return sendMail( action );
 
@@ -57,9 +60,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr 
 
         case BusinessActionType::BA_ShowPopup:
             break;
-
-        case BusinessActionType::BA_TriggerOutput:
-            return triggerCameraOutput( action );
 
         default:
             break;
@@ -142,20 +142,20 @@ bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActio
 
     if( !resource )
     {
-        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput with no resource reference. Ignoring..."), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
         return false;
     }
     QnSecurityCamResourcePtr securityCam = resource.dynamicCast<QnSecurityCamResource>();
     if( !securityCam )
     {
-        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
+        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action for resource %1 which is not of required type QnSecurityCamResource. Ignoring...").
             arg(resource->getId()), cl_logWARNING );
         return false;
     }
     QnBusinessParams::const_iterator relayOutputIDIter = action->getParams().find( RELAY_OUTPUT_ID );
     if( relayOutputIDIter == action->getParams().end() )
     {
-        cl_log.log( QString::fromLatin1("Received BA_TriggerOutput action without required parameter %1. Ignoring...").arg(RELAY_OUTPUT_ID), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter %1. Ignoring...").arg(RELAY_OUTPUT_ID), cl_logWARNING );
         return false;
     }
     QnBusinessParams::const_iterator autoResetTimeoutIter = action->getParams().find( RELAY_AUTO_RESET_TIMEOUT );
