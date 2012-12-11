@@ -580,6 +580,7 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
             return;
     }
 
+    /*
     // no more buffering
     qint64 bt = d->bufferingTime;
     d->bufferingTime = AV_NOPTS_VALUE;
@@ -594,8 +595,10 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     else {
         reinitTime(displayTime);
     }
-
-    //reinitTime(getDisplayedTime());
+    */
+    // reinit time to real position. If reinit time to requested position (it differs if rought jump), redAss can switch item to LQ
+    d->bufferingTime = AV_NOPTS_VALUE;
+    reinitTime(getDisplayedTime());
 }
 
 void QnArchiveSyncPlayWrapper::onEofReached(QnlTimeSource* source, bool value)

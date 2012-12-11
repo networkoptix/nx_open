@@ -595,8 +595,7 @@ void QnCamDisplay::blockTimeValue(qint64 time)
 void QnCamDisplay::onBeforeJump(qint64 time)
 {
     if (m_extTimeSrc)
-        m_extTimeSrc->onBufferingStarted(this, time);
-
+        m_extTimeSrc->onBufferingStarted(this, m_doNotChangeDisplayTime ? getDisplayedTime() : time);
     /*
     if (time < 1000000ll * 100000)
         cl_log.log("before jump to ", time, cl_logWARNING);
