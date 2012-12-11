@@ -99,18 +99,24 @@ static inline bool useSSE42()
 }
 
 #ifdef Q_OS_LINUX
-#define __cpuid(out, infoType)\
-    asm("cpuid": "=a" (out[0]), "=b" (out[1]), "=c" (out[2]), "=d" (out[3]): "a" (infoType));
+#define __cpuid(res, op)\
+  __asm__ volatile(                         \
+            "movl %%ebx, %%esi   \n\t"		\
+            "cpuid               \n\t"		\
+            "movl %%ebx, %1      \n\t"		\
+            "movl %%esi, %%ebx   \n\t"		\
+            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
+            :"0"(op) : "%esi")
 #endif
 
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40];
-    int CPUInfo[4] = {-1};
+    quint32 CPUInfo[4] = {-1};
 
     // Calling __cpuid with 0x80000000 as the InfoType argument
     // gets the number of valid extended IDs.
-    __cpuid(CPUInfo, 0x80000000);
+    __cpuid(CPUInfo, (quint32)0x80000000);
     unsigned int nExIds = CPUInfo[0];
     memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
