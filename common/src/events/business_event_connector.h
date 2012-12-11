@@ -13,7 +13,7 @@ class QnBusinessEventConnector: public QObject
 public:
     static QnBusinessEventConnector* instance();
 public slots:
-    void at_motionDetected(QnResourcePtr resource, bool value, qint64 timestamp);
+    void at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp);
     /*!
         \param inputPortID device-specific ID of input port
         \param value true, if input activated. false, if deactivated
@@ -22,7 +22,7 @@ public slots:
         QnResourcePtr resource,
         const QString& inputPortID,
         bool value,
-        qint64 timestamp );
+        qint64 timeStamp );
 };
 
 #define qnBusinessRuleConnector QnBusinessEventConnector::instance()

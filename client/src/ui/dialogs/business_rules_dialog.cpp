@@ -1,7 +1,7 @@
 #include "business_rules_dialog.h"
 #include "ui_business_rules_dialog.h"
 
-#include <ui/widgets/business_rule_widget.h>
+#include <ui/widgets/business/business_rule_widget.h>
 
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent): 

@@ -2,6 +2,8 @@
 #include "abstract_business_event.h"
 #include "utils/common/synctime.h"
 
+#include "core/resource/resource.h"
+
 
 namespace BusinessEventType
 {
@@ -26,26 +28,36 @@ namespace BusinessEventType
 }
 
 
-QnAbstractBusinessEvent::QnAbstractBusinessEvent():
-    m_toggleState(ToggleState::NotDefined),
-    m_eventType(BusinessEventType::BE_NotDefined),
-    m_dateTime(qnSyncTime->currentUSecsSinceEpoch())
+QnAbstractBusinessEvent::QnAbstractBusinessEvent(
+        BusinessEventType::Value eventType,
+        QnResourcePtr resource,
+        ToggleState::Value toggleState,
+        qint64 timeStamp):
+    m_eventType(eventType),
+    m_timeStamp(timeStamp),
+    m_resource(resource),
+    m_toggleState(toggleState)
 {
 }
 
 QString QnAbstractBusinessEvent::toString() const
 {   //Input event (input 1, on)
     QString text = QString::fromLatin1("  event type: %1\n").arg(BusinessEventType::toString(m_eventType));
-    text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_dateTime).toString());
+    text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_timeStamp).toString());
     return text;
 }
 
-bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const
-{
-    QnBusinessParams::const_iterator toggleStateParamIter = params.find(BusinessEventParameters::toggleState);
-    if( toggleStateParamIter == params.end() )
+bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const {
+    QVariant toggleState = getParameter(params, BusinessEventParameters::toggleState);
+    if (!toggleState.isValid())
         return true;
-
-    ToggleState::Value requiredToggleState = ToggleState::fromString(toggleStateParamIter.value().toString().toLatin1().data());
+    ToggleState::Value requiredToggleState = ToggleState::fromString(toggleState.toString().toLatin1().data());
     return requiredToggleState == ToggleState::Any || requiredToggleState == m_toggleState;
+}
+
+QVariant QnAbstractBusinessEvent::getParameter(const QnBusinessParams &params, const QString &paramName) {
+    QnBusinessParams::const_iterator paramIter = params.find(paramName);
+    if( paramIter == params.end() )
+        return QVariant();
+    return paramIter.value();
 }

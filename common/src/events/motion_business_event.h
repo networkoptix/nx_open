@@ -6,11 +6,10 @@
 class QnMotionBusinessEvent: public QnAbstractBusinessEvent
 {
 public:
-    QnMotionBusinessEvent();
+    QnMotionBusinessEvent(QnResourcePtr resource,
+                          ToggleState::Value toggleState,
+                          qint64 timeStamp);
 
-protected:
-    //virtual QByteArray serialize() override;
-    //virtual bool deserialize(const QByteArray& data) override;
 };
 
 typedef QSharedPointer<QnMotionBusinessEvent> QnMotionBusinessEventPtr;

@@ -10,7 +10,6 @@
 #include <QThread>
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
-#include "core/resource/resource_fwd.h"
 
 /*
 * High level business message transport.

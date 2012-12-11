@@ -41,7 +41,7 @@ namespace BusinessActionType
 QnAbstractBusinessAction::QnAbstractBusinessAction(): 
     m_actionType(BusinessActionType::BA_NotDefined),
     m_toggleState(ToggleState::NotDefined), 
-    m_receivedFromRemoveHost(false) 
+    m_receivedFromRemoteHost(false)
 {
 
 }
@@ -61,7 +61,7 @@ QByteArray QnAbstractBusinessAction::serialize()
     return QByteArray(str.data(), str.length());
 }
 
-QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
+QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
 

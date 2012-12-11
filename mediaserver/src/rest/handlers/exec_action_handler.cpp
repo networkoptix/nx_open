@@ -17,9 +17,9 @@ int QnExecActionHandler::executeGet(const QString& path, const QnRequestParamLis
 
 int QnExecActionHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, QByteArray& result, QByteArray& contentType)
 {
-    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray(body);
+    QnAbstractBusinessActionPtr action = QnAbstractBusinessAction::fromByteArray2(body);
     if (action) {
-        action->setReceivedFromRemoveHost(true);
+        action->setDebugFlag(true);
         qnBusinessMessageBus->at_actionReceived(action);
     }
 

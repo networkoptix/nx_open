@@ -1,21 +1,13 @@
 #include "motion_business_event.h"
+#include "core/resource/resource.h"
 
-QnMotionBusinessEvent::QnMotionBusinessEvent():
-    QnAbstractBusinessEvent()
+QnMotionBusinessEvent::QnMotionBusinessEvent(
+        QnResourcePtr resource,
+        ToggleState::Value toggleState,
+        qint64 timeStamp):
+    QnAbstractBusinessEvent(BusinessEventType::BE_Camera_Motion,
+                            resource,
+                            toggleState,
+                            timeStamp)
 {
-    setEventType(BusinessEventType::BE_Camera_Motion);
 }
-
-/*
-QByteArray QnMotionBusinessEvent::serialize()
-{
-    // todo: implement me
-    return QByteArray();
-}
-
-bool QnMotionBusinessEvent::deserialize(const QByteArray& data)
-{
-    // todo: implement me
-    return true;
-}
-*/

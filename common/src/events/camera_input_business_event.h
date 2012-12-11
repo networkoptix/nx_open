@@ -3,26 +3,34 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef CAMERA_INPUT_EVENT_H
-#define CAMERA_INPUT_EVENT_H
+#ifndef CAMERA_INPUT_BUSINESS_EVENT_H
+#define CAMERA_INPUT_BUSINESS_EVENT_H
 
 #include "abstract_business_event.h"
 
-
-class QnCameraInputEvent
-:
-    public QnAbstractBusinessEvent
+namespace BusinessEventParameters
 {
+    static QLatin1String inputPortId( "inputPortId" );
+}
+
+
+
+class QnCameraInputEvent: public QnAbstractBusinessEvent
+{
+    typedef QnAbstractBusinessEvent base_type;
 public:
     QnCameraInputEvent(
         QnResourcePtr resource,
-        const QString& inputPortID,
         ToggleState::Value toggleState,
-        qint64 timestamp );
+        qint64 timeStamp,
+        const QString& inputPortID);
 
     virtual QString toString() const;
 
     const QString& inputPortID() const;
+
+
+    virtual bool checkCondition(const QnBusinessParams &params) const override;
 
 private:
     const QString m_inputPortID;
@@ -30,4 +38,4 @@ private:
 
 typedef QSharedPointer<QnCameraInputEvent> QnCameraInputEventPtr;
 
-#endif //CAMERA_INPUT_EVENT_H
+#endif //CAMERA_INPUT_BUSINESS_EVENT_H

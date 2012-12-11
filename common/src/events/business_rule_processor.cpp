@@ -1,6 +1,7 @@
 
 #include <QList>
 #include "business_rule_processor.h"
+#include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/security_cam_resource.h"
 #include "api/app_server_connection.h"
@@ -35,7 +36,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(QnAbstractBusin
 void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
 {
     QnMediaServerResourcePtr routeToServer = getDestMServer(action);
-    if (routeToServer && !action->isReceivedFromRemoveHost() /*&& routeToServer->getGuid() != getGuid()*/)
+    if (routeToServer && !action->isReceivedFromRemoteHost() /*&& routeToServer->getGuid() != getGuid()*/)
         qnBusinessMessageBus->deliveryBusinessAction(action, closeDirPath(routeToServer->getApiUrl()) + QLatin1String("api/execAction")); // delivery to other server
     else
         executeActionInternal(action);
@@ -46,8 +47,6 @@ static const QLatin1String RELAY_AUTO_RESET_TIMEOUT( "relayAutoResetTimeout" );
 
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
-    QnResourcePtr resource = action->getResource();
-
     switch( action->actionType() )
     {
         case BusinessActionType::BA_SendMail:
@@ -108,6 +107,7 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
         {
             bool condOK = bEvent->checkCondition(rule->getEventCondition());
             QnAbstractBusinessActionPtr action;
+
             if (rule->isActionInProgress())
             {
                 // Toggle event repeated with some interval with state 'on'.
@@ -118,6 +118,7 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
             }
             else if (condOK)
                 action = rule->getAction(bEvent);
+
             if (action)
                 result << action;
         }

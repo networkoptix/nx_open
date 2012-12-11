@@ -1,6 +1,7 @@
 #include "business_message_bus.h"
 
-Q_GLOBAL_STATIC(QnBusinessMessageBus, inst);
+Q_GLOBAL_STATIC(QnBusinessMessageBus, inst)
+
 QnBusinessMessageBus* QnBusinessMessageBus::instance()
 {
     return inst();

@@ -59,7 +59,7 @@ public:
     BusinessActionType::Value actionType() const { return m_actionType; }
 
     QByteArray serialize();
-    static QnAbstractBusinessActionPtr fromByteArray(const QByteArray&);
+    static QnAbstractBusinessActionPtr fromByteArray2(const QByteArray&);
 
     /*
     * Resource depend of action type.
@@ -79,8 +79,8 @@ public:
     void setToggleState(ToggleState::Value value) { m_toggleState = value; }
     ToggleState::Value getToggleState() const { return m_toggleState; }
 
-    void setReceivedFromRemoveHost(bool value) { m_receivedFromRemoveHost = value; }
-    bool isReceivedFromRemoveHost() const { return m_receivedFromRemoveHost; }
+    void setReceivedFromRemoteHost(bool value) { m_receivedFromRemoteHost = value; }
+    bool isReceivedFromRemoteHost() const { return m_receivedFromRemoteHost; }
 
     bool isToggledAction() const;
 protected:
@@ -93,7 +93,7 @@ protected:
 
 private:
     ToggleState::Value m_toggleState;
-    bool m_receivedFromRemoveHost;
+    bool m_receivedFromRemoteHost;
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)

@@ -3,6 +3,7 @@
 
 #include <QThread>
 #include <QMultiMap>
+#include "core/resource/resource_fwd.h"
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
 #include "business_message_bus.h"
