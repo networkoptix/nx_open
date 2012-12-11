@@ -843,6 +843,9 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(widget()));
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {
@@ -1244,10 +1247,6 @@ void QnWorkbenchActionHandler::at_systemSettingsAction_triggered() {
 void QnWorkbenchActionHandler::at_connectToServerAction_triggered() {
     const QUrl lastUsedUrl = qnSettings->lastUsedConnection().url;
     if (lastUsedUrl.isValid() && lastUsedUrl != QnAppServerConnectionFactory::defaultUrl())
-        return;
-
-    QScopedPointer<QnBusinessRulesDialog> dialog2(new QnBusinessRulesDialog(widget()));
-    if (!dialog2->exec())
         return;
 
     QScopedPointer<LoginDialog> dialog(new LoginDialog(context(), widget()));
