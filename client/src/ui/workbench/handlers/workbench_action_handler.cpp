@@ -844,7 +844,7 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
 
-    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(widget()));
+    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
     dialog->exec();
 }
 
