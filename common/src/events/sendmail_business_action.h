@@ -17,8 +17,8 @@ class QnSendMailBusinessAction
 public:
     QnSendMailBusinessAction( QnAbstractBusinessEventPtr eventPtr );
 
-    //!Convert action to printable string
-    virtual QString toString() const;
+    //!Convert action to human-readable string (for inserting into email body)
+    QString toString() const;
 
     QString emailAddress() const;
     void setEmailAddress( const QString& newEmailAddress );
