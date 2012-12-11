@@ -46,7 +46,8 @@ void QnServerMessageProcessor::at_connectionReset()
 
 void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 {
-    // qDebug() << "Got event: " << event.eventType << " " << event.objectName << " " << event.objectId;
+    NX_LOG( QString::fromLatin1("Received event message %1, resourceId %2, resource %3").
+        arg(Qn::toString(event.eventType)).arg(event.resourceId.toString()).arg(event.resource ? event.resource->getName() : QString("NULL")), cl_logDEBUG1 );
 
     if (event.eventType == Qn::Message_Type_License)
     {
