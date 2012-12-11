@@ -2,6 +2,7 @@
 #include "business_event_rule.h"
 #include "recording_business_action.h"
 #include "sendmail_business_action.h"
+#include "common_business_action.h"
 
 
 QnBusinessEventRule::QnBusinessEventRule()
@@ -22,6 +23,8 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
         case BusinessActionType::BA_CameraOutput:
         case BusinessActionType::BA_Bookmark:
         case BusinessActionType::BA_PanicRecording:
+            result = QnAbstractBusinessActionPtr(new CommonBusinessAction(m_actionType));
+            break;
         case BusinessActionType::BA_CameraRecording:
             result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
             break;
