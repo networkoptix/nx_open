@@ -10,28 +10,26 @@ namespace BusinessActionType
 {
     enum Value
     {
-        // media server based actions
-        BA_NotDefined,
-        BA_CameraOutput,       // set camera output signal
-        BA_Bookmark,           // mark part of camera archive as undeleted
-        BA_CameraRecording,    // start camera recording
-        BA_PanicRecording,     // activate panic recording mode
         //!change camera output state
         /*!
             parameters:\n
-                - relayoutputid (string, required)          - id of output to trigger
-                - relayautoresettimeout (uint, optional)    - timeout (in seconds) to reset camera state back
+                - relayOutputID (string, required)          - id of output to trigger
+                - relayAutoResetTimeout (uint, optional)    - timeout (in seconds) to reset camera state back
         */
-        BA_TriggerOutput,
-
+        BA_CameraOutput,
+        BA_Bookmark,           // mark part of camera archive as undeleted
+        BA_CameraRecording,    // start camera recording
+        BA_PanicRecording,     // activate panic recording mode
         // these actions can be executed from any endpoint. actually these actions call specified function at ec
         /*!
             parameters:\n
-                - emailaddress (string, required)
+                - emailAddress (string, required)
         */
         BA_SendMail,
         BA_Alert,
-        BA_ShowPopup
+        BA_ShowPopup,
+        // media server based actions
+        BA_NotDefined
     };
 
     QString toString( Value val );
