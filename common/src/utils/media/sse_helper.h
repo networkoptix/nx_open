@@ -112,7 +112,7 @@ static inline bool useSSE42()
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40];
-    quint32 CPUInfo[4] = {-1};
+    int CPUInfo[4] = {-1};
 
     // Calling __cpuid with 0x80000000 as the InfoType argument
     // gets the number of valid extended IDs.
