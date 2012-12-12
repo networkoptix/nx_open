@@ -36,21 +36,6 @@ const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
 
 class QDomElement;
 
-struct CameraPhysicalWindowSize
-{
-    int x;
-    int y;
-    int width;
-    int height;
-
-    CameraPhysicalWindowSize(): x(0), y(0), width(0), height(0) {}
-
-    bool isValid()
-    {
-        return x >= 0 && y >=0 && width > 0 && height > 0;
-    }
-};
-
 class QnPlOnvifResource : public QnPhysicalCameraResource
 {
 public:
@@ -119,7 +104,7 @@ public:
     ResolutionPair getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
-    const CameraPhysicalWindowSize getPhysicalWindowSize() const;
+    const QRect getPhysicalWindowSize() const;
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
     const QString getAudioEncoderId() const;
@@ -234,7 +219,7 @@ private:
     int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
-    CameraPhysicalWindowSize m_physicalWindowSize;
+    QRect m_physicalWindowSize;
     QString m_primaryVideoEncoderId;
     QString m_secondaryVideoEncoderId;
     QString m_audioEncoderId;

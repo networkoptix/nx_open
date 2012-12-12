@@ -221,7 +221,7 @@ bool QnPlOnvifResource::hasDualStreaming() const
     return mediaVariant.toInt();
 }
 
-const CameraPhysicalWindowSize QnPlOnvifResource::getPhysicalWindowSize() const
+const QRect QnPlOnvifResource::getPhysicalWindowSize() const
 {
     QMutexLocker lock(&m_mutex);
     return m_physicalWindowSize;
@@ -1123,7 +1123,8 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     }
 
     setVideoEncoderOptions(optionsList[m_channelNumer].optionsResp);
-    checkMaxFps(confResponse, optionsList[m_channelNumer].id);
+    if (m_maxChannels == 1)
+        checkMaxFps(confResponse, optionsList[m_channelNumer].id);
 
     m_mutex.lock();
     m_primaryVideoEncoderId = optionsList[m_channelNumer].id;
@@ -1364,13 +1365,8 @@ void QnPlOnvifResource::setVideoSourceOptions(const VideoSrcOptions& options)
             << getUniqueId() << ").";
     }
 
-    {
-        QMutexLocker lock(&m_mutex);
-        m_physicalWindowSize.x = x;
-        m_physicalWindowSize.y = y;
-        m_physicalWindowSize.width = width;
-        m_physicalWindowSize.height = height;
-    }
+    QMutexLocker lock(&m_mutex);
+    m_physicalWindowSize = QRect(x,y, width,height);
 }
 
 bool QnPlOnvifResource::updateResourceCapabilities()
@@ -1384,7 +1380,7 @@ bool QnPlOnvifResource::updateResourceCapabilities()
     QList<ResolutionPair>::iterator it = m_resolutionList.begin();
     while (it != m_resolutionList.end())
     {
-        if (it->first > m_physicalWindowSize.width || it->second > m_physicalWindowSize.height)
+        if (it->first > m_physicalWindowSize.width() || it->second > m_physicalWindowSize.height())
         {
             it = m_resolutionList.erase(it);
         } else {
@@ -1447,15 +1443,15 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source) const
         return;
     }
 
-    CameraPhysicalWindowSize size = getPhysicalWindowSize();
+    QRect size = getPhysicalWindowSize();
     if (!size.isValid()) {
         return;
     }
 
-    source->Bounds->x = size.x;
-    source->Bounds->y = size.y;
-    source->Bounds->height = size.height;
-    source->Bounds->width = size.width;
+    source->Bounds->x = size.x();
+    source->Bounds->y = size.y();
+    source->Bounds->height = size.height();
+    source->Bounds->width = size.width();
 }
 
 bool QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
@@ -1545,8 +1541,14 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
             }
 
             fetchAndSetVideoSourceOptions();
-            updateVideoSource(conf);
-            return sendVideoSourceToCamera(conf);
+            QRect r(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
+            if (r != m_physicalWindowSize) {
+                updateVideoSource(conf);
+                return sendVideoSourceToCamera(conf);
+            }
+            else {
+                return true;
+            }
         }
     }
 
