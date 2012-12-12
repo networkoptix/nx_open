@@ -4,7 +4,10 @@ Q_GLOBAL_STATIC(QnBusinessMessageBus, inst)
 
 QnBusinessMessageBus* QnBusinessMessageBus::instance()
 {
-    return inst();
+    QnBusinessMessageBus* _instance = inst();
+    if( !_instance->isRunning() )
+        _instance->start();
+    return _instance;
 }
 
 QnBusinessMessageBus::QnBusinessMessageBus()
