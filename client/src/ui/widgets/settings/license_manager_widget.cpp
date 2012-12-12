@@ -127,7 +127,7 @@ void QnLicenseManagerWidget::validateLicense(const QnLicensePtr &license) {
 void QnLicenseManagerWidget::showLicenseDetails(const QnLicensePtr &license){
     QString details = tr("<b>Generic:</b><br />\n"
         "License Owner: %1<br />\n"
-        "Serial Key: %2<br />\n"
+        "License key: %2<br />\n"
         "Locked to Hardware ID: %3<br />\n"
         "<br />\n"
         "<b>Features:</b><br />\n"
