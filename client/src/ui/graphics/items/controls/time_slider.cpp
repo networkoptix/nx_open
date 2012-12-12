@@ -1978,6 +1978,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         qint64 time = qRound(valueFromPosition(event->pos(), false), thumbnailsLoader()->timeStep());
         QMap<qint64, ThumbnailData>::const_iterator pos = m_thumbnailData.find(time);
         if(pos != m_thumbnailData.end()) {
+            emit thumbnailClicked();
             setSliderPosition(pos->thumbnail.actualTime(), true);
             processed = true;
         }
