@@ -77,20 +77,21 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         if (!isServer && !isCamera)
             return;
 
-        // If the resource is mediaServer then egnore if not this server
+        // If the resource is mediaServer then ignore if not this server
         if (isServer && resource->getGuid() != serverGuid())
             return;
 
-        // If camera from other server - ignore 
+        //storing all servers' cameras too
+        // If camera from other server - marking it
         if (isCamera && resource->getParentId() != ownMediaServer->getId())
-            return;
+            resource->addFlags( QnResource::foreigner );
 
         // We are always online
         if (isServer)
             resource->setStatus(QnResource::Online);
 
         QByteArray errorString;
-        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+        QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId(), QnResourcePool::rfAllResources);
         if (ownResource)
         {
             ownResource->update(resource);
@@ -106,7 +107,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
     } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::rfAllResources);
 
         if (resource)
         {
@@ -116,7 +117,7 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
         }
     } else if (event.eventType == Qn::Message_Type_ResourceDelete)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::rfAllResources);
 
         if (resource)
         {

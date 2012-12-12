@@ -744,7 +744,7 @@ void QnApiPbSerializer::deserializeBusinessRules(QnBusinessEventRules &businessR
         // businessRule->setEventCondition();
 
         businessRule->setActionType((BusinessActionType::Value)ci->actiontype());
-        businessRule->setDstResource(qnResPool->getResourceById(ci->actionresource()));
+        businessRule->setDstResource(qnResPool->getResourceById(ci->actionresource(), QnResourcePool::rfAllResources)); //destination resource can belong to another server
         businessRule->setBusinessParams(deserializeBusinessParams(ci->actionparams().c_str()));
         const QnBusinessParams& eventConditions = deserializeBusinessParams(ci->eventcondition().c_str());
         for( QnBusinessParams::const_iterator it = eventConditions.begin(); it != eventConditions.end(); ++it )
