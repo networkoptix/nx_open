@@ -146,6 +146,11 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
     );
 
     connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
+
+    m_mediaServerStartAction->setVisible(false);
+    m_mediaServerStopAction->setVisible(false);
+    m_appServerStartAction->setVisible(false);
+    m_appServerStopAction->setVisible(false);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
