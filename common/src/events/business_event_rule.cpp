@@ -19,12 +19,12 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
     QnAbstractBusinessActionPtr result;
     switch (m_actionType)
     {
-        case BusinessActionType::BA_CameraRecording:
-            result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
-            break;
         case BusinessActionType::BA_CameraOutput:
         case BusinessActionType::BA_Bookmark:
         case BusinessActionType::BA_PanicRecording:
+        case BusinessActionType::BA_CameraRecording:
+            result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
+            break;
         case BusinessActionType::BA_SendMail:
             result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent));
             break;

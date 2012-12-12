@@ -27,6 +27,8 @@ namespace Qn {
         Message_Type_BusinessRuleInsertOrUpdate = 8,
         Message_Type_BusinessRuleDelete = 9
     };
+
+    QString toString( Message_Type val );
 }
 
 struct QnMessage

@@ -172,18 +172,31 @@ private:
 class CommunicatingSocket : public Socket {
     Q_DECLARE_TR_FUNCTIONS(CommunicatingSocket)
 public:
+    static const int DEFAULT_TIMEOUT_MILLIS = 3000;
+
     /**
      *   Establish a socket connection with the given foreign
      *   address and port
      *   @param foreignAddress foreign address (IP address or name)
      *   @param foreignPort foreign port
+     *   @param timeoutMs connection timeout. if < 0 - no timeout used. TODO should use write timeout for connection establishment
      *   @return false if unable to establish connection
      */
-    bool connect(const QString &foreignAddress, unsigned short foreignPort);
+    bool connect(const QString &foreignAddress, unsigned short foreignPort, int timeoutMs = DEFAULT_TIMEOUT_MILLIS);
     void shutdown();
     virtual void close();
-    void setReadTimeOut( unsigned int ms );
-    void setWriteTimeOut( unsigned int ms );
+    /*!
+        \param ms. New timeout value. 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setReadTimeOut( unsigned int ms );
+    /*!
+        \param ms. New timeout value. 0 - no timeout
+        \return true. if timeout has been changed
+        By default, there is no timeout
+    */
+    bool setWriteTimeOut( unsigned int ms );
 
     /**
      *   Write the given buffer to this socket.  Call connect() before
@@ -231,7 +244,8 @@ protected:
     CommunicatingSocket(int newConnSD);
 
 protected:
-    unsigned int m_timeout;
+    unsigned int m_readTimeoutMS;
+    unsigned int m_writeTimeoutMS;
     bool mConnected;
 };
 
