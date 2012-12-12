@@ -355,6 +355,8 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
         return saveAsync(user, target, slot);
     else if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>())
         return saveAsync(layout, target, slot);
+    else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>())
+        return saveAsync(rule, target, slot);
 
     return 0;
 }
@@ -428,6 +430,17 @@ int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject*
     m_serializer.serialize(layout, data);
 
     return addObjectAsync(QLatin1String("layout"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+}
+
+int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
+{
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("businessRule"));
+    QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
+
+    QByteArray data;
+    m_serializer.serialize(rule, data);
+
+    return addObjectAsync(QLatin1String("businessRule"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObject* target, const char* slot)
