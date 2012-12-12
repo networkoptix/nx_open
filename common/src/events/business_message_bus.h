@@ -43,7 +43,6 @@ public slots:
     void at_actionReceived(QnAbstractBusinessActionPtr action);
 private slots:
     void at_replyFinished(QNetworkReply* reply);
-    void at_replyError(QNetworkReply::NetworkError code);
 private:
     QNetworkAccessManager m_transport;
     typedef QMap<QNetworkReply*, QnAbstractBusinessActionPtr> ActionMap;

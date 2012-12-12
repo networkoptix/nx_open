@@ -27,7 +27,6 @@ int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAc
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String("application/data"));
     QNetworkReply* reply = m_transport.post(request, bAction->serialize());
     m_actionsInProgress.insert(reply, bAction);
-    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)), this, SLOT(at_replyError(QNetworkReply::NetworkError)));
 
     return 0;
 }
@@ -35,30 +34,20 @@ int QnBusinessMessageBus::deliveryBusinessAction(QnAbstractBusinessActionPtr bAc
 void QnBusinessMessageBus::at_replyFinished(QNetworkReply* reply)
 {
     QnAbstractBusinessActionPtr action;
+    QNetworkReply::NetworkError replyResultCode = QNetworkReply::NoError;
     {
         QMutexLocker lock(&m_mutex);
         ActionMap::Iterator itr =  m_actionsInProgress.find(reply);
         Q_ASSERT(itr != m_actionsInProgress.end());
         action = itr.value();
         m_actionsInProgress.erase(itr);
+        replyResultCode = reply->error();
         reply->deleteLater();
     }
-    emit actionDelivered(action);
-}
-
-void QnBusinessMessageBus::at_replyError(QNetworkReply::NetworkError code)
-{
-    QnAbstractBusinessActionPtr action;
-    QNetworkReply* reply = (QNetworkReply*) sender();
-    {
-        QMutexLocker lock(&m_mutex);
-        ActionMap::Iterator itr =  m_actionsInProgress.find(reply);
-        Q_ASSERT(itr != m_actionsInProgress.end());
-        action = itr.value();
-        m_actionsInProgress.erase(itr);
-        reply->deleteLater();
-    }
-    emit actionDeliveryFail(action);
+    if( replyResultCode == QNetworkReply::NoError )
+        emit actionDelivered(action);
+    else
+        emit actionDeliveryFail(action);
 }
 
 void QnBusinessMessageBus::at_actionReceived(QnAbstractBusinessActionPtr action)
