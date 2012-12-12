@@ -1,1 +1,0 @@
-${environment.dir}\bin\signtool.exe sign /a /v /p 123 /d "${company.name} ${product.name}" /f ${basedir}/sign/${customization}/app.p12 ${project.build.finalName}.msi

@@ -293,8 +293,8 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${project.build.directory}/sign/${customization}/sign.bat</executable>
-                                    <workingDirectory>${project.build.directory}/sign/${customization}</workingDirectory>
+                                    <executable>${project.build.directory}/sign-${customization}.bat</executable>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
                                     <skip>${skip.sign}</skip>                       
                                 </configuration>                    
                             </execution>                            
