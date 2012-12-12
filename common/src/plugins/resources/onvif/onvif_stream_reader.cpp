@@ -380,18 +380,20 @@ bool QnOnvifStreamReader::fetchUpdateVideoEncoder(MediaSoapWrapper& soapWrapper,
 VideoEncoder* QnOnvifStreamReader::fetchVideoEncoder(VideoConfigsResp& response, bool isPrimary) const
 {
     std::vector<VideoEncoder*>::const_iterator iter = response.Configurations.begin();
-    QString id = (isPrimary || m_onvifRes->forcePrimaryEncoderCodec()) ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
+    QString id = isPrimary  ? m_onvifRes->getPrimaryVideoEncoderId() : m_onvifRes->getSecondaryVideoEncoderId();
 
     for (;iter != response.Configurations.end(); ++iter) 
     {
         VideoEncoder* conf = *iter;
         //TODO:UTF unuse std::string
         if (conf && id == QString::fromStdString(conf->token)) {
-            if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec()) 
+            /*
+            if (!isPrimary && m_onvifRes->forcePrimaryEncoderCodec())
             {
                 // get codec list from primary encoder, but use ID of secondary encoder
                 conf->token = m_onvifRes->getSecondaryVideoEncoderId().toStdString();
             }
+            */
             return conf;
         }
     }
@@ -448,46 +450,24 @@ bool QnOnvifStreamReader::fetchUpdateProfile(MediaSoapWrapper& soapWrapper, Came
 void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& profiles, bool isPrimary) const
 {
     std::vector<Profile*>::const_iterator iter = response.Profiles.begin();
-    Profile* additionalProfile = 0;
 
     const char* token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
-    const char* filteredToken = isPrimary? NETOPTIX_SECONDARY_TOKEN: NETOPTIX_PRIMARY_TOKEN;
+    std::string videoSourceId = m_onvifRes->getVideoSourceId().toStdString();
+    std::string encoderToken = isPrimary? m_onvifRes->getPrimaryVideoEncoderId().toStdString(): m_onvifRes->getSecondaryVideoEncoderId().toStdString();
 
-    QString encoderToken = isPrimary? m_onvifRes->getPrimaryVideoEncoderId(): m_onvifRes->getSecondaryVideoEncoderId();
-    QString filteredEncoderToken = isPrimary? m_onvifRes->getSecondaryVideoEncoderId(): m_onvifRes->getPrimaryVideoEncoderId();
-
-    //Trying to find our and some predefined profile
     for (; iter != response.Profiles.end(); ++iter) {
         Profile* profile = *iter;
+        if (!profile)
+            continue;
+        if (profile->VideoSourceConfiguration && profile->VideoSourceConfiguration->token != videoSourceId)
+            continue;
 
-        if (profile && profile->token != filteredToken) {
-
-            if (profile->token == token) {
-                profiles.netoptix = profile;
-                continue;
-            }
-
-            bool finish = false;
-            if (profile->VideoEncoderConfiguration)
-            {
-                if (encoderToken == QString::fromStdString(profile->VideoEncoderConfiguration->token)) {
-                    profiles.predefined = profile;
-                } else if (filteredEncoderToken == QString::fromStdString(profile->VideoEncoderConfiguration->token)) {
-                    finish = true;
-                }
-            }
-
-            //If there are no our profiles and no profiles with our (choosen) encoders
-            //choose any other. To avoid race between primary and secondary: primary will used 
-            //the first, and secondary - the last
-            if (!finish && (!additionalProfile || !isPrimary)) {
-                additionalProfile = profile;
-            }
+        if (profile->token == token) {
+            profiles.netoptix = profile;
         }
-    }
-
-    if (!profiles.predefined) {
-        profiles.predefined = additionalProfile;
+        else if (!profiles.predefined && !QByteArray(profile->token.c_str()).startsWith("netoptix") && 
+                 profile->VideoEncoderConfiguration && profile->VideoEncoderConfiguration->token == encoderToken)
+            profiles.predefined = profile;
     }
 
     //Netoptix profile not found. Trying to create it.
@@ -495,7 +475,7 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
         profiles.profileAbsent = true;
 
         profiles.netoptix = &profiles.tmp;
-        profiles.netoptix->token = isPrimary? NETOPTIX_PRIMARY_TOKEN: NETOPTIX_SECONDARY_TOKEN;
+        profiles.netoptix->token = token;
     }
 }
 

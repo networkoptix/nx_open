@@ -78,7 +78,13 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (square1 != square2)
         return square1 > square2;
 
-    return s1.optionsResp.Options->H264 > s2.optionsResp.Options->H264; // if some option doesn't have H264 it "less"
+    // if some option doesn't have H264 it "less"
+    if (!s1.optionsResp.Options->H264 && s2.optionsResp.Options->H264)
+        return true;
+    else if (s1.optionsResp.Options->H264 && !s2.optionsResp.Options->H264)
+        return true;
+
+    return s1.id < s2.id; // sort by name
 }
 
 //
@@ -102,10 +108,10 @@ QnPlOnvifResource::QnPlOnvifResource() :
     m_audioBitrate(0),
     m_audioSamplerate(0),
     m_needUpdateOnvifUrl(false),
-    m_forceCodecFromPrimaryEncoder(false),
     m_ptzController(0),
     m_timeDrift(0),
-    m_channelNumer(0)
+    m_channelNumer(0),
+    m_maxChannels(1)
 {
 }
 
@@ -291,7 +297,8 @@ bool QnPlOnvifResource::initInternal()
             m_needUpdateOnvifUrl = false;
     }
 
-    fetchAndSetVideoSource();
+    if (!fetchAndSetVideoSource())
+        return false;
     fetchAndSetAudioSource();
 
     if (!fetchAndSetResourceOptions()) 
@@ -518,11 +525,9 @@ QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, b
 {
     QUrl url(QString::fromStdString(onvifUrl));
     QUrl mediaUrl(getUrl());
-    QString gg4 = mediaUrl.toString();
     url.setHost(getHostAddress().toString());
     if (updatePort && mediaUrl.port(-1) != -1)
         url.setPort(mediaUrl.port());
-    QString gg = url.toString();
     return url.toString();
 }
 
@@ -1002,7 +1007,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(QnNetworkResourcePtr source)
         result = true;
     }
 
-
     return result;
 }
 
@@ -1023,7 +1027,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     VideoConfigsReq confRequest;
     VideoConfigsResp confResponse;
 
-    m_forceCodecFromPrimaryEncoder = false;
     int soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse); // get encoder list
     if (soapRes != SOAP_OK) {
         qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't get list of video encoders from camera (URL: "
@@ -1040,6 +1043,11 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     QList<VideoOptionsLocal> optionsList;
     QList<MediaSoapWrapperPtr> soapWrappersList;
+
+    if (getHostAddress().toString() == QLatin1String("10.10.10.185"))
+    {
+        int gg=  4;
+    }
 
     std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
     for (;encIt != confResponse.Configurations.end(); ++encIt)
@@ -1071,27 +1079,19 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                 qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
                     << QString::fromStdString(*(optRequest.ConfigurationToken)) << "' from camera (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId()
                     << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapperPtr->getLastError();
-                //return false;
+                
+                qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "got soap error for configuration" << configuration->Name.c_str() << "skip configuration";
+                optionsList.pop_back();
+                continue;
             }
 
             else if (!currVideoOpts.optionsResp.Options->H264 && !currVideoOpts.optionsResp.Options->JPEG)
             {
                 qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapperPtr->getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
-                if (!optionsList.isEmpty())
-                {
-                    // no codec info for secondary encoder
-                    m_forceCodecFromPrimaryEncoder = true;
-                }
+                optionsList.pop_back();
+                continue;
             }
-        }
-
-
-        
-        if (soapRes != SOAP_OK) {
-            qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "got soap error for configuration" << configuration->Name.c_str() << "skip configuration";
-            optionsList.pop_back();
-            continue;
         }
 
         //TODO:UTF unuse std::string
@@ -1108,39 +1108,47 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
+    if (optionsList.size() <= m_channelNumer)
+    {
+        qCritical() << QString(QLatin1String("Not enough encoders for multichannel camera. required at least %1 encoder. URL: %2")).arg(m_channelNumer+1).arg(getUrl());
+        return false;
+    }
 
-    if (optionsList[0].optionsResp.Options->H264) {
-        m_primaryH264Profile = getH264StreamProfile(optionsList[0].optionsResp);
+    if (optionsList[m_channelNumer].optionsResp.Options->H264) {
+        m_primaryH264Profile = getH264StreamProfile(optionsList[m_channelNumer].optionsResp);
         setCodec(H264, true);
     }
-    else if (optionsList[0].optionsResp.Options->JPEG) {
+    else if (optionsList[m_channelNumer].optionsResp.Options->JPEG) {
         setCodec(JPEG, true);
     }
 
-    setVideoEncoderOptions(optionsList[0].optionsResp);
-    checkMaxFps(confResponse, optionsList[0].id);
+    setVideoEncoderOptions(optionsList[m_channelNumer].optionsResp);
+    checkMaxFps(confResponse, optionsList[m_channelNumer].id);
+
+    m_mutex.lock();
+    m_primaryVideoEncoderId = optionsList[m_channelNumer].id;
+    m_secondaryResolutionList = m_resolutionList;
+    m_mutex.unlock();
 
     qDebug() << "ONVIF debug: got" << optionsList.size() << "encoders for camera " << getHostAddress();
 
+    bool dualStreamingAllowed = optionsList.size() >= m_maxChannels*2;
+    if (dualStreamingAllowed)
     {
+        int secondaryIndex = m_maxChannels*2 - m_channelNumer - 1;
         QMutexLocker lock(&m_mutex);
-        m_secondaryResolutionList = m_resolutionList;
-        m_primaryVideoEncoderId = optionsList[0].id;
 
-        if (optionsList.size() > 1) 
-        {
-            m_secondaryVideoEncoderId = optionsList[1].id;
-            if (optionsList[1].optionsResp.Options->H264) {
-                m_secondaryH264Profile = getH264StreamProfile(optionsList[1].optionsResp);
-                setCodec(H264, false);
-                qDebug() << "use H264 codec for secondary stream. camera=" << getHostAddress();
-            }
-            else {
-                setCodec(JPEG, false);
-                qDebug() << "use JPEG codec for secondary stream. camera=" << getHostAddress();
-            }
-            updateSecondaryResolutionList(optionsList[1].optionsResp);
+        m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
+        if (optionsList[secondaryIndex].optionsResp.Options->H264) {
+            m_secondaryH264Profile = getH264StreamProfile(optionsList[secondaryIndex].optionsResp);
+            setCodec(H264, false);
+            qDebug() << "use H264 codec for secondary stream. camera=" << getHostAddress();
         }
+        else {
+            setCodec(JPEG, false);
+            qDebug() << "use JPEG codec for secondary stream. camera=" << getHostAddress();
+        }
+        updateSecondaryResolutionList(optionsList[secondaryIndex].optionsResp);
     }
 
     return true;
@@ -1518,6 +1526,8 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
 
     }
 
+    m_maxChannels = response.Configurations.size();
+
     if (response.Configurations.size() <= m_channelNumer) {
         qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
@@ -1592,11 +1602,6 @@ const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractM
     }
     else
         return QnPhysicalCameraResource::getAudioLayout(dataProvider);
-}
-
-bool QnPlOnvifResource::forcePrimaryEncoderCodec() const
-{
-    return m_forceCodecFromPrimaryEncoder;
 }
 
 bool QnPlOnvifResource::getParamPhysical(const QnParam &param, QVariant &val)

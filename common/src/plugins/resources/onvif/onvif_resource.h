@@ -143,7 +143,6 @@ public:
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
-    bool forcePrimaryEncoderCodec() const;
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
     static int calcTimeDrift(const QString& deviceUrl);
 
@@ -244,7 +243,6 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    bool m_forceCodecFromPrimaryEncoder;
     QnOnvifPtzController* m_ptzController;
 
     QString m_imagingUrl;
@@ -252,6 +250,7 @@ private:
     int m_timeDrift;
     
     int m_channelNumer; // video/audio source number
+    int m_maxChannels;
 };
 
 #endif //onvif_resource_h
