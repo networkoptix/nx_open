@@ -1501,7 +1501,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
+    layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     if(context()->user())
         layout->setParentId(context()->user()->getId());
