@@ -149,8 +149,10 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
 
     m_mediaServerStartAction->setVisible(false);
     m_mediaServerStopAction->setVisible(false);
+    m_showMediaServerLogAction->setVisible(false);
     m_appServerStartAction->setVisible(false);
     m_appServerStopAction->setVisible(false);
+    m_showAppLogAction->setVisible(false);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
