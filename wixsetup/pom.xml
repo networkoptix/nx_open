@@ -301,9 +301,9 @@
                                         <argument>/p</argument>
                                         <argument>qweasd123</argument>
                                         <argument>/d</argument>
-                                        <argument>"Network Optix HD Witness"</argument>
+                                        <argument>"${company.name} ${product.name}"</argument>
                                         <argument>/f</argument>
-                                        <argument>${basedir}/sign/app.p12</argument>
+                                        <argument>${basedir}/sign/${customization}/app.p12</argument>
                                         <argument>${project.build.finalName}.msi</argument>
                                     </arguments>
                                     <skip>${skip.sign}</skip>                       
