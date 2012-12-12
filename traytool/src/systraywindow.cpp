@@ -144,6 +144,8 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER))
     );
+
+    connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -916,7 +918,7 @@ void QnSystrayWindow::onTestButtonClicked()
 
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("You have entered invalid URL."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("You have entered invalid URL."));
         return;
     }
 
@@ -948,4 +950,7 @@ void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
     ui->appPortSpinBox->setValue( urlToSet.port() );
     //ui->appServerLogin->setText( urlToSet.userName() );
     //ui->appServerPassword->setText( urlToSet.password() );
+}
+void QnSystrayWindow::at_appServerPassword_textChanged(const QString &text) {
+    ui->testButton->setEnabled(!text.isEmpty());
 }
