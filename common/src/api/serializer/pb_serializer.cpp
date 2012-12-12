@@ -536,19 +536,19 @@ void serializeCameraServerItem_i(pb::CameraServerItem& pb_cameraServerItem, cons
     pb_cameraServerItem.set_serverguid(cameraServerItem.mediaServerGuid.toStdString());
 }
 
-void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRule& businessRuleIn)
+void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusinessEventRulePtr& businessRulePtr)
 {
-    pb_businessRule.set_id(businessRuleIn.getId().toInt());
-    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRuleIn.getEventType());
-    if (businessRuleIn.getSrcResource())
-        pb_businessRule.set_eventresource(businessRuleIn.getSrcResource()->getId().toInt());
+    pb_businessRule.set_id(businessRulePtr->getId().toInt());
+    pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->getEventType());
+    if (businessRulePtr->getSrcResource())
+        pb_businessRule.set_eventresource(businessRulePtr->getSrcResource()->getId().toInt());
     // TODO vasilenko
     // pb_businessRule.set_eventcondition(businessRuleIn.getEventCondition());
 
-    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRuleIn.getActionType());
-    if (businessRuleIn.getDstResource())
-        pb_businessRule.set_actionresource(businessRuleIn.getDstResource()->getId().toInt());
-    pb_businessRule.set_actionparams(serializeBusinessParams(businessRuleIn.getBusinessParams()));
+    pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->getActionType());
+    if (businessRulePtr->getDstResource())
+        pb_businessRule.set_actionresource(businessRulePtr->getDstResource()->getId().toInt());
+    pb_businessRule.set_actionparams(serializeBusinessParams(businessRulePtr->getBusinessParams()));
 }
 
 void serializeLayout_i(pb::Resource& pb_layoutResource, const QnLayoutResourcePtr& layoutIn)
@@ -889,14 +889,14 @@ void QnApiPbSerializer::serializeBusinessRules(const QnBusinessEventRules &busin
     pb::BusinessRules pb_businessRules;
 
     foreach(QnBusinessEventRulePtr businessRulePtr, businessRules)
-        serializeBusinessRule_i(*pb_businessRules.add_businessrule(), *businessRulePtr);
+        serializeBusinessRule_i(*pb_businessRules.add_businessrule(), businessRulePtr);
 
     std::string str;
     pb_businessRules.SerializeToString(&str);
     data = QByteArray(str.data(), str.length());
 }
 
-void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRule &businessRule, QByteArray &data)
+void QnApiPbSerializer::serializeBusinessRule(const QnBusinessEventRulePtr &businessRule, QByteArray &data)
 {
     pb::BusinessRules pb_businessRules;
 

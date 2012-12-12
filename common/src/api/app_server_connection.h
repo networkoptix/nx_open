@@ -94,7 +94,7 @@ public:
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
-    int addBusinessRule(const QnBusinessEventRule& businessRule, QByteArray& errorString);
+    int addBusinessRule(const QnBusinessEventRulePtr& businessRule, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);

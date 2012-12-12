@@ -29,7 +29,7 @@ public:
     void serializeLicense(const QnLicensePtr& license, QByteArray& data) override;
     void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) override;
     void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) override;
-    void serializeBusinessRule(const QnBusinessEventRule&, QByteArray& data) override;
+    void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) override;
     void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data);
 
 private:

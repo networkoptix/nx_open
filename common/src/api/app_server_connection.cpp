@@ -438,7 +438,7 @@ int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
-    m_serializer.serialize(rule, data);
+    m_serializer.serializeBusinessRule(rule, data);
 
     return addObjectAsync(QLatin1String("businessRule"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
@@ -491,7 +491,7 @@ int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &camer
     return status;
 }
 
-int QnAppServerConnection::addBusinessRule(const QnBusinessEventRule &businessRule, QByteArray &errorString)
+int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &businessRule, QByteArray &errorString)
 {
     QByteArray data;
     m_serializer.serializeBusinessRule(businessRule, data);

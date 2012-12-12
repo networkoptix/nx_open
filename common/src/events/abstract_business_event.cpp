@@ -7,8 +7,10 @@
 
 namespace BusinessEventType
 {
-    QString toString( Value val )
-    {
+    QString toString( Value val )  {
+        if (val > BE_UserDefined)
+            return QString(QLatin1String("UserDefined (%1)")).arg((int)val);
+
         switch( val )
         {
             case BE_NotDefined:
@@ -21,9 +23,57 @@ namespace BusinessEventType
                 return QLatin1String("Camera_Disconnect");
             case BE_Storage_Failure:
                 return QLatin1String("Storage_Failure");
-            default:
-                return QString::fromLatin1(val >= BE_UserDefined ? "UserDefined (%1)" : "Unknown %1").arg((int)val);
+            case BE_UserDefined:
+                return QLatin1String("UserDefined");
         }
+        //warning should be raised on unknown events;
+        return QLatin1String("UnknownEvent");
+    }
+
+    bool isResourceRequired(Value val) {
+        if (val > BE_UserDefined)
+            return false;
+
+        switch( val )
+        {
+            case BE_NotDefined:
+                return false;
+            case BE_Camera_Motion:
+                return true;
+            case BE_Camera_Input:
+                return true;
+            case BE_Camera_Disconnect:
+                return true;
+            case BE_Storage_Failure:
+                return true;
+            case BE_UserDefined:
+                return false;
+        }
+        //warning should be raised on unknown events;
+        return false;
+    }
+
+    bool hasToggleState(Value val) {
+        if (val > BE_UserDefined)
+            return false;
+
+        switch( val )
+        {
+            case BE_NotDefined:
+                return false;
+            case BE_Camera_Motion:
+                return true;
+            case BE_Camera_Input:
+                return true;
+            case BE_Camera_Disconnect:
+                return false;
+            case BE_Storage_Failure:
+                return false;
+            case BE_UserDefined:
+                return false;
+        }
+        //warning should be raised on unknown events;
+        return false;
     }
 }
 
