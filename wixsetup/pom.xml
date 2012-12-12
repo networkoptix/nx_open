@@ -293,19 +293,8 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${environment.dir}/bin/signtool.exe</executable>
-                                    <workingDirectory>${project.build.directory}/bin</workingDirectory>
-                                    <arguments>
-                                        <argument>sign</argument>
-                                        <argument>/v</argument>
-                                        <argument>/p</argument>
-                                        <argument>qweasd123</argument>
-                                        <argument>/d</argument>
-                                        <argument>"${company.name} ${product.name}"</argument>
-                                        <argument>/f</argument>
-                                        <argument>${basedir}/sign/${customization}/app.p12</argument>
-                                        <argument>${project.build.finalName}.msi</argument>
-                                    </arguments>
+                                    <executable>${project.build.directory}/sign/${customization}/sign.bat</executable>
+                                    <workingDirectory>${project.build.directory}/sign/${customization}</workingDirectory>
                                     <skip>${skip.sign}</skip>                       
                                 </configuration>                    
                             </execution>                            

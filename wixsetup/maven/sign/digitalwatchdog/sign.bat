@@ -1,0 +1,1 @@
+${environment.dir}\bin\signtool.exe sign /ac ${basedir}/sign/${customization}/thawte-intermediate-ca.cer /a /v /p 123 /d "${company.name} ${product.name}" /f ${basedir}/sign/${customization}/app.p12 ${project.build.directory}\bin\${project.build.finalName}.msi
