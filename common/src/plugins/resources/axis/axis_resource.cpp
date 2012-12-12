@@ -68,6 +68,67 @@ void QnPlAxisResource::setCropingPhysical(QRect /*croping*/)
 
 }
 
+bool QnPlAxisResource::startInputPortMonitoring()
+{
+    if( isDisabled()
+        || hasFlags(QnResource::foreigner)      //we do not own camera
+        || m_inputPortNameToIndex.empty() )
+    {
+        return false;
+    }
+
+    //based on VAPIX Version 3 I/O Port API
+
+    const QAuthenticator& auth = getAuth();
+    QUrl requestUrl;
+    requestUrl.setHost( getHostAddress() );
+    requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
+    for( std::map<QString, unsigned int>::const_iterator
+        it = m_inputPortNameToIndex.begin();
+        it != m_inputPortNameToIndex.end();
+        ++it )
+    {
+        QMutexLocker lk( &m_inputPortMutex );
+        pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
+            p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
+        if( !p.second )
+            continue;   //port already monitored
+        lk.unlock();
+
+        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
+            //and forgetHttpClient cannot be called before doGet call
+
+        requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
+        nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
+        connect( httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        connect( httpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
+        connect( httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
+        httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
+        httpClient->setUserName( auth.user() );
+        httpClient->setUserPassword( auth.password() );
+        httpClient->doGet( requestUrl );
+
+        p.first->second = httpClient;
+    }
+
+    return true;
+}
+
+void QnPlAxisResource::stopInputPortMonitoring()
+{
+    QMutexLocker lk( &m_inputPortMutex );
+
+    nx_http::AsyncHttpClient* httpClient = NULL;
+    while( !m_inputPortHttpMonitor.empty() )
+    {
+        httpClient = m_inputPortHttpMonitor.begin()->second;
+        m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
+        lk.unlock();
+        httpClient->scheduleForRemoval();
+        lk.relock();
+    }
+}
+
 bool QnPlAxisResource::isInitialized() const
 {
     QMutexLocker lock(&m_mutex);
@@ -772,52 +833,6 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
     startInputPortMonitoring();
 }
 
-bool QnPlAxisResource::startInputPortMonitoring()
-{
-    if( isDisabled()
-        || hasFlags(QnResource::foreigner)      //we do not own camera
-        || m_inputPortNameToIndex.empty() )
-    {
-        return false;
-    }
-
-    //based on VAPIX Version 3 I/O Port API
-
-    const QAuthenticator& auth = getAuth();
-    QUrl requestUrl;
-    requestUrl.setHost( getHostAddress() );
-    requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
-    for( std::map<QString, unsigned int>::const_iterator
-        it = m_inputPortNameToIndex.begin();
-        it != m_inputPortNameToIndex.end();
-        ++it )
-    {
-        QMutexLocker lk( &m_inputPortMutex );
-        pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
-            p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
-        if( !p.second )
-            continue;   //port already monitored
-        lk.unlock();
-
-        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
-            //and forgetHttpClient cannot be called before doGet call
-
-        requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
-        nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
-        connect( httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
-        connect( httpClient, SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClient*)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClient*)),    Qt::DirectConnection );
-        connect( httpClient, SIGNAL(done(nx_http::AsyncHttpClient*)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
-        httpClient->setTotalReconnectTries( nx_http::AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
-        httpClient->setUserName( auth.user() );
-        httpClient->setUserPassword( auth.password() );
-        httpClient->doGet( requestUrl );
-
-        p.first->second = httpClient;
-    }
-
-    return true;
-}
-
 void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& notification )
 {
     //1I:H, 1I:L, 1I:/, "1I:\"
@@ -877,20 +892,5 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
             m_inputPortHttpMonitor.erase( it );
             return;
         }
-    }
-}
-
-void QnPlAxisResource::stopInputPortMonitoring()
-{
-    QMutexLocker lk( &m_inputPortMutex );
-
-    nx_http::AsyncHttpClient* httpClient = NULL;
-    while( !m_inputPortHttpMonitor.empty() )
-    {
-        httpClient = m_inputPortHttpMonitor.begin()->second;
-        m_inputPortHttpMonitor.erase( m_inputPortHttpMonitor.begin() );
-        lk.unlock();
-        httpClient->scheduleForRemoval();
-        lk.relock();
     }
 }
