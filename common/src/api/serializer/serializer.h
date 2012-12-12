@@ -71,7 +71,7 @@ public:
     virtual void serializeLicense(const QnLicensePtr& license, QByteArray& data) = 0;
     virtual void serializeCameraServerItem(const QnCameraHistoryItem& cameraHistory, QByteArray& data) = 0;
     virtual void serializeBusinessRules(const QnBusinessEventRules&, QByteArray& data) = 0;
-    virtual void serializeBusinessRule(const QnBusinessEventRule&, QByteArray& data) = 0;
+    virtual void serializeBusinessRule(const QnBusinessEventRulePtr&, QByteArray& data) = 0;
     virtual void serializeEmail(const QString& to, const QString& subject, const QString& message, QByteArray& data) = 0;
 
 protected:

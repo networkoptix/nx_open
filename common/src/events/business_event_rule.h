@@ -57,7 +57,7 @@ private:
     bool m_actionInProgress;
 };
 
-typedef QSharedPointer<QnBusinessEventRule> QnBusinessEventRulePtr;
-typedef QList<QnBusinessEventRulePtr> QnBusinessEventRules;
+typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
+typedef QnSharedResourcePointerList<QnBusinessEventRule> QnBusinessEventRules;
 
 #endif // __ABSTRACT_BUSINESS_EVENT_RULE_H__

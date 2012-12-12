@@ -26,11 +26,19 @@ namespace BusinessEventType
         /** Storage read error has occured. */
         BE_Storage_Failure,
 
+        /** Aliases for the convinient lists building */
+        BE_FirstType = BE_Camera_Motion,
+        BE_LastType = BE_Storage_Failure,
+
         /** Base index for the user defined events. */
         BE_UserDefined = 1000
     };
 
     QString toString( Value val );
+
+    bool isResourceRequired(Value val);
+
+    bool hasToggleState(Value val);
 }
 
 namespace BusinessEventParameters

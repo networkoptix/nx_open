@@ -5,6 +5,7 @@
 #include <QtGui/QDialog>
 
 #include <api/api_fwd.h>
+#include <core/resource/resource_fwd.h>
 
 namespace Ui {
     class BusinessRulesDialog;
@@ -19,6 +20,7 @@ public:
 
 private slots:
     void at_newRuleButton_clicked();
+    void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
 
 private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
