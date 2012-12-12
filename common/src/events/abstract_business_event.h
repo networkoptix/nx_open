@@ -135,5 +135,7 @@ private:
 
 typedef QSharedPointer<QnAbstractBusinessEvent> QnAbstractBusinessEventPtr;
 
+Q_DECLARE_METATYPE(QnAbstractBusinessEventPtr)
+
 
 #endif // __ABSTRACT_BUSINESS_EVENT_H_
