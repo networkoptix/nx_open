@@ -12,6 +12,8 @@
 #include "utils/common/synctime.h"
 
 
+using namespace std;
+
 const char* QnPlAxisResource::MANUFACTURE = "Axis";
 static const float MAX_AR_EPS = 0.04f;
 static const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
@@ -769,14 +771,17 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 
     //TODO/IMPL periodically update port names in case some one changes it
 
-    if( !isDisabled() && m_inputPortNameToIndex.size() > 0 )
-        registerInputPortEventHandler();
+    registerInputPortEventHandler();
 }
 
 bool QnPlAxisResource::registerInputPortEventHandler()
 {
-    if( m_inputPortNameToIndex.empty() )
+    if( isDisabled()
+        || hasFlags(QnResource::foreigner)      //we do not own camera
+        || m_inputPortNameToIndex.empty() )
+    {
         return false;
+    }
 
     //based on VAPIX Version 3 I/O Port API
 
@@ -789,6 +794,16 @@ bool QnPlAxisResource::registerInputPortEventHandler()
         it != m_inputPortNameToIndex.end();
         ++it )
     {
+        QMutexLocker lk( &m_inputPortMutex );
+        pair<map<unsigned int, nx_http::AsyncHttpClient*>::iterator, bool>
+            p = m_inputPortHttpMonitor.insert( make_pair( it->second, (nx_http::AsyncHttpClient*)NULL ) );
+        if( !p.second )
+            continue;   //port already monitored
+        lk.unlock();
+
+        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
+            //and forgetHttpClient cannot be called before doGet call
+
         requestUrl.setPath( QString::fromLatin1("/axis-cgi/io/port.cgi?monitor=%1").arg(it->second) );
         nx_http::AsyncHttpClient* httpClient = new nx_http::AsyncHttpClient();
         connect( httpClient, SIGNAL(responseReceived(nx_http::AsyncHttpClient*)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClient*)),        Qt::DirectConnection );
@@ -798,8 +813,8 @@ bool QnPlAxisResource::registerInputPortEventHandler()
         httpClient->setUserName( auth.user() );
         httpClient->setUserPassword( auth.password() );
         httpClient->doGet( requestUrl );
-        QMutexLocker lk( &m_inputPortMutex );
-        m_inputPortHttpMonitor.insert( std::make_pair( it->second, httpClient ) );
+
+        p.first->second = httpClient;
     }
 
     return true;
