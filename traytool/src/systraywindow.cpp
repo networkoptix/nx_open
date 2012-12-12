@@ -6,7 +6,7 @@
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
-#include "connectiontestingdialog.h"
+#include "connection_testing_dialog.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -920,7 +920,7 @@ void QnSystrayWindow::onTestButtonClicked()
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
+    QnConnectionTestingDialog dialog(url, this);
     dialog.setModal(true);
     dialog.exec();
 }
