@@ -106,6 +106,10 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual bool startInputPortMonitoring();
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual void stopInputPortMonitoring();
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
@@ -115,6 +119,9 @@ private:
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
+
+private slots:
+    void onDisabledChanged( bool oldValue, bool newValue );
 };
 
 #endif //sequrity_cam_resource_h_1239

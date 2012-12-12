@@ -259,6 +259,9 @@ protected:
     mutable QMutex m_physicalParamsMutex;
     QDateTime m_advSettingsLastUpdated;
 
+    virtual bool startInputPortMonitoring() override;
+    virtual void stopInputPortMonitoring() override;
+
 private slots:
     void onRenewSubscriptionTimer();
 
@@ -379,11 +382,10 @@ private:
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
 
-    bool registerNotificationConsumer();
     bool createPullPointSubscription();
     bool pullMessages();
     //!Registeres local NotificationConsumer in resource's NotificationProducer
-    bool registerNotificationHandler();
+    bool registerNotificationConsumer();
     //!Reads relay output list from resource
     bool fetchRelayOutputs( std::vector<RelayOutputInfo>* const relayOutputs );
     bool fetchRelayOutputInfo( const std::string& outputID, RelayOutputInfo* const relayOutputInfo );

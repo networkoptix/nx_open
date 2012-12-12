@@ -16,6 +16,8 @@ QnSecurityCamResource::QnSecurityCamResource()
         m_motionMaskList << QnMotionRegion();
 
     addFlags(live_cam);
+
+    connect( this, SIGNAL(disabledChanged(bool, bool)), this, SLOT(onDisabledChanged(bool, bool)), Qt::DirectConnection );
 }
 
 QnSecurityCamResource::~QnSecurityCamResource()
@@ -118,6 +120,15 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
     if (m_dpFactory)
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
+}
+
+bool QnSecurityCamResource::startInputPortMonitoring()
+{
+    return false;
+}
+
+void QnSecurityCamResource::stopInputPortMonitoring()
+{
 }
 
 void QnSecurityCamResource::setDataProviderFactory(QnDataProviderFactory* dpFactory)
@@ -379,4 +390,18 @@ MotionType QnSecurityCamResource::getMotionType()
 void QnSecurityCamResource::setMotionType(MotionType value)
 {
     m_motionType = value;
+}
+
+void QnSecurityCamResource::onDisabledChanged( bool oldValue, bool newValue )
+{
+    if( oldValue == newValue )
+        return;
+
+    if( hasFlags(QnResource::foreigner) )
+        return;     //we do not own camera
+
+    if( newValue )
+        stopInputPortMonitoring();
+    else
+        startInputPortMonitoring();
 }

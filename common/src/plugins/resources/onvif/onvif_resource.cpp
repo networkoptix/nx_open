@@ -154,11 +154,7 @@ QnPlOnvifResource::QnPlOnvifResource()
 
 QnPlOnvifResource::~QnPlOnvifResource()
 {
-    //removing timer
-    TimerManager::instance()->deleteTimer( m_timerID );
-    //TODO/IMPL removing device event registration
-
-    QnSoapServer::instance()->getService()->removeResourceRegistration( this );
+    stopInputPortMonitoring();
 
     delete m_onvifAdditionalSettings;
     delete m_ptzController;
@@ -373,7 +369,7 @@ bool QnPlOnvifResource::initInternal()
     fetchRelayOutputs( &relayOutputs );
     fetchRelayInputInfo();
     //if( !m_relayInputs.empty() )
-        registerNotificationHandler();
+        startInputPortMonitoring();
     //if( relayOutputs.size() > 0 )
     //    setRelayOutputState( QString::fromStdString(relayOutputs.front().token), true, 5 );
 
@@ -2045,8 +2041,14 @@ QnOnvifPtzController* QnPlOnvifResource::getPtzController()
     return m_ptzController;
 }
 
-bool QnPlOnvifResource::registerNotificationHandler()
+bool QnPlOnvifResource::startInputPortMonitoring()
 {
+    if( isDisabled()
+        || hasFlags(QnResource::foreigner) )     //we do not own camera
+    {
+        return false;
+    }
+
     if( !m_eventCapabilities )
         return false;
 
@@ -2056,6 +2058,16 @@ bool QnPlOnvifResource::registerNotificationHandler()
         return createPullPointSubscription();
     else
         return false;
+}
+
+void QnPlOnvifResource::stopInputPortMonitoring()
+{
+    //removing timer
+    TimerManager::instance()->deleteTimer( m_timerID );
+    //TODO/IMPL removing device event registration
+        //if we do not remove event registration, camera will do it for us in some timeout
+
+    QnSoapServer::instance()->getService()->removeResourceRegistration( this );
 }
 
 

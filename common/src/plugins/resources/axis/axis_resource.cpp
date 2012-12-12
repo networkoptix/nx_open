@@ -26,13 +26,11 @@ QnPlAxisResource::QnPlAxisResource()
     connect(
         this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
         QnBusinessEventConnector::instance(), SLOT(at_cameraInput( QnResourcePtr, const QString&, bool, qint64 )) );
-
-    connect( this, SIGNAL(disabledChanged(bool, bool)), this, SLOT(onDisabledChanged(bool, bool)), Qt::DirectConnection );
 }
 
 QnPlAxisResource::~QnPlAxisResource()
 {
-    stopInputMonitoring();
+    stopInputPortMonitoring();
 }
 
 bool QnPlAxisResource::isResourceAccessible()
@@ -771,10 +769,10 @@ void QnPlAxisResource::initializeIOPorts( CLSimpleHTTPClient* const http )
 
     //TODO/IMPL periodically update port names in case some one changes it
 
-    registerInputPortEventHandler();
+    startInputPortMonitoring();
 }
 
-bool QnPlAxisResource::registerInputPortEventHandler()
+bool QnPlAxisResource::startInputPortMonitoring()
 {
     if( isDisabled()
         || hasFlags(QnResource::foreigner)      //we do not own camera
@@ -882,7 +880,7 @@ void QnPlAxisResource::forgetHttpClient( nx_http::AsyncHttpClient* const httpCli
     }
 }
 
-void QnPlAxisResource::stopInputMonitoring()
+void QnPlAxisResource::stopInputPortMonitoring()
 {
     QMutexLocker lk( &m_inputPortMutex );
 
@@ -895,15 +893,4 @@ void QnPlAxisResource::stopInputMonitoring()
         httpClient->scheduleForRemoval();
         lk.relock();
     }
-}
-
-void QnPlAxisResource::onDisabledChanged( bool oldValue, bool newValue )
-{
-    if( oldValue == newValue )
-        return;
-
-    if( newValue )
-        stopInputMonitoring();  //stopping camera input monitoring
-    else
-        registerInputPortEventHandler();//starting camera input monitoring
 }
