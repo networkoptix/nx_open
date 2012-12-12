@@ -107,7 +107,8 @@ void QnServerMessageProcessor::at_messageReceived(QnMessage event)
 
     } else if (event.eventType == Qn::Message_Type_ResourceDisabledChange)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId, QnResourcePool::rfAllResources);
+        QnResourcePtr resource = qnResPool->getResourceById(event.resourceId);
+        //ignoring events for foreign resources
 
         if (resource)
         {
