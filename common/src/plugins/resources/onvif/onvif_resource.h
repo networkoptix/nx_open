@@ -19,10 +19,13 @@ class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
 class onvifXsd__VideoEncoderConfiguration;
+class onvifXsd__VideoSourceConfiguration;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
+typedef onvifXsd__VideoSourceConfiguration VideoSource;
+
 
 //first = width, second = height
 typedef QPair<int, int> ResolutionPair;
@@ -142,10 +145,15 @@ public:
 
     bool forcePrimaryEncoderCodec() const;
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
+    static int calcTimeDrift(const QString& deviceUrl);
+
 
     virtual QnOnvifPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
+
+    virtual void setUrl(const QString &url) override;
+    int getChannel() const;
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -171,11 +179,12 @@ private:
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
     void updateSecondaryResolutionList(const VideoOptionsResp& response);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper);
+    
+    bool fetchAndSetVideoSource();
+    bool fetchAndSetAudioSource();
+    bool fetchAndSetVideoSourceOptions();
 
     void setVideoEncoderOptions(const VideoOptionsResp& response);
     void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
@@ -195,6 +204,9 @@ private:
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     void readPtzInfo();
+
+    void updateVideoSource(VideoSource* source) const;
+    bool sendVideoSourceToCamera(VideoSource* source) const;
 protected:
     QList<ResolutionPair> m_resolutionList; //Sorted desc
     QList<ResolutionPair> m_secondaryResolutionList;
@@ -238,6 +250,8 @@ private:
     QString m_imagingUrl;
     QString m_ptzUrl;
     int m_timeDrift;
+    
+    int m_channelNumer; // video/audio source number
 };
 
 #endif //onvif_resource_h

@@ -31,9 +31,7 @@ struct CameraInfoParams
     QString predefinedProfileId;
     QString netoptixProfileId;
     QString videoEncoderId;
-    QString videoSourceId;
     QString audioEncoderId;
-    QString audioSourceId;
 
     QString finalProfileId; //Ptr to predefined or netoptix (if creation was successful) profile
     bool profileAbsent; //Create netoptix profile or not
@@ -42,11 +40,6 @@ struct CameraInfoParams
 //
 // QnOnvifStreamReader
 //
-
-const char* QnOnvifStreamReader::NETOPTIX_PRIMARY_NAME = "Netoptix Primary";
-const char* QnOnvifStreamReader::NETOPTIX_SECONDARY_NAME = "Netoptix Secondary";
-const char* QnOnvifStreamReader::NETOPTIX_PRIMARY_TOKEN = "netoptixP";
-const char* QnOnvifStreamReader::NETOPTIX_SECONDARY_TOKEN = "netoptixS";
 
 QnOnvifStreamReader::QnOnvifStreamReader(QnResourcePtr res):
     CLServerPushStreamreader(res),
@@ -65,6 +58,20 @@ void QnOnvifStreamReader::openStream()
 {
     if (isStreamOpened())
         return;
+
+    NETOPTIX_PRIMARY_NAME = "Netoptix Primary";
+    NETOPTIX_SECONDARY_NAME = "Netoptix Secondary";
+    NETOPTIX_PRIMARY_TOKEN = "netoptixP";
+    NETOPTIX_SECONDARY_TOKEN = "netoptixS";
+
+    int channel = m_onvifRes->getChannel();
+    if (channel > 0) {
+        QByteArray postfix = QByteArray("-") + QByteArray::number(channel);
+        NETOPTIX_PRIMARY_NAME += postfix;
+        NETOPTIX_SECONDARY_NAME += postfix;
+        NETOPTIX_PRIMARY_TOKEN += postfix;
+        NETOPTIX_SECONDARY_TOKEN += postfix;
+    }
 
     /*
     if (!m_onvifRes->isSoapAuthorized()) {
@@ -117,9 +124,7 @@ const QString QnOnvifStreamReader::updateCameraAndFetchStreamUrl(bool isPrimary)
         return QString();
     }
 
-    fetchUpdateVideoSource(soapWrapper, info, isPrimary);
     fetchUpdateAudioEncoder(soapWrapper, info, isPrimary);
-    fetchUpdateAudioSource(soapWrapper, info, isPrimary);
 
     if (!fetchUpdateProfile(soapWrapper, info, isPrimary)) {
         return QString();
@@ -499,71 +504,6 @@ void QnOnvifStreamReader::updateProfile(Profile& profile, bool isPrimary) const
     profile.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
 }
 
-bool QnOnvifStreamReader::fetchUpdateVideoSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const
-{
-    VideoSrcConfigsReq request;
-    VideoSrcConfigsResp response;
-
-    int soapRes = soapWrapper.getVideoSourceConfigurations(request, response);
-    if (soapRes != SOAP_OK) {
-        qCritical() << "QnOnvifStreamReader::fetchUpdateVideoSource: can't get video sources from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-        return false;
-    }
-
-    VideoSource* result = fetchVideoSource(response, isPrimary);
-
-    if (result) {
-        //TODO:UTF unuse std::string
-        info.videoSourceId = QString::fromStdString(result->token);
-        updateVideoSource(*result, isPrimary);
-        return sendVideoSourceToCamera(*result);
-    }
-
-    return false;
-}
-
-VideoSource* QnOnvifStreamReader::fetchVideoSource(VideoSrcConfigsResp& response, bool /*isPrimary*/) const
-{
-    QString id = m_onvifRes->getVideoSourceId();
-    if (id.isEmpty()) {
-        return 0;
-    }
-
-    std::vector<onvifXsd__VideoSourceConfiguration*>::const_iterator it = response.Configurations.begin();
-    for (;it != response.Configurations.end(); ++it) 
-    {
-        //TODO:UTF unuse std::string
-        if (*it && id == QString::fromStdString((*it)->token)) {
-            return *it;
-        }
-    }
-
-    return 0;
-}
-
-void QnOnvifStreamReader::updateVideoSource(VideoSource& source, bool /*isPrimary*/) const
-{
-    //One name for primary and secondary
-    source.Name = NETOPTIX_PRIMARY_NAME;
-
-    if (!source.Bounds) {
-        qWarning() << "QnOnvifStreamReader::updateVideoSource: rectangle object is NULL. UniqueId: " << m_onvifRes->getUniqueId();
-        return;
-    }
-
-    CameraPhysicalWindowSize size = m_onvifRes->getPhysicalWindowSize();
-    if (!size.isValid()) {
-        return;
-    }
-
-    source.Bounds->x = size.x;
-    source.Bounds->y = size.y;
-    source.Bounds->height = size.height;
-    source.Bounds->width = size.width;
-}
-
 bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create) const
 {
     QAuthenticator auth(m_onvifRes->getAuth());
@@ -585,15 +525,17 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile& p
         }
     }
 
-    bool result  = !info.videoSourceId.isEmpty();
+    std::string videoSourceId = m_onvifRes->getVideoSourceId().toStdString();
+    std::string audioSourceId = m_onvifRes->getAudioSourceId().toStdString();
+    bool result  = true;
     //Adding video source
-    if (result && (profile.VideoSourceConfiguration == 0 || profile.VideoSourceConfiguration->token != info.videoSourceId.toStdString()))
+    if (profile.VideoSourceConfiguration == 0 || profile.VideoSourceConfiguration->token != videoSourceId)
     {
         AddVideoSrcConfigReq request;
         AddVideoSrcConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = info.videoSourceId.toStdString();
+        request.ConfigurationToken = videoSourceId;
 
         int soapRes = soapWrapper.addVideoSourceConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -658,13 +600,13 @@ bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile& p
 
 
     //Adding audio source
-    if (!info.audioSourceId.isEmpty() && (profile.AudioSourceConfiguration == 0 || profile.AudioSourceConfiguration->token != info.audioSourceId.toStdString()))
+    if (!audioSourceId.empty() && (profile.AudioSourceConfiguration == 0 || profile.AudioSourceConfiguration->token != audioSourceId))
     {
         AddAudioSrcConfigReq request;
         AddAudioSrcConfigResp response;
 
         request.ProfileToken = profile.token;
-        request.ConfigurationToken = info.audioSourceId.toStdString();
+        request.ConfigurationToken = audioSourceId;
 
         int soapRes = soapWrapper.addAudioSourceConfiguration(request, response);
         if (soapRes != SOAP_OK) {
@@ -724,27 +666,6 @@ bool QnOnvifStreamReader::sendVideoEncoderToCamera(VideoEncoder& encoder) const
             << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId()
             << "encoder token=" << request.Configuration->token.c_str()
             << "encoder name=" << request.Configuration->Name.c_str()
-            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-        return false;
-    }
-
-    return true;
-}
-
-bool QnOnvifStreamReader::sendVideoSourceToCamera(VideoSource& source) const
-{
-    QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
-
-    SetVideoSrcConfigReq request;
-    SetVideoSrcConfigResp response;
-    request.Configuration = &source;
-    request.ForcePersistence = false;
-
-    int soapRes = soapWrapper.setVideoSourceConfiguration(request, response);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "QnOnvifStreamReader::setVideoSourceConfiguration: can't set required values into ONVIF physical device (URL: " 
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() 
             << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
         return false;
     }
@@ -858,31 +779,6 @@ bool QnOnvifStreamReader::sendAudioEncoderToCamera(AudioEncoder& encoder) const
     return true;
 }
 
-bool QnOnvifStreamReader::fetchUpdateAudioSource(MediaSoapWrapper& soapWrapper, CameraInfoParams& info, bool isPrimary) const
-{
-    AudioSrcConfigsReq request;
-    AudioSrcConfigsResp response;
-
-    int soapRes = soapWrapper.getAudioSourceConfigurations(request, response);
-    if (soapRes != SOAP_OK) {
-        qCritical() << "QnOnvifStreamReader::fetchUpdateAudioSource: can't get audio sources from camera (" 
-            << (isPrimary? "primary": "secondary") 
-            << "). URL: " << soapWrapper.getEndpointUrl() << ", uniqueId: " << m_onvifRes->getUniqueId();
-        return false;
-    }
-
-    AudioSource* result = fetchAudioSource(response, isPrimary);
-
-    if (result) {
-        //TODO:UTF unuse std::string
-        info.audioSourceId = QString::fromStdString(result->token);
-        updateAudioSource(*result, isPrimary);
-        return sendAudioSourceToCamera(*result);
-    }
-
-    return false;
-}
-
 AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response, bool /*isPrimary*/) const
 {
     QString id = m_onvifRes->getAudioSourceId();
@@ -899,33 +795,6 @@ AudioSource* QnOnvifStreamReader::fetchAudioSource(AudioSrcConfigsResp& response
     }
 
     return 0;
-}
-
-void QnOnvifStreamReader::updateAudioSource(AudioSource& source, bool /*isPrimary*/) const
-{
-    //One name for 2 streams
-    source.Name = NETOPTIX_PRIMARY_NAME;
-}
-
-bool QnOnvifStreamReader::sendAudioSourceToCamera(AudioSource& source) const
-{
-    QAuthenticator auth(m_onvifRes->getAuth());
-    MediaSoapWrapper soapWrapper(m_onvifRes->getMediaUrl().toStdString().c_str(), auth.user().toStdString(), auth.password().toStdString(), m_onvifRes->getTimeDrift());
-
-    SetAudioSrcConfigReq request;
-    SetAudioSrcConfigResp response;
-    request.Configuration = &source;
-    request.ForcePersistence = false;
-
-    int soapRes = soapWrapper.setAudioSourceConfiguration(request, response);
-    if (soapRes != SOAP_OK) {
-        qWarning() << "QnOnvifStreamReader::sendAudioSourceToCamera: can't set required values into ONVIF physical device (URL: " 
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << m_onvifRes->getUniqueId() 
-            << "). Root cause: SOAP failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-        return false;
-    }
-
-    return true;
 }
 
 const QnResourceAudioLayout* QnOnvifStreamReader::getDPAudioLayout() const
