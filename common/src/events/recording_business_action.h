@@ -6,6 +6,7 @@
 
 class QnRecordingBusinessAction: public QnAbstractBusinessAction
 {
+    typedef QnAbstractBusinessAction base_type;
 public:
     QnRecordingBusinessAction();
 

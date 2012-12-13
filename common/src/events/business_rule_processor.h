@@ -66,6 +66,11 @@ private:
     static QnBusinessRuleProcessor* m_instance;
     bool triggerCameraOutput( const QnAbstractBusinessActionPtr& action );
     bool sendMail( const QnAbstractBusinessActionPtr& action );
+
+    /**
+     * @brief m_rulesInProgress         Stores actions that are toggled and state is On
+     */
+    QSet<QString> m_rulesInProgress;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

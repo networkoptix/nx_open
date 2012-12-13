@@ -10,10 +10,9 @@
 #include "abstract_business_event.h"
 
 
-class QnSendMailBusinessAction
-:
-    public QnAbstractBusinessAction
+class QnSendMailBusinessAction : public QnAbstractBusinessAction
 {
+    typedef QnAbstractBusinessAction base_type;
 public:
     QnSendMailBusinessAction( QnAbstractBusinessEventPtr eventPtr );
 

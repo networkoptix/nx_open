@@ -4,6 +4,7 @@
 #include "core/resource/resource.h"
 #include "core/resource/media_server_resource.h"
 #include "core/resource/security_cam_resource.h"
+#include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
 #include "sendmail_business_action.h"
 
@@ -108,19 +109,25 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
             bool condOK = bEvent->checkCondition(rule->getEventCondition());
             QnAbstractBusinessActionPtr action;
 
-            if (rule->isActionInProgress())
+            if (m_rulesInProgress.contains(rule->getUniqueId()))
             {
                 // Toggle event repeated with some interval with state 'on'.
                 if (!condOK)
-                    action = rule->getAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
+                    action = rule->instantiateAction(bEvent, ToggleState::Off); // if toggled action is used and condition is no longer valid - stop action
                 else if (bEvent->getToggleState() == ToggleState::Off)
-                    action = rule->getAction(bEvent); // Toggle event goes to 'off'. stop action
+                    action = rule->instantiateAction(bEvent); // Toggle event goes to 'off'. stop action
             }
             else if (condOK)
-                action = rule->getAction(bEvent);
+                action = rule->instantiateAction(bEvent);
 
             if (action)
                 result << action;
+
+            bool actionInProgress = action && action->getToggleState() == ToggleState::On;
+            if (actionInProgress)
+                m_rulesInProgress.insert(rule->getUniqueId());
+            else
+                m_rulesInProgress.remove(rule->getUniqueId());
         }
     }
     return result;
@@ -128,12 +135,12 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
 
 void QnBusinessRuleProcessor::at_actionDelivered(QnAbstractBusinessActionPtr action)
 {
-    // todo: implement me
+    //TODO: implement me
 }
 
 void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPtr  action)
 {
-    // todo: implement me
+    //TODO: implement me
 }
 
 bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActionPtr& action )
@@ -187,11 +194,11 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
     if( appServerConnection->sendEmail(
             emailIter.value().toString(),
             sendMailAction->getEvent()->getResource()
-                ? QString::fromLatin1("Event %1 received from resource %2 (%3)").
+                ? tr("%1 Event received from resource %2 (%3)").
                     arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).
                     arg(sendMailAction->getEvent()->getResource()->getName()).
                     arg(sendMailAction->getEvent()->getResource()->getUrl())
-                : QString::fromLatin1("Event %1 received from resource UNKNOWN").
+                : tr("%1 Event received from an unknown resource").
                     arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())),
             sendMailAction->toString(),
             emailSendErrorText ) )

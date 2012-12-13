@@ -5,7 +5,7 @@
 
 #include "api/serializer/serializer.h"
 #include "abstract_business_action.h"
-
+#include <core/resource/resource.h>
 
 namespace BusinessActionType
 {
@@ -14,30 +14,55 @@ namespace BusinessActionType
         switch( val )
         {
             case BA_NotDefined:
-                return QLatin1String("Not defined");
+                return QObject::tr("---");
             case BA_CameraOutput:
-                return QLatin1String("Camera output");
+                return QObject::tr("Camera output");
             case BA_Bookmark:
-                return QLatin1String("Bookmark");
+                return QObject::tr("Bookmark");
             case BA_CameraRecording:
-                return QLatin1String("Camera recording");
+                return QObject::tr("Camera recording");
             case BA_PanicRecording:
-                return QLatin1String("Panic recording");
+                return QObject::tr("Panic recording");
             case BA_SendMail:
-                return QLatin1String("Send mail");
+                return QObject::tr("Send mail");
             case BA_Alert:
-                return QLatin1String("Alert");
+                return QObject::tr("Alert");
             case BA_ShowPopup:
-                return QLatin1String("Show popup");
-            default:
-                return QString::fromLatin1("unknown (%1)").arg((int)val);
+                return QObject::tr("Show popup");
+            //warning should be raised on unknown enumeration values
         }
+
+        return QObject::tr("Unknown (%1)").arg((int)val);
+    }
+
+    bool hasToggleState(Value val) {
+        switch( val )
+        {
+            case BA_NotDefined:
+                return false;
+            case BA_CameraOutput:
+                return true;
+            case BA_Bookmark:
+                return false;
+            case BA_CameraRecording:
+                return true;
+            case BA_PanicRecording:
+                return true;
+            case BA_SendMail:
+                return false;
+            case BA_Alert:
+                return false;
+            case BA_ShowPopup:
+                return false;
+            //warning should be raised on unknown enumeration values
+        }
+
+        return false;
     }
 }
 
-
-QnAbstractBusinessAction::QnAbstractBusinessAction(): 
-    m_actionType(BusinessActionType::BA_NotDefined),
+QnAbstractBusinessAction::QnAbstractBusinessAction(BusinessActionType::Value actionType):
+    m_actionType(actionType),
     m_toggleState(ToggleState::NotDefined), 
     m_receivedFromRemoteHost(false)
 {
@@ -59,7 +84,7 @@ QByteArray QnAbstractBusinessAction::serialize()
     return QByteArray(str.data(), str.length());
 }
 
-QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByteArray& data)
+QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray(const QByteArray& data)
 {
     pb::BusinessAction pb_businessAction;
 
@@ -81,10 +106,9 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByte
         case pb::SendMail:
         case pb::Alert:
         case pb::ShowPopup:
-            businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction());
+            businessAction = QnAbstractBusinessActionPtr(new QnAbstractBusinessAction((BusinessActionType::Value)pb_businessAction.actiontype()));
     }
 
-    businessAction->setActionType((BusinessActionType::Value)pb_businessAction.actiontype());
     businessAction->setResource(qnResPool->getResourceById(pb_businessAction.actionresource()));
     businessAction->setParams(deserializeBusinessParams(pb_businessAction.actionparams().c_str()));
     businessAction->setBusinessRuleId(pb_businessAction.businessruleid());
@@ -92,15 +116,42 @@ QnAbstractBusinessActionPtr QnAbstractBusinessAction::fromByteArray2(const QByte
     return businessAction;
 }
 
-bool QnAbstractBusinessAction::isToggledAction() const
-{
-    switch(m_actionType)
-    {
-        case BusinessActionType::BA_CameraOutput:
-        case BusinessActionType::BA_CameraRecording:
-        case BusinessActionType::BA_PanicRecording:
-            return true;
-        default:
-            return false;
-    }
+void QnAbstractBusinessAction::setResource(QnResourcePtr resource) {
+    m_resource = resource;
+}
+
+const QnResourcePtr& QnAbstractBusinessAction::getResource() {
+    return m_resource;
+}
+
+void QnAbstractBusinessAction::setParams(const QnBusinessParams& params) {
+    m_params = params;
+}
+
+const QnBusinessParams& QnAbstractBusinessAction::getParams() const {
+    return m_params;
+}
+
+void QnAbstractBusinessAction::setBusinessRuleId(const QnId& value) {
+    m_businessRuleId = value;
+}
+
+QnId QnAbstractBusinessAction::getBusinessRuleId() const {
+    return m_businessRuleId;
+}
+
+void QnAbstractBusinessAction::setToggleState(ToggleState::Value value) {
+    m_toggleState = value;
+}
+
+ToggleState::Value QnAbstractBusinessAction::getToggleState() const {
+    return m_toggleState;
+}
+
+void QnAbstractBusinessAction::setReceivedFromRemoteHost(bool value) {
+    m_receivedFromRemoteHost = value;
+}
+
+bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
+    return m_receivedFromRemoteHost;
 }

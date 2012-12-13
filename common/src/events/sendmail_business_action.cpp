@@ -8,11 +8,10 @@
 #include "core/resource/resource.h"
 
 
-QnSendMailBusinessAction::QnSendMailBusinessAction( QnAbstractBusinessEventPtr eventPtr )
-:
+QnSendMailBusinessAction::QnSendMailBusinessAction( QnAbstractBusinessEventPtr eventPtr ) :
+    base_type(BusinessActionType::BA_SendMail),
     m_eventPtr( eventPtr )
 {
-    setActionType( BusinessActionType::BA_SendMail );
 }
 
 QString QnSendMailBusinessAction::toString() const

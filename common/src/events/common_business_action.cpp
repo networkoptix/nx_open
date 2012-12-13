@@ -5,7 +5,7 @@
 #include "common_business_action.h"
 
 
-CommonBusinessAction::CommonBusinessAction( BusinessActionType::Value actionType )
+CommonBusinessAction::CommonBusinessAction( BusinessActionType::Value actionType ):
+    base_type(actionType)
 {
-    setActionType( actionType );
 }

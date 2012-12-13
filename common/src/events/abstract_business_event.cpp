@@ -9,25 +9,25 @@ namespace BusinessEventType
 {
     QString toString( Value val )  {
         if (val > BE_UserDefined)
-            return QString(QLatin1String("UserDefined (%1)")).arg((int)val);
+            return QObject::tr("User Defined (%1)").arg((int)val);
 
         switch( val )
         {
             case BE_NotDefined:
-                return QLatin1String("NotDefined");
+                return QLatin1String("---");
             case BE_Camera_Motion:
-                return QLatin1String("Camera_Motion");
+                return QObject::tr("Motion on Camera");
             case BE_Camera_Input:
-                return QLatin1String("Camera_Input");
+                return QObject::tr("Input Signal on Camera");
             case BE_Camera_Disconnect:
-                return QLatin1String("Camera_Disconnect");
+                return QObject::tr("Camera Disconnected");
             case BE_Storage_Failure:
-                return QLatin1String("Storage_Failure");
+                return QObject::tr("Storage Failure");
             case BE_UserDefined:
-                return QLatin1String("UserDefined");
+                return QObject::tr("User Defined");
+            //warning should be raised on unknown enumeration values
         }
-        //warning should be raised on unknown events;
-        return QLatin1String("UnknownEvent");
+        return QObject::tr("Unknown Event");
     }
 
     bool isResourceRequired(Value val) {
@@ -48,8 +48,8 @@ namespace BusinessEventType
                 return true;
             case BE_UserDefined:
                 return false;
+            //warning should be raised on unknown enumeration values
         }
-        //warning should be raised on unknown events;
         return false;
     }
 
@@ -101,7 +101,7 @@ bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) con
     QVariant toggleState = getParameter(params, BusinessEventParameters::toggleState);
     if (!toggleState.isValid())
         return true;
-    ToggleState::Value requiredToggleState = ToggleState::fromString(toggleState.toString().toLatin1().data());
+    ToggleState::Value requiredToggleState = (ToggleState::Value)toggleState.toInt();
     return requiredToggleState == ToggleState::Any || requiredToggleState == m_toggleState;
 }
 

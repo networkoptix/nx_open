@@ -13,11 +13,14 @@ namespace ToggleState
         On = 1,
         //!Used in event rule to associate non-toggle action with event with any toggle state
         Any,
-        NotDefined
+        NotDefined,
+
+        /** Used to implement for-loops over the enumeration */
+        Count
     };
 
-    const char* toString( Value val );
-    Value fromString( const char* str );
+    QString toString(Value val);
+
 }
 typedef QMap<QString, QVariant> QnBusinessParams; // param name and param value
 

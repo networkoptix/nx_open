@@ -8,10 +8,9 @@
 #include "abstract_business_action.h"
 
 
-class CommonBusinessAction
-:
-    public QnAbstractBusinessAction
+class CommonBusinessAction: public QnAbstractBusinessAction
 {
+    typedef QnAbstractBusinessAction base_type;
 public:
     CommonBusinessAction( BusinessActionType::Value actionType );
 };
