@@ -1010,24 +1010,22 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     std::string password = soapWrapper.getPassword()? soapWrapper.getPassword() : "";
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
 
-    QList<VideoOptionsLocal> optionsList;
-    QList<MediaSoapWrapperPtr> soapWrappersList;
-
-    std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
-    for (;encIt != confResponse.Configurations.end(); ++encIt)
+    int confRangeStart = 0;
+    int confRangeEnd = confResponse.Configurations.size();
+    if (m_maxChannels > 1)
     {
-        if (!*encIt) 
+        // determine amount encoder configurations per each video source
+        confRangeStart = confRangeEnd/m_maxChannels * m_channelNumer;
+        confRangeEnd = confRangeStart + confRangeEnd/m_maxChannels;
+    }
+
+    QList<VideoOptionsLocal> optionsList;
+    std::vector<onvifXsd__VideoEncoderConfiguration*>::const_iterator encIt = confResponse.Configurations.begin();
+    for (int confNum = confRangeStart; confNum < confRangeEnd; ++confNum)
+    {
+        onvifXsd__VideoEncoderConfiguration* configuration = confResponse.Configurations[confNum];
+        if (!configuration)
             continue;
-
-        onvifXsd__VideoEncoderConfiguration* configuration = *encIt;
-
-        //MediaSoapWrapperPtr soapWrapperPtr(new MediaSoapWrapper(endpoint, login, password, m_timeDrift));
-        //soapWrappersList.append(soapWrapperPtr);
-
-        //qWarning() << "camera" << soapWrapperPtr->getEndpointUrl() << "get params from configuration" << configuration->Name.c_str();
-
-        //optionsList.append(VideoOptionsLocal());
-        //VideoOptionsLocal& currVideoOpts = optionsList.back();
 
         int retryCount = getMaxOnvifRequestTries();
         soapRes = SOAP_ERR;
@@ -1058,9 +1056,9 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                 qWarning() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: video encoder '" << optRequest.ConfigurationToken->c_str()
                     << "' contains no data for H264/JPEG (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId() << ")." << "Ignoring and use default codec list";
         }
+        if (soapRes != SOAP_OK)
+            return false;
     }
-    if (soapRes != SOAP_OK)
-        return false;
 
     qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
 
@@ -1072,35 +1070,37 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
+    /*
     if (optionsList.size() <= m_channelNumer)
     {
         qCritical() << QString(QLatin1String("Not enough encoders for multichannel camera. required at least %1 encoder. URL: %2")).arg(m_channelNumer+1).arg(getUrl());
         return false;
     }
+    */
 
-    if (optionsList[m_channelNumer].isH264) {
-        m_primaryH264Profile = getH264StreamProfile(optionsList[m_channelNumer]);
+    if (optionsList[0].isH264) {
+        m_primaryH264Profile = getH264StreamProfile(optionsList[0]);
         setCodec(H264, true);
     }
     else {
         setCodec(JPEG, true);
     }
 
-    setVideoEncoderOptions(optionsList[m_channelNumer]);
+    setVideoEncoderOptions(optionsList[0]);
     if (m_maxChannels == 1)
-        checkMaxFps(confResponse, optionsList[m_channelNumer].id);
+        checkMaxFps(confResponse, optionsList[0].id);
 
     m_mutex.lock();
-    m_primaryVideoEncoderId = optionsList[m_channelNumer].id;
+    m_primaryVideoEncoderId = optionsList[0].id;
     m_secondaryResolutionList = m_resolutionList;
     m_mutex.unlock();
 
     qDebug() << "ONVIF debug: got" << optionsList.size() << "encoders for camera " << getHostAddress();
 
-    bool dualStreamingAllowed = optionsList.size() >= m_maxChannels*2;
+    bool dualStreamingAllowed = optionsList.size() >= 2;
     if (dualStreamingAllowed)
     {
-        int secondaryIndex = m_maxChannels*2 - m_channelNumer - 1;
+        int secondaryIndex = 1;
         QMutexLocker lock(&m_mutex);
 
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
