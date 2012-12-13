@@ -758,7 +758,7 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen)
                (sockaddr *) m_destAddr, sizeof(sockaddr_in)) == bufferLen;
 #else
     return doInterruptableSystemCallWithTimeout<>(
-        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const    sockaddr *) m_destAddr, sizeof(sockaddr_in)),
+        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const    sockaddr *) m_destAddr, (socklen_t)sizeof(sockaddr_in)),
         m_writeTimeoutMS ) == bufferLen;
 #endif
 }
