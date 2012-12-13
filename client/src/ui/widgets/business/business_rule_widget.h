@@ -18,36 +18,73 @@ class QnBusinessRuleWidget : public QWidget
     Q_OBJECT
     
 public:
-    explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0);
+    explicit QnBusinessRuleWidget(QWidget *parent = 0);
     ~QnBusinessRuleWidget();
 /*
     bool getExpanded();
     void setExpanded(bool expanded = true);
 */
 
+    void setRule(QnBusinessEventRulePtr rule);
+    QnBusinessEventRulePtr getRule() const;
+
 public slots:
     void at_expandButton_clicked();
     void at_deleteButton_clicked();
     void at_eventTypeComboBox_currentIndexChanged(int index);
+    void at_eventStatesComboBox_currentIndexChanged(int index);
+    void at_actionTypeComboBox_currentIndexChanged(int index);
 
+signals:
+    /**
+     * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
+     * @param rule                  Rule to delete. Should be replaced by ID if it is convinient.
+     */
+    void deleteConfirmed(QnBusinessEventRulePtr rule);
+
+    void expand();
 protected:
+    /**
+     * @brief initAnimations        Create all required animations and state machines.
+     */
     void initAnimations();
 
+    /**
+     * @brief initEventTypes        Fill combobox with all possible event types.
+     */
     void initEventTypes();
+
+    /**
+     * @brief initEventStates       Fill combobox with event states allowed to current event type.
+     * @param eventType             Selected event type.
+     */
     void initEventStates(BusinessEventType::Value eventType);
+
+    /**
+     * @brief initEventParameters   Display widget with current event paramenters.
+     * @param eventType             Selected event type.
+     */
     void initEventParameters(BusinessEventType::Value eventType);
 
-    void initActionTypes();
+    /**
+     * @brief initActionTypes       Fill combobox with actions allowed with current event state.
+     * @param eventState            Selected event state.
+     */
+    void initActionTypes(ToggleState::Value eventState);
+
+    void initActionParameters(BusinessActionType::Value actionType);
 
 private slots:
     void updateDisplay();
-    void updateSelection();
 
+    void resetFromRule();
+
+private:
+    BusinessEventType::Value getCurrentEventType() const;
 private:
     Ui::QnBusinessRuleWidget *ui;
 
     QStateMachine *machine;
-    bool m_expanded;
 
     QnBusinessEventRulePtr m_rule;
 
@@ -55,6 +92,7 @@ private:
 
     QStandardItemModel *m_eventsTypesModel;
     QStandardItemModel *m_eventStatesModel;
+    QStandardItemModel *m_actionTypesModel;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

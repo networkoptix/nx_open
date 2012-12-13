@@ -29,7 +29,6 @@ public:
 
     const QString& inputPortID() const;
 
-
     virtual bool checkCondition(const QnBusinessParams &params) const override;
 
 private:

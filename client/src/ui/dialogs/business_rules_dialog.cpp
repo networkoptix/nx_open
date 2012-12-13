@@ -14,17 +14,17 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
 {
     ui->setupUi(this);
 
-
     QnBusinessEventRules rules;
     QByteArray errString;
     connection->getBusinessRules(rules, errString); //sync :(
     foreach (QnBusinessEventRulePtr rule, rules) {
-        QnBusinessRuleWidget *w = new QnBusinessRuleWidget(rule, this);
+        QnBusinessRuleWidget *w = new QnBusinessRuleWidget(this);
+        w->setRule(rule);
         ui->verticalLayout->addWidget(w);
     }
 
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(ui->newRuleButton, SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
+    connect(ui->newRuleButton, SIGNAL(clicked()), ui->newRuleWidget, SIGNAL(expand()));
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -40,7 +40,8 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {
-    Q_UNUSED(handle);
+    Q_UNUSED(handle)
+    Q_UNUSED(resources)
 
     qDebug() << "saving rule...";
     if(status == 0)

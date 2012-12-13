@@ -20,7 +20,7 @@ public:
 
     virtual QString getUniqueId() const override;
 
-    QnAbstractBusinessActionPtr getAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined);
+    QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
     QnBusinessParams getEventCondition() const { return m_eventCondition; }
     /*!
         \param name This should be a constant from \a BusinessEventParameters namespace
@@ -42,10 +42,7 @@ public:
     QnBusinessParams getBusinessParams() const;
     void setBusinessParams(const QnBusinessParams& params);
 
-    /*
-    * Return true if last returned action is toggledAction and action has On
-    */
-    bool isActionInProgress() const;
+    ToggleState::Value getEventToggleState() const;
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
@@ -56,8 +53,6 @@ private:
     BusinessActionType::Value m_actionType;
     QnResourcePtr m_destination;
     QnBusinessParams m_actionParams;
-
-    bool m_actionInProgress;
 };
 
 typedef QnSharedResourcePointer<QnBusinessEventRule> QnBusinessEventRulePtr;
