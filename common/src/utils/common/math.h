@@ -3,9 +3,13 @@
 
 #include <cmath>
 #include <cfloat>
+#include <cassert>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/qnumeric.h>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
 
 #include "fuzzy.h"
 
@@ -31,6 +35,19 @@
 #endif
 
 
+inline bool qIsNaN(const QVector2D &vector) {
+    return qIsNaN(vector.x()) || qIsNaN(vector.y());
+}
+
+inline bool qIsNaN(const QVector3D &vector) {
+    return qIsNaN(vector.x()) || qIsNaN(vector.y()) || qIsNaN(vector.z());
+}
+
+inline bool qIsNaN(const QVector4D &vector) {
+    return qIsNaN(vector.x()) || qIsNaN(vector.y()) || qIsNaN(vector.z()) || qIsNaN(vector.w());
+}
+
+
 /**
  * \param value                         Value to check.
  * \param min                           Interval's left border.
@@ -50,8 +67,7 @@ bool qBetween(const T &value, const T &min, const T &max) {
  * \param x                             Value to convert, in host byte order.
  * \returns                             Converted value, in network byte order.
  */
-inline static quint64 htonll(quint64 x)
-{
+inline quint64 htonll(quint64 x) {
     return
         ((((x) & 0xff00000000000000ULL) >> 56) | 
         (((x) & 0x00ff000000000000ULL) >> 40) | 
@@ -69,13 +85,18 @@ inline static quint64 htonll(quint64 x)
  * \param x                             Value to convert, in network byte order.
  * \returns                             Converted value, in host byte order.
  */
-inline static quint64 ntohll(quint64 x) { return htonll(x); }
+inline quint64 ntohll(quint64 x) { return htonll(x); }
 
 #else
-inline static quint64 htonll(quint64 x) { return x;}
-inline static quint64 ntohll(quint64 x)  { return x;}
+inline quint64 htonll(quint64 x) { return x;}
+inline quint64 ntohll(quint64 x)  { return x;}
 #endif
 
+
+/**
+ * \param value
+ * \returns                             Whether the given value is a power of 2.
+ */
 template<class T>
 inline bool qIsPower2(T value) {
     return (value & (value - 1)) == 0;
@@ -87,10 +108,12 @@ inline bool qIsPower2(T value) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Ceil(unsigned int value, int step) {
+    DEBUG_CODE(assert(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
 inline quint64 qPower2Ceil(quint64 value, int step) {
+    DEBUG_CODE(assert(qIsPower2(step)));
     return ((value - 1) & ~(step - 1)) + step;
 }
 
@@ -100,6 +123,7 @@ inline quint64 qPower2Ceil(quint64 value, int step) {
  * \returns                             Rounded value.
  */
 inline unsigned int qPower2Floor(unsigned int value, int step) {
+    DEBUG_CODE(assert(qIsPower2(step)));
     return value & ~(step - 1);
 }
 
@@ -136,21 +160,32 @@ inline double qMod(double l, double r) {
  */
 template<class T>
 T qCeil(T value, T step) {
+    DEBUG_CODE(assert(step > 0));
     value = value + step - 1;
     return value - qMod(value, step);
 }
 
+/**
+ * \param value                         Value to round down.
+ * \param step                          Rounding step, must be positive.
+ * \returns                             Rounded value.
+ */
 template<class T>
 T qFloor(T value, T step) {
+    DEBUG_CODE(assert(step > 0));
     return qCeil(value - step + 1, step);
 }
 
+/**
+ * \param value                         Value to round.
+ * \param step                          Rounding step, must be positive.
+ * \returns                             Rounded value.
+ */
 template<class T>
 T qRound(T value, T step) {
+    DEBUG_CODE(assert(step > 0));
     return qCeil(value - step / 2, step);
 }
-
-
 
 /**
  * \returns                             Index of the leading 1 bit, counting the least significant bit at index 0.  

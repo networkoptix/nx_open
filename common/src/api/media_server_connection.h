@@ -138,7 +138,7 @@ namespace detail {
         /*!
             \note calls \a deleteLater after handling response
         */
-        void at_replyReceived(const QnHTTPRawResponse& response, int /*handle*/);
+        void at_replyReceived(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, const QList<QPair<QString, bool> > &operationResult);
@@ -154,7 +154,7 @@ namespace detail {
         QnMediaServerPtzGetPosReplyProcessor(QObject *parent = NULL): QObject(parent) {}
 
     public slots:
-        void at_replyReceived(int status, const QByteArray &reply, const QByteArray &errorString, int handle);
+        void at_replyReceived(const QnHTTPRawResponse &response, int handle);
 
     signals:
         void finished(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);

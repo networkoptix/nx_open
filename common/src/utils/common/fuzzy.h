@@ -1,9 +1,9 @@
 #ifndef QN_FUZZY_H
 #define QN_FUZZY_H 
 
-#include <QPointF>
-#include <QSizeF>
-#include <QRectF>
+#include <QtCore/QPointF>
+#include <QtCore/QSizeF>
+#include <QtCore/QRectF>
 
 inline bool qFuzzyIsNull(const QPointF &p) {
     return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
@@ -33,7 +33,7 @@ inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
  * \param value                         Value to check.
  * \param min                           Interval's left border.
  * \param max                           Interval's right border.
- * \returns                             Whether the given value lies in [min, max] interval, 
+ * \returns                             Whether the given value lies in [min, max] interval.
  */
 inline bool qFuzzyBetween(double value, double min, double max, double precision = 0.000000000001) {
     double localPrecision = precision * qMax(qAbs(min), qAbs(max));
