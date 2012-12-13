@@ -34,7 +34,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 
     connect(ui->expandButton, SIGNAL(clicked()), this, SIGNAL(expand()));
     connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
+
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
+    connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
 
     //TODO: init and reset from rule, then connect 'OnChanged', yep?
     initAnimations();
@@ -62,10 +64,8 @@ void QnBusinessRuleWidget::initAnimations() {
     machine = new QStateMachine(this);
     QState *state1 = new QState(machine);
     state1->assignProperty(ui->editFrame, "maximumHeight", 1000); //TODO: magic const?
-    state1->assignProperty(ui->editFrame, "visible", true);
 
     QState *state2 = new QState(machine);
-    //state2->assignProperty(ui->editFrame, "visible", false);
     state2->assignProperty(ui->editFrame, "maximumHeight", 0);
 
     machine->setInitialState(state2);
@@ -76,6 +76,7 @@ void QnBusinessRuleWidget::initAnimations() {
     QSignalTransition *transition2 = state2->addTransition(this, SIGNAL(expand()), state1);
     transition2->addAnimation(new QPropertyAnimation(ui->editFrame, "maximumHeight"));
 
+    connect(machine, SIGNAL(stopped()), this, SLOT(updateSummary()));
     machine->start();
 }
 
@@ -166,14 +167,14 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
         row << item;
         m_actionTypesModel->appendRow(row);
     }
-    ui->editFrame->layout()->update();
+
 
     //TODO: do not lose data in the details widget
     //TODO: store data in persistent storage between changes?
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
-    ui->actionTypeLayout->update();
+
 }
 
 BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
@@ -183,11 +184,44 @@ BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
     return (BusinessEventType::Value)typeIdx;
 }
 
+BusinessActionType::Value QnBusinessRuleWidget::getCurrentActionType() const {
+    //TODO: security checks?
+    int index = ui->actionTypeComboBox->currentIndex();
+    int typeIdx = m_actionTypesModel->item(index)->data().toInt();
+    return (BusinessActionType::Value)typeIdx;
+}
+
 // Handlers
 
 void QnBusinessRuleWidget::updateDisplay() {
     ui->summaryFrame->setVisible(m_rule);
     ui->deleteButton->setVisible(m_rule);
+    if (m_rule)
+        updateSummary();
+}
+
+void QnBusinessRuleWidget::updateSummary() {
+    if (!m_rule)
+        return;
+
+    QLatin1String formatString("<html><head/><body><p>%1"\
+            "<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>"\
+            "<span style=\" font-style:italic;\">DW1031ax</span><span style=\" font-weight:600;\">: %2</span>"\
+            "[description?]"\
+            "</p></body></html>");
+
+    QString summary = QString(formatString)
+            .arg(BusinessEventType::toString(m_rule->getEventType()))
+            .arg(BusinessActionType::toString(m_rule->getActionType()));
+    ui->summaryLabel->setText(summary);
+    /*
+
+           %1 On motion at
+           %2 start recording at
+           %3 <span style=" text-decoration: underline;">Low Quality</span>, <span style=" text-decoration: underline;">25FPS</span>, <span style=" text-decoration: underline;">10 sec pre</span>, <span style=" text-decoration: underline;">10 sec post</span>
+    */
+
+
 }
 
 void QnBusinessRuleWidget::resetFromRule() {
@@ -216,6 +250,15 @@ void QnBusinessRuleWidget::at_deleteButton_clicked() {
     //TODO: confirmation dialog, delete at the server
     //TODO: possible return just ID
     emit deleteConfirmed(m_rule);
+}
+
+void QnBusinessRuleWidget::at_applyButton_clicked() {
+    QnBusinessEventRulePtr rule = m_rule ? m_rule : QnBusinessEventRulePtr(new QnBusinessEventRule);
+    rule->setEventType(getCurrentEventType());
+    rule->setActionType(getCurrentActionType());
+    //TODO: fill rule
+    emit apply(rule);
+    updateSummary();
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {

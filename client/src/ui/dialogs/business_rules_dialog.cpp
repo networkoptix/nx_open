@@ -5,7 +5,6 @@
 #include <api/app_server_connection.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
-#include <events/business_event_rule.h>
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection, QWidget *parent):
     QDialog(parent, Qt::MSWindowsFixedSizeDialogHint),
@@ -18,13 +17,14 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     QByteArray errString;
     connection->getBusinessRules(rules, errString); //sync :(
     foreach (QnBusinessEventRulePtr rule, rules) {
-        QnBusinessRuleWidget *w = new QnBusinessRuleWidget(this);
-        w->setRule(rule);
-        ui->verticalLayout->addWidget(w);
+        addRuleToList(rule);
     }
 
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
     connect(ui->newRuleButton, SIGNAL(clicked()), ui->newRuleWidget, SIGNAL(expand()));
+    connect(ui->newRuleWidget, SIGNAL(apply(QnBusinessEventRulePtr)), this, SLOT(saveRule(QnBusinessEventRulePtr)));
+    connect(ui->newRuleWidget, SIGNAL(apply(QnBusinessEventRulePtr)), this, SLOT(addRuleToList(QnBusinessEventRulePtr)));
+
 }
 
 QnBusinessRulesDialog::~QnBusinessRulesDialog()
@@ -48,5 +48,16 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
         qDebug() << errorString;
     else
         qDebug() << "success";
+}
+
+void QnBusinessRulesDialog::addRuleToList(QnBusinessEventRulePtr rule) {
+    QnBusinessRuleWidget *w = new QnBusinessRuleWidget(this);
+    w->setRule(rule);
+    connect(w, SIGNAL(apply(QnBusinessEventRulePtr)), this, SLOT(saveRule(QnBusinessEventRulePtr)));
+    ui->verticalLayout->insertWidget(0, w);
+}
+
+void QnBusinessRulesDialog::saveRule(QnBusinessEventRulePtr rule) {
+    m_connection->saveAsync(rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
 }
 
