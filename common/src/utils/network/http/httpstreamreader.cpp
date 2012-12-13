@@ -243,7 +243,7 @@ namespace nx_http
         size_t currentOffset = offset;
         for( ; currentOffset < maxOffset; )
         {
-            const BufferType::value_type currentChar = data[currentOffset];
+            const BufferType::value_type currentChar = data[(unsigned int)currentOffset];
             switch( m_chunkStreamParseState )
             {
                 case waitingChunkStart:
