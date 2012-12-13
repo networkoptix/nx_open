@@ -2,7 +2,9 @@
 #define BUSINESS_RULE_WIDGET_H
 
 #include <QWidget>
+
 #include <events/business_event_rule.h>
+#include <events/business_logic_common.h>
 
 namespace Ui {
     class QnBusinessRuleWidget;
@@ -18,20 +20,28 @@ class QnBusinessRuleWidget : public QWidget
 public:
     explicit QnBusinessRuleWidget(QnBusinessEventRulePtr rule, QWidget *parent = 0);
     ~QnBusinessRuleWidget();
-
+/*
     bool getExpanded();
     void setExpanded(bool expanded = true);
+*/
 
-    void initAnimations();
-    void initEventTypes();
-    void initActionTypes();
 public slots:
     void at_expandButton_clicked();
     void at_deleteButton_clicked();
     void at_eventTypeComboBox_currentIndexChanged(int index);
 
+protected:
+    void initAnimations();
+
+    void initEventTypes();
+    void initEventStates(BusinessEventType::Value eventType);
+    void initEventParameters(BusinessEventType::Value eventType);
+
+    void initActionTypes();
+
 private slots:
     void updateDisplay();
+    void updateSelection();
 
 private:
     Ui::QnBusinessRuleWidget *ui;
@@ -41,7 +51,10 @@ private:
 
     QnBusinessEventRulePtr m_rule;
 
-    QStandardItemModel *m_eventsModel;
+    QWidget *m_eventParameters;
+
+    QStandardItemModel *m_eventsTypesModel;
+    QStandardItemModel *m_eventStatesModel;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

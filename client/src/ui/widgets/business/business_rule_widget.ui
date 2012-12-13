@@ -95,7 +95,7 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="QGroupBox" name="conditionGroupBox">
+       <widget class="QGroupBox" name="eventGroupBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -105,24 +105,18 @@
         <property name="title">
          <string>Condition</string>
         </property>
-        <layout class="QVBoxLayout" name="conditionLayout">
+        <layout class="QVBoxLayout" name="eventLayout">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
+          <layout class="QHBoxLayout" name="eventDefinitionLayout">
            <item>
             <widget class="QLabel" name="eventDoLabel">
              <property name="text">
-              <string>On</string>
+              <string>When</string>
              </property>
             </widget>
            </item>
            <item>
             <widget class="QComboBox" name="eventTypeComboBox">
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>0</height>
-              </size>
-             </property>
              <item>
               <property name="text">
                <string>Motion</string>
@@ -149,12 +143,6 @@
            </item>
            <item>
             <widget class="QComboBox" name="eventResourceComboBox">
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>0</height>
-              </size>
-             </property>
              <item>
               <property name="text">
                <string>DW1031ax</string>
@@ -162,6 +150,33 @@
               <property name="icon">
                <iconset resource="../../../../x86/build/client-custom.qrc">
                 <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="eventStatesComboBox">
+             <property name="currentIndex">
+              <number>3</number>
+             </property>
+             <item>
+              <property name="text">
+               <string>lasts</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>starts</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>ends</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>starts/ends</string>
               </property>
              </item>
             </widget>
@@ -224,12 +239,6 @@
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>135</width>
-               <height>0</height>
-              </size>
-             </property>
              <item>
               <property name="text">
                <string>Start recording</string>
@@ -248,7 +257,7 @@
             <widget class="QComboBox" name="actionResourceComboBox">
              <property name="minimumSize">
               <size>
-               <width>135</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>

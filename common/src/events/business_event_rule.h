@@ -4,6 +4,7 @@
 #include "abstract_business_event.h"
 #include "abstract_business_action.h"
 #include "business_logic_common.h"
+
 #include "core/resource/resource.h"
 
 /*
@@ -12,6 +13,8 @@
 
 class QnBusinessEventRule: public QnResource
 {
+    Q_OBJECT
+
 public:
     QnBusinessEventRule();
 
@@ -24,17 +27,17 @@ public:
     */
     void addEventCondition( const QString& name, const QVariant& value ) { m_eventCondition[name] = value; }
 
-    QnResourcePtr getSrcResource() const { return m_source; }
-    void setSrcResource(QnResourcePtr value) { m_source = value; }
+    QnResourcePtr getSrcResource() const;
+    void setSrcResource(QnResourcePtr value);
 
-    BusinessEventType::Value getEventType() const { return m_eventType; }
-    void setEventType(BusinessEventType::Value value) { m_eventType = value; }
+    BusinessEventType::Value getEventType() const;
+    void setEventType(BusinessEventType::Value value);
 
-    BusinessActionType::Value getActionType() const { return m_actionType; }
-    void setActionType(BusinessActionType::Value value) { m_actionType = value; }
+    BusinessActionType::Value getActionType() const;
+    void setActionType(BusinessActionType::Value value);
 
-    QnResourcePtr getDstResource() const { return m_destination; }
-    void setDstResource(QnResourcePtr value) { m_destination = value; }
+    QnResourcePtr getDstResource() const;
+    void setDstResource(QnResourcePtr value);
 
     QnBusinessParams getBusinessParams() const;
     void setBusinessParams(const QnBusinessParams& params);

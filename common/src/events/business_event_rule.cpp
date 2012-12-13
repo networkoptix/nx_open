@@ -1,8 +1,10 @@
-
 #include "business_event_rule.h"
+
 #include "recording_business_action.h"
 #include "sendmail_business_action.h"
 #include "common_business_action.h"
+
+#include <core/resource/resource.h>
 
 
 QnBusinessEventRule::QnBusinessEventRule()
@@ -57,6 +59,38 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::getAction(QnAbstractBusinessEve
     result->setBusinessRuleId(getId());
 
     return result;
+}
+
+QnResourcePtr QnBusinessEventRule::getSrcResource() const {
+    return m_source;
+}
+
+void QnBusinessEventRule::setSrcResource(QnResourcePtr value) {
+    m_source = value;
+}
+
+BusinessEventType::Value QnBusinessEventRule::getEventType() const {
+    return m_eventType;
+}
+
+void QnBusinessEventRule::setEventType(BusinessEventType::Value value) {
+    m_eventType = value;
+}
+
+BusinessActionType::Value QnBusinessEventRule::getActionType() const {
+    return m_actionType;
+}
+
+void QnBusinessEventRule::setActionType(BusinessActionType::Value value) {
+    m_actionType = value;
+}
+
+QnResourcePtr QnBusinessEventRule::getDstResource() const {
+    return m_destination;
+}
+
+void QnBusinessEventRule::setDstResource(QnResourcePtr value) {
+    m_destination = value;
 }
 
 QnBusinessParams QnBusinessEventRule::getBusinessParams() const
