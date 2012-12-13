@@ -264,8 +264,8 @@
 <context>
     <name>QnTranscoder</name>
     <message>
-        <location filename="../src/transcoding/transcoder.cpp" line="156"/>
-        <location filename="../src/transcoding/transcoder.cpp" line="185"/>
+        <location filename="../src/transcoding/transcoder.cpp" line="159"/>
+        <location filename="../src/transcoding/transcoder.cpp" line="188"/>
         <source>OpenCLTranscode is not implemented</source>
         <translation type="unfinished">OpenCLTranscode未应用</translation>
     </message>
