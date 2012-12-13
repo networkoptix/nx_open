@@ -37,6 +37,9 @@ public:
     bool isCameraRecoring(QnResourcePtr camera);
 
     Recorders findRecorders(QnResourcePtr res) const;
+
+    bool startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration);
+    bool stopForcedRecording(QnSecurityCamResourcePtr camRes);
 private slots:
     void onNewResource(QnResourcePtr res);
     void onRemoveResource(QnResourcePtr res);
@@ -67,5 +70,7 @@ public:
     static QnServerDataProviderFactory* instance();
     QnAbstractStreamDataProvider* createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role);
 };
+
+#define qnRecordingManager QnRecordingManager::instance()
 
 #endif // __RECORDING_MANAGER_H__

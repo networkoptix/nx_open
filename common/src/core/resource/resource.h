@@ -59,10 +59,12 @@ public:
         url = 0x02,             /**< Has url, e.g. file name. */
         streamprovider = 0x04,
         media = 0x08,
+
         playback = 0x10,        /**< Something playable (not real time and not a single shot). */
         video = 0x20,
         audio = 0x40,
         live = 0x80,
+
         still_image = 0x100,    /**< Still image device. */
 
         local = 0x200,          /**< Local client resource. */
@@ -74,8 +76,11 @@ public:
 
         utc = 0x4000,           /**< Resource uses UTC-based timing. */
         periods = 0x8000,       /**< Resource has recorded periods. */
+
         motion = 0x10000,       /**< Resource has motion */
         sync = 0x20000,         /**< Resource can be used in sync playback mode. */
+
+        foreigner = 0x40000,      /**< Resource belongs to other entity. E.g., camera on another server */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -152,6 +157,7 @@ public:
 
 
     QnResourcePtr toSharedPointer() const;
+    QnResourcePtr getParentResource() const;
 
     // ==================================================
 

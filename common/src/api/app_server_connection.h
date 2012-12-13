@@ -4,6 +4,8 @@
 #include <QtCore/QMutex>
 #include <QtCore/QUrl>
 
+#include <QtNetwork/QNetworkReply>
+
 #include "utils/common/request_param.h"
 
 #include "core/resource/resource_type.h"
@@ -42,7 +44,7 @@ namespace conn_detail
         }
 
     public slots:
-        void finished(int status, const QByteArray &result, const QByteArray &errorString, int handle);
+        void finished(const QnHTTPRawResponse& response, int handle);
 
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
@@ -87,11 +89,12 @@ public:
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
 
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& errorString);
+    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey, QByteArray& errorString);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
 
     int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
+    int addBusinessRule(const QnBusinessEventRulePtr& businessRule, QByteArray& errorString);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
     int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);
@@ -99,6 +102,7 @@ public:
     int getUsers(QnUserResourceList& users, QByteArray& errorString);
     int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
     int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
+    int getBusinessRules(QnBusinessEventRules& businessRules, QByteArray& errorString);
 
     int saveSync(const QnMediaServerResourcePtr&, QByteArray& errorString);
     int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
@@ -108,6 +112,7 @@ public:
     int saveAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int saveAsync(const QnUserResourcePtr&, QObject*, const char*);
     int saveAsync(const QnLayoutResourcePtr&, QObject*, const char*);
+    int saveAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
 
     int saveAsync(const QnLayoutResourceList&, QObject*, const char*);
     int saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot);
@@ -131,15 +136,15 @@ public:
     static int getMediaProxyPort();
 
 private:
-    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid);
+    QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 
-    int connectAsync_i(const QnRequestParamList& params, QObject* target, const char *slot);
+    int connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot);
 
     int getObjectsAsync(const QString& objectName, const QString& args, QObject* target, const char* slot);
-    int getObjects(const QString& objectName, const QString& args, QByteArray& data, QByteArray& errorString);
+    int getObjects(const QString& objectName, const QString& args, QnHTTPRawResponse& response);
 
     int addObjectAsync(const QString& objectName, const QByteArray& data, QObject* target, const char* slot);
-    int addObject(const QString& objectName, const QByteArray& body, QByteArray& response, QByteArray& errorString);
+    int addObject(const QString& objectName, const QByteArray& body, QnHTTPRawResponse &response);
 
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 
@@ -147,6 +152,7 @@ private:
 private:
     QUrl m_url;
     QnRequestParamList m_requestParams;
+    QnRequestHeaderList m_requestHeaders;
 
     QnResourceFactory& m_resourceFactory;
     QnMediaServerResourceFactory m_serverFactory;
@@ -159,12 +165,14 @@ private:
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
+    static QString authKey();
     static QString clientGuid();
     static QUrl defaultUrl();
     static int defaultMediaProxyPort();
     static QString currentVersion();
 	static QnResourceFactory* defaultFactory();
 
+    static void setAuthKey(const QString &key);
     static void setClientGuid(const QString &guid);
     static void setDefaultUrl(const QUrl &url);
     static void setDefaultFactory(QnResourceFactory*);
@@ -177,6 +185,7 @@ public:
 private:
     QMutex m_mutex;
     QString m_clientGuid;
+    QString m_authKey;
     QUrl m_defaultUrl;
     int m_defaultMediaProxyPort;
     QString m_currentVersion;

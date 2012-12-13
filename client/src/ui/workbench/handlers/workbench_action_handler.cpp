@@ -55,6 +55,7 @@
 #include <ui/dialogs/preferences_dialog.h>
 #include <ui/dialogs/camera_addition_dialog.h>
 #include <ui/dialogs/progress_dialog.h>
+#include <ui/dialogs/business_rules_dialog.h>
 #include <youtube/youtubeuploaddialog.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
@@ -842,6 +843,9 @@ void QnWorkbenchActionHandler::at_layoutCountWatcher_layoutCountChanged() {
 
 void QnWorkbenchActionHandler::at_debugIncrementCounterAction_triggered() {
     qnSettings->setDebugCounter(qnSettings->debugCounter() + 1);
+
+    QScopedPointer<QnBusinessRulesDialog> dialog(new QnBusinessRulesDialog(connection(), widget()));
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_debugDecrementCounterAction_triggered() {

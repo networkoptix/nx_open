@@ -65,7 +65,7 @@ public:
 
     void setMotionRegionList(const QList<QnMotionRegion>& maskList, QnDomain domain);
     void setMotionRegion(const QnMotionRegion& mask, QnDomain domain, int channel);
-    
+
     QRegion getMotionMask(int channel) const;
     QnMotionRegion getMotionRegion(int channel) const;
     QList<QnMotionRegion> getMotionRegionList() const;
@@ -76,6 +76,20 @@ public:
     virtual bool hasDualStreaming() const;
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+
+    //!Returns ids of camera's relay outputs
+    virtual QStringList getRelayOutputList() const;
+    //!Returns ids of camera's input ports
+    virtual QStringList getInputPortList() const;
+    /*!
+        Change output with id \a ouputID state to \a activate
+        \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
+        \return true in case of success. false, if nothing has been done
+    */
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS = 0 );
 
 signals:
     /** 
@@ -92,6 +106,10 @@ protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
     virtual void setCropingPhysical(QRect croping) = 0; // TODO: 'cropping'!!!
     virtual void setMotionMaskPhysical(int channel) { Q_UNUSED(channel); }
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual bool startInputPortMonitoring();
+    //!MUST be overridden for camera with input port. Default implementation does noting
+    virtual void stopInputPortMonitoring();
 
 protected:
     QList<QnMotionRegion> m_motionMaskList;
@@ -101,6 +119,9 @@ private:
     
     QnScheduleTaskList m_scheduleTasks;
     MotionType m_motionType;
+
+private slots:
+    void onDisabledChanged( bool oldValue, bool newValue );
 };
 
 #endif //sequrity_cam_resource_h_1239

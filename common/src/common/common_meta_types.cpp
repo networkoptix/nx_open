@@ -21,6 +21,8 @@
 #include <core/resource/motion_window.h>
 #include <core/resource/layout_item_data.h>
 #include <core/misc/schedule_task.h>
+#include <events/abstract_business_action.h>
+#include <events/abstract_business_event.h>
 
 
 namespace {
@@ -48,12 +50,17 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnVirtualCameraResourcePtr>();
     qRegisterMetaType<QnUserResourcePtr>();
 
+
     qRegisterMetaType<QnLayoutItemData>();
     qRegisterMetaType<QnMotionRegion>();
     qRegisterMetaType<QnScheduleTask>();
     qRegisterMetaType<QnScheduleTaskList>();
 
-    qRegisterMetaType<QnRequestParamList>();
+    qRegisterMetaType<QnRequestParamList>("QnRequestParamList");
+    qRegisterMetaType<QnRequestHeaderList>("QnRequestHeaderList");
+    qRegisterMetaType<QnReplyHeaderList>("QnReplyHeaderList");
+    qRegisterMetaType<QnHTTPRawResponse>();
+
     qRegisterMetaType<QnMessage>();
 
     qRegisterMetaType<QnCamerasFoundInfoList>();
@@ -66,6 +73,10 @@ void QnCommonMetaTypes::initilize() {
     qRegisterMetaType<QnUpdateInfoItemList>();
 
     qRegisterMetaType<TypeSpecificParamMap>("TypeSpecificParamMap");
+
+    //events/actions
+    qRegisterMetaType<QnAbstractBusinessActionPtr>();
+    qRegisterMetaType<QnAbstractBusinessEventPtr>();
 
     qn_commonMetaTypes_initialized = true;
 }

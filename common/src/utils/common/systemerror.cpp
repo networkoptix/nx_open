@@ -53,4 +53,9 @@ namespace SystemError
         return QString::fromAscii( strerror( errorCode ) );
 #endif
     }
+
+    QString getLastOSErrorText()
+    {
+        return toString(getLastOSErrorCode());
+    }
 }

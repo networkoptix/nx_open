@@ -713,7 +713,7 @@ QnResourceList QnResourceDiscoveryManager::findResources(QString startAddr, QStr
         if (!h.result)
             continue;
 
-        if (qnResPool->hasSuchResouce(h.result->getUniqueId())) // already in resource pool 
+        if (qnResPool->hasSuchResource(h.result->getUniqueId())) // already in resource pool 
             continue;
 
         // For onvif uniqID may be different. Some GUID in pool and macAddress after manual adding. So, do addition cheking for IP address
@@ -806,8 +806,11 @@ void QnResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredRe
         if (res->hasFlags(QnResource::server_live_cam)) // if this is camera from mediaserver on the client
             continue;
 
-        if (res->isDisabled()) // if this is camera from other mediaserver 
+        if( res->isDisabled() ||                        //camera is enabled on some other server
+            res->hasFlags(QnResource::foreigner) )      //this camera belongs to some other mediaserver
+        {
             continue;
+        }
 
         QDateTime ldt = netRes->getLastDiscoveredTime();
         QDateTime currentT = qnSyncTime->currentDateTime();

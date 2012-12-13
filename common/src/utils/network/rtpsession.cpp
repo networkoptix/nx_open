@@ -1308,7 +1308,19 @@ bool RTPSession::readTextResponce(QByteArray& response)
         if (readMoreData) {
             int readed = m_tcpSock.recv(m_responseBuffer+m_responseBufferLen, qMin(1024, RTSP_BUFFER_LEN - m_responseBufferLen));
             if (readed <= 0)
-                return readed;
+            {
+                if( readed == 0 )
+                {
+                    NX_LOG( QString::fromLatin1("RTSP connection to %1:%2 has been unexpectedly closed").
+                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()), cl_logINFO );
+                }
+                else
+                {
+                    NX_LOG( QString::fromLatin1("Error reading RTSP response from %1:%2. %3").
+                        arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(SystemError::getLastOSErrorText()), cl_logWARNING );
+                }
+                return false;	//error occured or connection closed
+            }
             m_responseBufferLen += readed;
         }
         if (m_responseBuffer[0] == '$') {
@@ -1333,7 +1345,11 @@ bool RTPSession::readTextResponce(QByteArray& response)
         }
         readMoreData = true;
         if (m_responseBufferLen == RTSP_BUFFER_LEN)
+        {
+            NX_LOG( QString::fromLatin1("RTSP response from %1:%2 has exceeded max response size (%3)").
+                arg(m_tcpSock.getForeignAddress()).arg(m_tcpSock.getForeignPort()).arg(RTSP_BUFFER_LEN), cl_logINFO );
             return false;
+        }
     }
     return false;
 }

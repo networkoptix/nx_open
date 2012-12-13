@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QnBusinessRuleWidget</class>
+ <widget class="QWidget" name="QnBusinessRuleWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>776</width>
+    <height>327</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QFrame" name="summaryFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="summaryLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;On motion at &lt;img src=&quot;:/skin/tree/camera.png&quot; width=&quot;16&quot; height=&quot;16&quot;/&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;DW1031ax&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;: start recording at &lt;/span&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Low Quality&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;25FPS&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec pre&lt;/span&gt;, &lt;span style=&quot; text-decoration: underline;&quot;&gt;10 sec post&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="expandButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../x86/build/client-custom.qrc">
+          <normaloff>:/skin/titlebar/dropdown_hovered.png</normaloff>:/skin/titlebar/dropdown_hovered.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="deleteButton">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="icon">
+         <iconset resource="../../../../x86/build/client-custom.qrc">
+          <normaloff>:/skin/titlebar/exit_hovered.png</normaloff>:/skin/titlebar/exit_hovered.png</iconset>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="editFrame">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QGroupBox" name="conditionGroupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Condition</string>
+        </property>
+        <layout class="QVBoxLayout" name="conditionLayout">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="eventDoLabel">
+             <property name="text">
+              <string>On</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="eventTypeComboBox">
+             <property name="minimumSize">
+              <size>
+               <width>135</width>
+               <height>0</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>Motion</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Motion starts</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Motion ends</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="eventAtLabel">
+             <property name="text">
+              <string>at</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="eventResourceComboBox">
+             <property name="minimumSize">
+              <size>
+               <width>135</width>
+               <height>0</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>DW1031ax</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../../../x86/build/client-custom.qrc">
+                <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="eventSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_toDelete">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Region&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="actionGroupBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Action</string>
+        </property>
+        <layout class="QVBoxLayout" name="actionLayout">
+         <item>
+          <layout class="QHBoxLayout" name="actionTypeLayout">
+           <item>
+            <widget class="QLabel" name="actionDoLabel">
+             <property name="text">
+              <string>Do</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="actionTypeComboBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>135</width>
+               <height>0</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>Start recording</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="actionAtLabel">
+             <property name="text">
+              <string>at</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="actionResourceComboBox">
+             <property name="minimumSize">
+              <size>
+               <width>135</width>
+               <height>0</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>DW1031ax</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../../../../x86/build/client-custom.qrc">
+                <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="actionSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_toDelete2">
+           <item>
+            <widget class="QComboBox" name="comboBox_7">
+             <item>
+              <property name="text">
+               <string>Low Quality</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox">
+             <property name="value">
+              <number>25</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>fps</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox_2">
+             <property name="suffix">
+              <string>s</string>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>before</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox_3">
+             <property name="suffix">
+              <string>s</string>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>after</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox_4">
+             <property name="suffix">
+              <string>min</string>
+             </property>
+             <property name="value">
+              <number>5</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_13">
+             <property name="text">
+              <string>max</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="controlsFrame">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QPushButton" name="resetButton">
+           <property name="text">
+            <string>Reset</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../../x86/build/client-custom.qrc">
+             <normaloff>:/skin/titlebar/recording_pressed.png</normaloff>:/skin/titlebar/recording_pressed.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="buttonsSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="applyButton">
+           <property name="text">
+            <string>Apply</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../../x86/build/client-custom.qrc">
+             <normaloff>:/skin/titlebar/connected.png</normaloff>:/skin/titlebar/connected.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancelButton">
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../../../x86/build/client-custom.qrc">
+             <normaloff>:/skin/titlebar/exit.png</normaloff>:/skin/titlebar/exit.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
+ <connections/>
+</ui>

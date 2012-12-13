@@ -114,6 +114,9 @@ def setup_openssl():
     return openssl_path
 
 def setup_tools():
+    if platform() == 'mac':
+        return '/usr/local'
+
     os_bit = ''
     if platform() == 'linux' and array.array('L').itemsize != 4:
         os_bit = '64'

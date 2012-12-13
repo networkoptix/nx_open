@@ -8,6 +8,38 @@ void parseResource(QnResourcePtr& resource, const pb::Resource& pb_resource, QnR
 void parseLicense(QnLicensePtr& license, const pb::License& pb_license);
 void parseCameraServerItem(QnCameraHistoryItemPtr& historyItem, const pb::CameraServerItem& pb_cameraServerItem);
 
+namespace Qn
+{
+    QString toString( Message_Type val )
+    {
+        switch( val )
+        {
+            case Message_Type_Initial:
+                return QLatin1String("Initial");
+            case Message_Type_Ping:
+                return QLatin1String("Ping");
+            case Message_Type_ResourceChange:
+                return QLatin1String("ResourceChange");
+            case Message_Type_ResourceDelete:
+                return QLatin1String("ResourceDelete");
+            case Message_Type_ResourceStatusChange:
+                return QLatin1String("ResourceStatusChange");
+            case Message_Type_ResourceDisabledChange:
+                return QLatin1String("ResourceDisabledChange");
+            case Message_Type_License:
+                return QLatin1String("License");
+            case Message_Type_CameraServerItem:
+                return QLatin1String("CameraServerItem");
+            case Message_Type_BusinessRuleInsertOrUpdate:
+                return QLatin1String("BusinessRuleInsertOrUpdate");
+            case Message_Type_BusinessRuleDelete:
+                return QLatin1String("BusinessRuleDelete");
+            default:
+                return QString::fromAscii("Unknown %1").arg((int)val);
+        }
+    }
+}
+
 bool QnMessage::load(const pb::Message &message)
 {
     eventType = (Qn::Message_Type)message.type();

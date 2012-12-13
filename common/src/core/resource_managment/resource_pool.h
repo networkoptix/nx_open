@@ -30,6 +30,14 @@ class QN_EXPORT QnResourcePool : public QObject
     Q_OBJECT
 
 public:
+    enum Filter
+    {
+        //!do not check resources, omwned by another entites
+        rfOnlyFriends,
+        //!check all resources
+        rfAllResources
+    };
+
     QnResourcePool();
     ~QnResourcePool();
 
@@ -48,13 +56,13 @@ public:
 
     QnResourceList getResources() const;
 
-    QnResourcePtr getResourceById(QnId id) const;
+    QnResourcePtr getResourceById(QnId id, Filter searchFilter = rfOnlyFriends) const;
     QnResourcePtr getResourceByGuid(QString guid) const;
 
     QnResourcePtr getResourceByUniqId(const QString &id) const;
     void updateUniqId(QnResourcePtr res, const QString &newUniqId);
 
-    bool hasSuchResouce(const QString &uniqid) const;
+    bool hasSuchResource(const QString &uniqid) const;
 
     QnResourcePtr getResourceByUrl(const QString &url) const;
 
@@ -96,6 +104,16 @@ private:
     bool m_updateLayouts;
     QnResourcePtr localServer;
     QHash<QString, QnResourcePtr> m_resources;
+    //!Resources with flag \a QnResource::foreign set
+    /*!
+        Using separate dictionary to minimize existing code modification
+    */
+    QHash<QString, QnResourcePtr> m_foreignResources;
+
+    /*!
+        \return true, if \a resource has been inserted. false - if updated existing resource
+    */
+    bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool );
 };
 
 

@@ -195,9 +195,9 @@ void QnLayoutResource::removeItemUnderLock(const QUuid &itemUuid) {
     QnLayoutItemData item = *pos;
     m_itemByUuid.erase(pos);
 
-    m_mutex.lock();
-    emit itemRemoved(item);
     m_mutex.unlock();
+    emit itemRemoved(item);
+    m_mutex.lock();
 }
 
 QnTimePeriod QnLayoutResource::getLocalRange() const

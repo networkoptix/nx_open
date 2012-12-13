@@ -17,6 +17,8 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
+QString toString( CLHttpStatus status );
+
 class CLSimpleHTTPClient
 {
     enum { Basic, Digestaccess };

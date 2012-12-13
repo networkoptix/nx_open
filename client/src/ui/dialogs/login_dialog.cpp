@@ -126,10 +126,10 @@ void LoginDialog::updateFocus()
 QUrl LoginDialog::currentUrl() const {
     QUrl url;
     url.setScheme(QLatin1String("https"));
-    url.setHost(ui->hostnameLineEdit->text());
+    url.setHost(ui->hostnameLineEdit->text().trimmed());
     url.setPort(ui->portSpinBox->value());
-    url.setUserName(ui->loginLineEdit->text());
-    url.setPassword(ui->passwordLineEdit->text());
+    url.setUserName(ui->loginLineEdit->text().trimmed());
+    url.setPassword(ui->passwordLineEdit->text().trimmed());
     return url;
 }
 

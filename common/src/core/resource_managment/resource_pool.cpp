@@ -132,19 +132,11 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     foreach (const QnResourcePtr &resource, resources)
     {
-        const QnId resId = resource->getId();
-        QString uniqueId = resource->getUniqueId();
-
-        if (m_resources.contains(uniqueId))
+        if( insertOrUpdateResource(
+                resource,
+                resource->hasFlags(QnResource::foreigner) ? &m_foreignResources : &m_resources ) )
         {
-            // if we already have such resource in the pool
-            m_resources[uniqueId]->update(resource);
-        }
-        else
-        {
-            // new resource
-            m_resources[uniqueId] = resource;
-            newResources.insert(resId, resource);
+            newResources.insert(resource->getId(), resource);
         }
     }
 
@@ -165,6 +157,27 @@ void QnResourcePool::addResources(const QnResourceList &resources)
     }
 }
 
+namespace
+{
+    class MatchResourceByID
+    {
+    public:
+        MatchResourceByID( const QnId& _idToFind )
+        :
+            idToFind( _idToFind )
+        {
+        }
+
+        bool operator()( const QnResourcePtr& res ) const
+        {
+            return res->getId() == idToFind;
+        }
+
+    private:
+        QnId idToFind;
+    };
+}
+
 void QnResourcePool::removeResources(const QnResourceList &resources)
 {
     QnResourceList removedResources;
@@ -182,11 +195,26 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         if(resource->resourcePool() != this)
             qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
 
-        QString uniqueId = resource->getUniqueId();
-
-        if (m_resources.remove(uniqueId) != 0)
+        //const QString& uniqueId = resource->getUniqueId();
+        //if( m_resources.remove(uniqueId) != 0 )
+        //    removedResources.append(resource);
+        
+        //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
+        QHash<QString, QnResourcePtr>::iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(resource->getId()) );
+        if( resIter != m_resources.end() )
         {
+            m_resources.erase( resIter );
             removedResources.append(resource);
+        }
+        else
+        {
+            //may be foreign resource?
+            resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(resource->getId()) );
+            if( resIter != m_foreignResources.end() )
+            {
+                m_foreignResources.erase( resIter );
+                removedResources.append(resource);
+            }
         }
 
         resource->setResourcePool(NULL);
@@ -234,16 +262,23 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
-QnResourcePtr QnResourcePool::getResourceById(QnId id) const
+QnResourcePtr QnResourcePool::getResourceById(QnId id, Filter searchFilter) const
 {
     QMutexLocker locker(&m_resourcesMtx);
-    foreach(const QnResourcePtr& res, m_resources)
-    {
-        if (res->getId() == id)
-            return res;
-    }
 
-    return QnResourcePtr(0);
+    QHash<QString, QnResourcePtr>::const_iterator resIter = std::find_if( m_resources.begin(), m_resources.end(), MatchResourceByID(id) );
+    if( resIter != m_resources.end() )
+        return resIter.value();
+
+    if( searchFilter == rfOnlyFriends )
+        return QnResourcePtr(NULL);
+
+    //looking through foreign resources
+    resIter = std::find_if( m_foreignResources.begin(), m_foreignResources.end(), MatchResourceByID(id) );
+    if( resIter != m_foreignResources.end() )
+        return resIter.value();
+
+    return QnResourcePtr(NULL);
 }
 
 QnResourcePtr QnResourcePool::getResourceByUrl(const QString &url) const
@@ -331,7 +366,7 @@ void QnResourcePool::updateUniqId(QnResourcePtr res, const QString &newUniqId)
     m_resources.insert(newUniqId, res);
 }
 
-bool QnResourcePool::hasSuchResouce(const QString &uniqid) const
+bool QnResourcePool::hasSuchResource(const QString &uniqid) const
 {
     return !getResourceByUniqId(uniqid).isNull();
 }
@@ -413,3 +448,20 @@ int QnResourcePool::activeCameras() const
     return count;
 }
 
+bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHash<QString, QnResourcePtr>* const resourcePool )
+{
+    const QString& uniqueId = resource->getUniqueId();
+
+    if (resourcePool->contains(uniqueId))
+    {
+        // if we already have such resource in the pool
+        (*resourcePool)[uniqueId]->update(resource);
+        return false;
+    }
+    else
+    {
+        // new resource
+        (*resourcePool)[uniqueId] = resource;
+        return true;
+    }
+}

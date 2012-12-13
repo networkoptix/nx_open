@@ -75,10 +75,10 @@ private:
 #define CL_LOG(level)                                                           \
     if (level > cl_log.logLevel()) {} else                                      \
 
-#define NX_LOG(msg, level)              \
-    if( level <= cl_log.logLevel() )    \
-    {                                   \
-        cl_log.log( msg, level );       \
+#define NX_LOG(msg, level)                \
+    {                                     \
+        if( level <= cl_log.logLevel() )  \
+            cl_log.log( msg, level );     \
     }
 
 #define cl_log (*QnLog::instance())

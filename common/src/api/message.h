@@ -23,8 +23,12 @@ namespace Qn {
         Message_Type_ResourceStatusChange = 4,
         Message_Type_ResourceDisabledChange = 5,
         Message_Type_License = 6,
-        Message_Type_CameraServerItem = 7
+        Message_Type_CameraServerItem = 7,
+        Message_Type_BusinessRuleInsertOrUpdate = 8,
+        Message_Type_BusinessRuleDelete = 9
     };
+
+    QString toString( Message_Type val );
 }
 
 struct QnMessage

@@ -35,6 +35,7 @@
 #include "settings.h"
 
 #include <fstream>
+#include "soap/soapserver.h"
 #include "plugins/resources/onvif/onvif_resource_searcher.h"
 #include "plugins/resources/axis/axis_resource_searcher.h"
 #include "plugins/resources/d-link/dlink_resource_searcher.h"
@@ -62,6 +63,10 @@
 #include "rest/handlers/ptz_handler.h"
 #include "plugins/storage/dts/coldstore/coldstore_dts_resource_searcher.h"
 #include "rest/handlers/image_handler.h"
+#include "events/mserver_business_rule_processor.h"
+#include "events/business_event_rule.h"
+#include "events/business_rule_processor.h"
+#include "rest/handlers/exec_action_handler.h"
 #include "rest/handlers/time_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
@@ -291,11 +296,18 @@ QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
     QnMediaServerResourceList servers;
     QByteArray errorString;
     serverPtr->setStatus(QnResource::Online);
-    if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
+
+    QByteArray authKey;
+    if (appServerConnection->registerServer(serverPtr, servers, authKey, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
         return QnMediaServerResourcePtr();
+    }
+
+    if (!authKey.isEmpty()) {
+        qSettings.setValue("authKey", authKey);
+        QnAppServerConnectionFactory::setAuthKey(authKey);
     }
 
     return servers.at(0);
@@ -398,6 +410,8 @@ int serverMain(int argc, char *argv[])
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
     qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
+    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+
     return 0;
 }
 
@@ -415,6 +429,7 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
+    QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
@@ -452,8 +467,8 @@ bool checkIfAppServerIsOld()
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 
-    QByteArray reply, errorString;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", reply, errorString) == 204)
+    QnHTTPRawResponse response;
+    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", response) == 204)
     {
         cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
         return true;
@@ -519,17 +534,20 @@ void QnMain::stopObjects()
     }
 }
 
+static const unsigned int APP_SERVER_REQUEST_ERROR_TIMEOUT_MS = 5500;
+
 void QnMain::loadResourcesFromECS()
 {
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
 
     QByteArray errorString;
 
+    //reading local cameras
     QnVirtualCameraResourceList cameras;
     while (appServerConnection->getCameras(cameras, m_mediaServer->getId(), errorString) != 0)
     {
         qDebug() << "QnMain::run(): Can't get cameras. Reason: " << errorString;
-        QnSleep::msleep(10000);
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
     QnManualCamerasMap manualCameras;
@@ -550,17 +568,60 @@ void QnMain::loadResourcesFromECS()
     }
     QnResourceDiscoveryManager::instance().registerManualCameras(manualCameras);
 
+    //reading media servers list
+    QnMediaServerResourceList mediaServerList;
+    while( appServerConnection->getServers( mediaServerList, errorString ) != 0 )
+    {
+        NX_LOG( QString::fromLatin1("QnMain::run(). Can't get media servers. Reason %1").arg(QLatin1String(errorString)), cl_logERROR );
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    //reading other servers' cameras
+    foreach( const QnMediaServerResourcePtr& mediaServer, mediaServerList )
+    {
+        if( mediaServer->getGuid() == serverGuid() )
+            continue;
+
+        qnResPool->addResource( mediaServer );
+        //requesting remote server cameras
+        QnVirtualCameraResourceList cameras;
+        while( appServerConnection->getCameras(cameras, mediaServer->getId(), errorString) != 0 )
+        {
+            NX_LOG( QString::fromLatin1("QnMain::run(). Error retreiving server %1(%2) cameras from enterprise controller. %3").
+                arg(mediaServer->getId()).arg(mediaServer->getGuid()).arg(QLatin1String(errorString)), cl_logERROR );
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+        }
+        foreach( const QnVirtualCameraResourcePtr &camera, cameras )
+        {
+            camera->addFlags( QnResource::foreigner );  //marking resource as not belonging to us
+            camera->setDisabled( true );
+            camera->setStatus( QnResource::Offline );
+            qnResPool->addResource( camera );
+        }
+    }
+
     QnCameraHistoryList cameraHistoryList;
     while (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
     {
         qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
-        QnSleep::msleep(1000);
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 
     foreach(QnCameraHistoryPtr history, cameraHistoryList)
     {
         QnCameraHistoryPool::instance()->addCameraHistory(history);
     }
+
+    //loading business rules
+    QnBusinessEventRules rules;
+    while( appServerConnection->getBusinessRules( rules, errorString ) != 0 )
+    {
+        qDebug() << "QnMain::run(): Can't get business rules. Reason: " << errorString;
+        QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+    }
+
+    foreach(QnBusinessEventRulePtr rule, rules)
+        qnBusinessRuleProcessor->addBusinessRule( rule );
 }
 
 void QnMain::at_localInterfacesChanged()
@@ -591,6 +652,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/manualCamera", new QnManualCameraAdditionHandler());
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
+    QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
     QnRestConnectionProcessor::registerHandler("api/version", new QnVersionHandler());
 
@@ -606,6 +668,7 @@ void QnMain::initTcpListener()
 
     m_restServer = new QnRestServer(QHostAddress::Any, apiPort);
     m_progressiveDownloadingServer = new QnProgressiveDownloadingServer(QHostAddress::Any, streamingPort);
+    m_progressiveDownloadingServer->start();
     m_progressiveDownloadingServer->enableSSLMode();
     m_rtspListener = new QnRtspListener(QHostAddress::Any, rtspUrl.port());
     m_restServer->start();
@@ -865,6 +928,10 @@ void QnMain::run()
 
     connect(&QnResourceDiscoveryManager::instance(), SIGNAL(localInterfacesChanged()), this, SLOT(at_localInterfacesChanged()));
 
+    //starting soap server to accept event notifications from onvif servers
+    QnSoapServer::instance()->initialize( 8083 );   //TODO/IMPL get port from settings or use any unused port?
+    QnSoapServer::instance()->start();
+
     exec();
 }
 
@@ -931,8 +998,6 @@ void stopServer(int signal)
     av_lockmgr_register(NULL);
     qApp->quit();
 }
-
-#include "api/session_manager.h"
 
 int main(int argc, char* argv[])
 {

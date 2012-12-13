@@ -1,6 +1,7 @@
 #include "socket.h"
 
 #include <utils/common/warnings.h>
+#include <utils/common/stdext.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -29,8 +30,10 @@ typedef void raw_type;       // Type used for raw data on this platform
 #ifdef WIN32
 static bool initialized = false;
 static const int ERR_TIMEOUT = WSAETIMEDOUT;
+static const int ERR_WOULDBLOCK = WSAEWOULDBLOCK;
 #else
-static const int ERR_TIMEOUT = EAGAIN;
+static const int ERR_TIMEOUT = ETIMEDOUT;
+static const int ERR_WOULDBLOCK = EWOULDBLOCK;
 #endif
 
 int getSystemErrCode()
@@ -276,15 +279,60 @@ unsigned short Socket::resolveService(const QString &service,
 
 // CommunicatingSocket Code
 
+#ifndef _WIN32
+namespace
+{
+    static const size_t MILLIS_IN_SEC = 1000;
+    static const size_t NSECS_IN_MS = 1000000;
+
+    template<class Func>
+    int doInterruptableSystemCallWithTimeout( const Func& func, unsigned int timeout )
+    {
+        struct timespec waitStartTime;
+        memset( &waitStartTime, 0, sizeof(waitStartTime) );
+        bool waitStartTimeActual = false;
+        if( timeout > 0 )
+            waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+        for( ;; )
+        {
+            int result = func();
+            //const int errCode = errno;
+            if( result == -1 && errno == EINTR )
+            {
+                if( timeout == 0 ||  //no timeout
+                    !waitStartTimeActual )  //cannot check timeout expiration
+                {
+                    continue;
+                }
+                struct timespec waitStopTime;
+                memset( &waitStopTime, 0, sizeof(waitStopTime) );
+                if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+                    continue;   //not updating timeout value
+                const int millisAlreadySlept = 
+                    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+                if( (unsigned int)millisAlreadySlept < timeout )
+                    continue;
+                errno = ERR_TIMEOUT;    //operation timedout
+            }
+            return result;
+        }
+    }
+}
+#endif
+
 CommunicatingSocket::CommunicatingSocket(int type, int protocol)
     : Socket(type, protocol),
-      m_timeout(3000),
+      m_readTimeoutMS( 0 ),
+      m_writeTimeoutMS( 0 ),
       mConnected(false)
 {
 }
 
-CommunicatingSocket::CommunicatingSocket(int newConnSD) : Socket(newConnSD),
-    m_timeout(3000)
+CommunicatingSocket::CommunicatingSocket(int newConnSD) 
+    : Socket(newConnSD),
+      m_readTimeoutMS( 0 ),
+      m_writeTimeoutMS( 0 )
 {
 }
 
@@ -294,10 +342,13 @@ void CommunicatingSocket::close()
     mConnected = false;
 }
 
-
-bool CommunicatingSocket::connect(const QString &foreignAddress,
-                                  unsigned short foreignPort)
+bool CommunicatingSocket::connect(
+    const QString &foreignAddress,
+    unsigned short foreignPort,
+    int timeoutMs )
 {
+    //TODO/IMPL non blocking connect
+
     m_lastError.clear();
 
     // Get the address of the requested host
@@ -307,51 +358,83 @@ bool CommunicatingSocket::connect(const QString &foreignAddress,
     if (!fillAddr(foreignAddress, foreignPort, destAddr))
         return false;
 
-#ifdef _WIN32
+    //switching to non-blocking mode to connect with timeout
     const bool isNonBlockingModeBak = isNonBlockingMode();
-    if( !setNonBlockingMode( true ) )
+    if( !isNonBlockingModeBak && !setNonBlockingMode( true ) )
         return false;
-#endif
 
     int connectResult = ::connect(sockDesc, (sockaddr *) &destAddr, sizeof(destAddr));// Try to connect to the given port
 
-#ifndef _WIN32
-    if (connectResult != 0)
+    if( connectResult != 0 )
     {
-        m_lastError = tr("Connect failed (connect()).");
-        return false;
+        if( SystemError::getLastOSErrorCode() != SystemError::inProgress )
+        {
+            m_lastError = tr("Connect failed (connect()). %1").arg(SystemError::getLastOSErrorText());
+            return false;
+        }
+        if( isNonBlockingModeBak )
+            return true;        //async connect started
     }
-#else
-    Q_UNUSED(connectResult);
-#endif
 
-#ifdef _WIN32
     timeval timeVal;
     fd_set wrtFDS;
-    int iSelRet;
+    int iSelRet = 0;
 
     /* monitor for incomming connections */
     FD_ZERO(&wrtFDS);
     FD_SET(sockDesc, &wrtFDS);
 
-    /* set timeout values */
-    timeVal.tv_sec  = m_timeout/1000;
-    timeVal.tv_usec = m_timeout%1000;
-
-    iSelRet = ::select(sockDesc + 1, NULL, &wrtFDS, NULL, &timeVal);
-
-    if (iSelRet<=0)
-        return false;
-#endif // _WIN32
-
 #ifdef _WIN32
-    //restoring original mode
-    setNonBlockingMode( isNonBlockingModeBak );
+    /* set timeout values */
+    timeVal.tv_sec  = timeoutMs/1000;
+    timeVal.tv_usec = timeoutMs%1000;
+    iSelRet = ::select(
+        sockDesc + 1,
+        NULL,
+        &wrtFDS, 
+        NULL,
+        timeoutMs >= 0 ? &timeVal : NULL );
+#else
+    //handling interruption by a signal
+    struct timespec waitStartTime;
+    memset( &waitStartTime, 0, sizeof(waitStartTime) );
+    bool waitStartTimeActual = false;
+    if( timeoutMs >= 0 )
+        waitStartTimeActual = clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
+    for( ;; )
+    {
+        timeVal.tv_sec  = timeoutMs/1000;
+        timeVal.tv_usec = timeoutMs%1000;
+        iSelRet = ::select( sockDesc + 1, NULL, &wrtFDS, NULL, timeoutMs >= 0 ? &timeVal : NULL );
+        if( iSelRet == -1 && errno == EINTR )
+        {
+            //modifying timeout for time we've already spent in select
+            if( timeoutMs < 0 ||  //no timeout
+                !waitStartTimeActual )
+            {
+                //not updating timeout value. This can lead to spending "tcp connect timeout" in select (if signals arrive frequently and no monotonic clock on system)
+                continue;
+            }
+            struct timespec waitStopTime;
+            memset( &waitStopTime, 0, sizeof(waitStopTime) );
+            if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
+                continue;   //not updating timeout value
+            const int millisAlreadySlept = 
+                ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) - 
+                ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
+            if( millisAlreadySlept >= timeoutMs )
+                break;
+            timeoutMs -= millisAlreadySlept;
+            continue;
+        }
+        break;
+    }
 #endif
 
-    mConnected = true;
-
-    return true;
+    mConnected = iSelRet > 0;
+    //restoring original mode
+    setNonBlockingMode( isNonBlockingModeBak );
+    return mConnected;
 }
 
 void CommunicatingSocket::shutdown()
@@ -363,10 +446,8 @@ void CommunicatingSocket::shutdown()
 #endif
 }
 
-void CommunicatingSocket::setReadTimeOut( unsigned int ms )
+bool CommunicatingSocket::setReadTimeOut( unsigned int ms )
 {
-    m_timeout = ms;
-
     timeval tv;
 
     tv.tv_sec = ms/1000;
@@ -378,13 +459,14 @@ void CommunicatingSocket::setReadTimeOut( unsigned int ms )
 #endif
     {
         qnWarning("Timeout function failed.");
+        return false;
     }
+    m_readTimeoutMS = ms;
+    return true;
 }
 
-void CommunicatingSocket::setWriteTimeOut( unsigned int ms )
+bool CommunicatingSocket::setWriteTimeOut( unsigned int ms )
 {
-    m_timeout = ms;
-
     timeval tv;
 
     tv.tv_sec = ms/1000;
@@ -396,7 +478,10 @@ void CommunicatingSocket::setWriteTimeOut( unsigned int ms )
 #endif
     {
         qnWarning("Timeout function failed.");
+        return false;
     }
+    m_writeTimeoutMS = ms;
+    return true;
 }
 
 int CommunicatingSocket::send(const QnByteArray& data)
@@ -411,26 +496,43 @@ int CommunicatingSocket::send(const QByteArray& data)
 
 int CommunicatingSocket::send(const void *buffer, int bufferLen)
 {
+#ifdef _WIN32
     int sended = ::send(sockDesc, (raw_type *) buffer, bufferLen, 0);
     if (sended < 0) {
-        //int errCode = getSystemErrCode();
-        //if (errCode != ERR_TIMEOUT)
-        mConnected = false;
+        int errCode = getSystemErrCode();
+        if (/*errCode != ERR_TIMEOUT &&*/ errCode != ERR_WOULDBLOCK)    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+            mConnected = false;
     }
     return sended;
+#else
+    int sended = doInterruptableSystemCallWithTimeout<>(
+        stdext::bind<>(&::send, sockDesc, (const void*)buffer, (size_t)bufferLen, 0),
+        m_writeTimeoutMS );
+    if( sended == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )    //TODO why not checking ERR_TIMEOUT? some kind of a hack?
+        mConnected = false;
+    return sended;
+#endif
 }
 
 int CommunicatingSocket::recv(void *buffer, int bufferLen, int flags)
 {
+#ifdef _WIN32
     int rtn = ::recv(sockDesc, (raw_type *) buffer, bufferLen, flags);
     if (rtn < 0)
     {
         int errCode = getSystemErrCode();
-        if (errCode != ERR_TIMEOUT)
+        if (errCode != ERR_TIMEOUT && errCode != ERR_WOULDBLOCK)
             mConnected = false;
-        return -1;
     }
     return rtn;
+#else
+    int bytesRead = doInterruptableSystemCallWithTimeout<>(
+        stdext::bind<>(&::recv, sockDesc, (void*)buffer, (size_t)bufferLen, flags),
+        m_readTimeoutMS );
+    if( bytesRead == -1 && errno != ERR_TIMEOUT && errno != ERR_WOULDBLOCK )
+        mConnected = false;
+    return bytesRead;
+#endif
 }
 
 QString CommunicatingSocket::getForeignAddress()
@@ -649,16 +751,16 @@ bool UDPSocket::sendTo(const void *buffer, int bufferLen, const QString &foreign
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {
-
     // Write out the whole buffer as a single message.
-    if (sendto(sockDesc, (raw_type *) buffer, bufferLen, 0,
-               (sockaddr *) m_destAddr, sizeof(sockaddr_in)) != bufferLen)
-    {
-        return false;
-    }
 
-    return true;
-
+#ifdef _WIN32
+    return sendto(sockDesc, (raw_type *) buffer, bufferLen, 0,
+               (sockaddr *) m_destAddr, sizeof(sockaddr_in)) == bufferLen;
+#else
+    return doInterruptableSystemCallWithTimeout<>(
+        stdext::bind<>(&::sendto, sockDesc, (const void*)buffer, (size_t)bufferLen, 0, (const    sockaddr *) m_destAddr, sizeof(sockaddr_in)),
+        m_writeTimeoutMS ) == bufferLen;
+#endif
 }
 
 int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
@@ -666,7 +768,15 @@ int UDPSocket::recvFrom(void *buffer, int bufferLen, QString &sourceAddress,
 {
     sockaddr_in clntAddr;
     socklen_t addrLen = sizeof(clntAddr);
+
+#ifdef _WIN32
     int rtn = recvfrom(sockDesc, (raw_type *) buffer, bufferLen, 0, (sockaddr *) &clntAddr, (socklen_t *) &addrLen);
+#else
+    int rtn = doInterruptableSystemCallWithTimeout<>(
+        stdext::bind<>(&::recvfrom, sockDesc, (void*)buffer, (size_t)bufferLen, 0, (sockaddr*)&clntAddr, (socklen_t*)&addrLen),
+        m_readTimeoutMS );
+#endif
+
     if (rtn >= 0) {
         sourceAddress = QLatin1String(inet_ntoa(clntAddr.sin_addr));
         sourcePort = ntohs(clntAddr.sin_port);
@@ -840,4 +950,10 @@ bool Socket::setNonBlockingMode(bool val)
 bool Socket::isNonBlockingMode() const
 {
     return m_nonBlockingMode;
+}
+
+SystemError::ErrorCode Socket::prevErrorCode() const
+{
+    //TODO/IMPL
+    return 0;
 }

@@ -16,6 +16,8 @@
 #include "core/resource/camera_history.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
+#include "events/business_event_rule.h"
+#include "events/business_rule_processor.h"
 
 QnRecordingManager::QnRecordingManager()
 {
@@ -136,12 +138,60 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
     return true;
 }
 
+bool QnRecordingManager::startForcedRecording(QnSecurityCamResourcePtr camRes, QnStreamQuality quality, int fps, int maxDuration)
+{
+    updateCamera(camRes); // ensure recorders are created
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
+    if (!camera)
+        return false;
+
+    QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.end())
+        return false;
+
+    // update current schedule task
+    const Recorders& recorders = itrRec.value();
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->startForcedRecording(quality, fps, maxDuration);
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->startForcedRecording(quality, fps, maxDuration);
+    
+    // start recorder threads
+    startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
+
+    // return true if recording started. if camera is not accessible e.t.c return false
+    return recorders.recorderHiRes->isRunning() || recorders.recorderLowRes->isRunning();
+}
+
+bool QnRecordingManager::stopForcedRecording(QnSecurityCamResourcePtr camRes)
+{
+    updateCamera(camRes); // ensure recorders are created
+    QnVideoCamera* camera = qnCameraPool->getVideoCamera(camRes);
+    if (!camera)
+        return false;
+
+    QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.find(camRes);
+    if (itrRec == m_recordMap.end())
+        return false;
+
+    // update current schedule task
+    const Recorders& recorders = itrRec.value();
+    if (recorders.recorderHiRes)
+        recorders.recorderHiRes->stopForcedRecording();
+    if (recorders.recorderLowRes)
+        recorders.recorderLowRes->stopForcedRecording();
+
+    // start recorder threads
+    startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
+    return true;
+}
+
 void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline &&
         recorderHiRes->currentScheduleTask().getRecordingType() != Qn::RecordingType_Never)
     {
         if (providerHi)
@@ -365,6 +415,23 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 
 void QnRecordingManager::onTimer()
 {
+    // for test purpose only
+    static int gggTest = 0;
+    if (gggTest == 0) {
+        gggTest = 1;
+        QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
+        QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
+        if (srcCamera && dstCamera) {
+            QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
+            bRule->setEventType(BusinessEventType::BE_Camera_Motion);
+            bRule->setSrcResource(srcCamera);
+            bRule->setActionType(BusinessActionType::BA_CameraRecording);
+            bRule->setDstResource(dstCamera);
+            qnBusinessRuleProcessor->addBusinessRule(bRule);
+        }
+    }
+    // =======================================================
+
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
