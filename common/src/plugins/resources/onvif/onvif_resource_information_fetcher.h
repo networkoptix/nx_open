@@ -58,11 +58,9 @@ private:
     bool findSpecialResource(const EndpointAdditionalInfo& info, const QHostAddress& sender, const QString& manufacturer, QnResourceList& result) const;
 
     QnPlOnvifResourcePtr createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, const QString& mac,
-        const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl) const;
+        const QString& uniqId, const char* login, const char* passwd, const QString& deviceUrl) const;
 
     bool isMacAlreadyExists(const QString& mac, const QnResourceList& resList) const;
-    QString fetchName(const DeviceInfoResp& response) const;
-    QString fetchManufacturer(const DeviceInfoResp& response) const;
     QString fetchSerial(const DeviceInfoResp& response) const;
 
 private:

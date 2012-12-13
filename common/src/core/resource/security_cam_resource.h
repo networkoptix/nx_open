@@ -30,6 +30,9 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
+    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;
@@ -76,6 +79,12 @@ public:
     virtual bool hasDualStreaming() const;
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
+
+    bool checkCameraCapability(CameraCapabilities value) const;
+    CameraCapabilities getCameraCapabilities();
+    void addCameraCapabilities(CameraCapabilities value);
+    void removeCameraCapabilities(CameraCapabilities value);
+
 
 signals:
     /** 

@@ -138,6 +138,7 @@ public:
 
     virtual void setUrl(const QString &url) override;
     int getChannel() const;
+    int getMaxChannels() const;
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);

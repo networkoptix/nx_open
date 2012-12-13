@@ -34,6 +34,7 @@ const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 200; //200 ms
 const double QnPlOnvifResource::MAX_SECONDARY_RESOLUTION_SQUARE =
     SECONDARY_STREAM_DEFAULT_RESOLUTION.first * SECONDARY_STREAM_DEFAULT_RESOLUTION.second * 4;
 
+static const int MAX_PRIMARY_RES_FOR_SOFT_MOTION = 720 * 576;
 
 //width > height is prefered
 bool resolutionGreaterThan(const ResolutionPair &s1, const ResolutionPair &s2)
@@ -316,8 +317,14 @@ bool QnPlOnvifResource::initInternal()
     //Additional camera settings
     fetchAndSetCameraSettings();
 
+    CameraCapabilities addFlags = CFNoFlags;
     if (m_ptzController)
-        addCameraCapabilities(HasPtz);
+        addFlags |= HasPtz;
+    if (m_primaryResolution.first * m_primaryResolution.second <= MAX_PRIMARY_RES_FOR_SOFT_MOTION)
+        addFlags |= primaryStreamSoftMotion;
+    
+    if (addFlags != CFNoFlags)
+        addCameraCapabilities(addFlags);
 
     save();
 
@@ -641,16 +648,6 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
         return false;
     }
 
-    //If failed - ignore
-    if (fetchAndSetAudioEncoderOptions(soapWrapper)) 
-    {
-        setParam(AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
-    }
-    else 
-    {
-        setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
-    }
-
     if (!updateResourceCapabilities()) {
         return false;
     }
@@ -661,7 +658,10 @@ bool QnPlOnvifResource::fetchAndSetResourceOptions()
     //Before invoking <fetchAndSetHasDualStreaming> Primary and Secondary Resolutions MUST be set
     fetchAndSetDualStreaming(soapWrapper);
 
-    fetchAndSetAudioEncoder(soapWrapper);
+    if (fetchAndSetAudioEncoder(soapWrapper) && fetchAndSetAudioEncoderOptions(soapWrapper))
+        setParam(AUDIO_SUPPORTED_PARAM_NAME, 1, QnDomainDatabase);
+    else
+        setParam(AUDIO_SUPPORTED_PARAM_NAME, 0, QnDomainDatabase);
 
     return true;
 }
@@ -1039,8 +1039,6 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
     std::string password = soapWrapper.getPassword()? soapWrapper.getPassword() : "";
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
 
-    VideoOptionsReq optRequest;
-
     QList<VideoOptionsLocal> optionsList;
     QList<MediaSoapWrapperPtr> soapWrappersList;
 
@@ -1065,6 +1063,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         optionsList.append(VideoOptionsLocal());
         VideoOptionsLocal& currVideoOpts = optionsList.back();
 
+        VideoOptionsReq optRequest;
         optRequest.ConfigurationToken = &(*encIt)->token;
         optRequest.ProfileToken = NULL;
 
@@ -1174,7 +1173,8 @@ bool QnPlOnvifResource::fetchAndSetDualStreaming(MediaSoapWrapper& /*soapWrapper
 bool QnPlOnvifResource::fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper)
 {
     AudioOptionsReq request;
-    request.ConfigurationToken = NULL;
+    std::string token = m_audioEncoderId.toStdString();
+    request.ConfigurationToken = &token;
     request.ProfileToken = NULL;
 
     AudioOptionsResp response;
@@ -1381,11 +1381,9 @@ bool QnPlOnvifResource::updateResourceCapabilities()
     while (it != m_resolutionList.end())
     {
         if (it->first > m_physicalWindowSize.width() || it->second > m_physicalWindowSize.height())
-        {
             it = m_resolutionList.erase(it);
-        } else {
+        else
             return true;
-        }
     }
 
     return true;
@@ -1421,12 +1419,18 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
             << ". " << soapWrapper.getLastError();
         return false;
     } else {
-        onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(0);
-
-        if (conf) {
-            QMutexLocker lock(&m_mutex);
-            //TODO:UTF unuse std::string
-            m_audioEncoderId = QString::fromStdString(conf->token);
+        if (response.Configurations.size() > m_channelNumer) 
+        {
+            onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
+            if (conf) {
+                QMutexLocker lock(&m_mutex);
+                //TODO:UTF unuse std::string
+                m_audioEncoderId = QString::fromStdString(conf->token);
+            }
+        }
+        else {
+            qWarning() << "Can't find appropriate audio encoder. url=" << getUrl();
+            return false;
         }
     }
 
@@ -1582,15 +1586,15 @@ bool QnPlOnvifResource::fetchAndSetAudioSource()
         return false;
     } else {
         onvifXsd__AudioSourceConfiguration* conf = response.Configurations.at(m_channelNumer);
-
         if (conf) {
             QMutexLocker lock(&m_mutex);
             //TODO:UTF unuse std::string
             m_audioSourceId = QString::fromStdString(conf->token);
+            return true;
         }
     }
 
-    return true;
+    return false;
 }
 
 const QnResourceAudioLayout* QnPlOnvifResource::getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider)
@@ -1837,4 +1841,9 @@ void QnPlOnvifResource::setUrl(const QString &url)
     m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
     if (m_channelNumer > 0)
         m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+}
+
+int QnPlOnvifResource::getMaxChannels() const
+{
+    return m_maxChannels;
 }

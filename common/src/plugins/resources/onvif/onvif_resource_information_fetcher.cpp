@@ -79,21 +79,17 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
             qDebug() << "OnvifResourceInformationFetcher::findResources: SOAP to endpoint '" << endpoint
                      << "' failed. Camera name will be set to 'Unknown'. GSoap error code: " << soapRes
                      << ". " << soapWrapper.getLastError();
-        } else {
+        } 
+        else {
+            if (!response.Manufacturer.empty())
+                manufacturer = QString::fromStdString(response.Manufacturer);
 
-            QString tmpManufacturer(fetchManufacturer(response));
-            if (!tmpManufacturer.isEmpty() && manufacturer != tmpManufacturer) {
-                manufacturer = tmpManufacturer;
-            }
+            if (!response.Model.empty())
+                name = QString::fromStdString(response.Model);
 
-            QString tmpName(fetchName(response));
-            if (!tmpName.isEmpty() && name != tmpName) {
-                name = tmpName;
-
-                if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(name).replace(manufacturer, QString()))) {
-                    qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
-                    return;
-                }
+            if (camersNamesData.isManufacturerSupported(manufacturer) && camersNamesData.isSupported(QString(name).replace(manufacturer, QString()))) {
+                qDebug() << "OnvifResourceInformationFetcher::findResources: (later step) skipping camera " << name;
+                return;
             }
         }
     }
@@ -104,70 +100,32 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         name = tr("Unknown - %1").arg(info.uniqId);
     }
 
-    //Trying to get onvif URLs
-    QString mediaUrl;
-    QString deviceUrl;
-    {
-        CapabilitiesReq request;
-        CapabilitiesResp response;
-
-        int soapRes = soapWrapper.getCapabilities(request, response);
-        if (soapRes != SOAP_OK) {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: can't fetch media and device URLs. Reason: SOAP to endpoint "
-                     << endpoint << " failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-
-        } else if (response.Capabilities) {
-            mediaUrl = response.Capabilities->Media? QString::fromStdString(response.Capabilities->Media->XAddr): mediaUrl;
-            deviceUrl = response.Capabilities->Device? QString::fromStdString(response.Capabilities->Device->XAddr): deviceUrl;
-        }
-
-        if (deviceUrl.isEmpty()) {
-            deviceUrl = endpoint;
-        }
-        //If media url is empty it will be filled in resource init method
-    }
-
-    //qDebug() << "OnvifResourceInformationFetcher::createResource: Found new camera: endpoint: " << endpoint
-    //         << ", UniqueId: " << info.uniqId << ", manufacturer: " << manufacturer << ", name: " << name;
 
     QnPlOnvifResourcePtr res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                              name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), mediaUrl, deviceUrl);
+                                              name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
     if (res)
         result << res;
     else
         return;
 
     // checking for multichannel encoders
-    if (mediaUrl.isEmpty())
-        return;
-
-    int timeDrift = QnPlOnvifResource::calcTimeDrift(deviceUrl);
-    MediaSoapWrapper mediaSoapWrapper(mediaUrl.toStdString(), soapWrapper.getLogin(), soapWrapper.getPassword(), timeDrift);
-    
-    VideoSrcConfigsReq request;
-    VideoSrcConfigsResp response;
-    int soapRes = mediaSoapWrapper.getVideoSourceConfigurations(request, response);
-    if (soapRes == SOAP_OK && response.Configurations.size() > 1)
+    QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
+    for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
     {
-        res->setName(res->getName() + QString(QLatin1String("-channel 1")));
-        for (int i = 1; i < response.Configurations.size(); ++i) 
-        {
-            res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                                      name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), mediaUrl, deviceUrl);
-            if (res) {
-                QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
-                res->setUrl(deviceUrl + suffix);
-                res->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
-                res->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
-                result << res;
-            }
+        res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+                                                  name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+        if (res) {
+            QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
+            res->setUrl(endpoint + suffix);
+            res->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
+            res->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
+            result << res;
         }
     }
-
 }
 
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, 
-    const QString& mac, const QString& uniqId, const char* login, const char* passwd, const QString& mediaUrl, const QString& deviceUrl) const
+    const QString& mac, const QString& uniqId, const char* login, const char* passwd, const QString& deviceUrl) const
 {
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
@@ -192,7 +150,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     if (!mac.size())
         resource->setPhysicalId(uniqId);
 
-    resource->setMediaUrl(mediaUrl);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (login) {
@@ -217,16 +174,6 @@ bool OnvifResourceInformationFetcher::isMacAlreadyExists(const QString& mac, con
     }
 
     return false;
-}
-
-QString OnvifResourceInformationFetcher::fetchName(const DeviceInfoResp& response) const
-{
-    return QString::fromStdString(response.Model);
-}
-
-QString OnvifResourceInformationFetcher::fetchManufacturer(const DeviceInfoResp& response) const
-{
-    return QString::fromStdString(response.Manufacturer);
 }
 
 QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& response) const
