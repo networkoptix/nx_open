@@ -26,12 +26,12 @@ typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
 typedef onvifXsd__VideoSourceConfiguration VideoSource;
 
+class VideoOptionsLocal;
 
 //first = width, second = height
-typedef QPair<int, int> ResolutionPair;
-const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
-const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
+const QSize EMPTY_RESOLUTION_PAIR(0, 0);
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
 
 
 class QDomElement;
@@ -97,14 +97,15 @@ public:
     int getGovLength() const;
     int getAudioBitrate() const;
     int getAudioSamplerate() const;
-    ResolutionPair getPrimaryResolution() const;
-    ResolutionPair getSecondaryResolution() const;
+    QSize getPrimaryResolution() const;
+    QSize getSecondaryResolution() const;
     int getPrimaryH264Profile() const;
     int getSecondaryH264Profile() const;
-    ResolutionPair getMaxResolution() const;
+    QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
-    const QRect getPhysicalWindowSize() const;
+    const QSize getVideoSourceSize() const;
+
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
     const QString getAudioEncoderId() const;
@@ -162,7 +163,7 @@ private:
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
-    void updateSecondaryResolutionList(const VideoOptionsResp& response);
+    void updateSecondaryResolutionList(const VideoOptionsLocal& opts);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
@@ -170,11 +171,10 @@ private:
     bool fetchVideoSourceToken();
     bool fetchAndSetVideoSource();
     bool fetchAndSetAudioSource();
-    bool fetchAndSetVideoSourceOptions();
 
-    void setVideoEncoderOptions(const VideoOptionsResp& response);
-    void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
-    void setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
+    void setVideoEncoderOptions(const VideoOptionsLocal& opts);
+    void setVideoEncoderOptionsH264(const VideoOptionsLocal& opts);
+    void setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts);
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
@@ -182,11 +182,11 @@ private:
     void save();
 
     int round(float value);
-    ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    static ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare, const QList<ResolutionPair>& resolutionList);
-    static float getResolutionAspectRatio(const ResolutionPair& resolution);
+    QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
+    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
+    static float getResolutionAspectRatio(const QSize& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    int getH264StreamProfile(const VideoOptionsResp& response);
+    int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     void readPtzInfo();
@@ -194,8 +194,8 @@ private:
     void updateVideoSource(VideoSource* source) const;
     bool sendVideoSourceToCamera(VideoSource* source) const;
 protected:
-    QList<ResolutionPair> m_resolutionList; //Sorted desc
-    QList<ResolutionPair> m_secondaryResolutionList;
+    QList<QSize> m_resolutionList; //Sorted desc
+    QList<QSize> m_secondaryResolutionList;
     OnvifCameraSettingsResp* m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
@@ -215,8 +215,8 @@ private:
     CODECS m_primaryCodec;
     CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
-    ResolutionPair m_primaryResolution;
-    ResolutionPair m_secondaryResolution;
+    QSize m_primaryResolution;
+    QSize m_secondaryResolution;
     int m_primaryH264Profile;
     int m_secondaryH264Profile;
     int m_audioBitrate;

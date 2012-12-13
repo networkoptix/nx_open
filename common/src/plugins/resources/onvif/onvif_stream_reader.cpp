@@ -241,7 +241,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
 
 
     QnStreamQuality quality = getQuality();
-    ResolutionPair resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
+    QSize resolution = isPrimary? m_onvifRes->getPrimaryResolution(): m_onvifRes->getSecondaryResolution();
 
     if (!encoder.H264)
     {
@@ -263,7 +263,7 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
     } else 
     {
         encoder.RateControl->FrameRateLimit = getFps();
-        encoder.RateControl->BitrateLimit = m_onvifRes->suggestBitrateKbps(quality, QSize(resolution.first, resolution.second), encoder.RateControl->FrameRateLimit);
+        encoder.RateControl->BitrateLimit = m_onvifRes->suggestBitrateKbps(quality, resolution, encoder.RateControl->FrameRateLimit);
     }
 
     
@@ -287,8 +287,8 @@ void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrima
         else 
         {
 
-            encoder.Resolution->Width = resolution.first;
-            encoder.Resolution->Height = resolution.second;
+            encoder.Resolution->Width = resolution.width();
+            encoder.Resolution->Height = resolution.height();
         }
     }
 }
