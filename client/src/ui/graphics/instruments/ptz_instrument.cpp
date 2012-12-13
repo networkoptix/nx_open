@@ -212,15 +212,24 @@ public:
                 m_rect.bottomRight(),
                 m_rect.bottomLeft()
             };
-            QPointF center = m_rect.center();
+            
+            qreal d = qMin(m_rect.width(), m_rect.height()) / 2;
+            QPointF centers[5] = {
+                m_rect.bottomLeft()     + QPointF( d, -d),
+                m_rect.topLeft()        + QPointF( d,  d),
+                m_rect.topRight()       + QPointF(-d,  d),
+                m_rect.bottomRight()    + QPointF(-d, -d),
+                m_rect.bottomLeft()     + QPointF( d, -d)
+            };
 
             for(int i = 0; i < 4; i++) {
                 QPainterPath path;
 
                 path = QPainterPath();
-                path.moveTo(center);
+                path.moveTo(centers[i]);
                 path.lineTo(points[i]);
                 path.lineTo(points[i + 1]);
+                path.lineTo(centers[i + 1]);
                 path.closeSubpath();
                 painter->fillPath(path, m_brushes[i]);
             }
@@ -231,7 +240,7 @@ private:
     /** Splash type. */
     SplashType m_splashType;
 
-    /** Brushes that are used for painting. 0 for circular, 1-4 for rectangular splash. */
+    /** Brushes that are used for painting. 0-3 for rectangular splash, 4 for circular. */
     QBrush m_brushes[5];
 
     /** Bounding rectangle of the splash. */
