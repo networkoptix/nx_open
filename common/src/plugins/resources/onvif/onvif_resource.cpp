@@ -1346,7 +1346,7 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
     return true;
 }
 
-void QnPlOnvifResource::updateVideoSource(VideoSource* source) const
+void QnPlOnvifResource::updateVideoSource(VideoSource* source, const QRect& maxRect) const
 {
     //One name for primary and secondary
     //source.Name = NETOPTIX_PRIMARY_NAME;
@@ -1359,10 +1359,10 @@ void QnPlOnvifResource::updateVideoSource(VideoSource* source) const
     if (!m_videoSourceSize.isValid())
         return;
 
-    source->Bounds->x = 0;
-    source->Bounds->y = 0;
-    source->Bounds->height = m_videoSourceSize.height();
-    source->Bounds->width = m_videoSourceSize.width();
+    source->Bounds->x = maxRect.left();
+    source->Bounds->y = maxRect.top();
+    source->Bounds->width = maxRect.width();
+    source->Bounds->height = maxRect.height();
 }
 
 bool QnPlOnvifResource::sendVideoSourceToCamera(VideoSource* source) const
@@ -1420,10 +1420,35 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
     if (conf) {
         QMutexLocker lock(&m_mutex);
         m_videoSourceToken = QString::fromStdString(conf->token);
-        m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
+        //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
         return true;
     }
     return false;
+}
+
+QRect QnPlOnvifResource::getVideoSourceMaxSize(const QString& configToken)
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
+
+    VideoSrcOptionsReq request;
+    std::string token = configToken.toStdString();
+    request.ConfigurationToken = &token;
+    request.ProfileToken = NULL;
+
+    VideoSrcOptionsResp response;
+
+    int soapRes = soapWrapper.getVideoSourceConfigurationOptions(request, response);
+    if (soapRes != SOAP_OK || !response.Options) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSourceOptions: can't receive data from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return QRect();
+    }
+    onvifXsd__IntRectangleRange* br = response.Options->BoundsRange;
+    return QRect(qMax(0, br->XRange->Min), qMax(0, br->YRange->Min), br->WidthRange->Max, br->HeightRange->Max);
 }
 
 bool QnPlOnvifResource::fetchAndSetVideoSource()
@@ -1460,10 +1485,12 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
             m_videoSourceId = QString::fromStdString(conf->token);
         }
 
-        QSize currentSize(conf->Bounds->width, conf->Bounds->height);
-        if (conf->Bounds->x || conf->Bounds->y || currentSize != m_videoSourceSize)
+        QRect currentRect(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
+        QRect maxRect = getVideoSourceMaxSize(QString::fromStdString(conf->token));
+        m_videoSourceSize = QSize(maxRect.width(), maxRect.height());
+        if (maxRect.isValid() && currentRect != maxRect)
         {
-            updateVideoSource(conf);
+            updateVideoSource(conf, maxRect);
             return sendVideoSourceToCamera(conf);
         }
         else {

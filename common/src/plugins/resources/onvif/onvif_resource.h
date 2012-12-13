@@ -191,8 +191,10 @@ private:
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
     void readPtzInfo();
 
-    void updateVideoSource(VideoSource* source) const;
+    void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
     bool sendVideoSourceToCamera(VideoSource* source) const;
+
+    QRect getVideoSourceMaxSize(const QString& configToken);
 protected:
     QList<QSize> m_resolutionList; //Sorted desc
     QList<QSize> m_secondaryResolutionList;
