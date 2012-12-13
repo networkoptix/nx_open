@@ -102,7 +102,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
 
     QnPlOnvifResourcePtr res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                              name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+                                              name, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
     if (res)
         result << res;
     else
@@ -114,7 +114,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
         {
             res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                                      name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+                name, mac, info.uniqId, QString::fromStdString(soapWrapper.getLogin()), QString::fromStdString(soapWrapper.getPassword()), endpoint);
             if (res) {
                 QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
                 res->setUrl(endpoint + suffix);
@@ -127,7 +127,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 }
 
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QString& manufacturer, const QHostAddress& sender, const QHostAddress& discoveryIp, const QString& name, 
-    const QString& mac, const QString& uniqId, const char* login, const char* passwd, const QString& deviceUrl) const
+    const QString& mac, const QString& uniqId, const QString& login, const QString& passwd, const QString& deviceUrl) const
 {
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
@@ -154,10 +154,8 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
 
     resource->setDeviceOnvifUrl(deviceUrl);
 
-    if (login) {
-        //qDebug() << "OnvifResourceInformationFetcher::createResource: Setting login = " << login << ", password = " << passwd;
-        resource->setAuth(QLatin1String(login), QLatin1String(passwd));
-    }
+    if (!login.isEmpty())
+        resource->setAuth(login, passwd);
 
     return resource;
 }

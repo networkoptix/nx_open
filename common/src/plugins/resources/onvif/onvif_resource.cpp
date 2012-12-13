@@ -1006,8 +1006,8 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         return false;
     }
 
-    std::string login = soapWrapper.getLogin()? soapWrapper.getLogin() : "";
-    std::string password = soapWrapper.getPassword()? soapWrapper.getPassword() : "";
+    std::string login = soapWrapper.getLogin();
+    std::string password = soapWrapper.getPassword();
     std::string endpoint = soapWrapper.getEndpointUrl().toStdString();
 
     int confRangeStart = 0;

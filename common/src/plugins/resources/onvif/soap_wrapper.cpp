@@ -95,6 +95,14 @@ soap_wsse_add_UsernameTokenDigest(struct soap *soap, const char *id, const char 
   return SOAP_OK;
 }
 
+int soap_wsse_add_PlainTextAuth(struct soap *soap, const char *id, const char *username, const char *password, time_t now)
+{ 
+    _wsse__Security *security = soap_wsse_add_Security(soap);
+    soap_wsse_add_UsernameTokenText(soap, id, username, password);
+    security->UsernameToken->Password->Type = (char*) wsse_PasswordTextURI;
+    return SOAP_OK;
+}
+
 } // anonymous namespace
 
 
@@ -109,8 +117,6 @@ static const int DIGEST_TIMEOUT_SEC = 60;
 
 template <class T>
 SoapWrapper<T>::SoapWrapper(const std::string& endpoint, const std::string& login, const std::string& passwd, int _timeDrift):
-    m_login(0),
-    m_passwd(0),
     invoked(false),
     m_timeDrift(_timeDrift)
 {
@@ -149,13 +155,8 @@ SoapWrapper<T>::~SoapWrapper()
 template <class T>
 void SoapWrapper<T>::cleanLoginPassword()
 {
-    if (m_login) {
-        delete[] m_login;
-        delete[] m_passwd;
-    }
-
-    m_login = 0;
-    m_passwd = 0;
+    m_login.clear();
+    m_passwd.clear();
 }
 
 template <class T>
@@ -163,13 +164,8 @@ void SoapWrapper<T>::setLoginPassword(const std::string& login, const std::strin
 {
     cleanLoginPassword();
 
-    m_login = new char[login.size() + 1];
-    strcpy(m_login, login.c_str());
-    m_login[login.size()] = '\0';
-
-    m_passwd = new char[passwd.size() + 1];
-    strcpy(m_passwd, passwd.c_str());
-    m_passwd[passwd.size()] = '\0';
+    m_login = login;
+    m_passwd = passwd;
 }
 
 template <class T>
@@ -199,18 +195,18 @@ void SoapWrapper<T>::beforeMethodInvocation()
         invoked = true;
     }
 
-    if (m_login && *m_login)
-        soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, NULL, m_login, m_passwd, time(NULL) + m_timeDrift);
+    if (!m_login.empty())
+        soap_wsse_add_UsernameTokenDigest(m_soapProxy->soap, NULL, m_login.c_str(), m_passwd.c_str(), time(NULL) + m_timeDrift);
 }
 
 template <class T>
-const char* SoapWrapper<T>::getLogin()
+const std::string& SoapWrapper<T>::getLogin()
 {
     return m_login;
 }
 
 template <class T>
-const char* SoapWrapper<T>::getPassword()
+const std::string& SoapWrapper<T>::getPassword()
 {
     return m_passwd;
 }
@@ -647,8 +643,8 @@ int PtzSoapWrapper::doGetServiceCapabilities(PtzGetServiceCapabilitiesReq& reque
 //
 
 template soap* SoapWrapper<DeviceBindingProxy>::getSoap();
-template const char* SoapWrapper<DeviceBindingProxy>::getLogin();
-template const char* SoapWrapper<DeviceBindingProxy>::getPassword();
+template const std::string& SoapWrapper<DeviceBindingProxy>::getLogin();
+template const std::string& SoapWrapper<DeviceBindingProxy>::getPassword();
 template int SoapWrapper<DeviceBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<DeviceBindingProxy>::getLastError();
 template const QString SoapWrapper<DeviceBindingProxy>::getEndpointUrl();
@@ -656,8 +652,8 @@ template bool SoapWrapper<DeviceBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<DeviceBindingProxy>::isConflictError();
 
 template soap* SoapWrapper<MediaBindingProxy>::getSoap();
-template const char* SoapWrapper<MediaBindingProxy>::getLogin();
-template const char* SoapWrapper<MediaBindingProxy>::getPassword();
+template const std::string& SoapWrapper<MediaBindingProxy>::getLogin();
+template const std::string& SoapWrapper<MediaBindingProxy>::getPassword();
 template int SoapWrapper<MediaBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<MediaBindingProxy>::getLastError();
 template const QString SoapWrapper<MediaBindingProxy>::getEndpointUrl();
@@ -665,8 +661,8 @@ template bool SoapWrapper<MediaBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<MediaBindingProxy>::isConflictError();
 
 template soap* SoapWrapper<PTZBindingProxy>::getSoap();
-template const char* SoapWrapper<PTZBindingProxy>::getLogin();
-template const char* SoapWrapper<PTZBindingProxy>::getPassword();
+template const std::string& SoapWrapper<PTZBindingProxy>::getLogin();
+template const std::string& SoapWrapper<PTZBindingProxy>::getPassword();
 template int SoapWrapper<PTZBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<PTZBindingProxy>::getLastError();
 template const QString SoapWrapper<PTZBindingProxy>::getEndpointUrl();
@@ -674,8 +670,8 @@ template bool SoapWrapper<PTZBindingProxy>::isNotAuthenticated();
 template bool SoapWrapper<PTZBindingProxy>::isConflictError();
 
 template soap* SoapWrapper<ImagingBindingProxy>::getSoap();
-template const char* SoapWrapper<ImagingBindingProxy>::getLogin();
-template const char* SoapWrapper<ImagingBindingProxy>::getPassword();
+template const std::string& SoapWrapper<ImagingBindingProxy>::getLogin();
+template const std::string& SoapWrapper<ImagingBindingProxy>::getPassword();
 template int SoapWrapper<ImagingBindingProxy>::getTimeDrift();
 template const QString SoapWrapper<ImagingBindingProxy>::getLastError();
 template const QString SoapWrapper<ImagingBindingProxy>::getEndpointUrl();

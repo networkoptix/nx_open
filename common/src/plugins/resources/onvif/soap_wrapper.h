@@ -185,8 +185,8 @@ class onvifPtz__StopResponse;
 template <class T>
 class SoapWrapper
 {
-    char* m_login;
-    char* m_passwd;
+    std::string m_login;
+    std::string m_passwd;
     bool invoked;
     int m_timeDrift;
 
@@ -201,8 +201,8 @@ public:
     virtual ~SoapWrapper();
 
     soap* getSoap();
-    const char* getLogin();
-    const char* getPassword();
+    const std::string& getLogin();
+    const std::string& getPassword();
     int getTimeDrift();
     const QString getLastError();
     const QString getEndpointUrl();
