@@ -624,7 +624,7 @@ int QnMediaServerConnection::asyncPtzMoveTo(const QnNetworkResourcePtr &camera, 
     requestParams << QnRequestParam("yPos", QString::number(yPos));
     requestParams << QnRequestParam("zoomPos", QString::number(zoomPos));
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/moveTo"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/moveTo"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
 }
 
 int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, QObject *target, const char *slot) {
@@ -634,7 +634,7 @@ int QnMediaServerConnection::asyncPtzGetPos(const QnNetworkResourcePtr &camera, 
     QnRequestParamList requestParams;
     requestParams << QnRequestParam("res_id", camera->getPhysicalId());
 
-    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getPosition"), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
+    return QnSessionManager::instance()->sendAsyncGetRequest(m_url, QLatin1String("ptz/getPosition"), QnRequestHeaderList(), requestParams, processor, SLOT(at_replyReceived(int, QByteArray, QByteArray, int)));
     
 }
 

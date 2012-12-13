@@ -6,6 +6,22 @@
 #include <emmintrin.h>
 
 
+#if defined(Q_CC_MSVC)
+#   include <intrin.h> /* For __cpuid. */
+#elif defined(Q_CC_GNU)
+#   define __cpuid(res, op)                                                     \
+        __asm__ volatile(                                                       \
+        "movl %%ebx, %%esi   \n\t"		                                        \
+        "cpuid               \n\t"		                                        \
+        "movl %%ebx, %1      \n\t"		                                        \
+        "movl %%esi, %%ebx   \n\t"		                                        \
+        :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	            \
+        :"0"(op) : "%esi")
+#else
+#   error __cpuid is not supported for your compiler.
+#endif
+
+
 #if defined(Q_CC_GNU) && !defined(Q_OS_MAC)
 
 /* We cannot include GCC intrinsic headers cause they cause compilation errors.
@@ -98,20 +114,10 @@ static inline bool useSSE42()
 #endif
 }
 
-#ifdef Q_OS_LINUX
-#define __cpuid(res, op)\
-  __asm__ volatile(                         \
-            "movl %%ebx, %%esi   \n\t"		\
-            "cpuid               \n\t"		\
-            "movl %%ebx, %1      \n\t"		\
-            "movl %%esi, %%ebx   \n\t"		\
-            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
-            :"0"(op) : "%esi")
-#endif
-
+// TODO: function too large for inlining. Move to cpp file.
 static inline QString getCPUString()
 {
-    char CPUBrandString[0x40];
+    char CPUBrandString[0x40]; 
     int CPUInfo[4] = {-1};
 
     // Calling __cpuid with 0x80000000 as the InfoType argument

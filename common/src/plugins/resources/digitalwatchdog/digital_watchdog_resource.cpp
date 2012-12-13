@@ -124,11 +124,7 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
     QString suffix = getIdSuffixByModel(cameraModel);
     if (!suffix.isEmpty()) {
-
-        if (suffix.endsWith(QLatin1String("-FOCUS")))
-            setCameraCapability(ZoomCapability, true);
-        else
-            removeCameraCapabilities(HasZoom);
+        setCameraCapability(ZoomCapability, suffix.endsWith(QLatin1String("-FOCUS")));
 
         QString prefix = baseIdStr.split(QLatin1String("-"))[0];
         QString fullCameraType = prefix + suffix;
