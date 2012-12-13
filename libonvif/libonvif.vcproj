@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="C:\develop\netoptix_vms.events\build-environment\x86\build\bin\$(ConfigurationName)\onvif.lib"
+				OutputFile="..\build-environment\x86\build\bin\$(ConfigurationName)\onvif.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -129,7 +129,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="C:\develop\netoptix_vms.events\build-environment\x64\build\bin\$(ConfigurationName)\onvif.lib"
+				OutputFile="..\build-environment\x64\build\bin\$(ConfigurationName)\onvif.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -195,7 +195,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="C:\develop\netoptix_vms.events\build-environment\x86\build\bin\$(ConfigurationName)\onvif.lib"
+				OutputFile="..\build-environment\x86\build\bin\$(ConfigurationName)\onvif.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -243,7 +243,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="C:\develop\netoptix_vms.events\build-environment\x86\build\include\"
-				PreprocessorDefinitions="WITH_OPENSSL;WIN32"
+				PreprocessorDefinitions="WITH_OPENSSL;WIN32;WITH_PURE_VIRTUAL"
 				MinimalRebuild="false"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -262,7 +262,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="C:\develop\netoptix_vms.events\build-environment\x64\build\bin\$(ConfigurationName)\onvif.lib"
+				OutputFile="..\build-environment\x64\build\bin\$(ConfigurationName)\onvif.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
