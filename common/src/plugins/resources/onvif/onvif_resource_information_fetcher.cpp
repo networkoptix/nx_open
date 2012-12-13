@@ -110,16 +110,18 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
 
     // checking for multichannel encoders
     QnPlOnvifResourcePtr onvifRes = existResource.dynamicCast<QnPlOnvifResource>();
-    for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
-    {
-        res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                                  name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
-        if (res) {
-            QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
-            res->setUrl(endpoint + suffix);
-            res->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
-            res->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
-            result << res;
+    if (onvifRes) {
+        for (int i = 1; i < onvifRes->getMaxChannels(); ++i) 
+        {
+            res = createResource(manufacturer, QHostAddress(sender), QHostAddress(info.discoveryIp),
+                                                      name, mac, info.uniqId, soapWrapper.getLogin(), soapWrapper.getPassword(), endpoint);
+            if (res) {
+                QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
+                res->setUrl(endpoint + suffix);
+                res->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
+                res->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
+                result << res;
+            }
         }
     }
 }

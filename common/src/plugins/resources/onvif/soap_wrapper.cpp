@@ -414,6 +414,12 @@ int MediaSoapWrapper::getVideoSourceConfigurations(VideoSrcConfigsReq& request, 
     return m_soapProxy->GetVideoSourceConfigurations(m_endpoint, NULL, &request, &response);
 }
 
+int MediaSoapWrapper::getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response)
+{
+    beforeMethodInvocation();
+    return m_soapProxy->GetVideoSources(m_endpoint, NULL, &request, &response);
+}
+
 int MediaSoapWrapper::getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response)
 {
     beforeMethodInvocation();

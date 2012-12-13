@@ -25,7 +25,8 @@ class _onvifDevice__SystemReboot;
 class _onvifDevice__SystemRebootResponse;
 class _onvifMedia__GetCompatibleMetadataConfigurations;
 class _onvifMedia__GetCompatibleMetadataConfigurationsResponse;
-
+class _onvifMedia__GetVideoSources;
+class _onvifMedia__GetVideoSourcesResponse;
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
@@ -271,8 +272,11 @@ public:
     int getStreamUri(StreamUriReq& request, StreamUriResp& response);
     int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
     int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
+
+    int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
     int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
     int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
+
     int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
 
     int getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response);

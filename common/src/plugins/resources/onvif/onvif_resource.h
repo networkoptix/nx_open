@@ -167,6 +167,7 @@ private:
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
     
+    bool fetchVideoSourceToken();
     bool fetchAndSetVideoSource();
     bool fetchAndSetAudioSource();
     bool fetchAndSetVideoSourceOptions();
@@ -220,7 +221,8 @@ private:
     int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
-    QRect m_physicalWindowSize;
+    //QRect m_physicalWindowSize;
+    QSize m_videoSourceSize;
     QString m_primaryVideoEncoderId;
     QString m_secondaryVideoEncoderId;
     QString m_audioEncoderId;

@@ -1507,8 +1507,51 @@ bool QnPlOnvifResource::fetchAndSetVideoSourceOptions()
     return true;
 }
 
+bool QnPlOnvifResource::fetchVideoSourceToken()
+{
+    QAuthenticator auth(getAuth());
+    MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
+
+    _onvifMedia__GetVideoSources request;
+    _onvifMedia__GetVideoSourcesResponse response;
+    int soapRes = soapWrapper.getVideoSources(request, response);
+
+    if (soapRes != SOAP_OK) {
+
+        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: can't receive data from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+
+    }
+
+    m_maxChannels = response.VideoSources.size();
+
+    if (m_maxChannels <= m_channelNumer) {
+        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
+            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
+            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
+            << ". " << soapWrapper.getLastError();
+        return false;
+    } 
+
+    onvifXsd__VideoSource* conf = response.VideoSources.at(m_channelNumer);
+
+    if (conf) {
+        QMutexLocker lock(&m_mutex);
+        m_videoSourceToken = QString::fromStdString(conf->token);
+        m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
+        return true;
+    }
+    return false;
+}
+
 bool QnPlOnvifResource::fetchAndSetVideoSource()
 {
+    if (!fetchVideoSourceToken())
+        return false;
+
     QAuthenticator auth(getAuth());
     MediaSoapWrapper soapWrapper(getMediaUrl().toStdString(), auth.user().toStdString(), auth.password().toStdString(), m_timeDrift);
 
@@ -1526,33 +1569,26 @@ bool QnPlOnvifResource::fetchAndSetVideoSource()
 
     }
 
-    m_maxChannels = response.Configurations.size();
+    std::string srcToken = m_videoSourceToken.toStdString();
+    for (int i = 0; i < response.Configurations.size(); ++i)
+    {
+        onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
+        if (!conf || conf->SourceToken != srcToken)
+            continue;
 
-    if (response.Configurations.size() <= m_channelNumer) {
-        qWarning() << "QnPlOnvifResource::fetchAndSetVideoSource: empty data received from camera (or data is empty) (URL: " 
-            << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
-            << "). Root cause: SOAP request failed. GSoap error code: " << soapRes
-            << ". " << soapWrapper.getLastError();
-        return false;
-    } else {
-        onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(m_channelNumer);
+        {
+            QMutexLocker lock(&m_mutex);
+            m_videoSourceId = QString::fromStdString(conf->token);
+        }
 
-        if (conf) {
-            {
-                QMutexLocker lock(&m_mutex);
-                m_videoSourceId = QString::fromStdString(conf->token);
-                m_videoSourceToken = QString::fromStdString(conf->SourceToken);
-            }
-
-            fetchAndSetVideoSourceOptions();
-            QRect r(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
-            if (r != m_physicalWindowSize) {
-                updateVideoSource(conf);
-                return sendVideoSourceToCamera(conf);
-            }
-            else {
-                return true;
-            }
+        fetchAndSetVideoSourceOptions();
+        QRect r(conf->Bounds->x, conf->Bounds->y, conf->Bounds->width, conf->Bounds->height);
+        if (r != m_physicalWindowSize) {
+            updateVideoSource(conf);
+            return sendVideoSourceToCamera(conf);
+        }
+        else {
+            return true;
         }
     }
 
