@@ -235,7 +235,7 @@ void QnStorageManager::clearSpace()
 {
     if (!m_catalogLoaded)
         return;
-    StorageMap storages = getAllStorages();
+    const StorageMap storages = getAllStorages();
     foreach(QnStorageResourcePtr storage, storages)
         clearSpace(storage);
 }
@@ -343,21 +343,23 @@ void QnStorageManager::updateStorageStatistics()
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_mutexStorages);
     QnStorageResourcePtr result;
     float minBitrate = INT_MAX;
 
-    if (!m_storagesStatisticsReady) {
-        updateStorageStatistics();
-        m_storagesStatisticsReady = true;
+    {
+        QMutexLocker lock(&m_mutexStorages);
+        if (!m_storagesStatisticsReady) {
+            updateStorageStatistics();
+            m_storagesStatisticsReady = true;
+        }
     }
 
     QVector<QPair<float, QnStorageResourcePtr> > bitrateInfo;
     QVector<QnStorageResourcePtr> candidates;
 
     // Got storages with minimal bitrate value. Accept storages with minBitrate +10%
-
-    for (StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    const StorageMap storages = getAllStorages();
+    for (StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
 		QnStorageResourcePtr storage = itr.value();
         if (storage->getStatus() != QnResource::Offline) {
@@ -469,15 +471,14 @@ DeviceFileCatalogPtr QnStorageManager::getFileCatalog(const QString& mac, QnReso
 QnStorageResourcePtr QnStorageManager::extractStorageFromFileName(int& storageIndex, const QString& fileName, QString& mac, QString& quality)
 {
     storageIndex = -1;
-    QMutexLocker lock(&m_mutexStorages);
-    for(StorageMap::const_iterator itr = m_storageRoots.constBegin(); itr != m_storageRoots.constEnd(); ++itr)
+    const StorageMap storages = getAllStorages();
+    for(StorageMap::const_iterator itr = storages.constBegin(); itr != storages.constEnd(); ++itr)
     {
         QString root = closeDirPath(itr.value()->getUrl());
         if (fileName.startsWith(root))
         {
             int qualityLen = fileName.indexOf('/', root.length()+1) - root.length();
             quality = fileName.mid(root.length(), qualityLen);
-            quality = QFileInfo(quality).baseName();
             int macPos = root.length() + qualityLen;
             mac = fileName.mid(macPos+1, fileName.indexOf('/', macPos+1) - macPos-1);
             storageIndex = itr.value()->getIndex();

@@ -21,8 +21,6 @@
 
 #include <core/resource_managment/resource_discovery_manager.h>
 #include <core/resource_managment/resource_pool.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource.h>
 
 #include <api/session_manager.h>
 
@@ -65,8 +63,6 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
-#include <ui/processors/free_space_processor.h>
-
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_synchronizer.h>
@@ -90,7 +86,6 @@
 // TODO: remove this include
 #include "../extensions/workbench_stream_synchronizer.h"
 #include "utils/common/synctime.h"
-#include <utils/common/counter.h>
 #include "camera/caching_time_period_loader.h"
 #include "launcher/nov_launcher.h"
 #include "plugins/resources/archive/archive_stream_reader.h"
@@ -618,20 +613,6 @@ void QnWorkbenchActionHandler::saveCameraSettingsFromDialog(bool checkControls) 
         QMessageBox::warning(widget(), tr("Could not Enable Recording"), message);
         cameraSettingsDialog()->widget()->setCamerasActive(false);
     }
-    else // storages will not be validated if recording is not enabled
-    if (cameraSettingsDialog()->widget()->activeCameraCount() > 0) {
-        QnMediaServerResourceList servers = validateStorages(cameras);
-        if (!servers.isEmpty()) {
-            QStringList srvNames;
-            foreach (QnMediaServerResourcePtr server, servers)
-                srvNames << server->getName();
-
-            QMessageBox::warning(widget(), tr("Could not Enable Recording"),
-                tr("Some of your servers (%1) have not enough disk space to enable recording. Your schedule will be saved, but will not take effect.")
-                                 .arg(srvNames.join(QLatin1String(", "))));
-            cameraSettingsDialog()->widget()->setCamerasActive(false);
-        }
-    }
 
     /* Submit and save it. */
     cameraSettingsDialog()->widget()->submitToResources();
@@ -685,65 +666,6 @@ void QnWorkbenchActionHandler::saveAdvancedCameraSettingsAsync(QnVirtualCameraRe
     qRegisterMetaType<QList<QPair<QString, bool> > >("QList<QPair<QString, bool> >"); // TODO: evil!
     serverConnectionPtr->asyncSetParam(cameraPtr, cameraSettingsDialog()->widget()->getModifiedAdvancedParams(),
         this, SLOT(at_camera_settings_saved(int, const QList<QPair<QString, bool> >&)) );
-}
-
-QnMediaServerResourceList QnWorkbenchActionHandler::validateStorages(QnVirtualCameraResourceList cameras) {
-    QnMediaServerResourceList servers;
-    QnMediaServerResourceList result;
-
-    foreach (QnVirtualCameraResourcePtr camera, cameras) {
-        QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(resourcePool()->
-                getResourceById(camera->getParentId()));
-        if (servers.indexOf(server) < 0)
-            servers.append(server);
-    }
-
-    foreach (QnMediaServerResourcePtr server, servers) {
-        QnAbstractStorageResourceList storages = server->getStorages();
-        QnMediaServerConnectionPtr serverConnection = server->apiConnection();
-
-        QScopedPointer<QnCounter> counter(new QnCounter(storages.size()));
-        QScopedPointer<QEventLoop> eventLoop(new QEventLoop());
-        connect(counter.data(), SIGNAL(reachedZero()), eventLoop.data(), SLOT(quit()));
-
-        QScopedPointer<CheckFreeSpaceReplyProcessor> processor(new CheckFreeSpaceReplyProcessor());
-        connect(processor.data(), SIGNAL(replyReceived(int, qint64, qint64, int)), counter.data(), SLOT(decrement()));
-
-        QHash<int, QnAbstractStorageResourcePtr> storageByHandle;
-        foreach (const QnAbstractStorageResourcePtr &storage, storages) {
-            int handle = serverConnection->asyncGetFreeSpace(storage->getUrl(), processor.data(), SLOT(processReply(int, qint64, qint64, int)));
-            storageByHandle[handle] = storage;
-        }
-
-        eventLoop->exec();
-
-        FreeSpaceMap freeSpaceMap = processor->freeSpaceInfo();
-        bool existsAtLeastOneGoodStorage = false;
-        bool serverError = false;
-        for (FreeSpaceMap::const_iterator itr = freeSpaceMap.constBegin(); itr != freeSpaceMap.constEnd(); ++itr)
-        {
-            QnAbstractStorageResourcePtr storage = storageByHandle.value(itr.key());
-            if (!storage)
-                continue;
-
-            if (itr.value().errorCode == CheckFreeSpaceReplyProcessor::SERVER_ERROR) {
-                serverError = true;
-                break;
-            }
-
-            qint64 availableSpace = itr.value().freeSpace + itr.value().usedSpace - storage->getSpaceLimit();
-            if (itr.value().errorCode != 0 || availableSpace < 0)
-                continue;
-            existsAtLeastOneGoodStorage = true;
-            break;
-        }
-
-        /* We could not validate inaccessible server storages so do not show warning for them */
-        if (!serverError && !existsAtLeastOneGoodStorage)
-            result.append(server);
-    }
-    return result;
-
 }
 
 void QnWorkbenchActionHandler::rotateItems(int degrees){
@@ -1497,7 +1419,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     const qint64 maxItems = 16; // TODO: take it from config?
 
     if(period.durationMs < steps[1]) {
-        QMessageBox::warning(widget(), tr("Could not perform thumbnails search"), tr("Selected time period is too short to perform thumbnails search. Please select a longer period."), QMessageBox::Ok);
+        QMessageBox::warning(widget(), tr("Could not perform preview search"), tr("Selected time period is too short to perform preview search. Please select a longer period."), QMessageBox::Ok);
         return;
     }
 
@@ -1579,7 +1501,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     /* Construct and add a new layout. */
     QnLayoutResourcePtr layout(new QnLayoutResource());
     layout->setGuid(QUuid::createUuid());
-    layout->setName(tr("Thumbnail Search for %1").arg(resource->getName()));
+    layout->setName(tr("Preview Search for %1").arg(resource->getName()));
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0))); // TODO: this does not belong here.
     if(context()->user())
         layout->setParentId(context()->user()->getId());
@@ -1973,9 +1895,9 @@ void QnWorkbenchActionHandler::at_takeScreenshotAction_triggered() {
     QString timeString;
     qint64 time = display->camDisplay()->getCurrentTime() / 1000;
     if(widget->resource()->flags() & QnResource::utc) {
-        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(QLatin1String("yyyy-MMM-dd_hh.mm.ss"));
+        timeString = QDateTime::fromMSecsSinceEpoch(time).toString(lit("yyyy-MMM-dd_hh.mm.ss"));
     } else {
-        timeString = QTime().addMSecs(time).toString(QLatin1String("hh.mm.ss"));
+        timeString = QTime().addMSecs(time).toString(lit("hh.mm.ss"));
     }
 
     QString suggetion = replaceNonFileNameCharacters(widget->resource()->getName(), QLatin1Char('_')) + QLatin1Char('_') + timeString; 
@@ -2630,8 +2552,7 @@ Do you want to continue?"),
         previousDir = qnSettings->mediaFolder();
     }
 
-    QString dateFormat = cameraResource ? tr("dd-mmm-yyyy hh-mm-ss") : tr("hh-mm-ss");
-        QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
+    QString suggestion = networkResource ? networkResource->getPhysicalId() : QString();
 
     QString fileName;
     QString selectedExtension;

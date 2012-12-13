@@ -57,7 +57,7 @@ public:
     void loadFullFileCatalog();
     QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider* provider);
 
-    StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
+    const StorageMap getAllStorages() const { QMutexLocker lock(&m_mutexStorages); return m_storageRoots; }
     void clearSpace();
 public slots:
     void at_archiveRangeChanged(qint64 newStartTimeMs, qint64 newEndTimeMs);

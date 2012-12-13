@@ -341,6 +341,9 @@ void QnRtspClientArchiveDelegate::reopen()
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
     QnAbstractMediaDataPtr result = getNextDataInternal();
+    if (!result)
+        result = getNextDataInternal(); // try again in case of RTSP reconnect
+
     if (m_serverTimePeriod.isNull() || !m_isMultiserverAllowed)
         return result;
     
@@ -356,6 +359,11 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
             m_lastSeekTime = qnSyncTime->currentMSecsSinceEpoch()*1000;
         QnResourcePtr newResource = getNextMediaServerFromTime(m_resource, m_lastSeekTime/1000);
         if (newResource) {
+            qDebug() << "Reached the edge for archive in a current server. packetTime=" << QDateTime::fromMSecsSinceEpoch(timeMs).toString() <<
+                "period: " << QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.startTimeMs).toString() << "-" << 
+                QDateTime::fromMSecsSinceEpoch(m_serverTimePeriod.endTimeMs()).toString();
+
+
             m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
             if (m_rtspSession.getScale() > 0)
                 m_position = m_serverTimePeriod.startTimeMs*1000;

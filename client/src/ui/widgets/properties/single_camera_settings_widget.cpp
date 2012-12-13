@@ -84,7 +84,7 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget() {
 }
 
 QnMediaServerConnectionPtr QnSingleCameraSettingsWidget::getServerConnection() const {
-    if (!m_camera.isNull() && m_serverConnection.isNull())
+    if (!m_camera.isNull())
     {
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(m_camera->getParentId()));
         if (mediaServer.isNull()) {

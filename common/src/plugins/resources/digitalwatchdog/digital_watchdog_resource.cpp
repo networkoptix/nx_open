@@ -127,15 +127,14 @@ void QnPlWatchDogResource::fetchAndSetCameraSettings()
 
         if (suffix.endsWith(QLatin1String("-FOCUS")))
             setCameraCapability(ZoomCapability, true);
-
-        if (baseIdStr.endsWith(suffix))
-        {
-            baseIdStr = baseIdStr.left(baseIdStr.length() - suffix.length());
-        }
         else
-        {
-            setParam(CAMERA_SETTINGS_ID_PARAM, baseIdStr + suffix, QnDomainDatabase);
-        }
+            removeCameraCapabilities(HasZoom);
+
+        QString prefix = baseIdStr.split(QLatin1String("-"))[0];
+        QString fullCameraType = prefix + suffix;
+        if (fullCameraType != baseIdStr)
+            setParam(CAMERA_SETTINGS_ID_PARAM, fullCameraType, QnDomainDatabase);
+        baseIdStr = prefix;
     }
 
     QMutexLocker lock(&m_physicalParamsMutex);

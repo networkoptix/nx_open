@@ -1,0 +1,1 @@
+mvn package  -Darch=x64 -Dcustomization=digitalwatchdog

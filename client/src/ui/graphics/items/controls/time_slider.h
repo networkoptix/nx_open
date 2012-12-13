@@ -167,6 +167,7 @@ signals:
     void selectionPressed();
     void selectionReleased();
     void thumbnailsVisibilityChanged();
+    void thumbnailClicked();
 
 protected:
     virtual void sliderChange(SliderChange change) override;

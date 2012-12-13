@@ -519,7 +519,7 @@ void AbstractGraphicsSlider::initStyleOption(QStyleOption *option) const {
             minimum      = 0;
         }
 
-        if(!isInt(maximum) || !isInt(pageStep) || !isInt(singleStep)) {
+        if(!isInt(maximum + pageStep) || !isInt(maximum + singleStep)) {
             qint64 k = qMax(qMax(maximum, pageStep), singleStep) >> 16;
 
             minimum     /= k;

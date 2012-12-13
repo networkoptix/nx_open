@@ -298,3 +298,22 @@ void QnRedAssController::addHQTry()
     m_hiQualityRetryCounter = qMin(m_hiQualityRetryCounter, HIGH_QUALITY_RETRY_COUNTER);
     m_hiQualityRetryCounter = qMax(0, m_hiQualityRetryCounter-1);
 }
+
+/*
+bool QnRedAssController::isPrecSeekAllowed(QnCamDisplay* currentDisplay)
+{
+    if (currentDisplay->isFullScreen() || !currentDisplay->isSyncAllowed())
+        return true;
+
+    QMutexLocker lock(&m_mutex);
+    if (m_redAssInfo.size() <= 1)
+        return true;
+    for (ConsumersMap::const_iterator itr = m_redAssInfo.begin(); itr != m_redAssInfo.end(); ++itr)
+    {
+        QnCamDisplay* display = itr.key();
+        if (display->getArchiveReader()->getQuality() == MEDIA_Quality_Low)
+            return false;
+    }
+    return true;
+}
+*/

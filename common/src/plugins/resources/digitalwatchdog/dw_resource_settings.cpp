@@ -77,9 +77,26 @@ bool DWCameraProxy::setToCamera(DWCameraSetting& src)
 
     bool res = src.getMethod() == QString::fromLatin1("POST")? setToCameraPost(src, desiredVal) :
         setToCameraGet(src, desiredVal);
-    res = getFromCamera(src) && res; //If we set incorrect value, camera will silently ignore it, so we need to compare desired value with actual
+    if (!res) {
+        qWarning() << "Can't set parameter" << src.getName() << "value" << desiredVal << "to camera" << m_host;
+        return false;
+    }
 
-    return res && desiredVal == src.getCurrentAsIntStr();
+    m_bufferedValues[src.getQuery()] = desiredVal;
+
+    return true;
+    /*
+    res = getFromCamera(src); //If we set incorrect value, camera will silently ignore it, so we need to compare desired value with actual
+    if (!res) {
+        qWarning() << "Can't check parameter value (after set). name" << src.getName() << "value" << desiredVal << "from camera" << m_host;
+        return false;
+    }
+    src.getCurrentAsIntStr();
+    if (desiredVal != src.getCurrentAsIntStr())
+        qWarning() << "parameter check failed.Name" << src.getName() << "desired value" << desiredVal << "readed value=" << src.getCurrentAsIntStr() << "from camera" << m_host;
+
+    return desiredVal == src.getCurrentAsIntStr();
+    */
 }
 
 bool DWCameraProxy::setToCameraGet(DWCameraSetting& src, const QString& desiredVal)

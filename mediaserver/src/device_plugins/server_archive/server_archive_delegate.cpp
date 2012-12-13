@@ -81,7 +81,7 @@ bool QnServerArchiveDelegate::open(QnResourcePtr resource)
     m_catalogLow = qnStorageMan->getFileCatalog(netResource->getPhysicalId(), QnResource::Role_SecondaryLiveVideo);
 
     m_currentChunkCatalog = m_quality == MEDIA_Quality_Low ? m_catalogLow : m_catalogHi;
-
+    m_opened = true;
     return true;
 }
 

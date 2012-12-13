@@ -46,11 +46,13 @@ public:
     {
         blockSetSpeedSignal = false;
         lastJumpTime = DATETIME_NOW;
-        inJumpCount = 0;
+        bufferingCnt = 0;
         speed = 1.0;
         enabled = true;
         bufferingTime = AV_NOPTS_VALUE;
         paused = false;
+        cachedTime = 0;
+        gotCacheTime = 0;
     }
 
 
@@ -66,7 +68,7 @@ public:
 
     bool blockSetSpeedSignal;
     qint64 lastJumpTime;
-    int inJumpCount;
+    int bufferingCnt;
     QTime timer;
     double speed;
     
@@ -74,6 +76,8 @@ public:
     qint64 bufferingTime;
     bool paused;
     bool liveModeEnabled;
+    mutable qint64 cachedTime;
+    mutable qint64 gotCacheTime;
     //QnPlaybackMaskHelper playbackMaskHelper;
 };
 
@@ -110,7 +114,8 @@ void QnArchiveSyncPlayWrapper::resumeMedia()
 
         info.reader->setNavDelegate(this);
     }
-    if (resumed)
+    bool isBuffering = d->enabled && d->bufferingCnt > 0;
+    if (resumed && !isBuffering)
         reinitTime(time);
 }
 
@@ -197,6 +202,22 @@ void QnArchiveSyncPlayWrapper::setJumpTime(qint64 mksec)
     d->timer.restart();
 }
 
+void QnArchiveSyncPlayWrapper::setSkipFramesToTime(qint64 skipTime)
+{
+    Q_D(QnArchiveSyncPlayWrapper);
+    QMutexLocker lock(&d->timeMutex);
+    setJumpTime(skipTime);
+    foreach(const ReaderInfo& info, d->readers)
+    {
+        if (info.enabled)
+        {
+            info.reader->setNavDelegate(0);
+            info.reader->setSkipFramesToTime(skipTime);
+            info.reader->setNavDelegate(this);
+        }
+    }
+}
+
 bool QnArchiveSyncPlayWrapper::jumpTo(qint64 mksec,  qint64 skipTime)
 {
     Q_D(QnArchiveSyncPlayWrapper);
@@ -250,9 +271,11 @@ void QnArchiveSyncPlayWrapper::previousFrame(qint64 mksec)
     QMutexLocker lock(&d->timeMutex);
     foreach(const ReaderInfo& info, d->readers)
     {
-        info.reader->setNavDelegate(0);
-        info.reader->previousFrame(mksec);
-        info.reader->setNavDelegate(this);
+        if (info.enabled) {
+            info.reader->setNavDelegate(0);
+            info.reader->previousFrame(mksec);
+            info.reader->setNavDelegate(this);
+        }
     }
 }
 
@@ -361,6 +384,8 @@ qint64 QnArchiveSyncPlayWrapper::getDisplayedTime() const
 
     if (d->lastJumpTime == DATETIME_NOW && !d->paused)
         return DATETIME_NOW;
+    else if (d->enabled && d->bufferingCnt > 0)
+        return d->bufferingTime;
 
     return getDisplayedTimeInternal();
 }
@@ -425,16 +450,12 @@ void QnArchiveSyncPlayWrapper::onBeforeJump(qint64 /*mksec*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    d->inJumpCount++;
 }
 
 void QnArchiveSyncPlayWrapper::onJumpCanceled(qint64 /*time*/)
 {
     Q_D(QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    if (d->inJumpCount > 0)
-        d->inJumpCount--;
-    Q_ASSERT(d->inJumpCount >= 0);
 }
 
 void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
@@ -442,13 +463,6 @@ void QnArchiveSyncPlayWrapper::onJumpOccured(qint64 mksec)
     Q_D(QnArchiveSyncPlayWrapper);
 
     QMutexLocker lock(&d->timeMutex);
-    if (d->inJumpCount > 0)
-        d->inJumpCount--;
-    Q_ASSERT(d->inJumpCount >= 0);
-    if (d->inJumpCount == 0) 
-    {
-        setJumpTime(mksec);
-    }
 }
 
 qint64 QnArchiveSyncPlayWrapper::minTime() const
@@ -501,6 +515,8 @@ void QnArchiveSyncPlayWrapper::erase(QnAbstractArchiveDelegate* value)
     {
         if (i->reader->getArchiveDelegate() == value)
         {
+            if (i->buffering)
+                d->bufferingCnt--;
             i->reader->disconnect(this);
             d->readers.erase(i);
             if (d->readers.isEmpty())
@@ -520,6 +536,8 @@ void QnArchiveSyncPlayWrapper::onBufferingStarted(QnlTimeSource* source, qint64 
     {
         if (i->cam == source)
         {
+            if (!i->buffering)
+                d->bufferingCnt++;
             i->buffering = true;
             d->bufferingTime = bufferingTime;
             break;
@@ -548,14 +566,13 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
     {
         if (i->cam == source)
         {
+            if (i->buffering)
+                d->bufferingCnt--;
             i->buffering = false;
             break;
         }
     }
 
-
-    //if (d->inJumpCount > 0)
-    //    return;
 
     for (QList<ReaderInfo>::iterator i = d->readers.begin(); i < d->readers.end(); ++i)
     {
@@ -563,11 +580,24 @@ void QnArchiveSyncPlayWrapper::onBufferingFinished(QnlTimeSource* source)
             return;
     }
 
+    /*
     // no more buffering
     qint64 bt = d->bufferingTime;
     d->bufferingTime = AV_NOPTS_VALUE;
-
-    //qDebug() << "correctTime after end of buffering=" << (getCurrentTime() - bt)/1000.0;
+    qint64 displayTime = getDisplayedTime();
+    if (bt != AV_NOPTS_VALUE) {
+        if (d->speed >= 0)
+            reinitTime(qMax(bt, displayTime));
+        else
+            reinitTime(qMin(bt, displayTime));
+        qDebug() << "correctTime after end of buffering=" << (displayTime - bt)/1000.0;
+    }
+    else {
+        reinitTime(displayTime);
+    }
+    */
+    // reinit time to real position. If reinit time to requested position (it differs if rought jump), redAss can switch item to LQ
+    d->bufferingTime = AV_NOPTS_VALUE;
     reinitTime(getDisplayedTime());
 }
 
@@ -616,22 +646,42 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
 {
     Q_D(const QnArchiveSyncPlayWrapper);
     QMutexLocker lock(&d->timeMutex);
-    if (d->lastJumpTime == DATETIME_NOW)
+    if (d->lastJumpTime == DATETIME_NOW) {
+        d->gotCacheTime = 0;
         return DATETIME_NOW;
-
-    if (d->inJumpCount > 0)
-        return d->lastJumpTime;
-
-    if (d->bufferingTime != qint64(AV_NOPTS_VALUE))
-        return d->bufferingTime; // same as last jump time
-
-    foreach(const ReaderInfo& info, d->readers) {
-        if (info.enabled && info.buffering) 
-            return d->lastJumpTime;
     }
 
-    qint64 expectTime = expectedTime();
+    if (d->bufferingCnt > 0) {
+        d->gotCacheTime = 0;
+        return d->lastJumpTime;
+    }
 
+    if (d->bufferingTime != qint64(AV_NOPTS_VALUE)) {
+        d->gotCacheTime = 0;
+        return d->bufferingTime; // same as last jump time
+    }
+
+    foreach(const ReaderInfo& info, d->readers) {
+        if (info.enabled && info.buffering) {
+            d->gotCacheTime = 0;
+            return d->lastJumpTime;
+        }
+    }
+    
+
+    qint64 usecTimer = getUsecTimer();
+    if (usecTimer - d->gotCacheTime < 1000ll)
+        return d->cachedTime;
+    d->gotCacheTime = usecTimer;
+
+    d->cachedTime = getCurrentTimeInternal();
+    return d->cachedTime;
+}
+
+
+qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
+{
+    Q_D(const QnArchiveSyncPlayWrapper);
     /*
     QString s;
     QTextStream str(&s);
@@ -641,6 +691,7 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTime() const
     */
 
 
+    qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();
     if (d->speed >= 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime > expectTime + MAX_FRAME_DURATION*1000)
     {

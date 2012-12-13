@@ -65,6 +65,7 @@
 #include "rest/handlers/gettime_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
+#include "rest/handlers/ping_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -290,11 +291,18 @@ QnMediaServerResourcePtr registerServer(QnAppServerConnectionPtr appServerConnec
     QnMediaServerResourceList servers;
     QByteArray errorString;
     serverPtr->setStatus(QnResource::Online);
-    if (appServerConnection->registerServer(serverPtr, servers, errorString) != 0)
+
+    QByteArray authKey;
+    if (appServerConnection->registerServer(serverPtr, servers, authKey, errorString) != 0)
     {
         qDebug() << "registerServer(): Call to registerServer failed. Reason: " << errorString;
 
         return QnMediaServerResourcePtr();
+    }
+
+    if (!authKey.isEmpty()) {
+        qSettings.setValue("authKey", authKey);
+        QnAppServerConnectionFactory::setAuthKey(authKey);
     }
 
     return servers.at(0);
@@ -414,6 +422,7 @@ void initAppServerConnection(const QSettings &settings)
     QUrl urlNoPassword(appServerUrl);
     urlNoPassword.setPassword("");
     cl_log.log("Connect to enterprise controller server ", urlNoPassword.toString(), cl_logINFO);
+    QnAppServerConnectionFactory::setAuthKey(authKey());
     QnAppServerConnectionFactory::setClientGuid(serverGuid());
     QnAppServerConnectionFactory::setDefaultUrl(appServerUrl);
     QnAppServerConnectionFactory::setDefaultFactory(&QnResourceDiscoveryManager::instance());
@@ -451,8 +460,8 @@ bool checkIfAppServerIsOld()
     httpUrl.setUserName("");
     httpUrl.setPassword("");
 
-    QByteArray reply, errorString;
-    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", reply, errorString) == 204)
+    QnHTTPRawResponse response;
+    if (QnSessionManager::instance()->sendGetRequest(httpUrl, "resourceEx", response) == 204)
     {
         cl_log.log("Old Incomatible Enterprise Controller version detected. Please update yout Enterprise Controler", cl_logERROR);
         return true;
@@ -591,6 +600,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/ptz", new QnPtzHandler());
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnGetTimeHandler());
+    QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

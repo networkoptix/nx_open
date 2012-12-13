@@ -30,7 +30,9 @@ public:
     // nav delegate
     virtual void directJumpToNonKeyFrame(qint64 mksec);
 
-    virtual bool jumpTo(qint64 mksec,  qint64 skipTime);
+    virtual bool jumpTo(qint64 mksec,  qint64 skipTime) override;
+    virtual void setSkipFramesToTime(qint64 skipTime) override;
+
     virtual void previousFrame(qint64 mksec);
     virtual void nextFrame();
     virtual void pauseMedia();
@@ -75,6 +77,7 @@ private:
     qint64 findTimeAtPlaybackMask(qint64 timeUsec);
     void setJumpTime(qint64 mksec);
     qint64 maxArchiveTime() const;
+    qint64 getCurrentTimeInternal() const;
 private:
     friend class QnSyncPlayArchiveDelegate;
     QN_DECLARE_PRIVATE(QnArchiveSyncPlayWrapper);

@@ -1420,7 +1420,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             if(qnSettings->timeMode() == Qn::ServerTimeMode)
                 displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: do offset adjustments in one place
 
-            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(tr("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(tr("hh:mm:ss"));
+            QString timeString = (widget->resource()->flags() & QnResource::utc) ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) : QTime().addMSecs(displayTime).toString(lit("hh:mm:ss"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
 

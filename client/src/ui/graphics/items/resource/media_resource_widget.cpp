@@ -755,7 +755,7 @@ QString QnMediaResourceWidget::calculateInfoText() const {
         timeString = tr("\t%1").arg(
             m_display->camDisplay()->isRealTimeSource() ? 
             tr("LIVE") :
-            QDateTime::fromMSecsSinceEpoch(utcTime).toString(tr("hh:mm:ss.zzz"))
+            QDateTime::fromMSecsSinceEpoch(utcTime).toString(lit("hh:mm:ss.zzz"))
         );
     }
     

@@ -6,7 +6,7 @@
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
-#include "connectiontestingdialog.h"
+#include "connection_testing_dialog.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -144,6 +144,15 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER))
     );
+
+    connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
+
+    m_mediaServerStartAction->setVisible(false);
+    m_mediaServerStopAction->setVisible(false);
+    m_showMediaServerLogAction->setVisible(false);
+    m_appServerStartAction->setVisible(false);
+    m_appServerStopAction->setVisible(false);
+    m_showAppLogAction->setVisible(false);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -303,12 +312,19 @@ void QnSystrayWindow::updateServiceInfo()
         return;
     }
 
-    int mediaServerStatus = updateServiceInfoInternal(m_mediaServerHandle, MEDIA_SERVER_NAME,       m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
-    int appServerStatus = updateServiceInfoInternal(m_appServerHandle,   APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
+    GetServiceInfoAsyncTask *mediaServerTask = new GetServiceInfoAsyncTask(m_mediaServerHandle);
+    connect(mediaServerTask, SIGNAL(finished(quint64)), this, SLOT(mediaServerInfoUpdated(quint64)), Qt::QueuedConnection);
+    QThreadPool::globalInstance()->start(mediaServerTask);
+   
+    GetServiceInfoAsyncTask *appServerTask = new GetServiceInfoAsyncTask(m_appServerHandle);
+    connect(appServerTask, SIGNAL(finished(quint64)), this, SLOT(appServerInfoUpdated(quint64)), Qt::QueuedConnection);
+    QThreadPool::globalInstance()->start(appServerTask);
+}
 
-    settingsAction->setVisible(m_mediaServerHandle || m_appServerHandle);
-
-    if (appServerStatus == SERVICE_STOPPED) 
+void QnSystrayWindow::appServerInfoUpdated(quint64 status) {
+    updateServiceInfoInternal(m_appServerHandle, status,  APP_SERVER_NAME, m_appServerStartAction,   m_appServerStopAction, m_showAppLogAction);
+    settingsAction->setVisible(true);
+    if (status == SERVICE_STOPPED) 
     {
         if (m_needStartAppServer)
         {
@@ -321,15 +337,20 @@ void QnSystrayWindow::updateServiceInfo()
             showMessage(APP_SERVER_NAME + QString(" has been stopped"));
         }
     }
-    else if (appServerStatus == SERVICE_RUNNING)
+    else if (status == SERVICE_RUNNING)
     {
         if (m_prevAppServerStatus >= 0 && m_prevAppServerStatus != SERVICE_RUNNING)
         {
             showMessage(APP_SERVER_NAME + QString(" has been started"));
         }
     }
+    m_prevAppServerStatus = status;
+}
 
-    if (mediaServerStatus == SERVICE_STOPPED)
+void QnSystrayWindow::mediaServerInfoUpdated(quint64 status) {
+    updateServiceInfoInternal(m_mediaServerHandle, status, MEDIA_SERVER_NAME, m_mediaServerStartAction, m_mediaServerStopAction, m_showMediaServerLogAction);
+    settingsAction->setVisible(true);
+    if (status == SERVICE_STOPPED)
     {
         if (m_needStartMediaServer) 
         {
@@ -342,37 +363,28 @@ void QnSystrayWindow::updateServiceInfo()
             showMessage(MEDIA_SERVER_NAME + QString(" has been stopped"));
         }
     }
-    else if (mediaServerStatus == SERVICE_RUNNING)
+    else if (status == SERVICE_RUNNING)
     {
         if (m_prevMediaServerStatus >= 0 && m_prevMediaServerStatus != SERVICE_RUNNING)
         {
             showMessage(MEDIA_SERVER_NAME + QString(" has been started"));
         }
     }
-
-    m_prevMediaServerStatus = mediaServerStatus;
-    m_prevAppServerStatus = appServerStatus;
+    m_prevMediaServerStatus = status;
 }
 
-int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction)
+void QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, DWORD status, const QString& serviceName, QAction* startAction, QAction* stopAction, QAction* logAction)
 {
-    SERVICE_STATUS serviceStatus;
-
     if (!service)
     {
         stopAction->setVisible(false);
         startAction->setVisible(false);
         logAction->setVisible(false);
-        return -1;
+        return;
     }
     logAction->setVisible(true);
 
-    QString str;
-
-    if (QueryServiceStatus(service, &serviceStatus))
-    {
-        switch(serviceStatus.dwCurrentState)
-        {
+    switch(status) {
         case SERVICE_STOPPED:
             stopAction->setVisible(false);
             startAction->setVisible(true);
@@ -417,9 +429,7 @@ int QnSystrayWindow::updateServiceInfoInternal(SC_HANDLE service, const QString&
             startAction->setEnabled(false);
             startAction->setText(tr("Start ") + serviceName + tr(" (pausing)"));
             break;
-        }
     }
-    return serviceStatus.dwCurrentState;
 }
 
 void QnSystrayWindow::at_mediaServerStartAction()
@@ -432,13 +442,16 @@ void QnSystrayWindow::at_mediaServerStartAction()
 
 void QnSystrayWindow::at_mediaServerStopAction()
 {
-    SERVICE_STATUS serviceStatus;
+    //SERVICE_STATUS serviceStatus;
     if (m_mediaServerHandle) 
     {
         if (QMessageBox::question(0, tr("Systray"), MEDIA_SERVER_NAME + " is going to be stopped. Are you sure?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-            updateServiceInfo();
+            //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+            StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_mediaServerHandle);
+            connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
+            QThreadPool::globalInstance()->start(stopTask);
+            m_mediaServerStopAction->setEnabled(false);
         }
     }
 }
@@ -452,13 +465,14 @@ void QnSystrayWindow::at_appServerStartAction()
 
 void QnSystrayWindow::at_appServerStopAction()
 {
-    SERVICE_STATUS serviceStatus;
     if (m_appServerHandle) 
     {
         if (QMessageBox::question(0, tr("Systray"), APP_SERVER_NAME + QString(" is going to be stopped. Are you sure?"), QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
         {
-            ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
-            updateServiceInfo();
+            StopServiceAsyncTask *stopTask = new StopServiceAsyncTask(m_appServerHandle);
+            connect(stopTask, SIGNAL(finished()), this, SLOT(updateServiceInfo()), Qt::QueuedConnection);
+            QThreadPool::globalInstance()->start(stopTask);
+            m_appServerStartAction->setEnabled(false);
         }
     }
 }
@@ -750,15 +764,19 @@ void QnSystrayWindow::buttonClicked(QAbstractButton * button)
                 requestStr += tr(" to be restarted. Would you like to restart now?");
                 if (QMessageBox::question(this, tr("Systray"), requestStr, QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes)
                 {
-                    SERVICE_STATUS serviceStatus;
+                    //SERVICE_STATUS serviceStatus;
                     if (appServerParamChanged) {
-                        ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        //ControlService(m_appServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_appServerHandle));
+
                         m_needStartAppServer = true;
                         m_prevAppServerStatus = SERVICE_STOPPED;
 
                     }
                     if (mediaServerParamChanged) {
-                        ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        //ControlService(m_mediaServerHandle, SERVICE_CONTROL_STOP, &serviceStatus);
+                        QThreadPool::globalInstance()->start(new StopServiceAsyncTask(m_mediaServerHandle));
+
                         m_needStartMediaServer = true;
                         m_prevMediaServerStatus = SERVICE_STOPPED;
                     }
@@ -907,11 +925,11 @@ void QnSystrayWindow::onTestButtonClicked()
 
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("You have entered invalid URL."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("You have entered invalid URL."));
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
+    QnConnectionTestingDialog dialog(url, this);
     dialog.setModal(true);
     dialog.exec();
 }
@@ -939,4 +957,7 @@ void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
     ui->appPortSpinBox->setValue( urlToSet.port() );
     //ui->appServerLogin->setText( urlToSet.userName() );
     //ui->appServerPassword->setText( urlToSet.password() );
+}
+void QnSystrayWindow::at_appServerPassword_textChanged(const QString &text) {
+    ui->testButton->setEnabled(!text.isEmpty());
 }

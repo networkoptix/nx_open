@@ -293,19 +293,8 @@
                                     <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <executable>${environment.dir}/bin/signtool.exe</executable>
-                                    <workingDirectory>${project.build.directory}/bin</workingDirectory>
-                                    <arguments>
-                                        <argument>sign</argument>
-                                        <argument>/v</argument>
-                                        <argument>/p</argument>
-                                        <argument>qweasd123</argument>
-                                        <argument>/d</argument>
-                                        <argument>"Network Optix HD Witness"</argument>
-                                        <argument>/f</argument>
-                                        <argument>${basedir}/sign/app.p12</argument>
-                                        <argument>${project.build.finalName}.msi</argument>
-                                    </arguments>
+                                    <executable>${project.build.directory}/sign-${customization}.bat</executable>
+                                    <workingDirectory>${project.build.directory}</workingDirectory>
                                     <skip>${skip.sign}</skip>                       
                                 </configuration>                    
                             </execution>                            

@@ -21,7 +21,7 @@
 Q_GLOBAL_STATIC(QMutex, activityMutex)
 static qint64 activityTime = 0;
 static const int REDASS_DELAY_INTERVAL = 2 * 1000*1000ll; // if archive frame delayed for interval, mark stream as slow
-static const int LIVE_MEDIA_LEN_THRESHOLD = 100*1000ll;   // do not sleep in live mode if queue is large
+static const int LIVE_MEDIA_LEN_THRESHOLD = 250*1000ll;   // do not sleep in live mode if queue is large
 
 static void updateActivity()
 {
@@ -525,8 +525,10 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
-                if (m_buffering == 0 && m_extTimeSrc)
+                if (m_buffering == 0 && m_extTimeSrc) {
                     m_extTimeSrc->onBufferingFinished(this);
+                    unblockTimeValue();
+                }
             }
             else
                 m_timeMutex.unlock();
@@ -550,9 +552,50 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
     return doProcessPacket;
 }
 
+void QnCamDisplay::onSkippingFrames(qint64 time)
+{
+    if (m_extTimeSrc)
+        m_extTimeSrc->onBufferingStarted(this, time);
+
+    m_dataQueue.lock();
+    for (int i = 0; i < m_dataQueue.size(); ++i) {
+        QnAbstractMediaDataPtr media = m_dataQueue.at(i).dynamicCast<QnAbstractMediaData>();
+        if (media) {
+            if (m_speed >= 0 && media->timestamp < time)
+                media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+            else if (m_speed < 0 && media->timestamp > time)
+                media->flags |= QnAbstractMediaData::MediaFlags_Ignore;
+        }
+    }
+    m_dataQueue.unlock();
+
+    QMutexLocker lock(&m_timeMutex);
+    m_singleShotQuantProcessed = false;
+    m_buffering = getBufferingMask();
+
+    blockTimeValue(time);
+
+    m_emptyPacketCounter = 0;
+    if (m_extTimeSrc && m_eofSignalSended) {
+        m_extTimeSrc->onEofReached(this, false);
+        m_eofSignalSended = false;
+    }
+}
+
+void QnCamDisplay::blockTimeValue(qint64 time)
+{
+    if (!m_doNotChangeDisplayTime) {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+            m_nextReverseTime[i] = AV_NOPTS_VALUE;
+            m_display[i]->blockTimeValue(time);
+        }
+    }
+}
+
 void QnCamDisplay::onBeforeJump(qint64 time)
 {
-
+    if (m_extTimeSrc)
+        m_extTimeSrc->onBufferingStarted(this, m_doNotChangeDisplayTime ? getDisplayedTime() : time);
     /*
     if (time < 1000000ll * 100000)
         cl_log.log("before jump to ", time, cl_logWARNING);
@@ -564,12 +607,7 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     onRealTimeStreamHint(time == DATETIME_NOW && m_speed >= 0);
 
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    if (!m_doNotChangeDisplayTime) {
-        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-            m_nextReverseTime[i] = AV_NOPTS_VALUE;
-            m_display[i]->blockTimeValue(time);
-        }
-    }
+    blockTimeValue(time);
     m_doNotChangeDisplayTime = false;
 
     m_emptyPacketCounter = 0;
@@ -603,21 +641,14 @@ void QnCamDisplay::onJumpOccured(qint64 time)
     else
         cl_log.log("after jump to ", QDateTime::fromMSecsSinceEpoch(time/1000).toString(), cl_logWARNING);
     */       
-    if (m_extTimeSrc)
-        m_extTimeSrc->onBufferingStarted(this, time);
+    //if (m_extTimeSrc)
+    //    m_extTimeSrc->onBufferingStarted(this, time);
 
     QMutexLocker lock(&m_timeMutex);
     m_afterJump = true;
     m_bofReceived = false;
     m_buffering = getBufferingMask();
     m_lastDecodedTime = AV_NOPTS_VALUE;
-    //clearUnprocessedData();
-    /*
-    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-        m_nextReverseTime[i] = AV_NOPTS_VALUE;
-        m_display[i]->blockTimeValue(time);
-    }
-    */
     
     m_singleShotQuantProcessed = false;
     m_jumpTime = time;
@@ -715,12 +746,8 @@ void QnCamDisplay::setSpeed(float speed)
             m_executingChangeSpeed = true; // do not show "No data" while display preparing for new speed. 
             if (m_extTimeSrc) {
                 qint64 time = m_extTimeSrc->getCurrentTime();
-                if (time != DATETIME_NOW) {
-                    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
-                        m_nextReverseTime[i] = AV_NOPTS_VALUE;
-                        m_display[i]->blockTimeValue(time);
-                    }
-                }
+                if (time != DATETIME_NOW)
+                    blockTimeValue(time);
             }
         }
         if (speed < 0 && m_speed >= 0) {
@@ -729,6 +756,12 @@ void QnCamDisplay::setSpeed(float speed)
         }
         m_speed = speed;
     }
+};
+
+void QnCamDisplay::unblockTimeValue()
+{
+    for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
+        m_display[i]->unblockTimeValue();
 };
 
 void QnCamDisplay::processNewSpeed(float speed)
@@ -750,7 +783,7 @@ void QnCamDisplay::processNewSpeed(float speed)
     if (speed < 0 && m_prevSpeed >= 0)
         m_buffering = getBufferingMask(); // decode first gop is required some time
 
-    if (speed == 0 && m_extTimeSrc && m_eofSignalSended)
+    if (m_prevSpeed == 0 && m_extTimeSrc && m_eofSignalSended)
     {
         m_extTimeSrc->onEofReached(this, false);
         m_eofSignalSended = false;
@@ -762,10 +795,9 @@ void QnCamDisplay::processNewSpeed(float speed)
         clearVideoQueue();
         QMutexLocker lock(&m_timeMutex);
         m_lastDecodedTime = AV_NOPTS_VALUE;
-        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i) {
+        for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
             m_nextReverseTime[i] = AV_NOPTS_VALUE;
-            m_display[i]->unblockTimeValue();
-        }
+        unblockTimeValue();
     }
     if (qAbs(speed) > 1.0) {
         m_storedMaxQueueSize = m_dataQueue.maxSize();
@@ -783,6 +815,11 @@ void QnCamDisplay::processNewSpeed(float speed)
     }
     setLightCPUMode(QnAbstractVideoDecoder::DecodeMode_Full);
     m_executingChangeSpeed = false;
+}
+
+bool QnCamDisplay::isSyncAllowed() const
+{
+    return m_extTimeSrc && m_extTimeSrc->isEnabled();
 }
 
 bool QnCamDisplay::useSync(QnCompressedVideoDataPtr vd)
@@ -971,6 +1008,7 @@ bool QnCamDisplay::processData(QnAbstractDataPacketPtr data)
                 m_timeMutex.unlock();
                 if (m_extTimeSrc)
                     m_extTimeSrc->onBufferingFinished(this);
+                unblockTimeValue();
             }
             else 
                 m_timeMutex.unlock();
