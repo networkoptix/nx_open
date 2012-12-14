@@ -450,7 +450,7 @@
     </message>
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui" line="53"/>
-        <source>Serial</source>
+        <source>License key</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -477,6 +477,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/widgets/settings/license_widget.ui" line="80"/>
+        <source>License Key:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui" line="103"/>
         <source>Hardware ID:</source>
         <translation type="unfinished"></translation>
@@ -498,11 +503,6 @@
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;MS Shell Dlg 2&apos;; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/widgets/settings/license_widget.ui" line="80"/>
-        <source>Serial Key:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1397,6 +1397,11 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/actions/action_manager.cpp" line="992"/>
+        <source>Preview Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="1103"/>
         <source>Show Title Bar</source>
         <translation type="unfinished"></translation>
@@ -1733,11 +1738,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <location filename="../src/ui/actions/action_manager.cpp" line="975"/>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/actions/action_manager.cpp" line="992"/>
-        <source>Thumbnails Search...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2208,7 +2208,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <location filename="../src/ui/widgets/settings/license_manager_widget.cpp" line="128"/>
         <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
 License Owner: %1&lt;br /&gt;
-Serial Key: %2&lt;br /&gt;
+License key: %2&lt;br /&gt;
 Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
@@ -2340,11 +2340,6 @@ Try to activate your License manually.</source>
     <message>
         <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="753"/>
         <source>%1x%2 %3fps @ %4Mbps%5%6%7</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/resource/media_resource_widget.cpp" line="749"/>
-        <source>hh:mm:ss.zzz</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2843,12 +2838,6 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="350"/>
-        <source>hh:mm:ss</source>
-        <comment>DEFAULT_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="366"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="367"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="368"/>
@@ -2858,30 +2847,6 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="394"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="395"/>
         <source>ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="366"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="392"/>
-        <source>10ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="367"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="393"/>
-        <source>50ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="368"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="394"/>
-        <source>100ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="369"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="395"/>
-        <source>500ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2897,18 +2862,6 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="370"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="371"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="372"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="373"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="396"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="397"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="398"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="399"/>
-        <source>59s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="374"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="375"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="376"/>
@@ -2918,23 +2871,6 @@ AVAILABLE</source>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="402"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="403"/>
         <source>m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="374"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="375"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="376"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="377"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="400"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="401"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="402"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="403"/>
-        <source>59m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="374"/>
-        <source>dd MMMM yyyy hh:mm ap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2948,72 +2884,8 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="378"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="379"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="380"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="404"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="405"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="406"/>
-        <source>23h</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="378"/>
-        <source>dd MMMM yyyy h ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="381"/>
-        <source>dd MMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="381"/>
-        <source>29 Mar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="381"/>
-        <source>dd MMMM yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="382"/>
-        <source>MMMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="382"/>
-        <source>September</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="382"/>
-        <source>MMMM yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="383"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="384"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="385"/>
-        <source>yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="383"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="384"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="385"/>
-        <source>2000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="407"/>
         <source>d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="407"/>
-        <source>29d</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3022,22 +2894,10 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="408"/>
-        <source>11M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="409"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="410"/>
         <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="411"/>
         <source>y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="409"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="410"/>
-        <location filename="../src/ui/graphics/items/controls/time_slider.cpp" line="411"/>
-        <source>2000y</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3145,7 +3005,7 @@ AVAILABLE</source>
 <context>
     <name>QnVideoCamera</name>
     <message>
-        <location filename="../src/camera/video_camera.cpp" line="146"/>
+        <location filename="../src/camera/video_camera.cpp" line="147"/>
         <source>Invalid resource type for data export.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3262,9 +3122,9 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1111"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1927"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2775"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2792"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2817"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2774"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2791"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2816"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3309,21 +3169,6 @@ AVAILABLE</source>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1192"/>
         <source>Layouts (*.layout)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1422"/>
-        <source>Could not perform thumbnails search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1422"/>
-        <source>Selected time period is too short to perform thumbnails search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1504"/>
-        <source>Thumbnail Search for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3489,47 +3334,62 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2605"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2604"/>
         <source>AVI format is not recommended</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2606"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2605"/>
         <source>AVI format is not recommended for camera with audio track there is some recording holes exists. Press &apos;Yes&apos; to continue export or &apos;No&apos; to select other format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2853"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2852"/>
         <source>Software Update is Available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2854"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2853"/>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2179"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2584"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2583"/>
         <source>Save As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1422"/>
+        <source>Could not perform preview search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1422"/>
+        <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="1504"/>
+        <source>Preview Search for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2180"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2585"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2584"/>
         <source>File &apos;%1&apos; already exists. Overwrite?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2192"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2618"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2617"/>
         <source>Can&apos;t overwrite file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2193"/>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2256"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2619"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2618"/>
         <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3555,13 +3415,13 @@ Do you want to continue?</source>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2413"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2685"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2684"/>
         <source>Export finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2413"/>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2685"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2684"/>
         <source>Export successfully finished</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3593,85 +3453,75 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2555"/>
-        <source>dd-mmm-yyyy hh-mm-ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2555"/>
-        <source>hh-mm-ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2561"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2560"/>
         <source>AVI (*.avi);;Matroska (*.mkv);;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2562"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2561"/>
         <source>AVI with Timestamps (Requires Transcoding)(*.avi);;Matroska  with Timestamps (Requires Transcoding)(*.mkv);;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2567"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2566"/>
         <source>Export Video As...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2646"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2645"/>
         <source>Exporting Video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2647"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2646"/>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2662"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2661"/>
         <source>with Timestamps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2710"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2709"/>
         <source>Could not export video</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2776"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2775"/>
         <source>Could not save the following %n layout(s) to Enterprise Controller.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2777"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2776"/>
         <source>Do you want to restore these %n layout(s)?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2793"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2792"/>
         <source>Could not save the following %n items to Enterprise Controller.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2794"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2793"/>
         <source>Error description: 
 %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2807"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2806"/>
         <source>Could not delete resource from Enterprise Controller. 
 
 Error description: &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2818"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2817"/>
         <source>Could not save changes made to the following %n resource(s).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2819"/>
+        <location filename="../src/ui/workbench/handlers/workbench_action_handler.cpp" line="2818"/>
         <source>Error description:
 %1</source>
         <translation type="unfinished"></translation>
@@ -3713,19 +3563,6 @@ Error description: &apos;%2&apos;</source>
     <message>
         <location filename="../src/ui/workbench/workbench_controller.cpp" line="684"/>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnWorkbenchDisplay</name>
-    <message>
-        <location filename="../src/ui/workbench/workbench_display.cpp" line="1423"/>
-        <source>yyyy MMM dd hh:mm:ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/workbench_display.cpp" line="1423"/>
-        <source>hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3781,33 +3618,14 @@ Error description: &apos;%2&apos;</source>
 <context>
     <name>QnWorkbenchNavigator</name>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="896"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="897"/>
         <source>All Cameras</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1116"/>
+        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1117"/>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1119"/>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
-        <comment>CAMERA_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1122"/>
-        <source>hh:mm:ss</source>
-        <comment>LONG_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../src/ui/workbench/workbench_navigator.cpp" line="1124"/>
-        <source>mm:ss</source>
-        <comment>SHORT_TOOL_TIP_FORMAT</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

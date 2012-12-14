@@ -358,10 +358,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Serial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -375,6 +371,10 @@
     </message>
     <message>
         <source>Active Licenses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License key</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -421,15 +421,15 @@ p, li { white-space: pre-wrap; }
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Serial Key:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Activation Key:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Activation Key File:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License Key:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1334,10 +1334,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Thumbnails Search...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Space</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1551,6 +1547,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Hide Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Search...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2030,16 +2030,6 @@ Built for %5-%6 with %7.&lt;br/&gt;
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
-License Owner: %1&lt;br /&gt;
-Serial Key: %2&lt;br /&gt;
-Locked to Hardware ID: %3&lt;br /&gt;
-&lt;br /&gt;
-&lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
-Archive Streams Allowed: %4</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License Details</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2062,6 +2052,16 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
+License Owner: %1&lt;br /&gt;
+License key: %2&lt;br /&gt;
+Locked to Hardware ID: %3&lt;br /&gt;
+&lt;br /&gt;
+&lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
+Archive Streams Allowed: %4</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2090,10 +2090,6 @@ Try to activate your License manually.</source>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
-    <message>
-        <source>hh:mm:ss.zzz</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Smart Search</source>
         <translation type="unfinished"></translation>
@@ -2551,28 +2547,7 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <comment>DEFAULT_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>10ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>50ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>100ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>500ms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2580,19 +2555,7 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>59s</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>59m</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy hh:mm ap</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2600,51 +2563,7 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>23h</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy h ap</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd MMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>29 Mar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>dd MMMM yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MMMM</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>September</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MMMM yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yyyy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>d</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>29d</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2652,15 +2571,7 @@ AVAILABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>11M</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>y</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>2000y</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2975,14 +2886,6 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd-mmm-yyyy hh-mm-ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh-mm-ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export Video As...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3028,18 +2931,6 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>Error description:
 %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not perform thumbnails search</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected time period is too short to perform thumbnails search. Please select a longer period.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Thumbnail Search for %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3159,6 +3050,18 @@ Error description: &apos;%2&apos;</source>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Could not perform preview search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Search for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -3188,17 +3091,6 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Can&apos;t start recording due to the following error: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnWorkbenchDisplay</name>
-    <message>
-        <source>yyyy MMM dd hh:mm:ss</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3250,22 +3142,6 @@ Error description: &apos;%2&apos;</source>
     <message>
         <source>&apos;Live&apos;</source>
         <comment>LIVE_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>yyyy MMM dd
-hh:mm:ss</source>
-        <comment>CAMERA_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <comment>LONG_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>mm:ss</source>
-        <comment>SHORT_TOOL_TIP_FORMAT</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -513,7 +513,7 @@
     </message>
     <message>
         <source>Serial</source>
-        <translation type="unfinished">序列</translation>
+        <translation type="obsolete">序列</translation>
     </message>
     <message>
         <source>...</source>
@@ -530,6 +530,10 @@
     <message>
         <source>Active Licenses</source>
         <translation type="unfinished">激活许可</translation>
+    </message>
+    <message>
+        <source>License key</source>
+        <translation type="unfinished">许可码</translation>
     </message>
 </context>
 <context>
@@ -620,7 +624,7 @@ p, li { white-space: pre-wrap; }
     </message>
     <message>
         <source>Serial Key:</source>
-        <translation type="unfinished">序列号：</translation>
+        <translation type="obsolete">序列号：</translation>
     </message>
     <message>
         <source>Activation Key:</source>
@@ -629,6 +633,10 @@ p, li { white-space: pre-wrap; }
     <message>
         <source>Activation Key File:</source>
         <translation type="unfinished">激活码文件：</translation>
+    </message>
+    <message>
+        <source>License Key:</source>
+        <translation type="unfinished">许可码：</translation>
     </message>
 </context>
 <context>
@@ -1621,7 +1629,7 @@ Built for %5-%6 with %7.&lt;br/&gt;
     </message>
     <message>
         <source>Thumbnails Search...</source>
-        <translation type="unfinished">小图标搜索</translation>
+        <translation type="obsolete">小图标搜索</translation>
     </message>
     <message>
         <source>Show Calendar</source>
@@ -1854,6 +1862,10 @@ Built for %5-%6 with %7.&lt;br/&gt;
     <message>
         <source>Hide Timeline</source>
         <translation type="unfinished">隐藏时间轴</translation>
+    </message>
+    <message>
+        <source>Preview Search...</source>
+        <translation type="unfinished">上一次搜索</translation>
     </message>
 </context>
 <context>
@@ -2406,7 +2418,7 @@ Locked to Hardware ID: %3&lt;br /&gt;
 &lt;br /&gt;
 &lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
 Archive Streams Allowed: %4</source>
-        <translation type="unfinished">&lt;b&gt;基本:&lt;/b&gt;&lt;br /&gt;
+        <translation type="obsolete">&lt;b&gt;基本:&lt;/b&gt;&lt;br /&gt;
 许可拥有者: %1&lt;br /&gt;
 序列号: %2&lt;br /&gt;
 锁定硬件ID: %3&lt;br /&gt;
@@ -2438,6 +2450,16 @@ Try to activate your License manually.</source>
     <message>
         <source>You do not have a valid License installed. Please activate your commercial license.</source>
         <translation type="unfinished">没有安装有效的许可。请激活有效的许可。</translation>
+    </message>
+    <message>
+        <source>&lt;b&gt;Generic:&lt;/b&gt;&lt;br /&gt;
+License Owner: %1&lt;br /&gt;
+License key: %2&lt;br /&gt;
+Locked to Hardware ID: %3&lt;br /&gt;
+&lt;br /&gt;
+&lt;b&gt;Features:&lt;/b&gt;&lt;br /&gt;
+Archive Streams Allowed: %4</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2471,7 +2493,7 @@ Try to activate your License manually.</source>
     </message>
     <message>
         <source>hh:mm:ss.zzz</source>
-        <translation type="unfinished">时:分:秒.zzz</translation>
+        <translation type="obsolete">时:分:秒.zzz</translation>
     </message>
     <message>
         <source>Smart Search</source>
@@ -3040,7 +3062,7 @@ AVAILABLE</source>
     <message>
         <source>hh:mm:ss</source>
         <comment>DEFAULT_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished">时:分:秒</translation>
+        <translation type="obsolete">时:分:秒</translation>
     </message>
     <message>
         <source>ms</source>
@@ -3048,19 +3070,19 @@ AVAILABLE</source>
     </message>
     <message>
         <source>10ms</source>
-        <translation type="unfinished">10毫秒</translation>
+        <translation type="obsolete">10毫秒</translation>
     </message>
     <message>
         <source>50ms</source>
-        <translation type="unfinished">50毫秒</translation>
+        <translation type="obsolete">50毫秒</translation>
     </message>
     <message>
         <source>100ms</source>
-        <translation type="unfinished">100毫秒</translation>
+        <translation type="obsolete">100毫秒</translation>
     </message>
     <message>
         <source>500ms</source>
-        <translation type="unfinished">500毫秒</translation>
+        <translation type="obsolete">500毫秒</translation>
     </message>
     <message>
         <source>s</source>
@@ -3068,7 +3090,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>59s</source>
-        <translation type="unfinished">59秒</translation>
+        <translation type="obsolete">59秒</translation>
     </message>
     <message>
         <source>m</source>
@@ -3076,11 +3098,11 @@ AVAILABLE</source>
     </message>
     <message>
         <source>59m</source>
-        <translation type="unfinished">59分</translation>
+        <translation type="obsolete">59分</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
-        <translation type="unfinished">日 月 年 时:分</translation>
+        <translation type="obsolete">日 月 年 时:分</translation>
     </message>
     <message>
         <source>h</source>
@@ -3088,43 +3110,43 @@ AVAILABLE</source>
     </message>
     <message>
         <source>23h</source>
-        <translation type="unfinished">23时</translation>
+        <translation type="obsolete">23时</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
-        <translation type="unfinished">日 月 年 时</translation>
+        <translation type="obsolete">日 月 年 时</translation>
     </message>
     <message>
         <source>dd MMM</source>
-        <translation type="unfinished">日 月</translation>
+        <translation type="obsolete">日 月</translation>
     </message>
     <message>
         <source>29 Mar</source>
-        <translation type="unfinished">3月29日</translation>
+        <translation type="obsolete">3月29日</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
-        <translation type="unfinished">日 月 年</translation>
+        <translation type="obsolete">日 月 年</translation>
     </message>
     <message>
         <source>MMMM</source>
-        <translation type="unfinished">月</translation>
+        <translation type="obsolete">月</translation>
     </message>
     <message>
         <source>September</source>
-        <translation type="unfinished">9月</translation>
+        <translation type="obsolete">9月</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
-        <translation type="unfinished">月 年</translation>
+        <translation type="obsolete">月 年</translation>
     </message>
     <message>
         <source>yyyy</source>
-        <translation type="unfinished">年</translation>
+        <translation type="obsolete">年</translation>
     </message>
     <message>
         <source>2000</source>
-        <translation type="unfinished">2000</translation>
+        <translation type="obsolete">2000</translation>
     </message>
     <message>
         <source>d</source>
@@ -3132,7 +3154,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>29d</source>
-        <translation type="unfinished">29日</translation>
+        <translation type="obsolete">29日</translation>
     </message>
     <message>
         <source>M</source>
@@ -3140,7 +3162,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>11M</source>
-        <translation type="unfinished">11月</translation>
+        <translation type="obsolete">11月</translation>
     </message>
     <message>
         <source>y</source>
@@ -3148,7 +3170,7 @@ AVAILABLE</source>
     </message>
     <message>
         <source>2000y</source>
-        <translation type="unfinished">2000年</translation>
+        <translation type="obsolete">2000年</translation>
     </message>
 </context>
 <context>
@@ -3477,11 +3499,11 @@ Do you want to continue?</source>
     </message>
     <message>
         <source>dd-mmm-yyyy hh-mm-ss</source>
-        <translation type="unfinished">日-月-年 时-分-秒</translation>
+        <translation type="obsolete">日-月-年 时-分-秒</translation>
     </message>
     <message>
         <source>hh-mm-ss</source>
-        <translation type="unfinished">时-分-秒</translation>
+        <translation type="obsolete">时-分-秒</translation>
     </message>
     <message>
         <source>Export Video As...</source>
@@ -3546,15 +3568,15 @@ Error description: &apos;%2&apos;</source>
     </message>
     <message>
         <source>Could not perform thumbnails search</source>
-        <translation type="unfinished">无法执行小图标搜索</translation>
+        <translation type="obsolete">无法执行小图标搜索</translation>
     </message>
     <message>
         <source>Selected time period is too short to perform thumbnails search. Please select a longer period.</source>
-        <translation type="unfinished">选择的时间区间太短无法执行小图标搜索。请选择一个较长的时间区间。</translation>
+        <translation type="obsolete">选择的时间区间太短无法执行小图标搜索。请选择一个较长的时间区间。</translation>
     </message>
     <message>
         <source>Thumbnail Search for %1</source>
-        <translation type="unfinished">小图标搜素%1</translation>
+        <translation type="obsolete">小图标搜素%1</translation>
     </message>
     <message>
         <source> Your recording changes have not been saved. Pick desired Recording Type, FPS, and Quality and mark the changes on the schedule. Press APPLY to save changes.</source>
@@ -3664,6 +3686,18 @@ Error description: &apos;%2&apos;</source>
         <source>Version %1 is available for download at &lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;.</source>
         <translation type="unfinished">版本 %1可在&lt;a href=&quot;%2&quot;&gt;%2&lt;/a&gt;下载</translation>
     </message>
+    <message>
+        <source>Could not perform preview search</source>
+        <translation type="unfinished">无法执行上一次搜索</translation>
+    </message>
+    <message>
+        <source>Selected time period is too short to perform preview search. Please select a longer period.</source>
+        <translation type="unfinished">选择的时间区域太短无法执行上一次搜索。请选择较长的一个时间区域。</translation>
+    </message>
+    <message>
+        <source>Preview Search for %1</source>
+        <translation type="unfinished">上一次搜索 %1</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchController</name>
@@ -3700,11 +3734,11 @@ Error description: &apos;%2&apos;</source>
     <name>QnWorkbenchDisplay</name>
     <message>
         <source>yyyy MMM dd hh:mm:ss</source>
-        <translation type="unfinished">年 月 日 时:分:秒</translation>
+        <translation type="obsolete">年 月 日 时:分:秒</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
-        <translation type="unfinished">时:分:秒</translation>
+        <translation type="obsolete">时:分:秒</translation>
     </message>
 </context>
 <context>
@@ -3761,18 +3795,18 @@ Error description: &apos;%2&apos;</source>
         <source>yyyy MMM dd
 hh:mm:ss</source>
         <comment>CAMERA_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished">年 月 日
+        <translation type="obsolete">年 月 日
 时:分:秒</translation>
     </message>
     <message>
         <source>hh:mm:ss</source>
         <comment>LONG_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished">时:分:秒</translation>
+        <translation type="obsolete">时:分:秒</translation>
     </message>
     <message>
         <source>mm:ss</source>
         <comment>SHORT_TOOL_TIP_FORMAT</comment>
-        <translation type="unfinished">分:秒</translation>
+        <translation type="obsolete">分:秒</translation>
     </message>
 </context>
 <context>
