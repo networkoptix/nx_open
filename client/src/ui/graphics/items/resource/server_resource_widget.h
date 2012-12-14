@@ -50,14 +50,6 @@ private:
     /** Main painting function. */
     void drawStatistics(const QRectF &rect, QPainter *painter);
 
-    /**
-     * Util function that add new values to the statistics storage and mantain its number.
-     *
-     * \param key                       Id of the corresponding history item.
-     * \param newValues                 Updated values.
-     */
-    void updateValues(QString key, QnStatisticsData newValues);
-
 private:
     QnMediaServerStatisticsManager *m_manager;
 
@@ -82,6 +74,8 @@ private:
 
     /** Number of successfull responces received, required to smooth scroll. */
     int m_counter;
+
+    int m_storageLimit;
 
     /** Status of the frame. */
     Qn::RenderStatus m_renderStatus;
