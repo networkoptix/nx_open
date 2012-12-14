@@ -989,7 +989,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ThumbnailsSearchAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Preview search...")).
+        text(tr("Preview Search...")).
         condition(new QnExportActionCondition(true, this));
 
 
