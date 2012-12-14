@@ -30,10 +30,29 @@ namespace {
     }
 
     /** Get corresponding color from config */
-    QColor getColorById(int id) {
+    QColor getColorByKey(const QString &key) {
+        int id;
+
+        // some hacks to align hashes for keys like 'C:' and 'sda'
+        // strongly depends on size of systemHealthColors
+        QLatin1String salt = QLatin1String("2");
+        if (key == QLatin1String("CPU"))
+            id = 7;
+        else if (key == QLatin1String("RAM"))
+            id = 8;
+        else
+        if (key.endsWith(QLatin1Char(':'))) {
+            QString key2(key);
+            key2.chop(1);
+            id = qHash(salt + key2);
+        }
+        else
+            id = qHash(salt + key);
         QnColorVector colors = qnGlobals->systemHealthColors();
         return colors[id % colors.size()];
     }
+
+
 
     /** Create path for the chart */
     QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
@@ -305,13 +324,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setWidthF(pen_width * 2);
         graphPen.setCapStyle(Qt::FlatCap);
 
-        int counter = 0;
         foreach(QString key, m_sortedKeys) {
             QnStatisticsData &stats = m_history[key];
             qreal currentValue = 0;
             QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - space_offset*2), elapsed_step, &currentValue);
             values.append(currentValue);
-            graphPen.setColor(getColorById(counter++));
+            graphPen.setColor(getColorByKey(key));
             painter->strokePath(path, graphPen);
         }
     }
@@ -322,7 +340,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(getColorById(0));
+        main_pen.setColor(getColorByKey(QLatin1String("CPU")));
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 
@@ -352,7 +370,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             qreal x = unzoom * (offset * 1.1 + ow);
             for (int i = 0; i < values.length(); i++){
                 qreal interValue = values[i];
-                main_pen.setColor(getColorById(i));
+                main_pen.setColor(getColorByKey(m_sortedKeys.at(i)));
                 painter->setPen(main_pen);
                 qreal y = unzoom * (offset + oh * (1.0 - interValue));
                 if (interValue >= 0)
@@ -395,9 +413,8 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             QPen legendPen(main_pen);
             legendPen.setWidthF(pen_width * 2 * unzoom);
 
-            int counter = 0;
             foreach(QString key, m_sortedKeys) {
-                legendPen.setColor(getColorById(counter++));
+                legendPen.setColor(getColorByKey(key));
                 painter->setPen(legendPen);
                 painter->strokePath(legend, legendPen);
                 painter->drawText(offset * 0.1* unzoom, offset * 0.1* unzoom, key);
