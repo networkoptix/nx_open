@@ -48,13 +48,22 @@ private slots:
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
 
 private:
+    enum PtzRequestType {
+        SetMovementRequest,
+        SetPositionRequest,
+        GetPositionRequest,
+        RequestTypeCount
+    };
+
     struct PtzData {
-        QVector3D position;
-        QVector3D movement;
+        QVector3D knownPosition, pendingPosition;
+        QVector3D knownMovement, pendingMovement;
+        int attemptCount[RequestTypeCount];
     };
 
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
+    QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;
 };
 
 
