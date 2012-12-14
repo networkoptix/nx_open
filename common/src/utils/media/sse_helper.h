@@ -9,14 +9,25 @@
 #if defined(Q_CC_MSVC)
 #   include <intrin.h> /* For __cpuid. */
 #elif defined(Q_CC_GNU)
-#   define __cpuid(res, op)                                                     \
-        __asm__ volatile(                                                       \
-        "movl %%ebx, %%esi   \n\t"		                                        \
-        "cpuid               \n\t"		                                        \
-        "movl %%ebx, %1      \n\t"		                                        \
-        "movl %%esi, %%ebx   \n\t"		                                        \
-        :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	            \
-        :"0"(op) : "%esi")
+#   ifdef __amd64__
+#       define __cpuid(res, op)                                                 \
+            __asm__ volatile(                                                   \
+            "mov %%rbx, %%rsi    \n\t"                                          \
+            "cpuid               \n\t"                                          \
+            "mov %%rbx, %1       \n\t"                                          \
+            "mov %%rsi, %%rbx    \n\t"                                          \
+            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
+            :"0"(op) : "%rsi")
+#   else
+#       define __cpuid(res, op)                                                 \
+            __asm__ volatile(                                                   \
+            "movl %%ebx, %%esi   \n\t"                                          \
+            "cpuid               \n\t"                                          \
+            "movl %%ebx, %1      \n\t"                                          \
+            "movl %%esi, %%ebx   \n\t"                                          \
+            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3])             \
+            :"0"(op) : "%esi")
+#   endif
 #else
 #   error __cpuid is not supported for your compiler.
 #endif
@@ -115,17 +126,6 @@ static inline bool useSSE42()
 }
 
 // TODO: function too large for inlining. Move to cpp file.
-#ifdef __amd64__
-#define __cpuid(res, op)\
-  __asm__ volatile(                         \
-            "mov %%rbx, %%rsi   \n\t"		\
-            "cpuid               \n\t"		\
-            "mov %%rbx, %1      \n\t"		\
-            "mov %%rsi, %%rbx   \n\t"		\
-            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
-            :"0"(op) : "%rsi")
-#else
-#endif
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 
@@ -138,7 +138,7 @@ static inline QString getCPUString()
     memset(CPUBrandString, 0, sizeof(CPUBrandString));
 
     // Get the information associated with each extended ID.
-    for( unsigned int i=0x80000000; i<=nExIds; ++i )
+    for(unsigned int i=0x80000000; i<=nExIds; ++i)
     {
         __cpuid(CPUInfo, i);
 
@@ -151,7 +151,7 @@ static inline QString getCPUString()
             memcpy(CPUBrandString + 32, CPUInfo, sizeof(CPUInfo));
     }
 
-    if( nExIds >= 0x80000004 )
+    if(nExIds >= 0x80000004)
     {
         //printf_s("\nCPU Brand String: %s\n", CPUBrandString);
         return QString::fromAscii( CPUBrandString ).trimmed();
