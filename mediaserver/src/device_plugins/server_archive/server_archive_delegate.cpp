@@ -203,8 +203,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::Chunk& chunk, Devi
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk);
-    return chunk.startTimeMs > m_currentChunk.startTimeMs || 
-           chunkCatalog != m_currentChunkCatalog && chunk.endTimeMs() > m_currentChunk.endTimeMs();
+    return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
 
 QnAbstractMediaDataPtr QnServerArchiveDelegate::getNextData()
