@@ -99,6 +99,16 @@ static inline bool useSSE42()
 }
 
 #ifdef Q_OS_LINUX
+#ifdef __amd64__
+#define __cpuid(res, op)\
+  __asm__ volatile(                         \
+            "mov %%rbx, %%rsi   \n\t"		\
+            "cpuid               \n\t"		\
+            "mov %%rbx, %1      \n\t"		\
+            "mov %%rsi, %%rbx   \n\t"		\
+            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
+            :"0"(op) : "%rsi")
+#else
 #define __cpuid(res, op)\
   __asm__ volatile(                         \
             "movl %%ebx, %%esi   \n\t"		\
@@ -107,6 +117,7 @@ static inline bool useSSE42()
             "movl %%esi, %%ebx   \n\t"		\
             :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
             :"0"(op) : "%esi")
+#endif
 #endif
 
 static inline QString getCPUString()
