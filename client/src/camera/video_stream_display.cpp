@@ -606,7 +606,8 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
                 }
             }
             else {
-                m_drawer->waitForFrameDisplayed(outFrame->channel); // wait old frame
+                if (qAbs(m_speed) < 1.0 + FPS_EPS)
+                    m_drawer->waitForFrameDisplayed(outFrame->channel); // wait old frame
                 m_drawer->draw(outFrame); // send new one
             }
             m_lastDisplayedFrame = outFrame;
