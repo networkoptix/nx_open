@@ -5,14 +5,16 @@
 
 #include <utils/common/synctime.h>
 
-#define STORAGE_LIMIT 60
+/** Here can be any value below the zero */
+#define NO_DATA -1
 
-QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, QObject *parent):
+QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int storageLimit, QObject *parent):
     QObject(parent),
     m_alreadyUpdating(false),
     m_lastId(-1),
     m_timeStamp(0),
     m_listeners(0),
+    m_storageLimit(storageLimit),
     m_apiConnection(apiConnection)
 {}
 
@@ -26,27 +28,13 @@ void QnMediaServerStatisticsStorage::unregisterServerWidget(QObject *target) {
     m_listeners--;
 }
 
-qint64 QnMediaServerStatisticsStorage::getHistory(qint64 lastId, QnStatisticsHistory *history) {
+QnStatisticsHistory QnMediaServerStatisticsStorage::history() const {
+    return m_history;
+}
+
+qint64 QnMediaServerStatisticsStorage::historyId() const {
     if (m_history.isEmpty())
         return -1;
-
-    QnStatisticsIterator iter(m_history);
-    while (iter.hasNext()){
-        iter.next();
-        QnStatisticsData item = iter.value();
-        QnStatisticsData update;
-        update.description = item.description;
-        update.deviceType = item.deviceType;
-        qint64 counter = m_lastId;
-        QnStatisticsDataIterator peeker(item.values);
-        peeker.toBack();
-        while (counter > lastId && peeker.hasPrevious()) {
-            update.values.prepend(peeker.previous());
-            counter--;
-        }
-        history->insert(iter.key(), update);
-    }
-
     return m_lastId;
 }
 
@@ -57,8 +45,8 @@ void QnMediaServerStatisticsStorage::update() {
 
         for (QnStatisticsHistory::iterator iter = m_history.begin(); iter != m_history.end(); iter++) {
             QnStatisticsData &stats = iter.value();
-            stats.values.append(0);
-            if (stats.values.size() > STORAGE_LIMIT)
+            stats.values.append(NO_DATA);
+            if (stats.values.size() > m_storageLimit)
                 stats.values.removeFirst();
         }
         if (!m_alreadyUpdating)
@@ -73,6 +61,10 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
     m_timeStamp = qnSyncTime->currentMSecsSinceEpoch();
     m_lastId++;
 
+    QSet<QString> not_updated;
+    foreach (QString key, m_history.keys())
+        not_updated << key;
+
     QListIterator<QnStatisticsDataItem> iter(data);
     while(iter.hasNext()) {
         QnStatisticsDataItem nextData = iter.next();
@@ -81,12 +73,24 @@ void QnMediaServerStatisticsStorage::at_statisticsReceived(const QnStatisticsDat
         QnStatisticsData &stats = m_history[id];
         stats.deviceType = nextData.deviceType;
         stats.description = nextData.description;
+        while (stats.values.count() < m_storageLimit)
+            stats.values.append(NO_DATA);
         stats.values.append(nextData.value);
-        if (stats.values.size() > STORAGE_LIMIT)
+        if (stats.values.size() > m_storageLimit)
             stats.values.removeFirst();
+        not_updated.remove(id);
     }
-    m_alreadyUpdating = false;
 
+    foreach(QString id, not_updated) {
+        QnStatisticsData &stats = m_history[id];
+        stats.values.append(NO_DATA);
+        if (stats.values.size() > m_storageLimit)
+            stats.values.removeFirst();
+        if (stats.values.count(NO_DATA) == stats.values.count())
+            m_history.remove(id);
+    }
+
+    m_alreadyUpdating = false;
     emit statisticsChanged();
 }
 
