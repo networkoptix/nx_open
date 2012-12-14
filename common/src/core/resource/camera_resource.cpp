@@ -209,6 +209,8 @@ QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCa
 void QnVirtualCameraResource::setCameraCapabilities(CameraCapabilities capabilities) {
     setParam(QLatin1String("cameraCapabilities"), static_cast<int>(capabilities), QnDomainDatabase);
 
+    // TODO: #1.5 this signal won't be emitted if parameter was changed directly (e.g. as a result of resource update).
+
     // TODO: we don't check whether they have actually changed. This better be fixed.
     emit cameraCapabilitiesChanged();
 }
