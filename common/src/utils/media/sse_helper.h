@@ -115,6 +115,17 @@ static inline bool useSSE42()
 }
 
 // TODO: function too large for inlining. Move to cpp file.
+#ifdef __amd64__
+#define __cpuid(res, op)\
+  __asm__ volatile(                         \
+            "mov %%rbx, %%rsi   \n\t"		\
+            "cpuid               \n\t"		\
+            "mov %%rbx, %1      \n\t"		\
+            "mov %%rsi, %%rbx   \n\t"		\
+            :"=a"(res[0]), "=m"(res[1]), "=c"(res[2]), "=d"(res[3]) 	\
+            :"0"(op) : "%rsi")
+#else
+#endif
 static inline QString getCPUString()
 {
     char CPUBrandString[0x40]; 
