@@ -65,13 +65,13 @@
 		</SetProperty>
 
 		<SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]>
+			<![CDATA[ $(var.VmsInstalling) OR !AppServerFeature = 3 ]]>
 		</SetProperty>
 		<SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !ServerFeature = 3 ]]>
+			<![CDATA[ $(var.VmsInstalling) OR !ServerFeature = 3 ]]>
 		</SetProperty>
 		<SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !ClientFeature = 3 ]]>
+			<![CDATA[ $(var.VmsInstalling) OR !ClientFeature = 3 ]]>
 		</SetProperty>
 
 		<SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch">
