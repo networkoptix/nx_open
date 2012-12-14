@@ -949,6 +949,7 @@
 		</Feature>
 
 		<Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
+		    <ComponentRef Id="AlwaysFiles"/>
 			<ComponentRef Id="ARPAltRegistryEntries"/>            
 			<ComponentRef Id="UninstallProgramMenuFolder"/>
 		</Feature>
