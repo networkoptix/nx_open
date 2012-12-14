@@ -481,7 +481,7 @@ void QnOnvifStreamReader::fetchProfile(ProfilesResp& response, ProfilePair& prof
 
 void QnOnvifStreamReader::updateProfile(Profile& profile, bool isPrimary) const
 {
-    profile.Name = isPrimary? NETOPTIX_PRIMARY_NAME: NETOPTIX_SECONDARY_NAME;
+    profile.Name = isPrimary? std::string(NETOPTIX_PRIMARY_NAME.data()): std::string(NETOPTIX_SECONDARY_NAME.data());
 }
 
 bool QnOnvifStreamReader::sendProfileToCamera(CameraInfoParams& info, Profile& profile, bool create) const
