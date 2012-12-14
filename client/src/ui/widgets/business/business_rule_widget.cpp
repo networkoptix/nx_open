@@ -178,17 +178,18 @@ void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value action
 }
 
 BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
-    //TODO: security checks?
-    int index = ui->eventTypeComboBox->currentIndex();
-    int typeIdx = m_eventsTypesModel->item(index)->data().toInt();
+    int typeIdx = m_eventsTypesModel->item(ui->eventTypeComboBox->currentIndex())->data().toInt();
     return (BusinessEventType::Value)typeIdx;
 }
 
 BusinessActionType::Value QnBusinessRuleWidget::getCurrentActionType() const {
-    //TODO: security checks?
-    int index = ui->actionTypeComboBox->currentIndex();
-    int typeIdx = m_actionTypesModel->item(index)->data().toInt();
+    int typeIdx = m_actionTypesModel->item(ui->actionTypeComboBox->currentIndex())->data().toInt();
     return (BusinessActionType::Value)typeIdx;
+}
+
+ToggleState::Value QnBusinessRuleWidget::getCurrentEventToggleState() const {
+    int typeIdx = m_eventStatesModel->item(ui->eventStatesComboBox->currentIndex())->data().toInt();
+    return (ToggleState::Value)typeIdx;
 }
 
 // Handlers
@@ -204,15 +205,35 @@ void QnBusinessRuleWidget::updateSummary() {
     if (!m_rule)
         return;
 
-    QLatin1String formatString("<html><head/><body><p>%1"\
-            "<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>"\
-            "<span style=\" font-style:italic;\">DW1031ax</span><span style=\" font-weight:600;\">: %2</span>"\
-            "[description?]"\
-            "</p></body></html>");
+    QLatin1String formatString("<html><head/><body><p>%1: %2</p></body></html>");
 
-    QString summary = QString(formatString)
+    QLatin1String eventString("When %1 %2 at %3");
+    QLatin1String actionString("Do %1 at %2");
+
+    QLatin1String cameraString("<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>"\
+            "<span style=\" font-style:italic;\">%1</span>");
+
+    QString eventResource = QString(cameraString)
+            .arg(QLatin1String("Camera_name"));
+
+    QString actionResource = QString(cameraString)
+            .arg(QLatin1String("Camera_name"));
+
+    QString eventSummary = QString(eventString)
             .arg(BusinessEventType::toString(m_rule->getEventType()))
-            .arg(BusinessActionType::toString(m_rule->getActionType()));
+            .arg(ToggleState::toString(m_rule->getEventToggleState()))
+            .arg(eventResource);
+
+    QString actionSummary = QString(actionString)
+            .arg(BusinessActionType::toString(m_rule->getActionType()))
+            .arg(actionResource);
+
+    //TODO: load details description from sub-widgets
+    QString summary = QString(formatString)
+            .arg(eventSummary)
+            .arg(actionSummary);
+
+
     ui->summaryLabel->setText(summary);
     /*
 
@@ -256,6 +277,7 @@ void QnBusinessRuleWidget::at_applyButton_clicked() {
     QnBusinessEventRulePtr rule = m_rule ? m_rule : QnBusinessEventRulePtr(new QnBusinessEventRule);
     rule->setEventType(getCurrentEventType());
     rule->setActionType(getCurrentActionType());
+    rule->setEventToggleState(getCurrentEventToggleState());
     //TODO: fill rule
     emit apply(rule);
     updateSummary();

@@ -43,6 +43,7 @@ public:
     void setBusinessParams(const QnBusinessParams& params);
 
     ToggleState::Value getEventToggleState() const;
+    void setEventToggleState(ToggleState::Value value);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule

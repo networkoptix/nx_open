@@ -85,6 +85,8 @@ private slots:
 private:
     BusinessEventType::Value getCurrentEventType() const;
     BusinessActionType::Value getCurrentActionType() const;
+    ToggleState::Value getCurrentEventToggleState() const;
+
 private:
     Ui::QnBusinessRuleWidget *ui;
 
