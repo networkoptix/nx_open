@@ -21,11 +21,17 @@ public:
     virtual QString getUniqueId() const override;
 
     QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
-    QnBusinessParams getEventCondition() const { return m_eventCondition; }
+
     /*!
         \param name This should be a constant from \a BusinessEventParameters namespace
     */
     void addEventCondition( const QString& name, const QVariant& value ) { m_eventCondition[name] = value; }
+    void addEventConditions(QnBusinessParams conditions) {
+        //TODO: implement me
+    }
+
+    void clearEventConditions() { m_eventCondition.clear();  }
+    QnBusinessParams eventConditions() const { return m_eventCondition; }
 
     QnResourcePtr getSrcResource() const;
     void setSrcResource(QnResourcePtr value);

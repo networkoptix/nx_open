@@ -11,6 +11,8 @@
 namespace BusinessEventParameters
 {
     static QLatin1String inputPortId( "inputPortId" );
+
+    QString getInputPortId(QnBusinessParams params);
 }
 
 

@@ -247,13 +247,13 @@ void QnBusinessRuleWidget::updateSummary() {
 
 void QnBusinessRuleWidget::resetFromRule() {
     if (m_rule) {
-        QModelIndexList eventTypeIdx = m_eventsTypesModel->match(m_eventsTypesModel->index(0, 0), Qt::UserRole, (int)m_rule->getEventType());
+        QModelIndexList eventTypeIdx = m_eventsTypesModel->match(m_eventsTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getEventType());
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole, (int)m_rule->getEventToggleState());
+        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getEventToggleState());
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
 
-        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole, (int)m_rule->getActionType());
+        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getActionType());
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
     } else {
         ui->eventTypeComboBox->setCurrentIndex(0);

@@ -44,6 +44,8 @@ namespace BusinessEventType
 namespace BusinessEventParameters
 {
     static QLatin1String toggleState( "toggleState" );
+
+    ToggleState::Value getToggleState(QnBusinessParams params);
 }
 
 /**
@@ -101,16 +103,6 @@ public:
      * @return                  True if event should be handled, false otherwise.
      */
     virtual bool checkCondition(const QnBusinessParams& params) const;
-
-protected:
-    /**
-     * @brief getParameter      Utility function for retrieving event parameters.
-     * @param params            Parameters of an event that are selected in rule.
-     * @param paramName         Name of the parameter that is looked up.
-     * @return                  Value of the parameter or an invalid variant if params are not contain
-     *                          parameter with target name.
-     */
-    static QVariant getParameter(const QnBusinessParams& params, const QString &paramName);
 private:
     /**
      * @brief m_eventType       Type of event. See BusinessEventType::Value.

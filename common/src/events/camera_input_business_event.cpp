@@ -6,6 +6,19 @@
 #include "camera_input_business_event.h"
 #include "core/resource/resource.h"
 
+namespace BusinessEventParameters {
+
+    QString getInputPortId(QnBusinessParams params) {
+        QnBusinessParams::const_iterator paramIter = params.find(inputPortId);
+        if( paramIter == params.end() )
+            return QString();
+        return paramIter.value().toString();
+    }
+
+
+}
+
+
 QnCameraInputEvent::QnCameraInputEvent(
     QnResourcePtr resource,
     ToggleState::Value toggleState,
@@ -38,10 +51,6 @@ bool QnCameraInputEvent::checkCondition(const QnBusinessParams &params) const {
     if (!result)
         return false;
 
-    QVariant inputPort = getParameter(params, BusinessEventParameters::inputPortId);
-    if (!inputPort.isValid())
-        return true; // no condition on input port => work on any
-
-    QString requiredPort = inputPort.toString();
-    return requiredPort.isEmpty() || requiredPort == m_inputPortID;
+    QString inputPort = BusinessEventParameters::getInputPortId(params);
+    return inputPort.isEmpty() || inputPort == m_inputPortID;
 }

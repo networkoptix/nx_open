@@ -77,6 +77,18 @@ namespace BusinessEventType
     }
 }
 
+namespace BusinessEventParameters {
+
+    ToggleState::Value getToggleState(QnBusinessParams params) {
+        QnBusinessParams::const_iterator paramIter = params.find(toggleState);
+        if( paramIter == params.end() )
+            return ToggleState::NotDefined;
+        return (ToggleState::Value)paramIter.value().toInt();
+    }
+
+
+}
+
 
 QnAbstractBusinessEvent::QnAbstractBusinessEvent(
         BusinessEventType::Value eventType,
@@ -98,16 +110,6 @@ QString QnAbstractBusinessEvent::toString() const
 }
 
 bool QnAbstractBusinessEvent::checkCondition(const QnBusinessParams& params) const {
-    QVariant toggleState = getParameter(params, BusinessEventParameters::toggleState);
-    if (!toggleState.isValid())
-        return true;
-    ToggleState::Value requiredToggleState = (ToggleState::Value)toggleState.toInt();
-    return requiredToggleState == ToggleState::Any || requiredToggleState == m_toggleState;
-}
-
-QVariant QnAbstractBusinessEvent::getParameter(const QnBusinessParams &params, const QString &paramName) {
-    QnBusinessParams::const_iterator paramIter = params.find(paramName);
-    if( paramIter == params.end() )
-        return QVariant();
-    return paramIter.value();
+    ToggleState::Value toggleState = BusinessEventParameters::getToggleState(params);
+    return toggleState == ToggleState::Any || toggleState == m_toggleState;
 }

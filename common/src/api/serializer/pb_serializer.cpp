@@ -542,8 +542,7 @@ void serializeBusinessRule_i(pb::BusinessRule& pb_businessRule, const QnBusiness
     pb_businessRule.set_eventtype((pb::BusinessEventType)businessRulePtr->getEventType());
     if (businessRulePtr->getSrcResource())
         pb_businessRule.set_eventresource(businessRulePtr->getSrcResource()->getId().toInt());
-    // TODO vasilenko
-    // pb_businessRule.set_eventcondition(businessRuleIn.getEventCondition());
+    pb_businessRule.set_eventcondition(serializeBusinessParams(businessRulePtr->eventConditions()));
 
     pb_businessRule.set_actiontype((pb::BusinessActionType)businessRulePtr->getActionType());
     if (businessRulePtr->getDstResource())

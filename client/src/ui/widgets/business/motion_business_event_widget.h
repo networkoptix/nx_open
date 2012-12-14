@@ -2,12 +2,13 @@
 #define MOTION_BUSINESS_EVENT_WIDGET_H
 
 #include <QWidget>
+#include <ui/widgets/business/abstract_business_event_widget.h>
 
 namespace Ui {
 class QnMotionBusinessEventWidget;
 }
 
-class QnMotionBusinessEventWidget : public QWidget
+class QnMotionBusinessEventWidget : public QnAbstractBusinessEventWidget
 {
     Q_OBJECT
     

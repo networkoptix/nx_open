@@ -2,12 +2,13 @@
 #define CAMERA_INPUT_BUSINESS_EVENT_WIDGET_H
 
 #include <QWidget>
+#include <ui/widgets/business/abstract_business_event_widget.h>
 
 namespace Ui {
 class QnCameraInputBusinessEventWidget;
 }
 
-class QnCameraInputBusinessEventWidget : public QWidget
+class QnCameraInputBusinessEventWidget : public QnAbstractBusinessEventWidget
 {
     Q_OBJECT
     

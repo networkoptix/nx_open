@@ -2,12 +2,13 @@
 #define EMPTY_BUSINESS_EVENT_WIDGET_H
 
 #include <QWidget>
+#include <ui/widgets/business/abstract_business_event_widget.h>
 
 namespace Ui {
 class QnEmptyBusinessEventWidget;
 }
 
-class QnEmptyBusinessEventWidget : public QWidget
+class QnEmptyBusinessEventWidget : public QnAbstractBusinessEventWidget
 {
     Q_OBJECT
     
