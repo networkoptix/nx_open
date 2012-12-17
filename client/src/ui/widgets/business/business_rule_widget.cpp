@@ -12,12 +12,15 @@
 #include <events/abstract_business_event.h>
 
 #include <ui/widgets/business/business_event_widget_factory.h>
+#include <ui/widgets/business/business_action_widget_factory.h>
 
 QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QnBusinessRuleWidget),
+    m_expanded(false),
     m_rule(0),
     m_eventParameters(NULL),
+    m_actionParameters(NULL),
     m_eventsTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
@@ -28,15 +31,22 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
 
+    QPalette pal = ui->editFrame->palette();
+    QColor bgcolor = pal.color(QPalette::Window);
+    pal.setColor(QPalette::Window, QColor(bgcolor.red() + 10, bgcolor.green() + 10, bgcolor.blue() + 10));
+    ui->editFrame->setPalette(pal);
+    ui->editFrame->setVisible(m_expanded);
+
     connect(ui->eventTypeComboBox,      SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventTypeComboBox_currentIndexChanged(int)));
     connect(ui->eventStatesComboBox,    SIGNAL(currentIndexChanged(int)), this, SLOT(at_eventStatesComboBox_currentIndexChanged(int)));
     connect(ui->actionTypeComboBox,     SIGNAL(currentIndexChanged(int)), this, SLOT(at_actionTypeComboBox_currentIndexChanged(int)));
 
-    connect(ui->expandButton, SIGNAL(clicked()), this, SIGNAL(expand()));
+    connect(ui->expandButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));
     connect(ui->resetButton,  SIGNAL(clicked()), this, SLOT(resetFromRule()));
 
     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(at_deleteButton_clicked()));
     connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
+    connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));
 
     //TODO: init and reset from rule, then connect 'OnChanged', yep?
     initAnimations();
@@ -59,9 +69,29 @@ QnBusinessEventRulePtr QnBusinessRuleWidget::getRule() const {
     return m_rule;
 }
 
+void QnBusinessRuleWidget::setExpanded(bool expanded) {
+    if (m_expanded == expanded)
+        return;
+    m_expanded = expanded;
+    ui->editFrame->setVisible(expanded);
+
+    QIcon icon;
+    if (m_expanded)
+        icon.addFile(QString::fromUtf8(":/skin/titlebar/unfullscreen_hovered.png"));
+    else
+        icon.addFile(QString::fromUtf8(":/skin/titlebar/fullscreen_hovered.png"));
+    ui->expandButton->setIcon(icon);
+    if (expanded)
+        resetFromRule();
+}
+
+bool QnBusinessRuleWidget::expanded() const {
+    return m_expanded;
+}
+
 //TODO: refactor
 void QnBusinessRuleWidget::initAnimations() {
-    machine = new QStateMachine(this);
+  /*  machine = new QStateMachine(this);
     QState *state1 = new QState(machine);
     state1->assignProperty(ui->editFrame, "maximumHeight", 1000); //TODO: magic const?
 
@@ -77,7 +107,7 @@ void QnBusinessRuleWidget::initAnimations() {
     transition2->addAnimation(new QPropertyAnimation(ui->editFrame, "maximumHeight"));
 
     connect(machine, SIGNAL(stopped()), this, SLOT(updateSummary()));
-    machine->start();
+    machine->start();*/
 }
 
 void QnBusinessRuleWidget::initEventTypes() {
@@ -114,17 +144,17 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
 
 //TODO: 'needAnimate' flag is requested, or just do not animate during constructor and during first expansion
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
-    QParallelAnimationGroup *group = new QParallelAnimationGroup(this);
+    //QParallelAnimationGroup *group = new QParallelAnimationGroup(this);
 
     if (m_eventParameters) {
         ui->eventLayout->removeWidget(m_eventParameters);
 
         //TODO: animating opacity is not working on child widgets, need something else
-        QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
+      /*  QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
         animation->setDuration(1500);
         animation->setStartValue(1.0);
         animation->setEndValue(0.0);
-        group->addAnimation(animation);
+        group->addAnimation(animation);*/
 
         m_eventParameters->setVisible(false);
         //TODO: really it should be removed after animation transition
@@ -136,15 +166,15 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
     m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
     if (m_eventParameters) {
         ui->eventLayout->addWidget(m_eventParameters);
-        QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
+      /*  QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
         animation->setDuration(1500);
         animation->setStartValue(0.0);
         animation->setEndValue(1.0);
-        group->addAnimation(animation);
+        group->addAnimation(animation);*/
     }
 
     //TODO: replace with state-machine
-    group->start(QAbstractAnimation::DeleteWhenStopped);
+    //group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
@@ -174,7 +204,18 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
+    if (m_actionParameters) {
+        ui->actionLayout->removeWidget(m_actionParameters);
+        m_actionParameters->setVisible(false);
+    }
 
+    //TODO: reuse existing widget to use already set parameters
+    //TODO: read parameters from rule if exist on first creating
+    //TODO: common widget interface required to setup rule and read settings from it
+    m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
+    if (m_actionParameters) {
+        ui->actionLayout->addWidget(m_actionParameters);
+    }
 }
 
 BusinessEventType::Value QnBusinessRuleWidget::getCurrentEventType() const {
@@ -264,7 +305,7 @@ void QnBusinessRuleWidget::resetFromRule() {
 
 // TODO: expansion from the outer module still not work
 void QnBusinessRuleWidget::at_expandButton_clicked() {
-  //  setExpanded(!m_expanded);
+    setExpanded(!m_expanded);
 }
 
 void QnBusinessRuleWidget::at_deleteButton_clicked() {

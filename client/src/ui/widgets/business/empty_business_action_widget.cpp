@@ -2,7 +2,7 @@
 #include "ui_empty_business_action_widget.h"
 
 QnEmptyBusinessActionWidget::QnEmptyBusinessActionWidget(QWidget *parent) :
-    QWidget(parent),
+    base_type(parent),
     ui(new Ui::QnEmptyBusinessActionWidget)
 {
     ui->setupUi(this);

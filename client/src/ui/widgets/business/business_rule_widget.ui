@@ -57,8 +57,8 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>:/skin/titlebar/dropdown_hovered.png</normaloff>:/skin/titlebar/dropdown_hovered.png</iconset>
+         <iconset resource="../../../../x86/build/client-custom.qrc">
+          <normaloff>:/skin/titlebar/fullscreen_hovered.png</normaloff>:/skin/titlebar/fullscreen_hovered.png</iconset>
         </property>
        </widget>
       </item>
@@ -71,7 +71,7 @@
          </sizepolicy>
         </property>
         <property name="icon">
-         <iconset>
+         <iconset resource="../../../../x86/build/client-custom.qrc">
           <normaloff>:/skin/titlebar/exit_hovered.png</normaloff>:/skin/titlebar/exit_hovered.png</iconset>
         </property>
        </widget>
@@ -86,6 +86,9 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="autoFillBackground">
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
@@ -123,7 +126,7 @@
                <string>DW1031ax</string>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="../../../../x86/build/client-custom.qrc">
                 <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
               </property>
              </item>
@@ -208,7 +211,7 @@
                <string>DW1031ax</string>
               </property>
               <property name="icon">
-               <iconset>
+               <iconset resource="../../../../x86/build/client-custom.qrc">
                 <normaloff>:/skin/tree/camera.png</normaloff>:/skin/tree/camera.png</iconset>
               </property>
              </item>
@@ -331,7 +334,7 @@
             <string>Reset</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../x86/build/client-custom.qrc">
              <normaloff>:/skin/titlebar/recording_pressed.png</normaloff>:/skin/titlebar/recording_pressed.png</iconset>
            </property>
           </widget>
@@ -355,7 +358,7 @@
             <string>Apply</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../x86/build/client-custom.qrc">
              <normaloff>:/skin/titlebar/connected.png</normaloff>:/skin/titlebar/connected.png</iconset>
            </property>
           </widget>
@@ -366,7 +369,7 @@
             <string>Cancel</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../../../x86/build/client-custom.qrc">
              <normaloff>:/skin/titlebar/exit.png</normaloff>:/skin/titlebar/exit.png</iconset>
            </property>
           </widget>
@@ -386,6 +389,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../../../x86/build/client-custom.qrc"/>
+ </resources>
  <connections/>
 </ui>

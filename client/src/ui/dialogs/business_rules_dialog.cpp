@@ -21,7 +21,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
     }
 
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    connect(ui->newRuleButton, SIGNAL(clicked()), ui->newRuleWidget, SIGNAL(expand()));
+    connect(ui->newRuleButton, SIGNAL(clicked()), this, SLOT(at_newRuleButton_clicked()));
     connect(ui->newRuleWidget, SIGNAL(apply(QnBusinessEventRulePtr)), this, SLOT(saveRule(QnBusinessEventRulePtr)));
     connect(ui->newRuleWidget, SIGNAL(apply(QnBusinessEventRulePtr)), this, SLOT(addRuleToList(QnBusinessEventRulePtr)));
 
@@ -32,11 +32,7 @@ QnBusinessRulesDialog::~QnBusinessRulesDialog()
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
-    //TODO: just expand "new rule" widget without short caption and Reset button
-    QnBusinessEventRulePtr rule(new QnBusinessEventRule());
-    rule->setActionType(BusinessActionType::BA_SendMail);
-    rule->setEventType(BusinessEventType::BE_Camera_Input);
-    m_connection->saveAsync(rule, this, SLOT(at_resources_saved(int, const QByteArray &, const QnResourceList &, int)));
+    ui->newRuleWidget->setExpanded(!ui->newRuleWidget->expanded());
 }
 
 void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle) {

@@ -3,18 +3,23 @@
 
 #include <QWidget>
 
+#include <ui/widgets/business/abstract_business_params_widget.h>
+
 namespace Ui {
 class QnEmptyBusinessActionWidget;
 }
 
-class QnEmptyBusinessActionWidget : public QWidget
+class QnEmptyBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
+    typedef QnAbstractBusinessParamsWidget base_type;
     
 public:
     explicit QnEmptyBusinessActionWidget(QWidget *parent = 0);
     ~QnEmptyBusinessActionWidget();
-    
+
+    virtual void loadParameters(const QnBusinessParams &params) override {}
+    virtual QnBusinessParams parameters() override {return QnBusinessParams(); }
 private:
     Ui::QnEmptyBusinessActionWidget *ui;
 };

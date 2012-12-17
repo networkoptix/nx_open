@@ -2,20 +2,24 @@
 #define EMPTY_BUSINESS_EVENT_WIDGET_H
 
 #include <QWidget>
-#include <ui/widgets/business/abstract_business_event_widget.h>
+#include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
 class QnEmptyBusinessEventWidget;
 }
 
-class QnEmptyBusinessEventWidget : public QnAbstractBusinessEventWidget
+class QnEmptyBusinessEventWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
+    typedef QnAbstractBusinessParamsWidget base_type;
     
 public:
     explicit QnEmptyBusinessEventWidget(QWidget *parent = 0);
     ~QnEmptyBusinessEventWidget();
     
+    virtual void loadParameters(const QnBusinessParams &params) override {}
+    virtual QnBusinessParams parameters() override {return QnBusinessParams(); }
+
 private:
     Ui::QnEmptyBusinessEventWidget *ui;
 };

@@ -2,7 +2,7 @@
 #include "ui_motion_business_event_widget.h"
 
 QnMotionBusinessEventWidget::QnMotionBusinessEventWidget(QWidget *parent) :
-    QnAbstractBusinessEventWidget(parent),
+    base_type(parent),
     ui(new Ui::QnMotionBusinessEventWidget)
 {
     ui->setupUi(this);

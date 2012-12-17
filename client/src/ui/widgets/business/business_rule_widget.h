@@ -5,6 +5,7 @@
 
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
+#include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
     class QnBusinessRuleWidget;
@@ -20,13 +21,12 @@ class QnBusinessRuleWidget : public QWidget
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0);
     ~QnBusinessRuleWidget();
-/*
-    bool getExpanded();
-    void setExpanded(bool expanded = true);
-*/
 
     void setRule(QnBusinessEventRulePtr rule);
     QnBusinessEventRulePtr getRule() const;
+
+    void setExpanded(bool expanded = true);
+    bool expanded() const;
 
 signals:
     /**
@@ -36,8 +36,6 @@ signals:
     void deleteConfirmed(QnBusinessEventRulePtr rule);
 
     void apply(QnBusinessEventRulePtr rule);
-
-    void expand();
 protected:
     /**
      * @brief initAnimations        Create all required animations and state machines.
@@ -90,11 +88,12 @@ private:
 private:
     Ui::QnBusinessRuleWidget *ui;
 
-    QStateMachine *machine;
+    bool m_expanded;
 
     QnBusinessEventRulePtr m_rule;
 
-    QWidget *m_eventParameters;
+    QnAbstractBusinessParamsWidget *m_eventParameters;
+    QnAbstractBusinessParamsWidget *m_actionParameters;
 
     QStandardItemModel *m_eventsTypesModel;
     QStandardItemModel *m_eventStatesModel;

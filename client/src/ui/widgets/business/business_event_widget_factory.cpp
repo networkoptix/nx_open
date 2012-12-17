@@ -4,7 +4,7 @@
 #include <ui/widgets/business/motion_business_event_widget.h>
 #include <ui/widgets/business/camera_input_business_event_widget.h>
 
-QnAbstractBusinessEventWidget* QnBusinessEventWidgetFactory::createWidget(BusinessEventType::Value eventType, QWidget *parent) {
+QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(BusinessEventType::Value eventType, QWidget *parent) {
     switch (eventType) {
     case BusinessEventType::BE_Camera_Motion:
         return new QnMotionBusinessEventWidget(parent);
