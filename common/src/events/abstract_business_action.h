@@ -41,12 +41,6 @@ namespace BusinessActionType
     bool hasToggleState(Value val);
 }
 
-namespace BusinessActionParamName
-{
-    static QLatin1String relayOutputID( "relayOutputID" );
-    static QLatin1String relayAutoResetTimeout( "relayAutoResetTimeout" );
-}
-
 class QnAbstractBusinessAction;
 typedef QSharedPointer<QnAbstractBusinessAction> QnAbstractBusinessActionPtr;
 

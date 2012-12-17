@@ -16,7 +16,7 @@ namespace BusinessActionParameters {
     void setEmailAddress(QnBusinessParams* params, const QString &value);
 }
 
-class QnSendMailBusinessAction : public QnAbstractBusinessAction
+class QnSendMailBusinessAction: public QnAbstractBusinessAction
 {
     typedef QnAbstractBusinessAction base_type;
 public:

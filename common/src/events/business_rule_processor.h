@@ -8,6 +8,8 @@
 #include "abstract_business_action.h"
 #include "business_message_bus.h"
 #include "business_event_rule.h"
+#include "sendmail_business_action.h"
+#include "camera_output_business_action.h"
 
 /*
 * This class route business event and generate business action
@@ -64,8 +66,8 @@ private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
-    bool triggerCameraOutput( const QnAbstractBusinessActionPtr& action );
-    bool sendMail( const QnAbstractBusinessActionPtr& action );
+    bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action );
+    bool sendMail( const QnSendMailBusinessActionPtr& action );
 
     /**
      * @brief m_rulesInProgress         Stores actions that are toggled and state is On

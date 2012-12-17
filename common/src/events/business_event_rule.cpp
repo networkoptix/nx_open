@@ -3,6 +3,7 @@
 #include "recording_business_action.h"
 #include "sendmail_business_action.h"
 #include "common_business_action.h"
+#include "camera_output_business_action.h"
 
 #include <core/resource/resource.h>
 
@@ -21,6 +22,8 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
     switch (m_actionType)
     {
         case BusinessActionType::BA_CameraOutput:
+            result = QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction);
+            break;
         case BusinessActionType::BA_Bookmark:
         case BusinessActionType::BA_PanicRecording:
             result = QnAbstractBusinessActionPtr(new CommonBusinessAction(m_actionType));

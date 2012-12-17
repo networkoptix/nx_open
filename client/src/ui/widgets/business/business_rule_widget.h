@@ -38,11 +38,6 @@ signals:
     void apply(QnBusinessEventRulePtr rule);
 protected:
     /**
-     * @brief initAnimations        Create all required animations and state machines.
-     */
-    void initAnimations();
-
-    /**
      * @brief initEventTypes        Fill combobox with all possible event types.
      */
     void initEventTypes();

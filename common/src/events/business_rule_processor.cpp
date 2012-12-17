@@ -6,8 +6,6 @@
 #include "core/resource/security_cam_resource.h"
 #include "events/business_event_rule.h"
 #include "api/app_server_connection.h"
-#include "sendmail_business_action.h"
-
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
@@ -43,18 +41,15 @@ void QnBusinessRuleProcessor::executeAction(QnAbstractBusinessActionPtr action)
         executeActionInternal(action);
 }
 
-static const QLatin1String RELAY_OUTPUT_ID( "relayOutputID" );
-static const QLatin1String RELAY_AUTO_RESET_TIMEOUT( "relayAutoResetTimeout" );
-
 bool QnBusinessRuleProcessor::executeActionInternal(QnAbstractBusinessActionPtr action)
 {
     switch( action->actionType() )
     {
         case BusinessActionType::BA_CameraOutput:
-            return triggerCameraOutput( action );
+            return triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
 
         case BusinessActionType::BA_SendMail:
-            return sendMail( action );
+            return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
 
         case BusinessActionType::BA_Alert:
             break;
@@ -143,7 +138,7 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: implement me
 }
 
-bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActionPtr& action )
+bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action )
 {
     const QnResourcePtr& resource = action->getResource();
 
@@ -159,23 +154,23 @@ bool QnBusinessRuleProcessor::triggerCameraOutput( const QnAbstractBusinessActio
             arg(resource->getId()), cl_logWARNING );
         return false;
     }
-    QnBusinessParams::const_iterator relayOutputIDIter = action->getParams().find( RELAY_OUTPUT_ID );
-    if( relayOutputIDIter == action->getParams().end() )
+    QString relayOutputId = action->getRelayOutputId();
+    if( relayOutputId.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter %1. Ignoring...").arg(RELAY_OUTPUT_ID), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Received BA_CameraOutput action without required parameter relayOutputID. Ignoring..."), cl_logWARNING );
         return false;
     }
-    QnBusinessParams::const_iterator autoResetTimeoutIter = action->getParams().find( RELAY_AUTO_RESET_TIMEOUT );
+
+    int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
     return securityCam->setRelayOutputState(
-        relayOutputIDIter->toString(),
+        relayOutputId,
         action->getToggleState() == ToggleState::On,
-        autoResetTimeoutIter == action->getParams().end() ? 0 : autoResetTimeoutIter->toUInt() );
+        autoResetTimeout );
 }
 
-bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& action )
+bool QnBusinessRuleProcessor::sendMail( const QnSendMailBusinessActionPtr& action )
 {
-    QnSendMailBusinessActionPtr sendMailAction = action.dynamicCast<QnSendMailBusinessAction>();
-    Q_ASSERT( sendMailAction );
+    Q_ASSERT( action );
 
     QString emailAddress = BusinessActionParameters::getEmailAddress(action->getParams());
     if( emailAddress.isEmpty() )
@@ -192,8 +187,8 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
     QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
             emailAddress,
-            sendMailAction->getSubject(),
-            sendMailAction->getMessageBody(),
+            action->getSubject(),
+            action->getMessageBody(),
             emailSendErrorText ) )
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").

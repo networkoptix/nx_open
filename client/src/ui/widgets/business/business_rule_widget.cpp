@@ -48,8 +48,6 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     connect(ui->applyButton,  SIGNAL(clicked()), this, SLOT(at_applyButton_clicked()));
     connect(ui->cancelButton, SIGNAL(clicked()), this, SLOT(at_expandButton_clicked()));
 
-    //TODO: init and reset from rule, then connect 'OnChanged', yep?
-    initAnimations();
     initEventTypes();
     updateDisplay();
 }
@@ -89,27 +87,6 @@ bool QnBusinessRuleWidget::expanded() const {
     return m_expanded;
 }
 
-//TODO: refactor
-void QnBusinessRuleWidget::initAnimations() {
-  /*  machine = new QStateMachine(this);
-    QState *state1 = new QState(machine);
-    state1->assignProperty(ui->editFrame, "maximumHeight", 1000); //TODO: magic const?
-
-    QState *state2 = new QState(machine);
-    state2->assignProperty(ui->editFrame, "maximumHeight", 0);
-
-    machine->setInitialState(state2);
-
-    QSignalTransition *transition1 = state1->addTransition(ui->expandButton, SIGNAL(clicked()), state2);
-    transition1->addAnimation(new QPropertyAnimation(ui->editFrame, "maximumHeight"));
-
-    QSignalTransition *transition2 = state2->addTransition(this, SIGNAL(expand()), state1);
-    transition2->addAnimation(new QPropertyAnimation(ui->editFrame, "maximumHeight"));
-
-    connect(machine, SIGNAL(stopped()), this, SLOT(updateSummary()));
-    machine->start();*/
-}
-
 void QnBusinessRuleWidget::initEventTypes() {
     m_eventsTypesModel->clear();
     for (int i = BusinessEventType::BE_FirstType; i <= BusinessEventType::BE_LastType; i++) {
@@ -142,22 +119,10 @@ void QnBusinessRuleWidget::initEventStates(BusinessEventType::Value eventType) {
     }
 }
 
-//TODO: 'needAnimate' flag is requested, or just do not animate during constructor and during first expansion
 void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventType) {
-    //QParallelAnimationGroup *group = new QParallelAnimationGroup(this);
-
     if (m_eventParameters) {
         ui->eventLayout->removeWidget(m_eventParameters);
-
-        //TODO: animating opacity is not working on child widgets, need something else
-      /*  QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
-        animation->setDuration(1500);
-        animation->setStartValue(1.0);
-        animation->setEndValue(0.0);
-        group->addAnimation(animation);*/
-
         m_eventParameters->setVisible(false);
-        //TODO: really it should be removed after animation transition
     }
 
     if (m_eventWidgetsByType.contains(eventType)) {
@@ -169,15 +134,7 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
     if (m_eventParameters) {
         ui->eventLayout->addWidget(m_eventParameters);
         m_eventParameters->setVisible(true);
-      /*  QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
-        animation->setDuration(1500);
-        animation->setStartValue(0.0);
-        animation->setEndValue(1.0);
-        group->addAnimation(animation);*/
     }
-
-    //TODO: replace with state-machine
-    //group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
@@ -200,10 +157,6 @@ void QnBusinessRuleWidget::initActionTypes(ToggleState::Value eventState) {
         row << item;
         m_actionTypesModel->appendRow(row);
     }
-
-
-    //TODO: do not lose data in the details widget
-    //TODO: store data in persistent storage between changes?
 }
 
 void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value actionType) {
@@ -316,7 +269,6 @@ void QnBusinessRuleWidget::resetFromRule() {
     }
 }
 
-// TODO: expansion from the outer module still not work
 void QnBusinessRuleWidget::at_expandButton_clicked() {
     setExpanded(!m_expanded);
 }
@@ -360,8 +312,6 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     ToggleState::Value val = (ToggleState::Value)typeIdx;
 
     initActionTypes(val);
-    //TODO: setPossibleActions;
-    // action parameters will be setup in at_action..indexChanged.
 }
 
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
