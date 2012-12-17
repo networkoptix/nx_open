@@ -15,6 +15,7 @@ public:
 
     virtual void loadParameters(const QnBusinessParams &params) = 0;
     virtual QnBusinessParams parameters() const = 0;
+    virtual QString description() const = 0;
 
 };
 

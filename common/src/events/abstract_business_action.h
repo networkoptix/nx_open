@@ -38,6 +38,8 @@ namespace BusinessActionType
 
     QString toString( Value val );
 
+    bool isResourceRequired(Value val);
+
     bool hasToggleState(Value val);
 }
 
@@ -63,7 +65,7 @@ public:
     /*
     * Resource depend of action type.
     * For actions: BA_CameraOutput, BA_Bookmark, BA_CameraRecording, BA_PanicRecording resource MUST be camera
-    * For actions: BA_SendMail, BA_Alert resource is not used
+    * For actions: BA_SendMail, BA_Alert, BA_ShowPopup resource is not used
     */
     void setResource(QnResourcePtr resource);
 

@@ -35,6 +35,30 @@ namespace BusinessActionType
         return QObject::tr("Unknown (%1)").arg((int)val);
     }
 
+    bool isResourceRequired(Value val) {
+        switch( val )
+        {
+            case BA_NotDefined:
+                return false;
+            case BA_CameraOutput:
+                return true;
+            case BA_Bookmark:
+                return true;
+            case BA_CameraRecording:
+                return true;
+            case BA_PanicRecording:
+                return false;
+            case BA_SendMail:
+                return false;
+            case BA_Alert:
+                return false;
+            case BA_ShowPopup:
+                return false;
+            //warning should be raised on unknown enumeration values
+        }
+        return false;
+    }
+
     bool hasToggleState(Value val) {
         switch( val )
         {

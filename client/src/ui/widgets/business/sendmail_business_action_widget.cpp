@@ -24,3 +24,11 @@ QnBusinessParams QnSendmailBusinessActionWidget::parameters() const {
     BusinessActionParameters::setEmailAddress(&params, ui->emailLineEdit->text());
     return params;
 }
+
+QString QnSendmailBusinessActionWidget::description() const {
+    QString fmt = QLatin1String("%1 <span style=\"font-style:italic;\">%2</span>");
+    QString recordStr = QObject::tr("E-mail to");
+    return fmt
+            .arg(recordStr)
+            .arg(ui->emailLineEdit->text());
+}

@@ -22,3 +22,7 @@ void QnMotionBusinessEventWidget::loadParameters(const QnBusinessParams &params)
 QnBusinessParams QnMotionBusinessEventWidget::parameters() const {
     return QnBusinessParams();
 }
+
+QString QnMotionBusinessEventWidget::description() const {
+    return QObject::tr("Motion");
+}

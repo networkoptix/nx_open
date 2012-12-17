@@ -12,3 +12,7 @@ QnEmptyBusinessEventWidget::~QnEmptyBusinessEventWidget()
 {
     delete ui;
 }
+
+QString QnEmptyBusinessEventWidget::description() const {
+    return QLatin1String("Not implemented yet");
+}

@@ -19,7 +19,7 @@ public:
     
     virtual void loadParameters(const QnBusinessParams &params) override;
     virtual QnBusinessParams parameters() const override;
-
+    virtual QString description() const override;
 private:
     Ui::QnMotionBusinessEventWidget *ui;
 };

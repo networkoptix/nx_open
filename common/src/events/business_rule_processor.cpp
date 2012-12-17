@@ -138,6 +138,7 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(QnAbstractBusinessActionPt
     //TODO: implement me
 }
 
+//TODO: move to mserver_business_rule_processor
 bool QnBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action )
 {
     const QnResourcePtr& resource = action->getResource();

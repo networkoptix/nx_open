@@ -66,7 +66,10 @@ private:
     QList<QnBusinessEventRulePtr> m_rules;
     //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
+
+    //TODO: move to mserver_business_rule_processor
     bool triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action );
+
     bool sendMail( const QnSendMailBusinessActionPtr& action );
 
     /**

@@ -59,8 +59,8 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
 
 void QnBusinessRuleWidget::setRule(QnBusinessEventRulePtr rule) {
     m_rule = rule;
-    updateDisplay();
     resetFromRule();
+    updateDisplay();
 }
 
 QnBusinessEventRulePtr QnBusinessRuleWidget::getRule() const {
@@ -208,25 +208,29 @@ void QnBusinessRuleWidget::updateSummary() {
 
     QLatin1String formatString("<html><head/><body><p>%1: %2</p></body></html>");
 
-    QLatin1String eventString("When %1 %2 at %3");
-    QLatin1String actionString("Do %1 at %2");
+    QLatin1String eventString("%1 %2 %3");
+    QLatin1String actionString("%1 %2");
 
-    QLatin1String cameraString("<img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>"\
+    QLatin1String cameraString("at <img src=\":/skin/tree/camera.png\" width=\"16\" height=\"16\"/>"\
             "<span style=\" font-style:italic;\">%1</span>");
 
-    QString eventResource = QString(cameraString)
-            .arg(QLatin1String("Camera_name"));
+    QString eventResource = BusinessEventType::isResourceRequired(m_rule->eventType())
+            ? QString(cameraString).arg(QLatin1String("Camera_name"))
+            : QString();
 
-    QString actionResource = QString(cameraString)
-            .arg(QLatin1String("Camera_name"));
+    QString actionResource = BusinessActionType::isResourceRequired(m_rule->actionType())
+            ? QString(cameraString).arg(QLatin1String("Camera_name"))
+            : QString();
 
     QString eventSummary = QString(eventString)
-            .arg(BusinessEventType::toString(m_rule->eventType()))
+            .arg(m_eventParameters ? m_eventParameters->description()
+                                   : BusinessEventType::toString(m_rule->eventType()))
             .arg(ToggleState::toString(m_rule->getEventToggleState()))
             .arg(eventResource);
 
     QString actionSummary = QString(actionString)
-            .arg(BusinessActionType::toString(m_rule->actionType()))
+            .arg(m_actionParameters ? m_actionParameters->description()
+                                    : BusinessActionType::toString(m_rule->actionType()))
             .arg(actionResource);
 
     //TODO: load details description from sub-widgets
