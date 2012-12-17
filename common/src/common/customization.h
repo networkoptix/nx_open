@@ -37,7 +37,7 @@ namespace Qn {
     inline QnProductFeatures calculateProductFeatures() {
         QnProductFeatures result;
         result.freeLicenseCount = QN_FREE_LICENSE_COUNT;
-        result.freeLicenseKey = QN_FREE_LICENSE_KEY;
+        result.freeLicenseKey = QLatin1String(QN_FREE_LICENSE_KEY);
         return result;
     }
 
