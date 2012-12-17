@@ -1,6 +1,8 @@
 #include "motion_business_event_widget.h"
 #include "ui_motion_business_event_widget.h"
 
+#include <events/motion_business_event.h>
+
 QnMotionBusinessEventWidget::QnMotionBusinessEventWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnMotionBusinessEventWidget)
@@ -11,4 +13,12 @@ QnMotionBusinessEventWidget::QnMotionBusinessEventWidget(QWidget *parent) :
 QnMotionBusinessEventWidget::~QnMotionBusinessEventWidget()
 {
     delete ui;
+}
+
+void QnMotionBusinessEventWidget::loadParameters(const QnBusinessParams &params) {
+    Q_UNUSED(params)
+}
+
+QnBusinessParams QnMotionBusinessEventWidget::parameters() const {
+    return QnBusinessParams();
 }

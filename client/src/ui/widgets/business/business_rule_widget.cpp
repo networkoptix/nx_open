@@ -160,12 +160,15 @@ void QnBusinessRuleWidget::initEventParameters(BusinessEventType::Value eventTyp
         //TODO: really it should be removed after animation transition
     }
 
-    //TODO: reuse existing widget to use already set parameters
-    //TODO: read parameters from rule if exist on first creating
-    //TODO: common widget interface required to setup rule and read settings from it
-    m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
+    if (m_eventWidgetsByType.contains(eventType)) {
+        m_eventParameters = m_eventWidgetsByType.find(eventType).value();
+    } else {
+        m_eventParameters = QnBusinessEventWidgetFactory::createWidget(eventType, this);
+        m_eventWidgetsByType[eventType] = m_eventParameters;
+    }
     if (m_eventParameters) {
         ui->eventLayout->addWidget(m_eventParameters);
+        m_eventParameters->setVisible(true);
       /*  QPropertyAnimation *animation = new QPropertyAnimation(m_eventParameters, "windowOpacity", this);
         animation->setDuration(1500);
         animation->setStartValue(0.0);
@@ -209,12 +212,16 @@ void QnBusinessRuleWidget::initActionParameters(BusinessActionType::Value action
         m_actionParameters->setVisible(false);
     }
 
-    //TODO: reuse existing widget to use already set parameters
-    //TODO: read parameters from rule if exist on first creating
-    //TODO: common widget interface required to setup rule and read settings from it
-    m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
+    if (m_actionWidgetsByType.contains(actionType)) {
+        m_actionParameters = m_actionWidgetsByType.find(actionType).value();
+    } else {
+        m_actionParameters = QnBusinessActionWidgetFactory::createWidget(actionType, this);
+        m_actionWidgetsByType[actionType] = m_actionParameters;
+    }
+
     if (m_actionParameters) {
         ui->actionLayout->addWidget(m_actionParameters);
+        m_actionParameters->setVisible(true);
     }
 }
 
@@ -261,12 +268,12 @@ void QnBusinessRuleWidget::updateSummary() {
             .arg(QLatin1String("Camera_name"));
 
     QString eventSummary = QString(eventString)
-            .arg(BusinessEventType::toString(m_rule->getEventType()))
+            .arg(BusinessEventType::toString(m_rule->eventType()))
             .arg(ToggleState::toString(m_rule->getEventToggleState()))
             .arg(eventResource);
 
     QString actionSummary = QString(actionString)
-            .arg(BusinessActionType::toString(m_rule->getActionType()))
+            .arg(BusinessActionType::toString(m_rule->actionType()))
             .arg(actionResource);
 
     //TODO: load details description from sub-widgets
@@ -288,14 +295,20 @@ void QnBusinessRuleWidget::updateSummary() {
 
 void QnBusinessRuleWidget::resetFromRule() {
     if (m_rule) {
-        QModelIndexList eventTypeIdx = m_eventsTypesModel->match(m_eventsTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getEventType());
+        QModelIndexList eventTypeIdx = m_eventsTypesModel->match(m_eventsTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventType());
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
         QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getEventToggleState());
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
 
-        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getActionType());
+        QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
+
+        if (m_eventParameters)
+            m_eventParameters->loadParameters(m_rule->eventParams());
+
+        if (m_actionParameters)
+            m_actionParameters->loadParameters(m_rule->actionParams());
     } else {
         ui->eventTypeComboBox->setCurrentIndex(0);
         ui->eventStatesComboBox->setCurrentIndex(0);
@@ -316,10 +329,18 @@ void QnBusinessRuleWidget::at_deleteButton_clicked() {
 
 void QnBusinessRuleWidget::at_applyButton_clicked() {
     QnBusinessEventRulePtr rule = m_rule ? m_rule : QnBusinessEventRulePtr(new QnBusinessEventRule);
+
     rule->setEventType(getCurrentEventType());
-    rule->setActionType(getCurrentActionType());
+
+    if (m_eventParameters)
+        rule->setEventParams(m_eventParameters->parameters());
     rule->setEventToggleState(getCurrentEventToggleState());
-    //TODO: fill rule
+
+    rule->setActionType(getCurrentActionType());
+    if (m_actionParameters)
+        rule->setActionParams(m_actionParameters->parameters());
+
+    //TODO: fill resources
     emit apply(rule);
     updateSummary();
 }

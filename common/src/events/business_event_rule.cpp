@@ -29,7 +29,9 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
             result = QnAbstractBusinessActionPtr(new QnRecordingBusinessAction);
             break;
         case BusinessActionType::BA_SendMail:
-            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent));
+            result = QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(bEvent->getEventType(),
+                                                                              bEvent->getResource(),
+                                                                              bEvent->toString()));
             break;
         case BusinessActionType::BA_Alert:
         case BusinessActionType::BA_ShowPopup:
@@ -39,7 +41,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
 
     if (!m_actionParams.isEmpty())
         result->setParams(m_actionParams);
-    result->setResource(m_destination);
+    result->setResource(m_actionResource);
 
     if (BusinessEventType::hasToggleState(bEvent->getEventType()) && BusinessActionType::hasToggleState(m_actionType)) {
         ToggleState::Value value = tState != ToggleState::NotDefined ? tState : bEvent->getToggleState();
@@ -50,15 +52,7 @@ QnAbstractBusinessActionPtr QnBusinessEventRule::instantiateAction(QnAbstractBus
     return result;
 }
 
-QnResourcePtr QnBusinessEventRule::getSrcResource() const {
-    return m_source;
-}
-
-void QnBusinessEventRule::setSrcResource(QnResourcePtr value) {
-    m_source = value;
-}
-
-BusinessEventType::Value QnBusinessEventRule::getEventType() const {
+BusinessEventType::Value QnBusinessEventRule::eventType() const {
     return m_eventType;
 }
 
@@ -66,7 +60,25 @@ void QnBusinessEventRule::setEventType(BusinessEventType::Value value) {
     m_eventType = value;
 }
 
-BusinessActionType::Value QnBusinessEventRule::getActionType() const {
+
+QnResourcePtr QnBusinessEventRule::eventResource() const {
+    return m_eventResource;
+}
+
+void QnBusinessEventRule::setEventResource(QnResourcePtr value) {
+    m_eventResource = value;
+}
+
+QnBusinessParams QnBusinessEventRule::eventParams() const {
+    return m_eventParams;
+}
+
+void QnBusinessEventRule::setEventParams(const QnBusinessParams &params)
+{
+    m_eventParams = params;
+}
+
+BusinessActionType::Value QnBusinessEventRule::actionType() const {
     return m_actionType;
 }
 
@@ -74,33 +86,23 @@ void QnBusinessEventRule::setActionType(BusinessActionType::Value value) {
     m_actionType = value;
 }
 
-QnResourcePtr QnBusinessEventRule::getDstResource() const {
-    return m_destination;
+QnResourcePtr QnBusinessEventRule::actionResource() const {
+    return m_actionResource;
 }
 
-void QnBusinessEventRule::setDstResource(QnResourcePtr value) {
-    m_destination = value;
+void QnBusinessEventRule::setActionResource(QnResourcePtr value) {
+    m_actionResource = value;
 }
 
-QnBusinessParams QnBusinessEventRule::getBusinessParams() const
+QnBusinessParams QnBusinessEventRule::actionParams() const
 {
     return m_actionParams;
 }
 
-void QnBusinessEventRule::setBusinessParams(const QnBusinessParams &params)
+void QnBusinessEventRule::setActionParams(const QnBusinessParams &params)
 {
     m_actionParams = params;
 }
-
-//ToggleState::Value QnBusinessEventRule::getToggleStateFilter() const
-//{
-//    return m_toggleStateFilter;
-//}
-//
-//void QnBusinessEventRule::setToggleStateFilter( ToggleState::Value _filter )
-//{
-//    m_toggleStateFilter = _filter;
-//}
 
 QString QnBusinessEventRule::getUniqueId() const
 {
@@ -108,12 +110,9 @@ QString QnBusinessEventRule::getUniqueId() const
 }
 
 ToggleState::Value QnBusinessEventRule::getEventToggleState() const {
-    QnBusinessParams::const_iterator paramIter = m_eventCondition.find( BusinessEventParameters::toggleState);
-    if( paramIter == m_eventCondition.end() )
-        return ToggleState::NotDefined;
-    return (ToggleState::Value)paramIter.value().toInt();
+    return BusinessEventParameters::getToggleState(m_eventParams);
 }
 
 void QnBusinessEventRule::setEventToggleState(ToggleState::Value value) {
-    m_eventCondition[BusinessEventParameters::toggleState] = (int)value;
+    BusinessEventParameters::setToggleState(&m_eventParams, value);
 }

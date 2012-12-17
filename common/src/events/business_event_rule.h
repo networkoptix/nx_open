@@ -7,10 +7,9 @@
 
 #include "core/resource/resource.h"
 
-/*
+/**
 * This class define relation between business event and action
 */
-
 class QnBusinessEventRule: public QnResource
 {
     Q_OBJECT
@@ -20,45 +19,41 @@ public:
 
     virtual QString getUniqueId() const override;
 
+    // TODO: move to some factory
     QnAbstractBusinessActionPtr instantiateAction(QnAbstractBusinessEventPtr bEvent, ToggleState::Value tstate = ToggleState::NotDefined) const;
 
-    /*!
-        \param name This should be a constant from \a BusinessEventParameters namespace
-    */
-    void addEventCondition( const QString& name, const QVariant& value ) { m_eventCondition[name] = value; }
-    void addEventConditions(QnBusinessParams conditions) {
-        //TODO: implement me
-    }
 
-    void clearEventConditions() { m_eventCondition.clear();  }
-    QnBusinessParams eventConditions() const { return m_eventCondition; }
-
-    QnResourcePtr getSrcResource() const;
-    void setSrcResource(QnResourcePtr value);
-
-    BusinessEventType::Value getEventType() const;
+    BusinessEventType::Value eventType() const;
     void setEventType(BusinessEventType::Value value);
 
-    BusinessActionType::Value getActionType() const;
+    QnResourcePtr eventResource() const;
+    void setEventResource(QnResourcePtr value);
+
+    QnBusinessParams eventParams() const;
+    void setEventParams(const QnBusinessParams& params);
+
+    BusinessActionType::Value actionType() const;
     void setActionType(BusinessActionType::Value value);
 
-    QnResourcePtr getDstResource() const;
-    void setDstResource(QnResourcePtr value);
+    QnResourcePtr actionResource() const;
+    void setActionResource(QnResourcePtr value);
 
-    QnBusinessParams getBusinessParams() const;
-    void setBusinessParams(const QnBusinessParams& params);
+    QnBusinessParams actionParams() const;
+    void setActionParams(const QnBusinessParams& params);
 
+//////////
+    //TODO: move to some iface
     ToggleState::Value getEventToggleState() const;
     void setEventToggleState(ToggleState::Value value);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule
     BusinessEventType::Value m_eventType;
-    QnResourcePtr m_source;
-    QnBusinessParams m_eventCondition;
+    QnResourcePtr m_eventResource;
+    QnBusinessParams m_eventParams;
 
     BusinessActionType::Value m_actionType;
-    QnResourcePtr m_destination;
+    QnResourcePtr m_actionResource;
     QnBusinessParams m_actionParams;
 };
 

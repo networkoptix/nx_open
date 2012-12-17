@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QLineEdit" name="lineEdit"/>
+    <widget class="QLineEdit" name="inputIdLineEdit"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">

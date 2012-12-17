@@ -19,7 +19,7 @@ public:
     ~QnEmptyBusinessActionWidget();
 
     virtual void loadParameters(const QnBusinessParams &params) override {}
-    virtual QnBusinessParams parameters() override {return QnBusinessParams(); }
+    virtual QnBusinessParams parameters() const override {return QnBusinessParams(); }
 private:
     Ui::QnEmptyBusinessActionWidget *ui;
 };

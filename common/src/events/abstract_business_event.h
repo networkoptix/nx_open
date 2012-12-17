@@ -43,9 +43,8 @@ namespace BusinessEventType
 
 namespace BusinessEventParameters
 {
-    static QLatin1String toggleState( "toggleState" );
-
-    ToggleState::Value getToggleState(QnBusinessParams params);
+    ToggleState::Value getToggleState(const QnBusinessParams &params);
+    void setToggleState(QnBusinessParams* params, ToggleState::Value value);
 }
 
 /**
@@ -73,7 +72,7 @@ public:
     virtual ~QnAbstractBusinessEvent() {}
 
     /**
-     * @brief toString          Convert event to human-readable string in debug purposes.
+     * @brief toString          Convert event to human-readable string in debug purposes and as sendMail text.
      * @return                  Printable string with all event data in human-readable form.
      */
     virtual QString toString() const;

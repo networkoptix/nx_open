@@ -14,7 +14,7 @@ public:
     ~QnAbstractBusinessParamsWidget() {}
 
     virtual void loadParameters(const QnBusinessParams &params) = 0;
-    virtual QnBusinessParams parameters() = 0;
+    virtual QnBusinessParams parameters() const = 0;
 
 };
 

@@ -79,13 +79,15 @@ namespace BusinessEventType
 
 namespace BusinessEventParameters {
 
-    ToggleState::Value getToggleState(QnBusinessParams params) {
-        QnBusinessParams::const_iterator paramIter = params.find(toggleState);
-        if( paramIter == params.end() )
-            return ToggleState::NotDefined;
-        return (ToggleState::Value)paramIter.value().toInt();
+    static QLatin1String toggleState( "toggleState" );
+
+    ToggleState::Value getToggleState(const QnBusinessParams &params) {
+        return (ToggleState::Value) params.value(toggleState, ToggleState::NotDefined).toInt();
     }
 
+    void setToggleState(QnBusinessParams *params, ToggleState::Value value) {
+        (*params)[toggleState] = (int)value;
+    }
 
 }
 
@@ -104,8 +106,8 @@ QnAbstractBusinessEvent::QnAbstractBusinessEvent(
 
 QString QnAbstractBusinessEvent::toString() const
 {   //Input event (input 1, on)
-    QString text = QString::fromLatin1("  event type: %1\n").arg(BusinessEventType::toString(m_eventType));
-    text += QString::fromLatin1("  timestamp: %2\n").arg(QDateTime::fromMSecsSinceEpoch(m_timeStamp).toString());
+    QString text = QObject::tr("event type: %1\n").arg(BusinessEventType::toString(m_eventType));
+    text += QObject::tr("timestamp: %1\n").arg(QDateTime::fromMSecsSinceEpoch(m_timeStamp).toString());
     return text;
 }
 

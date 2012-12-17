@@ -102,11 +102,11 @@ QList<QnAbstractBusinessActionPtr> QnBusinessRuleProcessor::matchActions(QnAbstr
     QList<QnAbstractBusinessActionPtr> result;
     foreach(QnBusinessEventRulePtr rule, m_rules)    
     {
-        bool typeOK = rule->getEventType() == bEvent->getEventType();
-        bool resOK = !rule->getSrcResource() || !bEvent->getResource() || rule->getSrcResource()->getId() == bEvent->getResource()->getId();
+        bool typeOK = rule->eventType() == bEvent->getEventType();
+        bool resOK = !rule->eventResource() || !bEvent->getResource() || rule->eventResource()->getId() == bEvent->getResource()->getId();
         if (typeOK && resOK)
         {
-            bool condOK = bEvent->checkCondition(rule->eventConditions());
+            bool condOK = bEvent->checkCondition(rule->eventParams());
             QnAbstractBusinessActionPtr action;
 
             if (m_rulesInProgress.contains(rule->getUniqueId()))
@@ -177,34 +177,27 @@ bool QnBusinessRuleProcessor::sendMail( const QnAbstractBusinessActionPtr& actio
     QnSendMailBusinessActionPtr sendMailAction = action.dynamicCast<QnSendMailBusinessAction>();
     Q_ASSERT( sendMailAction );
 
-    const QnBusinessParams& actionParams = sendMailAction->getParams();
-    QnBusinessParams::const_iterator emailIter = actionParams.find( BusinessActionParamName::emailAddress );
-    if( emailIter == actionParams.end() )
+    QString emailAddress = BusinessActionParameters::getEmailAddress(action->getParams());
+    if( emailAddress.isEmpty() )
     {
-        cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"%1\". Ignoring...").
-            arg(BusinessActionParamName::emailAddress), cl_logWARNING );
+        cl_log.log( QString::fromLatin1("Action SendMail missing required parameter \"emailAddress\". Ignoring..."), cl_logWARNING );
         return false;
     }
 
-    cl_log.log( QString::fromLatin1("Processing action SendMail from camera %1. Sending mail to %2").
-        arg(sendMailAction->getEvent()->getResource()->getName()).arg(emailIter.value().toString()), cl_logDEBUG1 );
+    cl_log.log( QString::fromLatin1("Processing action SendMail. Sending mail to %1").
+        arg(emailAddress), cl_logDEBUG1 );
+
 
     const QnAppServerConnectionPtr& appServerConnection = QnAppServerConnectionFactory::createConnection();
     QByteArray emailSendErrorText;
     if( appServerConnection->sendEmail(
-            emailIter.value().toString(),
-            sendMailAction->getEvent()->getResource()
-                ? tr("%1 Event received from resource %2 (%3)").
-                    arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())).
-                    arg(sendMailAction->getEvent()->getResource()->getName()).
-                    arg(sendMailAction->getEvent()->getResource()->getUrl())
-                : tr("%1 Event received from an unknown resource").
-                    arg(BusinessEventType::toString(sendMailAction->getEvent()->getEventType())),
-            sendMailAction->toString(),
+            emailAddress,
+            sendMailAction->getSubject(),
+            sendMailAction->getMessageBody(),
             emailSendErrorText ) )
     {
         cl_log.log( QString::fromLatin1("Error processing action SendMail (TO: %1). %2").
-            arg(emailIter.value().toString()).arg(QLatin1String(emailSendErrorText)), cl_logWARNING );
+            arg(emailAddress).arg(QLatin1String(emailSendErrorText)), cl_logWARNING );
         return false;
     }
     return true;

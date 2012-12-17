@@ -5,7 +5,7 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-class QnCameraInputBusinessEventWidget;
+    class QnCameraInputBusinessEventWidget;
 }
 
 class QnCameraInputBusinessEventWidget : public QnAbstractBusinessParamsWidget
@@ -18,8 +18,8 @@ public:
     ~QnCameraInputBusinessEventWidget();
     
 
-    virtual void loadParameters(const QnBusinessParams &params) override {}
-    virtual QnBusinessParams parameters() override {return QnBusinessParams(); }
+    virtual void loadParameters(const QnBusinessParams &params) override;
+    virtual QnBusinessParams parameters() const override;
 private:
     Ui::QnCameraInputBusinessEventWidget *ui;
 };

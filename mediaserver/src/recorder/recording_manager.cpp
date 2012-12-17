@@ -415,23 +415,6 @@ bool QnRecordingManager::isCameraRecoring(QnResourcePtr camera)
 
 void QnRecordingManager::onTimer()
 {
-    // for test purpose only
-    static int gggTest = 0;
-    if (gggTest == 0) {
-        gggTest = 1;
-        QnResourcePtr srcCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
-        QnResourcePtr dstCamera = qnResPool->getResourceByUniqId("00-1C-A6-01-21-97");
-        if (srcCamera && dstCamera) {
-            QnBusinessEventRulePtr bRule(new QnBusinessEventRule);
-            bRule->setEventType(BusinessEventType::BE_Camera_Motion);
-            bRule->setSrcResource(srcCamera);
-            bRule->setActionType(BusinessActionType::BA_CameraRecording);
-            bRule->setDstResource(dstCamera);
-            qnBusinessRuleProcessor->addBusinessRule(bRule);
-        }
-    }
-    // =======================================================
-
     qint64 time = qnSyncTime->currentMSecsSinceEpoch();
     for (QMap<QnResourcePtr, Recorders>::iterator itrRec = m_recordMap.begin(); itrRec != m_recordMap.end(); ++itrRec)
     {
@@ -450,14 +433,14 @@ void QnRecordingManager::onTimer()
 }
 
 
-Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance);
+Q_GLOBAL_STATIC(QnRecordingManager, qn_recordingManager_instance)
 QnRecordingManager* QnRecordingManager::instance()
 {
     return qn_recordingManager_instance();
 }
 
 // --------------------- QnServerDataProviderFactory -------------------
-Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance);
+Q_GLOBAL_STATIC(QnServerDataProviderFactory, qn_serverDataProviderFactory_instance)
 
 QnAbstractStreamDataProvider* QnServerDataProviderFactory::createDataProviderInternal(QnResourcePtr res, QnResource::ConnectionRole role)
 {

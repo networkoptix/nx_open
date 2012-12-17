@@ -4,17 +4,19 @@
 ***********************************************************/
 
 #include "camera_input_business_event.h"
-#include "core/resource/resource.h"
+#include "core/resource/resource_fwd.h"
 
 namespace BusinessEventParameters {
 
-    QString getInputPortId(QnBusinessParams params) {
-        QnBusinessParams::const_iterator paramIter = params.find(inputPortId);
-        if( paramIter == params.end() )
-            return QString();
-        return paramIter.value().toString();
+    static QLatin1String inputPortId( "inputPortId" );
+
+    QString getInputPortId(const QnBusinessParams &params) {
+        return params.value(inputPortId, QString()).toString();
     }
 
+    void setInputPortId(QnBusinessParams *params, const QString &value) {
+        (*params)[inputPortId] = value;
+    }
 
 }
 

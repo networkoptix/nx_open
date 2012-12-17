@@ -45,7 +45,6 @@ namespace BusinessActionParamName
 {
     static QLatin1String relayOutputID( "relayOutputID" );
     static QLatin1String relayAutoResetTimeout( "relayAutoResetTimeout" );
-    static QLatin1String emailAddress( "emailAddress" );
 }
 
 class QnAbstractBusinessAction;
@@ -87,15 +86,13 @@ public:
 
     void setReceivedFromRemoteHost(bool value);
     bool isReceivedFromRemoteHost() const;
-protected:
-    QnResourcePtr m_resource;
-    QnBusinessParams m_params;
-    QnId m_businessRuleId; // business rule, that generated this action
-
 private:
     BusinessActionType::Value m_actionType;
     ToggleState::Value m_toggleState;
     bool m_receivedFromRemoteHost;
+    QnResourcePtr m_resource;
+    QnBusinessParams m_params;
+    QnId m_businessRuleId; // business rule, that generated this action
 };
 
 Q_DECLARE_METATYPE(QnAbstractBusinessActionPtr)

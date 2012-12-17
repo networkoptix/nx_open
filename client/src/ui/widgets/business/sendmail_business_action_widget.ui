@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QnMotionBusinessEventWidget</class>
- <widget class="QWidget" name="QnMotionBusinessEventWidget">
+ <class>QnSendmailBusinessActionWidget</class>
+ <widget class="QWidget" name="QnSendmailBusinessActionWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
+    <width>823</width>
     <height>45</height>
    </rect>
   </property>
@@ -15,18 +15,14 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <widget class="QPushButton" name="selectRegionButton">
+    <widget class="QLabel" name="label">
      <property name="text">
-      <string>Select region...</string>
+      <string>Recipients:</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="summaryLabel">
-     <property name="text">
-      <string>Selected region: Anywhere</string>
-     </property>
-    </widget>
+    <widget class="QLineEdit" name="emailLineEdit"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">
@@ -35,7 +31,7 @@
      </property>
      <property name="sizeHint" stdset="0">
       <size>
-       <width>40</width>
+       <width>357</width>
        <height>20</height>
       </size>
      </property>
