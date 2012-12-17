@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cfloat>
 #include <cassert>
+#include <limits>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/qnumeric.h>
@@ -46,6 +47,25 @@ inline bool qIsNaN(const QVector3D &vector) {
 inline bool qIsNaN(const QVector4D &vector) {
     return qIsNaN(vector.x()) || qIsNaN(vector.y()) || qIsNaN(vector.z()) || qIsNaN(vector.w());
 }
+
+template<class T> inline T qQNaN();
+template<class T> inline T qSNaN();
+
+#define QN_DEFINE_NAN_FUNCTION(TYPE, NAME, VALUE) template<> inline TYPE NAME<TYPE>() { return VALUE; }                           
+QN_DEFINE_NAN_FUNCTION(float, qQNaN, std::numeric_limits<float>::quiet_NaN())
+QN_DEFINE_NAN_FUNCTION(float, qSNaN, std::numeric_limits<float>::signaling_NaN())
+QN_DEFINE_NAN_FUNCTION(double, qQNaN, std::numeric_limits<double>::quiet_NaN())
+QN_DEFINE_NAN_FUNCTION(double, qSNaN, std::numeric_limits<double>::signaling_NaN())
+#undef QN_DEFINE_NAN_FUNCTION
+
+#define QN_DEFINE_COMPOSITE_NAN_FUNCTIONS(TYPE, SOURCE_TYPE, VALUE)             \
+template<> inline TYPE qQNaN<TYPE>() { SOURCE_TYPE nan = qQNaN<SOURCE_TYPE>(); return VALUE; } \
+template<> inline TYPE qSNaN<TYPE>() { SOURCE_TYPE nan = qSNaN<SOURCE_TYPE>(); return VALUE; }
+
+QN_DEFINE_COMPOSITE_NAN_FUNCTIONS(QVector2D, qreal, QVector2D(nan, nan))
+QN_DEFINE_COMPOSITE_NAN_FUNCTIONS(QVector3D, qreal, QVector3D(nan, nan, nan))
+QN_DEFINE_COMPOSITE_NAN_FUNCTIONS(QVector4D, qreal, QVector4D(nan, nan, nan, nan))
+#undef QN_DEFINE_COMPOSITE_NAN_FUNCTIONS
 
 
 /**
