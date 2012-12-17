@@ -67,6 +67,7 @@
         <Property Id="INSTALL_ECS" Secure="yes"/>
         <Property Id="INSTALL_SERVER" Secure="yes"/>
         <Property Id="INSTALL_CLIENT" Secure="yes"/>
+	    <Property Id="SERVER_DIRECTORY" Secure="yes"/>
         
         <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
             <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
