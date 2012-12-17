@@ -46,14 +46,19 @@ public:
 private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
+    void at_camera_statusChanged();
+    void at_camera_statusChanged(const QnVirtualCameraResourcePtr &camera);
 
     void at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
     void at_ptzSetPosition_replyReceived(int status, int handle);
+    void at_ptzSetMovement_replyReceived(int status, int handle);
 
 private:
     void sendGetPosition(const QnVirtualCameraResourcePtr &camera);
     void sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position);
     void sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
+
+    void tryInitialize(const QnVirtualCameraResourcePtr &camera);
 
 private:
     enum PtzRequestType {
@@ -64,17 +69,18 @@ private:
     };
 
     struct PtzData {
-        PtzData() { for(int i = 0; i < RequestTypeCount; i++) attemptCount[i] = handle[i] = -1; }
+        PtzData();
 
-        QVector3D knownPosition, pendingPosition;
-        QVector3D knownMovement, pendingMovement;
+        bool initialized;
+        QVector3D position;
+        QVector3D movement;
         int attemptCount[RequestTypeCount];
-        int handle[RequestTypeCount];
     };
 
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;
+    QHash<int, QVector3D> m_requestByHandle;
 };
 
 
