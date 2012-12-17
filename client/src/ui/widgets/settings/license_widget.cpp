@@ -11,6 +11,8 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <common/customization.h>
+
 #include "licensing/license.h"
 #include "version.h"
 
