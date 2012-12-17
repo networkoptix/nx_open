@@ -628,12 +628,17 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
         }
         if (reverseMode) 
             m_prevFrameToDelete = outFrame;
-        return !m_bufferedFrameDisplayer;
+        return true; //!m_bufferedFrameDisplayer;
     }
     else {
         delete outFrame;
         return false;
     }
+}
+
+bool QnVideoStreamDisplay::selfSyncUsed() const
+{
+    return m_bufferedFrameDisplayer;
 }
 
 bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)
