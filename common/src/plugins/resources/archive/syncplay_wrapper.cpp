@@ -693,25 +693,8 @@ qint64 QnArchiveSyncPlayWrapper::getCurrentTimeInternal() const
 
     qint64 expectTime = expectedTime();
     qint64 nextTime = getNextTime();
-    if (d->speed >= 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime > expectTime + MAX_FRAME_DURATION*1000)
+    if (nextTime != qint64(AV_NOPTS_VALUE) && qAbs(nextTime - expectTime) > MAX_FRAME_DURATION*1000)
     {
-        QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
-        
-        /*
-        qDebug() << "reinitTimeTo=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
-               "expected time=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz");
-        */
-
-        nonConstThis->reinitTime(nextTime);
-        expectTime = expectedTime();
-    }
-    else if (d->speed < 0 && nextTime != qint64(AV_NOPTS_VALUE) && nextTime < expectTime - MAX_FRAME_DURATION*1000)
-    {
-        /*
-        qDebug() << "nextTime=" << QDateTime::fromMSecsSinceEpoch(nextTime/1000).toString("hh:mm:ss.zzz") << 
-            "expectTime=" << QDateTime::fromMSecsSinceEpoch(expectTime/1000).toString("hh:mm:ss.zzz")
-            << "currentTime=" << QDateTime::fromMSecsSinceEpoch(getDisplayedTimeInternal()/1000).toString("hh:mm:ss.zzz");
-        */
         QnArchiveSyncPlayWrapper* nonConstThis = const_cast<QnArchiveSyncPlayWrapper*>(this);
         nonConstThis->reinitTime(nextTime);
         expectTime = expectedTime();
