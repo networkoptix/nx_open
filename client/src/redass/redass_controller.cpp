@@ -208,6 +208,10 @@ void QnRedAssController::onTimer()
 
         // switch HQ->LQ if visual item size is small
         QnArchiveStreamReader* reader = display->getArchiveReader();
+
+        if (display->isFullScreen())
+            reader->setQuality(MEDIA_Quality_High, true); // todo: remove quality control from workbench display. Set quality here again to prevent race condition
+
         if (reader->getQuality() == MEDIA_Quality_High && isSmallItem(display))
         {
             gotoLowQuality(display, Reason_Small);

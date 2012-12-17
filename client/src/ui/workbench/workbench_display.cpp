@@ -565,10 +565,10 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             oldMediaWidget->display()->camDisplay()->setFullScreen(false);
         }
         if(QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget)) {
+            newMediaWidget->display()->camDisplay()->setFullScreen(true);
             if (newMediaWidget->display()->archiveReader()) {
                 newMediaWidget->display()->archiveReader()->setQuality(MEDIA_Quality_High, true);
             }
-            newMediaWidget->display()->camDisplay()->setFullScreen(true);
         }
 
         /* Hide / show other items when zoomed. */
