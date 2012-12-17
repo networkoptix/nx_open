@@ -54,7 +54,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(m_licenses.hardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY) && (qnProductFeatures().freeLicenseCount > 0));
+    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(qnProductFeatures().freeLicenseKey) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
     ui->gridLicenses->clear();
