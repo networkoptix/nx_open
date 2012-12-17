@@ -605,8 +605,11 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
                         dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Fast);
                 }
             }
-            else
-                m_drawer->draw(outFrame);
+            else {
+                if (qAbs(m_speed) < 1.0 + FPS_EPS)
+                    m_drawer->waitForFrameDisplayed(outFrame->channel); // wait old frame
+                m_drawer->draw(outFrame); // send new one
+            }
             m_lastDisplayedFrame = outFrame;
             m_frameQueueIndex = (m_frameQueueIndex + 1) % MAX_FRAME_QUEUE_SIZE; // allow frame queue for selected video
             m_queueUsed = true;
@@ -625,12 +628,17 @@ bool QnVideoStreamDisplay::processDecodedFrame(QnAbstractVideoDecoder* dec, CLVi
         }
         if (reverseMode) 
             m_prevFrameToDelete = outFrame;
-        return !m_bufferedFrameDisplayer;
+        return true; //!m_bufferedFrameDisplayer;
     }
     else {
         delete outFrame;
         return false;
     }
+}
+
+bool QnVideoStreamDisplay::selfSyncUsed() const
+{
+    return m_bufferedFrameDisplayer;
 }
 
 bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CLVideoDecoderOutput& outFrame, int newWidth, int newHeight)

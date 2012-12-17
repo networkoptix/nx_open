@@ -4,6 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
+#include <QtGui/QAbstractItemView>
+#include <QtGui/QTreeWidgetItem>
 #include <QtGui/QFileDialog>
 #include <QtGui/QMessageBox>
 
@@ -52,7 +54,7 @@ void QnLicenseManagerWidget::updateLicenses() {
 
     /* Update license widget. */
     ui->licenseWidget->setHardwareId(m_licenses.hardwareId());
-    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY) && (qnProductFeatures() & Qn::FreeLicenseFeature));
+    ui->licenseWidget->setFreeLicenseAvailable(!m_licenses.haveLicenseKey(QnLicense::FREE_LICENSE_KEY) && (qnProductFeatures().freeLicenseCount > 0));
 
     /* Update grid. */
     ui->gridLicenses->clear();
@@ -80,7 +82,7 @@ void QnLicenseManagerWidget::updateLicenses() {
             ui->infoLabel->setText(tr("Obtaining licenses from Enterprise Controller..."));
             useRedLabel = false;
         } else {
-            QString text = (qnProductFeatures() & Qn::FreeLicenseFeature) ?
+            QString text = (qnProductFeatures().freeLicenseCount > 0) ?
                 tr("You do not have a valid License installed. Please activate your commercial or free license.") :
                 tr("You do not have a valid License installed. Please activate your commercial license.");
             ui->infoLabel->setText(text);

@@ -450,7 +450,7 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
                 //qDebug() << "sleepTimer=" << sleepTimer.elapsed() << "extSleep=" << realSleepTime;
             }
         }
-        else {
+        else if (!m_display[0]->selfSyncUsed()) {
             if (m_lastFrameDisplayed == QnVideoStreamDisplay::Status_Displayed) {
                 if (m_isRealTimeSource)
                     realSleepTime = m_delay.terminatedSleep(needToSleep, needToSleep*qAbs(speed)*2);
@@ -525,8 +525,9 @@ bool QnCamDisplay::display(QnCompressedVideoDataPtr vd, bool sleep, float speed)
             {
                 m_buffering &= ~(1 << vd->channelNumber);
                 m_timeMutex.unlock();
-                if (m_buffering == 0 && m_extTimeSrc) {
-                    m_extTimeSrc->onBufferingFinished(this);
+                if (m_buffering == 0) {
+                    if (m_extTimeSrc)
+                        m_extTimeSrc->onBufferingFinished(this);
                     unblockTimeValue();
                 }
             }

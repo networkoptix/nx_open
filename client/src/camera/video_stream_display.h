@@ -55,6 +55,7 @@ public:
     QSharedPointer<CLVideoDecoderOutput> flush(QnFrameScaler::DownscaleFactor force_factor, int channelNum);
     QSize getScreenSize() const;
     QnVideoStreamDisplay::FrameDisplayStatus flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor);
+    bool selfSyncUsed() const;
 private:
     mutable QMutex m_mtx;
     mutable QMutex m_timeMutex;

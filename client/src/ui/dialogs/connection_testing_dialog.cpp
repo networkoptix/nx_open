@@ -111,7 +111,7 @@ void QnConnectionTestingDialog::testSettings()
     httpUrl.setScheme(QLatin1String("http"));
     httpUrl.setUserName(QString());
     httpUrl.setPassword(QString());
-    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse& response, QByteArray,int)));
+    QnSessionManager::instance()->sendAsyncGetRequest(httpUrl, QLatin1String("resourceEx"), this, SLOT(oldHttpTestResults(const QnHTTPRawResponse& response, int)));
 }
 
 void QnConnectionTestingDialog::updateUi(bool success){
