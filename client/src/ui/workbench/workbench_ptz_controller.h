@@ -47,6 +47,14 @@ private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
 
+    void at_ptzGetPosition_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
+    void at_ptzSetPosition_replyReceived(int status, int handle);
+
+private:
+    void sendGetPosition(const QnVirtualCameraResourcePtr &camera);
+    void sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position);
+    void sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement);
+
 private:
     enum PtzRequestType {
         SetMovementRequest,
@@ -56,9 +64,12 @@ private:
     };
 
     struct PtzData {
+        PtzData() { for(int i = 0; i < RequestTypeCount; i++) attemptCount[i] = handle[i] = -1; }
+
         QVector3D knownPosition, pendingPosition;
         QVector3D knownMovement, pendingMovement;
         int attemptCount[RequestTypeCount];
+        int handle[RequestTypeCount];
     };
 
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;

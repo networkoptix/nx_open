@@ -4,6 +4,9 @@
 #include <QtCore/QPointF>
 #include <QtCore/QSizeF>
 #include <QtCore/QRectF>
+#include <QtGui/QVector2D>
+#include <QtGui/QVector3D>
+#include <QtGui/QVector4D>
 
 inline bool qFuzzyIsNull(const QPointF &p) {
     return ::qFuzzyIsNull(p.x()) && ::qFuzzyIsNull(p.y());
@@ -28,6 +31,19 @@ inline bool qFuzzyCompare(const QRectF &l, const QRectF &r) {
         ::qFuzzyCompare(l.width(), r.width()) &&
         ::qFuzzyCompare(l.height(), r.height());
 }
+
+inline bool qFuzzyIsNull(const QVector2D &vector) {
+    return qFuzzyIsNull(vector.x()) && qFuzzyIsNull(vector.y());
+}
+
+inline bool qFuzzyIsNull(const QVector3D &vector) {
+    return qFuzzyIsNull(vector.x()) && qFuzzyIsNull(vector.y()) && qFuzzyIsNull(vector.z());
+}
+
+inline bool qFuzzyIsNull(const QVector4D &vector) {
+    return qFuzzyIsNull(vector.x()) && qFuzzyIsNull(vector.y()) && qFuzzyIsNull(vector.z()) && qFuzzyIsNull(vector.w());
+}
+
 
 /**
  * \param value                         Value to check.

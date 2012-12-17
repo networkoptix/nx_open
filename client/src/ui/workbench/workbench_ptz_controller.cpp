@@ -1,5 +1,7 @@
 #include "workbench_ptz_controller.h"
 
+#include <utils/common/math.h>
+
 #include <api/media_server_connection.h>
 
 #include <core/resource/camera_resource.h>
@@ -42,6 +44,46 @@ void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &cam
 
 }
 
+void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr &camera) {
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, qreal, qreal, qreal, int)));
+    m_cameraByHandle[handle] = camera;
+
+    PtzData &data = m_dataByCamera[camera];
+    data.attemptCount[GetPositionRequest]++;
+    data.handle[GetPositionRequest] = handle;
+}
+
+void QnWorkbenchPtzController::sendSetPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    int handle = server->apiConnection()->asyncPtzMoveTo(camera, position.x(), position.y(), position.z(), this, SLOT(at_ptzSetPosition_replyReceived()));
+    m_cameraByHandle[handle] = camera;
+
+    PtzData &data = m_dataByCamera[camera];
+    data.attemptCount[SetPositionRequest]++;
+    data.handle[SetPositionRequest] = handle;
+    data.pendingPosition = position;
+}
+
+void QnWorkbenchPtzController::sendSetMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &movement) {
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
+
+    int handle;
+    if(qFuzzyIsNull(movement)) {
+        handle = server->apiConnection()->asyncPtzStop(camera, this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+    } else {
+        handle = server->apiConnection()->asyncPtzMove(camera, movement.x(), movement.y(), movement.z(), this, SLOT(at_ptzSetMovement_replyReceived(int, int)));
+    }
+    m_cameraByHandle[handle] = camera;
+
+    PtzData &data = m_dataByCamera[camera];
+    data.attemptCount[SetMovementRequest]++;
+    data.handle[SetMovementRequest] = handle;
+    data.pendingMovement = movement;
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -51,7 +93,7 @@ void QnWorkbenchPtzController::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtua
 
     int handle;
     
-    handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
+    handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPosition_replyReceived(int, qreal, qreal, qreal, int)));
     m_cameraByHandle[handle] = camera;
 
     //handle = server->apiConnection()->asyncPtz
