@@ -45,27 +45,48 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
     connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraAdded(camera);
-
-
 }
 
 QnWorkbenchPtzController::~QnWorkbenchPtzController() {
-
+    QnWorkbenchPtzCamerasWatcher *watcher = context()->instance<QnWorkbenchPtzCamerasWatcher>();
+    foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
+        at_ptzCameraWatcher_ptzCameraRemoved(camera);
+    disconnect(watcher, NULL, this, NULL);
 }
 
 QVector3D QnWorkbenchPtzController::position(const QnVirtualCameraResourcePtr &camera) {
+    if(!camera) {
+        qnNullWarning(camera);
+        return;
+    }
+
     return QVector3D();
 }
 
 void QnWorkbenchPtzController::setPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
+    if(!camera) {
+        qnNullWarning(camera);
+        return;
+    }
 
+    
 }
 
 QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) {
+    if(!camera) {
+        qnNullWarning(camera);
+        return;
+    }
+
     return QVector3D();
 }
 
 void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &motion) {
+    if(!camera) {
+        qnNullWarning(camera);
+        return;
+    }
+
 
 }
 
