@@ -143,8 +143,6 @@
 			</activation>
 			<modules>
 				<module>quicksyncdecoder</module>	
-				<module>help</module>	
-	
 				<module>traytool</module>	
 				<module>wixsetup</module>
 			</modules>
