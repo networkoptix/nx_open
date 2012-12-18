@@ -57,7 +57,6 @@ protected:
     virtual void finishDragProcess(DragInfo *info) override;
 
 private slots:
-    void at_target_optionsChanged();
     void at_splashItem_destroyed();
 
 private:

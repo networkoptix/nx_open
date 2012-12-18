@@ -63,7 +63,7 @@
 #include <ui/graphics/instruments/animation_instrument.h>
 #include <ui/graphics/instruments/selection_overlay_hack_instrument.h>
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
-#include <ui/graphics/instruments/ptz_instrument.h>
+#include <ui/graphics/instruments/absolute_ptz_instrument.h>
 
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
@@ -225,7 +225,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     m_rubberBandInstrument->setRubberBandZValue(display()->layerZValue(Qn::EffectsLayer));
     m_rotationInstrument->setRotationItemZValue(display()->layerZValue(Qn::EffectsLayer));
-    ptzInstrument->setPtzItemZValue(display()->layerZValue(Qn::EffectsLayer));
     m_resizingInstrument->setEffectiveDistance(8);
 
     m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());

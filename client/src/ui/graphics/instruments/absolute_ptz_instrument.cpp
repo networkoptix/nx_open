@@ -1,4 +1,4 @@
-#include "ptz_instrument.h"
+#include "absolute_ptz_instrument.h"
 
 #include <cmath>
 #include <cassert>
@@ -353,8 +353,12 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item);
     if(widget) {
-        connect(widget, SIGNAL(optionsChanged()), this, SLOT(at_target_optionsChanged()));
-        return true;
+        QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+        if(m_ptzController->mapper(camera)) {
+            return true;
+        } else {
+            return false;
+        }
     } else {
         return false;
     }
@@ -536,11 +540,6 @@ void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
     }
 
     emit ptzProcessFinished(target());
-}
-
-void AbsolutePtzInstrument::at_target_optionsChanged() {
-    //if(sender() == target())
-        //updatePtzItemOpacity();
 }
 
 void AbsolutePtzInstrument::at_splashItem_destroyed() {
