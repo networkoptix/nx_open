@@ -223,8 +223,6 @@ class _oasisWsnB2__RenewResponse;
 template <class T>
 class SoapWrapper
 {
-    std::string m_login;
-    std::string m_passwd;
 public:
     /*!
         \param _timeDrift ???
@@ -267,8 +265,8 @@ protected:
     void beforeMethodInvocation();
 
 private:
-    char* m_login;
-    char* m_passwd;
+    std::string m_login;
+    std::string m_passwd;
     bool invoked;
     int m_timeDrift;
 

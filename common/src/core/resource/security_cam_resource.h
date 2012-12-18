@@ -80,12 +80,21 @@ public:
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
 
+    virtual QStringList QnSecurityCamResource::getRelayOutputList() const;
+    virtual QStringList QnSecurityCamResource::getInputPortList() const;
+
+
+    CameraCapabilities getCameraCapabilities() const;
     bool checkCameraCapability(CameraCapabilities value) const;
     void addCameraCapabilities(CameraCapabilities value);
+    void removeCameraCapabilities(CameraCapabilities value);
+
+
     /*!
         Change output with id \a ouputID state to \a activate
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
+    */
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,

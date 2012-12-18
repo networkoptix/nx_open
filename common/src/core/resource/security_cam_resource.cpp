@@ -392,25 +392,42 @@ void QnSecurityCamResource::setMotionType(MotionType value)
     m_motionType = value;
 }
 
-QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities()
+void QnSecurityCamResource::onDisabledChanged( bool oldValue, bool newValue )
+{
+    if( oldValue == newValue )
+        return;
+
+    if( hasFlags(QnResource::foreigner) )
+        return;     //we do not own camera
+
+    if( newValue )
+        stopInputPortMonitoring();
+    else
+        startInputPortMonitoring();
+}
+
+bool QnSecurityCamResource::checkCameraCapability(CameraCapabilities value) const
+{
+    return getCameraCapabilities() & value;
+}
+
+QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
 {
     QVariant mediaVariant;
-    getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
+    const_cast<QnSecurityCamResource*>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
     return (CameraCapabilities) mediaVariant.toInt();
 }
 
-{
-    return mediaVariant.toInt() & int(value);
-}
-    if( hasFlags(QnResource::foreigner) )
-        return;     //we do not own camera
 void QnSecurityCamResource::addCameraCapabilities(CameraCapabilities value)
 {
     value |= getCameraCapabilities();
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }
-    else
+
 void QnSecurityCamResource::removeCameraCapabilities(CameraCapabilities value)
 {
     value = getCameraCapabilities() & ~value;
+    int valueInt = (int) value;
     setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }

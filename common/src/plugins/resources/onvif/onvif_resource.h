@@ -28,6 +28,8 @@ class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
 class onvifXsd__VideoEncoderConfiguration;
 class oasisWsnB2__NotificationMessageHolderType;
+class onvifXsd__VideoSourceConfiguration;
+class onvifXsd__EventCapabilities;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
@@ -184,14 +186,17 @@ public:
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
+    virtual void setUrl(const QString &url) override;
+    int getChannel() const;
+    int getMaxChannels() const;
+
+signals:
     void cameraInput(
         QnResourcePtr resource,
         const QString& inputPortID,
         bool value,
+        qint64 timestamp );
 
-    virtual void setUrl(const QString &url) override;
-    int getChannel() const;
-    int getMaxChannels() const;
 protected:
     void setCodec(CODECS c, bool isPrimary);
     void setAudioCodec(AUDIO_CODECS c);
@@ -379,6 +384,8 @@ private:
     int m_channelNumer; // video/audio source number
     int m_maxChannels;
 	
+    bool createPullPointSubscription();
+    bool pullMessages();
     //!Registeres local NotificationConsumer in resource's NotificationProducer
     bool registerNotificationConsumer();
     //!Reads relay output list from resource

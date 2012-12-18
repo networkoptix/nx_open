@@ -22,6 +22,7 @@
 #include "api/app_server_connection.h"
 #include "events/business_event_connector.h"
 #include "soap/soapserver.h"
+#include "soapStub.h"
 
 
 const char* QnPlOnvifResource::MANUFACTURE = "OnvifDevice";
@@ -176,7 +177,9 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_ptzController(0),
     m_timeDrift(0),
     m_eventMonitorType( emtNone ),
-    m_timerID( 0 )
+    m_timerID( 0 ),
+    m_maxChannels(1),
+    m_channelNumer(0)
 {
     connect(
         this, SIGNAL(cameraInput( QnResourcePtr, const QString&, bool, qint64 )), 
@@ -1154,6 +1157,30 @@ QStringList QnPlOnvifResource::getInputPortList() const
     return QStringList();
 }
 
+bool QnPlOnvifResource::fetchRelayInputInfo()
+{
+    if( m_deviceIOUrl.empty() )
+        return false;
+
+    const QAuthenticator& auth = getAuth();
+    DeviceIOWrapper soapWrapper(
+        m_deviceIOUrl,
+        auth.user().toStdString(),
+        auth.password().toStdString(),
+        m_timeDrift );
+
+    _onvifDeviceIO__GetDigitalInputs request;
+    _onvifDeviceIO__GetDigitalInputsResponse response;
+    m_prevSoapCallResult = soapWrapper.getDigitalInputs( request, response );
+    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
+    {
+        cl_log.log( QString::fromAscii("Failed to get relay digital input list. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
+        return true;
+    }
+
+    return true;
+}
+
 //!Implementation of QnSecurityCamResource::setRelayOutputState
 bool QnPlOnvifResource::setRelayOutputState(
     const QString& outputID,
@@ -2090,6 +2117,7 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::characters(
 {
     if( m_readingSubscriptionID )
         subscriptionID = ch;
+    return true;
 }
 
 bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::startElement(
@@ -2213,6 +2241,7 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
 // QnPlOnvifResource
 //////////////////////////////////////////////////////////
 
+bool QnPlOnvifResource::registerNotificationConsumer()
 {
     QMutexLocker lk( &m_subscriptionMutex );
 
@@ -2309,6 +2338,7 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::endElement(
     m_eventMonitorType = emtNotification;
 
     cl_log.log( QString::fromAscii("Successfully registered in NotificationProducer. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logDEBUG1 );
+    return true;
 }
 
 static const unsigned int PULLPOINT_MESSAGE_CHECK_TIMEOUT_SEC = 5;
@@ -2360,13 +2390,15 @@ bool QnPlOnvifResource::createPullPointSubscription()
     return true;
 }
 
+bool QnPlOnvifResource::pullMessages()
+{
     const QAuthenticator& auth = getAuth();
     PullPointSubscriptionWrapper soapWrapper(
         m_eventCapabilities->XAddr,
         auth.user().toStdString(),
         auth.password().toStdString(),
         m_timeDrift );
-    
+
     char buf[512];
 
     _onvifEvents__PullMessages request;
@@ -2455,28 +2487,6 @@ bool QnPlOnvifResource::fetchRelayOutputInfo( const std::string& outputID, Relay
 
 }
 
-{
-    if( m_deviceIOUrl.empty() )
-
-    const QAuthenticator& auth = getAuth();
-    DeviceIOWrapper soapWrapper(
-        m_deviceIOUrl,
-        auth.user().toStdString(),
-        auth.password().toStdString(),
-        m_timeDrift );
-
-    _onvifDeviceIO__GetDigitalInputs request;
-    _onvifDeviceIO__GetDigitalInputsResponse response;
-    m_prevSoapCallResult = soapWrapper.getDigitalInputs( request, response );
-    if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
-    {
-        cl_log.log( QString::fromAscii("Failed to get relay digital input list. endpoint %1").arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
-        return true;
-    }
-
-    return true;
-}
-
 bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutputInfo )
 {
     const QAuthenticator& auth = getAuth();
@@ -2507,4 +2517,20 @@ bool QnPlOnvifResource::setRelayOutputSettings( const RelayOutputInfo& relayOutp
     }
 
     return true;
+}
+
+void QnPlOnvifResource::setUrl(const QString &url)
+{
+    QUrl u(url);
+
+    QMutexLocker lock(&m_mutex);
+    QnPhysicalCameraResource::setUrl(url);
+    m_channelNumer = u.queryItemValue(QLatin1String("channel")).toInt();
+    if (m_channelNumer > 0)
+        m_channelNumer--; // convert human readable channel in range [1..x] to range [0..x]
+}
+
+int QnPlOnvifResource::getMaxChannels() const
+{
+    return m_maxChannels;
 }
