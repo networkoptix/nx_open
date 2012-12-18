@@ -7,6 +7,18 @@
 #include "session_manager.h"
 #include "utils/common/synctime.h"
 
+static QLatin1String cameraObject("camera");
+static QLatin1String resourceObject("resource");
+static QLatin1String serverObject("server");
+static QLatin1String userObject("user");
+static QLatin1String layoutObject("layout");
+static QLatin1String licenseObject("license");
+static QLatin1String businessRuleObject("businessRule");
+static QLatin1String connectObject("connect");
+static QLatin1String timeObject("time");
+static QLatin1String emailObject("email");
+static QLatin1String statusObject("status");
+static QLatin1String disabledObject("disabled");
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
 {
@@ -17,7 +29,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
     if (status != 0)
         errorString += "\n" + response.data;
 
-    if (m_objectName == QLatin1String("server"))
+    if (m_objectName == serverObject)
     {
         QnMediaServerResourceList servers;
 
@@ -30,7 +42,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finished(status, errorString, QnResourceList(servers), handle);
-    } else if (m_objectName == QLatin1String("camera"))
+    } else if (m_objectName == cameraObject)
     {
         QnVirtualCameraResourceList cameras;
 
@@ -43,7 +55,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finished(status, errorString, QnResourceList(cameras), handle);
-    } else if (m_objectName == QLatin1String("user"))
+    } else if (m_objectName == userObject)
     {
         QnUserResourceList users;
 
@@ -56,7 +68,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finished(status, errorString, QnResourceList(users), handle);
-    } else if (m_objectName == QLatin1String("layout"))
+    } else if (m_objectName == layoutObject)
     {
         QnLayoutResourceList layouts;
 
@@ -69,7 +81,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finished(status, errorString, QnResourceList(layouts), handle);
-    } else if (m_objectName == QLatin1String("resource"))
+    } else if (m_objectName == resourceObject)
     {
         QnResourceList resources;
 
@@ -82,7 +94,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finished(status, errorString, resources, handle);
-    } else if (m_objectName == QLatin1String("license"))
+    } else if (m_objectName == licenseObject)
     {
         QnLicenseList licenses;
 
@@ -95,7 +107,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedLicense(status, errorString, licenses, handle);
-    } else if (m_objectName == QLatin1String("connect"))
+    } else if (m_objectName ==connectObject)
     {
         QnConnectInfoPtr connectInfo(new QnConnectInfo());
 
@@ -108,7 +120,7 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedConnect(status, errorString, connectInfo, handle);
-    } else if (m_objectName == QLatin1String("businessRule")) {
+    } else if (m_objectName == businessRuleObject) {
         QnBusinessEventRules rules;
 
         if(status == 0) {
@@ -190,11 +202,11 @@ int QnAppServerConnection::getObjects(const QString& objectName, const QString& 
 
 int QnAppServerConnection::connectAsync_i(const QnRequestHeaderList& headers, const QnRequestParamList& params, QObject* target, const char *slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("connect"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer,connectObject);
     QObject::connect(processor, SIGNAL(finishedConnect(int, const QByteArray&, QnConnectInfoPtr, int)), target, slot);
 
     QByteArray data;
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("connect"), headers, params, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,connectObject, headers, params, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::testConnectionAsync(QObject* target, const char *slot)
@@ -220,7 +232,7 @@ int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo, QByteArray& er
     QnRequestParamList params;
 
     QnHTTPRawResponse response;
-    int status = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("connect"), requestHeaders, params, QByteArray(), response);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url,connectObject, requestHeaders, params, QByteArray(), response);
     if (status == 0)
     {
         try {
@@ -261,7 +273,7 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
 int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& errorString)
 {
     QnHTTPRawResponse response;
-    int status = getObjects(QLatin1String("resource"), QString(), response);
+    int status = getObjects(resourceObject, QString(), response);
 
     if (status == 0)
     {
@@ -291,7 +303,7 @@ int QnAppServerConnection::getResources(const QString& args, QnResourceList& res
 {
     QnHTTPRawResponse response;
 
-    int status = getObjects(QLatin1String("resource"), args, response);
+    int status = getObjects(resourceObject, args, response);
     if (status == 0)
     {
         errorString.clear();
@@ -314,7 +326,7 @@ int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& server
     m_serializer.serialize(serverPtr, data);
 
     QnHTTPRawResponse response;
-    int status = addObject(QLatin1String("server"), data, response);
+    int status = addObject(serverObject, data, response);
     if (status == 0)
     {
         try {
@@ -341,7 +353,7 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr
     m_serializer.serialize(cameraPtr, data);
 
     QnHTTPRawResponse response;
-    if (addObject(QLatin1String("camera"), data, response) == 0)
+    if (addObject(cameraObject, data, response) == 0)
     {
         try {
             m_serializer.deserializeCameras(cameras, response.data, m_resourceFactory);
@@ -375,13 +387,13 @@ int QnAppServerConnection::saveAsync(const QnResourcePtr& resource, QObject* tar
 
 int QnAppServerConnection::addLicenseAsync(const QnLicensePtr &license, QObject *target, const char *slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("license"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
     QObject::connect(processor, SIGNAL(finishedLicense(int, const QByteArray&, const QnLicenseList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeLicense(license, data);
 
-    return addObjectAsync(QLatin1String("license"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(licenseObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot)
@@ -394,87 +406,87 @@ int QnAppServerConnection::getResourcesAsync(const QString& args, const QString&
 
 int QnAppServerConnection::getLicensesAsync(QObject *target, const char *slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("license"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, licenseObject);
     QObject::connect(processor, SIGNAL(finished(int,QByteArray,QnLicenseList,int)), target, slot);
 
-    return getObjectsAsync(QLatin1String("license"), QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return getObjectsAsync(licenseObject, QString(), processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnUserResourcePtr& userPtr, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("user"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, userObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(userPtr, data);
 
-    return addObjectAsync(QLatin1String("user"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(userObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnMediaServerResourcePtr& serverPtr, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("server"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, serverObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(serverPtr, data);
 
-    return addObjectAsync(QLatin1String("server"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(serverObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourcePtr& cameraPtr, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("camera"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, cameraObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(cameraPtr, data);
 
-    return addObjectAsync(QLatin1String("camera"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(cameraObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("layout"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, layoutObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serialize(layout, data);
 
-    return addObjectAsync(QLatin1String("layout"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(layoutObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("businessRule"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, businessRuleObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeBusinessRule(rule, data);
 
-    return addObjectAsync(QLatin1String("businessRule"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(businessRuleObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnLayoutResourceList& layouts, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("layout"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, layoutObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeLayouts(layouts, data);
 
-    return addObjectAsync(QLatin1String("layout"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(layoutObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras, QObject* target, const char* slot)
 {
-    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, QLatin1String("camera"));
+    conn_detail::ReplyProcessor* processor = new conn_detail::ReplyProcessor(m_resourceFactory, m_serializer, cameraObject);
     QObject::connect(processor, SIGNAL(finished(int, const QByteArray&, const QnResourceList&, int)), target, slot);
 
     QByteArray data;
     m_serializer.serializeCameras(cameras, data);
 
-    return addObjectAsync(QLatin1String("camera"), data, processor, SLOT(finished(QnHTTPRawResponse, int)));
+    return addObjectAsync(cameraObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
 int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QByteArray& errorString)
@@ -509,7 +521,7 @@ int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &busines
     m_serializer.serializeBusinessRule(businessRule, data);
 
     QnHTTPRawResponse reply;
-    const int result = addObject(QLatin1String("businessRule"), data, reply);
+    const int result = addObject(businessRuleObject, data, reply);
     errorString = reply.errorString;
     return result;
 }
@@ -518,7 +530,7 @@ int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &busines
 int QnAppServerConnection::getServers(QnMediaServerResourceList &servers, QByteArray &errorString)
 {
     QnHTTPRawResponse response;
-    int status = getObjects(QLatin1String("server"), QString(), response);
+    int status = getObjects(serverObject, QString(), response);
 
     try {
         m_serializer.deserializeServers(servers, response.data, m_resourceFactory);
@@ -534,7 +546,7 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId
 {
     QnHTTPRawResponse response;
 
-    int status = getObjects(QLatin1String("camera"), QString(QLatin1String("parent_id=%1")).arg(mediaServerId.toString()), response);
+    int status = getObjects(cameraObject, QString(QLatin1String("parent_id=%1")).arg(mediaServerId.toString()), response);
     if (status == 0) 
     {
         try {
@@ -553,7 +565,7 @@ int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts, QByteArray&
 {
     QnHTTPRawResponse response;
 
-    int status = getObjects(QLatin1String("layout"), QString(), response);
+    int status = getObjects(layoutObject, QString(), response);
     if (status == 0) {
         try {
             m_serializer.deserializeLayouts(layouts, response.data);
@@ -571,7 +583,7 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
 {
     QnHTTPRawResponse response;
 
-    int status = getObjects(QLatin1String("user"), QString(), response);
+    int status = getObjects(userObject, QString(), response);
     if (status == 0) {
         try {
             m_serializer.deserializeUsers(users, response.data);
@@ -589,7 +601,7 @@ int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &erro
 {
     QnHTTPRawResponse response;
 
-    int status = getObjects(QLatin1String("license"), QString(), response);
+    int status = getObjects(licenseObject, QString(), response);
     if (status == 0) {
         try {
             m_serializer.deserializeLicenses(licenses, response.data);
@@ -624,7 +636,7 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
 int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules, QByteArray &errorString)
 {
     QnHTTPRawResponse response;
-    int status = getObjects(QLatin1String("businessRule"), QString(), response);
+    int status = getObjects(businessRuleObject, QString(), response);
 
     errorString = response.errorString;
     try {
@@ -794,27 +806,27 @@ int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera, QB
 
 int QnAppServerConnection::deleteAsync(const QnMediaServerResourcePtr& server, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(QLatin1String("server"), server->getId().toInt(), target, slot);
+    return deleteObjectAsync(serverObject, server->getId().toInt(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnVirtualCameraResourcePtr& camera, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(QLatin1String("camera"), camera->getId().toInt(), target, slot);
+    return deleteObjectAsync(cameraObject, camera->getId().toInt(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnUserResourcePtr& user, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(QLatin1String("user"), user->getId().toInt(), target, slot);
+    return deleteObjectAsync(userObject, user->getId().toInt(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(QLatin1String("layout"), layout->getId().toInt(), target, slot);
+    return deleteObjectAsync(layoutObject, layout->getId().toInt(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
 {
-    return deleteObjectAsync(QLatin1String("businessRule"), rule->getId().toInt(), target, slot);
+    return deleteObjectAsync(businessRuleObject, rule->getId().toInt(), target, slot);
 }
 
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
@@ -837,7 +849,7 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
 qint64 QnAppServerConnection::getCurrentTime()
 {
     QnHTTPRawResponse response;
-    int rez = QnSessionManager::instance()->sendGetRequest(m_url, QLatin1String("time"), response);
+    int rez = QnSessionManager::instance()->sendGetRequest(m_url,timeObject, response);
     if (rez != 0) {
         qWarning() << "Can't read time from Enterprise Controller" << response.errorString;
         return QDateTime::currentMSecsSinceEpoch();
@@ -853,7 +865,7 @@ int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, 
     QnHTTPRawResponse response;
     QByteArray body;
     m_serializer.serializeEmail(to, subject, message, body);
-    int status = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("email"), QnRequestHeaderList(), requestParams, body, response);
+    int status = QnSessionManager::instance()->sendPostRequest(m_url,emailObject, QnRequestHeaderList(), requestParams, body, response);
     errorString = response.errorString;
     if (status != 0) {
         qWarning() << "Can't send email " << errorString;
@@ -876,7 +888,7 @@ int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnReso
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("status"), requestHeaders, requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,statusObject, requestHeaders, requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool disabled, QObject *target, const char *slot)
@@ -887,7 +899,7 @@ int QnAppServerConnection::setResourceDisabledAsync(const QnId &resourceId, bool
     requestParams.append(QnRequestParam("id", resourceId.toString()));
     requestParams.append(QnRequestParam("disabled", QString::number((int)disabled)));
 
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("disabled"), requestHeaders, requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,disabledObject, requestHeaders, requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resources, QObject *target, const char *slot)
@@ -904,7 +916,7 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
         n++;
     }
 
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("status"), requestHeaders, requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,statusObject, requestHeaders, requestParams, "", target, slot);
 }
 
 int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status, QByteArray &errorString)
@@ -916,7 +928,7 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
     QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url, QLatin1String("status"), requestHeaders, requestParams, "",
+    int result = QnSessionManager::instance()->sendPostRequest(m_url,statusObject, requestHeaders, requestParams, "",
         response);
     errorString = response.errorString;
     return result;
@@ -936,7 +948,7 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
         n++;
     }
 
-    return QnSessionManager::instance()->sendAsyncPostRequest(m_url, QLatin1String("disabled"), requestHeaders, requestParams, "", target, slot);
+    return QnSessionManager::instance()->sendAsyncPostRequest(m_url,disabledObject, requestHeaders, requestParams, "", target, slot);
 }
 
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
@@ -968,7 +980,7 @@ QString QnAppServerConnectionFactory::currentVersion()
         return factory->m_currentVersion;
     }
 
-    return QLatin1String("");
+    return QString();
 }
 
 QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
