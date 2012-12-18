@@ -19,7 +19,6 @@ class PtzSelectionItem;
 
 class QnWorkbenchPtzController;
 class QnMediaResourceWidget;
-class QnPtzInformation;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -65,12 +64,6 @@ protected:
 private slots:
     void at_target_optionsChanged();
     void at_splashItem_destroyed();
-    void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
-    void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
-    void at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle);
-    void at_ptzMoveTo_replyReceived(int status, int handle);
-
-    void at_replyReceived(int status, int handle);
 
 private:
     QnMediaResourceWidget *target() const {
@@ -97,8 +90,6 @@ private:
     int m_clickDelayMSec;
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
-
-    QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
     QWeakPointer<QWidget> m_viewport;

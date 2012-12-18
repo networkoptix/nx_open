@@ -5,6 +5,7 @@
 #include <limits>
 
 #include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QApplication>
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -236,42 +237,14 @@ PtzInstrument::PtzInstrument(QObject *parent):
         parent
     ),
     QnWorkbenchContextAware(parent),
-    m_ptzController(context()->instance<QnWorkbenchPtzController>())
+    m_ptzController(context()->instance<QnWorkbenchPtzController>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
-{
-    QnWorkbenchPtzCamerasWatcher *watcher = context()->instance<QnWorkbenchPtzCamerasWatcher>();
-    connect(watcher, SIGNAL(ptzCameraAdded(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &)));
-    connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
-    foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
-        at_ptzCameraWatcher_ptzCameraAdded(camera);
-
-    // TODO: make externally configurable.
-    QVector<QPair<qreal, qreal> > toCameraY;
-    toCameraY.push_back(qMakePair(-0.5, -90.0));
-    toCameraY.push_back(qMakePair(0.0, 0.0));
-    toCameraY.push_back(qMakePair(1.0, 20.0));
-
-    const qreal cropFactor = 7.92;//6.92;
-    m_infoByModel[QLatin1String("Q6035-E")] = new QnPtzInformation(
-        QnVectorSpaceMapper(
-            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
-            QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
-            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
-        ),
-        QnVectorSpaceMapper(
-            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
-            QnScalarSpaceMapper(toCameraY, Qn::ConstantExtrapolation),
-            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
-        )
-    );
-}
+{}
 
 PtzInstrument::~PtzInstrument() {
     ensureUninstalled();
-
-    qDeleteAll(m_infoByModel);
 }
 
 void PtzInstrument::setPtzItemZValue(qreal ptzItemZValue) {
@@ -322,12 +295,11 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos)
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
-
-    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
-    if(!info)
+    const QnPtzSpaceMapper *mapper = m_ptzController->mapper(camera);
+    if(!mapper)
         return;
 
-    QVector3D oldPhysicalPosition = m_physicalPositionByCamera.value(camera);
+    QVector3D oldPhysicalPosition = m_ptzController->physicalPosition(camera);
 
     qreal sideSize = 36.0 / oldPhysicalPosition.z();
     QVector3D r = sphericalToCartesian<QVector3D>(1.0, oldPhysicalPosition.x() / 180 * M_PI, oldPhysicalPosition.y() / 180 * M_PI);
@@ -342,22 +314,12 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     qreal zoom = widget->rect().width() / rect.width(); /* For 2x zoom we'll get 2.0 here. */
     
     QVector3D newPhysicalPosition = QVector3D(spherical.phi / M_PI * 180, spherical.psi / M_PI * 180, oldPhysicalPosition.z() * zoom);
-    QVector3D newLogicalPosition = info->toCameraMapper.physicalToLogical(newPhysicalPosition);
-    newPhysicalPosition = info->toCameraMapper.logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
+    QVector3D newLogicalPosition = mapper->toCamera.physicalToLogical(newPhysicalPosition);
+    newPhysicalPosition = mapper->toCamera.logicalToPhysical(newLogicalPosition); /* There-and-back mapping ensures bounds. */
 
     TRACE("PTZ ZOOM(" << newPhysicalPosition.x() - oldPhysicalPosition.x() << ", " << newPhysicalPosition.y() - oldPhysicalPosition.y() << ", " << zoom << "x)");
 
-    m_physicalPositionByCamera[camera] = newPhysicalPosition;
-
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-
-    if(qnSettings->debugCounter() % 2) {
-        int handle = server->apiConnection()->asyncPtzMoveTo(camera, newLogicalPosition.x(), newLogicalPosition.y(), newLogicalPosition.z(), this, SLOT(at_ptzMoveTo_replyReceived(int, int)));
-        m_cameraByHandle[handle] = camera;
-    } else {
-        int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
-        m_cameraByHandle[handle] = camera;
-    }
+    m_ptzController->setPhysicalPosition(camera, newPhysicalPosition);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
@@ -581,11 +543,6 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
     emit ptzProcessFinished(target());
 }
 
-void PtzInstrument::at_replyReceived(int status, int handle) {
-    Q_UNUSED(status);
-    Q_UNUSED(handle);
-}
-
 void PtzInstrument::at_target_optionsChanged() {
     //if(sender() == target())
         //updatePtzItemOpacity();
@@ -596,49 +553,5 @@ void PtzInstrument::at_splashItem_destroyed() {
 
     m_freeAnimations.removeAll(item);
     m_activeAnimations.removeAll(item);
-}
-
-void PtzInstrument::at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera) {
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById(camera->getParentId()).dynamicCast<QnMediaServerResource>();
-
-    int handle = server->apiConnection()->asyncPtzGetPos(camera, this, SLOT(at_ptzGetPos_replyReceived(int, qreal, qreal, qreal, int)));
-    m_cameraByHandle[handle] = camera;
-}
-
-void PtzInstrument::at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera) {
-    m_physicalPositionByCamera.remove(camera);
-
-    for(QHash<int, QnVirtualCameraResourcePtr>::iterator pos = m_cameraByHandle.begin(); pos != m_cameraByHandle.end();) {
-        if(pos.value() == camera) {
-            pos = m_cameraByHandle.erase(pos);
-        } else {
-            pos++;
-        }
-    }
-}
-
-void PtzInstrument::at_ptzGetPos_replyReceived(int status, qreal xPos, qreal yPox, qreal zoomPos, int handle) {
-    if(status != 0) {
-        qnWarning("Could not get PTZ position from camera.");
-        return;
-    }
-
-    QnVirtualCameraResourcePtr camera = m_cameraByHandle.value(handle);
-    if(!camera)
-        return;
-    m_cameraByHandle.remove(handle);
-
-    const QnPtzInformation *info = m_infoByModel[camera->getModel()];
-    if(!info)
-        return;
-
-    QVector3D physicalPos = info->fromCameraMapper.logicalToPhysical(QVector3D(xPos, yPox, zoomPos));
-    m_physicalPositionByCamera[camera] = physicalPos;
-
-    TRACE("PTZ POS" << camera->getName() << "=" << physicalPos);
-}
-
-void PtzInstrument::at_ptzMoveTo_replyReceived(int status, int handle) {
-    return;
 }
 

@@ -5,11 +5,22 @@
 #include <QtCore/QHash>
 #include <QtGui/QVector3D>
 
+#include <utils/common/space_mapper.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include "workbench_context_aware.h"
 
-class QnPtzInformation;
+class QnPtzSpaceMapper {
+public:
+    QnPtzSpaceMapper() {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &mapper): fromCamera(mapper), toCamera(mapper) {}
+    QnPtzSpaceMapper(const QnVectorSpaceMapper &fromCamera, const QnVectorSpaceMapper &toCamera): fromCamera(fromCamera), toCamera(toCamera) {}
+
+    QnVectorSpaceMapper fromCamera;
+    QnVectorSpaceMapper toCamera;
+};
+
 
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -17,7 +28,7 @@ public:
     QnWorkbenchPtzController(QObject *parent = NULL);
     virtual ~QnWorkbenchPtzController();
 
-    bool hasPhysicalPosition(const QnVirtualCameraResourcePtr &camera) const;
+    const QnPtzSpaceMapper *mapper(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \param camera                    Camera to get PTZ position for.
@@ -69,8 +80,6 @@ private:
 
     void tryInitialize(const QnVirtualCameraResourcePtr &camera);
 
-    const QnPtzInformation *info(const QnVirtualCameraResourcePtr &camera) const;
-
 private:
     enum PtzRequestType {
         SetMovementRequest,
@@ -88,7 +97,7 @@ private:
         int attemptCount[RequestTypeCount];
     };
 
-    QHash<QString, const QnPtzInformation *> m_infoByModel;
+    QHash<QString, const QnPtzSpaceMapper *> m_mapperByModel;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;
