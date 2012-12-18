@@ -5,6 +5,8 @@
 
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
+
+#include <ui/models/resource_pool_model.h>
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
@@ -33,9 +35,9 @@ signals:
      * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
      * @param rule                  Rule to delete. Should be replaced by ID if it is convinient.
      */
-    void deleteConfirmed(QnBusinessEventRulePtr rule);
+    void deleteConfirmed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 
-    void apply(QnBusinessEventRulePtr rule);
+    void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
@@ -86,6 +88,7 @@ private:
     bool m_expanded;
 
     QnBusinessEventRulePtr m_rule;
+    QnResourcePoolModel *m_resourceModel;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;

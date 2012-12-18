@@ -1816,7 +1816,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             if(snapshotManager()->isLocal(layout))
                 resourcePool()->removeResource(resource); /* This one can be simply deleted from resource pool. */
 
-        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(int, const QByteArray &, const QByteArray &, int)));
+        connection()->deleteAsync(resource, this, SLOT(at_resource_deleted(const QnHTTPRawResponse&, int)));
     }
 }
 
@@ -2826,14 +2826,13 @@ void QnWorkbenchActionHandler::at_resources_saved(int status, const QByteArray& 
     }
 }
 
-void QnWorkbenchActionHandler::at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle) {
+void QnWorkbenchActionHandler::at_resource_deleted(const QnHTTPRawResponse& response, int handle) {
     Q_UNUSED(handle);
-    Q_UNUSED(data);
 
-    if(status == 0)   
+    if(response.status == 0)
         return;
 
-    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(errorString.data())));
+    QMessageBox::critical(widget(), tr(""), tr("Could not delete resource from Enterprise Controller. \n\nError description: '%2'").arg(QLatin1String(response.errorString.data())));
 }
 
 void QnWorkbenchActionHandler::at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags) {

@@ -124,6 +124,7 @@ public:
     int deleteAsync(const QnVirtualCameraResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnUserResourcePtr&, QObject*, const char*);
     int deleteAsync(const QnLayoutResourcePtr&, QObject*, const char*);
+    int deleteAsync(const QnBusinessEventRulePtr&, QObject*, const char*);
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 

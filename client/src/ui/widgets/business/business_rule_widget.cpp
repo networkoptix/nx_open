@@ -8,6 +8,7 @@
 
 #include <QtGui/QStandardItemModel>
 #include <QtGui/QStandardItem>
+#include <QtGui/QMessageBox>
 
 #include <events/abstract_business_event.h>
 
@@ -27,13 +28,15 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+
     ui->eventTypeComboBox->setModel(m_eventsTypesModel);
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
+    ui->eventResourceComboBox->setModel(m_resourceModel);
 
     QPalette pal = ui->editFrame->palette();
-    QColor bgcolor = pal.color(QPalette::Window);
-    pal.setColor(QPalette::Window, QColor(bgcolor.red() + 10, bgcolor.green() + 10, bgcolor.blue() + 10));
+    pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
     ui->editFrame->setPalette(pal);
     ui->editFrame->setVisible(m_expanded);
 
@@ -225,7 +228,7 @@ void QnBusinessRuleWidget::updateSummary() {
     QString eventSummary = QString(eventString)
             .arg(m_eventParameters ? m_eventParameters->description()
                                    : BusinessEventType::toString(m_rule->eventType()))
-            .arg(ToggleState::toString(m_rule->getEventToggleState()))
+            .arg(ToggleState::toString(BusinessEventParameters::getToggleState(m_rule->eventParams())))
             .arg(eventResource);
 
     QString actionSummary = QString(actionString)
@@ -233,21 +236,12 @@ void QnBusinessRuleWidget::updateSummary() {
                                     : BusinessActionType::toString(m_rule->actionType()))
             .arg(actionResource);
 
-    //TODO: load details description from sub-widgets
     QString summary = QString(formatString)
             .arg(eventSummary)
             .arg(actionSummary);
 
 
     ui->summaryLabel->setText(summary);
-    /*
-
-           %1 On motion at
-           %2 start recording at
-           %3 <span style=" text-decoration: underline;">Low Quality</span>, <span style=" text-decoration: underline;">25FPS</span>, <span style=" text-decoration: underline;">10 sec pre</span>, <span style=" text-decoration: underline;">10 sec post</span>
-    */
-
-
 }
 
 void QnBusinessRuleWidget::resetFromRule() {
@@ -255,7 +249,7 @@ void QnBusinessRuleWidget::resetFromRule() {
         QModelIndexList eventTypeIdx = m_eventsTypesModel->match(m_eventsTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->eventType());
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->getEventToggleState());
+        QModelIndexList stateIdx = m_eventStatesModel->match(m_eventStatesModel->index(0, 0), Qt::UserRole + 1, (int)BusinessEventParameters::getToggleState(m_rule->eventParams()));
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
 
         QModelIndexList actionTypeIdx = m_actionTypesModel->match(m_actionTypesModel->index(0, 0), Qt::UserRole + 1, (int)m_rule->actionType());
@@ -278,9 +272,13 @@ void QnBusinessRuleWidget::at_expandButton_clicked() {
 }
 
 void QnBusinessRuleWidget::at_deleteButton_clicked() {
-    //TODO: confirmation dialog, delete at the server
-    //TODO: possible return just ID
-    emit deleteConfirmed(m_rule);
+    if (QMessageBox::question(this,
+                              tr("Confirm rule deletion"),
+                              tr("Are you sure you want to delete this rule?"),
+                              QMessageBox::Ok,
+                              QMessageBox::Cancel) == QMessageBox::Cancel)
+        return;
+    emit deleteConfirmed(this, m_rule);
 }
 
 void QnBusinessRuleWidget::at_applyButton_clicked() {
@@ -288,16 +286,30 @@ void QnBusinessRuleWidget::at_applyButton_clicked() {
 
     rule->setEventType(getCurrentEventType());
 
+    if (BusinessEventType::isResourceRequired(rule->eventType())) {
+        //TODO: fill resource
+    } else {
+        rule->setEventResource(QnResourcePtr());
+    }
+
+    QnBusinessParams eventParams;
     if (m_eventParameters)
-        rule->setEventParams(m_eventParameters->parameters());
-    rule->setEventToggleState(getCurrentEventToggleState());
+        eventParams = m_eventParameters->parameters();
+    BusinessEventParameters::setToggleState(&eventParams, getCurrentEventToggleState());
+    rule->setEventParams(eventParams);
 
     rule->setActionType(getCurrentActionType());
+
+    if (BusinessActionType::isResourceRequired(rule->actionType())) {
+        //TODO: fill resource
+    } else {
+        rule->setEventResource(QnResourcePtr());
+    }
+
     if (m_actionParameters)
         rule->setActionParams(m_actionParameters->parameters());
 
-    //TODO: fill resources
-    emit apply(rule);
+    emit apply(this, rule);
     updateSummary();
 }
 
@@ -305,7 +317,10 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
     int typeIdx = m_eventsTypesModel->item(index)->data().toInt();
     BusinessEventType::Value val = (BusinessEventType::Value)typeIdx;
 
-    //TODO: check isResourceRequired()
+    bool isResourceRequired = BusinessEventType::isResourceRequired(val);
+    ui->eventAtLabel->setVisible(isResourceRequired);
+    ui->eventResourceComboBox->setVisible(isResourceRequired);
+    //TODO: select resource type
 
     initEventStates(val);
     initEventParameters(val);
@@ -321,6 +336,11 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
 void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index) {
     int typeIdx = m_actionTypesModel->item(index)->data().toInt();
     BusinessActionType::Value val = (BusinessActionType::Value)typeIdx;
+
+    bool isResourceRequired = BusinessActionType::isResourceRequired(val);
+    ui->actionAtLabel->setVisible(isResourceRequired);
+    ui->actionResourceComboBox->setVisible(isResourceRequired);
+    //TODO: select resource type
 
     initActionParameters(val);
 }

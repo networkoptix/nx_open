@@ -293,7 +293,7 @@ protected slots:
     void at_camera_exportFailed(QString errorMessage);
 
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
-    void at_resource_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
+    void at_resource_deleted(const QnHTTPRawResponse& resource, int handle);
     void at_resources_statusSaved(int status, const QByteArray &errorString, const QnResourceList &resources, const QList<int> &oldDisabledFlags);
 
     void at_panicWatcher_panicModeChanged();
