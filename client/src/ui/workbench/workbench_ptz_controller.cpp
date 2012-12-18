@@ -2,6 +2,7 @@
 
 #include <utils/common/math.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/space_mapper.h>
 
 #include <api/media_server_connection.h>
 
@@ -28,9 +29,28 @@ namespace {
 
 } // anonymous namespace
 
+
+// -------------------------------------------------------------------------- //
+// QnPtzInformation
+// -------------------------------------------------------------------------- //
+class QnPtzInformation {
+public:
+    QnPtzInformation() {}
+    QnPtzInformation(const QnVectorSpaceMapper &mapper): fromCameraMapper(mapper), toCameraMapper(mapper) {}
+    QnPtzInformation(const QnVectorSpaceMapper &fromCameraMapper, const QnVectorSpaceMapper &toCameraMapper): fromCameraMapper(fromCameraMapper), toCameraMapper(toCameraMapper) {}
+
+    QnVectorSpaceMapper fromCameraMapper;
+    QnVectorSpaceMapper toCameraMapper;
+};
+
+
+// -------------------------------------------------------------------------- //
+// QnWorkbenchPtzController
+// -------------------------------------------------------------------------- //
 QnWorkbenchPtzController::PtzData::PtzData(): 
     initialized(false),
     position(qQNaN<QVector3D>()),
+    physicalPosition(qQNaN<QVector3D>()),
     movement(QVector3D())
 {
     memset(attemptCount, 0, sizeof(attemptCount));
@@ -45,6 +65,37 @@ QnWorkbenchPtzController::QnWorkbenchPtzController(QObject *parent):
     connect(watcher, SIGNAL(ptzCameraRemoved(const QnVirtualCameraResourcePtr &)), this, SLOT(at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &)));
     foreach(const QnVirtualCameraResourcePtr &camera, watcher->ptzCameras())
         at_ptzCameraWatcher_ptzCameraAdded(camera);
+
+
+    /* 
+     Get width from here:
+     http://en.wikipedia.org/wiki/Image_sensor_format
+     Note: 1/2.8" is 5.2mm x 3.9mm, D=6.5mm.
+
+     Calculate width-based crop factor C = 36/W.
+
+     Multiply focal lengths by width-based crop factor to get width-based equivalent focal length.
+    */
+
+    // TODO: make externally configurable.
+    QVector<QPair<qreal, qreal> > toCameraY;
+    toCameraY.push_back(qMakePair(-0.5, -90.0));
+    toCameraY.push_back(qMakePair(0.0, 0.0));
+    toCameraY.push_back(qMakePair(1.0, 20.0));
+
+    const qreal cropFactor = 7.92;//6.92;
+    m_infoByModel[QLatin1String("Q6035-E")] = new QnPtzInformation(
+        QnVectorSpaceMapper(
+            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
+            QnScalarSpaceMapper(0.111, -0.5, 20, -90, Qn::ConstantExtrapolation),
+            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
+        ),
+        QnVectorSpaceMapper(
+            QnScalarSpaceMapper(-1, 1, 0, 360, Qn::PeriodicExtrapolation),
+            QnScalarSpaceMapper(toCameraY, Qn::ConstantExtrapolation),
+            QnScalarSpaceMapper(0, 1, 4.7 * cropFactor, 94 * cropFactor, Qn::ConstantExtrapolation)
+        )
+    );
 }
 
 QnWorkbenchPtzController::~QnWorkbenchPtzController() {
@@ -54,13 +105,34 @@ QnWorkbenchPtzController::~QnWorkbenchPtzController() {
     disconnect(watcher, NULL, this, NULL);
 }
 
-QVector3D QnWorkbenchPtzController::position(const QnVirtualCameraResourcePtr &camera) {
+bool QnWorkbenchPtzController::hasPhysicalPosition(const QnVirtualCameraResourcePtr &camera) const {
+    return info(camera) != NULL;
+}
+
+QVector3D QnWorkbenchPtzController::position(const QnVirtualCameraResourcePtr &camera) const {
     if(!camera) {
         qnNullWarning(camera);
-        return;
+        return qQNaN<QVector3D>();
     }
 
-    return QVector3D();
+    QHash<QnVirtualCameraResourcePtr, PtzData>::const_iterator pos = m_dataByCamera.find(camera);
+    if(pos == m_dataByCamera.end())
+        return qQNaN<QVector3D>();
+
+    return pos->position;
+}
+
+QVector3D QnWorkbenchPtzController::physicalPosition(const QnVirtualCameraResourcePtr &camera) const {
+    if(!camera) {
+        qnNullWarning(camera);
+        return qQNaN<QVector3D>();
+    }
+
+    QHash<QnVirtualCameraResourcePtr, PtzData>::const_iterator pos = m_dataByCamera.find(camera);
+    if(pos == m_dataByCamera.end())
+        return qQNaN<QVector3D>();
+
+    return pos->physicalPosition;
 }
 
 void QnWorkbenchPtzController::setPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position) {
@@ -69,16 +141,35 @@ void QnWorkbenchPtzController::setPosition(const QnVirtualCameraResourcePtr &cam
         return;
     }
 
-    
+    sendSetPosition(camera, position);
 }
 
-QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) {
+void QnWorkbenchPtzController::setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition) {
     if(!camera) {
         qnNullWarning(camera);
         return;
     }
 
-    return QVector3D();
+    const QnPtzInformation *info = this->info(camera);
+    if(!info) {
+        qnWarning("Physical position is not supported for camera '%1'.", camera->getName());
+        return;
+    }
+
+    setPosition(camera, info->toCameraMapper.physicalToLogical(physicalPosition));
+}
+
+QVector3D QnWorkbenchPtzController::movement(const QnVirtualCameraResourcePtr &camera) const {
+    if(!camera) {
+        qnNullWarning(camera);
+        return QVector3D();
+    }
+
+    QHash<QnVirtualCameraResourcePtr, PtzData>::const_iterator pos = m_dataByCamera.find(camera);
+    if(pos == m_dataByCamera.end())
+        return QVector3D();
+
+    return pos->movement;
 }
 
 void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &camera, const QVector3D &motion) {
@@ -87,7 +178,7 @@ void QnWorkbenchPtzController::setMovement(const QnVirtualCameraResourcePtr &cam
         return;
     }
 
-
+    sendSetMovement(camera, motion);
 }
 
 void QnWorkbenchPtzController::sendGetPosition(const QnVirtualCameraResourcePtr &camera) {
@@ -141,6 +232,10 @@ void QnWorkbenchPtzController::tryInitialize(const QnVirtualCameraResourcePtr &c
     sendSetMovement(camera, QVector3D());
 }
 
+const QnPtzInformation *QnWorkbenchPtzController::info(const QnVirtualCameraResourcePtr &camera) const {
+    return m_infoByModel.value(camera->getModel());
+}
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -177,8 +272,11 @@ void QnWorkbenchPtzController::at_ptzGetPosition_replyReceived(int status, qreal
     
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
-        if(qFuzzyIsNull(data.movement))
+        if(qFuzzyIsNull(data.movement)) {
             data.position = QVector3D(xPos, yPox, zoomPos);
+            if(const QnPtzInformation *info = this->info(camera))
+                data.physicalPosition = info->fromCameraMapper.logicalToPhysical(data.position);
+        }
         data.attemptCount[GetPositionRequest] = 0;
     } else {
         if(data.attemptCount[GetPositionRequest] > maxAttempts) {
@@ -201,6 +299,8 @@ void QnWorkbenchPtzController::at_ptzSetPosition_replyReceived(int status, int h
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
         data.position = position;
+        if(const QnPtzInformation *info = this->info(camera))
+            data.physicalPosition = info->toCameraMapper.logicalToPhysical(data.position);
         data.movement = QVector3D();
         data.attemptCount[SetPositionRequest] = 0;
     } else {
@@ -224,6 +324,7 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
     PtzData &data = m_dataByCamera[camera];
     if(status == 0) {
         data.position = qQNaN<QVector3D>();
+        data.physicalPosition = qQNaN<QVector3D>();
         data.movement = movement;
         data.attemptCount[SetMovementRequest] = 0;
     } else {

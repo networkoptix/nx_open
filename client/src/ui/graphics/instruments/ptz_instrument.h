@@ -17,6 +17,7 @@ class SelectionItem;
 class PtzSplashItem;
 class PtzSelectionItem;
 
+class QnWorkbenchPtzController;
 class QnMediaResourceWidget;
 class QnPtzInformation;
 
@@ -91,13 +92,12 @@ private:
     void ptzUnzoom(QnMediaResourceWidget *widget);
 
 private:
-    QHash<QString, const QnPtzInformation *> m_infoByModel;
+    QnWorkbenchPtzController *m_ptzController;
 
     int m_clickDelayMSec;
     qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
-    QHash<QnVirtualCameraResourcePtr, QVector3D> m_physicalPositionByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;

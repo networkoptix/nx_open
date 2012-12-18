@@ -23,13 +23,13 @@
 #include <ui/animation/animation_event.h>
 #include <ui/style/globals.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_ptz_controller.h>
 #include <ui/workbench/watchers/workbench_ptz_cameras_watcher.h>
 
 #include "selection_item.h"
 #include "utils/settings.h"
 
 //#define QN_PTZ_INSTRUMENT_DEBUG
-
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
 #else
@@ -39,31 +39,7 @@
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
-    /* 
-     Get width from here:
-     http://en.wikipedia.org/wiki/Image_sensor_format
-     Note: 1/2.8" is 5.2mm x 3.9mm, D=6.5mm.
-
-     Calculate width-based crop factor C = 36/W.
-
-     Multiply focal lengths by width-based crop factor to get width-based equivalent focal length.
-    */
-
-} // anonymous namespace
-
-
-// -------------------------------------------------------------------------- //
-// QnPtzInformation
-// -------------------------------------------------------------------------- //
-class QnPtzInformation {
-public:
-    QnPtzInformation() {}
-    QnPtzInformation(const QnVectorSpaceMapper &mapper): fromCameraMapper(mapper), toCameraMapper(mapper) {}
-    QnPtzInformation(const QnVectorSpaceMapper &fromCameraMapper, const QnVectorSpaceMapper &toCameraMapper): fromCameraMapper(fromCameraMapper), toCameraMapper(toCameraMapper) {}
-
-    QnVectorSpaceMapper fromCameraMapper;
-    QnVectorSpaceMapper toCameraMapper;
-};
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -260,6 +236,7 @@ PtzInstrument::PtzInstrument(QObject *parent):
         parent
     ),
     QnWorkbenchContextAware(parent),
+    m_ptzController(context()->instance<QnWorkbenchPtzController>())
     m_clickDelayMSec(QApplication::doubleClickInterval()),
     m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)

@@ -9,11 +9,15 @@
 
 #include "workbench_context_aware.h"
 
+class QnPtzInformation;
+
 class QnWorkbenchPtzController: public QObject, public QnWorkbenchContextAware {
     Q_OBJECT;
 public:
     QnWorkbenchPtzController(QObject *parent = NULL);
     virtual ~QnWorkbenchPtzController();
+
+    bool hasPhysicalPosition(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \param camera                    Camera to get PTZ position for.
@@ -21,7 +25,9 @@ public:
      *                                  or NaN if it is not available.
      *                                  Use <tt>qIsNaN</tt> to check for NaN.
      */
-    QVector3D position(const QnVirtualCameraResourcePtr &camera);
+    QVector3D position(const QnVirtualCameraResourcePtr &camera) const;
+
+    QVector3D physicalPosition(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \param camera                    Camera to set PTZ position for.
@@ -29,13 +35,15 @@ public:
      */
     void setPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &position);
 
+    void setPhysicalPosition(const QnVirtualCameraResourcePtr &camera, const QVector3D &physicalPosition);
+
     /**
      * \param camera                    Camera to get current PTZ continuous movement speed for.
      * \returns                         Current PTZ continuous movement speed for the given
      *                                  camera, or NaN if it is not available.
      *                                  Use <tt>qIsNaN</tt> to check for NaN.
      */
-    QVector3D movement(const QnVirtualCameraResourcePtr &camera);
+    QVector3D movement(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \param camera                    Camera to set current PTZ continuous movement speed for.
@@ -46,6 +54,7 @@ public:
 private slots:
     void at_ptzCameraWatcher_ptzCameraAdded(const QnVirtualCameraResourcePtr &camera);
     void at_ptzCameraWatcher_ptzCameraRemoved(const QnVirtualCameraResourcePtr &camera);
+    
     void at_camera_statusChanged();
     void at_camera_statusChanged(const QnVirtualCameraResourcePtr &camera);
 
@@ -60,6 +69,8 @@ private:
 
     void tryInitialize(const QnVirtualCameraResourcePtr &camera);
 
+    const QnPtzInformation *info(const QnVirtualCameraResourcePtr &camera) const;
+
 private:
     enum PtzRequestType {
         SetMovementRequest,
@@ -72,11 +83,12 @@ private:
         PtzData();
 
         bool initialized;
-        QVector3D position;
+        QVector3D position, physicalPosition;
         QVector3D movement;
         int attemptCount[RequestTypeCount];
     };
 
+    QHash<QString, const QnPtzInformation *> m_infoByModel;
     QHash<QnVirtualCameraResourcePtr, PtzData> m_dataByCamera;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByHandle;
     QHash<int, QnVirtualCameraResourcePtr> m_cameraByTimerId;
