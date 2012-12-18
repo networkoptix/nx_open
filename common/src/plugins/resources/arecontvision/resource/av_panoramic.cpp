@@ -133,6 +133,9 @@ bool QnArecontPanoramicResource::initInternal()
         return false;
 
     setRegister(3, 100, 10); // sets I frame frequency to 10
+
+    setParam(QLatin1String("CnannelEnable"), 15, QnDomainPhysical); // to enable all channels
+
     return true;
 }
 
