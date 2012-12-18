@@ -366,9 +366,9 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
                                 QByteArray errorString;
                                 QnVirtualCameraResourceList cameras;
                                 QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                                if (connect->addCamera(cameraResource, cameras, errorString) != 0)
+                                if (connect->addCamera(cameraResource, cameras) != 0)
                                 {
-                                    qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
+                                    qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
                                 }
                             }
 
@@ -562,12 +562,11 @@ bool QnResourceDiscoveryManager::processDiscoveredResources(QnResourceList& reso
                         QnVirtualCameraResourcePtr cameraResource = rpNetRes.dynamicCast<QnVirtualCameraResource>();
                         if (cameraResource)
                         {
-                            QByteArray errorString;
                             QnVirtualCameraResourceList cameras;
                             QnAppServerConnectionPtr connect = QnAppServerConnectionFactory::createConnection();
-                            if (connect->addCamera(cameraResource, cameras, errorString) != 0)
+                            if (connect->addCamera(cameraResource, cameras) != 0)
                             {
-                                qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << errorString;
+                                qCritical() << "QnResourceDiscoveryManager::findNewResources(): Can't add camera. Reason: " << connect->getLastError();
                             }
                         }
 

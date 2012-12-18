@@ -920,11 +920,10 @@ QString QnPlOnvifResource::getPtzfUrl() const
 
 void QnPlOnvifResource::save()
 {
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-                    << getPhysicalId() << ". Description: " << errorStr;
+                    << getPhysicalId() << ". Description: " << conn->getLastError();
     }
 }
 
