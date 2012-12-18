@@ -8,7 +8,7 @@
 #include <core/resource/media_server_resource.h>
 
 /** Data update period. For the best result should be equal to server's */
-#define REQUEST_TIME 2000
+#define REQUEST_TIME 2000 //TODO: #GDM user server's value from xml
 
 QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
     QObject(parent)
@@ -21,7 +21,7 @@ QnMediaServerStatisticsManager::QnMediaServerStatisticsManager(QObject *parent):
 void QnMediaServerStatisticsManager::registerServerWidget(const QnMediaServerResourcePtr &resource, QObject *target, const char *slot){
     QString id = resource->apiConnection()->getUrl();
     if (!m_statistics.contains(id))
-        m_statistics[id] = new QnMediaServerStatisticsStorage(resource->apiConnection(), this);
+        m_statistics[id] = new QnMediaServerStatisticsStorage(resource->apiConnection(), storageLimit(), this);
     m_statistics[id]->registerServerWidget(target, slot);
 }
 
@@ -32,11 +32,18 @@ void QnMediaServerStatisticsManager::unregisterServerWidget(const QnMediaServerR
     m_statistics[id]->unregisterServerWidget(target);
 }
 
-qint64 QnMediaServerStatisticsManager::getHistory(const QnMediaServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history){
+QnStatisticsHistory QnMediaServerStatisticsManager::history(const QnMediaServerResourcePtr &resource) const {
+    QString id = resource->apiConnection()->getUrl();
+    if (!m_statistics.contains(id))
+        return QnStatisticsHistory();
+    return m_statistics[id]->history();
+}
+
+qint64 QnMediaServerStatisticsManager::historyId(const QnMediaServerResourcePtr &resource) const {
     QString id = resource->apiConnection()->getUrl();
     if (!m_statistics.contains(id))
         return -1;
-    return m_statistics[id]->getHistory(lastId, history);
+    return m_statistics[id]->historyId();
 }
 
 void QnMediaServerStatisticsManager::at_timer_timeout(){

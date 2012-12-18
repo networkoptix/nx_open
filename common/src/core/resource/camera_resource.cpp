@@ -213,6 +213,13 @@ void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
     setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }
 
+void QnVirtualCameraResource::removeCameraCapabilities(CameraCapabilities value)
+{
+    value = getCameraCapabilities() & ~value;
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+}
+
 QString QnVirtualCameraResource::getModel() const
 {
     return m_model;

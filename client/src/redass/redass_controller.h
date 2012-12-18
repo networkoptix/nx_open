@@ -19,7 +19,7 @@ public:
     void unregisterConsumer(QnCamDisplay* display);
     int counsumerCount() const;
 
-    bool isPrecSeekAllowed(QnCamDisplay* currentDisplay);
+    //bool isPrecSeekAllowed(QnCamDisplay* currentDisplay);
 public slots:
     /* Inform controller that not enough data or CPU for stream */
     void onSlowStream(QnArchiveStreamReader* reader);

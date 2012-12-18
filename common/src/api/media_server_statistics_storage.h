@@ -21,7 +21,7 @@ public:
      * \param apiConnection     Api connection of the server that will provide the statistics.
      * \param parent            Parent of the object
      */
-    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, QObject *parent);
+    QnMediaServerStatisticsStorage(const QnMediaServerConnectionPtr &apiConnection, int storageLimit, QObject *parent);
 
     // TODO: #Elric #1.4 Signal exposure + connectNotify/disconnectNotify is a more Qt-ish way to do this.
     /**
@@ -39,17 +39,8 @@ public:
      */
     void unregisterServerWidget(QObject *target);
 
-    // TODO: #GDM #1.4 I think we can have a simpler API here, like 
-    // QnStatisticsHistory history() const;
-    // This way we'll avoid the need to store request ID at the caller's side.
-    /**
-     *  Get history data for the selected server resource.
-     *
-     * \param lastId            Id of the last response that is already processed by consumer.
-     * \param history           Field that should be filled with results.
-     * \returns                 Id of the last response in history.
-     */
-    qint64 getHistory(qint64 lastId, QnStatisticsHistory *history);
+    QnStatisticsHistory history() const;
+    qint64 historyId() const;
 
     /**
      *  Send update request to the server.
@@ -74,6 +65,7 @@ private:
     qint64 m_lastId;
     qint64 m_timeStamp;
     uint m_listeners;
+    int m_storageLimit;
 
     QnStatisticsHistory m_history;
     QnMediaServerConnectionPtr m_apiConnection;

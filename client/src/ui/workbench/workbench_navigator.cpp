@@ -188,6 +188,7 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(customContextMenuRequested(const QPointF &, const QPoint &)), this, SLOT(at_timeSlider_customContextMenuRequested(const QPointF &, const QPoint &)));
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
+    connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
     m_timeSlider->setLineStretch(SyncedLine, 1.0);
@@ -1119,12 +1120,12 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
         m_timeSlider->setToolTipFormat(tr("'Live'", "LIVE_TOOL_TIP_FORMAT"));
     } else {
         if (m_currentWidgetFlags & WidgetUsesUTC) {
-            m_timeSlider->setToolTipFormat(tr("yyyy MMM dd\nhh:mm:ss", "CAMERA_TOOL_TIP_FORMAT"));
+            m_timeSlider->setToolTipFormat(lit("yyyy MMM dd\nhh:mm:ss"));
         } else {
             if(m_timeSlider->maximum() >= 60ll * 60ll * 1000ll) { /* Longer than 1 hour. */
-                m_timeSlider->setToolTipFormat(tr("hh:mm:ss", "LONG_TOOL_TIP_FORMAT"));
+                m_timeSlider->setToolTipFormat(lit("hh:mm:ss"));
             } else {
-                m_timeSlider->setToolTipFormat(tr("mm:ss", "SHORT_TOOL_TIP_FORMAT"));
+                m_timeSlider->setToolTipFormat(lit("mm:ss"));
             }
         }
     }
@@ -1139,8 +1140,10 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
                     reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
                 else if (m_timeSlider->isSliderDown())
                     reader->jumpTo(value * 1000, 0);
-                else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
-                    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                //else if (qnRedAssController->isPrecSeekAllowed(m_currentMediaWidget->display()->camDisplay()))
+                //    reader->jumpTo(value * 1000, value * 1000); /* Precise seek. */
+                else
+                    reader->setSkipFramesToTime(value * 1000); /* Precise seek. */
                 m_preciseNextSeek = false;
             }
         }
@@ -1196,6 +1199,11 @@ void QnWorkbenchNavigator::at_timeSlider_selectionReleased() {
 
     if(m_timeSlider->windowEnd() == m_timeSlider->maximum() && (m_currentWidgetFlags & WidgetSupportsLive))
         m_timeSlider->setWindowEnd(m_timeSlider->maximum() - 1); /* Go out of live. */
+}
+
+void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
+    // use precise seek when positioning throuh thumbnail click
+    m_preciseNextSeek = true;
 }
 
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {

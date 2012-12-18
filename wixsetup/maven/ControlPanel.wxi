@@ -28,7 +28,15 @@
     <Custom Action="SetARPINSTALLLOCATION" After="InstallValidate"></Custom>
   </InstallExecuteSequence>
 
-    <DirectoryRef Id="TARGETDIR">
+    <DirectoryRef Id="INSTALLDIR">
+        <Directory Id="Common" Name="Common">
+            <Directory Id="Resource" Name="Resource">
+                <Component Id="AlwaysFiles" Guid="{CAC36128-9083-4980-8931-EDAD62AA191A}">
+                    <File Id="alwayseve.ico" Name="eve_logo.ico" Source="Binary/eve/eve_logo.ico" />
+                </Component>
+            </Directory>
+        </Directory>
+        
         <!-- Create alternative ARP entry that lets us launch uninstall with
             full UI.  Setting ARPSYSTEMCOMPONENT above hides WI generated key
                     that uses the product GUID.-->
@@ -36,7 +44,7 @@
             <RegistryKey Root="HKLM" Key="SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\${product.name}" Action="createAndRemoveOnUninstall">
                 <RegistryValue Type="string" Name="DisplayName" Value="[ProductName]"/>
                 <RegistryValue Type="string" Name="UninstallString" Value="[SystemFolder]msiexec.exe /i [ProductCode]"/>
-                <RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLDIR]traytool\traytool.exe"/>
+                <RegistryValue Type="string" Name="DisplayIcon" Value="[INSTALLDIR]Common\Resource\eve_logo.ico"/>
                 <RegistryValue Type="string" Name="HelpLink" Value="${product.url}"/>
                 <RegistryValue Type="string" Name="InstallLocation" Value="[INSTALLDIR]"/>
                 <RegistryValue Type="string" Name="Publisher" Value="[Manufacturer]"/>

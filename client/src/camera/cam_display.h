@@ -91,6 +91,7 @@ public:
     int getAvarageFps() const;
 public slots:
     void onBeforeJump(qint64 time);
+    void onSkippingFrames(qint64 time);
     void onJumpOccured(qint64 time);
     void onJumpCanceled(qint64 time);
     void onRealTimeStreamHint(bool value);
@@ -136,6 +137,9 @@ private:
     qint64 getDisplayedMax() const;
     qint64 getDisplayedMin() const;
     void setAudioBufferSize(int bufferSize, int prebufferMs);
+
+    void blockTimeValue(qint64 time);
+    void unblockTimeValue();
 protected:
     QnVideoStreamDisplay* m_display[CL_MAX_CHANNELS];
     QQueue<QnCompressedVideoDataPtr> m_videoQueue[CL_MAX_CHANNELS];

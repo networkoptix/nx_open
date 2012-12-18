@@ -52,7 +52,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
                 {
                     DeviceFileCatalog::Chunk nextAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.endTimeMs(), findMethod));
                     //if (nextAltChunk.startTimeMs != altChunk.endTimeMs())
-                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - findEps)
+                    if (nextAltChunk.startTimeMs > chunk.startTimeMs - findEps && chunk.startTimeMs > time)
                         return;
                     if (nextAltChunk.startTimeMs == altChunk.startTimeMs)
                         return; // EOF reached
@@ -61,7 +61,7 @@ void QnDialQualityHelper::findDataForTime(const qint64 time, DeviceFileCatalog::
                 {
                     DeviceFileCatalog::Chunk prevAltChunk = catalogAlt->chunkAt(catalogAlt->findFileIndex(altChunk.startTimeMs-1, findMethod));
                     //if (prevAltChunk.endTimeMs() != altChunk.startTimeMs)
-                    if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + findEps)
+                    if (prevAltChunk.endTimeMs() < chunk.endTimeMs() + findEps && chunk.endTimeMs() < time)
                         return;
                 }
             }

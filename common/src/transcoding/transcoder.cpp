@@ -137,7 +137,7 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
         //bitrate = resolution.width() * resolution.height() * 5;
         bitrate = suggestBitrate(resolution);
     }
-
+    QnFfmpegVideoTranscoder* ffmpegTranscoder;
     m_videoCodec = codec;
     switch (method)
     {
@@ -145,7 +145,10 @@ int QnTranscoder::setVideoCodec(CodecID codec, TranscodeMethod method, const QSi
             m_vTranscoder = QnVideoTranscoderPtr();
             break;
         case TM_FfmpegTranscode:
-            m_vTranscoder = QnVideoTranscoderPtr(new QnFfmpegVideoTranscoder(codec));
+            ffmpegTranscoder = new QnFfmpegVideoTranscoder(codec);
+            if (getCPUString().toLower().contains(QLatin1String("atom")))
+                ffmpegTranscoder->setMTMode(true);
+            m_vTranscoder = QnVideoTranscoderPtr(ffmpegTranscoder);
             break;
             /*
         case TM_QuickSyncTranscode:

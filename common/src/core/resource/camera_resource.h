@@ -45,6 +45,7 @@ public:
     // TODO: move to QnSecurityCamResource
     CameraCapabilities getCameraCapabilities();
     void addCameraCapabilities(CameraCapabilities value);
+    void removeCameraCapabilities(CameraCapabilities value);
 
     // TODO: move to QnSecurityCamResource
     QString getModel() const;

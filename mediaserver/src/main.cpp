@@ -68,9 +68,9 @@
 #include "events/business_rule_processor.h"
 #include "rest/handlers/exec_action_handler.h"
 #include "rest/handlers/time_handler.h"
+#include "rest/handlers/ping_handler.h"
 #include "platform/platform_abstraction.h"
 #include "recorder/file_deletor.h"
-#include "rest/handlers/version_handler.h"
 
 #define USE_SINGLE_STREAMING_PORT
 
@@ -654,7 +654,7 @@ void QnMain::initTcpListener()
     QnRestConnectionProcessor::registerHandler("api/image", new QnImageHandler());
     QnRestConnectionProcessor::registerHandler("api/execAction", new QnExecActionHandler());
     QnRestConnectionProcessor::registerHandler("api/gettime", new QnTimeHandler());
-    QnRestConnectionProcessor::registerHandler("api/version", new QnVersionHandler());
+    QnRestConnectionProcessor::registerHandler("api/ping", new QnRestPingHandler());
 
     m_universalTcpListener = new QnUniversalTcpListener(QHostAddress::Any, rtspPort);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");

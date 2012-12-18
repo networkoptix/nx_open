@@ -64,15 +64,21 @@
 			<![CDATA[ APPSERVER_PASSWORD_REG = "" ]]>
 		</SetProperty>
 
-		<SetProperty Id="INSTALL_ECS" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !AppServerFeature = 3 ]]>
+        <Property Id="INSTALL_ECS" Secure="yes"/>
+        <Property Id="INSTALL_SERVER" Secure="yes"/>
+        <Property Id="INSTALL_CLIENT" Secure="yes"/>
+	    <Property Id="SERVER_DIRECTORY" Secure="yes"/>
+        
+        <SetProperty Id="INSTALL_ECS" Value="1" After="ResetPreselected" Sequence="ui">
+            <![CDATA[ $(var.VmsInstalling) OR &AppServerFeature = 3 OR !AppServerFeature = 3 ]]>
 		</SetProperty>
-		<SetProperty Id="INSTALL_SERVER" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !ServerFeature = 3 ]]>
+        <SetProperty Id="INSTALL_SERVER" Value="1" After="ResetPreselected" Sequence="ui">
+            <![CDATA[ $(var.VmsInstalling) OR &ServerFeature = 3 OR !ServerFeature = 3 ]]>
 		</SetProperty>
-		<SetProperty Id="INSTALL_CLIENT" Value="1" After="CostFinalize" Sequence="ui">
-			<![CDATA[ NOT Installed OR !ClientFeature = 3 ]]>
+        <SetProperty Id="INSTALL_CLIENT" Value="1" After="ResetPreselected" Sequence="ui">
+            <![CDATA[ $(var.VmsInstalling) OR &ClientFeature = 3 OR !ClientFeature = 3 ]]>
 		</SetProperty>
+
 
 		<SetProperty Id="SERVER_APPSERVER_HOST" Value="[SERVER_APPSERVER_HOST32]" After="AppSearch">
 			<![CDATA[ SERVER_APPSERVER_HOST = "" ]]>
@@ -466,7 +472,7 @@
 		<?define EcsNeedsGuid="(INSTALL_ECS AND NOT APPSERVER_GUID)"?>
 		<?define ServerNeedsGuid="INSTALL_SERVER AND NOT SERVER_GUID"?>
 		<InstallUISequence>
-			<Custom Action="ResetPreselected" After="CostFinalize">Installed AND Preselected</Custom>
+            <Custom Action="ResetPreselected" After="MigrateFeatureStates">Installed AND Preselected</Custom>
 			<FindRelatedProducts Before="AppSearch" />
 			<AppSearch Before="LaunchConditions" />
 
@@ -944,6 +950,7 @@
 		</Feature>
 
 		<Feature Id="AlwaysFeature" Title="Always Tool" AllowAdvertise="no" Display="hidden" Level="1">
+		    <ComponentRef Id="AlwaysFiles"/>
 			<ComponentRef Id="ARPAltRegistryEntries"/>            
 			<ComponentRef Id="UninstallProgramMenuFolder"/>
 		</Feature>
