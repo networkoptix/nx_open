@@ -951,6 +951,13 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     return QnSessionManager::instance()->sendAsyncPostRequest(m_url,disabledObject, requestHeaders, requestParams, "", target, slot);
 }
 
+bool QnAppServerConnection::setPanicMode(bool value)
+{
+    return true;
+}
+
+// --------------------------------- QnAppServerConnectionFactory ----------------------------------
+
 void QnAppServerConnectionFactory::setDefaultMediaProxyPort(int port)
 {
     if (QnAppServerConnectionFactory *factory = theAppServerConnectionFactory()) {
