@@ -38,11 +38,11 @@ bool QnPlSonyResource::updateResourceCapabilities()
         return false;
     }
 
-    typedef QSharedPointer<QList<ResolutionPair> > ResolutionListPtr;
+    typedef QSharedPointer<QList<QSize> > ResolutionListPtr;
     ResolutionListPtr resolutionListPtr(0);
     {
         QMutexLocker lock(&m_mutex);
-        resolutionListPtr = ResolutionListPtr(new QList<ResolutionPair>(m_resolutionList)); //Sorted desc
+        resolutionListPtr = ResolutionListPtr(new QList<QSize>(m_resolutionList)); //Sorted desc
     }
 
     MediaSoapWrapper soapWrapper(endpoint.c_str(), login, password, getTimeDrift());
@@ -53,12 +53,12 @@ bool QnPlSonyResource::updateResourceCapabilities()
     SetVideoConfigResp response;
 
     int triesNumLeft = MAX_RESOLUTION_DECREASES_NUM;
-    QList<ResolutionPair>::iterator it = resolutionListPtr->begin();
+    QList<QSize>::iterator it = resolutionListPtr->begin();
 
     for (; it != resolutionListPtr->end() && triesNumLeft > 0; --triesNumLeft)
     {
-        request.Configuration->Resolution->Width = it->first;
-        request.Configuration->Resolution->Height = it->second;
+        request.Configuration->Resolution->Width = it->width();
+        request.Configuration->Resolution->Height = it->height();
 
         int retryCount = getMaxOnvifRequestTries();
         soapRes = SOAP_ERR;
@@ -82,8 +82,8 @@ bool QnPlSonyResource::updateResourceCapabilities()
             break;
         }
 
-        qWarning() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->first 
-            << " x " << it->second << " dropped. UniqueId: " << getUniqueId();
+        qWarning() << "QnPlSonyResource::updateResourceCapabilities: resolution " << it->width()
+            << " x " << it->height() << " dropped. UniqueId: " << getUniqueId();
         it = resolutionListPtr->erase(it);
     }
 

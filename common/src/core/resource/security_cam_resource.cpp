@@ -371,7 +371,7 @@ MotionTypeFlags QnSecurityCamResource::supportedMotionType() const
             else if (s1 == QLatin1String("motionwindow"))
                 result |= MT_MotionWindow;
         }
-        if (!hasDualStreaming())
+        if (!hasDualStreaming() && !checkCameraCapability(primaryStreamSoftMotion))
             result &= ~MT_SoftwareGrid;
     }
     else {
@@ -404,4 +404,30 @@ void QnSecurityCamResource::onDisabledChanged( bool oldValue, bool newValue )
         stopInputPortMonitoring();
     else
         startInputPortMonitoring();
+}
+
+bool QnSecurityCamResource::checkCameraCapability(CameraCapabilities value) const
+{
+    return getCameraCapabilities() & value;
+}
+
+QnSecurityCamResource::CameraCapabilities QnSecurityCamResource::getCameraCapabilities() const
+{
+    QVariant mediaVariant;
+    const_cast<QnSecurityCamResource*>(this)->getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
+    return (CameraCapabilities) mediaVariant.toInt();
+}
+
+void QnSecurityCamResource::addCameraCapabilities(CameraCapabilities value)
+{
+    value |= getCameraCapabilities();
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
+}
+
+void QnSecurityCamResource::removeCameraCapabilities(CameraCapabilities value)
+{
+    value = getCameraCapabilities() & ~value;
+    int valueInt = (int) value;
+    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
 }

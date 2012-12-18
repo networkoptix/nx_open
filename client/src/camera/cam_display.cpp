@@ -187,7 +187,7 @@ void QnCamDisplay::addVideoChannel(int index, QnAbstractRenderer* vw, bool canDo
     Q_ASSERT(index < CL_MAX_CHANNELS);
 
     delete m_display[index];
-    m_display[index] = new QnVideoStreamDisplay(canDownscale);
+    m_display[index] = new QnVideoStreamDisplay(canDownscale, index);
     m_display[index]->setDrawer(vw);
 }
 

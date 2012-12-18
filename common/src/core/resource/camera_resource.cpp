@@ -199,27 +199,6 @@ void QnVirtualCameraResource::unLockDTSFactory()
     m_mutex.unlock();
 }
 
-QnVirtualCameraResource::CameraCapabilities QnVirtualCameraResource::getCameraCapabilities()
-{
-    QVariant mediaVariant;
-    getParam(QLatin1String("cameraCapabilities"), mediaVariant, QnDomainMemory);
-    return (CameraCapabilities) mediaVariant.toInt();
-}
-
-void QnVirtualCameraResource::addCameraCapabilities(CameraCapabilities value)
-{
-    value |= getCameraCapabilities();
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
-}
-
-void QnVirtualCameraResource::removeCameraCapabilities(CameraCapabilities value)
-{
-    value = getCameraCapabilities() & ~value;
-    int valueInt = (int) value;
-    setParam(QLatin1String("cameraCapabilities"), valueInt, QnDomainDatabase);
-}
-
 QString QnVirtualCameraResource::getModel() const
 {
     return m_model;

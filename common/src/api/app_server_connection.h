@@ -136,6 +136,9 @@ public:
 
     static int getMediaProxyPort();
 
+    // todo: #Vanja implement it!
+    bool setPanicMode(bool value);
+
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 

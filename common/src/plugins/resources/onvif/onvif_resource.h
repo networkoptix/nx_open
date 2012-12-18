@@ -27,36 +27,24 @@ class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
 class onvifXsd__VideoEncoderConfigurationOptions;
 class onvifXsd__VideoEncoderConfiguration;
-class onvifXsd__EventCapabilities;
 class oasisWsnB2__NotificationMessageHolderType;
+class onvifXsd__VideoSourceConfiguration;
+class onvifXsd__EventCapabilities;
 typedef onvifXsd__AudioEncoderConfigurationOption AudioOptions;
 typedef onvifXsd__VideoSourceConfigurationOptions VideoSrcOptions;
 typedef onvifXsd__VideoEncoderConfigurationOptions VideoOptions;
 typedef onvifXsd__VideoEncoderConfiguration VideoEncoder;
+typedef onvifXsd__VideoSourceConfiguration VideoSource;
+
+class VideoOptionsLocal;
 
 //first = width, second = height
-typedef QPair<int, int> ResolutionPair;
-const ResolutionPair EMPTY_RESOLUTION_PAIR(0, 0);
-const ResolutionPair SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
-const ResolutionPair SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
+const QSize EMPTY_RESOLUTION_PAIR(0, 0);
+const QSize SECONDARY_STREAM_DEFAULT_RESOLUTION(480, 316); // 316 is average between 272&360
+const QSize SECONDARY_STREAM_MAX_RESOLUTION(720, 480);
 
 
 class QDomElement;
-
-struct CameraPhysicalWindowSize
-{
-    int x;
-    int y;
-    int width;
-    int height;
-
-    CameraPhysicalWindowSize(): x(0), y(0), width(0), height(0) {}
-
-    bool isValid()
-    {
-        return x >= 0 && y >=0 && width > 0 && height > 0;
-    }
-};
 
 class QnPlOnvifResource
 :
@@ -151,14 +139,15 @@ public:
     int getGovLength() const;
     int getAudioBitrate() const;
     int getAudioSamplerate() const;
-    ResolutionPair getPrimaryResolution() const;
-    ResolutionPair getSecondaryResolution() const;
+    QSize getPrimaryResolution() const;
+    QSize getSecondaryResolution() const;
     int getPrimaryH264Profile() const;
     int getSecondaryH264Profile() const;
-    ResolutionPair getMaxResolution() const;
+    QSize getMaxResolution() const;
     int getTimeDrift() const; // return clock diff between camera and local clock at seconds
     //bool isSoapAuthorized() const;
-    const CameraPhysicalWindowSize getPhysicalWindowSize() const;
+    const QSize getVideoSourceSize() const;
+
     const QString getPrimaryVideoEncoderId() const;
     const QString getSecondaryVideoEncoderId() const;
     const QString getAudioEncoderId() const;
@@ -183,8 +172,9 @@ public:
 
     const QnResourceAudioLayout* getAudioLayout(const QnAbstractMediaStreamDataProvider* dataProvider);
 
-    bool forcePrimaryEncoderCodec() const;
     void calcTimeDrift(); // calculate clock diff between camera and local clock at seconds
+    static int calcTimeDrift(const QString& deviceUrl);
+
 
     virtual QnOnvifPtzController* getPtzController() override;
     bool fetchAndSetDeviceInformation();
@@ -195,6 +185,10 @@ public:
     //!Implementation of TimerEventHandler::onTimer
     virtual void onTimer( const quint64& timerID );
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
+
+    virtual void setUrl(const QString &url) override;
+    int getChannel() const;
+    int getMaxChannels() const;
 
 signals:
     void cameraInput(
@@ -225,17 +219,18 @@ private:
     bool fetchAndSetResourceOptions();
     void fetchAndSetPrimarySecondaryResolution();
     bool fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWrapper);
-    void updateSecondaryResolutionList(const VideoOptionsResp& response);
+    void updateSecondaryResolutionList(const VideoOptionsLocal& opts);
     bool fetchAndSetAudioEncoderOptions(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetVideoSourceOptions(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetDualStreaming(MediaSoapWrapper& soapWrapper);
     bool fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetVideoSource(MediaSoapWrapper& soapWrapper);
-    bool fetchAndSetAudioSource(MediaSoapWrapper& soapWrapper);
+    
+    bool fetchVideoSourceToken();
+    bool fetchAndSetVideoSource();
+    bool fetchAndSetAudioSource();
 
-    void setVideoEncoderOptions(const VideoOptionsResp& response);
-    void setVideoEncoderOptionsH264(const VideoOptionsResp& response);
-    void setVideoEncoderOptionsJpeg(const VideoOptionsResp& response);
+    void setVideoEncoderOptions(const VideoOptionsLocal& opts);
+    void setVideoEncoderOptionsH264(const VideoOptionsLocal& opts);
+    void setVideoEncoderOptionsJpeg(const VideoOptionsLocal& opts);
     void setAudioEncoderOptions(const AudioOptions& options);
     void setVideoSourceOptions(const VideoSrcOptions& options);
     void setMinMaxQuality(int min, int max);
@@ -243,17 +238,22 @@ private:
     void save();
 
     int round(float value);
-    ResolutionPair getNearestResolutionForSecondary(const ResolutionPair& resolution, float aspectRatio) const;
-    static ResolutionPair getNearestResolution(const ResolutionPair& resolution, float aspectRatio, double maxResolutionSquare, const QList<ResolutionPair>& resolutionList);
-    static float getResolutionAspectRatio(const ResolutionPair& resolution);
+    QSize getNearestResolutionForSecondary(const QSize& resolution, float aspectRatio) const;
+    static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList);
+    static float getResolutionAspectRatio(const QSize& resolution);
     int findClosestRateFloor(const std::vector<int>& values, int threshold) const;
-    int getH264StreamProfile(const VideoOptionsResp& response);
+    int  getH264StreamProfile(const VideoOptionsLocal& videoOptionsLocal);
     void checkMaxFps(VideoConfigsResp& response, const QString& encoderId);
     int sendVideoEncoderToCamera(VideoEncoder& encoder) const;
 
+
+    void updateVideoSource(VideoSource* source, const QRect& maxRect) const;
+    bool sendVideoSourceToCamera(VideoSource* source) const;
+
+    QRect getVideoSourceMaxSize(const QString& configToken);
 protected:
-    QList<ResolutionPair> m_resolutionList; //Sorted desc
-    QList<ResolutionPair> m_secondaryResolutionList;
+    QList<QSize> m_resolutionList; //Sorted desc
+    QList<QSize> m_secondaryResolutionList;
     OnvifCameraSettingsResp* m_onvifAdditionalSettings;
 
     mutable QMutex m_physicalParamsMutex;
@@ -351,13 +351,14 @@ private:
     CODECS m_primaryCodec;
     CODECS m_secondaryCodec;
     AUDIO_CODECS m_audioCodec;
-    ResolutionPair m_primaryResolution;
-    ResolutionPair m_secondaryResolution;
+    QSize m_primaryResolution;
+    QSize m_secondaryResolution;
     int m_primaryH264Profile;
     int m_secondaryH264Profile;
     int m_audioBitrate;
     int m_audioSamplerate;
-    CameraPhysicalWindowSize m_physicalWindowSize;
+    //QRect m_physicalWindowSize;
+    QSize m_videoSourceSize;
     QString m_primaryVideoEncoderId;
     QString m_secondaryVideoEncoderId;
     QString m_audioEncoderId;
@@ -366,7 +367,6 @@ private:
     QString m_videoSourceToken;
 
     bool m_needUpdateOnvifUrl;
-    bool m_forceCodecFromPrimaryEncoder;
     QnOnvifPtzController* m_ptzController;
 
     QString m_imagingUrl;
@@ -381,7 +381,9 @@ private:
     QMutex m_subscriptionMutex;
     EventMonitorType m_eventMonitorType;
     quint64 m_timerID;
-
+    int m_channelNumer; // video/audio source number
+    int m_maxChannels;
+	
     bool createPullPointSubscription();
     bool pullMessages();
     //!Registeres local NotificationConsumer in resource's NotificationProducer
