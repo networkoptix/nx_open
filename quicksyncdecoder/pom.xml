@@ -6,16 +6,16 @@
     It should also be possible to have one maven project per solution project, 
     and have a parent pom to deletegate the build.
   -->
+	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>cpp</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>4.0.0</version>
+		<version>1.4.0</version>
 		<relativePath>../cpp</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>4.0.0</version>
-	<modelVersion>4.0.0</modelVersion>
+	<version>1.4.0</version>
 	<artifactId>quicksyncdecoder</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Intel Quick Sync decoder plugin</name>	
@@ -23,7 +23,7 @@
 	<properties>
 		<product.title>${quicksyncdecoder.name}</product.title>	
 		<!--Global libs-->
-		<global.libs></global.libs>
+		<global.libs/>
 		<!--Specific os libs used-->
 		<windows.oslibs>-lcommon -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lglu32 -lDxva2</windows.oslibs>
 		<!--Global defines-->
