@@ -20,10 +20,6 @@
 #include <ui/graphics/painters/radial_gradient_painter.h>
 #include <ui/workbench/workbench_context.h>
 
-
-/** How many points of the chart are shown on the screen simultaneously */
-#define CHART_POINTS_LIMIT 60
-
 /** Data update period. For the best result should be equal to mediaServerStatisticsManager's */
 #define REQUEST_TIME 2000 // TODO: #GDM extract this one from server's response (updatePeriod element).
 
@@ -34,10 +30,29 @@ namespace {
     }
 
     /** Get corresponding color from config */
-    QColor getColorById(int id) {
+    QColor getColorByKey(const QString &key) {
+        int id;
+
+        // some hacks to align hashes for keys like 'C:' and 'sda'
+        // strongly depends on size of systemHealthColors
+        QLatin1String salt = QLatin1String("2");
+        if (key == QLatin1String("CPU"))
+            id = 7;
+        else if (key == QLatin1String("RAM"))
+            id = 8;
+        else
+        if (key.endsWith(QLatin1Char(':'))) {
+            QString key2(key);
+            key2.chop(1);
+            id = qHash(salt + key2);
+        }
+        else
+            id = qHash(salt + key);
         QnColorVector colors = qnGlobals->systemHealthColors();
         return colors[id % colors.size()];
     }
+
+
 
     /** Create path for the chart */
     QPainterPath createChartPath(const QnStatisticsData values, qreal x_step, qreal scale, qreal elapsedStep, qreal *currentValue) {
@@ -58,10 +73,14 @@ namespace {
 
         QnStatisticsDataIterator iter(values.values);
         bool last = !iter.hasNext();
-        while (true) {
-            qreal value = qBound(0.0, iter.next(), 1.0);
-            last = !iter.hasNext();
+        *currentValue = -1;
 
+        while (iter.hasNext()) {
+            qreal value = qMin(iter.next(), 1.0);
+            //bool noData = value < 0;
+            value = qMax(value, -0.005);
+
+            last = !iter.hasNext();
             maxValue = qMax(maxValue, value);
             if (first) {
                 y1 = value * scale;
@@ -71,6 +90,7 @@ namespace {
             }
 
             qreal y2 = value * scale;
+
 
             /* Note that we're using 89 degrees for arc length for a reason.
              * When using full 90 degrees, arcs are connected, but Qt still
@@ -188,6 +208,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     if(!m_resource) 
         qnCritical("Server resource widget was created with a non-server resource.");
 
+    m_storageLimit = m_manager->storageLimit();
     m_manager->registerServerWidget(m_resource, this, SLOT(at_statistics_received()));
 
     /* Run handlers. */
@@ -265,7 +286,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
     qreal elapsed_step = m_renderStatus == Qn::CannotRender ? 0 :
             (qreal)qBound((qreal)0, (qreal)m_elapsedTimer.elapsed(), (qreal)REQUEST_TIME) / (qreal)REQUEST_TIME;
 
-    const qreal x_step = (qreal)ow*1.0/(CHART_POINTS_LIMIT - 2);
+    const qreal x_step = (qreal)ow*1.0/(m_storageLimit - 2);
     const qreal y_step = oh * 0.025;
 
     /** Draw grid */
@@ -303,13 +324,12 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         graphPen.setWidthF(pen_width * 2);
         graphPen.setCapStyle(Qt::FlatCap);
 
-        int counter = 0;
         foreach(QString key, m_sortedKeys) {
             QnStatisticsData &stats = m_history[key];
             qreal currentValue = 0;
             QPainterPath path = createChartPath(stats, x_step, -1.0 * (oh - space_offset*2), elapsed_step, &currentValue);
             values.append(currentValue);
-            graphPen.setColor(getColorById(counter++));
+            graphPen.setColor(getColorByKey(key));
             painter->strokePath(path, graphPen);
         }
     }
@@ -320,7 +340,7 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
         Q_UNUSED(penRollback)
 
         QPen main_pen;
-        main_pen.setColor(getColorById(0));
+        main_pen.setColor(getColorByKey(QLatin1String("CPU")));
         main_pen.setWidthF(pen_width * 2);
         main_pen.setJoinStyle(Qt::MiterJoin);
 
@@ -353,10 +373,11 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             qreal x = unzoom * (offset * 1.1 + ow);
             for (int i = 0; i < values.length(); i++){
                 qreal interValue = values[i];
-                main_pen.setColor(getColorById(i));
+                main_pen.setColor(getColorByKey(m_sortedKeys.at(i)));
                 painter->setPen(main_pen);
                 qreal y = unzoom * (offset + oh * (1.0 - interValue));
-                painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
+                if (interValue >= 0)
+                    painter->drawText(x, y, tr("%1%").arg(qRound(interValue * 100.0)));
             }
             painter->scale(unzoom, unzoom);
         }
@@ -395,9 +416,8 @@ void QnServerResourceWidget::drawStatistics(const QRectF &rect, QPainter *painte
             QPen legendPen(main_pen);
             legendPen.setWidthF(pen_width * 2 * unzoom);
 
-            int counter = 0;
             foreach(QString key, m_sortedKeys) {
-                legendPen.setColor(getColorById(counter++));
+                legendPen.setColor(getColorByKey(key));
                 painter->setPen(legendPen);
                 painter->strokePath(legend, legendPen);
                 painter->drawText(offset * 0.1* unzoom, offset * 0.1* unzoom, key);
@@ -420,8 +440,7 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 void QnServerResourceWidget::at_statistics_received() {
-    QnStatisticsHistory history_update;
-    qint64 id = m_manager->getHistory(m_resource, m_lastHistoryId, &history_update);
+    qint64 id = m_manager->historyId(m_resource);
     if (id < 0) {
         m_renderStatus = Qn::CannotRender;
         return;
@@ -432,24 +451,13 @@ void QnServerResourceWidget::at_statistics_received() {
         return;
     }
 
-    bool reSort = false;
-
-    // remove charts that are no exist anymore
-    QnStatisticsCleaner cleaner(m_history);
-    while (cleaner.hasNext()) {
-         cleaner.next();
-         if (!(history_update.contains(cleaner.key()))){
-            cleaner.remove();
-            reSort = true;
-         }
-    }
-
-    // update existing charts
-    QnStatisticsIterator updater(history_update);
-    while (updater.hasNext()) {
-         updater.next();
-         reSort = reSort | !m_history.contains(updater.key());
-         updateValues(updater.key(), updater.value());
+    m_history = m_manager->history(m_resource);
+    bool reSort = true;
+    if (m_history.keys().size() == m_sortedKeys.size()) {
+        foreach (QString key, m_sortedKeys)
+            if (!m_history.contains(key))
+                break;
+        reSort = false;
     }
 
     if (reSort) {
@@ -466,17 +474,4 @@ void QnServerResourceWidget::at_statistics_received() {
 
     m_elapsedTimer.restart();
     m_counter++;
-}
-
-void QnServerResourceWidget::updateValues(QString key, QnStatisticsData newValues) {
-    QnStatisticsData &oldValues = m_history[key];
-    oldValues.deviceType = newValues.deviceType;
-    oldValues.description = newValues.description;
-
-    while (!newValues.values.isEmpty())
-        oldValues.values.append(newValues.values.takeFirst());
-    while (oldValues.values.size() > CHART_POINTS_LIMIT)
-        oldValues.values.removeFirst();
-    while (oldValues.values.size() < CHART_POINTS_LIMIT)
-        oldValues.values.prepend(0);
 }

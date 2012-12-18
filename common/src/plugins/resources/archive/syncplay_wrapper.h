@@ -30,7 +30,9 @@ public:
     // nav delegate
     virtual void directJumpToNonKeyFrame(qint64 mksec);
 
-    virtual bool jumpTo(qint64 mksec,  qint64 skipTime);
+    virtual bool jumpTo(qint64 mksec,  qint64 skipTime) override;
+    virtual void setSkipFramesToTime(qint64 skipTime) override;
+
     virtual void previousFrame(qint64 mksec);
     virtual void nextFrame();
     virtual void pauseMedia();

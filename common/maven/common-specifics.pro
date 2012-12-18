@@ -20,4 +20,5 @@ QMAKE_EXTRA_COMPILERS += pb
 
 TRANSLATIONS += ${basedir}/translations/common_en.ts \
 				${basedir}/translations/common_ru.ts \
-				${basedir}/translations/common_zh-CN.ts 
+				${basedir}/translations/common_zh-CN.ts \
+				${basedir}/translations/common_fr.ts \

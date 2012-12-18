@@ -33,19 +33,29 @@ public:
 class QnRtspTimeHelper
 {
 public:
-    QnRtspTimeHelper();
+    QnRtspTimeHelper(const QString& resId);
 
     qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
+private:
+    double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
+    bool isLocalTimeChanged();
     void reset();
 private:
-    double cameraTimeToLocalTime(double cameraTime, double localTime); // time in seconds since 1.1.1970
-    bool isLocalTimeChanged();
-private:
-    double m_cameraClockToLocalDiff; // in secs
     qint64 m_lastTime;
     double m_lastResultInSec;
     QElapsedTimer m_timer;
     qint64 m_localStartTime;
+
+    struct CamSyncInfo {
+        CamSyncInfo(): value(INT_MAX) {}
+        QMutex mutex;
+        double value;
+    };
+
+    CamSyncInfo* m_cameraClockToLocalDiff;
+
+    static QMutex m_camClockMutex;
+    static QMap<QString, CamSyncInfo*> m_camClock;
 };
 
 class RTPIODevice

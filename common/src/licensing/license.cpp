@@ -20,8 +20,6 @@ QT_STATIC_CONST char networkOptixRSAPublicKey[] =
         "EwVi0AB6ht0hQ3sZUtM9UAGrszPJOzFfZlDB2hZ4HFyXfVZcbPxOdmECAwEAAQ==\n"
         "-----END PUBLIC KEY-----";
 
-const QByteArray QnLicense::FREE_LICENSE_KEY = "0000-0000-0000-0001";
-
 static inline QByteArray genMachineHardwareId()
 {
     QByteArray hwid;

@@ -133,6 +133,13 @@ QVariant QnSettings::readValueFromSettings(QSettings *settings, int id, const QV
         settings->endGroup();
         return result;
     }
+    case UPDATE_FEED_URL:
+        // TODO: #Elric need another way to handle this. Looks hacky.
+        if(settings->format() == QSettings::IniFormat) {
+            return base_type::readValueFromSettings(settings, id, defaultValue);
+        } else {
+            return defaultValue;
+        }
     case BACKGROUND_EDITABLE:
     case DEBUG_COUNTER:
     case DEV_MODE:

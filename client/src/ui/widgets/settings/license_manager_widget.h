@@ -31,7 +31,6 @@ private slots:
     void at_gridLicenses_itemDoubleClicked(QTreeWidgetItem *item, int);
     void at_licenseWidget_stateChanged();
 
-
 private:
     void updateFromServer(const QString &licenseKey, const QString &hardwareId);
     void validateLicense(const QnLicensePtr &license);

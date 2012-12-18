@@ -6,7 +6,7 @@
 #include "systraywindow.h"
 #include "ui_settings.h"
 #include "ui_findappserverdialog.h"
-#include "connectiontestingdialog.h"
+#include "connection_testing_dialog.h"
 
 #include <shlobj.h>
 #include "version.h"
@@ -144,6 +144,15 @@ QnSystrayWindow::QnSystrayWindow( FoundEnterpriseControllersModel* const foundEn
         arg(QLatin1String(QN_APPLICATION_ARCH)).
         arg(QLatin1String(QN_APPLICATION_COMPILER))
     );
+
+    connect(ui->appServerPassword, SIGNAL(textChanged(const QString &)), this, SLOT(at_appServerPassword_textChanged(const QString &)));
+
+    m_mediaServerStartAction->setVisible(false);
+    m_mediaServerStopAction->setVisible(false);
+    m_showMediaServerLogAction->setVisible(false);
+    m_appServerStartAction->setVisible(false);
+    m_appServerStopAction->setVisible(false);
+    m_showAppLogAction->setVisible(false);
 }
 
 void QnSystrayWindow::handleMessage(const QString& message)
@@ -916,11 +925,11 @@ void QnSystrayWindow::onTestButtonClicked()
 
     if (!url.isValid())
     {
-        QMessageBox::warning(this, tr("Invalid paramters"), tr("You have entered invalid URL."));
+        QMessageBox::warning(this, tr("Invalid parameters"), tr("You have entered invalid URL."));
         return;
     }
 
-    ConnectionTestingDialog dialog(this, url);
+    QnConnectionTestingDialog dialog(url, this);
     dialog.setModal(true);
     dialog.exec();
 }
@@ -948,4 +957,7 @@ void QnSystrayWindow::onAppServerUrlHistoryComboBoxCurrentChanged( int index )
     ui->appPortSpinBox->setValue( urlToSet.port() );
     //ui->appServerLogin->setText( urlToSet.userName() );
     //ui->appServerPassword->setText( urlToSet.password() );
+}
+void QnSystrayWindow::at_appServerPassword_textChanged(const QString &text) {
+    ui->testButton->setEnabled(!text.isEmpty());
 }

@@ -9,6 +9,8 @@
 #include <api/media_server_statistics_data.h>
 #include <api/media_server_statistics_storage.h>
 
+#define STORAGE_LIMIT 60
+
 /**
   * Class that receives, parses and stores statistics data from all servers.
   * Also handles request sending through an inner timer.
@@ -40,16 +42,10 @@ public:
      */
     void unregisterServerWidget(const QnMediaServerResourcePtr &resource, QObject *target);
 
-    /**
-     *  Get history data for the selected server resource.
-     *
-     * \param resource          Server resource whous history we want to receive.
-     * \param lastId            Id of the last response that is already processed by consumer.
-     * \param history           Field that should be filled with results.
-     * \returns                 Id of the last response in history.
-     */
-    qint64 getHistory(const QnMediaServerResourcePtr &resource, qint64 lastId, QnStatisticsHistory *history);
+    QnStatisticsHistory history(const QnMediaServerResourcePtr &resource) const;
+    qint64 historyId(const QnMediaServerResourcePtr &resource) const;
 
+    int storageLimit() const {return STORAGE_LIMIT; }
 private slots:
     void at_timer_timeout();
 private:

@@ -11,12 +11,14 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 
+#include <common/customization.h>
+
 #include "licensing/license.h"
 #include "version.h"
 
 namespace {
     bool isValidSerialKey(const QString &key) {
-        return key.length() == QnLicense::FREE_LICENSE_KEY.length() && !key.contains(QLatin1Char(' '));
+        return key.length() == qnProductFeatures().freeLicenseKey.length() && !key.contains(QLatin1Char(' '));
     }
 
 } // anonymous namespace
@@ -150,7 +152,7 @@ void QnLicenseWidget::at_browseLicenseFileButton_clicked() {
 }
 
 void QnLicenseWidget::at_activateFreeLicenseButton_clicked() {
-    ui->serialKeyEdit->setText(QLatin1String(QnLicense::FREE_LICENSE_KEY));
+    ui->serialKeyEdit->setText(qnProductFeatures().freeLicenseKey);
     at_activateLicenseButton_clicked();
 }
 
