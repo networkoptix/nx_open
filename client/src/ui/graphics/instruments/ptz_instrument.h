@@ -1,5 +1,5 @@
-#ifndef QN_PTZ_INSTRUMENT_H
-#define QN_PTZ_INSTRUMENT_H
+#ifndef QN_ABSOLUTE_PTZ_INSTRUMENT_H
+#define QN_ABSOLUTE_PTZ_INSTRUMENT_H
 
 #include <QtCore/QWeakPointer>
 #include <QtCore/QBasicTimer>
@@ -16,24 +16,18 @@
 class SelectionItem;
 class PtzSplashItem;
 class PtzSelectionItem;
-class PtzArrowItem;
 
 class QnWorkbenchPtzController;
 class QnMediaResourceWidget;
 
-class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
+class AbsolutePtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef DragProcessingInstrument base_type;
+
 public:
-    PtzInstrument(QObject *parent = NULL);
-    virtual ~PtzInstrument();
-
-    qreal ptzItemZValue() const {
-        return m_ptzItemZValue;
-    }
-
-    void setPtzItemZValue(qreal ptzItemZValue);
+    AbsolutePtzInstrument(QObject *parent = NULL);
+    virtual ~AbsolutePtzInstrument();
 
 signals:
     void ptzProcessStarted(QnMediaResourceWidget *widget);
@@ -79,12 +73,7 @@ private:
         return m_selectionItem.data();
     }
 
-    PtzArrowItem *arrowItem() const {
-        return m_arrowItem.data();
-    }
-
     void ensureSelectionItem();
-    void ensureArrowItem();
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
@@ -94,11 +83,9 @@ private:
     QnWorkbenchPtzController *m_ptzController;
 
     int m_clickDelayMSec;
-    qreal m_ptzItemZValue;
     qreal m_expansionSpeed;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
-    QWeakPointer<PtzArrowItem> m_arrowItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
 
@@ -126,4 +113,4 @@ private:
 };
 
 
-#endif // QN_PTZ_INSTRUMENT_H
+#endif // QN_ABSOLUTE_PTZ_INSTRUMENT_H

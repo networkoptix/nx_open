@@ -29,7 +29,6 @@
 
 #include "selection_item.h"
 #include "utils/settings.h"
-#include "ui/animation/animated.h"
 
 //#define QN_PTZ_INSTRUMENT_DEBUG
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
@@ -39,17 +38,9 @@
 #endif
 
 namespace {
-    inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &front, const QPointF &back, const QPointF &side) {
-        shape->lineTo(base - side - back);
-        shape->lineTo(base + front);
-        shape->lineTo(base + side - back);
-    }
-
     const QColor ptzColor = qnGlobals->ptzColor();
 
-    const qreal ptzArrowItemOpacityAnimationSpeed = 2.0;
-
-} // anonymous namespace
+}
 
 
 // -------------------------------------------------------------------------- //
@@ -235,88 +226,9 @@ private:
 
 
 // -------------------------------------------------------------------------- //
-// PtzArrowItem
+// AbsolutePtzInstrument
 // -------------------------------------------------------------------------- //
-class PtzArrowItem: public Animated<GraphicsPathItem>, protected QnGeometry {
-    typedef Animated<GraphicsPathItem> base_type;
-
-public:
-    PtzArrowItem(QGraphicsItem *parent = NULL): 
-        base_type(parent),
-        m_pathValid(false),
-        m_opacityAnimator(::opacityAnimator(this, ptzArrowItemOpacityAnimationSpeed))
-    {}
-
-    const QSizeF &size() const {
-        return m_size;
-    }
-
-    void setSize(const QSizeF &size) {
-        if(qFuzzyCompare(m_size, size))
-            return;
-
-        m_size = size;
-
-        invalidatePath();
-    }
-
-    /**
-     * \returns                         This item's opacity animator.
-     */
-    VariantAnimator *opacityAnimator() const {
-        return m_opacityAnimator;
-    }
-
-private:
-    void ensurePath() {
-        if(m_pathValid)
-            return;
-
-        qreal tailWidth = m_size.width();
-        qreal arrowWidth = tailWidth * 2.0;
-
-        qreal tailLength = m_size.height();
-        qreal arrowFront = tailWidth * 4.0;
-        qreal arrowBack = tailWidth * 1.0;
-
-        qreal totalLength = tailLength + arrowFront;
-
-        /* Prepare shape. */
-        QPainterPath shape;
-        shape.moveTo(totalLength, tailWidth / 2);
-        shape.arcTo(QRectF(-tailWidth / 2, -tailWidth / 2, tailWidth, tailWidth), 90.0, -180.0);
-        shape.lineTo(arrowFront, -tailWidth  / 2);
-        addArrowHead(&shape, QPointF(arrowFront, 0), QPointF(-arrowFront, 0), QPointF(-arrowBack, 0), QPointF(0, -arrowWidth / 2));
-        shape.lineTo(arrowFront, tailWidth / 2);
-        shape.closeSubpath();
-        setPath(shape);
-
-        m_pathValid = true;
-    }
-
-    void invalidatePath() {
-        m_pathValid = false;
-    }
-
-private:
-    /** Whether this item's path is valid. */
-    bool m_pathValid;
-
-    /** Bounding rect of this item. */
-    QRectF m_boundingRect;
-
-    /** Arrow size. Width defines tail's width, height - tail's length. */
-    QSizeF m_size;
-
-    /** Opacity animator of this item. */
-    VariantAnimator *m_opacityAnimator;
-};
-
-
-// -------------------------------------------------------------------------- //
-// PtzInstrument
-// -------------------------------------------------------------------------- //
-PtzInstrument::PtzInstrument(QObject *parent): 
+AbsolutePtzInstrument::AbsolutePtzInstrument(QObject *parent): 
     base_type(
         makeSet(QEvent::MouseButtonPress, AnimationEvent::Animation),
         makeSet(),
@@ -327,26 +239,21 @@ PtzInstrument::PtzInstrument(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_ptzController(context()->instance<QnWorkbenchPtzController>()),
     m_clickDelayMSec(QApplication::doubleClickInterval()),
-    m_ptzItemZValue(0.0),
     m_expansionSpeed(qnGlobals->workbenchUnitSize() / 5.0)
 {}
 
-PtzInstrument::~PtzInstrument() {
+AbsolutePtzInstrument::~AbsolutePtzInstrument() {
     ensureUninstalled();
 }
 
-void PtzInstrument::setPtzItemZValue(qreal ptzItemZValue) {
-    m_ptzItemZValue = ptzItemZValue;
-}
-
-void PtzInstrument::setTarget(QnMediaResourceWidget *target) {
+void AbsolutePtzInstrument::setTarget(QnMediaResourceWidget *target) {
     if(this->target() == target)
         return;
 
     m_target = target;
 }
 
-PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
+PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     PtzSplashItem *result;
     if(!m_freeAnimations.empty()) {
         result = m_freeAnimations.back().item;
@@ -362,7 +269,7 @@ PtzSplashItem *PtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     return result;
 }
 
-void PtzInstrument::ensureSelectionItem() {
+void AbsolutePtzInstrument::ensureSelectionItem() {
     if(selectionItem() != NULL)
         return;
 
@@ -376,24 +283,12 @@ void PtzInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
-void PtzInstrument::ensureArrowItem() {
-    if(arrowItem() != NULL)
-        return;
-
-    m_arrowItem = new PtzArrowItem();
-    arrowItem()->setOpacity(1.0); // TODO
-    arrowItem()->setPen(toTransparent(ptzColor, 0.75));
-    arrowItem()->setBrush(toTransparent(ptzColor.lighter(120), 0.25));
-
-    if(scene() != NULL)
-        scene()->addItem(arrowItem());
-}
-
-void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
+void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
 
-void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
+
+void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
     const QnPtzSpaceMapper *mapper = m_ptzController->mapper(camera);
     if(!mapper)
@@ -422,7 +317,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect)
     m_ptzController->setPhysicalPosition(camera, newPhysicalPosition);
 }
 
-void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
+void AbsolutePtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     QSizeF size = widget->size() * 100;
 
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
@@ -432,29 +327,26 @@ void PtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void PtzInstrument::installedNotify() {
+void AbsolutePtzInstrument::installedNotify() {
     assert(selectionItem() == NULL);
 
     base_type::installedNotify();
 }
 
-void PtzInstrument::aboutToBeDisabledNotify() {
+void AbsolutePtzInstrument::aboutToBeDisabledNotify() {
     m_clickTimer.stop();
 
     base_type::aboutToBeDisabledNotify();
 }
 
-void PtzInstrument::aboutToBeUninstalledNotify() {
+void AbsolutePtzInstrument::aboutToBeUninstalledNotify() {
     base_type::aboutToBeUninstalledNotify();
 
     if(selectionItem())
         delete selectionItem();
-
-    if(arrowItem())
-        delete arrowItem();
 }
 
-bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
+bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
     bool result = base_type::registeredNotify(item);
     if(!result)
         return false;
@@ -468,13 +360,13 @@ bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
     }
 }
 
-void PtzInstrument::unregisteredNotify(QGraphicsItem *item) {
+void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
 }
 
-void PtzInstrument::timerEvent(QTimerEvent *event) {
+void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
     if(event->timerId() == m_clickTimer.timerId()) {
         m_clickTimer.stop();
 
@@ -490,7 +382,7 @@ void PtzInstrument::timerEvent(QTimerEvent *event) {
     }
 }
 
-bool PtzInstrument::animationEvent(AnimationEvent *event) {
+bool AbsolutePtzInstrument::animationEvent(AnimationEvent *event) {
     qreal dt = event->deltaTime() / 1000.0;
     
     for(int i = m_activeAnimations.size() - 1; i >= 0; i--) {
@@ -518,30 +410,20 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
         animation.item->setRect(rect);
     }
     
-    /* Updating arrow parameters in animation event is much simpler than subscribing to changes. */
-    if(arrowItem() && !qFuzzyIsNull(arrowItem()->opacity()) && m_viewport) {
-        QPointF viewportHead = viewport()->mapFromGlobal(QCursor::pos());
-
-        QPointF head = m_instrument->target()->mapFromScene(view()->mapToScene(m_viewportHead));
-        QPointF origin = m_instrument->target()->rect().center();
-        QPointF delta = head - origin;
-
-    }
-
     return false;
 }
 
-bool PtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
+bool AbsolutePtzInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *) {
     m_viewport = viewport;
 
     return false;
 }
 
-bool PtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool AbsolutePtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     return mousePressEvent(item, event);
 }
 
-bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
     bool clickTimerWasActive = m_clickTimer.isActive();
     m_clickTimer.stop();
 
@@ -564,12 +446,12 @@ bool PtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEven
     return false;
 }
 
-void PtzInstrument::startDragProcess(DragInfo *) {
+void AbsolutePtzInstrument::startDragProcess(DragInfo *) {
     m_isClick = true;
     emit ptzProcessStarted(target());
 }
 
-void PtzInstrument::startDrag(DragInfo *) {
+void AbsolutePtzInstrument::startDrag(DragInfo *) {
     m_isClick = false;
     m_ptzStartedEmitted = false;
 
@@ -590,7 +472,7 @@ void PtzInstrument::startDrag(DragInfo *) {
     m_ptzStartedEmitted = true;
 }
 
-void PtzInstrument::dragMove(DragInfo *info) {
+void AbsolutePtzInstrument::dragMove(DragInfo *info) {
     if(target() == NULL) {
         dragProcessor()->reset();
         return;
@@ -616,7 +498,7 @@ void PtzInstrument::dragMove(DragInfo *info) {
     selectionItem()->setSidePoints(sidePoints);
 }
 
-void PtzInstrument::finishDrag(DragInfo *) {
+void AbsolutePtzInstrument::finishDrag(DragInfo *) {
     if(target()) {
         ensureSelectionItem();
         opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
@@ -636,7 +518,7 @@ void PtzInstrument::finishDrag(DragInfo *) {
         emit ptzFinished(target());
 }
 
-void PtzInstrument::finishDragProcess(DragInfo *info) {
+void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
     if(target() && m_isClick) {
         if(m_isDoubleClick) {
             PtzSplashItem *splashItem = newSplashItem(target());
@@ -656,12 +538,12 @@ void PtzInstrument::finishDragProcess(DragInfo *info) {
     emit ptzProcessFinished(target());
 }
 
-void PtzInstrument::at_target_optionsChanged() {
+void AbsolutePtzInstrument::at_target_optionsChanged() {
     //if(sender() == target())
         //updatePtzItemOpacity();
 }
 
-void PtzInstrument::at_splashItem_destroyed() {
+void AbsolutePtzInstrument::at_splashItem_destroyed() {
     PtzSplashItem *item = static_cast<PtzSplashItem *>(sender());
 
     m_freeAnimations.removeAll(item);
