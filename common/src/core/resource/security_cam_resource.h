@@ -30,6 +30,9 @@ class QnSecurityCamResource : virtual public QnMediaResource
     Q_OBJECT
 
 public:
+    enum CameraFlag { CFNoFlags = 0, HasPtz = 1, HasZoom = 2, primaryStreamSoftMotion = 4};
+    Q_DECLARE_FLAGS(CameraCapabilities, CameraFlag) // TODO: CameraFlag -> CameraCapability
+
     MotionTypeFlags supportedMotionType() const;
     bool isAudioSupported() const;
     MotionType getCameraBasedMotionType() const;
@@ -77,15 +80,12 @@ public:
 
     virtual StreamFpsSharingMethod streamFpsSharingMethod() const;
 
-    //!Returns ids of camera's relay outputs
-    virtual QStringList getRelayOutputList() const;
-    //!Returns ids of camera's input ports
-    virtual QStringList getInputPortList() const;
+    bool checkCameraCapability(CameraCapabilities value) const;
+    void addCameraCapabilities(CameraCapabilities value);
     /*!
         Change output with id \a ouputID state to \a activate
         \param autoResetTimeoutMS If > 0 and \a activate is \a true, than output will be deactivated in \a autoResetTimeout milliseconds
         \return true in case of success. false, if nothing has been done
-    */
     virtual bool setRelayOutputState(
         const QString& ouputID,
         bool activate,

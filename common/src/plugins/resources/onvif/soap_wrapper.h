@@ -47,7 +47,8 @@ class _onvifDeviceIO__GetRelayOutputOptions;
 class _onvifDeviceIO__GetRelayOutputOptionsResponse;
 class _onvifDeviceIO__SetRelayOutputSettings;
 class _onvifDeviceIO__SetRelayOutputSettingsResponse;
-
+class _onvifMedia__GetVideoSources;
+class _onvifMedia__GetVideoSourcesResponse;
 
 typedef _onvifDevice__CreateUsers CreateUsersReq;
 typedef _onvifDevice__CreateUsersResponse CreateUsersResp;
@@ -222,6 +223,8 @@ class _oasisWsnB2__RenewResponse;
 template <class T>
 class SoapWrapper
 {
+    std::string m_login;
+    std::string m_passwd;
 public:
     /*!
         \param _timeDrift ???
@@ -237,8 +240,8 @@ public:
     const T* getProxy() const { return m_soapProxy; }
     T* getProxy() { return m_soapProxy; }
     const char* endpoint() const { return m_endpoint; }
-    const char* getLogin();
-    const char* getPassword();
+    const std::string& getLogin();
+    const std::string& getPassword();
     int getTimeDrift();
     const QString getLastError();
     const QString getEndpointUrl();
@@ -369,8 +372,11 @@ public:
     int getStreamUri(StreamUriReq& request, StreamUriResp& response);
     int getVideoEncoderConfigurationOptions(VideoOptionsReq& request, VideoOptionsResp& response);
     int getVideoEncoderConfiguration(VideoConfigReq& request, VideoConfigResp& response);
+
+    int getVideoSources(_onvifMedia__GetVideoSources& request, _onvifMedia__GetVideoSourcesResponse& response);
     int getVideoEncoderConfigurations(VideoConfigsReq& request, VideoConfigsResp& response);
     int getVideoSourceConfigurationOptions(VideoSrcOptionsReq& request, VideoSrcOptionsResp& response);
+
     int getVideoSourceConfigurations(VideoSrcConfigsReq& request, VideoSrcConfigsResp& response);
 
     int getCompatibleMetadataConfigurations(CompatibleMetadataConfiguration& request, CompatibleMetadataConfigurationResp& response);

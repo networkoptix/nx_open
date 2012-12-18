@@ -47,8 +47,8 @@ protected:
     virtual void updateStreamParamsBasedOnFps() = 0;
 
     QnMetaDataV1Ptr getMetaData();
-
     virtual QnMetaDataV1Ptr getCameraMetadata();
+    QnResource::ConnectionRole roleForMotionEstimation();
 protected:
     mutable QMutex m_livemutex;
 
@@ -62,6 +62,7 @@ private:
     QTime m_timeSinceLastMetaData; //used only for live providers
 
     QnResource::ConnectionRole m_role;
+    QnResource::ConnectionRole m_softMotionRole;
     QnMotionEstimation m_motionEstimation[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
     const QnResourceVideoLayout* m_layout;
