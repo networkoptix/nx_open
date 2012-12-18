@@ -234,21 +234,12 @@ void QnBusinessRuleWidget::updateSummary() {
                                     : BusinessActionType::toString(m_rule->actionType()))
             .arg(actionResource);
 
-    //TODO: load details description from sub-widgets
     QString summary = QString(formatString)
             .arg(eventSummary)
             .arg(actionSummary);
 
 
     ui->summaryLabel->setText(summary);
-    /*
-
-           %1 On motion at
-           %2 start recording at
-           %3 <span style=" text-decoration: underline;">Low Quality</span>, <span style=" text-decoration: underline;">25FPS</span>, <span style=" text-decoration: underline;">10 sec pre</span>, <span style=" text-decoration: underline;">10 sec post</span>
-    */
-
-
 }
 
 void QnBusinessRuleWidget::resetFromRule() {
@@ -285,9 +276,7 @@ void QnBusinessRuleWidget::at_deleteButton_clicked() {
                               QMessageBox::Ok,
                               QMessageBox::Cancel) == QMessageBox::Cancel)
         return;
-    //TODO: confirmation dialog, delete at the server
-    //TODO: possible return just ID
-    emit deleteConfirmed(m_rule);
+    emit deleteConfirmed(this, m_rule);
 }
 
 void QnBusinessRuleWidget::at_applyButton_clicked() {
@@ -318,7 +307,7 @@ void QnBusinessRuleWidget::at_applyButton_clicked() {
     if (m_actionParameters)
         rule->setActionParams(m_actionParameters->parameters());
 
-    emit apply(rule);
+    emit apply(this, rule);
     updateSummary();
 }
 

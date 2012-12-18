@@ -108,6 +108,18 @@ void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, in
         }
 
         emit finishedConnect(status, errorString, connectInfo, handle);
+    } else if (m_objectName == QLatin1String("businessRule")) {
+        QnBusinessEventRules rules;
+
+        if(status == 0) {
+            try {
+                m_serializer.deserializeBusinessRules(rules, result);
+            } catch (const QnSerializeException& e) {
+                errorString += e.errorString();
+            }
+        }
+
+        emit finished(status, errorString, QnResourceList(rules), handle);
     }
 }
 

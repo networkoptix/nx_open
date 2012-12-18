@@ -33,9 +33,9 @@ signals:
      * @brief deleteConfirmed       Signal is emitted when "Delete" button was clicked and user has confirmed deletion.
      * @param rule                  Rule to delete. Should be replaced by ID if it is convinient.
      */
-    void deleteConfirmed(QnBusinessEventRulePtr rule);
+    void deleteConfirmed(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 
-    void apply(QnBusinessEventRulePtr rule);
+    void apply(QnBusinessRuleWidget* source, QnBusinessEventRulePtr rule);
 protected:
     /**
      * @brief initEventTypes        Fill combobox with all possible event types.
