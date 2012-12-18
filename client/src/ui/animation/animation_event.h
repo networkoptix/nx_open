@@ -25,7 +25,6 @@ public:
 private:
     qint64 m_time;
     qint64 m_deltaTime;
-
 };
 
 

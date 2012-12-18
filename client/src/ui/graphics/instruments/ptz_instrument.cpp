@@ -29,6 +29,7 @@
 
 #include "selection_item.h"
 #include "utils/settings.h"
+#include "ui/animation/animated.h"
 
 //#define QN_PTZ_INSTRUMENT_DEBUG
 #ifdef QN_PTZ_INSTRUMENT_DEBUG
@@ -38,9 +39,17 @@
 #endif
 
 namespace {
+    inline void addArrowHead(QPainterPath *shape, const QPointF &base, const QPointF &front, const QPointF &back, const QPointF &side) {
+        shape->lineTo(base - side - back);
+        shape->lineTo(base + front);
+        shape->lineTo(base + side - back);
+    }
+
     const QColor ptzColor = qnGlobals->ptzColor();
 
-}
+    const qreal ptzArrowItemOpacityAnimationSpeed = 2.0;
+
+} // anonymous namespace
 
 
 // -------------------------------------------------------------------------- //
@@ -226,6 +235,85 @@ private:
 
 
 // -------------------------------------------------------------------------- //
+// PtzArrowItem
+// -------------------------------------------------------------------------- //
+class PtzArrowItem: public Animated<GraphicsPathItem>, protected QnGeometry {
+    typedef Animated<GraphicsPathItem> base_type;
+
+public:
+    PtzArrowItem(QGraphicsItem *parent = NULL): 
+        base_type(parent),
+        m_pathValid(false),
+        m_opacityAnimator(::opacityAnimator(this, ptzArrowItemOpacityAnimationSpeed))
+    {}
+
+    const QSizeF &size() const {
+        return m_size;
+    }
+
+    void setSize(const QSizeF &size) {
+        if(qFuzzyCompare(m_size, size))
+            return;
+
+        m_size = size;
+
+        invalidatePath();
+    }
+
+    /**
+     * \returns                         This item's opacity animator.
+     */
+    VariantAnimator *opacityAnimator() const {
+        return m_opacityAnimator;
+    }
+
+private:
+    void ensurePath() {
+        if(m_pathValid)
+            return;
+
+        qreal tailWidth = m_size.width();
+        qreal arrowWidth = tailWidth * 2.0;
+
+        qreal tailLength = m_size.height();
+        qreal arrowFront = tailWidth * 4.0;
+        qreal arrowBack = tailWidth * 1.0;
+
+        qreal totalLength = tailLength + arrowFront;
+
+        /* Prepare shape. */
+        QPainterPath shape;
+        shape.moveTo(totalLength, tailWidth / 2);
+        shape.arcTo(QRectF(-tailWidth / 2, -tailWidth / 2, tailWidth, tailWidth), 90.0, -180.0);
+        shape.lineTo(arrowFront, -tailWidth  / 2);
+        addArrowHead(&shape, QPointF(arrowFront, 0), QPointF(-arrowFront, 0), QPointF(-arrowBack, 0), QPointF(0, -arrowWidth / 2));
+        shape.lineTo(arrowFront, tailWidth / 2);
+        shape.closeSubpath();
+        setPath(shape);
+
+        m_pathValid = true;
+    }
+
+    void invalidatePath() {
+        m_pathValid = false;
+    }
+
+private:
+    /** Whether this item's path is valid. */
+    bool m_pathValid;
+
+    /** Bounding rect of this item. */
+    QRectF m_boundingRect;
+
+    /** Arrow size. Width defines tail's width, height - tail's length. */
+    QSizeF m_size;
+
+    /** Opacity animator of this item. */
+    VariantAnimator *m_opacityAnimator;
+};
+
+
+// -------------------------------------------------------------------------- //
 // PtzInstrument
 // -------------------------------------------------------------------------- //
 PtzInstrument::PtzInstrument(QObject *parent): 
@@ -288,10 +376,22 @@ void PtzInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
+void PtzInstrument::ensureArrowItem() {
+    if(arrowItem() != NULL)
+        return;
+
+    m_arrowItem = new PtzArrowItem();
+    arrowItem()->setOpacity(1.0); // TODO
+    arrowItem()->setPen(toTransparent(ptzColor, 0.75));
+    arrowItem()->setBrush(toTransparent(ptzColor.lighter(120), 0.25));
+
+    if(scene() != NULL)
+        scene()->addItem(arrowItem());
+}
+
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
     ptzMoveTo(widget, QRectF(pos - toPoint(widget->size() / 2), widget->size()));
 }
-
 
 void PtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect) {
     QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
@@ -349,6 +449,9 @@ void PtzInstrument::aboutToBeUninstalledNotify() {
 
     if(selectionItem())
         delete selectionItem();
+
+    if(arrowItem())
+        delete arrowItem();
 }
 
 bool PtzInstrument::registeredNotify(QGraphicsItem *item) {
@@ -415,6 +518,16 @@ bool PtzInstrument::animationEvent(AnimationEvent *event) {
         animation.item->setRect(rect);
     }
     
+    /* Updating arrow parameters in animation event is much simpler than subscribing to changes. */
+    if(arrowItem() && !qFuzzyIsNull(arrowItem()->opacity()) && m_viewport) {
+        QPointF viewportHead = viewport()->mapFromGlobal(QCursor::pos());
+
+        QPointF head = m_instrument->target()->mapFromScene(view()->mapToScene(m_viewportHead));
+        QPointF origin = m_instrument->target()->rect().center();
+        QPointF delta = head - origin;
+
+    }
+
     return false;
 }
 

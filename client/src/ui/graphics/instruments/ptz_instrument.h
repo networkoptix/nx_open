@@ -16,6 +16,7 @@
 class SelectionItem;
 class PtzSplashItem;
 class PtzSelectionItem;
+class PtzArrowItem;
 
 class QnWorkbenchPtzController;
 class QnMediaResourceWidget;
@@ -78,7 +79,12 @@ private:
         return m_selectionItem.data();
     }
 
+    PtzArrowItem *arrowItem() const {
+        return m_arrowItem.data();
+    }
+
     void ensureSelectionItem();
+    void ensureArrowItem();
 
     void ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos);
     void ptzMoveTo(QnMediaResourceWidget *widget, const QRectF &rect);
@@ -92,6 +98,7 @@ private:
     qreal m_expansionSpeed;
 
     QWeakPointer<PtzSelectionItem> m_selectionItem;
+    QWeakPointer<PtzArrowItem> m_arrowItem;
     QWeakPointer<QWidget> m_viewport;
     QWeakPointer<QnMediaResourceWidget> m_target;
 
