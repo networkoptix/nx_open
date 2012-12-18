@@ -829,7 +829,7 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
     } else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>()) {
         return deleteAsync(rule, target, slot);
     } else {
-        qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
+        qWarning() << "Cannot delete resources of type" << resource->metaObject()->className();
         return 0;
     }
 }
