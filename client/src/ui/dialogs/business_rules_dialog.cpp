@@ -1,6 +1,8 @@
 #include "business_rules_dialog.h"
 #include "ui_business_rules_dialog.h"
 
+#include <QtGui/QMessageBox>
+
 #include <api/app_server_connection.h>
 #include <core/resource_managment/resource_pool.h>
 #include <core/resource/resource.h>
@@ -37,32 +39,33 @@ void QnBusinessRulesDialog::at_resources_saved(int status, const QByteArray& err
 
     if (!m_savingWidgets.contains(handle))
         return;
+
     QWidget* w = m_savingWidgets[handle];
     w->setEnabled(true);
+    if(status != 0) {
+        QMessageBox::critical(this, tr("Error while saving rule"), QString::fromLatin1(errorString));
+    }
+    else {
+        //TODO: update rule from resources
+    }
     m_savingWidgets.remove(handle);
-
-    qDebug() << "saving rule...";
-    if(status != 0)
-        qDebug() << errorString;
-    else
-        qDebug() << "success";
-    //TODO: update rule caption
 }
 
 void QnBusinessRulesDialog::at_resources_deleted(const QnHTTPRawResponse& response, int handle) {
     if (!m_deletingWidgets.contains(handle))
         return;
-    QWidget* w = m_deletingWidgets[handle];
-    ui->verticalLayout->removeWidget(w);
-    w->setVisible(false);
-    m_deletingWidgets.remove(handle);
 
-    qDebug() << "deleting rule...";
-    if(response.status != 0)
+    QWidget* w = m_deletingWidgets[handle];
+    if(response.status != 0) {
         qDebug() << response.errorString;
-    else
-        qDebug() << "success";
-    //TODO: remove rule from the list
+        w->setEnabled(true);
+        QMessageBox::critical(this, tr("Error while deleting rule"), QString::fromLatin1(response.errorString));
+    }
+    else {
+        ui->verticalLayout->removeWidget(w);
+        w->setVisible(false);
+    }
+    m_deletingWidgets.remove(handle);
 }
 
 void QnBusinessRulesDialog::addRuleToList(QnBusinessEventRulePtr rule) {

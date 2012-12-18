@@ -5,10 +5,13 @@
 #include <QtGui/QDialog>
 
 #include <api/api_fwd.h>
+
 #include <core/resource/resource_fwd.h>
 #include <events/business_event_rule.h>
 #include <ui/widgets/business/business_rule_widget.h>
 #include <utils/common/request_param.h>
+
+
 
 namespace Ui {
     class BusinessRulesDialog;

@@ -28,13 +28,15 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_resourceModel = new QnResourcePoolModel(this, Qn::ServersNode);
+
     ui->eventTypeComboBox->setModel(m_eventsTypesModel);
     ui->eventStatesComboBox->setModel(m_eventStatesModel);
     ui->actionTypeComboBox->setModel(m_actionTypesModel);
+    ui->eventResourceComboBox->setModel(m_resourceModel);
 
     QPalette pal = ui->editFrame->palette();
-    QColor bgcolor = pal.color(QPalette::Window);
-    pal.setColor(QPalette::Window, QColor(bgcolor.red() + 10, bgcolor.green() + 10, bgcolor.blue() + 10));
+    pal.setColor(QPalette::Window, pal.color(QPalette::Window).lighter());
     ui->editFrame->setPalette(pal);
     ui->editFrame->setVisible(m_expanded);
 

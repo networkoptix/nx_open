@@ -5,6 +5,8 @@
 
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
+
+#include <ui/models/resource_pool_model.h>
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
@@ -86,6 +88,7 @@ private:
     bool m_expanded;
 
     QnBusinessEventRulePtr m_rule;
+    QnResourcePoolModel *m_resourceModel;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
