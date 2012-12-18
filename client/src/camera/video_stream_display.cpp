@@ -749,8 +749,10 @@ qint64 QnVideoStreamDisplay::getLastDisplayedTime() const
 
     if( m_timeChangeEnabled )
         return m_lastDisplayedTime;
-    else
+    else if( m_drawer )
         return m_drawer->lastDisplayedTime(m_channelNumber);
+    else
+        return AV_NOPTS_VALUE;
 }
 
 void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value) 
