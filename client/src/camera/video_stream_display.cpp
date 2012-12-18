@@ -16,11 +16,12 @@ static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
 
-QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale) :
+QnVideoStreamDisplay::QnVideoStreamDisplay(bool canDownscale, int channelNumber) :
     m_prevFrameToDelete(NULL),
     m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
+    m_channelNumber(channelNumber),
     m_prevFactor(QnFrameScaler::factor_1),
     m_scaleFactor(QnFrameScaler::factor_1),
     m_previousOnScreenSize(0, 0),
@@ -745,10 +746,11 @@ void QnVideoStreamDisplay::setSpeed(float value)
 qint64 QnVideoStreamDisplay::getLastDisplayedTime() const 
 { 
     QMutexLocker lock(&m_timeMutex);
-    if (m_bufferedFrameDisplayer && m_timeChangeEnabled)
-        return m_bufferedFrameDisplayer->getLastDisplayedTime();
+
+    if( m_timeChangeEnabled )
+        return m_lastDisplayedTime;
     else
-        return m_lastDisplayedTime; 
+        return m_drawer->lastDisplayedTime(m_channelNumber);
 }
 
 void QnVideoStreamDisplay::setLastDisplayedTime(qint64 value) 

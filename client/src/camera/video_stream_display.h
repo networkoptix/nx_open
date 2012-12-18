@@ -23,8 +23,9 @@ class QnVideoStreamDisplay
 public:
     enum FrameDisplayStatus {Status_Displayed, Status_Skipped, Status_Buffered};
 
-    QnVideoStreamDisplay(bool can_downscale);
+    QnVideoStreamDisplay(bool can_downscale, int channelNumber);
     ~QnVideoStreamDisplay();
+
     void setDrawer(QnAbstractRenderer* draw);
     FrameDisplayStatus display(
         QnCompressedVideoDataPtr data,
@@ -76,6 +77,7 @@ private:
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
     bool m_canDownscale;
+    const int m_channelNumber;
 
     QnFrameScaler::DownscaleFactor m_prevFactor;
     QnFrameScaler::DownscaleFactor m_scaleFactor;
