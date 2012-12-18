@@ -19,7 +19,7 @@
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
-//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
 

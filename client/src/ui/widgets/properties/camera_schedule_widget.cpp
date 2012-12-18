@@ -5,7 +5,7 @@
 
 #include <utils/common/event_processors.h>
 
-//TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of this module
+//TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
 
 #include <core/resource_managment/resource_pool.h>
@@ -707,7 +707,7 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked() {
         if (recordingEnabled){
             int maxFps = camera->getMaxFps();
 
-            //TODO: #gdm ask #elrik about constant MIN_SECOND_STREAM_FPS moving out of the live_stream_provider module
+            //TODO: #gdm ask #elric about constant MIN_SECOND_STREAM_FPS moving out of the live_stream_provider module
             // or just use camera->reservedSecondStreamFps();
 
             int decreaseAlways = 0;

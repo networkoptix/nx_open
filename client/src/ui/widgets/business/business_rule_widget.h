@@ -6,7 +6,6 @@
 #include <events/business_event_rule.h>
 #include <events/business_logic_common.h>
 
-#include <ui/models/resource_pool_model.h>
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
@@ -44,6 +43,8 @@ protected:
      */
     void initEventTypes();
 
+    void initEventResources(BusinessEventType::Value eventType);
+
     /**
      * @brief initEventStates       Fill combobox with event states allowed to current event type.
      * @param eventType             Selected event type.
@@ -61,6 +62,8 @@ protected:
      * @param eventState            Selected event state.
      */
     void initActionTypes(ToggleState::Value eventState);
+
+    void initActionResources(BusinessActionType::Value actionType);
 
     void initActionParameters(BusinessActionType::Value actionType);
 
@@ -81,6 +84,7 @@ private:
     BusinessEventType::Value getCurrentEventType() const;
     BusinessActionType::Value getCurrentActionType() const;
     ToggleState::Value getCurrentEventToggleState() const;
+    QString getResourceName(const QnResourcePtr& resource) const;
 
 private:
     Ui::QnBusinessRuleWidget *ui;
@@ -88,7 +92,6 @@ private:
     bool m_expanded;
 
     QnBusinessEventRulePtr m_rule;
-    QnResourcePoolModel *m_resourceModel;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
@@ -96,9 +99,11 @@ private:
     QMap<BusinessEventType::Value, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
     QMap<BusinessActionType::Value, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
-    QStandardItemModel *m_eventsTypesModel;
+    QStandardItemModel *m_eventTypesModel;
+    QStandardItemModel *m_eventResourcesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
+    QStandardItemModel *m_actionResourcesModel;
 };
 
 #endif // BUSINESS_RULE_WIDGET_H

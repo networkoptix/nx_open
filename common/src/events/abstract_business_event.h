@@ -39,6 +39,10 @@ namespace BusinessEventType
     bool isResourceRequired(Value val);
 
     bool hasToggleState(Value val);
+
+    bool requiresCameraResource(Value val);
+
+    bool requiresServerResource(Value val);
 }
 
 namespace BusinessEventParameters

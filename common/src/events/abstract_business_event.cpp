@@ -75,6 +75,52 @@ namespace BusinessEventType
         //warning should be raised on unknown events;
         return false;
     }
+
+    bool requiresCameraResource(Value val) {
+        if (val > BE_UserDefined)
+            return false;
+
+        switch( val )
+        {
+            case BE_NotDefined:
+                return false;
+            case BE_Camera_Motion:
+                return true;
+            case BE_Camera_Input:
+                return true;
+            case BE_Camera_Disconnect:
+                return true;
+            case BE_Storage_Failure:
+                return false;
+            case BE_UserDefined:
+                return false;
+            //warning should be raised on unknown enumeration values
+        }
+        return false;
+    }
+
+    bool requiresServerResource(Value val) {
+        if (val > BE_UserDefined)
+            return false;
+
+        switch( val )
+        {
+            case BE_NotDefined:
+                return false;
+            case BE_Camera_Motion:
+                return false;
+            case BE_Camera_Input:
+                return false;
+            case BE_Camera_Disconnect:
+                return false;
+            case BE_Storage_Failure:
+                return true;
+            case BE_UserDefined:
+                return false;
+            //warning should be raised on unknown enumeration values
+        }
+        return false;
+    }
 }
 
 namespace BusinessEventParameters {
