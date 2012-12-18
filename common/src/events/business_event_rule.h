@@ -40,11 +40,6 @@ public:
 
     QnBusinessParams actionParams() const;
     void setActionParams(const QnBusinessParams& params);
-
-//////////
-    //TODO: move to some iface
-    ToggleState::Value getEventToggleState() const;
-    void setEventToggleState(ToggleState::Value value);
 private:
     //TODO: instant action + prolonged event: expose action when event starts or finishes
     //TODO: schedule

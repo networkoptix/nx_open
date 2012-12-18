@@ -800,6 +800,11 @@ int QnAppServerConnection::deleteAsync(const QnLayoutResourcePtr& layout, QObjec
     return deleteObjectAsync(QLatin1String("layout"), layout->getId().toInt(), target, slot);
 }
 
+int QnAppServerConnection::deleteAsync(const QnBusinessEventRulePtr& rule, QObject* target, const char* slot)
+{
+    return deleteObjectAsync(QLatin1String("businessRule"), rule->getId().toInt(), target, slot);
+}
+
 int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot) {
     if(QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
         return deleteAsync(server, target, slot);
@@ -809,6 +814,8 @@ int QnAppServerConnection::deleteAsync(const QnResourcePtr& resource, QObject* t
         return deleteAsync(user, target, slot);
     } else if(QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         return deleteAsync(layout, target, slot);
+    } else if (QnBusinessEventRulePtr rule = resource.dynamicCast<QnBusinessEventRule>()) {
+        return deleteAsync(rule, target, slot);
     } else {
         qnWarning("Cannot delete resources of type '%1'.", resource->metaObject()->className());
         return 0;

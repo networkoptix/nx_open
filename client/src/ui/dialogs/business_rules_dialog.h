@@ -22,9 +22,11 @@ public:
 private slots:
     void at_newRuleButton_clicked();
     void at_resources_saved(int status, const QByteArray& errorString, const QnResourceList &resources, int handle);
+    void at_resources_deleted(int status, const QByteArray &data, const QByteArray &errorString, int handle);
 
     void addRuleToList(QnBusinessEventRulePtr rule);
     void saveRule(QnBusinessEventRulePtr rule);
+    void deleteRule(QnBusinessEventRulePtr rule);
 
 private:
     QScopedPointer<Ui::BusinessRulesDialog> ui;
