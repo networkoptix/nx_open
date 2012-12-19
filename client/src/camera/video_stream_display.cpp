@@ -142,8 +142,7 @@ QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(int ch
         newWidth /= 2;
         newHeight /= 2;
     }
-    //return rez;
-    return (QnFrameScaler::DownscaleFactor)(rez * 2);
+    return rez;
 }
 
 void QnVideoStreamDisplay::reorderPrevFrames()
