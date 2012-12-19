@@ -129,10 +129,9 @@ bool QnRecordingManager::updateCameraHistory(QnResourcePtr res)
 
     QnMediaServerResourcePtr server = qSharedPointerDynamicCast<QnMediaServerResource>(qnResPool->getResourceById(res->getParentId()));
     QnCameraHistoryItem cameraHistoryItem(netRes->getPhysicalId(), currentTime, server->getGuid());
-    QByteArray errStr;
     QnAppServerConnectionPtr appServerConnection = QnAppServerConnectionFactory::createConnection();
-    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem, errStr) != 0) {
-        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << errStr;
+    if (appServerConnection->addCameraHistoryItem(cameraHistoryItem) != 0) {
+        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << appServerConnection->getLastError();
         return false;
     }
     return true;
@@ -191,7 +190,7 @@ void QnRecordingManager::startOrStopRecording(QnResourcePtr res, QnVideoCamera* 
     QnAbstractMediaStreamDataProviderPtr providerHi = camera->getLiveReader(QnResource::Role_LiveVideo);
     QnAbstractMediaStreamDataProviderPtr providerLow = camera->getLiveReader(QnResource::Role_SecondaryLiveVideo);
 
-    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline &&
+    if (!isResourceDisabled(res) && res->getStatus() != QnResource::Offline && 
         recorderHiRes->currentScheduleTask().getRecordingType() != Qn::RecordingType_Never)
     {
         if (providerHi)

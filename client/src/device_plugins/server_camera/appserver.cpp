@@ -30,9 +30,9 @@ QnResourceList QnAppServerResourceSearcher::findResources()
     QByteArray errorString;
     QnResourceList resources;
 
-    if (appServerConnection->getResources(resources, errorString) != 0)
+    if (appServerConnection->getResources(resources) != 0)
     {
-        qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << errorString;
+        qDebug() << "QnAppServerResourceSearcher::findResources(): Can't get resources from appserver. Reason: " << appServerConnection->getLastError();
     } else
     {
         setShouldBeUsed(false);

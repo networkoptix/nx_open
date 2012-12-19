@@ -146,6 +146,11 @@ QnAppServerConnection::QnAppServerConnection(const QUrl &url, QnResourceFactory&
     m_requestHeaders.append(QnRequestHeader(QLatin1String("X-NetworkOptix-AuthKey"), authKey));
 }
 
+const QByteArray& QnAppServerConnection::getLastError() const
+{
+    return m_lastError;
+}
+
 int QnAppServerConnection::addObject(const QString& objectName, const QByteArray& data, QnHTTPRawResponse& response)
 {
     int status = QnSessionManager::instance()->sendPostRequest(m_url, objectName, m_requestHeaders, m_requestParams, data, response);
@@ -226,8 +231,10 @@ int QnAppServerConnection::connectAsync(QObject* target, const char *slot)
     return connectAsync_i(requestHeaders, params, target, slot);
 }
 
-int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo, QByteArray& errorString)
+int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo)
 {
+    m_lastError.clear();
+
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList params;
 
@@ -238,11 +245,11 @@ int QnAppServerConnection::connect(QnConnectInfoPtr &connectInfo, QByteArray& er
         try {
             m_serializer.deserializeConnectInfo(connectInfo, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
             status = -1;
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
     
     return status;
@@ -252,8 +259,10 @@ QnAppServerConnection::~QnAppServerConnection()
 {
 }
 
-int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString)
+int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
 
     int status = getObjects(QLatin1String("resourceType"), QString(), response);
@@ -262,65 +271,70 @@ int QnAppServerConnection::getResourceTypes(QnResourceTypeList& resourceTypes, Q
         try {
             m_serializer.deserializeResourceTypes(resourceTypes, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
+    } else {
+        m_lastError = response.errorString;
     }
 
-    errorString = response.errorString;
     return status;
 }
 
-int QnAppServerConnection::getResources(QnResourceList& resources, QByteArray& errorString)
+int QnAppServerConnection::getResources(QnResourceList& resources)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
     int status = getObjects(resourceObject, QString(), response);
 
     if (status == 0)
     {
-        errorString.clear();
         try {
             m_serializer.deserializeResources(resources, response.data, m_resourceFactory);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getResource(const QnId& id, QnResourcePtr& resource, QByteArray& errorString)
+int QnAppServerConnection::getResource(const QnId& id, QnResourcePtr& resource)
 {
     QnResourceList resources;
-    int status = getResources(QString(QLatin1String("id=%1")).arg(id.toString()), resources, errorString);
+    int status = getResources(QString(QLatin1String("id=%1")).arg(id.toString()), resources);
     if (status == 0) 
         resource = resources[0];
     return status;
 }
 
-int QnAppServerConnection::getResources(const QString& args, QnResourceList& resources, QByteArray& errorString)
+int QnAppServerConnection::getResources(const QString& args, QnResourceList& resources)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
 
     int status = getObjects(resourceObject, args, response);
     if (status == 0)
     {
-        errorString.clear();
         try {
             m_serializer.deserializeResources(resources, response.data, m_resourceFactory);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
     
     return status;
 }
 
-int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey, QByteArray& errorString)
+int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& serverPtr, QnMediaServerResourceList& servers, QByteArray& authKey)
 {
+    m_lastError.clear();
+
     QByteArray data;
 
     m_serializer.serialize(serverPtr, data);
@@ -338,16 +352,18 @@ int QnAppServerConnection::registerServer(const QnMediaServerResourcePtr& server
                 }
             }
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
     return status;
 }
 
-int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr, QnVirtualCameraResourceList& cameras, QByteArray& errorString)
+int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr, QnVirtualCameraResourceList& cameras)
 {
+    m_lastError.clear();
+
     QByteArray data;
 
     m_serializer.serialize(cameraPtr, data);
@@ -357,13 +373,13 @@ int QnAppServerConnection::addCamera(const QnVirtualCameraResourcePtr& cameraPtr
     {
         try {
             m_serializer.deserializeCameras(cameras, response.data, m_resourceFactory);
+            return 0;
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
             cl_log.log(cl_logERROR, "AHTUNG! the client and app server version must be unsynched!");
-            return 1;
         }
-
-        return 0;
+    } else {
+        m_lastError = response.errorString;
     }
 
     return 1;
@@ -489,61 +505,61 @@ int QnAppServerConnection::saveAsync(const QnVirtualCameraResourceList& cameras,
     return addObjectAsync(cameraObject, data, processor, SLOT(finished(QnHTTPRawResponse, int)));
 }
 
-int QnAppServerConnection::addStorage(const QnStorageResourcePtr& storagePtr, QByteArray& errorString)
+int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &cameraHistoryItem)
 {
-    QByteArray data;
-    m_serializer.serialize(storagePtr, data);
+    m_lastError.clear();
 
-    QnHTTPRawResponse response;
-    int status = addObject(QLatin1String("storage"), data, response);
-    if (status)
-        errorString = response.errorString;
-
-    return status;
-}
-
-int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &cameraHistoryItem, QByteArray &errorString)
-{
     QByteArray data;
     m_serializer.serializeCameraServerItem(cameraHistoryItem, data);
 
     QnHTTPRawResponse response;
     int status = addObject(QLatin1String("cameraServerItem"), data, response);
     if (status)
-        errorString = response.errorString;
+        m_lastError = response.errorString;
 
     return status;
 }
 
 int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &businessRule, QByteArray &errorString)
 {
+    m_lastError.clear();
+
     QByteArray data;
     m_serializer.serializeBusinessRule(businessRule, data);
 
     QnHTTPRawResponse reply;
     const int result = addObject(businessRuleObject, data, reply);
-    errorString = reply.errorString;
+    if (status)
+        m_lastError = response.errorString;
+
     return result;
 }
 
 
-int QnAppServerConnection::getServers(QnMediaServerResourceList &servers, QByteArray &errorString)
+int QnAppServerConnection::getServers(QnMediaServerResourceList &servers)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
     int status = getObjects(serverObject, QString(), response);
 
-    try {
-        m_serializer.deserializeServers(servers, response.data, m_resourceFactory);
-    } catch (const QnSerializeException& e) {
-        errorString += e.errorString();
+    if (status == 0) {
+        try {
+            m_serializer.deserializeServers(servers, response.data, m_resourceFactory);
+        } catch (const QnSerializeException& e) {
+            m_lastError = e.errorString();
+        }
+    } else {
+        m_lastError = response.errorString;
     }
 
-    errorString = response.errorString;
     return status;
 }
 
-int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString)
+int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
 
     int status = getObjects(cameraObject, QString(QLatin1String("parent_id=%1")).arg(mediaServerId.toString()), response);
@@ -552,17 +568,19 @@ int QnAppServerConnection::getCameras(QnVirtualCameraResourceList& cameras, QnId
         try {
             m_serializer.deserializeCameras(cameras, response.data, m_resourceFactory);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError += e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString)
+int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts)
 {
+    m_lastError.clear();
+
     QnHTTPRawResponse response;
 
     int status = getObjects(layoutObject, QString(), response);
@@ -570,16 +588,16 @@ int QnAppServerConnection::getLayouts(QnLayoutResourceList& layouts, QByteArray&
         try {
             m_serializer.deserializeLayouts(layouts, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& errorString)
+int QnAppServerConnection::getUsers(QnUserResourceList& users)
 {
     QnHTTPRawResponse response;
 
@@ -588,16 +606,16 @@ int QnAppServerConnection::getUsers(QnUserResourceList& users, QByteArray& error
         try {
             m_serializer.deserializeUsers(users, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &errorString)
+int QnAppServerConnection::getLicenses(QnLicenseList &licenses)
 {
     QnHTTPRawResponse response;
 
@@ -606,16 +624,16 @@ int QnAppServerConnection::getLicenses(QnLicenseList &licenses, QByteArray &erro
         try {
             m_serializer.deserializeLicenses(licenses, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHistoryList, QByteArray &errorString)
+int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHistoryList)
 {
     QnHTTPRawResponse response;
 
@@ -624,25 +642,28 @@ int QnAppServerConnection::getCameraHistoryList(QnCameraHistoryList &cameraHisto
         try {
             m_serializer.deserializeCameraHistoryList(cameraHistoryList, response.data);
         } catch (const QnSerializeException& e) {
-            errorString += e.errorString();
+            m_lastError = e.errorString();
         }
     } else {
-        errorString = response.errorString;
+        m_lastError = response.errorString;
     }
 
     return status;
 }
 
-int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules, QByteArray &errorString)
+int QnAppServerConnection::getBusinessRules(QnBusinessEventRules &businessRules)
 {
     QnHTTPRawResponse response;
     int status = getObjects(businessRuleObject, QString(), response);
 
-    errorString = response.errorString;
-    try {
-        m_serializer.deserializeBusinessRules(businessRules, response.data);
-    } catch (const QnSerializeException& e) {
-        errorString += e.errorString();
+    if (status == 0) {
+        try {
+            m_serializer.deserializeBusinessRules(businessRules, response.data);
+        } catch (const QnSerializeException& e) {
+            m_lastError = e.errorString();
+        }
+    } else {
+        m_lastError = response.errorString;
     }
 
     return status;
@@ -731,10 +752,9 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
 
-    QByteArray errorString;
-    if (appServerConnection->getResourceTypes(resourceTypeList, errorString) != 0)
+    if (appServerConnection->getResourceTypes(resourceTypeList) != 0)
     {
-        qWarning() << "Can't get resource types: " << errorString;
+        qWarning() << "Can't get resource types: " << appServerConnection->getLastError();
         return false;
     }
 
@@ -746,10 +766,9 @@ bool initResourceTypes(QnAppServerConnectionPtr appServerConnection)
 bool initCameraHistory(QnAppServerConnectionPtr appServerConnection)
 {
     QnCameraHistoryList cameraHistoryList;
-    QByteArray errorString;
-    if (appServerConnection->getCameraHistoryList(cameraHistoryList, errorString) != 0)
+    if (appServerConnection->getCameraHistoryList(cameraHistoryList) != 0)
     {
-        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << errorString;
+        qDebug() << "QnMain::run(): Can't get cameras history. Reason: " << appServerConnection->getLastError();
         return false;
     }
     foreach(QnCameraHistoryPtr history, cameraHistoryList)
@@ -764,10 +783,9 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
 
     QnLicenseList licenses;
 
-    QByteArray errorString;
-    if (appServerConnection->getLicenses(licenses, errorString) != 0)
+    if (appServerConnection->getLicenses(licenses) != 0)
     {
-        qDebug() << "Can't get licenses: " << errorString;
+        qDebug() << "Can't get licenses: " << appServerConnection->getLastError();
         return false;
     }
 
@@ -791,17 +809,17 @@ bool initLicenses(QnAppServerConnectionPtr appServerConnection)
     return true;
 }
 
-int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server, QByteArray &errorString)
+int QnAppServerConnection::saveSync(const QnMediaServerResourcePtr &server)
 {
     QByteArray authKey;
     QnMediaServerResourceList servers;
-    return registerServer(server, servers, authKey, errorString);
+    return registerServer(server, servers, authKey);
 }
 
-int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera, QByteArray &errorString)
+int QnAppServerConnection::saveSync(const QnVirtualCameraResourcePtr &camera)
 {
     QnVirtualCameraResourceList cameras;
-    return addCamera(camera, cameras, errorString);
+    return addCamera(camera, cameras);
 }
 
 int QnAppServerConnection::deleteAsync(const QnMediaServerResourcePtr& server, QObject* target, const char* slot)
@@ -858,7 +876,7 @@ qint64 QnAppServerConnection::getCurrentTime()
     return response.data.toLongLong();
 }
 
-int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString)
+int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, const QString& message)
 {
     QnRequestParamList requestParams(m_requestParams);
 
@@ -866,18 +884,14 @@ int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, 
     QByteArray body;
     m_serializer.serializeEmail(to, subject, message, body);
     int status = QnSessionManager::instance()->sendPostRequest(m_url,emailObject, QnRequestHeaderList(), requestParams, body, response);
-    errorString = response.errorString;
-    if (status != 0) {
+
+    if (status == 0) {
+        return 0;
+    } else {
+        m_lastError = response.errorString;
         qWarning() << "Can't send email " << errorString;
         return status;
     }
-
-    if (response.status != 200) {
-        //errorString = reply;
-        return -1;
-    }
-
-    return 0;
 }
 
 int QnAppServerConnection::setResourceStatusAsync(const QnId &resourceId, QnResource::Status status, QObject *target, const char *slot)
@@ -919,8 +933,10 @@ int QnAppServerConnection::setResourcesStatusAsync(const QnResourceList &resourc
     return QnSessionManager::instance()->sendAsyncPostRequest(m_url,statusObject, requestHeaders, requestParams, "", target, slot);
 }
 
-int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status, QByteArray &errorString)
+int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource::Status status)
 {
+    m_lastError.clear();
+
     QnRequestHeaderList requestHeaders(m_requestHeaders);
     QnRequestParamList requestParams(m_requestParams);
 
@@ -928,9 +944,12 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
     QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url,statusObject, requestHeaders, requestParams, "",
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, statusObject, requestHeaders, requestParams, "",
         response);
-    errorString = response.errorString;
+
+    if (result)
+        m_lastError = response.errorString;
+
     return result;
 }
 

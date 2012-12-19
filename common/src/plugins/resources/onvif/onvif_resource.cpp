@@ -721,9 +721,9 @@ bool QnPlOnvifResource::fetchAndSetDeviceInformation()
             setPhysicalId(hardwareId);
         }
     }
-
+            
     return true;
-}
+    }
 
 void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMessageHolderType& notification )
 {
@@ -731,12 +731,12 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
     {
         cl_log.log( QString::fromLatin1("Received notification with empty message. Ignoring..."), cl_logDEBUG1 );
         return;
-    }
+}
 
     if( !notification.oasisWsnB2__Topic ||
         !notification.oasisWsnB2__Topic->__item ||
         strcmp(notification.oasisWsnB2__Topic->__item, "tns:Device/tnsw4n:IO/Port") != 0 )
-    {
+{
         cl_log.log( QString::fromLatin1("Received notification with unknown topic: %1. Ignoring...").
             arg(QString::fromStdString(notification.oasisWsnB2__Topic ? notification.oasisWsnB2__Topic->Dialect : std::string())), cl_logDEBUG1 );
         return;
@@ -799,7 +799,7 @@ void QnPlOnvifResource::notificationReceived( const oasisWsnB2__NotificationMess
             </tt:Data>
         </tt:MessageDescription>
     */
-}
+    }
 
 void QnPlOnvifResource::onTimer( const quint64& /*timerID*/ )
 {
@@ -1046,11 +1046,10 @@ QString QnPlOnvifResource::getPtzfUrl() const
 
 void QnPlOnvifResource::save()
 {
-    QByteArray errorStr;
     QnAppServerConnectionPtr conn = QnAppServerConnectionFactory::createConnection();
-    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>(), errorStr) != 0) {
+    if (conn->saveSync(toSharedPointer().dynamicCast<QnVirtualCameraResource>()) != 0) {
         qCritical() << "QnPlOnvifResource::init: can't save resource params to Enterprise Controller. Resource physicalId: "
-                    << getPhysicalId() << ". Description: " << errorStr;
+                    << getPhysicalId() << ". Description: " << conn->getLastError();
     }
 }
 
@@ -1218,7 +1217,7 @@ bool QnPlOnvifResource::setRelayOutputState(
 
         cl_log.log( QString::fromAscii("Camera %1 output %2 has been switched to %3 mode").arg(QString()).arg(outputID).
             arg(QLatin1String(relayOutputInfo.isBistable ? "bistable" : "monostable")), cl_logWARNING );
-    }
+}
 
     //modifing output
     const QAuthenticator& auth = getAuth();
@@ -1234,7 +1233,7 @@ bool QnPlOnvifResource::setRelayOutputState(
     _onvifDevice__SetRelayOutputStateResponse response;
     m_prevSoapCallResult = soapWrapper.setRelayOutputState( request, response );
     if( m_prevSoapCallResult != SOAP_OK && m_prevSoapCallResult != SOAP_MUSTUNDERSTAND )
-    {
+{
         cl_log.log( QString::fromAscii("Failed to set relay %1 output state to %2. endpoint %3").
             arg(outputID).arg(active).arg(QString::fromAscii(soapWrapper.endpoint())), cl_logWARNING );
         return false;
@@ -1305,10 +1304,10 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
                 qCritical() << "QnPlOnvifResource::fetchAndSetVideoEncoderOptions: can't receive options (or data is empty) for video encoder '" 
                     << QString::fromStdString(*(optRequest.ConfigurationToken)) << "' from camera (URL: "  << soapWrapper.getEndpointUrl() << ", UniqueId: " << getUniqueId()
                     << "). Root cause: SOAP request failed. GSoap error code: " << soapRes << ". " << soapWrapper.getLastError();
-                
+        
                 qWarning() << "camera" << soapWrapper.getEndpointUrl() << "got soap error for configuration" << configuration->Name.c_str() << "skip configuration";
-                continue;
-            }
+            continue;
+        }
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
                 optionsList << VideoOptionsLocal(QString::fromStdString(configuration->token), optResp);
@@ -1348,7 +1347,7 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
 
     setVideoEncoderOptions(optionsList[0]);
     if (m_maxChannels == 1)
-        checkMaxFps(confResponse, optionsList[0].id);
+    checkMaxFps(confResponse, optionsList[0].id);
 
     m_mutex.lock();
     m_primaryVideoEncoderId = optionsList[0].id;
@@ -1366,13 +1365,13 @@ bool QnPlOnvifResource::fetchAndSetVideoEncoderOptions(MediaSoapWrapper& soapWra
         m_secondaryVideoEncoderId = optionsList[secondaryIndex].id;
         if (optionsList[secondaryIndex].isH264) {
             m_secondaryH264Profile = getH264StreamProfile(optionsList[secondaryIndex]);
-            setCodec(H264, false);
-            qDebug() << "use H264 codec for secondary stream. camera=" << getHostAddress();
-        }
-        else {
-            setCodec(JPEG, false);
-            qDebug() << "use JPEG codec for secondary stream. camera=" << getHostAddress();
-        }
+                setCodec(H264, false);
+                qDebug() << "use H264 codec for secondary stream. camera=" << getHostAddress();
+            }
+            else {
+                setCodec(JPEG, false);
+                qDebug() << "use JPEG codec for secondary stream. camera=" << getHostAddress();
+            }
         updateSecondaryResolutionList(optionsList[secondaryIndex]);
     }
 
@@ -1553,7 +1552,7 @@ bool QnPlOnvifResource::updateResourceCapabilities()
             it = m_resolutionList.erase(it);
         else
             return true;
-    }
+        }
 
     return true;
 }
@@ -1591,12 +1590,12 @@ bool QnPlOnvifResource::fetchAndSetAudioEncoder(MediaSoapWrapper& soapWrapper)
         if (response.Configurations.size() > m_channelNumer) 
         {
             onvifXsd__AudioEncoderConfiguration* conf = response.Configurations.at(m_channelNumer);
-            if (conf) {
-                QMutexLocker lock(&m_mutex);
-                //TODO:UTF unuse std::string
-                m_audioEncoderId = QString::fromStdString(conf->token);
-            }
+        if (conf) {
+            QMutexLocker lock(&m_mutex);
+            //TODO:UTF unuse std::string
+            m_audioEncoderId = QString::fromStdString(conf->token);
         }
+    }
         else {
             qWarning() << "Can't find appropriate audio encoder. url=" << getUrl();
             return false;
@@ -1677,8 +1676,8 @@ bool QnPlOnvifResource::fetchVideoSourceToken()
 
     onvifXsd__VideoSource* conf = response.VideoSources.at(m_channelNumer);
 
-    if (conf) {
-        QMutexLocker lock(&m_mutex);
+        if (conf) {
+            QMutexLocker lock(&m_mutex);
         m_videoSourceToken = QString::fromStdString(conf->token);
         //m_videoSourceSize = QSize(conf->Resolution->Width, conf->Resolution->Height);
         return true;

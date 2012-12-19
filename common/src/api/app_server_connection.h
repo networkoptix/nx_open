@@ -48,8 +48,8 @@ namespace conn_detail
 
     signals:
         void finished(int status, const QByteArray& errorString, QnResourceList resources, int handle);
-        void finishedLicense(int status, const QByteArray& errorString, QnLicenseList resources, int handle);
-        void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int requestHandle);
+        void finishedLicense(int status, const QByteArray &errorString, QnLicenseList licenses, int handle);
+        void finishedConnect(int status, const QByteArray &errorString, QnConnectInfoPtr connectInfo, int handle);
 
     private:
         QnResourceFactory& m_resourceFactory;
@@ -63,49 +63,45 @@ class QN_EXPORT QnAppServerConnection
 public:
     ~QnAppServerConnection();
 
+    void stop();
+    static int getMediaProxyPort();
+    const QByteArray& getLastError() const;
+
+    // Synchronous API
+    int connect(QnConnectInfoPtr& connectInfo);
+    int getResourceTypes(QnResourceTypeList& resourceTypes);
+    int getResources(QnResourceList& resources);
+    int getResources(const QString& args, QnResourceList& resources);
+    int getResource(const QnId& id, QnResourcePtr& resource);
+
+    int setResourceStatus(const QnId& resourceId, QnResource::Status status);
+    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
+    int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
+    int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
+
+    int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
+    int getServers(QnMediaServerResourceList& servers);
+    int getLayouts(QnLayoutResourceList& layouts);
+    int getUsers(QnUserResourceList& users);
+    int getLicenses(QnLicenseList& licenses);
+    int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList);
+
+    int saveSync(const QnMediaServerResourcePtr&);
+    int saveSync(const QnVirtualCameraResourcePtr&);
+
+    qint64 getCurrentTime();
+
+    // Asynchronous API
     int testConnectionAsync(QObject* target, const char* slot);
     int connectAsync(QObject* target, const char *slot);
-
-    int connect(QnConnectInfoPtr& connectInfo, QByteArray &errorString);
-
-    int getResourceTypes(QnResourceTypeList& resourceTypes, QByteArray& errorString);
-
-    int getResources(QnResourceList& resources, QByteArray& errorString);
-    int getResources(const QString& args, QnResourceList& resources, QByteArray& errorString);
-    int getResource(const QnId& id, QnResourcePtr& resource, QByteArray& errorString);
-
-    /**
-      get resources synchronously
-
-      @param args Currently we use args for passing id. Later we can introduce more sophisticated filters here.
-    */
     int getResourcesAsync(const QString& args, const QString& objectName, QObject *target, const char *slot);
     int getLicensesAsync(QObject *target, const char *slot);
 
     int setResourceStatusAsync(const QnId& resourceId, QnResource::Status status , QObject *target, const char *slot);
     int setResourcesStatusAsync(const QnResourceList& resources, QObject *target, const char *slot);
-    int setResourceStatus(const QnId& resourceId, QnResource::Status status, QByteArray& errorString);
 
     int setResourceDisabledAsync(const QnId& resourceId, bool disabled, QObject *target, const char *slot);
     int setResourcesDisabledAsync(const QnResourceList& resources, QObject *target, const char *slot);
-
-    int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey, QByteArray& errorString);
-    int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras, QByteArray& errorString);
-
-    int addStorage(const QnStorageResourcePtr&, QByteArray& errorString);
-    int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem, QByteArray& errorString);
-    int addBusinessRule(const QnBusinessEventRulePtr& businessRule, QByteArray& errorString);
-
-    int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId, QByteArray& errorString);
-    int getServers(QnMediaServerResourceList& servers, QByteArray& errorString);
-    int getLayouts(QnLayoutResourceList& layouts, QByteArray& errorString);
-    int getUsers(QnUserResourceList& users, QByteArray& errorString);
-    int getLicenses(QnLicenseList& licenses, QByteArray& errorString);
-    int getCameraHistoryList(QnCameraHistoryList& cameraHistoryList, QByteArray& errorString);
-    int getBusinessRules(QnBusinessEventRules& businessRules, QByteArray& errorString);
-
-    int saveSync(const QnMediaServerResourcePtr&, QByteArray& errorString);
-    int saveSync(const QnVirtualCameraResourcePtr&, QByteArray& errorString);
 
     // Returns request id
     int saveAsync(const QnMediaServerResourcePtr&, QObject*, const char*);
@@ -128,17 +124,6 @@ public:
 
     int deleteAsync(const QnResourcePtr& resource, QObject* target, const char* slot);
 
-    qint64 getCurrentTime();
-
-    int sendEmail(const QString& to, const QString& subject, const QString& message, QByteArray& errorString);
-
-    void stop();
-
-    static int getMediaProxyPort();
-
-    // todo: #Vanja implement it!
-    bool setPanicMode(bool value);
-
 private:
     QnAppServerConnection(const QUrl &url, QnResourceFactory& resourceFactory, QnApiSerializer& serializer, const QString& guid, const QString& authKey);
 
@@ -152,8 +137,11 @@ private:
 
     int deleteObjectAsync(const QString& objectName, int id, QObject* target, const char* slot);
 
-
 private:
+    // By now this is used only by synchronous api.
+    // TODO: Make use for asynch API as well
+    QByteArray m_lastError;
+
     QUrl m_url;
     QnRequestParamList m_requestParams;
     QnRequestHeaderList m_requestHeaders;
