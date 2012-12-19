@@ -73,11 +73,14 @@ public:
     int getResources(QnResourceList& resources);
     int getResources(const QString& args, QnResourceList& resources);
     int getResource(const QnId& id, QnResourcePtr& resource);
+    int getBusinessRules(QnBusinessEventRules &businessRules);
 
     int setResourceStatus(const QnId& resourceId, QnResource::Status status);
     int registerServer(const QnMediaServerResourcePtr&, QnMediaServerResourceList& servers, QByteArray& authKey);
     int addCamera(const QnVirtualCameraResourcePtr&, QnVirtualCameraResourceList& cameras);
     int addCameraHistoryItem(const QnCameraHistoryItem& cameraHistoryItem);
+    int addBusinessRule(const QnBusinessEventRulePtr &businessRule);
+    bool setPanicMode(bool value);
 
     int getCameras(QnVirtualCameraResourceList& cameras, QnId mediaServerId);
     int getServers(QnMediaServerResourceList& servers);
@@ -89,6 +92,7 @@ public:
     int saveSync(const QnMediaServerResourcePtr&);
     int saveSync(const QnVirtualCameraResourcePtr&);
 
+    int sendEmail(const QString& to, const QString& subject, const QString& message);
     qint64 getCurrentTime();
 
     // Asynchronous API

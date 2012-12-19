@@ -16,7 +16,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QnAppServerConnectionPtr connection
 
     QnBusinessEventRules rules;
     QByteArray errString;
-    connection->getBusinessRules(rules, errString); //sync :(
+    connection->getBusinessRules(rules); // synchronous call
     foreach (QnBusinessEventRulePtr rule, rules) {
         addRuleToList(rule);
     }

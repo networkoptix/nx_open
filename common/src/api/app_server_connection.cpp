@@ -7,18 +7,21 @@
 #include "session_manager.h"
 #include "utils/common/synctime.h"
 
-static QLatin1String cameraObject("camera");
-static QLatin1String resourceObject("resource");
-static QLatin1String serverObject("server");
-static QLatin1String userObject("user");
-static QLatin1String layoutObject("layout");
-static QLatin1String licenseObject("license");
-static QLatin1String businessRuleObject("businessRule");
-static QLatin1String connectObject("connect");
-static QLatin1String timeObject("time");
-static QLatin1String emailObject("email");
-static QLatin1String statusObject("status");
-static QLatin1String disabledObject("disabled");
+namespace {
+    const QLatin1String cameraObject("camera");
+    const QLatin1String resourceObject("resource");
+    const QLatin1String serverObject("server");
+    const QLatin1String userObject("user");
+    const QLatin1String layoutObject("layout");
+    const QLatin1String licenseObject("license");
+    const QLatin1String businessRuleObject("businessRule");
+    const QLatin1String connectObject("connect");
+    const QLatin1String timeObject("time");
+    const QLatin1String emailObject("email");
+    const QLatin1String statusObject("status");
+    const QLatin1String disabledObject("disabled");
+    const QLatin1String panicObject("panic");
+}
 
 void conn_detail::ReplyProcessor::finished(const QnHTTPRawResponse& response, int handle)
 {
@@ -520,19 +523,19 @@ int QnAppServerConnection::addCameraHistoryItem(const QnCameraHistoryItem &camer
     return status;
 }
 
-int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &businessRule, QByteArray &errorString)
+int QnAppServerConnection::addBusinessRule(const QnBusinessEventRulePtr &businessRule)
 {
     m_lastError.clear();
 
     QByteArray data;
     m_serializer.serializeBusinessRule(businessRule, data);
 
-    QnHTTPRawResponse reply;
-    const int result = addObject(businessRuleObject, data, reply);
+    QnHTTPRawResponse response;
+    const int status = addObject(businessRuleObject, data, response);
     if (status)
         m_lastError = response.errorString;
 
-    return result;
+    return status;
 }
 
 
@@ -889,7 +892,7 @@ int QnAppServerConnection::sendEmail(const QString& to, const QString& subject, 
         return 0;
     } else {
         m_lastError = response.errorString;
-        qWarning() << "Can't send email " << errorString;
+        qWarning() << "Can't send email " << m_lastError;
         return status;
     }
 }
@@ -944,8 +947,25 @@ int QnAppServerConnection::setResourceStatus(const QnId &resourceId, QnResource:
     requestParams.append(QnRequestParam("status", QString::number(status)));
 
     QnHTTPRawResponse response;
-    int result = QnSessionManager::instance()->sendPostRequest(m_url, statusObject, requestHeaders, requestParams, "",
-        response);
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, statusObject, requestHeaders, requestParams, "", response);
+
+    if (result)
+        m_lastError = response.errorString;
+
+    return result;
+}
+
+bool QnAppServerConnection::setPanicMode(bool value)
+{
+    m_lastError.clear();
+
+    QnRequestHeaderList requestHeaders(m_requestHeaders);
+    QnRequestParamList requestParams(m_requestParams);
+
+    requestParams.append(QnRequestParam("mode", value ? "on" : "off"));
+
+    QnHTTPRawResponse response;
+    int result = QnSessionManager::instance()->sendPostRequest(m_url, panicObject, requestHeaders, requestParams, "", response);
 
     if (result)
         m_lastError = response.errorString;
@@ -968,11 +988,6 @@ int QnAppServerConnection::setResourcesDisabledAsync(const QnResourceList &resou
     }
 
     return QnSessionManager::instance()->sendAsyncPostRequest(m_url,disabledObject, requestHeaders, requestParams, "", target, slot);
-}
-
-bool QnAppServerConnection::setPanicMode(bool value)
-{
-    return true;
 }
 
 // --------------------------------- QnAppServerConnectionFactory ----------------------------------
