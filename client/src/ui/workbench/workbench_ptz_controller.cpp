@@ -311,6 +311,8 @@ void QnWorkbenchPtzController::at_ptzSetMovement_replyReceived(int status, int h
         if(!qFuzzyIsNull(movement)) {
             data.position = qQNaN<QVector3D>();
             data.physicalPosition = qQNaN<QVector3D>();
+        } else if(qIsNaN(data.position)) {
+            sendGetPosition(camera);
         }
         data.movement = movement;
         data.attemptCount[SetMovementRequest] = 0;
