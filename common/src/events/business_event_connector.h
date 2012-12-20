@@ -2,6 +2,7 @@
 #define __BUSINESS_EVENT_CONNECTOR_H__
 
 #include "core/resource/resource_fwd.h"
+#include "core/datapacket/media_data_packet.h"
 
 /*
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
@@ -13,7 +14,7 @@ class QnBusinessEventConnector: public QObject
 public:
     static QnBusinessEventConnector* instance();
 public slots:
-    void at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp);
+    void at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata);
     /*!
         \param inputPortID device-specific ID of input port
         \param value true, if input activated. false, if deactivated

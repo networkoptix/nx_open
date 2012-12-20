@@ -130,6 +130,8 @@ typedef QSharedPointer<QnEmptyMediaData> QnEmptyMediaDataPtr;
 
 struct QnMetaDataV1;
 typedef QSharedPointer<QnMetaDataV1> QnMetaDataV1Ptr;
+Q_DECLARE_METATYPE(QnMetaDataV1Ptr);
+
 
 
 struct QnCompressedVideoData : public QnAbstractMediaData

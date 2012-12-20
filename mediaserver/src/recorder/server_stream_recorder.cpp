@@ -13,6 +13,7 @@
 #include "events/business_event_connector.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "core/datapacket/media_data_packet.h"
+#include "common/common_meta_types.h"
 
 static const int MAX_BUFFERED_SIZE = 1024*1024*20;
 
@@ -28,6 +29,8 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     m_lastMotionState(false),
     m_queuedSize(0)
 {
+    QnCommonMetaTypes::initilize();
+
     //m_skipDataToTime = AV_NOPTS_VALUE;
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
@@ -42,7 +45,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(QnResourcePtr dev, QnResource::Co
     scheduleData.m_streamQuality = QnQualityHighest;
     m_panicSchedileRecord.setData(scheduleData);
 
-    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64)), qnBusinessRuleConnector, SLOT(at_motionDetected(QnResourcePtr, bool, qint64)));
+    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnMetaDataV1Ptr)), qnBusinessRuleConnector, SLOT(at_motionDetected(QnResourcePtr, bool, qint64, QnMetaDataV1Ptr)));
 }
 
 QnServerStreamRecorder::~QnServerStreamRecorder()
@@ -142,8 +145,8 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     if (metaData) {
         m_dualStreamingHelper->onMotion(metaData);
         qint64 motionTime = m_dualStreamingHelper->getLastMotionTime();
-        if (motionTime != AV_NOPTS_VALUE) {
-            updateMotionStateInternal(true, metaData->timestamp);
+        if (!metaData->isEmpty()) {
+            updateMotionStateInternal(true, metaData->timestamp, metaData);
             m_lastMotionTimeUsec = motionTime;
         }
         return;
@@ -177,12 +180,12 @@ void QnServerStreamRecorder::beforeProcessData(QnAbstractMediaDataPtr media)
     }
 }
 
-void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp)
+void QnServerStreamRecorder::updateMotionStateInternal(bool value, qint64 timestamp, QnMetaDataV1Ptr metaData)
 {
-    if (m_lastMotionState == value)
+    if (m_lastMotionState == value && !value)
         return;
     m_lastMotionState = value;
-    emit motionDetected(getResource(), m_lastMotionState, timestamp);
+    emit motionDetected(getResource(), m_lastMotionState, timestamp, metaData);
 }
 
 bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
@@ -194,9 +197,9 @@ bool QnServerStreamRecorder::needSaveData(QnAbstractMediaDataPtr media)
     if (!isMotionContinue)
     {
         if (m_endDateTime == AV_NOPTS_VALUE || media->timestamp - m_endDateTime < MAX_FRAME_DURATION*1000)
-            updateMotionStateInternal(false, media->timestamp);
+            updateMotionStateInternal(false, media->timestamp, QnMetaDataV1Ptr());
         else
-            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION);
+            updateMotionStateInternal(false, m_endDateTime + MIN_FRAME_DURATION, QnMetaDataV1Ptr());
     }
 	QnScheduleTask task = currentScheduleTask();
 

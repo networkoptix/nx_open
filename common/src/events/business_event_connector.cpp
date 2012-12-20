@@ -12,12 +12,13 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 }
 
 
-void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp)
+void QnBusinessEventConnector::at_motionDetected(QnResourcePtr resource, bool value, qint64 timeStamp, QnMetaDataV1Ptr metadata)
 {
     QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(
                                              resource->toSharedPointer(),
                                              value ? ToggleState::On : ToggleState::Off,
-                                             timeStamp));
+                                             timeStamp,
+                                             metadata));
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
