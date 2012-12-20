@@ -4,6 +4,7 @@
 #include <cassert>
 #include <limits>
 
+#include <QtCore/QVariant>
 #include <QtGui/QGraphicsSceneMouseEvent>
 #include <QtGui/QApplication>
 
@@ -40,6 +41,10 @@
 namespace {
     const QColor ptzColor = qnGlobals->ptzColor();
 
+    const QColor ptzBorderColor = toTransparent(ptzColor, 0.75);
+    const QColor ptzBaseColor = toTransparent(ptzColor.lighter(120), 0.25);
+
+    const qreal instantSpeedUpdateThreshold = 0.1;
 }
 
 
@@ -226,6 +231,101 @@ private:
 
 
 // -------------------------------------------------------------------------- //
+// PtzArrowItem
+// -------------------------------------------------------------------------- //
+class PtzArrowItem: public GraphicsPathItem {
+    typedef GraphicsPathItem base_type;
+
+public:
+    PtzArrowItem(QGraphicsItem *parent = NULL): base_type(parent) {}
+
+private:
+
+};
+
+
+
+// -------------------------------------------------------------------------- //
+// PtzManipulatorWidget
+// -------------------------------------------------------------------------- //
+class PtzManipulatorWidget: public Instrumented<QGraphicsWidget> {
+    typedef Instrumented<QGraphicsWidget> base_type;
+
+public:
+    PtzManipulatorWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+        base_type(parent, windowFlags) 
+    {
+        setCursor(Qt::SizeAllCursor);
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = NULL) override {
+        QRectF rect = this->rect();
+        qreal penWidth = qMin(rect.width(), rect.height()) / 16;
+        QPointF center = rect.center();
+        QPointF centralStep = QPointF(penWidth, penWidth);
+
+        QnScopedPainterPenRollback penRollback(painter, QPen(ptzBorderColor, penWidth));
+        QnScopedPainterBrushRollback brushRollback(painter, ptzBaseColor);
+
+        painter->drawEllipse(rect);
+        painter->drawEllipse(QRectF(center - centralStep, center + centralStep));
+    }
+};
+
+
+// -------------------------------------------------------------------------- //
+// PtzOverlayWidget
+// -------------------------------------------------------------------------- //
+class PtzOverlayWidget: public QGraphicsWidget {
+    typedef QGraphicsWidget base_type;
+
+public:
+    PtzOverlayWidget(QGraphicsItem *parent = NULL, Qt::WindowFlags windowFlags = 0): 
+        base_type(parent, windowFlags),
+        m_manipulatorWidget(new PtzManipulatorWidget(this))
+    {
+        updateLayout();
+    }
+
+    PtzManipulatorWidget *manipulatorWidget() const {
+        return m_manipulatorWidget;
+    }
+
+    virtual void setGeometry(const QRectF &rect) override {
+        QSizeF oldSize = size();
+
+        base_type::setGeometry(rect);
+
+        if(!qFuzzyCompare(oldSize, size()))
+            updateLayout();
+    }
+
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget /* = 0 */) {
+        painter->setPen(Qt::green);
+        painter->drawRect(rect());
+    }
+
+private:
+    void updateLayout() {
+        /* We're doing manual layout of child items as this is an overlay widget and
+         * we don't want layouts to mess up widget's size constraints. */
+
+        QRectF rect = this->rect();
+        QPointF center = rect.center();
+        qreal centralWidth = qMin(rect.width(), rect.height()) / 32;
+        QPointF centralStep(centralWidth, centralWidth);
+
+        m_manipulatorWidget->setGeometry(QRectF(center - centralStep, center + centralStep));
+    }
+
+private:
+    PtzManipulatorWidget *m_manipulatorWidget;
+};
+
+Q_DECLARE_METATYPE(PtzOverlayWidget *);
+
+
+// -------------------------------------------------------------------------- //
 // AbsolutePtzInstrument
 // -------------------------------------------------------------------------- //
 AbsolutePtzInstrument::AbsolutePtzInstrument(QObject *parent): 
@@ -246,13 +346,6 @@ AbsolutePtzInstrument::~AbsolutePtzInstrument() {
     ensureUninstalled();
 }
 
-void AbsolutePtzInstrument::setTarget(QnMediaResourceWidget *target) {
-    if(this->target() == target)
-        return;
-
-    m_target = target;
-}
-
 PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     PtzSplashItem *result;
     if(!m_freeAnimations.empty()) {
@@ -269,18 +362,42 @@ PtzSplashItem *AbsolutePtzInstrument::newSplashItem(QGraphicsItem *parentItem) {
     return result;
 }
 
+PtzOverlayWidget *AbsolutePtzInstrument::overlayWidget(QnMediaResourceWidget *widget) const {
+    return m_overlayByWidget.value(widget);
+}
+
+void AbsolutePtzInstrument::ensureOverlayWidget(QnMediaResourceWidget *widget) {
+    PtzOverlayWidget *overlay = m_overlayByWidget.value(widget);
+    if(overlay)
+        return;
+
+    overlay = new PtzOverlayWidget();
+    m_overlayByWidget[widget] = overlay;
+
+    widget->addOverlayWidget(overlay, false, false);
+}
+
 void AbsolutePtzInstrument::ensureSelectionItem() {
     if(selectionItem() != NULL)
         return;
 
     m_selectionItem = new PtzSelectionItem();
     selectionItem()->setOpacity(0.0);
-    selectionItem()->setPen(toTransparent(ptzColor, 0.75));
-    selectionItem()->setBrush(toTransparent(ptzColor.lighter(120), 0.25));
+    selectionItem()->setPen(ptzBorderColor);
+    selectionItem()->setBrush(ptzBaseColor);
     selectionItem()->setElementSize(qnGlobals->workbenchUnitSize() / 64.0);
 
     if(scene() != NULL)
         scene()->addItem(selectionItem());
+}
+
+void AbsolutePtzInstrument::updateOverlayWidget() {
+    updateOverlayWidget(checked_cast<QnMediaResourceWidget *>(sender()));
+}
+
+void AbsolutePtzInstrument::updateOverlayWidget(QnMediaResourceWidget *widget) {
+    if(widget->options() & QnResourceWidget::DisplayCrosshair)
+        ensureOverlayWidget(widget);
 }
 
 void AbsolutePtzInstrument::ptzMoveTo(QnMediaResourceWidget *widget, const QPointF &pos) {
@@ -323,6 +440,25 @@ void AbsolutePtzInstrument::ptzUnzoom(QnMediaResourceWidget *widget) {
     ptzMoveTo(widget, QRectF(widget->rect().center() - toPoint(size) / 2, size));
 }
 
+void AbsolutePtzInstrument::ptzMove(QnMediaResourceWidget *widget, const QVector3D &speed) {
+    PtzSpeed &ptzSpeed = m_speedByWidget[widget];
+
+    ptzSpeed.requested = speed;
+
+    bool send = 
+        (qFuzzyIsNull(ptzSpeed.current) ^ qFuzzyIsNull(ptzSpeed.requested)) || 
+        (ptzSpeed.current - ptzSpeed.requested).lengthSquared() > instantSpeedUpdateThreshold * instantSpeedUpdateThreshold;
+
+    if(!send) 
+        return;
+
+    QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
+
+    m_ptzController->setMovement(camera, ptzSpeed.requested);
+    ptzSpeed.current = ptzSpeed.requested;
+}
+
+
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -351,8 +487,10 @@ bool AbsolutePtzInstrument::registeredNotify(QGraphicsItem *item) {
     if(!result)
         return false;
 
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item);
-    if(widget) {
+    if(QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(item)) {
+        connect(widget, SIGNAL(optionsChanged()), this, SLOT(updateOverlayWidget()));
+        updateOverlayWidget(widget);
+
         QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>();
         if(m_ptzController->mapper(camera)) {
             return true;
@@ -368,6 +506,9 @@ void AbsolutePtzInstrument::unregisteredNotify(QGraphicsItem *item) {
     /* We don't want to use RTTI at this point, so we don't cast to QnMediaResourceWidget. */
     QGraphicsObject *object = item->toGraphicsObject();
     disconnect(object, NULL, this, NULL);
+
+    m_overlayByWidget.remove(object);
+    m_speedByWidget.remove(object);
 }
 
 void AbsolutePtzInstrument::timerEvent(QTimerEvent *event) {
@@ -428,10 +569,17 @@ bool AbsolutePtzInstrument::mouseDoubleClickEvent(QGraphicsItem *item, QGraphics
 }
 
 bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneMouseEvent *event) {
+    if(!dragProcessor()->isWaiting())
+        return false; /* Prevent click-through scenarios. */
+
     bool clickTimerWasActive = m_clickTimer.isActive();
     m_clickTimer.stop();
 
     if(event->button() != Qt::LeftButton)
+        return false;
+
+    QGraphicsObject *object = item->toGraphicsObject();
+    if(!object)
         return false;
 
     QnMediaResourceWidget *target = checked_cast<QnMediaResourceWidget *>(item);
@@ -441,8 +589,16 @@ bool AbsolutePtzInstrument::mousePressEvent(QGraphicsItem *item, QGraphicsSceneM
     if(!target->rect().contains(event->pos()))
         return false; /* Ignore clicks on widget frame. */
 
+    PtzManipulatorWidget *manipulator = NULL;
+    if(PtzOverlayWidget *overlay = overlayWidget(target)) {
+        manipulator = overlay->manipulatorWidget();
+        if(!manipulator->rect().contains(manipulator->mapFromItem(item, event->pos())))
+            manipulator = NULL;
+    }
+
     m_isDoubleClick = this->target() == target && clickTimerWasActive && (m_clickPos - event->pos()).manhattanLength() < dragProcessor()->startDragDistance();
     m_target = target;
+    m_manipulator = manipulator;
 
     dragProcessor()->mousePressEvent(item, event);
     
@@ -465,12 +621,14 @@ void AbsolutePtzInstrument::startDrag(DragInfo *) {
         return;
     }
 
-    ensureSelectionItem();
-    selectionItem()->setParentItem(target());
-    selectionItem()->setViewport(m_viewport.data());
-    opacityAnimator(selectionItem())->stop();
-    selectionItem()->setOpacity(1.0);
-    /* Everything else will be initialized in the first call to drag(). */
+    if(!manipulator()) {
+        ensureSelectionItem();
+        selectionItem()->setParentItem(target());
+        selectionItem()->setViewport(m_viewport.data());
+        opacityAnimator(selectionItem())->stop();
+        selectionItem()->setOpacity(1.0);
+        /* Everything else will be initialized in the first call to drag(). */
+    }
 
     emit ptzStarted(target());
     m_ptzStartedEmitted = true;
@@ -481,41 +639,53 @@ void AbsolutePtzInstrument::dragMove(DragInfo *info) {
         dragProcessor()->reset();
         return;
     }
-    ensureSelectionItem();
 
-    QPointF origin = info->mousePressItemPos();
-    QPointF corner = bounded(info->mouseItemPos(), target()->rect());
-    QRectF rect = QnGeometry::movedInto(
-        QnGeometry::expanded(
-            QnGeometry::aspectRatio(target()->size()),
-            QRectF(origin, corner).normalized(),
-            Qt::KeepAspectRatioByExpanding,
-            Qt::AlignCenter
-        ),
-        target()->rect()
-    );
+    if(!manipulator()) {
+        ensureSelectionItem();
 
-    QVector<QPointF> sidePoints;
-    sidePoints << origin << corner;
+        QPointF origin = info->mousePressItemPos();
+        QPointF corner = bounded(info->mouseItemPos(), target()->rect());
+        QRectF rect = QnGeometry::movedInto(
+            QnGeometry::expanded(
+                QnGeometry::aspectRatio(target()->size()),
+                QRectF(origin, corner).normalized(),
+                Qt::KeepAspectRatioByExpanding,
+                Qt::AlignCenter
+            ),
+            target()->rect()
+        );
 
-    selectionItem()->setRect(rect);
-    selectionItem()->setSidePoints(sidePoints);
+        QVector<QPointF> sidePoints;
+        sidePoints << origin << corner;
+
+        selectionItem()->setRect(rect);
+        selectionItem()->setSidePoints(sidePoints);
+    } else {
+        QPointF delta = info->mouseItemPos() - info->mousePressItemPos();
+
+        QSizeF size = target()->size();
+        qreal scale = qMax(size.width(), size.height()) / 2.0;
+
+        ptzMove(target(), QVector3D(qBound(-1.0, delta.x() / scale, 1.0), qBound(-1.0, -delta.y() / scale, 1.0), 0.0));
+    }
 }
 
 void AbsolutePtzInstrument::finishDrag(DragInfo *) {
     if(target()) {
-        ensureSelectionItem();
-        opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
+        if(!manipulator()) {
+            ensureSelectionItem();
+            opacityAnimator(selectionItem(), 4.0)->animateTo(0.0);
 
-        QRectF selectionRect = selectionItem()->boundingRect();
+            QRectF selectionRect = selectionItem()->boundingRect();
 
-        PtzSplashItem *splashItem = newSplashItem(target());
-        splashItem->setSplashType(PtzSplashItem::Rectangular);
-        splashItem->setPos(selectionRect.center());
-        splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
-        m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
+            PtzSplashItem *splashItem = newSplashItem(target());
+            splashItem->setSplashType(PtzSplashItem::Rectangular);
+            splashItem->setPos(selectionRect.center());
+            splashItem->setRect(QRectF(-toPoint(selectionRect.size()) / 2, selectionRect.size()));
+            m_activeAnimations.push_back(SplashItemAnimation(splashItem, 1.0, 1.0));
 
-        ptzMoveTo(target(), selectionRect);
+            ptzMoveTo(target(), selectionRect);
+        }
     }
 
     if(m_ptzStartedEmitted)
@@ -523,8 +693,8 @@ void AbsolutePtzInstrument::finishDrag(DragInfo *) {
 }
 
 void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
-    if(target() && m_isClick) {
-        if(m_isDoubleClick) {
+    if(target()) {
+        if(m_isClick && m_isDoubleClick) {
             PtzSplashItem *splashItem = newSplashItem(target());
             splashItem->setSplashType(PtzSplashItem::Rectangular);
             splashItem->setPos(target()->rect().center());
@@ -533,9 +703,11 @@ void AbsolutePtzInstrument::finishDragProcess(DragInfo *info) {
             m_activeAnimations.push_back(SplashItemAnimation(splashItem, -1.0, 1.0));
 
             ptzUnzoom(target());
-        } else {
+        } else if(!manipulator() && m_isClick) {
             m_clickTimer.start(m_clickDelayMSec, this);
             m_clickPos = info->mousePressItemPos();
+        } else if(manipulator() && m_isClick) {
+            ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
         }
     }
 

@@ -668,6 +668,8 @@ void QnResourceWidget::addOverlayWidget(QGraphicsWidget *widget, bool autoRotate
     overlay.rotationTransform = rotationTransform;
 
     m_overlayWidgets.push_back(overlay);
+
+    updateOverlayWidgetsGeometry();
 }
 
 void QnResourceWidget::removeOverlayWidget(QGraphicsWidget *widget) {
@@ -686,19 +688,19 @@ void QnResourceWidget::removeOverlayWidget(QGraphicsWidget *widget) {
 
 void QnResourceWidget::updateOverlayWidgetsGeometry() {
     foreach(const OverlayWidget &overlay, m_overlayWidgets) {
-        QRectF geometry = this->geometry();
+        QSizeF size = this->size();
 
         if(overlay.rotationTransform) {
             overlay.rotationTransform->setAngle(m_overlayRotation);
 
             if(m_overlayRotation == Qn::Angle90 || m_overlayRotation == Qn::Angle270)
-                geometry = QRectF(geometry.topLeft(), QSizeF(geometry.height(), geometry.width()));
+                size.transpose();
         }
        
         if(overlay.boundWidget) {
-            overlay.boundWidget->setFixedSize(geometry.size());
+            overlay.boundWidget->setFixedSize(size);
         } else {
-            overlay.widget->setGeometry(geometry);
+            overlay.widget->resize(size);
         }
     }
 }
