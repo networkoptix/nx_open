@@ -421,6 +421,7 @@ void QnBusinessRuleWidget::at_applyButton_clicked() {
 
     emit apply(this, rule);
     updateSummary();
+    setExpanded(false);
 }
 
 void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index) {
